@@ -7,11 +7,11 @@ internal sealed class Note(
     string deckName,
     string modelName,
     Dictionary<string, object> fields,
-    Dictionary<string, object> options,
     string[] tags,
+    Dictionary<string, object>? options,
     Dictionary<string, object>? audio,
-    Dictionary<string, object>? video,
-    Dictionary<string, object>? picture)
+    Dictionary<string, object>? picture,
+    Dictionary<string, object>? video)
 {
     [JsonPropertyName("deckName")] public string DeckName { get; } = deckName;
 
@@ -19,13 +19,13 @@ internal sealed class Note(
 
     [JsonPropertyName("fields")] public Dictionary<string, object> Fields { get; } = fields;
 
-    [JsonPropertyName("options")] public Dictionary<string, object> Options { get; } = options;
-
     [JsonPropertyName("tags")] public string[] Tags { get; } = tags;
 
-    [JsonPropertyName("audio")] public Dictionary<string, object>? Audio { get; } = audio;
+    [JsonPropertyName("options")] public Dictionary<string, object>? Options { get; set; } = options;
+
+    [JsonPropertyName("audio")] public Dictionary<string, object>? Audio { get; set; } = audio;
+
+    [JsonPropertyName("picture")] public Dictionary<string, object>? Picture { get; set; } = picture;
 
     [JsonPropertyName("video")] public Dictionary<string, object>? Video { get; } = video;
-
-    [JsonPropertyName("picture")] public Dictionary<string, object>? Picture { get; } = picture;
 }

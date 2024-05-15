@@ -42,6 +42,18 @@ internal static class AnkiConnect
         return await Send(req).ConfigureAwait(false);
     }
 
+    public static async ValueTask<Response?> GetCanAddNotesResponse(Note note)
+    {
+        Request req = new("canAddNotes", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
+        {
+            {
+                "notes", new Note[] { note }
+            }
+        });
+
+        return await Send(req).ConfigureAwait(false);
+    }
+
     // public static async ValueTask<Response> StoreMediaFile(string filename, string data)
     // {
     //     Request req = new("storeMediaFile", 6,

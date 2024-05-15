@@ -64,9 +64,14 @@ internal static class SpeechSynthesisUtils
         _ = Synthesizer.SpeakAsync(text);
     }
 
-    public static byte[] GetAudioResponseFromTextToSpeech(string voiceName, string text)
+    public static byte[]? GetAudioResponseFromTextToSpeech(string text)
     {
-        Synthesizer.SelectVoice(voiceName);
+        if (InstalledVoiceWithHighestPriority is null)
+        {
+            return null;
+        }
+
+        Synthesizer.SelectVoice(InstalledVoiceWithHighestPriority);
         using MemoryStream audioDataStream = new();
         Synthesizer.SetOutputToWaveStream(audioDataStream);
         Synthesizer.Speak(text);

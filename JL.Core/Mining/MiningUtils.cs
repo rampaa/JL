@@ -405,7 +405,7 @@ public static class MiningUtils
         Stats.IncrementStat(StatType.CardsMined);
 
         Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
-        Utils.Logger.Information("Mined {FoundSpelling}", lookupResult.PrimarySpelling);
+        Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
     }
 
     public static async Task Mine(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition)
@@ -417,7 +417,6 @@ public static class MiningUtils
         }
 
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
-
         if (ankiConfigDict is null)
         {
             Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
@@ -449,6 +448,30 @@ public static class MiningUtils
         }
 
         Dictionary<string, JLField> userFields = ankiConfig.Fields;
+        Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResult, currentText, selectedDefinitions, currentCharPosition, true);
+        Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
+
+        // Audio/Picture/Video shouldn't be set here
+        // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
+        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, ankiConfig.Tags, null, null, null, null);
+        if (!CoreConfigManager.AllowDuplicateCards)
+        {
+            bool? canAddNote = await AnkiUtils.CanAddNote(note).ConfigureAwait(false);
+            if (canAddNote is null)
+            {
+                Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {lookupResult.PrimarySpelling}");
+                Utils.Logger.Error("Mining failed for {PrimarySpelling}", lookupResult.PrimarySpelling);
+                return;
+            }
+
+            if (!canAddNote.Value)
+            {
+                Utils.Frontend.Alert(AlertLevel.Error, $"Cannot mine {lookupResult.PrimarySpelling} because it is a duplicate card");
+                Utils.Logger.Information("Cannot mine {PrimarySpelling} because it is a duplicate card", lookupResult.PrimarySpelling);
+                return;
+            }
+        }
+
         List<string> audioFields = FindFields(JLField.Audio, userFields);
         bool needsAudio = audioFields.Count > 0;
         string reading = lookupResult.Readings?[0] ?? lookupResult.PrimarySpelling;
@@ -458,17 +481,12 @@ public static class MiningUtils
             : null;
 
         byte[]? audioData = audioResponse?.AudioData;
-
         if (audioResponse?.AudioSource is AudioSourceType.TextToSpeech)
         {
-            string voiceName = AudioUtils.AudioSources
-                .Where(static a => a.Value is { Active: true, Type: AudioSourceType.TextToSpeech })
-                .Aggregate(static (a1, a2) => a1.Value.Priority < a2.Value.Priority ? a1 : a2).Key;
-
-            audioData = Utils.Frontend.GetAudioResponseFromTextToSpeech(voiceName, reading);
+            audioData = Utils.Frontend.GetAudioResponseFromTextToSpeech(reading);
         }
 
-        Dictionary<string, object>? audio = audioData is null
+        note.Audio = audioData is null
             ? null
             : new Dictionary<string, object>(4, StringComparer.Ordinal)
             {
@@ -492,7 +510,7 @@ public static class MiningUtils
             ? Utils.Frontend.GetImageFromClipboardAsByteArray()
             : null;
 
-        Dictionary<string, object>? image = imageBytes is null
+        note.Picture = imageBytes is null
             ? null
             : new Dictionary<string, object>(3, StringComparer.Ordinal)
             {
@@ -507,37 +525,31 @@ public static class MiningUtils
                 }
             };
 
-        Dictionary<string, object> options = new(1, StringComparer.Ordinal)
+        note.Options = new(1, StringComparer.Ordinal)
         {
             {
                 "allowDuplicate", CoreConfigManager.AllowDuplicateCards
             }
         };
 
-        Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResult, currentText, selectedDefinitions, currentCharPosition, true);
-
-        Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
-
-        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, options, ankiConfig.Tags, audio, null, image);
         Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
-
         if (response is null)
         {
             Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {lookupResult.PrimarySpelling}");
-            Utils.Logger.Error("Mining failed for {FoundSpelling}", lookupResult.PrimarySpelling);
+            Utils.Logger.Error("Mining failed for {PrimarySpelling}", lookupResult.PrimarySpelling);
             return;
         }
 
         if (needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash))
         {
             Utils.Frontend.Alert(AlertLevel.Warning, $"Mined {lookupResult.PrimarySpelling} (no audio)");
-            Utils.Logger.Information("Mined {FoundSpelling} (no audio)", lookupResult.PrimarySpelling);
+            Utils.Logger.Information("Mined {PrimarySpelling} (no audio)", lookupResult.PrimarySpelling);
         }
 
         else
         {
             Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
-            Utils.Logger.Information("Mined {FoundSpelling}", lookupResult.PrimarySpelling);
+            Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
         }
 
         if (CoreConfigManager.ForceSyncAnki)
