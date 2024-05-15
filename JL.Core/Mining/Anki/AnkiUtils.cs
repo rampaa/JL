@@ -40,7 +40,7 @@ public static class AnkiUtils
         string? resultString = response?.Result?.ToString() ?? null;
 
         return resultString is not null
-            ? JsonSerializer.Deserialize<List<bool>>(resultString)![0]
+            ? JsonSerializer.Deserialize<bool[]>(resultString)![0]
             : null;
     }
 }
