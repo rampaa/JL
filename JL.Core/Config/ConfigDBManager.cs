@@ -166,12 +166,12 @@ public static class ConfigDBManager
         return number;
     }
 
-    public static void SendOptimizePragma()
+    internal static void SendOptimizePragma()
     {
         DBUtils.SendOptimizePragma(s_configsPath);
     }
 
-    public static void SendOptimizePragma(SqliteConnection connection)
+    private static void SendOptimizePragma(SqliteConnection connection)
     {
         DBUtils.SendOptimizePragma(connection);
     }

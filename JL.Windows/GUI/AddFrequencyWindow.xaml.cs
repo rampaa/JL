@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
@@ -154,7 +155,7 @@ internal sealed partial class AddFrequencyWindow : Window
         }
     }
 
-    private void FreqTypeComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    private void FreqTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         GenerateDictOptions();
     }

@@ -37,6 +37,8 @@ internal static class FrequencyYomichanLoader
                 int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
 
+#pragma warning disable IDE0010
+                // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
                 switch (thirdElement.ValueKind)
                 {
                     case JsonValueKind.Number:
@@ -78,10 +80,8 @@ internal static class FrequencyYomichanLoader
                         reading = thirdElement[0].GetString()!.GetPooledString();
                         frequency = thirdElement[1].GetInt32();
                         break;
-
-                    default:
-                        break;
                 }
+#pragma warning restore IDE0010
 
                 if (frequency is not int.MaxValue)
                 {

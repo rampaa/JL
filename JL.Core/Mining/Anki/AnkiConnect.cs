@@ -47,7 +47,7 @@ internal static class AnkiConnect
         Request req = new("canAddNotes", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
         {
             {
-                "notes", new Note[] { note }
+                "notes", new[] { note }
             }
         });
 

@@ -5,8 +5,10 @@ using System.IO.Compression;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Web;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -26,7 +28,9 @@ using NAudio.Vorbis;
 using NAudio.Wave;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
-using MessageBox = HandyControl.Controls.MessageBox;
+using Clipboard = System.Windows.Clipboard;
+using FlowDirection = System.Windows.FlowDirection;
+using TextBox = System.Windows.Controls.TextBox;
 using Window = System.Windows.Window;
 
 namespace JL.Windows.Utilities;
@@ -38,8 +42,7 @@ internal static class WindowsUtils
     private static DateTime s_lastAudioPlayTime;
     public static WaveOut? AudioPlayer { get; private set; }
 
-    public static System.Windows.Forms.Screen ActiveScreen { get; set; } =
-        System.Windows.Forms.Screen.FromHandle(MainWindow.Instance.WindowHandle);
+    public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
 
     public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
     public static double DpiAwareWorkAreaWidth { get; set; } = ActiveScreen.Bounds.Width / Dpi.DpiScaleX;
@@ -290,7 +293,7 @@ internal static class WindowsUtils
         if (selectedText?.Length > 0)
         {
             _ = Process.Start(new ProcessStartInfo("cmd",
-                $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\"")
+                $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\"")
             {
                 CreateNoWindow = true
             });
@@ -519,16 +522,16 @@ internal static class WindowsUtils
         return opaqueBrush;
     }
 
-    public static void Unselect(System.Windows.Controls.TextBox? tb)
+    public static void Unselect(TextBox? textBox)
     {
-        if (tb is null)
+        if (textBox is null)
         {
             return;
         }
 
-        double verticalOffset = tb.VerticalOffset;
-        tb.Select(0, 0);
-        tb.ScrollToVerticalOffset(verticalOffset);
+        double verticalOffset = textBox.VerticalOffset;
+        textBox.Select(0, 0);
+        textBox.ScrollToVerticalOffset(verticalOffset);
     }
 
     public static void SetSizeToContentForPopup(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, Window window)
@@ -714,6 +717,6 @@ internal static class WindowsUtils
 
     public static bool ShowYesNoDialog(string text, string caption)
     {
-        return MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
+        return HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
     }
 }

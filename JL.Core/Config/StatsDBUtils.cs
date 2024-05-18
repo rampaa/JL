@@ -25,7 +25,7 @@ public static class StatsDBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    public static void UpdateStats(SqliteConnection connection, Stats stats, int profileId)
+    private static void UpdateStats(SqliteConnection connection, Stats stats, int profileId)
     {
         UpdateStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
     }

@@ -1,4 +1,3 @@
-using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -170,7 +169,6 @@ internal static class ConfigManager
 
     #endregion
 
-    public static ExeConfigurationFileMap MappedExeConfiguration { get; set; } = new();
     private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
     private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneJapaneseFontComboBoxItems(s_japaneseFonts);
     private static SkinType s_theme = SkinType.Dark;

@@ -261,18 +261,18 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public async Task LookupOnMouseMoveOrClick(TextBox tb)
+    public async Task LookupOnMouseMoveOrClick(TextBox textBox)
     {
-        int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
+        int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
 
         if (charPosition is not -1)
         {
-            if (charPosition > 0 && char.IsHighSurrogate(tb.Text[charPosition - 1]))
+            if (charPosition > 0 && char.IsHighSurrogate(textBox.Text[charPosition - 1]))
             {
                 --charPosition;
             }
 
-            await LookupOnCharPosition(tb, tb.Text, charPosition, ConfigManager.LookupOnMouseClickOnly).ConfigureAwait(false);
+            await LookupOnCharPosition(textBox, textBox.Text, charPosition, ConfigManager.LookupOnMouseClickOnly).ConfigureAwait(false);
         }
         else
         {
@@ -280,16 +280,16 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public async Task LookupOnSelect(TextBox tb)
+    public async Task LookupOnSelect(TextBox textBox)
     {
-        string text = tb.SelectedText;
+        string text = textBox.SelectedText;
         if (string.IsNullOrWhiteSpace(text))
         {
             HidePopup();
             return;
         }
 
-        int charPosition = tb.SelectionStart;
+        int charPosition = textBox.SelectionStart;
 
         _currentText = text;
         _currentCharPosition = charPosition;
@@ -311,12 +311,12 @@ internal sealed partial class PopupWindow : Window
 
         LastText = text;
 
-        List<LookupResult>? lookupResults = LookupUtils.LookupText(tb.SelectedText);
+        List<LookupResult>? lookupResults = LookupUtils.LookupText(textBox.SelectedText);
 
         if (lookupResults?.Count > 0)
         {
             Stats.IncrementStat(StatType.NumberOfLookups);
-            _previousTextBox = tb;
+            _previousTextBox = textBox;
             LastSelectedText = lookupResults[0].MatchedText;
             LastLookupResults = lookupResults;
 
@@ -343,7 +343,7 @@ internal sealed partial class PopupWindow : Window
                 UpdatePosition(WinApi.GetMousePosition());
             }
 
-            _ = tb.Focus();
+            _ = textBox.Focus();
 
             if (ConfigManager.Focusable)
             {

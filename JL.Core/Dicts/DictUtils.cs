@@ -16,7 +16,6 @@ using JL.Core.Utilities;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
 
-
 namespace JL.Core.Dicts;
 
 public static class DictUtils

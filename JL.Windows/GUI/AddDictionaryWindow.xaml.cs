@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
@@ -212,7 +213,7 @@ internal sealed partial class AddDictionaryWindow : Window
         }
     }
 
-    private void ComboBoxDictType_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    private void ComboBoxDictType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         GenerateDictOptions();
     }

@@ -48,7 +48,7 @@ public class LookupTests
         foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
         {
             freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(StringComparer.Ordinal);
-            freq.Options = new Freqs.Options.FreqOptions() { UseDB = new Freqs.Options.UseDBOption(false) };
+            freq.Options = new Freqs.Options.FreqOptions { UseDB = new Freqs.Options.UseDBOption(false) };
             FreqUtils.FreqDicts[key] = freq;
         }
 

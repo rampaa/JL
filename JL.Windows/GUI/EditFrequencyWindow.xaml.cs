@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core.Freqs;
+using JL.Core.Freqs.Options;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using Microsoft.Data.Sqlite;
@@ -85,7 +86,7 @@ internal sealed partial class EditFrequencyWindow : Window
                 }
             }
 
-            Core.Freqs.Options.FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
+            FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
 
             if (_freq.Options?.UseDB?.Value != options.UseDB?.Value)
             {

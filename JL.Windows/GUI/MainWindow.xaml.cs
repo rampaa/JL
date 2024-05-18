@@ -1,7 +1,9 @@
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -17,6 +19,11 @@ using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
+using Clipboard = System.Windows.Clipboard;
+using Cursors = System.Windows.Input.Cursors;
+using DpiChangedEventArgs = System.Windows.DpiChangedEventArgs;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Window = System.Windows.Window;
 
 namespace JL.Windows.GUI;
@@ -392,7 +399,7 @@ internal sealed partial class MainWindow : Window
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void MainWindow_Closing(object sender, CancelEventArgs e)
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         ConfigManager.SaveBeforeClosing();
@@ -1109,7 +1116,7 @@ internal sealed partial class MainWindow : Window
     private void DisplaySettingsChanged(object? sender, EventArgs? e)
     {
         Size oldResolution = new(WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX, WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY);
-        WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle);
+        WindowsUtils.ActiveScreen = Screen.FromHandle(new WindowInteropHelper(this).Handle);
         WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
         WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
         WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
@@ -1175,7 +1182,7 @@ internal sealed partial class MainWindow : Window
     private void Window_DpiChanged(object sender, DpiChangedEventArgs e)
     {
         WindowsUtils.Dpi = e.NewDpi;
-        WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(WindowHandle);
+        WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
         WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / e.NewDpi.DpiScaleX;
         WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
         WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / e.NewDpi.DpiScaleX;
@@ -1488,11 +1495,11 @@ internal sealed partial class MainWindow : Window
 
     private void Window_LocationChanged(object sender, EventArgs e)
     {
-        System.Windows.Forms.Screen newScreen = System.Windows.Forms.Screen.FromHandle(WindowHandle);
+        Screen newScreen = Screen.FromHandle(WindowHandle);
 
         if (WindowsUtils.ActiveScreen.DeviceName != newScreen.DeviceName)
         {
-            WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(WindowHandle);
+            WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
             WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
             WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
             WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;

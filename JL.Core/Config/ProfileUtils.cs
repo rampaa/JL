@@ -4,7 +4,7 @@ namespace JL.Core.Config;
 
 public static class ProfileUtils
 {
-    public const int DefaultProfileId = 1;
+    internal const int DefaultProfileId = 1;
     public const string DefaultProfileName = "Default";
     public static readonly string ProfileFolderPath = Path.Join(Utils.ApplicationPath, "Profiles");
     public static int CurrentProfileId { get; set; } = DefaultProfileId;

@@ -2,6 +2,7 @@ using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
+using Serilog.Events;
 
 namespace JL.Core.Config;
 
@@ -31,15 +32,15 @@ public static class CoreConfigManager
             }
             else
             {
-                Utils.LoggingLevelSwitch.MinimumLevel = minimumLogLevelStr switch
+                Utils.s_loggingLevelSwitch.MinimumLevel = minimumLogLevelStr switch
                 {
-                    "Fatal" => Serilog.Events.LogEventLevel.Fatal,
-                    "Error" => Serilog.Events.LogEventLevel.Error,
-                    "Warning" => Serilog.Events.LogEventLevel.Warning,
-                    "Information" => Serilog.Events.LogEventLevel.Information,
-                    "Debug" => Serilog.Events.LogEventLevel.Debug,
-                    "Verbose" => Serilog.Events.LogEventLevel.Verbose,
-                    _ => Serilog.Events.LogEventLevel.Error
+                    "Fatal" => LogEventLevel.Fatal,
+                    "Error" => LogEventLevel.Error,
+                    "Warning" => LogEventLevel.Warning,
+                    "Information" => LogEventLevel.Information,
+                    "Debug" => LogEventLevel.Debug,
+                    "Verbose" => LogEventLevel.Verbose,
+                    _ => LogEventLevel.Error
                 };
             }
         }

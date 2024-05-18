@@ -17,6 +17,7 @@ using JL.Core.Statistics;
 using JL.Core.WordClass;
 using Serilog;
 using Serilog.Core;
+using Serilog.Events;
 
 namespace JL.Core.Utilities;
 
@@ -33,13 +34,13 @@ public static partial class Utils
 
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
 
-    public static readonly LoggingLevelSwitch LoggingLevelSwitch = new()
+    internal static readonly LoggingLevelSwitch s_loggingLevelSwitch = new()
     {
-        MinimumLevel = Serilog.Events.LogEventLevel.Error
+        MinimumLevel = LogEventLevel.Error
     };
 
     public static readonly ILogger Logger = new LoggerConfiguration()
-        .MinimumLevel.ControlledBy(LoggingLevelSwitch)
+        .MinimumLevel.ControlledBy(s_loggingLevelSwitch)
         .WriteTo.File(Path.Join(ApplicationPath, "Logs", "log.txt"),
             formatProvider: CultureInfo.InvariantCulture,
             rollingInterval: RollingInterval.Day,

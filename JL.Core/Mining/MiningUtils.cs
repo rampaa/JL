@@ -486,9 +486,9 @@ public static class MiningUtils
             audioData = Utils.Frontend.GetAudioResponseFromTextToSpeech(reading);
         }
 
-        note.Audio = audioData is null
-            ? null
-            : new Dictionary<string, object>(4, StringComparer.Ordinal)
+        if (audioData is not null)
+        {
+            note.Audio = new Dictionary<string, object>(4, StringComparer.Ordinal)
             {
                 {
                     "data", audioData
@@ -503,6 +503,7 @@ public static class MiningUtils
                     "fields", audioFields
                 }
             };
+        }
 
         List<string> imageFields = FindFields(JLField.Image, userFields);
         bool needsImage = imageFields.Count > 0;
@@ -510,9 +511,9 @@ public static class MiningUtils
             ? Utils.Frontend.GetImageFromClipboardAsByteArray()
             : null;
 
-        note.Picture = imageBytes is null
-            ? null
-            : new Dictionary<string, object>(3, StringComparer.Ordinal)
+        if (imageBytes is not null)
+        {
+            note.Picture = new Dictionary<string, object>(3, StringComparer.Ordinal)
             {
                 {
                     "data", imageBytes
@@ -524,8 +525,9 @@ public static class MiningUtils
                     "fields", imageFields
                 }
             };
+        }
 
-        note.Options = new(1, StringComparer.Ordinal)
+        note.Options = new Dictionary<string, object>(1, StringComparer.Ordinal)
         {
             {
                 "allowDuplicate", CoreConfigManager.AllowDuplicateCards
