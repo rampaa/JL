@@ -71,6 +71,8 @@ public static class CoreConfigManager
         }
 
         {
+            CaptureTextFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket), bool.TryParse);
+
             string? webSocketUriStr = ConfigDBManager.GetSettingValue(connection, nameof(WebSocketUri));
             if (webSocketUriStr is null)
             {
@@ -107,7 +109,6 @@ public static class CoreConfigManager
         CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
         CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
 
-        CaptureTextFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket), bool.TryParse);
         if (!CaptureTextFromWebSocket && !CaptureTextFromClipboard)
         {
             StatsUtils.StatsStopWatch.Stop();
