@@ -111,14 +111,14 @@ internal static class KeyGestureUtils
         }
     }
 
-    public static bool CompareKeyGestures(KeyGesture keyGesture1, KeyGesture keyGesture2)
+    public static bool IsEqual(this KeyGesture sourceKeyGesture, KeyGesture targetKeyGesture)
     {
-        return keyGesture2.Modifiers is ModifierKeys.Windows
-            ? keyGesture1.Key == keyGesture2.Key && Keyboard.Modifiers is ModifierKeys.None
-            : keyGesture1.Key == keyGesture2.Key && keyGesture1.Modifiers == keyGesture2.Modifiers;
+        return targetKeyGesture.Modifiers is ModifierKeys.Windows
+            ? sourceKeyGesture.Key == targetKeyGesture.Key && Keyboard.Modifiers is ModifierKeys.None
+            : sourceKeyGesture.Key == targetKeyGesture.Key && sourceKeyGesture.Modifiers == targetKeyGesture.Modifiers;
     }
 
-    public static bool CompareKeyGesture(KeyGesture keyGesture)
+    public static bool IsPressed(this KeyGesture keyGesture)
     {
         return keyGesture.Modifiers is ModifierKeys.Windows
             ? Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers is ModifierKeys.None
@@ -135,7 +135,7 @@ internal static class KeyGestureUtils
                || (key is Key.LeftShift or Key.RightShift && Keyboard.Modifiers is ModifierKeys.Shift);
     }
 
-    public static string KeyGestureToString(KeyGesture keyGesture)
+    public static string ToFormattedString(this KeyGesture keyGesture)
     {
         if (keyGesture.Key is Key.LeftShift or Key.RightShift
             or Key.LeftCtrl or Key.RightCtrl
@@ -194,7 +194,7 @@ internal static class KeyGestureUtils
             return newKeyGesture;
         }
 
-        ConfigDBManager.InsertSetting(connection, keyGestureName, KeyGestureToString(keyGesture));
+        ConfigDBManager.InsertSetting(connection, keyGestureName, keyGesture.ToFormattedString());
 
         if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
         {
@@ -204,12 +204,12 @@ internal static class KeyGestureUtils
         return keyGesture;
     }
 
-    public static void SetInputGestureText(MenuItem menuItem, KeyGesture keyGesture)
+    public static void SetInputGestureText(this MenuItem menuItem, KeyGesture keyGesture)
     {
-        string keyGestureString = KeyGestureToString(keyGesture);
+        string formattedString = keyGesture.ToFormattedString();
 
-        menuItem.InputGestureText = keyGestureString is not "None"
-            ? keyGestureString
+        menuItem.InputGestureText = formattedString is not "None"
+            ? formattedString
             : "";
     }
 

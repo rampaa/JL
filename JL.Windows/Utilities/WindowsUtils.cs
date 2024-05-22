@@ -30,6 +30,7 @@ using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
 using Clipboard = System.Windows.Clipboard;
 using FlowDirection = System.Windows.FlowDirection;
+using PopupWindow = JL.Windows.GUI.PopupWindow;
 using TextBox = System.Windows.Controls.TextBox;
 using Window = System.Windows.Window;
 
@@ -534,7 +535,7 @@ internal static class WindowsUtils
         textBox.ScrollToVerticalOffset(verticalOffset);
     }
 
-    public static void SetSizeToContentForPopup(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, Window window)
+    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, PopupWindow window)
     {
         window.MaxHeight = maxHeight;
         window.MaxWidth = maxWidth;
@@ -564,7 +565,7 @@ internal static class WindowsUtils
         }
     }
 
-    public static void SetSizeToContentForMainWindow(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double width, double height, Window window)
+    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double width, double height, MainWindow window)
     {
         if (dynamicWidth && dynamicHeight)
         {
@@ -599,7 +600,7 @@ internal static class WindowsUtils
         }
     }
 
-    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, Window window)
+    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, MainWindow window)
     {
         if (dynamicWidth && dynamicHeight)
         {

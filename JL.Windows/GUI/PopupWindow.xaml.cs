@@ -98,11 +98,11 @@ internal sealed partial class PopupWindow : Window
         Foreground = ConfigManager.DefinitionsColor;
         FontFamily = ConfigManager.PopupFont;
 
-        WindowsUtils.SetSizeToContentForPopup(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, this);
+        WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, this);
 
-        KeyGestureUtils.SetInputGestureText(AddNameMenuItem, ConfigManager.ShowAddNameWindowKeyGesture);
-        KeyGestureUtils.SetInputGestureText(AddWordMenuItem, ConfigManager.ShowAddWordWindowKeyGesture);
-        KeyGestureUtils.SetInputGestureText(SearchMenuItem, ConfigManager.SearchWithBrowserKeyGesture);
+        AddNameMenuItem.SetInputGestureText(ConfigManager.ShowAddNameWindowKeyGesture);
+        AddWordMenuItem.SetInputGestureText(ConfigManager.ShowAddWordWindowKeyGesture);
+        SearchMenuItem.SetInputGestureText(ConfigManager.SearchWithBrowserKeyGesture);
 
         if (ConfigManager.ShowMiningModeReminder)
         {
@@ -1063,7 +1063,7 @@ internal sealed partial class PopupWindow : Window
             || PopupContextMenu.IsVisible
             || ReadingSelectionWindow.IsItVisible()
             || (ConfigManager.RequireLookupKeyPress
-                && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
+                && !ConfigManager.LookupKeyKeyGesture.IsPressed()))
         {
             return;
         }
@@ -1206,7 +1206,7 @@ internal sealed partial class PopupWindow : Window
     public async Task HandleHotKey(KeyGesture keyGesture)
     {
         bool handled = false;
-        if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
+        if (keyGesture.IsEqual(ConfigManager.DisableHotkeysKeyGesture))
         {
             handled = true;
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
@@ -1229,7 +1229,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MiningModeKeyGesture))
+        if (keyGesture.IsEqual(ConfigManager.MiningModeKeyGesture))
         {
             if (MiningMode)
             {
@@ -1253,17 +1253,17 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.PlayAudioKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.PlayAudioKeyGesture))
         {
             await PlayAudio().ConfigureAwait(false);
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ClosePopupKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.ClosePopupKeyGesture))
         {
             HidePopup();
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.KanjiModeKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.KanjiModeKeyGesture))
         {
             CoreConfigManager.KanjiMode = !CoreConfigManager.KanjiMode;
             LastText = "";
@@ -1279,7 +1279,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddNameWindowKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.ShowAddNameWindowKeyGesture))
         {
             if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
             {
@@ -1307,7 +1307,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddWordWindowKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.ShowAddWordWindowKeyGesture))
         {
             if (DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready)
             {
@@ -1335,7 +1335,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SearchWithBrowserKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.SearchWithBrowserKeyGesture))
         {
             if (!MiningMode)
             {
@@ -1358,17 +1358,17 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.InactiveLookupModeKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.InactiveLookupModeKeyGesture))
         {
             ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MotivationKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.MotivationKeyGesture))
         {
             await WindowsUtils.Motivate().ConfigureAwait(false);
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.NextDictKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.NextDictKeyGesture))
         {
             bool foundSelectedButton = false;
 
@@ -1394,7 +1394,7 @@ internal sealed partial class PopupWindow : Window
             ClickDictTypeButton(nextButton ?? _buttonAll);
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.PreviousDictKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.PreviousDictKeyGesture))
         {
             bool foundSelectedButton = false;
             Button? previousButton = null;
@@ -1436,7 +1436,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleMinimizedStateKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.ToggleMinimizedStateKeyGesture))
         {
             PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
 
@@ -1461,7 +1461,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeechKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.SelectedTextToSpeechKeyGesture))
         {
             if (MiningMode
                 && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
@@ -1474,7 +1474,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectNextLookupResultKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.SelectNextLookupResultKeyGesture))
         {
             if (MiningMode)
             {
@@ -1482,7 +1482,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectPreviousLookupResultKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.SelectPreviousLookupResultKeyGesture))
         {
             if (MiningMode)
             {
@@ -1490,7 +1490,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MineSelectedLookupResultKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.MineSelectedLookupResultKeyGesture))
         {
             if (MiningMode && PopupListView.SelectedItem is not null)
             {
@@ -1510,13 +1510,13 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
         {
             ConfigManager.AlwaysShowMainTextBoxCaret = !ConfigManager.AlwaysShowMainTextBoxCaret;
             MainWindow.Instance.MainTextBox.IsReadOnlyCaretVisible = ConfigManager.AlwaysShowMainTextBoxCaret;
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.LookupSelectedTextKeyGesture))
+        else if (keyGesture.IsEqual(ConfigManager.LookupSelectedTextKeyGesture))
         {
             if (MiningMode)
             {
@@ -1619,7 +1619,7 @@ internal sealed partial class PopupWindow : Window
         LastSelectedText = _lastInteractedTextBox.SelectedText;
 
         if (ConfigManager.InactiveLookupMode
-            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
+            || (ConfigManager.RequireLookupKeyPress && !ConfigManager.LookupKeyKeyGesture.IsPressed())
             || ((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
                 && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton)))
         {
