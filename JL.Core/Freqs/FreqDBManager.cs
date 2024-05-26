@@ -45,38 +45,47 @@ internal static class FreqDBManager
 
     public static void InsertRecordsToDB(Freq freq)
     {
+        ulong id = 1;
+
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetFreqDBPath(freq.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ulong id = 1;
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            """
+            INSERT INTO record (id, spelling, frequency)
+            VALUES (@id, @spelling, @frequency);
+            """;
+
+        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@spelling", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@frequency", SqliteType.Integer);
+        insertRecordCommand.Prepare();
+
+        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
+        insertSearchKeyCommand.CommandText =
+            """
+            INSERT INTO record_search_key (record_id, search_key)
+            VALUES (@record_id, @search_key);
+            """;
+
+        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
+        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Prepare();
+
         foreach ((string key, IList<FrequencyRecord> records) in freq.Contents)
         {
             int recordCount = records.Count;
             for (int i = 0; i < recordCount; i++)
             {
-                using SqliteCommand insertRecordCommand = connection.CreateCommand();
-
-                insertRecordCommand.CommandText =
-                    """
-                    INSERT INTO record (id, spelling, frequency)
-                    VALUES (@id, @spelling, @frequency);
-                    """;
-
                 FrequencyRecord record = records[i];
-                _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
-                _ = insertRecordCommand.Parameters.AddWithValue("@spelling", record.Spelling);
-                _ = insertRecordCommand.Parameters.AddWithValue("@frequency", record.Frequency);
+                _ = insertRecordCommand.Parameters["@id"].Value = id;
+                _ = insertRecordCommand.Parameters["@spelling"].Value = record.Spelling;
+                _ = insertRecordCommand.Parameters["@frequency"].Value = record.Frequency;
                 _ = insertRecordCommand.ExecuteNonQuery();
 
-                using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-                insertSearchKeyCommand.CommandText =
-                    """
-                    INSERT INTO record_search_key (record_id, search_key)
-                    VALUES (@record_id, @search_key);
-                    """;
-
-                _ = insertSearchKeyCommand.Parameters.AddWithValue("@record_id", id);
-                _ = insertSearchKeyCommand.Parameters.AddWithValue("@search_key", key);
+                _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
+                _ = insertSearchKeyCommand.Parameters["@search_key"].Value = key;
                 _ = insertSearchKeyCommand.ExecuteNonQuery();
 
                 ++id;
@@ -84,12 +93,18 @@ internal static class FreqDBManager
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
-
         createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);";
-
         _ = createIndexCommand.ExecuteNonQuery();
 
         transaction.Commit();
+
+        using SqliteCommand analyzeCommand = connection.CreateCommand();
+        analyzeCommand.CommandText = "ANALYZE;";
+        _ = analyzeCommand.ExecuteNonQuery();
+
+        using SqliteCommand vacuumCommand = connection.CreateCommand();
+        vacuumCommand.CommandText = "VACUUM;";
+        _ = vacuumCommand.ExecuteNonQuery();
     }
 
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, List<string> terms)

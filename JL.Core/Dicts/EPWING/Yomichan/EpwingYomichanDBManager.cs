@@ -60,56 +60,61 @@ internal static class EpwingYomichanDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
+        HashSet<EpwingYomichanRecord> yomichanWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingYomichanRecord)v).ToHashSet();
+
+        ulong id = 1;
+
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ulong id = 1;
-        HashSet<EpwingYomichanRecord> yomichanWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingYomichanRecord)v).ToHashSet();
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            """
+            INSERT INTO record (id, primary_spelling, reading, glossary, part_of_speech, glossary_tags)
+            VALUES (@id, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags);
+            """;
+
+        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@part_of_speech", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@glossary_tags", SqliteType.Text);
+        insertRecordCommand.Prepare();
+
+        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
+        insertSearchKeyCommand.CommandText =
+            """
+            INSERT INTO record_search_key(record_id, search_key)
+            VALUES (@record_id, @search_key);
+            """;
+
+        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
+        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Prepare();
+
         foreach (EpwingYomichanRecord record in yomichanWordRecords)
         {
-            using SqliteCommand insertRecordCommand = connection.CreateCommand();
-            insertRecordCommand.CommandText =
-                """
-                INSERT INTO record (id, primary_spelling, reading, glossary, part_of_speech, glossary_tags)
-                VALUES (@id, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags);
-                """;
-
-            _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
-            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
-            _ = insertRecordCommand.Parameters.AddWithValue("@reading", record.Reading is not null ? record.Reading : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
-            _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_tags", record.DefinitionTags is not null ? JsonSerializer.Serialize(record.DefinitionTags, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-
+            _ = insertRecordCommand.Parameters["@id"].Value = id;
+            _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
+            _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull);
+            _ = insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary_tags"].Value = record.DefinitionTags is not null ? JsonSerializer.Serialize(record.DefinitionTags, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            using SqliteCommand insertPrimarySpellingCommand = connection.CreateCommand();
-            insertPrimarySpellingCommand.CommandText =
-                """
-                INSERT INTO record_search_key(record_id, search_key)
-                VALUES (@record_id, @search_key);
-                """;
-            _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@record_id", id);
+            _ = insertSearchKeyCommand.Parameters["@id"].Value = id;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
-            _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@search_key", primarySpellingInHiragana);
-            _ = insertPrimarySpellingCommand.ExecuteNonQuery();
+            _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
+            _ = insertSearchKeyCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
             {
                 string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
-                    using SqliteCommand insertReadingCommand = connection.CreateCommand();
-                    insertReadingCommand.CommandText =
-                        """
-                        INSERT INTO record_search_key(record_id, search_key)
-                        VALUES (@record_id, @search_key);
-                        """;
-
-                    _ = insertReadingCommand.Parameters.AddWithValue("@record_id", id);
-                    _ = insertReadingCommand.Parameters.AddWithValue("@search_key", readingInHiragana);
-
-                    _ = insertReadingCommand.ExecuteNonQuery();
+                    _ = insertRecordCommand.Parameters["@search_key"].Value = readingInHiragana;
+                    _ = insertRecordCommand.ExecuteNonQuery();
                 }
             }
 
@@ -117,9 +122,7 @@ internal static class EpwingYomichanDBManager
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
-
         createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);";
-
         _ = createIndexCommand.ExecuteNonQuery();
 
         transaction.Commit();
@@ -131,8 +134,6 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
-
-        dict.Ready = true;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string query)

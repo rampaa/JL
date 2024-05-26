@@ -57,55 +57,57 @@ internal static class YomichanPitchAccentDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
+        HashSet<PitchAccentRecord> yomichanPitchAccentRecord = dict.Contents.Values.SelectMany(static v => v).Select(static v => (PitchAccentRecord)v).ToHashSet();
+
+        ulong id = 1;
+
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ulong id = 1;
-        HashSet<PitchAccentRecord> yomichanPitchAccentRecord = dict.Contents.Values.SelectMany(static v => v).Select(static v => (PitchAccentRecord)v).ToHashSet();
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            """
+            INSERT INTO record (id, spelling, reading, position)
+            VALUES (@id, @spelling, @reading, @position)
+            """;
+
+        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@spelling", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@position", SqliteType.Integer);
+        insertRecordCommand.Prepare();
+
+        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
+        insertSearchKeyCommand.CommandText =
+            """
+            INSERT INTO record_search_key(record_id, search_key)
+            VALUES (@record_id, @search_key)
+            """;
+
+        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
+        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Prepare();
+
         foreach (PitchAccentRecord record in yomichanPitchAccentRecord)
         {
-            using SqliteCommand insertRecordCommand = connection.CreateCommand();
-            insertRecordCommand.CommandText =
-                """
-                INSERT INTO record (id, spelling, reading, position)
-                VALUES (@id, @spelling, @reading, @position)
-                """;
-
-            _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
-            _ = insertRecordCommand.Parameters.AddWithValue("@spelling", record.Spelling);
-            _ = insertRecordCommand.Parameters.AddWithValue("@reading", record.Reading is not null ? record.Reading : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@position", record.Position);
-
+            _ = insertRecordCommand.Parameters["@id"].Value = id;
+            _ = insertRecordCommand.Parameters["@spelling"].Value = record.Spelling;
+            _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@position"].Value = record.Position;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            using SqliteCommand insertSpellingCommand = connection.CreateCommand();
-            insertSpellingCommand.CommandText =
-                """
-                INSERT INTO record_search_key(record_id, search_key)
-                VALUES (@record_id, @search_key)
-                """;
-            _ = insertSpellingCommand.Parameters.AddWithValue("@record_id", id);
-
+            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Spelling);
-            _ = insertSpellingCommand.Parameters.AddWithValue("@search_key", primarySpellingInHiragana);
-            _ = insertSpellingCommand.ExecuteNonQuery();
+            _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
+            _ = insertSearchKeyCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
             {
                 string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
-                    using SqliteCommand insertReadingCommand = connection.CreateCommand();
-                    insertReadingCommand.CommandText =
-                        """
-                        INSERT INTO record_search_key(record_id, search_key)
-                        VALUES (@record_id, @search_key)
-                        """;
-
-                    _ = insertReadingCommand.Parameters.AddWithValue("@record_id", id);
-                    _ = insertReadingCommand.Parameters.AddWithValue("@search_key", readingInHiragana);
-
-                    _ = insertReadingCommand.ExecuteNonQuery();
+                    _ = insertSearchKeyCommand.Parameters["@search_key"].Value = readingInHiragana;
+                    _ = insertSearchKeyCommand.ExecuteNonQuery();
                 }
             }
 
@@ -125,8 +127,6 @@ internal static class YomichanPitchAccentDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
-
-        dict.Ready = true;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)

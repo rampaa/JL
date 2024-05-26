@@ -58,57 +58,59 @@ internal static class EpwingNazekaDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
+        HashSet<EpwingNazekaRecord> nazekaWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingNazekaRecord)v).ToHashSet();
+
+        ulong id = 1;
+
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ulong id = 1;
-        HashSet<EpwingNazekaRecord> nazekaWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingNazekaRecord)v).ToHashSet();
-        foreach (EpwingNazekaRecord record in nazekaWordRecords)
-        {
-            using SqliteCommand insertRecordCommand = connection.CreateCommand();
-            insertRecordCommand.CommandText =
-                """
-                INSERT INTO record (id, primary_spelling, reading, alternative_spellings, glossary)
-                VALUES (@id, @primary_spelling, @reading, @alternative_spellings, @glossary);
-                """;
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            """
+            INSERT INTO record (id, primary_spelling, reading, alternative_spellings, glossary)
+            VALUES (@id, @primary_spelling, @reading, @alternative_spellings, @glossary);
+            """;
 
-            _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
-            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
-            _ = insertRecordCommand.Parameters.AddWithValue("@reading", record.Reading is not null ? record.Reading : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
+        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
+        insertRecordCommand.Prepare();
 
-            _ = insertRecordCommand.ExecuteNonQuery();
-
-            using SqliteCommand insertPrimarySpellingCommand = connection.CreateCommand();
-
-            insertPrimarySpellingCommand.CommandText =
-                """
+        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
+        insertSearchKeyCommand.CommandText =
+            """
                 INSERT INTO record_search_key(record_id, search_key)
                 VALUES (@record_id, @search_key);
                 """;
 
-            _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@record_id", id);
+        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
+        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Prepare();
+
+        foreach (EpwingNazekaRecord record in nazekaWordRecords)
+        {
+            _ = insertRecordCommand.Parameters["@id"].Value = id;
+            _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
+            _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull);
+            _ = insertRecordCommand.ExecuteNonQuery();
+
+            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
-            _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@search_key", primarySpellingInHiragana);
-            _ = insertPrimarySpellingCommand.ExecuteNonQuery();
+            _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
+            _ = insertSearchKeyCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
             {
                 string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
-                    using SqliteCommand insertReadingCommand = connection.CreateCommand();
-                    insertReadingCommand.CommandText =
-                        """
-                        INSERT INTO record_search_key(record_id, search_key)
-                        VALUES (@record_id, @search_key);
-                        """;
-
-                    _ = insertReadingCommand.Parameters.AddWithValue("@record_id", id);
-                    _ = insertReadingCommand.Parameters.AddWithValue("@search_key", readingInHiragana);
-
-                    _ = insertReadingCommand.ExecuteNonQuery();
+                    _ = insertSearchKeyCommand.Parameters["@search_key"].Value = readingInHiragana;
+                    _ = insertSearchKeyCommand.ExecuteNonQuery();
                 }
             }
 
@@ -128,8 +130,6 @@ internal static class EpwingNazekaDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
-
-        dict.Ready = true;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string query)

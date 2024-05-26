@@ -49,30 +49,37 @@ internal static class YomichanKanjiDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
+        ulong id = 1;
+
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ulong id = 1;
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            """
+            INSERT INTO record (id, kanji, on_readings, kun_readings, glossary, stats)
+            VALUES (@id, @kanji, @on_readings, @kun_readings, @glossary, @stats);
+            """;
+
+        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@kanji", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@on_readings", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@kun_readings", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@stats", SqliteType.Text);
+        insertRecordCommand.Prepare();
+
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
         {
             foreach (IDictRecord record in records)
             {
                 YomichanKanjiRecord yomichanKanjiRecord = (YomichanKanjiRecord)record;
-
-                using SqliteCommand insertRecordCommand = connection.CreateCommand();
-                insertRecordCommand.CommandText =
-                    """
-                    INSERT INTO record (id, kanji, on_readings, kun_readings, glossary, stats)
-                    VALUES (@id, @kanji, @on_readings, @kun_readings, @glossary, @stats);
-                    """;
-
-                _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
-                _ = insertRecordCommand.Parameters.AddWithValue("@kanji", kanji);
-                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", yomichanKanjiRecord.OnReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.OnReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@kun_readings", yomichanKanjiRecord.KunReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.KunReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@glossary", yomichanKanjiRecord.Definitions is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Definitions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@stats", yomichanKanjiRecord.Stats is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Stats, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-
+                _ = insertRecordCommand.Parameters["@id"].Value = id;
+                _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
+                _ = insertRecordCommand.Parameters["@on_readings"].Value = yomichanKanjiRecord.OnReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.OnReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@kun_readings"].Value = yomichanKanjiRecord.KunReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.KunReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@glossary"].Value = yomichanKanjiRecord.Definitions is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Definitions, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@stats"].Value = yomichanKanjiRecord.Stats is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Stats, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
                 _ = insertRecordCommand.ExecuteNonQuery();
 
                 ++id;
@@ -80,9 +87,7 @@ internal static class YomichanKanjiDBManager
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
-
         createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_kanji ON record(kanji);";
-
         _ = createIndexCommand.ExecuteNonQuery();
 
         transaction.Commit();
@@ -94,8 +99,6 @@ internal static class YomichanKanjiDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
-
-        dict.Ready = true;
     }
 
     public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)

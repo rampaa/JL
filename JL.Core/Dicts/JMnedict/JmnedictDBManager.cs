@@ -40,30 +40,40 @@ internal static class JmnedictDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
+        HashSet<JmnedictRecord> jmnedictRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (JmnedictRecord)v).ToHashSet();
+
+        ulong id = 1;
+
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ulong id = 1;
-        HashSet<JmnedictRecord> jmnedictRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (JmnedictRecord)v).ToHashSet();
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            """
+            INSERT INTO record (id, jmnedict_id, primary_spelling, primary_spelling_in_hiragana, readings, alternative_spellings, glossary, name_types)
+            VALUES (@id, @jmnedict_id, @primary_spelling, @primary_spelling_in_hiragana, @readings, @alternative_spellings, @glossary, @name_types);
+            """;
+
+        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@jmnedict_id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@primary_spelling_in_hiragana", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@readings", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@name_types", SqliteType.Text);
+        insertRecordCommand.Prepare();
+
         foreach (JmnedictRecord record in jmnedictRecords)
         {
-            using SqliteCommand insertRecordCommand = connection.CreateCommand();
-
-            insertRecordCommand.CommandText =
-                """
-                INSERT INTO record (id, jmnedict_id, primary_spelling, primary_spelling_in_hiragana, readings, alternative_spellings, glossary, name_types)
-                VALUES (@id, @jmnedict_id, @primary_spelling, @primary_spelling_in_hiragana, @readings, @alternative_spellings, @glossary, @name_types);
-                """;
-
-            _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
-            _ = insertRecordCommand.Parameters.AddWithValue("@jmnedict_id", record.Id);
-            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
-            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling_in_hiragana", JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling));
-            _ = insertRecordCommand.Parameters.AddWithValue("@readings", record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
-            _ = insertRecordCommand.Parameters.AddWithValue("@name_types", JsonSerializer.Serialize(record.NameTypes, Utils.s_jsoNotIgnoringNull));
-
+            _ = insertRecordCommand.Parameters["@id"].Value = id;
+            _ = insertRecordCommand.Parameters["@jmnedict_id"].Value = record.Id;
+            _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
+            _ = insertRecordCommand.Parameters["@primary_spelling_in_hiragana"].Value = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
+            _ = insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull);
+            _ = insertRecordCommand.Parameters["@name_types"].Value = JsonSerializer.Serialize(record.NameTypes, Utils.s_jsoNotIgnoringNull);
             _ = insertRecordCommand.ExecuteNonQuery();
 
             ++id;
@@ -82,8 +92,6 @@ internal static class JmnedictDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
-
-        dict.Ready = true;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)

@@ -60,9 +60,6 @@ internal static class JmdictDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
-        using SqliteTransaction transaction = connection.BeginTransaction();
-
         Dictionary<JmdictRecord, List<string>> recordToKeysDict = [];
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
@@ -82,52 +79,77 @@ internal static class JmdictDBManager
         }
 
         ulong id = 1;
+
+        using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteTransaction transaction = connection.BeginTransaction();
+
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            """
+            INSERT INTO record (id, edict_id, primary_spelling, primary_spelling_orthography_info, alternative_spellings, alternative_spellings_orthography_info, readings, readings_orthography_info, reading_restrictions, glossary, glossary_info, part_of_speech, spelling_restrictions, fields, misc, dialects, loanword_etymology, cross_references, antonyms)
+            VALUES (@id, @edict_id, @primary_spelling, @primary_spelling_orthography_info, @alternative_spellings, @alternative_spellings_orthography_info, @readings, @readings_orthography_info, @reading_restrictions, @glossary, @glossary_info, @part_of_speech, @spelling_restrictions, @fields, @misc, @dialects, @loanword_etymology, @cross_references, @antonyms);
+            """;
+
+        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@edict_id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@primary_spelling_orthography_info", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@alternative_spellings_orthography_info", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@readings", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@readings_orthography_info", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@reading_restrictions", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@glossary_info", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@part_of_speech", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@spelling_restrictions", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@fields", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@misc", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@dialects", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@loanword_etymology", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@cross_references", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@antonyms", SqliteType.Text);
+        insertRecordCommand.Prepare();
+
+        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
+        insertSearchKeyCommand.CommandText =
+            """
+            INSERT INTO record_search_key(record_id, search_key)
+            VALUES (@record_id, @search_key);
+            """;
+
+        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
+        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Prepare();
+
         foreach ((JmdictRecord record, List<string> keys) in recordToKeysDict)
         {
-            using SqliteCommand insertRecordCommand = connection.CreateCommand();
-
-            insertRecordCommand.CommandText =
-                """
-                INSERT INTO record (id, edict_id, primary_spelling, primary_spelling_orthography_info, alternative_spellings, alternative_spellings_orthography_info, readings, readings_orthography_info, reading_restrictions, glossary, glossary_info, part_of_speech, spelling_restrictions, fields, misc, dialects, loanword_etymology, cross_references, antonyms)
-                VALUES (@id, @edict_id, @primary_spelling, @primary_spelling_orthography_info, @alternative_spellings, @alternative_spellings_orthography_info, @readings, @readings_orthography_info, @reading_restrictions, @glossary, @glossary_info, @part_of_speech, @spelling_restrictions, @fields, @misc, @dialects, @loanword_etymology, @cross_references, @antonyms);
-                """;
-
-            insertRecordCommand.Prepare();
-
-            _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
-            _ = insertRecordCommand.Parameters.AddWithValue("@edict_id", record.Id);
-            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
-            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling_orthography_info", record.PrimarySpellingOrthographyInfo is not null ? JsonSerializer.Serialize(record.PrimarySpellingOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings_orthography_info", record.AlternativeSpellingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@readings", record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@readings_orthography_info", record.ReadingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.ReadingsOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@reading_restrictions", record.ReadingRestrictions is not null ? JsonSerializer.Serialize(record.ReadingRestrictions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_info", record.DefinitionInfo is not null ? JsonSerializer.Serialize(record.DefinitionInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull));
-            _ = insertRecordCommand.Parameters.AddWithValue("@spelling_restrictions", record.SpellingRestrictions is not null ? JsonSerializer.Serialize(record.SpellingRestrictions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@fields", record.Fields is not null ? JsonSerializer.Serialize(record.Fields, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@misc", record.Misc is not null ? JsonSerializer.Serialize(record.Misc, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@dialects", record.Dialects is not null ? JsonSerializer.Serialize(record.Dialects, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@loanword_etymology", record.LoanwordEtymology is not null ? JsonSerializer.Serialize(record.LoanwordEtymology, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@cross_references", record.RelatedTerms is not null ? JsonSerializer.Serialize(record.RelatedTerms, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@antonyms", record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            insertRecordCommand.Parameters["@id"].Value = id;
+            insertRecordCommand.Parameters["@edict_id"].Value = record.Id;
+            insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
+            insertRecordCommand.Parameters["@primary_spelling_orthography_info"].Value = record.PrimarySpellingOrthographyInfo is not null ? JsonSerializer.Serialize(record.PrimarySpellingOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@alternative_spellings_orthography_info"].Value = record.AlternativeSpellingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@readings_orthography_info"].Value = record.ReadingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.ReadingsOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@reading_restrictions"].Value = record.ReadingRestrictions is not null ? JsonSerializer.Serialize(record.ReadingRestrictions, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull);
+            insertRecordCommand.Parameters["@glossary_info"].Value = record.DefinitionInfo is not null ? JsonSerializer.Serialize(record.DefinitionInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@part_of_speech"].Value = JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull);
+            insertRecordCommand.Parameters["@spelling_restrictions"].Value = record.SpellingRestrictions is not null ? JsonSerializer.Serialize(record.SpellingRestrictions, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@fields"].Value = record.Fields is not null ? JsonSerializer.Serialize(record.Fields, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@misc"].Value = record.Misc is not null ? JsonSerializer.Serialize(record.Misc, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@dialects"].Value = record.Dialects is not null ? JsonSerializer.Serialize(record.Dialects, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@loanword_etymology"].Value = record.LoanwordEtymology is not null ? JsonSerializer.Serialize(record.LoanwordEtymology, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@cross_references"].Value = record.RelatedTerms is not null ? JsonSerializer.Serialize(record.RelatedTerms, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@antonyms"].Value = record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
             int keyCount = keys.Count;
             for (int i = 0; i < keyCount; i++)
             {
-                using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-                insertSearchKeyCommand.CommandText =
-                    """
-                    INSERT INTO record_search_key(record_id, search_key)
-                    VALUES (@record_id, @search_key);
-                    """;
-
-                _ = insertSearchKeyCommand.Parameters.AddWithValue("@record_id", id);
-                _ = insertSearchKeyCommand.Parameters.AddWithValue("@search_key", keys[i]);
-
+                insertSearchKeyCommand.Parameters["@record_id"].Value = id;
+                insertSearchKeyCommand.Parameters["@search_key"].Value = keys[i];
                 _ = insertSearchKeyCommand.ExecuteNonQuery();
             }
 
@@ -147,8 +169,6 @@ internal static class JmdictDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
-
-        dict.Ready = true;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)
