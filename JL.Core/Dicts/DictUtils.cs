@@ -603,16 +603,19 @@ public static class DictUtils
                                     else
                                     {
                                         await JmdictLoader.Load(dict).ConfigureAwait(false);
-                                        dict.Size = dict.Contents.Count;
-
-                                        if (!dbExists && (useDB || dbExisted))
+                                        if (dict.Active)
                                         {
-                                            JmdictDBManager.CreateDB(dict.Name);
-                                            JmdictDBManager.InsertRecordsToDB(dict);
+                                            dict.Size = dict.Contents.Count;
 
-                                            if (useDB)
+                                            if (!dbExists && (useDB || dbExisted))
                                             {
-                                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                                JmdictDBManager.CreateDB(dict.Name);
+                                                JmdictDBManager.InsertRecordsToDB(dict);
+
+                                                if (useDB)
+                                                {
+                                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                                }
                                             }
                                         }
                                     }
@@ -679,16 +682,19 @@ public static class DictUtils
 
                                     // We don't load JMnedict from DB because it is slower and allocates more memory for JMnedict for some reason
                                     await JmnedictLoader.Load(dict).ConfigureAwait(false);
-                                    dict.Size = dict.Contents.Count;
-
-                                    if (!dbExists && (useDB || dbExisted))
+                                    if (dict.Active)
                                     {
-                                        JmnedictDBManager.CreateDB(dict.Name);
-                                        JmnedictDBManager.InsertRecordsToDB(dict);
+                                        dict.Size = dict.Contents.Count;
 
-                                        if (useDB)
+                                        if (!dbExists && (useDB || dbExisted))
                                         {
-                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            JmnedictDBManager.CreateDB(dict.Name);
+                                            JmnedictDBManager.InsertRecordsToDB(dict);
+
+                                            if (useDB)
+                                            {
+                                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            }
                                         }
                                     }
 
@@ -760,16 +766,19 @@ public static class DictUtils
                                     else
                                     {
                                         await KanjidicLoader.Load(dict).ConfigureAwait(false);
-                                        dict.Size = dict.Contents.Count;
-
-                                        if (!dbExists && (useDB || dbExisted))
+                                        if (dict.Active)
                                         {
-                                            KanjidicDBManager.CreateDB(dict.Name);
-                                            KanjidicDBManager.InsertRecordsToDB(dict);
+                                            dict.Size = dict.Contents.Count;
 
-                                            if (useDB)
+                                            if (!dbExists && (useDB || dbExisted))
                                             {
-                                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                                KanjidicDBManager.CreateDB(dict.Name);
+                                                KanjidicDBManager.InsertRecordsToDB(dict);
+
+                                                if (useDB)
+                                                {
+                                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                                }
                                             }
                                         }
                                     }
