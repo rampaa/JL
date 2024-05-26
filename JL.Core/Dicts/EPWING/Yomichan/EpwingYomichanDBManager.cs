@@ -103,7 +103,7 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.Parameters["@glossary_tags"].Value = record.DefinitionTags is not null ? JsonSerializer.Serialize(record.DefinitionTags, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            _ = insertSearchKeyCommand.Parameters["@id"].Value = id;
+            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
             _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
             _ = insertSearchKeyCommand.ExecuteNonQuery();
@@ -113,8 +113,8 @@ internal static class EpwingYomichanDBManager
                 string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
-                    _ = insertRecordCommand.Parameters["@search_key"].Value = readingInHiragana;
-                    _ = insertRecordCommand.ExecuteNonQuery();
+                    _ = insertSearchKeyCommand.Parameters["@search_key"].Value = readingInHiragana;
+                    _ = insertSearchKeyCommand.ExecuteNonQuery();
                 }
             }
 
