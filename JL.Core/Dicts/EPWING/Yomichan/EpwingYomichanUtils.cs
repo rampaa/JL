@@ -7,7 +7,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanUtils
 {
-    public static string[]? GetDefinitions(JsonElement jsonElement)
+    public static string[]? GetDefinitions(JsonElement jsonElement, Dict dict)
     {
         List<string> definitions = [];
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
@@ -27,6 +27,11 @@ internal static class EpwingYomichanUtils
 
             if (definition is not null)
             {
+                if (dict.Type is DictType.Kenkyuusha)
+                {
+                    definition = definition.Replace("┏", "", StringComparison.Ordinal);
+                }
+
                 definitions.Add(definition.GetPooledString());
             }
         }
