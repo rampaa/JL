@@ -411,6 +411,12 @@ public static class DictUtils
 
     public static readonly DictType[] YomichanDictTypes =
     [
+        DictType.NonspecificWordYomichan,
+        DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificKanjiWithWordSchemaYomichan,
+        DictType.NonspecificNameYomichan,
+        DictType.NonspecificYomichan,
+        DictType.PitchAccentYomichan,
         DictType.Daijirin,
         DictType.Daijisen,
         DictType.Gakken,
@@ -429,13 +435,7 @@ public static class DictUtils
         DictType.ShinmeikaiYomichan,
         DictType.ShinmeikaiYojijukugoYomichan,
         DictType.WeblioKogoYomichan,
-        DictType.ZokugoYomichan,
-        DictType.PitchAccentYomichan,
-        DictType.NonspecificWordYomichan,
-        DictType.NonspecificKanjiYomichan,
-        DictType.NonspecificKanjiWithWordSchemaYomichan,
-        DictType.NonspecificNameYomichan,
-        DictType.NonspecificYomichan
+        DictType.ZokugoYomichan
     ];
 
     public static readonly DictType[] NazekaDictTypes =
