@@ -1334,6 +1334,11 @@ public static class DictUtils
 
             if (tasks.Count > 0)
             {
+                if (rebuildingAnyDB)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Information, "Rebuilding some databases because their schemas are out of date...");
+                }
+
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
                 if (dictRemoved)
@@ -1346,11 +1351,6 @@ public static class DictUtils
                         dict.Priority = priority;
                         ++priority;
                     }
-                }
-
-                if (rebuildingAnyDB)
-                {
-                    Utils.Frontend.Alert(AlertLevel.Information, "Rebuilding some databases because their schemas are out of date...");
                 }
             }
 

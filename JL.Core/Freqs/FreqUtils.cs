@@ -300,6 +300,11 @@ public static class FreqUtils
 
             if (tasks.Count > 0)
             {
+                if (rebuildingDBs)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Information, "Rebuilding frequency databases because their schemas are out of date...");
+                }
+
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
                 if (freqRemoved)
@@ -312,11 +317,6 @@ public static class FreqUtils
                         freq.Priority = priority;
                         ++priority;
                     }
-                }
-
-                if (rebuildingDBs)
-                {
-                    Utils.Frontend.Alert(AlertLevel.Information, "Rebuilding frequency databases because their schemas are out of date...");
                 }
             }
 
