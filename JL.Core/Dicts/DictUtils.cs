@@ -922,7 +922,7 @@ public static class DictUtils
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
 
-                                if (dbExists)
+                                if (File.Exists(dbPath))
                                 {
                                     DBUtils.SendOptimizePragmaToAllDBs();
                                     SqliteConnection.ClearAllPools();
@@ -1009,7 +1009,7 @@ public static class DictUtils
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
 
-                                if (dbExists)
+                                if (File.Exists(dbPath))
                                 {
                                     DBUtils.SendOptimizePragmaToAllDBs();
                                     SqliteConnection.ClearAllPools();
@@ -1192,7 +1192,7 @@ public static class DictUtils
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
 
-                                if (dbExists)
+                                if (File.Exists(dbPath))
                                 {
                                     DBUtils.SendOptimizePragmaToAllDBs();
                                     SqliteConnection.ClearAllPools();
@@ -1280,7 +1280,7 @@ public static class DictUtils
                                 _ = SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
                                 dictRemoved = true;
 
-                                if (dbExists)
+                                if (File.Exists(dbPath))
                                 {
                                     DBUtils.SendOptimizePragmaToAllDBs();
                                     SqliteConnection.ClearAllPools();

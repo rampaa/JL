@@ -139,7 +139,7 @@ public static class FreqUtils
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
 
-                                if (dbExists)
+                                if (File.Exists(dbPath))
                                 {
                                     DBUtils.SendOptimizePragmaToAllDBs();
                                     SqliteConnection.ClearAllPools();
@@ -239,7 +239,7 @@ public static class FreqUtils
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
 
-                                if (dbExists)
+                                if (File.Exists(dbPath))
                                 {
                                     DBUtils.SendOptimizePragmaToAllDBs();
                                     SqliteConnection.ClearAllPools();
