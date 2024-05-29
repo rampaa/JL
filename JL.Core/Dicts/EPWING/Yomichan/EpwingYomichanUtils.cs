@@ -70,7 +70,7 @@ internal static class EpwingYomichanUtils
                     {
                         _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" ({contentResult.Content}) ");
                     }
-                    else //if (contentResult.Tag is "div" or "li" or "ul" or "ol" or "p" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6")
+                    else //if (contentResult.Tag is "div" or "a" or "li" or "ul" or "ol" or "p" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6")
                     {
                         _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart('\n')}");
                     }
@@ -97,9 +97,18 @@ internal static class EpwingYomichanUtils
 
                 if (contentElement.ValueKind is JsonValueKind.String)
                 {
-                    string? contentText = tag is "a"
-                        ? null
-                        : contentElement.GetString();
+                    string? contentText;
+                    if (tag is "a" && jsonElement.TryGetProperty("href", out JsonElement hrefElement))
+                    {
+                        string? hrefText = hrefElement.GetString();
+                        contentText = hrefText?.StartsWith("?query=", StringComparison.Ordinal) ?? true
+                            ? contentElement.GetString()
+                            : $"{contentElement.GetString()}: {hrefText}";
+                    }
+                    else
+                    {
+                        contentText = contentElement.GetString();
+                    }
 
                     return new YomichanContent(parentTag ?? tag, contentText);
                 }

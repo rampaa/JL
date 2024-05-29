@@ -293,8 +293,12 @@ internal static class WindowsUtils
 
         if (selectedText?.Length > 0)
         {
+            string urlToBeSearched = Uri.IsWellFormedUriString(selectedText, UriKind.Absolute)
+                ? selectedText
+                : ConfigManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal);
+
             _ = Process.Start(new ProcessStartInfo("cmd",
-                $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\"")
+                $"/c start \"\" {browserPath} \"{urlToBeSearched}\"")
             {
                 CreateNoWindow = true
             });
