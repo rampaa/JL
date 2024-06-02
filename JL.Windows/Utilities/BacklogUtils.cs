@@ -25,7 +25,7 @@ internal static class BacklogUtils
 
     public static void ReplaceLastBacklogText(string text)
     {
-        Backlog[s_currentTextIndex] = text;
+        Backlog[^1] = text;
     }
 
     public static void ShowPreviousBacklogItem()
