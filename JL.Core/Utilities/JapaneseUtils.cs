@@ -171,13 +171,38 @@ public static partial class JapaneseUtils
 
     private static readonly FrozenSet<char> s_expressionTerminatingCharacters = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters).ToFrozenSet();
 
+    private static int FirstKatakanaIndex(string text)
+    {
+        int textLength = text.Length;
+        for (int i = 0; i < textLength; i++)
+        {
+            if (s_katakanaToHiraganaDict.ContainsKey(text[i]))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     public static string KatakanaToHiragana(string text)
     {
-        // Normalizes ＯＬ to OL, ｶﾞ to が, ﾜ to わ, ㍿ to 株式会社 etc.
-        string normalizedText = text.Normalize(NormalizationForm.FormKC);
+        string normalizedText = text;
+        if (!text.IsNormalized(NormalizationForm.FormKC))
+        {
+            // Normalizes ＯＬ to OL, ｶﾞ to が, ﾜ to わ, ㍿ to 株式会社 etc.
+            normalizedText = text.Normalize(NormalizationForm.FormKC);
+        }
 
-        StringBuilder textInHiragana = new(normalizedText.Length);
-        for (int i = 0; i < normalizedText.Length; i++)
+        int firstKatakanaIndex = FirstKatakanaIndex(normalizedText);
+        if (firstKatakanaIndex is -1)
+        {
+            return normalizedText;
+        }
+
+        int normalizedTextLength = normalizedText.Length;
+        StringBuilder textInHiragana = new(normalizedText[..firstKatakanaIndex], normalizedTextLength);
+        for (int i = firstKatakanaIndex; i < normalizedTextLength; i++)
         {
             char character = normalizedText[i];
             _ = textInHiragana.Append(s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr)
@@ -381,10 +406,37 @@ public static partial class JapaneseUtils
         return sentence;
     }
 
+    private static int FirstPunctuationIndex(string text)
+    {
+        int charIndex = 0;
+        foreach (Rune rune in text.EnumerateRunes())
+        {
+            if (!Rune.IsLetterOrDigit(rune))
+            {
+                return charIndex;
+            }
+
+            charIndex += rune.Utf16SequenceLength;
+        }
+
+        return -1;
+    }
+
     public static string RemovePunctuation(string text)
     {
-        StringBuilder sb = new(text.Length);
-        foreach (Rune rune in text.EnumerateRunes())
+        int index = FirstPunctuationIndex(text);
+        if (index is -1)
+        {
+            return text;
+        }
+
+        if (index == text.Length - 1)
+        {
+            return text[..^1];
+        }
+
+        StringBuilder sb = new(text[..index], text.Length - 1);
+        foreach (Rune rune in text.AsSpan(index + 1).EnumerateRunes())
         {
             if (Rune.IsLetterOrDigit(rune))
             {
