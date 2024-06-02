@@ -146,8 +146,8 @@ internal sealed partial class MainWindow : Window
                                 if (ConfigManager.MergeSequentialTextsWhenTheyMatch)
                                 {
                                     string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
-                                    if ((ConfigManager.OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds is 0
-                                            || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds)
+                                    if ((ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
+                                            || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
                                         && text.StartsWith(lastText, StringComparison.Ordinal))
                                     {
                                         subsequentText = text[lastText.Length..];
@@ -200,8 +200,8 @@ internal sealed partial class MainWindow : Window
                         if (ConfigManager.MergeSequentialTextsWhenTheyMatch)
                         {
                             string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
-                            if ((ConfigManager.OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds is 0
-                                    || (preciseTimeNow - s_lastTextCopyTime).TotalSeconds < ConfigManager.OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds)
+                            if ((ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
+                                    || (preciseTimeNow - s_lastTextCopyTime).TotalSeconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
                                 && text.StartsWith(lastText, StringComparison.Ordinal))
                             {
                                 subsequentText = text[lastText.Length..];

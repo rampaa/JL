@@ -343,12 +343,12 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Only merge sequential texts when they match within milliseconds"
+                            <TextBlock HorizontalAlignment="Left" Text="Max delay between copies to merge sequential texts when they match (in milliseconds)"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="Setting it to 0 removes the time constraint"/>
-                            <hc:NumericUpDown x:Name="OnlyMergeSequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown" Maximum="10000" Minimum="0" DecimalPlaces="0"
+                            <hc:NumericUpDown x:Name="MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown" Maximum="10000" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 

@@ -63,7 +63,7 @@ internal static class ConfigManager
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     private static bool HorizontallyCenterMainWindowText { get; set; } // = false;
     public static bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
-    public static double OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds { get; private set; } = 5000;
+    public static double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
 
     #endregion
 
@@ -316,7 +316,7 @@ internal static class ConfigManager
         FrequencyFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FrequencyFontSize, nameof(FrequencyFontSize), double.TryParse);
         DeconjugationInfoFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize), double.TryParse);
         DictTypeFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DictTypeFontSize, nameof(DictTypeFontSize), double.TryParse);
-        OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds, nameof(OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds), double.TryParse);
+        MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds), double.TryParse);
         MaxNumResultsNotInMiningMode = ConfigDBManager.GetValueFromConfig(connection, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
 
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
@@ -813,7 +813,7 @@ internal static class ConfigManager
         preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value = AlternativeSpellingsFontSize;
         preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value = DeconjugationInfoFontSize;
         preferenceWindow.DictTypeFontSizeNumericUpDown.Value = DictTypeFontSize;
-        preferenceWindow.OnlyMergeSequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown.Value = OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds;
+        preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value = MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
         preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
         preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
@@ -1164,8 +1164,8 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(DictTypeFontSize),
                 preferenceWindow.DictTypeFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, nameof(OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds),
-                preferenceWindow.OnlyMergeSequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            ConfigDBManager.UpdateSetting(connection, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds),
+                preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(SeparatorColor), preferenceWindow.SeparatorColorButton.Tag.ToString()!);
 
