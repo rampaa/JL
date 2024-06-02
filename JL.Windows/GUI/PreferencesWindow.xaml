@@ -339,7 +339,7 @@
                                        &#10;For example, if the current text is 我が and 我が妹よ is the next text found in Clipboard/WebSocket, 妹よ is appended to 我が.
                                        &#10;This is useful when you feed JL with real-time generated text as it is being generated.
                                        &#10;It keeps the statistics accurate and prevents unwanted scroll up." />
-                            <CheckBox x:Name="MergesequentialTextsWhenTheyMatchCheckBox"  HorizontalAlignment="Right" />
+                            <CheckBox x:Name="MergeSequentialTextsWhenTheyMatchCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -348,7 +348,7 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="Setting it to 0 removes the time constraint"/>
-                            <hc:NumericUpDown x:Name="OnlyMergesequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown" Maximum="10000" Minimum="0" DecimalPlaces="0"
+                            <hc:NumericUpDown x:Name="OnlyMergeSequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown" Maximum="10000" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 

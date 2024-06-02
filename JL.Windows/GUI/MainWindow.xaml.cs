@@ -143,11 +143,11 @@ internal sealed partial class MainWindow : Window
                         {
                             Dispatcher.Invoke(() =>
                             {
-                                if (ConfigManager.MergesequentialTextsWhenTheyMatch)
+                                if (ConfigManager.MergeSequentialTextsWhenTheyMatch)
                                 {
                                     string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
-                                    if ((ConfigManager.OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds is 0
-                                            || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds)
+                                    if ((ConfigManager.OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds is 0
+                                            || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds)
                                         && text.StartsWith(lastText, StringComparison.Ordinal))
                                     {
                                         subsequentText = text[lastText.Length..];
@@ -197,11 +197,11 @@ internal sealed partial class MainWindow : Window
                 {
                     if (WindowState is not WindowState.Minimized)
                     {
-                        if (ConfigManager.MergesequentialTextsWhenTheyMatch)
+                        if (ConfigManager.MergeSequentialTextsWhenTheyMatch)
                         {
                             string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
-                            if ((ConfigManager.OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds is 0
-                                    || (preciseTimeNow - s_lastTextCopyTime).TotalSeconds < ConfigManager.OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds)
+                            if ((ConfigManager.OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds is 0
+                                    || (preciseTimeNow - s_lastTextCopyTime).TotalSeconds < ConfigManager.OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds)
                                 && text.StartsWith(lastText, StringComparison.Ordinal))
                             {
                                 subsequentText = text[lastText.Length..];

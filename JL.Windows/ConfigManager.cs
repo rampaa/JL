@@ -62,8 +62,8 @@ internal static class ConfigManager
     private static double MainWindowMaxDynamicHeight { get; set; } = 269;
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     private static bool HorizontallyCenterMainWindowText { get; set; } // = false;
-    public static bool MergesequentialTextsWhenTheyMatch { get; private set; } // = false;
-    public static double OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds { get; private set; } = 5000;
+    public static bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
+    public static double OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds { get; private set; } = 5000;
 
     #endregion
 
@@ -282,7 +282,7 @@ internal static class ConfigManager
 
         HidePopupsOnTextChange = ConfigDBManager.GetValueFromConfig(connection, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange), bool.TryParse);
 
-        MergesequentialTextsWhenTheyMatch = ConfigDBManager.GetValueFromConfig(connection, MergesequentialTextsWhenTheyMatch, nameof(MergesequentialTextsWhenTheyMatch), bool.TryParse);
+        MergeSequentialTextsWhenTheyMatch = ConfigDBManager.GetValueFromConfig(connection, MergeSequentialTextsWhenTheyMatch, nameof(MergeSequentialTextsWhenTheyMatch), bool.TryParse);
 
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = ConfigDBManager.GetValueFromConfig(connection, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
         MainWindow.Instance.ChangeVisibilityOfTitleBarButtons();
@@ -316,7 +316,7 @@ internal static class ConfigManager
         FrequencyFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FrequencyFontSize, nameof(FrequencyFontSize), double.TryParse);
         DeconjugationInfoFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize), double.TryParse);
         DictTypeFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DictTypeFontSize, nameof(DictTypeFontSize), double.TryParse);
-        OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds, nameof(OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds), double.TryParse);
+        OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds, nameof(OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds), double.TryParse);
         MaxNumResultsNotInMiningMode = ConfigDBManager.GetValueFromConfig(connection, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
 
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
@@ -775,7 +775,7 @@ internal static class ConfigManager
         preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
-        preferenceWindow.MergesequentialTextsWhenTheyMatchCheckBox.IsChecked = MergesequentialTextsWhenTheyMatch;
+        preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked = MergeSequentialTextsWhenTheyMatch;
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
@@ -813,7 +813,7 @@ internal static class ConfigManager
         preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value = AlternativeSpellingsFontSize;
         preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value = DeconjugationInfoFontSize;
         preferenceWindow.DictTypeFontSizeNumericUpDown.Value = DictTypeFontSize;
-        preferenceWindow.OnlyMergesequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown.Value = OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds;
+        preferenceWindow.OnlyMergeSequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown.Value = OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
         preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
         preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
@@ -1016,8 +1016,8 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(HidePopupsOnTextChange),
                 preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(MergesequentialTextsWhenTheyMatch),
-                preferenceWindow.MergesequentialTextsWhenTheyMatchCheckBox.IsChecked.ToString()!);
+            ConfigDBManager.UpdateSetting(connection, nameof(MergeSequentialTextsWhenTheyMatch),
+                preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar),
                 preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked.ToString()!);
@@ -1164,8 +1164,8 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(DictTypeFontSize),
                 preferenceWindow.DictTypeFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, nameof(OnlyMergesequentialTextsWhenTheyMatchWithinMilliseconds),
-                preferenceWindow.OnlyMergesequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            ConfigDBManager.UpdateSetting(connection, nameof(OnlyMergeSequentialTextsWhenTheyMatchWithinMilliseconds),
+                preferenceWindow.OnlyMergeSequentialTextsWhenTheyMatchWithinMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(SeparatorColor), preferenceWindow.SeparatorColorButton.Tag.ToString()!);
 
