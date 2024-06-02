@@ -23,6 +23,11 @@ internal static class BacklogUtils
         }
     }
 
+    public static void ReplaceLastBacklogText(string text)
+    {
+        Backlog[s_currentTextIndex] = text;
+    }
+
     public static void ShowPreviousBacklogItem()
     {
         if (!ConfigManager.EnableBacklog || MainWindow.Instance.FirstPopupWindow.MiningMode || Backlog.Count is 0)

@@ -330,6 +330,29 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Merge sequantial texts when they match"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="If the new text found in Clipboard/WebSocket starts with the current text
+                                       &#10;then simply append the subsequent text to the current text, instead of copying it as a new text.
+                                       &#10;For example, if the current text is 我が and 我が妹よ is the next text found in Clipboard/WebSocket, 妹よ is appended to 我が.
+                                       &#10;This is useful when you feed JL with real-time generated text as it is being generated.
+                                       &#10;It keeps the statistics accurate and prevents unwanted scroll up." />
+                            <CheckBox x:Name="MergeSequantialTextsWhenTheyMatchCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Only merge sequantial texts when they match within milliseconds"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="Setting it to 0 removes the time constraint"/>
+                            <hc:NumericUpDown x:Name="OnlyMergeSequantialTextsWhenTheyMatchWithinMillisecondsNumericUpDown" Maximum="10000" Minimum="0" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Disable lookups for non-Japanese characters"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />

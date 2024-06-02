@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -54,6 +55,8 @@ internal sealed partial class MainWindow : Window
     private static string? s_lastTextCopiedWhileMinimized;
 
     private Point _swipeStartPoint;
+
+    private static DateTime s_lastTextCopyTime;
 
     private MainWindow()
     {
@@ -134,16 +137,39 @@ internal sealed partial class MainWindow : Window
                     text = TextUtils.SanitizeText(text);
                     if (text.Length > 0)
                     {
+                        string? subsequentText = null;
+                        DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
                         if (WindowState is not WindowState.Minimized)
                         {
                             Dispatcher.Invoke(() =>
                             {
-                                MainTextBox.Text = text;
+                                if (ConfigManager.MergeSequantialTextsWhenTheyMatch)
+                                {
+                                    string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
+                                    if ((ConfigManager.OnlyMergeSequantialTextsWhenTheyMatchWithinMilliseconds is 0
+                                            || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.OnlyMergeSequantialTextsWhenTheyMatchWithinMilliseconds)
+                                        && text.StartsWith(lastText, StringComparison.Ordinal))
+                                    {
+                                        subsequentText = text[lastText.Length..];
+                                        MainTextBox.AppendText(subsequentText);
+                                    }
+                                    else
+                                    {
+                                        MainTextBox.Text = text;
+                                    }
+                                }
+                                else
+                                {
+                                    MainTextBox.Text = text;
+                                }
+
                                 MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
                             }, DispatcherPriority.Send);
                         }
 
-                        HandlePostCopy(text);
+                        s_lastTextCopyTime = preciseTimeNow;
+
+                        HandlePostCopy(text, subsequentText);
 
                         return true;
                     }
@@ -165,16 +191,41 @@ internal sealed partial class MainWindow : Window
             text = TextUtils.SanitizeText(text);
             if (text.Length > 0)
             {
+                string? subsequentText = null;
+                DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
                 Dispatcher.Invoke(() =>
                 {
                     if (WindowState is not WindowState.Minimized)
                     {
-                        MainTextBox.Text = text;
+                        if (ConfigManager.MergeSequantialTextsWhenTheyMatch)
+                        {
+                            string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
+                            if ((ConfigManager.OnlyMergeSequantialTextsWhenTheyMatchWithinMilliseconds is 0
+                                    || (preciseTimeNow - s_lastTextCopyTime).TotalSeconds < ConfigManager.OnlyMergeSequantialTextsWhenTheyMatchWithinMilliseconds)
+                                && text.StartsWith(lastText, StringComparison.Ordinal))
+                            {
+                                subsequentText = text[lastText.Length..];
+                                MainTextBox.AppendText(subsequentText);
+                                int lineIndex = MainTextBox.GetLineIndexFromCharacterIndex(lastText.Length);
+                                MainTextBox.ScrollToLine(lineIndex);
+                            }
+                            else
+                            {
+                                MainTextBox.Text = text;
+                            }
+                        }
+                        else
+                        {
+                            MainTextBox.Text = text;
+                        }
+
                         MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
                     }
                 }, DispatcherPriority.Send);
 
-                HandlePostCopy(text);
+                s_lastTextCopyTime = preciseTimeNow;
+
+                HandlePostCopy(text, subsequentText);
 
                 await Dispatcher.Invoke(async () =>
                 {
@@ -207,7 +258,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void HandlePostCopy(string text)
+    private void HandlePostCopy(string text, string? subsequentText)
     {
         Dispatcher.Invoke(() =>
         {
@@ -231,7 +282,14 @@ internal sealed partial class MainWindow : Window
 
         BringToFront();
 
-        BacklogUtils.AddToBacklog(text);
+        if (subsequentText is null)
+        {
+            BacklogUtils.AddToBacklog(text);
+        }
+        else
+        {
+            BacklogUtils.ReplaceLastBacklogText(text);
+        }
 
         if (ConfigManager.TextToSpeechOnTextChange
             && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
@@ -239,11 +297,14 @@ internal sealed partial class MainWindow : Window
             _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfigManager.AudioVolume).ConfigureAwait(false);
         }
 
-        Stats.IncrementStat(StatType.Lines);
+        if (subsequentText is null)
+        {
+            Stats.IncrementStat(StatType.Lines);
+        }
 
         string strippedText = ConfigManager.StripPunctuationBeforeCalculatingCharacterCount
-            ? JapaneseUtils.RemovePunctuation(text)
-            : text;
+            ? JapaneseUtils.RemovePunctuation(subsequentText ?? text)
+            : subsequentText ?? text;
 
         Stats.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
     }
