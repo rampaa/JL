@@ -244,25 +244,20 @@ internal sealed partial class MainWindow : Window
 
     private static void HandlePostCopy(string text, string? subsequentText)
     {
-        bool mergeText = subsequentText is not null;
-        if (mergeText)
+        if (subsequentText is null)
         {
-            BacklogUtils.ReplaceLastBacklogText(text);
+            BacklogUtils.AddToBacklog(text);
+            Stats.IncrementStat(StatType.Lines);
         }
         else
         {
-            BacklogUtils.AddToBacklog(text);
+            BacklogUtils.ReplaceLastBacklogText(text);
         }
 
         if (ConfigManager.TextToSpeechOnTextChange
             && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
         {
             _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfigManager.AudioVolume).ConfigureAwait(false);
-        }
-
-        if (!mergeText)
-        {
-            Stats.IncrementStat(StatType.Lines);
         }
 
         string strippedText = ConfigManager.StripPunctuationBeforeCalculatingCharacterCount
