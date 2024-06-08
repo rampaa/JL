@@ -182,6 +182,8 @@ internal sealed partial class MainWindow : Window
                                 || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
                             && text.StartsWith(lastText, StringComparison.Ordinal);
 
+        s_lastTextCopyTime = preciseTimeNow;
+
         string? subsequentText = mergeTexts
             ? text[lastText.Length..]
             : null;
@@ -228,8 +230,6 @@ internal sealed partial class MainWindow : Window
                 BringToFront();
             }
         }, DispatcherPriority.Send);
-
-        s_lastTextCopyTime = preciseTimeNow;
 
         HandlePostCopy(text, subsequentText);
 
