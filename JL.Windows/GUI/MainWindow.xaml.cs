@@ -155,7 +155,7 @@ internal sealed partial class MainWindow : Window
                     && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                         || WindowState is WindowState.Minimized))
                 {
-                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, text, 0, true).ConfigureAwait(false);
+                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, s_lastTextCopiedWhileMinimized ?? MainTextBox.Text, 0, true).ConfigureAwait(false);
                 }
             }).ConfigureAwait(false);
         }
@@ -163,79 +163,81 @@ internal sealed partial class MainWindow : Window
 
     private bool CopyText(string text)
     {
-        if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex().IsMatch(text))
+        if (ConfigManager.OnlyCaptureTextWithJapaneseChars && !JapaneseUtils.JapaneseRegex().IsMatch(text))
         {
-            text = TextUtils.SanitizeText(text);
-            if (text.Length > 0)
-            {
-                DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-
-                string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
-                bool mergeTexts = ConfigManager.MergeSequentialTextsWhenTheyMatch
-                                    && (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
-                                        || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                                    && text.StartsWith(lastText, StringComparison.Ordinal);
-
-                string? subsequentText = mergeTexts
-                    ? text[lastText.Length..]
-                    : null;
-
-                Dispatcher.Invoke(() =>
-                {
-                    if (WindowState is not WindowState.Minimized)
-                    {
-                        if (mergeTexts)
-                        {
-                            MainTextBox.AppendText(subsequentText);
-                        }
-                        else
-                        {
-                            MainTextBox.Text = text;
-                        }
-
-                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                    }
-                }, DispatcherPriority.Send);
-
-                s_lastTextCopyTime = preciseTimeNow;
-
-                HandlePostCopy(text, subsequentText);
-
-                return true;
-            }
+            return false;
         }
 
-        return false;
-    }
+        text = TextUtils.SanitizeText(text);
+        if (text.Length is 0)
+        {
+            return false;
+        }
 
-    private void HandlePostCopy(string text, string? subsequentText)
-    {
+        DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
+
+        string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
+        bool mergeTexts = ConfigManager.MergeSequentialTextsWhenTheyMatch
+                            && (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
+                                || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
+                            && text.StartsWith(lastText, StringComparison.Ordinal);
+
+        string? subsequentText = mergeTexts
+            ? text[lastText.Length..]
+            : null;
+
         Dispatcher.Invoke(() =>
         {
             bool windowIsMinimized = WindowState is WindowState.Minimized;
+            if (!windowIsMinimized)
+            {
+                if (mergeTexts)
+                {
+                    MainTextBox.AppendText(subsequentText);
+                }
+                else
+                {
+                    MainTextBox.Text = text;
+                }
 
-            s_mergeTextsWhenRestored = windowIsMinimized && subsequentText is not null;
+                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+            }
+
+            s_mergeTextsWhenRestored = windowIsMinimized && mergeTexts;
 
             s_lastTextCopiedWhileMinimized = windowIsMinimized
                 ? text
                 : null;
 
-            if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+            if (!mergeTexts && SizeToContent is SizeToContent.Manual
+                && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
                 WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
             }
 
-            TitleBarContextMenu.IsOpen = false;
-            MainTextBoxContextMenu.IsOpen = false;
-
-            if (ConfigManager.HidePopupsOnTextChange)
+            if (!windowIsMinimized)
             {
-                PopupWindowUtils.HidePopups(FirstPopupWindow);
+                TitleBarContextMenu.IsOpen = false;
+                MainTextBoxContextMenu.IsOpen = false;
+
+                if (ConfigManager.HidePopupsOnTextChange)
+                {
+                    PopupWindowUtils.HidePopups(FirstPopupWindow);
+                }
+
+                BringToFront();
             }
         }, DispatcherPriority.Send);
 
-        BringToFront();
+        s_lastTextCopyTime = preciseTimeNow;
 
+        HandlePostCopy(text, subsequentText);
+
+        return true;
+    }
+
+    private static void HandlePostCopy(string text, string? subsequentText)
+    {
         if (subsequentText is null)
         {
             BacklogUtils.AddToBacklog(text);
@@ -1516,6 +1518,12 @@ internal sealed partial class MainWindow : Window
                 else
                 {
                     MainTextBox.Text = s_lastTextCopiedWhileMinimized;
+
+                    if (SizeToContent is SizeToContent.Manual
+                        && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+                    {
+                        WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
+                    }
                 }
 
                 MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
@@ -1532,6 +1540,11 @@ internal sealed partial class MainWindow : Window
             if (ConfigManager.GlobalHotKeys)
             {
                 WinApi.RegisterAllHotKeys(WindowHandle);
+            }
+
+            if (ConfigManager.AlwaysOnTop)
+            {
+                WinApi.BringToFront(WindowHandle);
             }
         }
     }
