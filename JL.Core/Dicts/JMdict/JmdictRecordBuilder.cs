@@ -10,7 +10,7 @@ internal static class JmdictRecordBuilder
 
         List<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.Contains("sK")).ToList();
         List<string> allSpellingsWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.Keb).ToList();
-        List<string[]?> allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimStringListToStringArray()).ToList();
+        List<string[]?> allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimListToArray()).ToList();
 
         int index = 0;
         int kanjiElementCount = entry.KanjiElements.Count;
@@ -47,7 +47,7 @@ internal static class JmdictRecordBuilder
                     && (readingElement.ReRestrList.Count is 0 || readingElement.ReRestrList.Contains(kanjiElement.Keb)))
                 {
                     readingList.Add(readingElement.Reb);
-                    readingsOrthographyInfoList.Add(readingElement.ReInfList.TrimStringListToStringArray());
+                    readingsOrthographyInfoList.Add(readingElement.ReInfList.TrimListToArray());
                 }
             }
 
@@ -72,14 +72,14 @@ internal static class JmdictRecordBuilder
                 {
                     definitionList.Add(sense.GlossList.ToArray());
                     wordClassList.Add(sense.PosList.ToArray());
-                    readingRestrictionList.Add(sense.StagRList.TrimStringListToStringArray());
-                    spellingRestrictionList.Add(sense.StagKList.TrimStringListToStringArray());
-                    fieldList.Add(sense.FieldList.TrimStringListToStringArray());
-                    miscList.Add(sense.MiscList.TrimStringListToStringArray());
-                    dialectList.Add(sense.DialList.TrimStringListToStringArray());
+                    readingRestrictionList.Add(sense.StagRList.TrimListToArray());
+                    spellingRestrictionList.Add(sense.StagKList.TrimListToArray());
+                    fieldList.Add(sense.FieldList.TrimListToArray());
+                    miscList.Add(sense.MiscList.TrimListToArray());
+                    dialectList.Add(sense.DialList.TrimListToArray());
                     definitionInfoList.Add(sense.SInf);
-                    relatedTermList.Add(sense.XRefList.TrimStringListToStringArray());
-                    antonymList.Add(sense.AntList.TrimStringListToStringArray());
+                    relatedTermList.Add(sense.XRefList.TrimListToArray());
+                    antonymList.Add(sense.AntList.TrimListToArray());
                     loanwordSourceList.Add(sense.LSourceList.Count > 0 ? sense.LSourceList.ToArray() : null);
                 }
             }
@@ -88,8 +88,8 @@ internal static class JmdictRecordBuilder
                 kanjiElement.Keb,
                 allKanjiOrthographyInfoWithoutSearchOnlyForms[index],
                 allSpellingsWithoutSearchOnlyForms.RemoveAtToArray(index),
-                allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAtToArray(index),
-                readingList.TrimStringListToStringArray(),
+                allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAtToArrayNullable(index),
+                readingList.TrimListToArray(),
                 readingsOrthographyInfoList.TrimListOfNullableArraysToArrayOfArrays(),
                 definitionList.ToArray(),
                 wordClassList.ToArray(),
@@ -110,7 +110,7 @@ internal static class JmdictRecordBuilder
 
         List<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => !ke.ReInfList.Contains("sk")).ToList();
         List<string> allReadingsWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.Reb).ToList();
-        List<string[]?> allROrthographyInfoWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.ReInfList.TrimStringListToStringArray()).ToList();
+        List<string[]?> allROrthographyInfoWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.ReInfList.TrimListToArray()).ToList();
 
         index = 0;
         for (int i = 0; i < readingElementCount; i++)
@@ -171,7 +171,7 @@ internal static class JmdictRecordBuilder
                 primarySpellingOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms[index];
 
                 alternativeSpellings = allReadingsWithoutSearchOnlyForms.RemoveAtToArray(index);
-                alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAtToArray(index);
+                alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAtToArrayNullable(index);
             }
 
             List<string[]> definitionList = [];
@@ -196,14 +196,14 @@ internal static class JmdictRecordBuilder
                 {
                     definitionList.Add(sense.GlossList.ToArray());
                     wordClassList.Add(sense.PosList.ToArray());
-                    readingRestrictionList.Add(sense.StagRList.TrimStringListToStringArray());
-                    spellingRestrictionList.Add(sense.StagKList.TrimStringListToStringArray());
-                    fieldList.Add(sense.FieldList.TrimStringListToStringArray());
-                    miscList.Add(sense.MiscList.TrimStringListToStringArray());
-                    dialectList.Add(sense.DialList.TrimStringListToStringArray());
+                    readingRestrictionList.Add(sense.StagRList.TrimListToArray());
+                    spellingRestrictionList.Add(sense.StagKList.TrimListToArray());
+                    fieldList.Add(sense.FieldList.TrimListToArray());
+                    miscList.Add(sense.MiscList.TrimListToArray());
+                    dialectList.Add(sense.DialList.TrimListToArray());
                     definitionInfoList.Add(sense.SInf);
-                    relatedTermList.Add(sense.XRefList.TrimStringListToStringArray());
-                    antonymList.Add(sense.AntList.TrimStringListToStringArray());
+                    relatedTermList.Add(sense.XRefList.TrimListToArray());
+                    antonymList.Add(sense.AntList.TrimListToArray());
                     loanwordSourceList.Add(sense.LSourceList.Count > 0 ? sense.LSourceList.ToArray() : null);
                 }
             }

@@ -34,7 +34,7 @@ internal static class JmnedictRecordBuilder
                     //relatedTermList.Add(translation.XRefList > 0 ? translation.XRefList.ToArray() : null);
                 }
 
-                JmnedictRecord record = new(entry.Id, entry.KebList[i], entry.KebList.RemoveAtToArray(i), entry.RebList.TrimStringListToStringArray(), definitionList.ToArray(), nameTypeList.ToArray());
+                JmnedictRecord record = new(entry.Id, entry.KebList[i], entry.KebList.RemoveAtToArray(i), entry.RebList.TrimListToArray(), definitionList.ToArray(), nameTypeList.ToArray());
                 //record.RelatedTerms = relatedTermList.TrimListToArray();
 
                 recordDictionary.Add(key, record);

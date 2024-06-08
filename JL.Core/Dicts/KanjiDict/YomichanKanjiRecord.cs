@@ -54,12 +54,16 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
         List<string> definitionList = [];
         JsonElement definitionsArray = jsonElement[4];
-        foreach (JsonElement definition in definitionsArray.EnumerateArray())
+        foreach (JsonElement definitionElement in definitionsArray.EnumerateArray())
         {
-            definitionList.Add(definition.GetString()!);
+            string? definition = definitionElement.GetString();
+            if (!string.IsNullOrWhiteSpace(definition))
+            {
+                definitionList.Add(definition);
+            }
         }
 
-        Definitions = definitionList.TrimStringListToStringArray();
+        Definitions = definitionList.TrimListToArray();
 
         List<string> statList = [];
         JsonElement statsElement = jsonElement[5];

@@ -69,8 +69,15 @@ public static class ExtensionMethods
         }
     }
 
-    internal static T[] RemoveAt<T>(this T[] source, int index)
+    internal static T[]? RemoveAt<T>(this T[] source, int index)
     {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, source.Length);
+
+        if (source.Length is 1)
+        {
+            return null;
+        }
+
         T[] destination = new T[source.Length - 1];
         if (index > 0)
         {
@@ -89,12 +96,37 @@ public static class ExtensionMethods
     {
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, list.Count);
 
-        if (list.Count is 1 || list.All(static l => l is null))
+        if (list.Count is 1)
         {
             return null;
         }
 
         T[] array = new T[list.Count - 1];
+
+        int arrayIndex = 0;
+        int listCount = list.Count;
+        for (int i = 0; i < listCount; i++)
+        {
+            if (i != index)
+            {
+                array[arrayIndex] = list[i];
+                ++arrayIndex;
+            }
+        }
+
+        return array;
+    }
+
+    internal static T?[]? RemoveAtToArrayNullable<T>(this List<T?> list, int index) where T : class
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, list.Count);
+
+        if (list.Count is 1 || list.All(static l => l is null))
+        {
+            return null;
+        }
+
+        T?[] array = new T?[list.Count - 1];
 
         bool hasNonNullElement = false;
         int arrayIndex = 0;
@@ -103,7 +135,7 @@ public static class ExtensionMethods
         {
             if (i != index)
             {
-                T element = list[i];
+                T? element = list[i];
                 array[arrayIndex] = element;
                 ++arrayIndex;
 
@@ -117,9 +149,9 @@ public static class ExtensionMethods
         return hasNonNullElement ? array : null;
     }
 
-    internal static string[]? TrimStringListToStringArray(this List<string> list)
+    internal static T[]? TrimListToArray<T>(this List<T> list)
     {
-        return list.Count is 0 || list.All(string.IsNullOrEmpty)
+        return list.Count is 0
             ? null
             : list.ToArray();
     }

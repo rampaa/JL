@@ -32,11 +32,14 @@ internal static class EpwingYomichanUtils
                     definition = definition.Replace("┏", "", StringComparison.Ordinal);
                 }
 
-                definitions.Add(definition.GetPooledString());
+                if (!string.IsNullOrWhiteSpace(definition))
+                {
+                    definitions.Add(definition.GetPooledString());
+                }
             }
         }
 
-        return definitions.TrimStringListToStringArray();
+        return definitions.TrimListToArray();
     }
 
     private static string? GetDefinitionsFromJsonArray(JsonElement jsonElement, string? parentTag = null)

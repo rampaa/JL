@@ -102,11 +102,6 @@ public static class CustomWordLoader
         for (int i = 0; i < spellings.Length; i++)
         {
             string[]? alternativeSpellings = spellings.RemoveAt(i);
-            if (alternativeSpellings.Length is 0)
-            {
-                alternativeSpellings = null;
-            }
-
             string spelling = spellings[i];
 
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);

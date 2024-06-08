@@ -46,7 +46,7 @@ internal static class EpwingUtils
                     {
                         if (!char.IsDigit(definitions[i][0]))
                         {
-                            definitions = definitions.RemoveAt(i);
+                            definitions = definitions.RemoveAt(i)!;
                             --i;
                         }
                     }
@@ -69,7 +69,7 @@ internal static class EpwingUtils
                         {
                             if (!isMainExample)
                             {
-                                definitions = definitions.RemoveAt(i);
+                                definitions = definitions.RemoveAt(i)!;
                                 --i;
                             }
 
