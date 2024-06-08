@@ -244,13 +244,14 @@ internal sealed partial class MainWindow : Window
 
     private static void HandlePostCopy(string text, string? subsequentText)
     {
-        if (subsequentText is null)
+        bool mergeText = subsequentText is not null;
+        if (mergeText)
         {
-            BacklogUtils.AddToBacklog(text);
+            BacklogUtils.ReplaceLastBacklogText(text);
         }
         else
         {
-            BacklogUtils.ReplaceLastBacklogText(text);
+            BacklogUtils.AddToBacklog(text);
         }
 
         if (ConfigManager.TextToSpeechOnTextChange
@@ -259,7 +260,7 @@ internal sealed partial class MainWindow : Window
             _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfigManager.AudioVolume).ConfigureAwait(false);
         }
 
-        if (subsequentText is null)
+        if (!mergeText)
         {
             Stats.IncrementStat(StatType.Lines);
         }
