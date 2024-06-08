@@ -174,19 +174,25 @@ internal sealed partial class MainWindow : Window
             return false;
         }
 
-        DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
+        bool mergeTexts = false;
+        string? subsequentText = null;
 
-        string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
-        bool mergeTexts = ConfigManager.MergeSequentialTextsWhenTheyMatch
-                            && (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
-                                || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                            && text.StartsWith(lastText, StringComparison.Ordinal);
+        if (ConfigManager.MergeSequentialTextsWhenTheyMatch)
+        {
+            DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
 
-        s_lastTextCopyTime = preciseTimeNow;
+            string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
+            mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
+                            || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
+                        && text.StartsWith(lastText, StringComparison.Ordinal);
 
-        string? subsequentText = mergeTexts
-            ? text[lastText.Length..]
-            : null;
+            s_lastTextCopyTime = preciseTimeNow;
+
+            if (mergeTexts)
+            {
+                subsequentText = text[lastText.Length..];
+            }
+        }
 
         Dispatcher.Invoke(() =>
         {
