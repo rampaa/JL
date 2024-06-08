@@ -102,7 +102,7 @@ internal static class BacklogUtils
             return;
         }
 
-        string allBacklogText = string.Join("\n", Backlog);
+        string allBacklogText = string.Join('\n', Backlog);
         if (MainWindow.Instance.MainTextBox.Text != allBacklogText)
         {
             if (MainWindow.Instance.MainTextBox.GetFirstVisibleLineIndex() is 0)
