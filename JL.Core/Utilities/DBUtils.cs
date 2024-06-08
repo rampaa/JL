@@ -102,7 +102,7 @@ public static class DBUtils
         SendOptimizePragma(connection);
     }
 
-    internal static void SendOptimizePragma(SqliteConnection connection)
+    private static void SendOptimizePragma(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA optimize;";
@@ -183,5 +183,20 @@ public static class DBUtils
     //    using SqliteCommand command = connection.CreateCommand();
     //    command.CommandText = "SELECT SQLITE_VERSION();";
     //    return (string)command.ExecuteScalar()!;
+    //}
+
+    //public static List<string> GetCompileOptions()
+    //{
+    //    using SqliteConnection connection = new();
+    //    connection.Open();
+    //    using SqliteCommand command = connection.CreateCommand();
+    //    command.CommandText = "PRAGMA compile_options";
+    //    List<string> compileOptions = [];
+    //    using SqliteDataReader sqliteDataReader = command.ExecuteReader();
+    //    while (sqliteDataReader.Read())
+    //    {
+    //        compileOptions.Add(sqliteDataReader.GetString(0));
+    //    }
+    //    return compileOptions;
     //}
 }

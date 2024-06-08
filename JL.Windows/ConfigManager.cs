@@ -1262,7 +1262,7 @@ internal static class ConfigManager
             ? MainWindow.Instance.Left.ToString(CultureInfo.InvariantCulture)
             : "0");
 
-        ConfigDBManager.OptimizeAnalyzeAndVacuum(connection);
+        ConfigDBManager.AnalyzeAndVacuum(connection);
     }
 
     private static Brush GetBrushFromConfig(SqliteConnection connection, Brush solidColorBrush, string configKey)

@@ -171,15 +171,8 @@ public static class ConfigDBManager
         DBUtils.SendOptimizePragma(s_configsPath);
     }
 
-    private static void SendOptimizePragma(SqliteConnection connection)
+    public static void AnalyzeAndVacuum(SqliteConnection connection)
     {
-        DBUtils.SendOptimizePragma(connection);
-    }
-
-    public static void OptimizeAnalyzeAndVacuum(SqliteConnection connection)
-    {
-        SendOptimizePragma(connection);
-
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
         _ = analyzeCommand.ExecuteNonQuery();
