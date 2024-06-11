@@ -55,6 +55,7 @@ internal sealed partial class PreferencesWindow : Window
                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                             • Dictionary Name: Name of the dictionary, e.g., JMDict.
                                             • Audio: Audio for the first reading of the mined word.
+                                            • Image: Image found in clipboard at the time of mining.
                                             • Source Text: Whole text in which the mined word appears in.
                                             • Sentence: Sentence in which the mined word appears in.
                                             • Leading Sentence Part: Part of the sentence that appears before the matched text. e.g., if the mined word is "大好き" while the sentence is "妹が大好きです", "Leading Sentence Part" will be "妹が".
@@ -85,6 +86,8 @@ internal sealed partial class PreferencesWindow : Window
                                              • Definitions: Definitions of the mined kanji.
                                              • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                              • Dictionary Name: Name of the dictionary, e.g., "Kanjidic".
+                                             • Audio: Audio for the first reading of the mined word.
+                                             • Image: Image found in clipboard at the time of mining.
                                              • Source Text: Whole text in which the mined kanji appears in.
                                              • Sentence: Sentence in which the mined kanji appears in.
                                              • Leading Sentence Part: Part of the sentence that appears before the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Leading Sentence Part" will be "妹が".
@@ -105,6 +108,8 @@ internal sealed partial class PreferencesWindow : Window
                                             • Definitions: Translations of the name.
                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                             • Dictionary Name: Name of the dictionary, e.g., "JMnedict".
+                                            • Audio: Audio for the first reading of the mined word.
+                                            • Image: Image found in clipboard at the time of mining.
                                             • Source Text: Whole text in which the mined name appears in.
                                             • Sentence: Sentence in which the mined name appears in.
                                             • Leading Sentence Part: Part of the sentence that appears before the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Leading Sentence Part" will be "俺は".
