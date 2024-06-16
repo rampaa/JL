@@ -174,6 +174,10 @@ internal sealed partial class WinApi
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool SetPropW(nint hWnd, string lpString, nint hData);
 
+        [LibraryImport("user32.dll", EntryPoint = "RemovePropW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial nint RemovePropW(nint hWnd, string lpString);
+
         // ReSharper restore InconsistentNaming
     }
 #pragma warning restore IDE1006
@@ -343,6 +347,11 @@ internal sealed partial class WinApi
     public static void MarkWindowAsMagpieToolWindow(nint hwnd)
     {
         _ = SetPropW(hwnd, "Magpie.ToolWindow", 1);
+    }
+
+    public static void UnmarkWindowAsMagpieToolWindow(nint hwnd)
+    {
+        _ = RemovePropW(hwnd, "Magpie.ToolWindow");
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)

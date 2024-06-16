@@ -439,6 +439,7 @@ internal sealed partial class MainWindow : Window
     private async void MainWindow_Closing(object sender, CancelEventArgs e)
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
+        WinApi.UnmarkWindowAsMagpieToolWindow(WindowHandle);
         ConfigManager.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
 
