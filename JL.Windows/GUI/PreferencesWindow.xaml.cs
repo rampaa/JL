@@ -51,7 +51,7 @@ internal sealed partial class PreferencesWindow : Window
                                             • Readings with Orthography Info: Readings of the mined word with their orthography info, e.g. if you look up "従妹", its "Readings with Orthography Info" will be "じゅうまい, いとこ (gikun)".
                                             • Alternative Spellings: Alternative spellings of the mined word, e.g., if you look up "わかりました", its alternative spellings will be "解る, 判る, 分る".
                                             • Alternative Spellings with Orthography Info: Alternative spellings of the mined word with their orthography info, e.g., if you look up "嫁" its "Alternative Spellings with Orthography Info" will be "娵 (rK), 婦 (rK), 媳 (rK)".
-                                            • Definitions: Definitions of the mined word.
+                                            • Definitions: Definitions of the mined word. You can edit the definitions in the popup window by pressing Ctrl+Alt and clicking on the definitions text box with the left mouse button.
                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                             • Dictionary Name: Name of the dictionary, e.g., JMDict.
                                             • Audio: Audio for the first reading of the mined word.
@@ -83,7 +83,7 @@ internal sealed partial class PreferencesWindow : Window
                                              • Stroke Count: Stroke count of the kanji.
                                              • Kanji Grade: The kanji grade level.
                                              • Kanji Composition: Kanji composition info, e.g., "⿰女未" for "妹".
-                                             • Definitions: Definitions of the mined kanji.
+                                             • Definitions: Definitions of the mined kanji. You can edit the definitions in the popup window by pressing Ctrl+Alt and clicking on the definitions text box with the left mouse button.
                                              • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                              • Dictionary Name: Name of the dictionary, e.g., "Kanjidic".
                                              • Audio: Audio for the first reading of the mined word.
@@ -105,7 +105,7 @@ internal sealed partial class PreferencesWindow : Window
                                             • Primary Spelling: It's the spelling you click to mine the name.
                                             • Readings: Readings of the name.
                                             • Alternative Spellings: Alternative spellings of the mined name.
-                                            • Definitions: Translations of the name.
+                                            • Definitions: Translations of the name. You can edit the definitions in the popup window by pressing Ctrl+Alt and clicking on the definitions text box with the left mouse button.
                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                             • Dictionary Name: Name of the dictionary, e.g., "JMnedict".
                                             • Audio: Audio for the first reading of the mined word.

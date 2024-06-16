@@ -74,7 +74,7 @@ public static class MiningUtils
         </style>
         """;
 
-    private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition, bool replaceLineBreakWithBrTag)
+    private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, bool replaceLineBreakWithBrTag)
     {
         Dictionary<JLField, string> miningParams = new()
         {
@@ -108,7 +108,7 @@ public static class MiningUtils
             miningParams[JLField.Readings] = readings;
 
             miningParams[JLField.ReadingsWithOrthographyInfo] = lookupResult.ReadingsOrthographyInfoList is not null
-                ? LookupResultUtils.ReadingsToText(lookupResult.Readings, lookupResult.ReadingsOrthographyInfoList)
+                ? LookupResultUtils.ElementWithOrthographyInfoToText(lookupResult.Readings, lookupResult.ReadingsOrthographyInfoList)
                 : readings;
         }
 
@@ -118,7 +118,7 @@ public static class MiningUtils
             miningParams[JLField.AlternativeSpellings] = alternativeSpellings;
 
             miningParams[JLField.AlternativeSpellingsWithOrthographyInfo] = lookupResult.AlternativeSpellingsOrthographyInfoList is not null
-                ? LookupResultUtils.ReadingsToText(lookupResult.AlternativeSpellings, lookupResult.AlternativeSpellingsOrthographyInfoList)
+                ? LookupResultUtils.ElementWithOrthographyInfoToText(lookupResult.AlternativeSpellings, lookupResult.AlternativeSpellingsOrthographyInfoList)
                 : alternativeSpellings;
         }
 
@@ -141,11 +141,11 @@ public static class MiningUtils
             }
         }
 
-        if (lookupResult.FormattedDefinitions is not null)
+        if (formattedDefinitions is not null)
         {
-            string formattedDefinitions = replaceLineBreakWithBrTag
-                ? lookupResult.FormattedDefinitions.ReplaceLineEndings("<br/>")
-                : lookupResult.FormattedDefinitions;
+            formattedDefinitions = replaceLineBreakWithBrTag
+                ? formattedDefinitions.ReplaceLineEndings("<br/>")
+                : formattedDefinitions;
 
             miningParams[JLField.Definitions] = formattedDefinitions;
 
@@ -356,7 +356,7 @@ public static class MiningUtils
         return expressionWithPitchAccentStringBuilder;
     }
 
-    public static async Task MineToFile(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition)
+    public static async Task MineToFile(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition)
     {
         string filePath;
         JLField[] jlFields;
@@ -381,7 +381,7 @@ public static class MiningUtils
             jlFields = JLFieldUtils.JLFieldsForWordDicts;
         }
 
-        Dictionary<JLField, string> miningParameters = GetMiningParameters(lookupResult, currentText, selectedDefinitions, currentCharPosition, false);
+        Dictionary<JLField, string> miningParameters = GetMiningParameters(lookupResult, currentText, formattedDefinitions, selectedDefinitions, currentCharPosition, false);
         StringBuilder lineToMine = new();
         for (int i = 1; i < jlFields.Length; i++)
         {
@@ -408,7 +408,7 @@ public static class MiningUtils
         Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
     }
 
-    public static async Task Mine(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition)
+    public static async Task Mine(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition)
     {
         if (!CoreConfigManager.AnkiIntegration)
         {
@@ -448,7 +448,7 @@ public static class MiningUtils
         }
 
         Dictionary<string, JLField> userFields = ankiConfig.Fields;
-        Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResult, currentText, selectedDefinitions, currentCharPosition, true);
+        Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResult, currentText, formattedDefinitions, selectedDefinitions, currentCharPosition, true);
         Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
 
         // Audio/Picture/Video shouldn't be set here

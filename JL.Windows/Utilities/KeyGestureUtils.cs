@@ -102,7 +102,7 @@ internal static class KeyGestureUtils
 
         if (lastPopup is not null)
         {
-            await lastPopup.HandleHotKey(keyGesture).ConfigureAwait(false);
+            await lastPopup.HandleHotKey(keyGesture, e).ConfigureAwait(false);
         }
 
         else

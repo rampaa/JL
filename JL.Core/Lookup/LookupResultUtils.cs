@@ -94,24 +94,24 @@ public static class LookupResultUtils
         return sb.ToString();
     }
 
-    public static string ReadingsToText(string[] readings, string[]?[] rOrthographyInfoList)
+    public static string ElementWithOrthographyInfoToText(string[] elements, string[]?[] orthographyInfoList)
     {
         StringBuilder sb = new();
 
-        for (int index = 0; index < readings.Length; index++)
+        for (int index = 0; index < elements.Length; index++)
         {
-            _ = sb.Append(readings[index]);
+            _ = sb.Append(elements[index]);
 
-            if (index < rOrthographyInfoList.Length)
+            if (index < orthographyInfoList.Length)
             {
-                string[]? rOrthographyInfo = rOrthographyInfoList[index];
-                if (rOrthographyInfo is not null)
+                string[]? orthographyInfo = orthographyInfoList[index];
+                if (orthographyInfo is not null)
                 {
-                    _ = sb.Append(CultureInfo.InvariantCulture, $" ({string.Join(", ", rOrthographyInfo)})");
+                    _ = sb.Append(CultureInfo.InvariantCulture, $" ({string.Join(", ", orthographyInfo)})");
                 }
             }
 
-            if (index + 1 != readings.Length)
+            if (index + 1 != elements.Length)
             {
                 _ = sb.Append(", ");
             }
@@ -120,7 +120,7 @@ public static class LookupResultUtils
         return sb.ToString();
     }
 
-    public static string AlternativeSpellingsToText(string[] alternativeSpellings, string[]?[] aOrthographyInfoList)
+    public static string ElementWithOrthographyInfoToTextWithParentheses(string[] alternativeSpellings, string[]?[] aOrthographyInfoList)
     {
         StringBuilder sb = new();
 

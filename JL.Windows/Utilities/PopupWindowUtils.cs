@@ -47,6 +47,7 @@ internal static class PopupWindowUtils
             Name = name,
             Text = text,
             Foreground = foregroundBrush,
+            CaretBrush = foregroundBrush,
             FontSize = fontSize,
             ContextMenu = contextMenu,
             VerticalAlignment = verticalAlignment,
