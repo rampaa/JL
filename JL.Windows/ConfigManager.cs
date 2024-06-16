@@ -258,6 +258,8 @@ internal static class ConfigManager
         {
             MainWindow.Instance.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
             MainWindow.Instance.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
+            MainWindow.Instance.MainTextBox.AcceptsReturn = !TextBoxIsReadOnly;
+            MainWindow.Instance.MainTextBox.AcceptsTab = !TextBoxIsReadOnly;
             MainWindow.Instance.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
         }
 

@@ -1107,19 +1107,21 @@ internal sealed partial class PopupWindow : Window
 
         if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Alt))
         {
-            bool isReadOnly = !definitionsTextBox.IsReadOnly;
-            definitionsTextBox.IsReadOnly = isReadOnly;
-            definitionsTextBox.IsUndoEnabled = !isReadOnly;
+            bool isEditable = definitionsTextBox.IsReadOnly;
+            definitionsTextBox.IsReadOnly = !isEditable;
+            definitionsTextBox.IsUndoEnabled = isEditable;
+            definitionsTextBox.AcceptsReturn = isEditable;
+            definitionsTextBox.AcceptsTab = isEditable;
 
-            if (isReadOnly)
-            {
-                definitionsTextBox.ContextMenu = PopupContextMenu;
-                definitionsTextBox.UndoLimit = 0;
-            }
-            else
+            if (isEditable)
             {
                 definitionsTextBox.ContextMenu = _editableTextBoxContextMenu;
                 definitionsTextBox.UndoLimit = -1;
+            }
+            else
+            {
+                definitionsTextBox.ContextMenu = PopupContextMenu;
+                definitionsTextBox.UndoLimit = 0;
             }
         }
     }
