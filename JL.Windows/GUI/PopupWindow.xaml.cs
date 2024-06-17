@@ -594,7 +594,7 @@ internal sealed partial class PopupWindow : Window
 
             if (MiningMode)
             {
-                TouchScreenTextBox readingTextBox = PopupWindowUtils.CreateTextBox(nameof(result.Readings),
+                TextBox readingTextBox = PopupWindowUtils.CreateTextBox(nameof(result.Readings),
                     readingsText, ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -699,7 +699,7 @@ internal sealed partial class PopupWindow : Window
 
             if (MiningMode)
             {
-                TouchScreenTextBox alternativeSpellingsTexBox = PopupWindowUtils.CreateTextBox(nameof(result.AlternativeSpellings),
+                TextBox alternativeSpellingsTexBox = PopupWindowUtils.CreateTextBox(nameof(result.AlternativeSpellings),
                     alternativeSpellingsText,
                     ConfigManager.AlternativeSpellingsColor,
                     ConfigManager.AlternativeSpellingsFontSize,
@@ -729,7 +729,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox deconjugationProcessTextBox = PopupWindowUtils.CreateTextBox(nameof(result.DeconjugationProcess),
+                TextBox deconjugationProcessTextBox = PopupWindowUtils.CreateTextBox(nameof(result.DeconjugationProcess),
                     $"{result.MatchedText} {result.DeconjugationProcess}",
                     ConfigManager.DeconjugationInfoColor,
                     ConfigManager.DeconjugationInfoFontSize,
@@ -794,7 +794,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox definitionsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.FormattedDefinitions),
+                TextBox definitionsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.FormattedDefinitions),
                     result.FormattedDefinitions,
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
@@ -825,7 +825,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.OnReadings),
+                TextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.OnReadings),
                     $"On: {string.Join(", ", result.OnReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
@@ -856,7 +856,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KunReadings),
+                TextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KunReadings),
                     $"Kun: {string.Join(", ", result.KunReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
@@ -887,7 +887,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.NanoriReadings),
+                TextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.NanoriReadings),
                     $"Nanori: {string.Join(", ", result.NanoriReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
@@ -918,7 +918,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(result.RadicalNames),
+                TextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(result.RadicalNames),
                     $"Radical names: {string.Join(", ", result.RadicalNames)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
@@ -975,7 +975,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KanjiComposition),
+                TextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KanjiComposition),
                     $"Composition: {result.KanjiComposition}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
@@ -1102,7 +1102,7 @@ internal sealed partial class PopupWindow : Window
 
     private void DefinitionsTextBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        TouchScreenTextBox definitionsTextBox = (TouchScreenTextBox)sender;
+        TextBox definitionsTextBox = (TextBox)sender;
         _lastInteractedTextBox = definitionsTextBox;
 
         if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Alt))

@@ -40,7 +40,7 @@ internal static class PopupWindowUtils
         };
     }
 
-    public static TouchScreenTextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
+    public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
         return new TouchScreenTextBox
         {
