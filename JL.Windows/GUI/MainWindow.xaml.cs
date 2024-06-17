@@ -145,20 +145,15 @@ internal sealed partial class MainWindow : Window
         return false;
     }
 
-    public async Task CopyFromWebSocket(string text)
+    public Task CopyFromWebSocket(string text)
     {
-        if (CopyText(text))
-        {
-            await Dispatcher.Invoke(async () =>
-            {
-                if (ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
-                    && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
-                        || WindowState is WindowState.Minimized))
-                {
-                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, s_lastTextCopiedWhileMinimized ?? MainTextBox.Text, 0, true).ConfigureAwait(false);
-                }
-            }).ConfigureAwait(false);
-        }
+        return CopyText(text)
+            ? Dispatcher.Invoke(() => ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
+                                      && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+                                          || WindowState is WindowState.Minimized)
+                ? FirstPopupWindow.LookupOnCharPosition(MainTextBox, s_lastTextCopiedWhileMinimized ?? MainTextBox.Text, 0, true)
+                : Task.CompletedTask)
+            : Task.CompletedTask;
     }
 
     private bool CopyText(string text)
@@ -308,22 +303,19 @@ internal sealed partial class MainWindow : Window
 
     public Task HandleMouseMove(MouseEventArgs? e)
     {
-        if (ConfigManager.InactiveLookupMode
-            || ConfigManager.LookupOnSelectOnly
-            || ConfigManager.LookupOnMouseClickOnly
-            || e?.LeftButton is MouseButtonState.Pressed
-            || MainTextBoxContextMenu.IsVisible
-            || TitleBarContextMenu.IsVisible
-            || FontSizeSlider.IsVisible
-            || OpacitySlider.IsVisible
-            || FirstPopupWindow.MiningMode
-            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
-            || (ConfigManager.RequireLookupKeyPress && !ConfigManager.LookupKeyKeyGesture.IsPressed()))
-        {
-            return Task.CompletedTask;
-        }
-
-        return FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox);
+        return ConfigManager.InactiveLookupMode
+               || ConfigManager.LookupOnSelectOnly
+               || ConfigManager.LookupOnMouseClickOnly
+               || e?.LeftButton is MouseButtonState.Pressed
+               || MainTextBoxContextMenu.IsVisible
+               || TitleBarContextMenu.IsVisible
+               || FontSizeSlider.IsVisible
+               || OpacitySlider.IsVisible
+               || FirstPopupWindow.MiningMode
+               || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
+               || (ConfigManager.RequireLookupKeyPress && !ConfigManager.LookupKeyKeyGesture.IsPressed())
+            ? Task.CompletedTask
+            : FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox);
     }
 
     // ReSharper disable once AsyncVoidMethod
