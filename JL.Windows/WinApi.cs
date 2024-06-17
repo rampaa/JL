@@ -35,7 +35,6 @@ internal sealed partial class WinApi
         internal const int WM_SYSCOMMAND = 0x0112;
         internal const int WM_WINDOWPOSCHANGING = 0x0046;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
-        internal static int WM_MAGPIE_SCALINGCHANGED = -1;
         // public const nint WVR_VALIDRECTS = 0x0400;
 
         // RECT Structure
@@ -177,6 +176,14 @@ internal sealed partial class WinApi
         [LibraryImport("user32.dll", EntryPoint = "RemovePropW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial nint RemovePropW(nint hWnd, string lpString);
+
+        [LibraryImport("user32.dll", EntryPoint = "GetPropW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial nint GetPropW(nint hWnd, string lpString);
+
+        [LibraryImport("user32.dll", EntryPoint = "FindWindowW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial nint FindWindowW(string? lpClassName, string? lpWindowName);
 
         // ReSharper restore InconsistentNaming
     }
@@ -323,7 +330,7 @@ internal sealed partial class WinApi
         return new Point(lpPoint.X, lpPoint.Y);
     }
 
-    private static int RegisterToWindowMessage(string messageName)
+    public static int RegisterToWindowMessage(string messageName)
     {
         return RegisterWindowMessage(messageName);
     }
@@ -333,25 +340,29 @@ internal sealed partial class WinApi
         return ChangeWindowMessageFilterEx(windowHandle, message, filterAction, 0);
     }
 
-    private static bool AllowWindowMessage(nint windowHandle, int message)
+    public static bool AllowWindowMessage(nint windowHandle, int message)
     {
         return ChangeWindowMessageFilter(windowHandle, message, ChangeWindowMessageFilterExAction.Allow);
     }
 
-    public static void RegisterToMagpieScalingChangedMessage()
+    public static void SetProp(nint windowHandle, string lpString, nint hData)
     {
-        WM_MAGPIE_SCALINGCHANGED = RegisterToWindowMessage("MagpieScalingChanged");
-        _ = AllowWindowMessage(MainWindow.Instance.WindowHandle, WM_MAGPIE_SCALINGCHANGED);
+        _ = SetPropW(windowHandle, lpString, hData);
     }
 
-    public static void MarkWindowAsMagpieToolWindow(nint hwnd)
+    public static void RemoveProp(nint windowHandle, string lpString)
     {
-        _ = SetPropW(hwnd, "Magpie.ToolWindow", 1);
+        _ = RemovePropW(windowHandle, lpString);
     }
 
-    public static void UnmarkWindowAsMagpieToolWindow(nint hwnd)
+    public static nint GetProp(nint windowHandle, string lpString)
     {
-        _ = RemovePropW(hwnd, "Magpie.ToolWindow");
+        return GetPropW(windowHandle, lpString);
+    }
+
+    public static nint FindWindow(string? lpClassName, string? lpWindowName)
+    {
+        return FindWindowW(lpClassName, lpWindowName);
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
@@ -412,11 +423,19 @@ internal sealed partial class WinApi
             //    break;
 
             default:
-                if (msg == WM_MAGPIE_SCALINGCHANGED)
+                if (msg == MagpieUtils.MagpieScalingChangedWindowMessage)
                 {
                     if (wParam is 1)
                     {
                         MainWindow.Instance.BringToFront();
+                        MagpieUtils.IsMagpieScaling = true;
+                        MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowLeftEdgePosition(lParam);
+                        MagpieUtils.DpiAwareMagpieWindowRightEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowRightEdgePosition(lParam);
+                        MagpieUtils.DpiAwareMagpieWindowTopEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowTopEdgePosition(lParam);
+                    }
+                    else
+                    {
+                        MagpieUtils.IsMagpieScaling = false;
                     }
                 }
                 break;

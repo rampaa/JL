@@ -78,8 +78,8 @@ internal sealed partial class MainWindow : Window
         _winApi = new WinApi();
         _winApi.ClipboardChanged += ClipboardChanged;
         _winApi.SubscribeToWndProc(this);
-        WinApi.RegisterToMagpieScalingChangedMessage();
-        WinApi.MarkWindowAsMagpieToolWindow(WindowHandle);
+        MagpieUtils.RegisterToMagpieScalingChangedMessage(WindowHandle);
+        MagpieUtils.MarkWindowAsMagpieToolWindow(WindowHandle);
 
         ConfigDBManager.CreateDB();
 
@@ -433,7 +433,7 @@ internal sealed partial class MainWindow : Window
     private async void MainWindow_Closing(object sender, CancelEventArgs e)
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
-        WinApi.UnmarkWindowAsMagpieToolWindow(WindowHandle);
+        MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
         ConfigManager.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
 
@@ -1344,9 +1344,28 @@ internal sealed partial class MainWindow : Window
             && !ConfigManager.MainWindowDynamicWidth
             && ConfigManager.MainWindowDynamicHeight)
         {
-            Left = WindowsUtils.ActiveScreen.Bounds.X;
-            Top = WindowsUtils.ActiveScreen.Bounds.Y;
-            Width = WindowsUtils.DpiAwareWorkAreaWidth;
+            if (MagpieUtils.IsMagpieScaling)
+            {
+                // If Magpie crashes or is killed during the process of scaling a window,
+                // JL will not receive the MagpieScalingChangedWindowMessage.
+                // Consequently, IsMagpieScaling may not be set to false.
+                // To ensure Magpie is still running, we must re-check whether it is scaling a window.
+                MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
+            }
+
+            if (!MagpieUtils.IsMagpieScaling)
+            {
+                Left = WindowsUtils.ActiveScreen.Bounds.X;
+                Top = WindowsUtils.ActiveScreen.Bounds.Y;
+                Width = WindowsUtils.DpiAwareWorkAreaWidth;
+            }
+            else
+            {
+                Left = MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition;
+                Top = MagpieUtils.DpiAwareMagpieWindowTopEdgePosition;
+                Width = MagpieUtils.DpiAwareMagpieWindowRightEdgePosition - MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition;
+            }
+
             WidthBeforeResolutionChange = Width;
         }
 
