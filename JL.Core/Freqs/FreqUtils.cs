@@ -326,17 +326,17 @@ public static class FreqUtils
         FreqsReady = true;
     }
 
-    public static async Task CreateDefaultFreqsConfig()
+    public static Task CreateDefaultFreqsConfig()
     {
         _ = Directory.CreateDirectory(Utils.ConfigPath);
-        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-            JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
+        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
+            JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoWithEnumConverterAndIndentation));
     }
 
-    public static async Task SerializeFreqs()
+    public static Task SerializeFreqs()
     {
-        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-            JsonSerializer.Serialize(FreqDicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
+        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
+            JsonSerializer.Serialize(FreqDicts, Utils.s_jsoWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeFreqs()

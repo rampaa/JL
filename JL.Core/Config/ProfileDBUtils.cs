@@ -3,6 +3,7 @@ using System.Globalization;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;
+
 public static class ProfileDBUtils
 {
     public static void InsertProfile(SqliteConnection connection, string profileName)

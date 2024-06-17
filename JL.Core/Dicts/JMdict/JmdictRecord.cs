@@ -381,8 +381,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
     public override bool Equals(object? obj)
     {
         return obj is JmdictRecord jmdictRecord
-            && Id == jmdictRecord.Id
-            && PrimarySpelling == jmdictRecord.PrimarySpelling;
+               && Id == jmdictRecord.Id
+               && PrimarySpelling == jmdictRecord.PrimarySpelling;
     }
 
     public override int GetHashCode()

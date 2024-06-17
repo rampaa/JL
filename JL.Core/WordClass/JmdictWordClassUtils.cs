@@ -53,7 +53,7 @@ internal static class JmdictWordClassUtils
         DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    public static async Task Serialize()
+    public static Task Serialize()
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new(StringComparer.Ordinal);
 
@@ -85,8 +85,8 @@ internal static class JmdictWordClassUtils
                 if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? results))
                 {
                     if (!results.Any(result => result.Spelling == jmdictRecord.PrimarySpelling
-                        && ((result.Readings is not null && jmdictRecord.Readings is not null && result.Readings.SequenceEqual(jmdictRecord.Readings))
-                            || (result.Readings is null && jmdictRecord.Readings is null))))
+                                               && ((result.Readings is not null && jmdictRecord.Readings is not null && result.Readings.SequenceEqual(jmdictRecord.Readings))
+                                                   || (result.Readings is null && jmdictRecord.Readings is null))))
                     {
                         results.Add(new JmdictWordClass(jmdictRecord.PrimarySpelling, jmdictRecord.Readings, wordClasses));
                     }
@@ -99,8 +99,8 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        await File.WriteAllTextAsync(Path.Join(Utils.ResourcesPath, "PoS.json"),
-            JsonSerializer.Serialize(jmdictWordClassDictionary, Utils.s_defaultJso)).ConfigureAwait(false);
+        return File.WriteAllTextAsync(Path.Join(Utils.ResourcesPath, "PoS.json"),
+            JsonSerializer.Serialize(jmdictWordClassDictionary, Utils.s_defaultJso));
     }
 
     internal static async Task Initialize()

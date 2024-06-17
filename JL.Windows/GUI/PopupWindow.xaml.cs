@@ -10,7 +10,6 @@ using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
-using JL.Windows.GUI.UserControls;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Timer = System.Timers.Timer;
@@ -117,6 +116,7 @@ internal sealed partial class PopupWindow : Window
 
     private void AddMenuItemsToEditableTextBoxContextMenu()
     {
+        // ReSharper disable BadExpressionBracesLineBreaks
         MenuItem addNameMenuItem = new() { Name = "AddNameMenuItem", Header = "Add name", Padding = new Thickness() };
         addNameMenuItem.Click += AddName;
         _ = _editableTextBoxContextMenu.Items.Add(addNameMenuItem);
@@ -138,6 +138,7 @@ internal sealed partial class PopupWindow : Window
         MenuItem searchMenuItem = new() { Name = "SearchMenuItem", Header = "Search", Padding = new Thickness() };
         searchMenuItem.Click += SearchWithBrowser;
         _ = _editableTextBoxContextMenu.Items.Add(searchMenuItem);
+        // ReSharper restore BadExpressionBracesLineBreaks
     }
 
     private void PressBackSpace(object sender, RoutedEventArgs e)
@@ -298,7 +299,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public async Task LookupOnMouseMoveOrClick(TextBox textBox)
+    public Task LookupOnMouseMoveOrClick(TextBox textBox)
     {
         int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
 
@@ -309,12 +310,11 @@ internal sealed partial class PopupWindow : Window
                 --charPosition;
             }
 
-            await LookupOnCharPosition(textBox, textBox.Text, charPosition, ConfigManager.LookupOnMouseClickOnly).ConfigureAwait(false);
+            return LookupOnCharPosition(textBox, textBox.Text, charPosition, ConfigManager.LookupOnMouseClickOnly);
         }
-        else
-        {
-            HidePopup();
-        }
+
+        HidePopup();
+        return Task.CompletedTask;
     }
 
     public async Task LookupOnSelect(TextBox textBox)
@@ -1105,24 +1105,26 @@ internal sealed partial class PopupWindow : Window
         TextBox definitionsTextBox = (TextBox)sender;
         _lastInteractedTextBox = definitionsTextBox;
 
-        if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Alt))
+        if (Keyboard.Modifiers != (ModifierKeys.Control | ModifierKeys.Alt))
         {
-            bool isEditable = definitionsTextBox.IsReadOnly;
-            definitionsTextBox.IsReadOnly = !isEditable;
-            definitionsTextBox.IsUndoEnabled = isEditable;
-            definitionsTextBox.AcceptsReturn = isEditable;
-            definitionsTextBox.AcceptsTab = isEditable;
+            return;
+        }
 
-            if (isEditable)
-            {
-                definitionsTextBox.ContextMenu = _editableTextBoxContextMenu;
-                definitionsTextBox.UndoLimit = -1;
-            }
-            else
-            {
-                definitionsTextBox.ContextMenu = PopupContextMenu;
-                definitionsTextBox.UndoLimit = 0;
-            }
+        bool isEditable = definitionsTextBox.IsReadOnly;
+        definitionsTextBox.IsReadOnly = !isEditable;
+        definitionsTextBox.IsUndoEnabled = isEditable;
+        definitionsTextBox.AcceptsReturn = isEditable;
+        definitionsTextBox.AcceptsTab = isEditable;
+
+        if (isEditable)
+        {
+            definitionsTextBox.ContextMenu = _editableTextBoxContextMenu;
+            definitionsTextBox.UndoLimit = -1;
+        }
+        else
+        {
+            definitionsTextBox.ContextMenu = PopupContextMenu;
+            definitionsTextBox.UndoLimit = 0;
         }
     }
 
@@ -1692,18 +1694,18 @@ internal sealed partial class PopupWindow : Window
         ItemsControlButtons.Visibility = Visibility.Visible;
     }
 
-    private async Task PlayAudio()
+    private Task PlayAudio()
     {
         if (LastLookupResults.Count is 0)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         LookupResult lastLookupResult = LastLookupResults[_listViewItemIndex];
         string primarySpelling = lastLookupResult.PrimarySpelling;
         string? reading = lastLookupResult.Readings?[0];
 
-        await PopupWindowUtils.PlayAudio(primarySpelling, reading).ConfigureAwait(false);
+        return PopupWindowUtils.PlayAudio(primarySpelling, reading);
     }
 
     private void OnMouseEnter(object sender, MouseEventArgs e)

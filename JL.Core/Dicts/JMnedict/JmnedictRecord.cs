@@ -88,8 +88,8 @@ internal sealed class JmnedictRecord : IDictRecord
     public override bool Equals(object? obj)
     {
         return obj is JmnedictRecord jmnedictObj
-            && Id == jmnedictObj.Id
-            && PrimarySpelling == jmnedictObj.PrimarySpelling;
+               && Id == jmnedictObj.Id
+               && PrimarySpelling == jmnedictObj.PrimarySpelling;
     }
 
     public override int GetHashCode()

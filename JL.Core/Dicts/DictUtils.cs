@@ -1406,17 +1406,17 @@ public static class DictUtils
         }
     }
 
-    public static async Task CreateDefaultDictsConfig()
+    public static Task CreateDefaultDictsConfig()
     {
         _ = Directory.CreateDirectory(Utils.ConfigPath);
-        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-            JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
+        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
+            JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoWithEnumConverterAndIndentation));
     }
 
-    public static async Task SerializeDicts()
+    public static Task SerializeDicts()
     {
-        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-            JsonSerializer.Serialize(Dicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
+        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
+            JsonSerializer.Serialize(Dicts, Utils.s_jsoWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeDicts()
@@ -1569,7 +1569,7 @@ public static class DictUtils
         }
     }
 
-    private static void CheckIfDBIsUsedForAtLeastOneDict(List<Dict> dicts)
+    private static void CheckIfDBIsUsedForAtLeastOneDict(IReadOnlyList<Dict> dicts)
     {
         DBIsUsedForAtLeastOneDict = dicts.Any(static dict => dict.Options?.UseDB?.Value ?? true);
         DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? true));

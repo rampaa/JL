@@ -4,6 +4,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;
+
 public static class StatsDBUtils
 {
     public static void InsertStats(SqliteConnection connection, Stats stats, int profileId)

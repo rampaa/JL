@@ -698,17 +698,17 @@ internal static class WindowsUtils
                 {
                     BitmapSource? image = Clipboard.GetImage();
 
-                    if (image is not null)
+                    if (image is null)
                     {
-                        PngBitmapEncoder pngBitmapEncoder = new();
-                        pngBitmapEncoder.Frames.Add(BitmapFrame.Create(image));
-
-                        using MemoryStream stream = new();
-                        pngBitmapEncoder.Save(stream);
-                        return stream.ToArray();
+                        return null;
                     }
 
-                    return null;
+                    PngBitmapEncoder pngBitmapEncoder = new();
+                    pngBitmapEncoder.Frames.Add(BitmapFrame.Create(image));
+
+                    using MemoryStream stream = new();
+                    pngBitmapEncoder.Save(stream);
+                    return stream.ToArray();
                 }
                 catch (Exception ex)
                 {

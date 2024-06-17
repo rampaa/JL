@@ -48,41 +48,43 @@ public static class CustomWordLoader
     internal static void Load(Dict dict, CancellationToken cancellationToken)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-        if (File.Exists(fullPath))
+        if (!File.Exists(fullPath))
         {
-            IDictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
+            return;
+        }
 
-            foreach (string line in File.ReadLines(fullPath))
+        IDictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
+
+        foreach (string line in File.ReadLines(fullPath))
+        {
+            if (cancellationToken.IsCancellationRequested)
             {
-                if (cancellationToken.IsCancellationRequested)
+                customWordDictionary.Clear();
+                break;
+            }
+
+            string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
+            if (lParts.Length >= 4)
+            {
+                string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+                string[]? readings = lParts[1].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                if (readings.Length is 0
+                    || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
                 {
-                    customWordDictionary.Clear();
-                    break;
+                    readings = null;
                 }
 
-                string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
-                if (lParts.Length >= 4)
+                string[] definitions = lParts[2].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string partOfSpeech = lParts[3];
+
+                string[]? wordClasses = null;
+                if (lParts.Length is 5)
                 {
-                    string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-                    string[]? readings = lParts[1].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    if (readings.Length is 0
-                        || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
-                    {
-                        readings = null;
-                    }
-
-                    string[] definitions = lParts[2].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    string partOfSpeech = lParts[3];
-
-                    string[]? wordClasses = null;
-                    if (lParts.Length is 5)
-                    {
-                        wordClasses = lParts[4].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    }
-
-                    AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses, customWordDictionary);
+                    wordClasses = lParts[4].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                 }
+
+                AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses, customWordDictionary);
             }
         }
     }
@@ -124,7 +126,7 @@ public static class CustomWordLoader
         }
     }
 
-    private static bool AddRecordToDictionary(string spelling, CustomWordRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
+    private static bool AddRecordToDictionary(string spelling, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
     {
         string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
         if (dictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))

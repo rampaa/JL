@@ -86,85 +86,86 @@ internal static class PopupWindowUtils
         for (int i = 0; i < expressions.Length; i++)
         {
             string normalizedExpression = JapaneseUtils.KatakanaToHiragana(expressions[i]);
-
-            if (lookupDict.TryGetValue(normalizedExpression, out IList<IDictRecord>? pitchAccentDictResultList))
+            if (!lookupDict.TryGetValue(normalizedExpression, out IList<IDictRecord>? pitchAccentDictResultList))
             {
-                List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
+                continue;
+            }
 
-                if (i > 0)
+            List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
+
+            if (i > 0)
+            {
+                horizontalOffsetForReading +=
+                    WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo[i - 1]}, ", fontSize).Width;
+            }
+
+            PitchAccentRecord? chosenPitchAccentDictResult = null;
+
+            int pitchAccentDictResultListCount = pitchAccentDictResultList.Count;
+            for (int j = 0; j < pitchAccentDictResultListCount; j++)
+            {
+                PitchAccentRecord pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
+
+                if ((!hasReading && pitchAccentDictResult.Reading is null)
+                    || (pitchAccentDictResult.Reading is not null
+                        && normalizedExpression == JapaneseUtils.KatakanaToHiragana(pitchAccentDictResult.Reading)))
                 {
-                    horizontalOffsetForReading +=
-                        WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo[i - 1]}, ", fontSize).Width;
-                }
-
-                PitchAccentRecord? chosenPitchAccentDictResult = null;
-
-                int pitchAccentDictResultListCount = pitchAccentDictResultList.Count;
-                for (int j = 0; j < pitchAccentDictResultListCount; j++)
-                {
-                    PitchAccentRecord pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
-
-                    if ((!hasReading && pitchAccentDictResult.Reading is null)
-                        || (pitchAccentDictResult.Reading is not null
-                            && normalizedExpression == JapaneseUtils.KatakanaToHiragana(pitchAccentDictResult.Reading)))
+                    if (primarySpelling == pitchAccentDictResult.Spelling)
                     {
-                        if (primarySpelling == pitchAccentDictResult.Spelling)
-                        {
-                            chosenPitchAccentDictResult = pitchAccentDictResult;
-                            break;
-                        }
-
-                        if (alternativeSpellings?.Contains(pitchAccentDictResult.Spelling) ?? false)
-                        {
-                            chosenPitchAccentDictResult ??= pitchAccentDictResult;
-                        }
-                    }
-                }
-
-                if (chosenPitchAccentDictResult is not null)
-                {
-                    Polyline polyline = new()
-                    {
-                        StrokeThickness = 2,
-                        Stroke = DictOptionManager.PitchAccentMarkerColor,
-                        StrokeDashArray = StrokeDashArray
-                    };
-
-                    bool lowPitch = false;
-                    double horizontalOffsetForChar = horizontalOffsetForReading;
-                    int combinedFormListCount = combinedFormList.Count;
-                    for (int j = 0; j < combinedFormListCount; j++)
-                    {
-                        Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
-
-                        if (chosenPitchAccentDictResult.Position - 1 == j)
-                        {
-                            polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
-
-                            lowPitch = true;
-                        }
-
-                        else if (j is 0)
-                        {
-                            polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                        }
-
-                        else
-                        {
-                            double charHeight = lowPitch ? charSize.Height : 0;
-                            polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charHeight));
-                        }
-
-                        horizontalOffsetForChar += charSize.Width;
+                        chosenPitchAccentDictResult = pitchAccentDictResult;
+                        break;
                     }
 
-                    _ = pitchAccentGrid.Children.Add(polyline);
+                    if (alternativeSpellings?.Contains(pitchAccentDictResult.Spelling) ?? false)
+                    {
+                        chosenPitchAccentDictResult ??= pitchAccentDictResult;
+                    }
                 }
+            }
+
+            if (chosenPitchAccentDictResult is not null)
+            {
+                Polyline polyline = new()
+                {
+                    StrokeThickness = 2,
+                    Stroke = DictOptionManager.PitchAccentMarkerColor,
+                    StrokeDashArray = StrokeDashArray
+                };
+
+                bool lowPitch = false;
+                double horizontalOffsetForChar = horizontalOffsetForReading;
+                int combinedFormListCount = combinedFormList.Count;
+                for (int j = 0; j < combinedFormListCount; j++)
+                {
+                    Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
+
+                    if (chosenPitchAccentDictResult.Position - 1 == j)
+                    {
+                        polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
+                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
+                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
+
+                        lowPitch = true;
+                    }
+
+                    else if (j is 0)
+                    {
+                        polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
+                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
+                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
+                    }
+
+                    else
+                    {
+                        double charHeight = lowPitch ? charSize.Height : 0;
+                        polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
+                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charHeight));
+                    }
+
+                    horizontalOffsetForChar += charSize.Width;
+                }
+
+                _ = pitchAccentGrid.Children.Add(polyline);
             }
         }
 
@@ -239,19 +240,19 @@ internal static class PopupWindowUtils
         }
     }
 
-    public static async Task PlayAudio(string primarySpelling, string? reading)
+    public static Task PlayAudio(string primarySpelling, string? reading)
     {
         if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing
             && s_primarySpellingOfLastPlayedAudio == primarySpelling
             && s_readingOfLastPlayedAudio == reading)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         s_primarySpellingOfLastPlayedAudio = primarySpelling;
         s_readingOfLastPlayedAudio = reading;
 
-        await AudioUtils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
+        return AudioUtils.GetAndPlayAudio(primarySpelling, reading);
     }
 
     public static void SetStrokeDashArray(bool showPitchAccentWithDottedLines)

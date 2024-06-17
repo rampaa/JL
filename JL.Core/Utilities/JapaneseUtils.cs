@@ -206,8 +206,8 @@ public static partial class JapaneseUtils
         {
             char character = normalizedText[i];
             _ = textInHiragana.Append(s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr)
-                    ? hiraganaStr
-                    : character);
+                ? hiraganaStr
+                : character);
         }
 
         return textInHiragana.ToString();

@@ -163,28 +163,28 @@ internal static class YomichanPitchAccentDBManager
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        if (dataReader.HasRows)
+        if (!dataReader.HasRows)
         {
-            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-            while (dataReader.Read())
-            {
-                PitchAccentRecord record = GetRecord(dataReader);
-
-                string searchKey = dataReader.GetString(nameof(searchKey));
-                if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
-                {
-                    result.Add(record);
-                }
-                else
-                {
-                    results[searchKey] = [record];
-                }
-            }
-
-            return results;
+            return null;
         }
 
-        return null;
+        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+        while (dataReader.Read())
+        {
+            PitchAccentRecord record = GetRecord(dataReader);
+
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            {
+                result.Add(record);
+            }
+            else
+            {
+                results[searchKey] = [record];
+            }
+        }
+
+        return results;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, string term)
@@ -197,28 +197,28 @@ internal static class YomichanPitchAccentDBManager
         _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        if (dataReader.HasRows)
+        if (!dataReader.HasRows)
         {
-            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-            while (dataReader.Read())
-            {
-                PitchAccentRecord record = GetRecord(dataReader);
-
-                string searchKey = dataReader.GetString(nameof(searchKey));
-                if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
-                {
-                    result.Add(record);
-                }
-                else
-                {
-                    results[searchKey] = [record];
-                }
-            }
-
-            return results;
+            return null;
         }
 
-        return null;
+        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+        while (dataReader.Read())
+        {
+            PitchAccentRecord record = GetRecord(dataReader);
+
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            {
+                result.Add(record);
+            }
+            else
+            {
+                results[searchKey] = [record];
+            }
+        }
+
+        return results;
     }
 
     public static void LoadFromDB(Dict dict)

@@ -199,26 +199,28 @@ internal sealed partial class ManageAudioSourcesWindow : Window
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (WindowsUtils.ShowYesNoDialog("Do you really want to remove this audio source?", "Confirmation"))
+        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this audio source?", "Confirmation"))
         {
-            Button removeButton = (Button)sender;
-
-            string uri = removeButton.Parent.GetChildByName<TextBlock>("audioSourceUriTextBlock")!.Text;
-            _ = AudioUtils.AudioSources.Remove(uri);
-
-            AudioSource audioSource = (AudioSource)removeButton.Tag;
-            int priorityOfDeletedAudioSource = audioSource.Priority;
-
-            foreach (AudioSource a in AudioUtils.AudioSources.Values)
-            {
-                if (a.Priority > priorityOfDeletedAudioSource)
-                {
-                    a.Priority -= 1;
-                }
-            }
-
-            UpdateAudioSourcesDisplay();
+            return;
         }
+
+        Button removeButton = (Button)sender;
+
+        string uri = removeButton.Parent.GetChildByName<TextBlock>("audioSourceUriTextBlock")!.Text;
+        _ = AudioUtils.AudioSources.Remove(uri);
+
+        AudioSource audioSource = (AudioSource)removeButton.Tag;
+        int priorityOfDeletedAudioSource = audioSource.Priority;
+
+        foreach (AudioSource a in AudioUtils.AudioSources.Values)
+        {
+            if (a.Priority > priorityOfDeletedAudioSource)
+            {
+                a.Priority -= 1;
+            }
+        }
+
+        UpdateAudioSourcesDisplay();
     }
 
     private void EditButton_Click(object sender, RoutedEventArgs e)

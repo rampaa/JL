@@ -180,17 +180,17 @@ internal static class FreqDBManager
         _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        if (dataReader.HasRows)
+        if (!dataReader.HasRows)
         {
-            List<FrequencyRecord> records = [];
-            while (dataReader.Read())
-            {
-                records.Add(GetRecord(dataReader));
-            }
-            return records;
+            return null;
         }
 
-        return null;
+        List<FrequencyRecord> records = [];
+        while (dataReader.Read())
+        {
+            records.Add(GetRecord(dataReader));
+        }
+        return records;
     }
 
     public static void SetMaxFrequencyValue(Freq freq)

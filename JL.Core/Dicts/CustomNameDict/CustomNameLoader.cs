@@ -7,44 +7,46 @@ public static class CustomNameLoader
     internal static void Load(Dict dict, CancellationToken cancellationToken)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-        if (File.Exists(fullPath))
+        if (!File.Exists(fullPath))
         {
-            IDictionary<string, IList<IDictRecord>> customNameDictionary = dict.Contents;
+            return;
+        }
 
-            foreach (string line in File.ReadLines(fullPath))
+        IDictionary<string, IList<IDictRecord>> customNameDictionary = dict.Contents;
+
+        foreach (string line in File.ReadLines(fullPath))
+        {
+            if (cancellationToken.IsCancellationRequested)
             {
-                if (cancellationToken.IsCancellationRequested)
+                customNameDictionary.Clear();
+                break;
+            }
+
+            string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
+
+            if (lParts.Length >= 3)
+            {
+                string spelling = lParts[0];
+
+                string? reading = lParts[1];
+                if (reading.Length is 0 || reading == spelling)
                 {
-                    customNameDictionary.Clear();
-                    break;
+                    reading = null;
                 }
 
-                string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
+                string nameType = lParts[2];
 
-                if (lParts.Length >= 3)
+                string? extraInfo = null;
+                if (lParts.Length is 4)
                 {
-                    string spelling = lParts[0];
-
-                    string? reading = lParts[1];
-                    if (reading.Length is 0 || reading == spelling)
+                    extraInfo = lParts[3];
+                    if (extraInfo.Length is 0)
                     {
-                        reading = null;
+                        extraInfo = null;
                     }
-
-                    string nameType = lParts[2];
-
-                    string? extraInfo = null;
-                    if (lParts.Length is 4)
-                    {
-                        extraInfo = lParts[3];
-                        if (extraInfo.Length is 0)
-                        {
-                            extraInfo = null;
-                        }
-                    }
-
-                    AddToDictionary(spelling, reading, nameType, extraInfo, customNameDictionary);
                 }
+
+                AddToDictionary(spelling, reading, nameType, extraInfo, customNameDictionary);
             }
         }
     }

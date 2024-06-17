@@ -59,7 +59,7 @@ internal static class KeyGestureUtils
         nameof(ConfigManager.ShowAddWordWindowKeyGesture)
     ];
 
-    public static async Task HandleKeyDown(KeyEventArgs e)
+    public static Task HandleKeyDown(KeyEventArgs e)
     {
         Key key = e.Key is Key.System
             ? e.SystemKey
@@ -67,7 +67,7 @@ internal static class KeyGestureUtils
 
         if (key is Key.LWin or Key.RWin)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         ModifierKeys modifierKeys = Keyboard.Modifiers;
@@ -82,15 +82,15 @@ internal static class KeyGestureUtils
 
         if (modifierKeys is ModifierKeys.Shift)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         KeyGesture pressedKeyGesture = new(key, modifierKeys);
 
-        await HandleHotKey(pressedKeyGesture, e).ConfigureAwait(false);
+        return HandleHotKey(pressedKeyGesture, e);
     }
 
-    public static async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e = null)
+    public static Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e = null)
     {
         PopupWindow? lastPopup = null;
         PopupWindow? currentPopup = MainWindow.Instance.FirstPopupWindow;
@@ -100,15 +100,9 @@ internal static class KeyGestureUtils
             currentPopup = currentPopup.ChildPopupWindow;
         }
 
-        if (lastPopup is not null)
-        {
-            await lastPopup.HandleHotKey(keyGesture, e).ConfigureAwait(false);
-        }
-
-        else
-        {
-            await MainWindow.Instance.HandleHotKey(keyGesture, e).ConfigureAwait(false);
-        }
+        return lastPopup is not null
+            ? lastPopup.HandleHotKey(keyGesture, e)
+            : MainWindow.Instance.HandleHotKey(keyGesture, e);
     }
 
     public static bool IsEqual(this KeyGesture sourceKeyGesture, KeyGesture targetKeyGesture)
@@ -179,10 +173,10 @@ internal static class KeyGestureUtils
             KeyGestureConverter keyGestureConverter = new();
 
             string keyGestureString = rawKeyGesture.Contains("Ctrl", StringComparison.Ordinal)
-                                       || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
-                                       || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
-                                        ? rawKeyGesture
-                                        : $"Win+{rawKeyGesture}";
+                                      || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
+                                      || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
+                ? rawKeyGesture
+                : $"Win+{rawKeyGesture}";
 
             KeyGesture newKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromInvariantString(keyGestureString)!;
 

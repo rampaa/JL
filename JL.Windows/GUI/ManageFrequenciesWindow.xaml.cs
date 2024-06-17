@@ -249,32 +249,34 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (WindowsUtils.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
+        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
         {
-            Freq freq = (Freq)((Button)sender).Tag;
-            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-            _ = FreqUtils.FreqDicts.Remove(freq.Name);
-
-            string dbPath = DBUtils.GetFreqDBPath(freq.Name);
-            if (File.Exists(dbPath))
-            {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
-            }
-
-            int priorityOfDeletedFreq = freq.Priority;
-
-            foreach (Freq f in FreqUtils.FreqDicts.Values)
-            {
-                if (f.Priority > priorityOfDeletedFreq)
-                {
-                    f.Priority -= 1;
-                }
-            }
-
-            UpdateFreqsDisplay();
+            return;
         }
+
+        Freq freq = (Freq)((Button)sender).Tag;
+        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+        _ = FreqUtils.FreqDicts.Remove(freq.Name);
+
+        string dbPath = DBUtils.GetFreqDBPath(freq.Name);
+        if (File.Exists(dbPath))
+        {
+            DBUtils.SendOptimizePragmaToAllDBs();
+            SqliteConnection.ClearAllPools();
+            File.Delete(dbPath);
+        }
+
+        int priorityOfDeletedFreq = freq.Priority;
+
+        foreach (Freq f in FreqUtils.FreqDicts.Values)
+        {
+            if (f.Priority > priorityOfDeletedFreq)
+            {
+                f.Priority -= 1;
+            }
+        }
+
+        UpdateFreqsDisplay();
     }
 
     private void EditButton_Click(object sender, RoutedEventArgs e)

@@ -1,34 +1,23 @@
 namespace JL.Core.Dicts.KANJIDIC;
 
-internal sealed class KanjidicRecord : IDictRecord
+internal sealed class KanjidicRecord(
+    string[]? definitions,
+    string[]? onReadings,
+    string[]? kunReadings,
+    string[]? nanoriReadings,
+    string[]? radicalNames,
+    byte strokeCount,
+    byte grade,
+    int frequency) : IDictRecord
 {
-    public string[]? Definitions { get; }
-    public string[]? OnReadings { get; }
-    public string[]? KunReadings { get; }
-    public string[]? NanoriReadings { get; }
-    public string[]? RadicalNames { get; }
-    public byte StrokeCount { get; }
-    public byte Grade { get; }
-    public int Frequency { get; }
-
-    public KanjidicRecord(string[]? definitions,
-        string[]? onReadings,
-        string[]? kunReadings,
-        string[]? nanoriReadings,
-        string[]? radicalNames,
-        byte strokeCount,
-        byte grade,
-        int frequency)
-    {
-        Definitions = definitions;
-        OnReadings = onReadings;
-        KunReadings = kunReadings;
-        NanoriReadings = nanoriReadings;
-        StrokeCount = strokeCount;
-        Grade = grade;
-        Frequency = frequency;
-        RadicalNames = radicalNames;
-    }
+    public string[]? Definitions { get; } = definitions;
+    public string[]? OnReadings { get; } = onReadings;
+    public string[]? KunReadings { get; } = kunReadings;
+    public string[]? NanoriReadings { get; } = nanoriReadings;
+    public string[]? RadicalNames { get; } = radicalNames;
+    public byte StrokeCount { get; } = strokeCount;
+    public byte Grade { get; } = grade;
+    public int Frequency { get; } = frequency;
 
     public string? BuildFormattedDefinition()
     {

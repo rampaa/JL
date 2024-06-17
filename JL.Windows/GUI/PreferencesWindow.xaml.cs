@@ -147,37 +147,41 @@ internal sealed partial class PreferencesWindow : Window
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
 
-        if (_profileName != ProfileUtils.CurrentProfileName)
+        if (_profileName == ProfileUtils.CurrentProfileName)
         {
-            _profileName = ProfileUtils.CurrentProfileName;
-            _profileNamesDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName));
-            _profileWordsDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName));
-
-            if (_profileNamesDict.Active || _profileWordsDict.Active)
-            {
-                if (_profileNamesDict.Active)
-                {
-                    if (DictUtils.ProfileCustomNamesCancellationTokenSource is not null)
-                    {
-                        await DictUtils.ProfileCustomNamesCancellationTokenSource.CancelAsync().ConfigureAwait(false);
-                    }
-
-                    _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
-                }
-
-                if (_profileWordsDict.Active)
-                {
-                    if (DictUtils.ProfileCustomWordsCancellationTokenSource is not null)
-                    {
-                        await DictUtils.ProfileCustomWordsCancellationTokenSource.CancelAsync().ConfigureAwait(false);
-                    }
-
-                    _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
-                }
-
-                await DictUtils.LoadDictionaries().ConfigureAwait(false);
-            }
+            return;
         }
+
+        _profileName = ProfileUtils.CurrentProfileName;
+        _profileNamesDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName));
+        _profileWordsDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName));
+
+        if (!_profileNamesDict.Active && !_profileWordsDict.Active)
+        {
+            return;
+        }
+
+        if (_profileNamesDict.Active)
+        {
+            if (DictUtils.ProfileCustomNamesCancellationTokenSource is not null)
+            {
+                await DictUtils.ProfileCustomNamesCancellationTokenSource.CancelAsync().ConfigureAwait(false);
+            }
+
+            _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
+        }
+
+        if (_profileWordsDict.Active)
+        {
+            if (DictUtils.ProfileCustomWordsCancellationTokenSource is not null)
+            {
+                await DictUtils.ProfileCustomWordsCancellationTokenSource.CancelAsync().ConfigureAwait(false);
+            }
+
+            _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
+        }
+
+        await DictUtils.LoadDictionaries().ConfigureAwait(false);
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -409,11 +413,11 @@ internal sealed partial class PreferencesWindow : Window
         return new AnkiConfig(deckName, modelName, dict, tags);
     }
 
-    public async Task SaveMiningSetup()
+    public Task SaveMiningSetup()
     {
         if (!CoreConfigManager.AnkiIntegration)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         Dictionary<MineType, AnkiConfig> ankiConfigDict = [];
@@ -444,15 +448,13 @@ internal sealed partial class PreferencesWindow : Window
 
         if (ankiConfigDict.Count > 0)
         {
-            await AnkiConfig.WriteAnkiConfig(ankiConfigDict).ConfigureAwait(false);
+            return AnkiConfig.WriteAnkiConfig(ankiConfigDict);
         }
 
-        else
-        {
-            WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
-            Utils.Logger.Error("Error saving AnkiConfig");
-            CoreConfigManager.AnkiIntegration = false;
-        }
+        WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
+        Utils.Logger.Error("Error saving AnkiConfig");
+        CoreConfigManager.AnkiIntegration = false;
+        return Task.CompletedTask;
     }
 
     #endregion
@@ -594,24 +596,26 @@ internal sealed partial class PreferencesWindow : Window
     private void ProfileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         string selectedProfileName = (string)((ComboBox)sender).SelectedItem;
-        if (selectedProfileName != ProfileUtils.CurrentProfileName)
+        if (selectedProfileName == ProfileUtils.CurrentProfileName)
         {
-            using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
-            {
-                StatsDBUtils.UpdateProfileLifetimeStats(connection);
-                ProfileUtils.CurrentProfileName = selectedProfileName;
-                ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
-                ProfileDBUtils.UpdateCurrentProfile(connection);
-                Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
-                StatsDBUtils.UpdateProfileLifetimeStats(connection);
-            }
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                ConfigManager.ApplyPreferences();
-                ConfigManager.LoadPreferenceWindow(this);
-            });
+            return;
         }
+
+        using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
+        {
+            StatsDBUtils.UpdateProfileLifetimeStats(connection);
+            ProfileUtils.CurrentProfileName = selectedProfileName;
+            ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
+            ProfileDBUtils.UpdateCurrentProfile(connection);
+            Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
+            StatsDBUtils.UpdateProfileLifetimeStats(connection);
+        }
+
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            ConfigManager.ApplyPreferences();
+            ConfigManager.LoadPreferenceWindow(this);
+        });
     }
 
     private void ProfileConfigButton_Click(object sender, RoutedEventArgs e)

@@ -260,31 +260,36 @@ public static class DictUpdater
         for (int i = 0; i < dicts.Length; i++)
         {
             Dict dict = DictUtils.SingleDictTypeDicts[dicts[i]];
-            if (dict.Active)
+            if (!dict.Active)
             {
-                int dueDate = dict.Options?.AutoUpdateAfterNDays?.Value ?? 0;
-                if (dueDate > 0)
-                {
-                    string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                    bool pathExists = File.Exists(fullPath);
-                    if (!pathExists
-                        || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days >= dueDate)
-                    {
-                        Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
-                        if (dict.Type is DictType.JMdict)
-                        {
-                            await UpdateJmdict(pathExists, true).ConfigureAwait(false);
-                        }
-                        else if (dict.Type is DictType.JMnedict)
-                        {
-                            await UpdateJmnedict(pathExists, true).ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            await UpdateKanjidic(pathExists, true).ConfigureAwait(false);
-                        }
-                    }
-                }
+                continue;
+            }
+
+            int dueDate = dict.Options?.AutoUpdateAfterNDays?.Value ?? 0;
+            if (dueDate is 0)
+            {
+                continue;
+            }
+
+            string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+            bool pathExists = File.Exists(fullPath);
+            if (pathExists && (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
+            {
+                continue;
+            }
+
+            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
+            if (dict.Type is DictType.JMdict)
+            {
+                await UpdateJmdict(pathExists, true).ConfigureAwait(false);
+            }
+            else if (dict.Type is DictType.JMnedict)
+            {
+                await UpdateJmnedict(pathExists, true).ConfigureAwait(false);
+            }
+            else
+            {
+                await UpdateKanjidic(pathExists, true).ConfigureAwait(false);
             }
         }
     }

@@ -261,7 +261,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        string fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
+        string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
         if (Path.Exists(fullPath))
         {
             if (File.Exists(fullPath))
@@ -269,7 +269,10 @@ internal sealed partial class ManageDictionariesWindow : Window
                 fullPath = Path.GetDirectoryName(fullPath) ?? Utils.ApplicationPath;
             }
 
-            _ = Process.Start("explorer.exe", fullPath);
+            if (fullPath is not null)
+            {
+                _ = Process.Start("explorer.exe", fullPath);
+            }
         }
     }
 
@@ -310,37 +313,39 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (WindowsUtils.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
+        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
         {
-            Dict dict = (Dict)((Button)sender).Tag;
-            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-            _ = DictUtils.Dicts.Remove(dict.Name);
-
-            string dbPath = DBUtils.GetDictDBPath(dict.Name);
-            if (File.Exists(dbPath))
-            {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
-            }
-
-            if (dict.Type is DictType.PitchAccentYomichan)
-            {
-                _ = DictUtils.SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
-            }
-
-            int priorityOfDeletedDict = dict.Priority;
-
-            foreach (Dict d in DictUtils.Dicts.Values)
-            {
-                if (d.Priority > priorityOfDeletedDict)
-                {
-                    d.Priority -= 1;
-                }
-            }
-
-            UpdateDictionariesDisplay();
+            return;
         }
+
+        Dict dict = (Dict)((Button)sender).Tag;
+        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        _ = DictUtils.Dicts.Remove(dict.Name);
+
+        string dbPath = DBUtils.GetDictDBPath(dict.Name);
+        if (File.Exists(dbPath))
+        {
+            DBUtils.SendOptimizePragmaToAllDBs();
+            SqliteConnection.ClearAllPools();
+            File.Delete(dbPath);
+        }
+
+        if (dict.Type is DictType.PitchAccentYomichan)
+        {
+            _ = DictUtils.SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
+        }
+
+        int priorityOfDeletedDict = dict.Priority;
+
+        foreach (Dict d in DictUtils.Dicts.Values)
+        {
+            if (d.Priority > priorityOfDeletedDict)
+            {
+                d.Priority -= 1;
+            }
+        }
+
+        UpdateDictionariesDisplay();
     }
 
     private void EditButton_Click(object sender, RoutedEventArgs e)

@@ -116,18 +116,18 @@ internal static class KanjidicDBManager
         _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        if (dataReader.HasRows)
+        if (!dataReader.HasRows)
         {
-            List<IDictRecord> results = [];
-            while (dataReader.Read())
-            {
-                results.Add(GetRecord(dataReader));
-            }
-
-            return results;
+            return null;
         }
 
-        return null;
+        List<IDictRecord> results = [];
+        while (dataReader.Read())
+        {
+            results.Add(GetRecord(dataReader));
+        }
+
+        return results;
     }
 
     public static void LoadFromDB(Dict dict)

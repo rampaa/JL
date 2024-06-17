@@ -44,35 +44,37 @@ public sealed class AnkiConfig
 
     public static async ValueTask<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig()
     {
-        if (s_ankiConfigDict is null)
+        if (s_ankiConfigDict is not null)
         {
-            string filePath = Path.Join(Utils.ConfigPath, "AnkiConfig.json");
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    FileStream ankiConfigStream = File.OpenRead(filePath);
-                    await using (ankiConfigStream.ConfigureAwait(false))
-                    {
-                        s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
-                            Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
-                    }
-                }
+            return s_ankiConfigDict;
+        }
 
-                catch (Exception ex)
+        string filePath = Path.Join(Utils.ConfigPath, "AnkiConfig.json");
+        if (File.Exists(filePath))
+        {
+            try
+            {
+                FileStream ankiConfigStream = File.OpenRead(filePath);
+                await using (ankiConfigStream.ConfigureAwait(false))
                 {
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
-                    Utils.Logger.Error(ex, "Couldn't read AnkiConfig");
-                    return null;
+                    s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
+                        Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
                 }
             }
 
-            else
+            catch (Exception ex)
             {
-                // Utils.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
-                Utils.Logger.Warning("AnkiConfig.json doesn't exist");
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
+                Utils.Logger.Error(ex, "Couldn't read AnkiConfig");
                 return null;
             }
+        }
+
+        else
+        {
+            // Utils.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+            Utils.Logger.Warning("AnkiConfig.json doesn't exist");
+            return null;
         }
 
         return s_ankiConfigDict;

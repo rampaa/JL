@@ -4,6 +4,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;
+
 public static class ConfigDBManager
 {
     private static readonly string s_configsPath = Path.Join(Utils.ConfigPath, "Configs.sqlite");

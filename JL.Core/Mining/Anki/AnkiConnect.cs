@@ -8,7 +8,7 @@ namespace JL.Core.Mining.Anki;
 
 internal static class AnkiConnect
 {
-    public static async ValueTask<Response?> AddNoteToDeck(Note note)
+    public static ValueTask<Response?> AddNoteToDeck(Note note)
     {
         Request req = new("addNote", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
         {
@@ -16,22 +16,22 @@ internal static class AnkiConnect
                 "note", note
             }
         });
-        return await Send(req).ConfigureAwait(false);
+        return Send(req);
     }
 
-    public static async ValueTask<Response?> GetDeckNamesResponse()
+    public static ValueTask<Response?> GetDeckNamesResponse()
     {
         Request req = new("deckNames", 6);
-        return await Send(req).ConfigureAwait(false);
+        return Send(req);
     }
 
-    public static async ValueTask<Response?> GetModelNamesResponse()
+    public static ValueTask<Response?> GetModelNamesResponse()
     {
         Request req = new("modelNames", 6);
-        return await Send(req).ConfigureAwait(false);
+        return Send(req);
     }
 
-    public static async ValueTask<Response?> GetModelFieldNamesResponse(string modelName)
+    public static ValueTask<Response?> GetModelFieldNamesResponse(string modelName)
     {
         Request req = new("modelFieldNames", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
         {
@@ -39,26 +39,29 @@ internal static class AnkiConnect
                 "modelName", modelName
             }
         });
-        return await Send(req).ConfigureAwait(false);
+        return Send(req);
     }
 
-    public static async ValueTask<Response?> GetCanAddNotesResponse(Note note)
+    public static ValueTask<Response?> GetCanAddNotesResponse(Note note)
     {
         Request req = new("canAddNotes", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
         {
             {
-                "notes", new[] { note }
+                "notes", new[]
+                {
+                    note
+                }
             }
         });
 
-        return await Send(req).ConfigureAwait(false);
+        return Send(req);
     }
 
-    // public static async ValueTask<Response> StoreMediaFile(string filename, string data)
+    // public static ValueTask<Response> StoreMediaFile(string filename, string data)
     // {
     //     Request req = new("storeMediaFile", 6,
     //         new Dictionary<string, object> { { "filename", filename }, { "data", data } });
-    //     return await Send(req).ConfigureAwait(false);
+    //     return Send(req);
     // }
 
     public static async Task Sync()
@@ -78,19 +81,21 @@ internal static class AnkiConnect
             using HttpResponseMessage postResponse = await Networking.Client
                 .PostAsync(CoreConfigManager.AnkiConnectUri, payload).ConfigureAwait(false);
 
-            if (postResponse.IsSuccessStatusCode)
+            if (!postResponse.IsSuccessStatusCode)
             {
-                Response? json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
-                Utils.Logger.Information("json result: {JsonResult}", json?.Result ?? "null");
-
-                if (json?.Error is null)
-                {
-                    return json;
-                }
-
-                Utils.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
-                Utils.Logger.Error("{JsonError}", json.Error.ToString());
+                return null;
             }
+
+            Response? json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
+            Utils.Logger.Information("json result: {JsonResult}", json?.Result ?? "null");
+
+            if (json?.Error is null)
+            {
+                return json;
+            }
+
+            Utils.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
+            Utils.Logger.Error("{JsonError}", json.Error.ToString());
 
             return null;
         }

@@ -121,28 +121,28 @@ internal static class JmnedictDBManager
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        if (dataReader.HasRows)
+        if (!dataReader.HasRows)
         {
-            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-            while (dataReader.Read())
-            {
-                JmnedictRecord record = GetRecord(dataReader);
-
-                string searchKey = dataReader.GetString(nameof(searchKey));
-                if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
-                {
-                    result.Add(record);
-                }
-                else
-                {
-                    results[searchKey] = [record];
-                }
-            }
-
-            return results;
+            return null;
         }
 
-        return null;
+        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+        while (dataReader.Read())
+        {
+            JmnedictRecord record = GetRecord(dataReader);
+
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            {
+                result.Add(record);
+            }
+            else
+            {
+                results[searchKey] = [record];
+            }
+        }
+
+        return results;
     }
 
     // public static void LoadFromDB(Dict dict)

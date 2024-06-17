@@ -112,33 +112,35 @@ internal sealed partial class StatsWindow : Window
     private void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
     {
 #pragma warning disable CA1308 // Normalize strings to uppercase
-        if (WindowsUtils.ShowYesNoDialog(
+        if (!WindowsUtils.ShowYesNoDialog(
                 $"Are you really sure that you want to reset the {ButtonSwapStats.Content.ToString()!.ToLowerInvariant()} stats?",
                 string.Create(CultureInfo.InvariantCulture, $"Reset {ButtonSwapStats.Content} Stats?")))
         {
-            if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode statsMode))
-            {
-                Stats.ResetStats(statsMode);
-
-                if (statsMode is StatsMode.Lifetime)
-                {
-                    StatsDBUtils.UpdateLifetimeStats();
-                }
-
-                else if (statsMode is StatsMode.Profile)
-                {
-                    StatsDBUtils.UpdateProfileLifetimeStats();
-                }
-
-                UpdateStatsDisplay(statsMode);
-            }
-
-            else
-            {
-                Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
-            }
+            return;
         }
 #pragma warning restore CA1308 // Normalize strings to uppercase
+
+        if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode statsMode))
+        {
+            Stats.ResetStats(statsMode);
+
+            if (statsMode is StatsMode.Lifetime)
+            {
+                StatsDBUtils.UpdateLifetimeStats();
+            }
+
+            else if (statsMode is StatsMode.Profile)
+            {
+                StatsDBUtils.UpdateProfileLifetimeStats();
+            }
+
+            UpdateStatsDisplay(statsMode);
+        }
+
+        else
+        {
+            Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+        }
     }
 
     private void Window_Closed(object sender, EventArgs e)

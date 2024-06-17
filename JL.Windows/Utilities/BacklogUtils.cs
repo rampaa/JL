@@ -103,26 +103,24 @@ internal static class BacklogUtils
         }
 
         string allBacklogText = string.Join('\n', Backlog);
-        if (MainWindow.Instance.MainTextBox.Text != allBacklogText)
+        if (MainWindow.Instance.MainTextBox.Text != allBacklogText
+            && MainWindow.Instance.MainTextBox.GetFirstVisibleLineIndex() is 0)
         {
-            if (MainWindow.Instance.MainTextBox.GetFirstVisibleLineIndex() is 0)
+            int caretIndex = allBacklogText.Length - MainWindow.Instance.MainTextBox.Text.Length;
+
+            MainWindow.Instance.MainTextBox.Text = allBacklogText;
+            MainWindow.Instance.MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+
+            if (caretIndex >= 0)
             {
-                int caretIndex = allBacklogText.Length - MainWindow.Instance.MainTextBox.Text.Length;
-
-                MainWindow.Instance.MainTextBox.Text = allBacklogText;
-                MainWindow.Instance.MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-
-                if (caretIndex >= 0)
-                {
-                    MainWindow.Instance.MainTextBox.CaretIndex = caretIndex;
-                }
-
-                MainWindow.Instance.MainTextBox.ScrollToEnd();
+                MainWindow.Instance.MainTextBox.CaretIndex = caretIndex;
             }
+
+            MainWindow.Instance.MainTextBox.ScrollToEnd();
         }
     }
 
-    public static async Task WriteBacklog()
+    public static Task WriteBacklog()
     {
         if (ConfigManager.EnableBacklog
             && ConfigManager.AutoSaveBacklogBeforeClosing
@@ -134,7 +132,9 @@ internal static class BacklogUtils
                 _ = Directory.CreateDirectory(directory);
             }
 
-            await File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{ProfileUtils.CurrentProfileName}_{Process.GetCurrentProcess().StartTime:yyyy.MM.dd_HH.mm.ss}-{DateTime.Now:yyyy.MM.dd_HH.mm.ss}.txt")), Backlog).ConfigureAwait(false);
+            return File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{ProfileUtils.CurrentProfileName}_{Process.GetCurrentProcess().StartTime:yyyy.MM.dd_HH.mm.ss}-{DateTime.Now:yyyy.MM.dd_HH.mm.ss}.txt")), Backlog);
         }
+
+        return Task.CompletedTask;
     }
 }

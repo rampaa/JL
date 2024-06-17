@@ -25,12 +25,14 @@ public static class AudioUtils
 
     private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new Dictionary<string, string>(6, StringComparer.Ordinal)
     {
+        // ReSharper disable BadExpressionBracesLineBreaks
         { "mpeg", "mp3" },
         { "3gpp", "3gp" },
         { "3gpp2", "3g2" },
         { "vorbis", "ogg" },
         { "vorbis-config", "ogg" },
         { "x-midi", "midi" }
+        // ReSharper restore BadExpressionBracesLineBreaks
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
     private static async ValueTask<AudioResponse?> GetAudioFromUrl(Uri url)
@@ -196,17 +198,17 @@ public static class AudioUtils
         }
     }
 
-    public static async Task SerializeAudioSources()
+    public static Task SerializeAudioSources()
     {
-        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-            JsonSerializer.Serialize(AudioSources, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
+        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
+            JsonSerializer.Serialize(AudioSources, Utils.s_jsoWithEnumConverterAndIndentation));
     }
 
-    public static async Task CreateDefaultAudioSourceConfig()
+    public static Task CreateDefaultAudioSourceConfig()
     {
         _ = Directory.CreateDirectory(Utils.ConfigPath);
-        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-            JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
+        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
+            JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeAudioSources()

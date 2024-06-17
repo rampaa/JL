@@ -53,7 +53,7 @@ internal static class EpwingYomichanLoader
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    public static EpwingYomichanRecord? GetEpwingYomichanRecord(List<JsonElement> jsonElements, Dict dict)
+    private static EpwingYomichanRecord? GetEpwingYomichanRecord(List<JsonElement> jsonElements, Dict dict)
     {
         string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
         string? reading = jsonElements[1].GetString();

@@ -96,30 +96,31 @@ internal sealed partial class ManageProfilesWindow : Window
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (WindowsUtils.ShowYesNoDialog("Do you really want to remove this profile?", "Confirmation"))
+        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this profile?", "Confirmation"))
         {
-            string profile = (string)((Button)sender).Tag;
-
-            using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
-            {
-                ProfileDBUtils.DeleteProfile(connection, profile);
-                PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
-            }
-
-            string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(profile);
-            if (File.Exists(profileCustomNamesPath))
-            {
-                File.Delete(profileCustomNamesPath);
-            }
-
-            string profileCustomWordsPath = ProfileUtils.GetProfileCustomWordDictPath(profile);
-            if (File.Exists(profileCustomWordsPath))
-            {
-                File.Delete(profileCustomWordsPath);
-            }
-
-            UpdateProfilesDisplay();
+            return;
         }
+
+        string profile = (string)((Button)sender).Tag;
+        using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
+        {
+            ProfileDBUtils.DeleteProfile(connection, profile);
+            PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
+        }
+
+        string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(profile);
+        if (File.Exists(profileCustomNamesPath))
+        {
+            File.Delete(profileCustomNamesPath);
+        }
+
+        string profileCustomWordsPath = ProfileUtils.GetProfileCustomWordDictPath(profile);
+        if (File.Exists(profileCustomWordsPath))
+        {
+            File.Delete(profileCustomWordsPath);
+        }
+
+        UpdateProfilesDisplay();
     }
 
     private void AddProfileButton_Click(object sender, RoutedEventArgs e)

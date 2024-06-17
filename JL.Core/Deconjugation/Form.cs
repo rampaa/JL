@@ -1,31 +1,26 @@
 namespace JL.Core.Deconjugation;
 
-internal sealed class Form
+internal sealed class Form(
+    string text,
+    string originalText,
+    List<string> tags,
+    HashSet<string> seenText,
+    List<string> process)
 {
-    public string Text { get; }
-    public string OriginalText { get; }
-    public List<string> Tags { get; }
-    public HashSet<string> SeenText { get; }
-    public List<string> Process { get; }
-
-    public Form(string text, string originalText, List<string> tags, HashSet<string> seenText,
-        List<string> process)
-    {
-        Text = text;
-        OriginalText = originalText;
-        Tags = tags;
-        SeenText = seenText;
-        Process = process;
-    }
+    public string Text { get; } = text;
+    public string OriginalText { get; } = originalText;
+    public List<string> Tags { get; } = tags;
+    public HashSet<string> SeenText { get; } = seenText;
+    public List<string> Process { get; } = process;
 
     public override bool Equals(object? obj)
     {
         return obj is Form form
-            && Text == form.Text
-            && OriginalText == form.OriginalText
-            && Tags.SequenceEqual(form.Tags)
-            && SeenText.SetEquals(form.SeenText)
-            && Process.SequenceEqual(form.Process);
+               && Text == form.Text
+               && OriginalText == form.OriginalText
+               && Tags.SequenceEqual(form.Tags)
+               && SeenText.SetEquals(form.SeenText)
+               && Process.SequenceEqual(form.Process);
     }
 
     public override int GetHashCode()

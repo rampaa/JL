@@ -183,8 +183,8 @@ internal sealed partial class MainWindow : Window
 
             string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
             mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
-                            || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                        && text.StartsWith(lastText, StringComparison.Ordinal);
+                          || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
+                         && text.StartsWith(lastText, StringComparison.Ordinal);
 
             s_lastTextCopyTime = preciseTimeNow;
 
@@ -218,7 +218,7 @@ internal sealed partial class MainWindow : Window
                 : null;
 
             if (!mergeTexts && SizeToContent is SizeToContent.Manual
-                && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+                            && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
                 WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
             }
@@ -289,22 +289,24 @@ internal sealed partial class MainWindow : Window
     private async void ClipboardChanged(object? sender, EventArgs? e)
     {
         ulong currentClipboardSequenceNo = WinApi.GetClipboardSequenceNo();
-        if (s_clipboardSequenceNo != currentClipboardSequenceNo)
+        if (s_clipboardSequenceNo == currentClipboardSequenceNo)
         {
-            s_clipboardSequenceNo = currentClipboardSequenceNo;
-            bool gotTextFromClipboard = CopyFromClipboard();
+            return;
+        }
 
-            if (gotTextFromClipboard
-                && ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard
-                && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
-                    || WindowState is WindowState.Minimized))
-            {
-                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, s_lastTextCopiedWhileMinimized ?? MainTextBox.Text, 0, true).ConfigureAwait(false);
-            }
+        s_clipboardSequenceNo = currentClipboardSequenceNo;
+        bool gotTextFromClipboard = CopyFromClipboard();
+
+        if (gotTextFromClipboard
+            && ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard
+            && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+                || WindowState is WindowState.Minimized))
+        {
+            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, s_lastTextCopiedWhileMinimized ?? MainTextBox.Text, 0, true).ConfigureAwait(false);
         }
     }
 
-    public async Task HandleMouseMove(MouseEventArgs? e)
+    public Task HandleMouseMove(MouseEventArgs? e)
     {
         if (ConfigManager.InactiveLookupMode
             || ConfigManager.LookupOnSelectOnly
@@ -318,10 +320,10 @@ internal sealed partial class MainWindow : Window
             || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
             || (ConfigManager.RequireLookupKeyPress && !ConfigManager.LookupKeyKeyGesture.IsPressed()))
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox).ConfigureAwait(false);
+        return FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox);
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -1159,61 +1161,63 @@ internal sealed partial class MainWindow : Window
         WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
         WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
 
-        if (Math.Abs(oldResolution.Width - WindowsUtils.DpiAwareWorkAreaWidth) > 1 || Math.Abs(oldResolution.Height - WindowsUtils.DpiAwareWorkAreaHeight) > 1)
+        if (Math.Abs(oldResolution.Width - WindowsUtils.DpiAwareWorkAreaWidth) <= 1 && Math.Abs(oldResolution.Height - WindowsUtils.DpiAwareWorkAreaHeight) <= 1)
         {
-            double ratioX = oldResolution.Width / WindowsUtils.DpiAwareWorkAreaWidth;
-            double ratioY = oldResolution.Height / WindowsUtils.DpiAwareWorkAreaHeight;
+            return;
+        }
 
-            double fontScale = ratioX * ratioY > 1
-                ? Math.Min(ratioX, ratioY) * 0.75
-                : Math.Max(ratioX, ratioY) / 0.75;
+        double ratioX = oldResolution.Width / WindowsUtils.DpiAwareWorkAreaWidth;
+        double ratioY = oldResolution.Height / WindowsUtils.DpiAwareWorkAreaHeight;
 
-            FontSizeSlider.Value = Math.Round(FontSizeSlider.Value / fontScale);
+        double fontScale = ratioX * ratioY > 1
+            ? Math.Min(ratioX, ratioY) * 0.75
+            : Math.Max(ratioX, ratioY) / 0.75;
 
-            Left = LeftPositionBeforeResolutionChange / ratioX;
-            LeftPositionBeforeResolutionChange = Left;
+        FontSizeSlider.Value = Math.Round(FontSizeSlider.Value / fontScale);
 
-            Top = TopPositionBeforeResolutionChange / ratioY;
-            TopPositionBeforeResolutionChange = Top;
+        Left = LeftPositionBeforeResolutionChange / ratioX;
+        LeftPositionBeforeResolutionChange = Left;
 
-            Width = Math.Round(WidthBeforeResolutionChange / ratioX);
-            WidthBeforeResolutionChange = Width;
+        Top = TopPositionBeforeResolutionChange / ratioY;
+        TopPositionBeforeResolutionChange = Top;
 
-            Height = Math.Round(HeightBeforeResolutionChange / ratioY);
-            HeightBeforeResolutionChange = Height;
+        Width = Math.Round(WidthBeforeResolutionChange / ratioX);
+        WidthBeforeResolutionChange = Width;
 
-            ConfigManager.PopupMaxHeight = Math.Round(ConfigManager.PopupMaxHeight / ratioY);
-            ConfigManager.PopupMaxWidth = Math.Round(ConfigManager.PopupMaxWidth / ratioX);
-            WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
-            WindowsUtils.DpiAwarePopupMaxWidth = ConfigManager.PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
+        Height = Math.Round(HeightBeforeResolutionChange / ratioY);
+        HeightBeforeResolutionChange = Height;
 
-            ConfigManager.PopupYOffset = Math.Round(ConfigManager.PopupYOffset / ratioY);
-            ConfigManager.PopupXOffset = Math.Round(ConfigManager.PopupXOffset / ratioX);
-            WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
-            WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
+        ConfigManager.PopupMaxHeight = Math.Round(ConfigManager.PopupMaxHeight / ratioY);
+        ConfigManager.PopupMaxWidth = Math.Round(ConfigManager.PopupMaxWidth / ratioX);
+        WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
+        WindowsUtils.DpiAwarePopupMaxWidth = ConfigManager.PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
 
-            ConfigManager.FixedPopupYPosition = Math.Round(ConfigManager.FixedPopupYPosition / ratioY);
-            ConfigManager.FixedPopupXPosition = Math.Round(ConfigManager.FixedPopupXPosition / ratioX);
-            WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
-            WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
+        ConfigManager.PopupYOffset = Math.Round(ConfigManager.PopupYOffset / ratioY);
+        ConfigManager.PopupXOffset = Math.Round(ConfigManager.PopupXOffset / ratioX);
+        WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
 
-            PopupWindow? currentPopupWindow = FirstPopupWindow;
-            while (currentPopupWindow is not null)
-            {
-                WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, currentPopupWindow);
-                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
-            }
+        ConfigManager.FixedPopupYPosition = Math.Round(ConfigManager.FixedPopupYPosition / ratioY);
+        ConfigManager.FixedPopupXPosition = Math.Round(ConfigManager.FixedPopupXPosition / ratioX);
+        WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
 
-            if (ConfigManager.AutoAdjustFontSizesOnResolutionChange)
-            {
-                ConfigManager.AlternativeSpellingsFontSize = Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
-                ConfigManager.DeconjugationInfoFontSize = Math.Round(ConfigManager.DeconjugationInfoFontSize / fontScale);
-                ConfigManager.DefinitionsFontSize = Math.Round(ConfigManager.DefinitionsFontSize / fontScale);
-                ConfigManager.DictTypeFontSize = Math.Round(ConfigManager.DictTypeFontSize / fontScale);
-                ConfigManager.FrequencyFontSize = Math.Round(ConfigManager.FrequencyFontSize / fontScale);
-                ConfigManager.PrimarySpellingFontSize = Math.Round(ConfigManager.PrimarySpellingFontSize / fontScale);
-                ConfigManager.ReadingsFontSize = Math.Round(ConfigManager.ReadingsFontSize / fontScale);
-            }
+        PopupWindow? currentPopupWindow = FirstPopupWindow;
+        while (currentPopupWindow is not null)
+        {
+            WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, currentPopupWindow);
+            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+        }
+
+        if (ConfigManager.AutoAdjustFontSizesOnResolutionChange)
+        {
+            ConfigManager.AlternativeSpellingsFontSize = Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
+            ConfigManager.DeconjugationInfoFontSize = Math.Round(ConfigManager.DeconjugationInfoFontSize / fontScale);
+            ConfigManager.DefinitionsFontSize = Math.Round(ConfigManager.DefinitionsFontSize / fontScale);
+            ConfigManager.DictTypeFontSize = Math.Round(ConfigManager.DictTypeFontSize / fontScale);
+            ConfigManager.FrequencyFontSize = Math.Round(ConfigManager.FrequencyFontSize / fontScale);
+            ConfigManager.PrimarySpellingFontSize = Math.Round(ConfigManager.PrimarySpellingFontSize / fontScale);
+            ConfigManager.ReadingsFontSize = Math.Round(ConfigManager.ReadingsFontSize / fontScale);
         }
     }
 
@@ -1555,26 +1559,27 @@ internal sealed partial class MainWindow : Window
     private void Window_LocationChanged(object sender, EventArgs e)
     {
         Screen newScreen = Screen.FromHandle(WindowHandle);
-
-        if (WindowsUtils.ActiveScreen.DeviceName != newScreen.DeviceName)
+        if (WindowsUtils.ActiveScreen.DeviceName == newScreen.DeviceName)
         {
-            WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
-            WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
-            WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
-            WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
-            WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
-            WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
-            WindowsUtils.DpiAwareFixedPopupXPosition = ConfigManager.FixedPopupXPosition / WindowsUtils.Dpi.DpiScaleX;
-            WindowsUtils.DpiAwareFixedPopupYPosition = ConfigManager.FixedPopupYPosition / WindowsUtils.Dpi.DpiScaleY;
-            WindowsUtils.DpiAwarePopupMaxWidth = ConfigManager.PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
-            WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
+            return;
+        }
 
-            PopupWindow? currentPopupWindow = FirstPopupWindow;
-            while (currentPopupWindow is not null)
-            {
-                WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, currentPopupWindow);
-                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
-            }
+        WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
+        WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
+        WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
+        WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
+        WindowsUtils.DpiAwareFixedPopupXPosition = ConfigManager.FixedPopupXPosition / WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareFixedPopupYPosition = ConfigManager.FixedPopupYPosition / WindowsUtils.Dpi.DpiScaleY;
+        WindowsUtils.DpiAwarePopupMaxWidth = ConfigManager.PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
+
+        PopupWindow? currentPopupWindow = FirstPopupWindow;
+        while (currentPopupWindow is not null)
+        {
+            WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, currentPopupWindow);
+            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
     }
 

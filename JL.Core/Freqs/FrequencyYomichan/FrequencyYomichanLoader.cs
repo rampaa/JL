@@ -47,6 +47,7 @@ internal static class FrequencyYomichanLoader
                     case JsonValueKind.Object when thirdElement.TryGetProperty("value", out JsonElement freqValue):
                         frequency = freqValue.GetInt32();
                         break;
+
                     case JsonValueKind.Object:
                     {
                         if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
@@ -60,6 +61,7 @@ internal static class FrequencyYomichanLoader
 
                         break;
                     }
+
                     case JsonValueKind.String:
                     {
                         string freqStr = thirdElement.GetString()!;
@@ -83,50 +85,52 @@ internal static class FrequencyYomichanLoader
                 }
 #pragma warning restore IDE0010
 
-                if (frequency is not int.MaxValue)
+                if (frequency is int.MaxValue)
                 {
-                    if (frequency > freq.MaxValue)
-                    {
-                        freq.MaxValue = frequency;
-                    }
+                    continue;
+                }
 
-                    if (reading is null)
-                    {
-                        if (freq.Contents.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
-                        {
-                            spellingFreqResult.Add(new FrequencyRecord(spelling, frequency));
-                        }
+                if (frequency > freq.MaxValue)
+                {
+                    freq.MaxValue = frequency;
+                }
 
-                        else
-                        {
-                            freq.Contents[spellingInHiragana] = [new FrequencyRecord(spelling, frequency)];
-                        }
+                if (reading is null)
+                {
+                    if (freq.Contents.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
+                    {
+                        spellingFreqResult.Add(new FrequencyRecord(spelling, frequency));
                     }
 
                     else
                     {
-                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
-                        if (freq.Contents.TryGetValue(readingInHiragana, out IList<FrequencyRecord>? readingFreqResult))
+                        freq.Contents[spellingInHiragana] = [new FrequencyRecord(spelling, frequency)];
+                    }
+                }
+
+                else
+                {
+                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
+                    if (freq.Contents.TryGetValue(readingInHiragana, out IList<FrequencyRecord>? readingFreqResult))
+                    {
+                        readingFreqResult.Add(new FrequencyRecord(spelling, frequency));
+                    }
+
+                    else
+                    {
+                        freq.Contents[readingInHiragana] = [new FrequencyRecord(spelling, frequency)];
+                    }
+
+                    if (reading != spelling)
+                    {
+                        if (freq.Contents.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
                         {
-                            readingFreqResult.Add(new FrequencyRecord(spelling, frequency));
+                            spellingFreqResult.Add(new FrequencyRecord(reading, frequency));
                         }
 
                         else
                         {
-                            freq.Contents[readingInHiragana] = [new FrequencyRecord(spelling, frequency)];
-                        }
-
-                        if (reading != spelling)
-                        {
-                            if (freq.Contents.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
-                            {
-                                spellingFreqResult.Add(new FrequencyRecord(reading, frequency));
-                            }
-
-                            else
-                            {
-                                freq.Contents[spellingInHiragana] = [new FrequencyRecord(reading, frequency)];
-                            }
+                            freq.Contents[spellingInHiragana] = [new FrequencyRecord(reading, frequency)];
                         }
                     }
                 }

@@ -149,44 +149,44 @@ internal static class EpwingNazekaDBManager
 
         using SqliteDataReader dataReader = command.ExecuteReader();
 
-        if (dataReader.HasRows)
+        if (!dataReader.HasRows)
         {
-            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-
-            while (dataReader.Read())
-            {
-                string searchKey = dataReader.GetString(nameof(searchKey));
-                string primarySpelling = dataReader.GetString(nameof(primarySpelling));
-
-                string? reading = null;
-                if (dataReader[nameof(reading)] is string readingFromDB)
-                {
-                    reading = readingFromDB;
-                }
-
-                string[]? alternativeSpellings = null;
-                if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
-                {
-                    alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
-                }
-
-                string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
-
-                if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
-                {
-                    result.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
-                }
-
-                else
-                {
-                    results[searchKey] = [new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions)];
-                }
-            }
-
-            return results;
+            return null;
         }
 
-        return null;
+        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+
+        while (dataReader.Read())
+        {
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            string primarySpelling = dataReader.GetString(nameof(primarySpelling));
+
+            string? reading = null;
+            if (dataReader[nameof(reading)] is string readingFromDB)
+            {
+                reading = readingFromDB;
+            }
+
+            string[]? alternativeSpellings = null;
+            if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
+            {
+                alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
+
+            string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
+
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            {
+                result.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
+            }
+
+            else
+            {
+                results[searchKey] = [new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions)];
+            }
+        }
+
+        return results;
     }
 
     public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
@@ -199,18 +199,18 @@ internal static class EpwingNazekaDBManager
         _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        if (dataReader.HasRows)
+        if (!dataReader.HasRows)
         {
-            List<IDictRecord> results = [];
-            while (dataReader.Read())
-            {
-                results.Add(GetRecord(dataReader));
-            }
-
-            return results;
+            return null;
         }
 
-        return null;
+        List<IDictRecord> results = [];
+        while (dataReader.Read())
+        {
+            results.Add(GetRecord(dataReader));
+        }
+
+        return results;
     }
 
     public static void LoadFromDB(Dict dict)
