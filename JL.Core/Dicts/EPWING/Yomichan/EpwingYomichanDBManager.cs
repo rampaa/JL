@@ -10,7 +10,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 4;
+    public const int Version = 5;
 
     private const string SingleTermQuery =
         """
