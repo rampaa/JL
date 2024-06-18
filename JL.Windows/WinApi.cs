@@ -425,17 +425,13 @@ internal sealed partial class WinApi
             default:
                 if (msg == MagpieUtils.MagpieScalingChangedWindowMessage)
                 {
-                    if (wParam is 1)
+                    MagpieUtils.IsMagpieScaling = wParam is 1;
+                    if (MagpieUtils.IsMagpieScaling)
                     {
-                        MainWindow.Instance.BringToFront();
-                        MagpieUtils.IsMagpieScaling = true;
                         MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowLeftEdgePosition(lParam);
                         MagpieUtils.DpiAwareMagpieWindowRightEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowRightEdgePosition(lParam);
                         MagpieUtils.DpiAwareMagpieWindowTopEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowTopEdgePosition(lParam);
-                    }
-                    else
-                    {
-                        MagpieUtils.IsMagpieScaling = false;
+                        MainWindow.Instance.BringToFront();
                     }
                 }
                 break;
