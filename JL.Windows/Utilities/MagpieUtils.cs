@@ -46,6 +46,6 @@ internal static class MagpieUtils
 
     public static bool IsMagpieReallyScaling()
     {
-        return WinApi.FindWindow("Window_Magpie_967EB565-6F73-4E94-AE53-00CC42592A22", null) is not 0;
+        return WinApi.FindWindow("Window_Magpie_967EB565-6F73-4E94-AE53-00CC42592A22") is not 0;
     }
 }

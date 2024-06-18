@@ -360,9 +360,9 @@ internal sealed partial class WinApi
         return GetPropW(windowHandle, lpString);
     }
 
-    public static nint FindWindow(string? lpClassName, string? lpWindowName)
+    public static nint FindWindow(string lpClassName)
     {
-        return FindWindowW(lpClassName, lpWindowName);
+        return FindWindowW(lpClassName, null);
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
