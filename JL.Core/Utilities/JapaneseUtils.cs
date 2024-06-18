@@ -8,6 +8,9 @@ namespace JL.Core.Utilities;
 public static partial class JapaneseUtils
 {
     // Matches the following Unicode ranges:
+    // × (\u00D7) 
+    // General Punctuation (2000-206F) ‥, …, •, ※
+    // Geometric Shapes (25A0-U+25FF) ◦, ◎, ○, △, ◉× 
     // CJK Radicals Supplement (2E80–2EFF)
     // Kangxi Radicals (2F00–2FDF)
     // Ideographic Description Characters (2FF0–2FFF)
@@ -39,7 +42,7 @@ public static partial class JapaneseUtils
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
 
-    [GeneratedRegex(@"[\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD82B[\uDFF0-\uDFFF]|\uD82C[\uDC00-\uDD6F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]")]
+    [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD82B[\uDFF0-\uDFFF]|\uD82C[\uDC00-\uDD6F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]")]
     public static partial Regex JapaneseRegex();
 
     private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new Dictionary<char, string>(87)
