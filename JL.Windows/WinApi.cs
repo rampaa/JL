@@ -333,34 +333,33 @@ internal sealed partial class WinApi
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
     {
-        switch (msg)
+        if (msg is WM_CLIPBOARDUPDATE)
         {
-            case WM_CLIPBOARDUPDATE:
-                OnClipboardChanged();
+            OnClipboardChanged();
+            handled = true;
+        }
+
+        else if (msg is WM_HOTKEY)
+        {
+            if (KeyGestureUtils.KeyGestureDict.TryGetValue((int)wParam, out KeyGesture? keyGesture))
+            {
+                _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
                 handled = true;
-                break;
+            }
+        }
 
-            case WM_HOTKEY:
-                if (KeyGestureUtils.KeyGestureDict.TryGetValue((int)wParam, out KeyGesture? keyGesture))
-                {
-                    _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
-                    handled = true;
-                }
-                break;
+        else if (msg == MagpieUtils.MagpieScalingChangedWindowMessage)
+        {
+            MagpieUtils.IsMagpieScaling = wParam is 1;
+            if (MagpieUtils.IsMagpieScaling)
+            {
+                MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowLeftEdgePosition(lParam);
+                MagpieUtils.DpiAwareMagpieWindowRightEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowRightEdgePosition(lParam);
+                MagpieUtils.DpiAwareMagpieWindowTopEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowTopEdgePosition(lParam);
+                MainWindow.Instance.BringToFront();
+            }
 
-            default:
-                if (msg == MagpieUtils.MagpieScalingChangedWindowMessage)
-                {
-                    MagpieUtils.IsMagpieScaling = wParam is 1;
-                    if (MagpieUtils.IsMagpieScaling)
-                    {
-                        MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowLeftEdgePosition(lParam);
-                        MagpieUtils.DpiAwareMagpieWindowRightEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowRightEdgePosition(lParam);
-                        MagpieUtils.DpiAwareMagpieWindowTopEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowTopEdgePosition(lParam);
-                        MainWindow.Instance.BringToFront();
-                    }
-                }
-                break;
+            handled = true;
         }
 
         return 0;
