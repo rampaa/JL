@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="PopupWindow" PreviewMouseDown="Window_PreviewMouseDown"
-        Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520" ResizeMode="NoResize"
+        Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520" ResizeMode="NoResize" ShowActivated="False"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False" ContextMenuOpening="Window_ContextMenuOpening"
         PreviewKeyDown="Window_PreviewKeyDown" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" Closed="Window_Closed"
         x:ClassModifier="internal">
