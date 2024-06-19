@@ -1258,11 +1258,11 @@ internal static class ConfigManager
 
         ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", MainWindow.Instance.Top >= SystemParameters.VirtualScreenTop
             ? MainWindow.Instance.Top.ToString(CultureInfo.InvariantCulture)
-            : "0");
+            : WindowsUtils.ActiveScreen.Bounds.Y.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
             ? MainWindow.Instance.Left.ToString(CultureInfo.InvariantCulture)
-            : "0");
+            : WindowsUtils.ActiveScreen.Bounds.X.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.AnalyzeAndVacuum(connection);
     }
