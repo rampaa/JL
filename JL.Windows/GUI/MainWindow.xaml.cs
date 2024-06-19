@@ -1373,25 +1373,28 @@ internal sealed partial class MainWindow : Window
                 MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
             }
 
+            double width;
             if (!MagpieUtils.IsMagpieScaling)
             {
                 Left = WindowsUtils.ActiveScreen.Bounds.X;
                 Top = WindowsUtils.ActiveScreen.Bounds.Y;
-                Width = WindowsUtils.DpiAwareWorkAreaWidth;
+                width = WindowsUtils.DpiAwareWorkAreaWidth;
             }
             else
             {
                 Left = MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition;
                 Top = MagpieUtils.DpiAwareMagpieWindowTopEdgePosition;
-                Width = MagpieUtils.DpiAwareMagpieWindowRightEdgePosition - MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition;
+                width = MagpieUtils.DpiAwareMagpieWindowRightEdgePosition - MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition;
             }
 
-            if (ConfigManager.MainWindowMaxDynamicWidth < Width)
+            if (ConfigManager.MainWindowMaxDynamicWidth < width)
             {
-                ConfigManager.MainWindowMaxDynamicWidth = Width;
+                ConfigManager.MainWindowMaxDynamicWidth = width;
+                MaxWidth = width;
             }
 
-            WidthBeforeResolutionChange = Width;
+            Width = width;
+            WidthBeforeResolutionChange = width;
         }
 
         LeftPositionBeforeResolutionChange = Left;
