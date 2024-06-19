@@ -215,7 +215,7 @@ internal sealed partial class MainWindow : Window
             if (!mergeTexts && SizeToContent is SizeToContent.Manual
                             && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
-                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
+                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
             }
 
             if (!windowIsMinimized)
@@ -1165,7 +1165,19 @@ internal sealed partial class MainWindow : Window
             ? Math.Min(ratioX, ratioY) * 0.75
             : Math.Max(ratioX, ratioY) / 0.75;
 
-        FontSizeSlider.Value = Math.Round(FontSizeSlider.Value / fontScale);
+        ConfigManager.MainWindowMaxDynamicHeight = Math.Round(ConfigManager.MainWindowMaxDynamicHeight / ratioY);
+        ConfigManager.MainWindowMaxDynamicWidth = Math.Round(ConfigManager.MainWindowMaxDynamicWidth / ratioX);
+        if (SizeToContent is not SizeToContent.Manual)
+        {
+            if (ConfigManager.MainWindowDynamicHeight)
+            {
+                MaxHeight = ConfigManager.MainWindowMaxDynamicHeight;
+            }
+            if (ConfigManager.MainWindowDynamicWidth)
+            {
+                MaxWidth = ConfigManager.MainWindowMaxDynamicWidth;
+            }
+        }
 
         Left = LeftPositionBeforeResolutionChange / ratioX;
         LeftPositionBeforeResolutionChange = Left;
@@ -1178,6 +1190,8 @@ internal sealed partial class MainWindow : Window
 
         Height = Math.Round(HeightBeforeResolutionChange / ratioY);
         HeightBeforeResolutionChange = Height;
+
+        FontSizeSlider.Value = Math.Round(FontSizeSlider.Value / fontScale);
 
         ConfigManager.PopupMaxHeight = Math.Round(ConfigManager.PopupMaxHeight / ratioY);
         ConfigManager.PopupMaxWidth = Math.Round(ConfigManager.PopupMaxWidth / ratioX);
@@ -1320,6 +1334,12 @@ internal sealed partial class MainWindow : Window
                 wParam = 61448;
             }
 
+            if (SizeToContent is not SizeToContent.Manual)
+            {
+                MaxWidth = double.PositiveInfinity;
+                MaxHeight = double.PositiveInfinity;
+            }
+
             WinApi.ResizeWindow(WindowHandle, wParam);
 
             LeftPositionBeforeResolutionChange = Left;
@@ -1364,6 +1384,11 @@ internal sealed partial class MainWindow : Window
                 Left = MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition;
                 Top = MagpieUtils.DpiAwareMagpieWindowTopEdgePosition;
                 Width = MagpieUtils.DpiAwareMagpieWindowRightEdgePosition - MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition;
+            }
+
+            if (ConfigManager.MainWindowMaxDynamicWidth < Width)
+            {
+                ConfigManager.MainWindowMaxDynamicWidth = Width;
             }
 
             WidthBeforeResolutionChange = Width;
@@ -1540,7 +1565,7 @@ internal sealed partial class MainWindow : Window
                     if (SizeToContent is SizeToContent.Manual
                         && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
                     {
-                        WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
+                        WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
                     }
                 }
 

@@ -58,8 +58,8 @@ internal static class ConfigManager
     public static bool TextToSpeechOnTextChange { get; private set; } // = false;
     public static bool HidePopupsOnTextChange { get; private set; } = true;
     public static bool AlwaysShowMainTextBoxCaret { get; set; } // = false;
-    private static double MainWindowMaxDynamicWidth { get; set; } = 800;
-    private static double MainWindowMaxDynamicHeight { get; set; } = 269;
+    public static double MainWindowMaxDynamicWidth { get; set; } = 800;
+    public static double MainWindowMaxDynamicHeight { get; set; } = 269;
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     private static bool HorizontallyCenterMainWindowText { get; set; } // = false;
     public static bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;

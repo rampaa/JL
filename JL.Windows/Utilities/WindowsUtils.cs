@@ -604,24 +604,6 @@ internal static class WindowsUtils
         }
     }
 
-    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, MainWindow window)
-    {
-        if (dynamicWidth && dynamicHeight)
-        {
-            window.SizeToContent = SizeToContent.WidthAndHeight;
-        }
-
-        else if (dynamicHeight)
-        {
-            window.SizeToContent = SizeToContent.Height;
-        }
-
-        else if (dynamicWidth)
-        {
-            window.SizeToContent = SizeToContent.Width;
-        }
-    }
-
     public static void CopyTextToClipboard(string? text)
     {
         if (string.IsNullOrEmpty(text))
