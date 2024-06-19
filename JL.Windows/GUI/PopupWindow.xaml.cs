@@ -182,8 +182,10 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.SearchWithBrowser(text);
     }
 
-    public async Task LookupOnCharPosition(TextBox tb, string textBoxText, int charPosition, bool enableMiningMode)
+    public async Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode)
     {
+        string textBoxText = textBox.Text;
+
         _currentText = textBoxText;
         _currentCharPosition = charPosition;
 
@@ -232,7 +234,7 @@ internal sealed partial class PopupWindow : Window
         if (lookupResults?.Count > 0)
         {
             Stats.IncrementStat(StatType.NumberOfLookups);
-            _previousTextBox = tb;
+            _previousTextBox = textBox;
             LastSelectedText = lookupResults[0].MatchedText;
 
             if (ConfigManager.HighlightLongestMatch)
@@ -241,8 +243,8 @@ internal sealed partial class PopupWindow : Window
                     ? MainWindow.Instance.WindowHandle
                     : ((PopupWindow)Owner).WindowHandle);
 
-                _ = tb.Focus();
-                tb.Select(charPosition, lookupResults[0].MatchedText.Length);
+                _ = textBox.Focus();
+                textBox.Select(charPosition, lookupResults[0].MatchedText.Length);
             }
 
             LastLookupResults = lookupResults;
@@ -310,7 +312,7 @@ internal sealed partial class PopupWindow : Window
                 --charPosition;
             }
 
-            return LookupOnCharPosition(textBox, textBox.Text, charPosition, ConfigManager.LookupOnMouseClickOnly);
+            return LookupOnCharPosition(textBox, charPosition, ConfigManager.LookupOnMouseClickOnly);
         }
 
         HidePopup();

@@ -16,12 +16,10 @@ internal sealed partial class WinApi
         // ReSharper disable InconsistentNaming
 
         internal const int GWL_EXSTYLE = -20;
-        // public const nint HTCAPTION = 2;
         internal const nint HWND_TOPMOST = -1;
         // internal const nint HWND_TOP = 0;
         // internal const nint HWND_NOTOPMOST = -2;
         internal const int SWP_NOACTIVATE = 0x0010;
-        internal const int SWP_NOCOPYBITS = 0x0100;
         internal const int SWP_NOMOVE = 0x0002;
         internal const int SWP_NOSIZE = 0x0001;
         internal const int SWP_SHOWWINDOW = 0x0040;
@@ -30,37 +28,9 @@ internal sealed partial class WinApi
         internal const int WM_CLIPBOARDUPDATE = 0x031D;
         internal const int WM_ERASEBKGND = 0x0014;
         internal const int WM_HOTKEY = 0x0312;
-        // internal const int WM_NCCALCSIZE = 0x0083;
-        // internal const int WM_NCHITTEST = 0x0084;
         internal const int WM_SYSCOMMAND = 0x0112;
-        internal const int WM_WINDOWPOSCHANGING = 0x0046;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
-        // public const nint WVR_VALIDRECTS = 0x0400;
-
-        // RECT Structure
-        // [StructLayout(LayoutKind.Sequential)]
-        // internal struct RECT
-        // {
-        //     public int left, top, right, bottom;
-        // }
-
-        //NCCALCSIZE_PARAMS Structure
-        // [StructLayout(LayoutKind.Sequential)]
-        // internal struct NCCALCSIZE_PARAMS
-        // {
-        //     public RECT rgrc0, rgrc1, rgrc2;
-        //     public WINDOWPOS lppos;
-        // }
-
-        //WINDOWPOS Structure
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct WINDOWPOS
-        {
-            public nint hwnd;
-            public nint hwndinsertafter;
-            public int x, y, cx, cy;
-            public int flags;
-        }
+        internal const int WS_EX_APPWINDOW = 0x00040000;
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct LPPOINT
@@ -130,10 +100,6 @@ internal sealed partial class WinApi
                 ? GetWindowLongPtr64(hWnd, nIndex)
                 : GetWindowLongPtr32(hWnd, nIndex);
         }
-
-        [LibraryImport("user32.dll", EntryPoint = "DefWindowProcW")]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static partial nint DefWindowProc(nint hWnd, int msg, nint wParam, nint lParam);
 
         [LibraryImport("user32.dll", EntryPoint = "RegisterHotKey", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -309,7 +275,7 @@ internal sealed partial class WinApi
 
     public static void PreventActivation(nint windowHandle)
     {
-        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOACTIVATE | WS_EX_APPWINDOW);
     }
 
     public static void AllowActivation(nint windowHandle)
@@ -378,49 +344,9 @@ internal sealed partial class WinApi
                 if (KeyGestureUtils.KeyGestureDict.TryGetValue((int)wParam, out KeyGesture? keyGesture))
                 {
                     _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
+                    handled = true;
                 }
-
                 break;
-
-            case WM_ERASEBKGND:
-                handled = true;
-                return 1;
-
-            case WM_WINDOWPOSCHANGING:
-                _ = DefWindowProc(hwnd, msg, wParam, lParam);
-                WINDOWPOS windowPos = Marshal.PtrToStructure<WINDOWPOS>(lParam);
-                windowPos.flags |= SWP_NOCOPYBITS;
-                Marshal.StructureToPtr(windowPos, lParam, true);
-                handled = true;
-                break;
-
-            //case WM_NCCALCSIZE:
-            //    if (wParam is not 0)
-            //    {
-            //        NCCALCSIZE_PARAMS calcSizeParams = Marshal.PtrToStructure<NCCALCSIZE_PARAMS>(lParam);
-            //        calcSizeParams.rgrc1.left = 0;
-            //        calcSizeParams.rgrc1.right = 1;
-            //        calcSizeParams.rgrc1.top = 0;
-            //        calcSizeParams.rgrc1.bottom = 1;
-
-            //        calcSizeParams.rgrc2.left = 0;
-            //        calcSizeParams.rgrc2.right = 1;
-            //        calcSizeParams.rgrc2.top = 0;
-            //        calcSizeParams.rgrc2.bottom = 1;
-
-            //        Marshal.StructureToPtr(calcSizeParams, lParam, true);
-            //        handled = true;
-            //        return WVR_VALIDRECTS;
-            //    }
-            //    break;
-
-            //case NativeMethods.WM_NCHITTEST:
-            //    if (MainWindow.Instance.IsMouseOnTitleBar(lParam.ToInt32()))
-            //    {
-            //        handled = true;
-            //        return HTCAPTION;
-            //    }
-            //    break;
 
             default:
                 if (msg == MagpieUtils.MagpieScalingChangedWindowMessage)

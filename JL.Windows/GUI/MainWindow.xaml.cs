@@ -52,9 +52,6 @@ internal sealed partial class MainWindow : Window
     private static ulong s_clipboardSequenceNo;
     public bool ContextMenuIsOpening { get; private set; } // = false;
 
-    private static string? s_lastTextCopiedWhileMinimized;
-    private static bool s_mergeTextsWhenRestored;
-
     private Point _swipeStartPoint;
 
     private static DateTime s_lastTextCopyTime;
@@ -97,8 +94,6 @@ internal sealed partial class MainWindow : Window
         }
 
         ConfigManager.ApplyPreferences();
-
-        WinApi.RestoreWindow(WindowHandle);
 
         if (ConfigManager.AlwaysOnTop)
         {
@@ -151,7 +146,7 @@ internal sealed partial class MainWindow : Window
             ? Dispatcher.Invoke(() => ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
                                       && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                                           || WindowState is WindowState.Minimized)
-                ? FirstPopupWindow.LookupOnCharPosition(MainTextBox, s_lastTextCopiedWhileMinimized ?? MainTextBox.Text, 0, true)
+                ? FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true)
                 : Task.CompletedTask)
             : Task.CompletedTask;
     }
@@ -176,41 +171,30 @@ internal sealed partial class MainWindow : Window
         {
             DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
 
-            string lastText = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
             mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
                           || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                         && text.StartsWith(lastText, StringComparison.Ordinal);
+                         && text.StartsWith(MainTextBox.Text, StringComparison.Ordinal);
 
             s_lastTextCopyTime = preciseTimeNow;
 
             if (mergeTexts)
             {
-                subsequentText = text[lastText.Length..];
+                subsequentText = text[MainTextBox.Text.Length..];
             }
         }
 
         Dispatcher.Invoke(() =>
         {
-            bool windowIsMinimized = WindowState is WindowState.Minimized;
-            if (!windowIsMinimized)
+            if (mergeTexts)
             {
-                if (mergeTexts)
-                {
-                    MainTextBox.AppendText(subsequentText);
-                }
-                else
-                {
-                    MainTextBox.Text = text;
-                }
-
-                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                MainTextBox.AppendText(subsequentText);
+            }
+            else
+            {
+                MainTextBox.Text = text;
             }
 
-            s_mergeTextsWhenRestored = windowIsMinimized && mergeTexts;
-
-            s_lastTextCopiedWhileMinimized = windowIsMinimized
-                ? text
-                : null;
+            MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
 
             if (!mergeTexts && SizeToContent is SizeToContent.Manual
                             && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
@@ -218,18 +202,15 @@ internal sealed partial class MainWindow : Window
                 WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
             }
 
-            if (!windowIsMinimized)
+            TitleBarContextMenu.IsOpen = false;
+            MainTextBoxContextMenu.IsOpen = false;
+
+            if (ConfigManager.HidePopupsOnTextChange)
             {
-                TitleBarContextMenu.IsOpen = false;
-                MainTextBoxContextMenu.IsOpen = false;
-
-                if (ConfigManager.HidePopupsOnTextChange)
-                {
-                    PopupWindowUtils.HidePopups(FirstPopupWindow);
-                }
-
-                BringToFront();
+                PopupWindowUtils.HidePopups(FirstPopupWindow);
             }
+
+            BringToFront();
         }, DispatcherPriority.Send);
 
         HandlePostCopy(text, subsequentText);
@@ -297,7 +278,7 @@ internal sealed partial class MainWindow : Window
             && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                 || WindowState is WindowState.Minimized))
         {
-            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, s_lastTextCopiedWhileMinimized ?? MainTextBox.Text, 0, true).ConfigureAwait(false);
+            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
         }
     }
 
@@ -795,11 +776,9 @@ internal sealed partial class MainWindow : Window
 
             if (SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
             {
-                string selectedText = WindowState is not WindowState.Minimized
-                    ? MainTextBox.SelectionLength > 0
+                string selectedText = MainTextBox.SelectionLength > 0
                         ? MainTextBox.SelectedText
-                        : MainTextBox.Text
-                    : s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
+                        : MainTextBox.Text;
 
                 if (selectedText.Length > 0)
                 {
@@ -849,7 +828,7 @@ internal sealed partial class MainWindow : Window
 
                 else
                 {
-                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.Text, MainTextBox.CaretIndex, true).ConfigureAwait(false);
+                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true).ConfigureAwait(false);
                 }
             }
         }
@@ -858,10 +837,9 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            string text = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
-            if (text.Length > 0)
+            if (MainTextBox.Text.Length > 0)
             {
-                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, text, 0, true).ConfigureAwait(false);
+                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
             }
         }
 
@@ -1555,28 +1533,6 @@ internal sealed partial class MainWindow : Window
 
         else
         {
-            if (s_lastTextCopiedWhileMinimized is not null)
-            {
-                if (s_mergeTextsWhenRestored)
-                {
-                    MainTextBox.AppendText(s_lastTextCopiedWhileMinimized);
-                }
-                else
-                {
-                    MainTextBox.Text = s_lastTextCopiedWhileMinimized;
-
-                    if (SizeToContent is SizeToContent.Manual
-                        && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
-                    {
-                        WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
-                    }
-                }
-
-                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                s_lastTextCopiedWhileMinimized = null;
-                s_mergeTextsWhenRestored = false;
-            }
-
             if (ConfigManager.StopIncreasingTimeStatWhenMinimized
                 && (CoreConfigManager.CaptureTextFromClipboard || (CoreConfigManager.CaptureTextFromWebSocket && WebSocketUtils.Connected)))
             {
