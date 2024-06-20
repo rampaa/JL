@@ -31,6 +31,7 @@ internal sealed partial class WinApi
         internal const int WM_SYSCOMMAND = 0x0112;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
         internal const int WS_EX_APPWINDOW = 0x00040000;
+        internal const int MOD_NOREPEAT = 0x4000;
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct LPPOINT
@@ -210,7 +211,7 @@ internal sealed partial class WinApi
     {
         foreach (KeyValuePair<int, KeyGesture> keyValuePair in KeyGestureUtils.KeyGestureDict)
         {
-            _ = RegisterHotKey(windowHandle, keyValuePair.Key, (uint)keyValuePair.Value.Modifiers, (uint)KeyInterop.VirtualKeyFromKey(keyValuePair.Value.Key));
+            _ = RegisterHotKey(windowHandle, keyValuePair.Key, (uint)keyValuePair.Value.Modifiers | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(keyValuePair.Value.Key));
         }
     }
 
