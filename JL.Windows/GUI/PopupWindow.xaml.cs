@@ -110,7 +110,7 @@ internal sealed partial class PopupWindow : Window
         if (ConfigManager.ShowMiningModeReminder)
         {
             TextBlockMiningModeReminder.Text = string.Create(CultureInfo.InvariantCulture,
-                $"Click on an entry's main spelling to mine it,\nor press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.");
+                $"Click on an entry's main spelling to mine it,\nor press {ConfigManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
         }
     }
 
