@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime;
 using System.Windows;
 using JL.Core.Utilities;
@@ -18,6 +19,34 @@ internal sealed partial class App : Application
 
         ProfileOptimization.SetProfileRoot(AppContext.BaseDirectory);
         ProfileOptimization.StartProfile("Startup.Profile");
+
+        if (IsSingleInstance())
+        {
+            StartupUri = new Uri("GUI/MainWindow.xaml", UriKind.Relative);
+            ShutdownMode = ShutdownMode.OnMainWindowClose;
+        }
+    }
+
+    private bool IsSingleInstance()
+    {
+        Process currentProcess = Process.GetCurrentProcess();
+        Process[] processes = Process.GetProcessesByName(currentProcess.ProcessName);
+
+        if (processes.Length > 1)
+        {
+            for (int i = 0; i < processes.Length; i++)
+            {
+                Process process = processes[i];
+                if (currentProcess.Id != process.Id && process.MainModule?.FileName == Environment.ProcessPath)
+                {
+                    WinApi.RestoreWindow(process.MainWindowHandle);
+                    Shutdown();
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private static void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
