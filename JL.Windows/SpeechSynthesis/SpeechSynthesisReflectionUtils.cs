@@ -24,14 +24,11 @@ internal static class SpeechSynthesisReflectionUtils
     {
         try
         {
-            Type objectTokenCategoryType = typeof(SpeechSynthesizer).Assembly
-                .GetType("System.Speech.Internal.ObjectTokens.ObjectTokenCategory")!;
+            Assembly speechSynthesizerAssembly = Assembly.GetAssembly(typeof(SpeechSynthesizer))!;
 
-            Type voiceInfoType = typeof(SpeechSynthesizer).Assembly
-                .GetType("System.Speech.Synthesis.VoiceInfo")!;
-
-            Type installedVoiceType = typeof(SpeechSynthesizer).Assembly
-                .GetType("System.Speech.Synthesis.InstalledVoice")!;
+            Type objectTokenCategoryType = speechSynthesizerAssembly.GetType("System.Speech.Internal.ObjectTokens.ObjectTokenCategory")!;
+            Type voiceInfoType = speechSynthesizerAssembly.GetType("System.Speech.Synthesis.VoiceInfo")!;
+            Type installedVoiceType = speechSynthesizerAssembly.GetType("System.Speech.Synthesis.InstalledVoice")!;
 
             object voiceSynthesizer = GetProperty(synthesizer, VoiceSynthesizerProperty)!;
             List<InstalledVoice> installedVoices = (List<InstalledVoice>?)GetField(voiceSynthesizer, InstalledVoicesField)!;
@@ -51,11 +48,8 @@ internal static class SpeechSynthesisReflectionUtils
                     continue;
                 }
 
-                object voiceInfo = typeof(SpeechSynthesizer).Assembly
-                    .CreateInstance(voiceInfoType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, [token], null, null)!;
-
-                InstalledVoice installedVoice = (InstalledVoice)typeof(SpeechSynthesizer).Assembly
-                    .CreateInstance(installedVoiceType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, [voiceSynthesizer, voiceInfo], null, null)!;
+                VoiceInfo voiceInfo = (VoiceInfo)Activator.CreateInstance(voiceInfoType.Assembly.FullName!, voiceInfoType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, [token], null, null)!.Unwrap()!;
+                InstalledVoice installedVoice = (InstalledVoice)Activator.CreateInstance(installedVoiceType.Assembly.FullName!, installedVoiceType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, [voiceSynthesizer, voiceInfo], null, null)!.Unwrap()!;
 
                 installedVoices.Add(installedVoice);
             }
