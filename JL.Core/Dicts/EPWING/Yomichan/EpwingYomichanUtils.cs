@@ -70,25 +70,42 @@ internal static class EpwingYomichanUtils
                 YomichanContent contentResult = GetDefinitionsFromJsonObject(definitionElement, parentTag);
                 if (contentResult.Content is not null)
                 {
-                    if (contentResult.Tag is null or "span" or "ruby")
+                    switch (contentResult.Tag)
                     {
-                        _ = stringBuilder.Append(contentResult.Content);
-                    }
-                    else if (contentResult.Tag is "li" && !contentResult.Content.StartsWith('•'))
-                    {
-                        _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n• {contentResult.Content}");
-                    }
-                    else if (contentResult.Tag is "rt")
-                    {
-                        _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"({contentResult.Content})");
-                    }
-                    else if (contentResult.Tag is "th" or "td")
-                    {
-                        _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\t{contentResult.Content}");
-                    }
-                    else //if (contentResult.Tag is "div" or "a" or "ul" or "ol" or "tr" or "p" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6")
-                    {
-                        _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content}");
+                        case "span":
+                        case "ruby":
+                            _ = stringBuilder.Append(contentResult.Content);
+                            break;
+
+                        case "rt":
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"({contentResult.Content})");
+                            break;
+
+                        case "li":
+                            if (!contentResult.Content.StartsWith('•'))
+                            {
+                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n• {contentResult.Content}");
+                            }
+                            else
+                            {
+                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content}");
+                            }
+                            break;
+
+                        case "ul":
+                        case "ol":
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content}\n");
+                            break;
+
+                        case "th":
+                        case "td":
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\t{contentResult.Content}");
+                            break;
+
+                        // "div" or "a" or "tr" or "p" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6"
+                        default:
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content}");
+                            break;
                     }
                 }
             }
