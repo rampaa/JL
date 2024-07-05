@@ -8,7 +8,7 @@ namespace JL.Core.Utilities;
 public static partial class JapaneseUtils
 {
     // Matches the following Unicode ranges:
-    // × (\u00D7) 
+    // × (\u00D7)
     // General Punctuation (2000-206F) ‥, …, •, ※
     // Geometric Shapes (25A0-U+25FF) ◦, ◎, ○, △, ◉
     // CJK Radicals Supplement (2E80–2EFF)

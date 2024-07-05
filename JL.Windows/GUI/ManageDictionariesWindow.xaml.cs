@@ -266,13 +266,15 @@ internal sealed partial class ManageDictionariesWindow : Window
         {
             if (File.Exists(fullPath))
             {
-                fullPath = Path.GetDirectoryName(fullPath) ?? Utils.ApplicationPath;
+                fullPath = Path.GetDirectoryName(fullPath);
             }
 
-            if (fullPath is not null)
+            if (string.IsNullOrEmpty(fullPath))
             {
-                _ = Process.Start("explorer.exe", fullPath);
+                fullPath = Utils.ApplicationPath;
             }
+
+            _ = Process.Start("explorer.exe", fullPath);
         }
     }
 
