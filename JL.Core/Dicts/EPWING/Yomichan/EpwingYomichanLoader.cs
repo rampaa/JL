@@ -102,7 +102,7 @@ internal static class EpwingYomichanLoader
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
     }
 
-    private static void AddToDictionary(IEpwingRecord yomichanRecord, Dict dict)
+    private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict)
     {
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiWithWordSchemaYomichan and not DictType.KanjigenYomichan;
         string primarySpellingInHiragana = nonKanjiDict
