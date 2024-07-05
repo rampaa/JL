@@ -11,16 +11,16 @@ public static class CoreConfigManager
     public static Uri AnkiConnectUri { get; set; } = new("http://127.0.0.1:8765");
     public static bool KanjiMode { get; set; } // = false;
     public static bool AnkiIntegration { get; set; } // = false;
-    public static bool ForceSyncAnki { get; set; } // = false;
-    public static bool AllowDuplicateCards { get; set; } // = false;
-    public static double LookupRate { get; set; } // = 0;
+    public static bool ForceSyncAnki { get; private set; } // = false;
+    public static bool AllowDuplicateCards { get; private set; } // = false;
+    public static double LookupRate { get; private set; } // = 0;
     public static bool CaptureTextFromClipboard { get; set; } = true;
     public static bool CaptureTextFromWebSocket { get; set; } // = false;
-    public static bool TextBoxTrimWhiteSpaceCharacters { get; set; } = true;
-    public static bool TextBoxRemoveNewlines { get; set; } // = false;
-    public static Uri WebSocketUri { get; set; } = new("ws://127.0.0.1:6677");
-    public static int AudioVolume { get; set; } = 100;
-    public static bool CheckForJLUpdatesOnStartUp { get; set; } = true;
+    public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
+    public static bool TextBoxRemoveNewlines { get; private set; } // = false;
+    public static Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
+    public static int AudioVolume { get; private set; } = 100;
+    public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
 
     public static void ApplyPreferences(SqliteConnection connection)
     {
