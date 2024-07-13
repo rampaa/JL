@@ -220,10 +220,10 @@ internal sealed partial class MainWindow : Window
 
     private static void HandlePostCopy(string text, string? subsequentText)
     {
-        if (subsequentText is null)
+        bool newText = subsequentText is null;
+        if (newText)
         {
             BacklogUtils.AddToBacklog(text);
-            Stats.IncrementStat(StatType.Lines);
         }
         else
         {
@@ -240,7 +240,15 @@ internal sealed partial class MainWindow : Window
             ? JapaneseUtils.RemovePunctuation(subsequentText ?? text)
             : subsequentText ?? text;
 
-        Stats.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
+        if (strippedText.Length > 0)
+        {
+            Stats.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
+
+            if (newText)
+            {
+                Stats.IncrementStat(StatType.Lines);
+            }
+        }
     }
 
     public void BringToFront()
