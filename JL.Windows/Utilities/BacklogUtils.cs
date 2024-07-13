@@ -68,16 +68,27 @@ internal static class BacklogUtils
     public static void DeleteCurrentLine()
     {
         TextBox mainTextBox = MainWindow.Instance.MainTextBox;
-
-        if (Backlog.Count is 0 || mainTextBox.Text != Backlog[s_currentTextIndex])
+        if (Backlog.Count is 0)
         {
             return;
         }
 
-        Stats.IncrementStat(StatType.Characters,
-            -new StringInfo(JapaneseUtils.RemovePunctuation(Backlog[s_currentTextIndex])).LengthInTextElements);
+        string text = Backlog[s_currentTextIndex];
+        if (text != mainTextBox.Text)
+        {
+            return;
+        }
 
-        Stats.IncrementStat(StatType.Lines, -1);
+        if (ConfigManager.StripPunctuationBeforeCalculatingCharacterCount)
+        {
+            text = JapaneseUtils.RemovePunctuation(text);
+        }
+
+        if (text.Length > 0)
+        {
+            Stats.IncrementStat(StatType.Characters, -new StringInfo(text).LengthInTextElements);
+            Stats.IncrementStat(StatType.Lines, -1);
+        }
 
         Backlog.RemoveAt(s_currentTextIndex);
 
