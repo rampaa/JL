@@ -26,7 +26,7 @@ internal sealed partial class WinApi
         internal const int SW_SHOWNOACTIVATE = 4;
         internal const int SW_SHOWMINNOACTIVE = 7;
         internal const int WM_CLIPBOARDUPDATE = 0x031D;
-        internal const int WM_ERASEBKGND = 0x0014;
+        // internal const int WM_ERASEBKGND = 0x0014;
         internal const int WM_HOTKEY = 0x0312;
         internal const int WM_SYSCOMMAND = 0x0112;
         internal const int WS_EX_NOACTIVATE = 0x08000000;

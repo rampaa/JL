@@ -19,12 +19,12 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Name="TitleBarGrid" Visibility="Collapsed">
-            <Rectangle Name="TitleBar" VerticalAlignment="Top" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+            <Rectangle VerticalAlignment="Top" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
                    HorizontalAlignment="Stretch" Height="20" Opacity="1" Margin="0"
                    Fill="Transparent">
             </Rectangle>
 
-            <Button x:Name="CloseButton" HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click"
+            <Button HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click"
                 Content="x" VerticalAlignment="Top" Padding="0" BorderThickness="0" VerticalContentAlignment="Top"
                 Background="Transparent"
                 Foreground="{Binding Path=Foreground,
