@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Effects;
 using HandyControl.Data;
 using JL.Core.Config;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
@@ -205,6 +206,41 @@ internal static class ConfigManager
             WinApi.UnsubscribeFromClipboardChanged(MainWindow.Instance.WindowHandle);
         }
 
+        bool stripPunctuationBeforeCalculatingCharacterCount = StripPunctuationBeforeCalculatingCharacterCount;
+        StripPunctuationBeforeCalculatingCharacterCount = ConfigDBManager.GetValueFromConfig(connection, StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount), bool.TryParse);
+        if (stripPunctuationBeforeCalculatingCharacterCount != StripPunctuationBeforeCalculatingCharacterCount && BacklogUtils.Backlog.Count > 0)
+        {
+            ulong characterCount = 0;
+            ulong lineCount = 0;
+
+            int backlogCount = BacklogUtils.Backlog.Count;
+            for (int i = 0; i < backlogCount; i++)
+            {
+                string text = BacklogUtils.Backlog[i];
+                if (StripPunctuationBeforeCalculatingCharacterCount)
+                {
+                    text = JapaneseUtils.RemovePunctuation(text);
+                }
+
+                if (text.Length > 0)
+                {
+                    ++lineCount;
+                    characterCount += (ulong)new StringInfo(text).LengthInTextElements;
+                }
+            }
+
+            if (StripPunctuationBeforeCalculatingCharacterCount)
+            {
+                Stats.IncrementStat(StatType.Characters, -(long)(Stats.SessionStats.Characters - characterCount));
+                Stats.IncrementStat(StatType.Lines, -(long)(Stats.SessionStats.Lines - lineCount));
+            }
+            else
+            {
+                Stats.IncrementStat(StatType.Characters, (long)(characterCount - Stats.SessionStats.Characters));
+                Stats.IncrementStat(StatType.Lines, (long)(lineCount - Stats.SessionStats.Lines));
+            }
+        }
+
         LookupOnClickMouseButton = ConfigDBManager.GetValueFromConfig(connection, LookupOnClickMouseButton, nameof(LookupOnClickMouseButton), Enum.TryParse);
         MiningModeMouseButton = ConfigDBManager.GetValueFromConfig(connection, MiningModeMouseButton, nameof(MiningModeMouseButton), Enum.TryParse);
         MineMouseButton = ConfigDBManager.GetValueFromConfig(connection, MineMouseButton, nameof(MineMouseButton), Enum.TryParse);
@@ -215,7 +251,6 @@ internal static class ConfigManager
         AutoPlayAudio = ConfigDBManager.GetValueFromConfig(connection, AutoPlayAudio, nameof(AutoPlayAudio), bool.TryParse);
         GlobalHotKeys = ConfigDBManager.GetValueFromConfig(connection, GlobalHotKeys, nameof(GlobalHotKeys), bool.TryParse);
         StopIncreasingTimeStatWhenMinimized = ConfigDBManager.GetValueFromConfig(connection, StopIncreasingTimeStatWhenMinimized, nameof(StopIncreasingTimeStatWhenMinimized), bool.TryParse);
-        StripPunctuationBeforeCalculatingCharacterCount = ConfigDBManager.GetValueFromConfig(connection, StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount), bool.TryParse);
         MineToFileInsteadOfAnki = ConfigDBManager.GetValueFromConfig(connection, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki), bool.TryParse);
         AlwaysOnTop = ConfigDBManager.GetValueFromConfig(connection, AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
         MainWindow.Instance.Topmost = AlwaysOnTop;

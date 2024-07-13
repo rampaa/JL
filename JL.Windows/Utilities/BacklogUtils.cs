@@ -90,11 +90,6 @@ internal static class BacklogUtils
 
             int textLength = new StringInfo(text).LengthInTextElements;
             Stats.IncrementStat(StatType.Characters, -textLength);
-            if (Stats.SessionStats.Characters < 0)
-            {
-                int strippedTextLength = new StringInfo(text).LengthInTextElements;
-                Stats.IncrementStat(StatType.Characters, textLength - strippedTextLength);
-            }
         }
 
         Backlog.RemoveAt(s_currentTextIndex);
