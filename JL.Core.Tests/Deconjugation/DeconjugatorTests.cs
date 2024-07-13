@@ -4,7 +4,9 @@ using NUnit.Framework;
 namespace JL.Core.Tests.Deconjugation;
 
 [TestFixture]
-public class DeconjugatorTests
+#pragma warning disable CA1812
+internal sealed class DeconjugatorTests
+#pragma warning restore CA1812
 {
     [OneTimeSetUp]
     public void ClassInit()

@@ -4,7 +4,9 @@ using NUnit.Framework;
 namespace JL.Core.Tests;
 
 [TestFixture]
-public class KanaTests
+#pragma warning disable CA1812
+internal sealed class KanaTests
+#pragma warning restore CA1812
 {
     [Test]
     public void KatakanaToHiraganaConverter_アToあ()

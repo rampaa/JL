@@ -4,7 +4,9 @@ using NUnit.Framework;
 namespace JL.Core.Tests;
 
 [TestFixture]
-public class UtilsTests
+#pragma warning disable CA1812
+internal sealed class UtilsTests
+#pragma warning restore CA1812
 {
     [Test]
     public void FindSentence_FromTheStart()
