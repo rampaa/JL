@@ -1533,7 +1533,7 @@ public static class DictUtils
         }
         else if (dict.Type is DictType.CustomWordDictionary or DictType.ProfileCustomWordDictionary)
         {
-            DictOptions builtInCustomWordOptions = BuiltInDicts[nameof(DictType.CustomWordDictionary)].Options;
+            DictOptions builtInCustomWordOptions = BuiltInDicts["Custom Word Dictionary"].Options;
             dict.Options.NewlineBetweenDefinitions ??= builtInCustomWordOptions.NewlineBetweenDefinitions;
         }
         else
