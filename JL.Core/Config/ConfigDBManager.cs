@@ -15,6 +15,11 @@ public static class ConfigDBManager
     {
         if (File.Exists(s_configsPath))
         {
+            if (File.Exists($"{s_configsPath}-journal"))
+            {
+                RestoreDatabase();
+            }
+
             return;
         }
 
@@ -51,6 +56,18 @@ public static class ConfigDBManager
 
         ProfileDBUtils.InsertDefaultProfile(connection);
         StatsDBUtils.InsertStats(connection, Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
+    }
+
+    private static void RestoreDatabase()
+    {
+        using SqliteConnection connection = CreateReadWriteDBConnection();
+
+        // Simply opening a connection does not actually access the database file
+        // In order to trigger the restoration process we need to actually retrieve something from the database
+        // https://www.sqlite.org/atomiccommit.html#_hot_rollback_journals
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "SELECT id FROM profile LIMIT 1";
+        _ = command.ExecuteNonQuery();
     }
 
     public static SqliteConnection CreateReadOnlyDBConnection()
