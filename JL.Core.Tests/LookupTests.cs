@@ -21,27 +21,14 @@ internal sealed class LookupTests
     {
         Utils.Frontend = new DummyFrontend();
 
-        string jmdictPath = Path.Join(Utils.ResourcesPath, "MockJMdict.xml");
+        Dict jmdict = DictUtils.BuiltInDicts[nameof(DictType.JMdict)];
+        jmdict.Options.NewlineBetweenDefinitions = new NewlineBetweenDefinitionsOption(false);
+        jmdict.Options.UseDB.Value = false;
+        jmdict.Path = Path.Join(Utils.ResourcesPath, "MockJMdict.xml");
+        jmdict.Active = true;
+        jmdict.Ready = false;
 
-        DictUtils.Dicts.Add(nameof(DictType.JMdict),
-            new Dict(DictType.JMdict, nameof(DictType.JMdict), jmdictPath, true, 0, 500000, false,
-                new DictOptions(
-                    new UseDBOption(false),
-                    new NoAllOption(false),
-                    new NewlineBetweenDefinitionsOption(false),
-                    wordClassInfo: new WordClassInfoOption(true),
-                    dialectInfo: new DialectInfoOption(true),
-                    pOrthographyInfo: new POrthographyInfoOption(true),
-                    pOrthographyInfoColor: new POrthographyInfoColorOption("#FFD2691E"),
-                    pOrthographyInfoFontSize: new POrthographyInfoFontSizeOption(15),
-                    aOrthographyInfo: new AOrthographyInfoOption(true),
-                    rOrthographyInfo: new ROrthographyInfoOption(true),
-                    wordTypeInfo: new WordTypeInfoOption(true),
-                    miscInfo: new MiscInfoOption(true),
-                    loanwordEtymology: new LoanwordEtymologyOption(true),
-                    relatedTerm: new RelatedTermOption(false),
-                    antonym: new AntonymOption(false)
-                )));
+        DictUtils.Dicts.Add(nameof(DictType.JMdict), jmdict);
 
         Dict dict = DictUtils.Dicts[nameof(DictType.JMdict)];
         dict.Contents = new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
