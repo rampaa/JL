@@ -12,7 +12,7 @@ public static class StatsDBUtils
         InsertStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
     }
 
-    private static void InsertStats(SqliteConnection connection, string stats, int profileId)
+    public static void InsertStats(SqliteConnection connection, string stats, int profileId)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
@@ -31,7 +31,7 @@ public static class StatsDBUtils
         UpdateStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
     }
 
-    private static void UpdateStats(SqliteConnection connection, string stats, int profileId)
+    public static void UpdateStats(SqliteConnection connection, string stats, int profileId)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
