@@ -35,14 +35,14 @@ public static class LookupUtils
 
         s_lastLookupTime = preciseTimeNow;
 
-        List<Freq> dbFreqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji } && (f.Options?.UseDB?.Value ?? true) && f.Ready).ToList();
+        List<Freq> dbFreqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji, Options.UseDB.Value: true, Ready: true }).ToList();
 
         _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
         bool pitchDictIsActive = pitchDict?.Active ?? false;
-        bool useDBForPitchDict = pitchDictIsActive && (pitchDict!.Options?.UseDB?.Value ?? true) && pitchDict.Ready;
+        bool useDBForPitchDict = pitchDictIsActive && pitchDict!.Options.UseDB.Value && pitchDict.Ready;
 
         ConcurrentBag<LookupResult> lookupResults = [];
-        string? kanji = null;
+        string kanji = "";
         if (DictUtils.AtLeastOneKanjiDictIsActive)
         {
             kanji = text.EnumerateRunes().First().ToString();
@@ -50,7 +50,7 @@ public static class LookupUtils
             {
                 _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
                 {
-                    bool useDB = (dict.Options?.UseDB?.Value ?? true) && dict.Ready;
+                    bool useDB = dict.Options.UseDB.Value && dict.Ready;
                     if (!dict.Active)
                     {
                         return;
@@ -188,7 +188,7 @@ public static class LookupUtils
                 return;
             }
 
-            bool useDB = (dict.Options?.UseDB?.Value ?? true) && dict.Ready;
+            bool useDB = dict.Options.UseDB.Value && dict.Ready;
             switch (dict.Type)
             {
                 case DictType.JMdict:
@@ -210,8 +210,8 @@ public static class LookupUtils
 
                 case DictType.Kanjidic:
                     Dictionary<string, IntermediaryResult>? kanjidicResults = useDB
-                        ? GetKanjiResultsFromDB(kanji!, dict, KanjidicDBManager.GetRecordsFromDB)
-                        : GetKanjiResults(kanji!, dict);
+                        ? GetKanjiResultsFromDB(kanji, dict, KanjidicDBManager.GetRecordsFromDB)
+                        : GetKanjiResults(kanji, dict);
 
                     if (kanjidicResults?.Count > 0)
                     {
@@ -225,8 +225,8 @@ public static class LookupUtils
                     // Template-wise, Kanjigen is a word dictionary that's why its results are put into Yomichan Word Results
                     // Content-wise though it's a kanji dictionary, that's why GetKanjiResults is being used for the lookup
                     Dictionary<string, IntermediaryResult>? epwingYomichanKanjiWithWordSchemaResults = useDB
-                        ? GetKanjiResultsFromDB(kanji!, dict, EpwingYomichanDBManager.GetRecordsFromDB)
-                        : GetKanjiResults(kanji!, dict);
+                        ? GetKanjiResultsFromDB(kanji, dict, EpwingYomichanDBManager.GetRecordsFromDB)
+                        : GetKanjiResults(kanji, dict);
 
                     if (epwingYomichanKanjiWithWordSchemaResults?.Count > 0)
                     {
@@ -254,8 +254,8 @@ public static class LookupUtils
 
                 case DictType.NonspecificKanjiYomichan:
                     Dictionary<string, IntermediaryResult>? epwingYomichanKanjiResults = useDB
-                        ? GetKanjiResultsFromDB(kanji!, dict, YomichanKanjiDBManager.GetRecordsFromDB)
-                        : GetKanjiResults(kanji!, dict);
+                        ? GetKanjiResultsFromDB(kanji, dict, YomichanKanjiDBManager.GetRecordsFromDB)
+                        : GetKanjiResults(kanji, dict);
 
                     if (epwingYomichanKanjiResults?.Count > 0)
                     {
@@ -303,8 +303,8 @@ public static class LookupUtils
 
                 case DictType.NonspecificKanjiNazeka:
                     Dictionary<string, IntermediaryResult>? epwingNazekaKanjiResults = useDB
-                        ? GetKanjiResultsFromDB(kanji!, dict, EpwingNazekaDBManager.GetRecordsFromDB)
-                        : GetKanjiResults(kanji!, dict);
+                        ? GetKanjiResultsFromDB(kanji, dict, EpwingNazekaDBManager.GetRecordsFromDB)
+                        : GetKanjiResults(kanji, dict);
 
                     if (epwingNazekaKanjiResults?.Count > 0)
                     {
@@ -1413,19 +1413,19 @@ public static class LookupUtils
         for (int i = 0; i < freqCount; i++)
         {
             Freq freq = freqs[i];
-            bool useDB = (freq.Options?.UseDB?.Value ?? true) && freq.Ready;
+            bool useDB = freq.Options.UseDB.Value && freq.Ready;
 
             if (useDB)
             {
                 if (freqDictsFromDB?.TryGetValue(freq.Name, out Dictionary<string, List<FrequencyRecord>>? freqDict) ?? false)
                 {
-                    freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequencyFromDB(freqDict), freq.Options?.HigherValueMeansHigherFrequency?.Value ?? false));
+                    freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequencyFromDB(freqDict), freq.Options.HigherValueMeansHigherFrequency.Value));
                 }
             }
 
             else
             {
-                freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq), freq.Options?.HigherValueMeansHigherFrequency?.Value ?? false));
+                freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq), freq.Options.HigherValueMeansHigherFrequency.Value));
             }
         }
 
@@ -1445,7 +1445,7 @@ public static class LookupUtils
         for (int i = 0; i < kanjiFreqCount; i++)
         {
             Freq kanjiFreq = kanjiFreqs[i];
-            bool useDB = (kanjiFreq.Options?.UseDB?.Value ?? true) && kanjiFreq.Ready;
+            bool useDB = kanjiFreq.Options.UseDB.Value && kanjiFreq.Ready;
             IList<FrequencyRecord>? freqResultList;
 
             if (useDB)

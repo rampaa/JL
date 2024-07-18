@@ -1,7 +1,10 @@
 namespace JL.Core.Freqs.Options;
 
-public sealed class FreqOptions(UseDBOption? useDB = null, HigherValueMeansHigherFrequencyOption? higherValueMeansHigherFrequency = null)
+public sealed class FreqOptions(UseDBOption useDB, HigherValueMeansHigherFrequencyOption higherValueMeansHigherFrequency)
 {
-    public UseDBOption? UseDB { get; internal set; } = useDB;
-    public HigherValueMeansHigherFrequencyOption? HigherValueMeansHigherFrequency { get; internal set; } = higherValueMeansHigherFrequency;
+    // ReSharper disable once MemberCanBeInternal
+    public FreqOptions() : this(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)) { }
+
+    public UseDBOption UseDB { get; } = useDB;
+    public HigherValueMeansHigherFrequencyOption HigherValueMeansHigherFrequency { get; } = higherValueMeansHigherFrequency;
 }

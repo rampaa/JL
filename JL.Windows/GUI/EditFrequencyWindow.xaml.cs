@@ -88,7 +88,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
             FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
 
-            if (_freq.Options?.UseDB?.Value != options.UseDB?.Value)
+            if (_freq.Options.UseDB.Value != options.UseDB.Value)
             {
                 _freq.Ready = false;
                 //if (dbExists && !(options.UseDB?.Value ?? false))

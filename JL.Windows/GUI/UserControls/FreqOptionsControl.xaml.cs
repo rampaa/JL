@@ -14,17 +14,13 @@ internal sealed partial class FreqOptionsControl : UserControl
 
     public FreqOptions GetFreqOptions(FreqType type)
     {
-        UseDBOption? useDBOption = null;
-        if (UseDBOption.ValidFreqTypes.Contains(type))
-        {
-            useDBOption = new UseDBOption(UseDBCheckBox.IsChecked!.Value);
-        }
+        UseDBOption useDBOption = UseDBOption.ValidFreqTypes.Contains(type)
+            ? new UseDBOption(UseDBCheckBox.IsChecked!.Value)
+            : new UseDBOption(false);
 
-        HigherValueMeansHigherFrequencyOption? higherValueMeansHigherFrequencyOption = null;
-        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(type))
-        {
-            higherValueMeansHigherFrequencyOption = new HigherValueMeansHigherFrequencyOption(HigherValueMeansHigherFrequencyCheckBox.IsChecked!.Value);
-        }
+        HigherValueMeansHigherFrequencyOption higherValueMeansHigherFrequencyOption = HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(type)
+            ? new HigherValueMeansHigherFrequencyOption(HigherValueMeansHigherFrequencyCheckBox.IsChecked!.Value)
+            : new HigherValueMeansHigherFrequencyOption(false);
 
         FreqOptions options = new(useDBOption, higherValueMeansHigherFrequencyOption);
 
@@ -60,14 +56,14 @@ internal sealed partial class FreqOptionsControl : UserControl
         bool showFreqOptions = false;
         if (UseDBOption.ValidFreqTypes.Contains(freq.Type))
         {
-            UseDBCheckBox.IsChecked = freq.Options?.UseDB?.Value ?? true;
+            UseDBCheckBox.IsChecked = freq.Options.UseDB.Value;
             UseDBCheckBox.Visibility = Visibility.Visible;
             showFreqOptions = true;
         }
 
         if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freq.Type))
         {
-            HigherValueMeansHigherFrequencyCheckBox.IsChecked = freq.Options?.HigherValueMeansHigherFrequency?.Value ?? false;
+            HigherValueMeansHigherFrequencyCheckBox.IsChecked = freq.Options.HigherValueMeansHigherFrequency.Value;
             HigherValueMeansHigherFrequencyCheckBox.Visibility = Visibility.Visible;
             showFreqOptions = true;
         }

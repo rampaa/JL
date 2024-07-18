@@ -14,10 +14,8 @@ internal static class DictOptionManager
     {
         if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.JMdict, out Dict? jmdict))
         {
-            string? colorString = jmdict.Options?.POrthographyInfoColor?.Value;
-            POrthographyInfoColor = colorString is not null
-                ? WindowsUtils.FrozenBrushFromHex(colorString)
-                : ConfigManager.PrimarySpellingColor;
+            string colorString = jmdict.Options.POrthographyInfoColor!.Value;
+            POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(colorString);
         }
         else
         {
@@ -26,12 +24,10 @@ internal static class DictOptionManager
 
         if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchAccentDict))
         {
-            string? colorString = pitchAccentDict.Options?.PitchAccentMarkerColor?.Value;
-            PitchAccentMarkerColor = colorString is not null
-                ? WindowsUtils.FrozenBrushFromHex(colorString)
-                : Brushes.DeepSkyBlue;
+            string colorString = pitchAccentDict.Options.PitchAccentMarkerColor!.Value;
+            PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(colorString);
 
-            MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetStrokeDashArray(pitchAccentDict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true));
+            MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetStrokeDashArray(pitchAccentDict.Options.ShowPitchAccentWithDottedLines!.Value));
         }
         else
         {

@@ -26,7 +26,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         DefinitionTags = definitionTags;
     }
 
-    public string BuildFormattedDefinition(DictOptions? options)
+    public string BuildFormattedDefinition(DictOptions options)
     {
         bool definitionTagsExist = DefinitionTags is not null;
         if (Definitions.Length is 1)
@@ -36,7 +36,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
                 : Definitions[0];
         }
 
-        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
+        bool newlines = options.NewlineBetweenDefinitions!.Value;
         string separator = newlines
             ? "\n"
             : "; ";

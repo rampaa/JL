@@ -67,25 +67,25 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
         Antonyms = antonyms;
     }
 
-    public string BuildFormattedDefinition(DictOptions? options)
+    public string BuildFormattedDefinition(DictOptions options)
     {
-        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
+        bool newlines = options.NewlineBetweenDefinitions!.Value;
 
         string separator = newlines ? "\n" : "; ";
 
         StringBuilder defResult = new();
 
         bool multipleDefinitions = Definitions.Length > 1;
-        bool showWordClassInfo = options?.WordClassInfo?.Value ?? true;
-        bool showDialectInfo = options?.DialectInfo?.Value ?? true;
-        bool showExtraDefinitionInfo = options?.ExtraDefinitionInfo?.Value ?? true;
+        bool showWordClassInfo = options.WordClassInfo!.Value;
+        bool showDialectInfo = options.DialectInfo!.Value;
+        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo!.Value;
         bool definitionInfoExists = DefinitionInfo?.Length > 0;
-        bool showMiscInfo = options?.MiscInfo?.Value ?? true;
-        bool showWordTypeInfo = options?.WordTypeInfo?.Value ?? true;
-        bool showSpellingRestrictionInfo = options?.SpellingRestrictionInfo?.Value ?? true;
-        bool showLoanwordEtymology = options?.LoanwordEtymology?.Value ?? true;
-        bool showRelatedTerms = options?.RelatedTerm?.Value ?? false;
-        bool showAntonyms = options?.Antonym?.Value ?? false;
+        bool showMiscInfo = options.MiscInfo!.Value;
+        bool showWordTypeInfo = options.WordTypeInfo!.Value;
+        bool showSpellingRestrictionInfo = options.SpellingRestrictionInfo!.Value;
+        bool showLoanwordEtymology = options.LoanwordEtymology!.Value;
+        bool showRelatedTerms = options.RelatedTerm!.Value;
+        bool showAntonyms = options.Antonym!.Value;
 
         for (int i = 0; i < Definitions.Length; i++)
         {

@@ -25,7 +25,7 @@ internal sealed class JmnedictRecord : IDictRecord
         //RelatedTerms = new List<List<string>?>();
     }
 
-    public string BuildFormattedDefinition(DictOptions? options)
+    public string BuildFormattedDefinition(DictOptions options)
     {
         if (Definitions.Length is 1)
         {
@@ -35,7 +35,7 @@ internal sealed class JmnedictRecord : IDictRecord
                 : string.Join("; ", Definitions[0]);
         }
 
-        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
+        bool newlines = options.NewlineBetweenDefinitions!.Value;
 
         string separator = newlines
             ? "\n"
@@ -65,7 +65,7 @@ internal sealed class JmnedictRecord : IDictRecord
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            // if (options?.RelatedTerm?.Value ?? false)
+            // if (options.RelatedTerm!.Value)
             // {
             //     string[]? relatedTerms = RelatedTerms?[i];
             //     if (relatedTerms?.Length > 0)

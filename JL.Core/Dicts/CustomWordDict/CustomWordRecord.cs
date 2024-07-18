@@ -26,7 +26,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
         HasUserDefinedWordClass = hasUserDefinedWordClass;
     }
 
-    public string BuildFormattedDefinition(DictOptions? options)
+    public string BuildFormattedDefinition(DictOptions options)
     {
         string tempWordClass;
         if (WordClasses.Contains("adj-i"))
@@ -55,7 +55,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
             return $"({tempWordClass}) {Definitions[0]}";
         }
 
-        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
+        bool newlines = options.NewlineBetweenDefinitions!.Value;
 
         StringBuilder defResult = new();
 

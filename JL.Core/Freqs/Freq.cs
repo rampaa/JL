@@ -4,7 +4,7 @@ using JL.Core.Freqs.Options;
 
 namespace JL.Core.Freqs;
 
-public sealed class Freq(FreqType type, string name, string path, bool active, int priority, int size, int maxValue, bool ready, FreqOptions options)
+public sealed class Freq(FreqType type, string name, string path, bool active, int priority, int size, int maxValue, bool ready, FreqOptions? options)
 {
     public FreqType Type { get; } = type;
     public string Name { get; set; } = name;
@@ -24,5 +24,5 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
     [JsonIgnore] public IDictionary<string, IList<FrequencyRecord>> Contents { get; set; } = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
 #pragma warning restore CA2227
 
-    public FreqOptions? Options { get; set; } = options; // can be null for freqs.json files generated before version 1.25.0
+    public FreqOptions Options { get; set; } = options ?? new FreqOptions();
 }

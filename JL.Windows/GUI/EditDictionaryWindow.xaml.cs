@@ -92,8 +92,8 @@ internal sealed partial class EditDictionaryWindow : Window
 
             if (_dict.Type is DictType.PitchAccentYomichan)
             {
-                bool oldDottedLinesOption = _dict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true;
-                bool newDottedLinesOption = options.ShowPitchAccentWithDottedLines?.Value ?? true;
+                bool oldDottedLinesOption = _dict.Options.ShowPitchAccentWithDottedLines!.Value;
+                bool newDottedLinesOption = options.ShowPitchAccentWithDottedLines!.Value;
 
                 if (oldDottedLinesOption != newDottedLinesOption)
                 {
@@ -101,7 +101,7 @@ internal sealed partial class EditDictionaryWindow : Window
                 }
             }
 
-            if (_dict.Options?.Examples?.Value != options.Examples?.Value)
+            if (_dict.Options.Examples?.Value != options.Examples?.Value)
             {
                 _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
 
@@ -114,7 +114,7 @@ internal sealed partial class EditDictionaryWindow : Window
                 }
             }
 
-            if (_dict.Options?.UseDB?.Value != options.UseDB?.Value)
+            if (_dict.Options.UseDB.Value != options.UseDB.Value)
             {
                 _dict.Ready = false;
                 //if (dbExists && !(options.UseDB?.Value ?? false))

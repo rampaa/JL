@@ -114,7 +114,7 @@ public static class DictUpdater
             await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
-            bool useDB = dict.Options?.UseDB?.Value ?? true;
+            bool useDB = dict.Options.UseDB.Value;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
@@ -165,7 +165,7 @@ public static class DictUpdater
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
-            bool useDB = dict.Options?.UseDB?.Value ?? true;
+            bool useDB = dict.Options.UseDB.Value;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
@@ -216,7 +216,7 @@ public static class DictUpdater
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
-            bool useDB = dict.Options?.UseDB?.Value ?? true;
+            bool useDB = dict.Options.UseDB.Value;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
@@ -265,7 +265,7 @@ public static class DictUpdater
                 continue;
             }
 
-            int dueDate = dict.Options?.AutoUpdateAfterNDays?.Value ?? 0;
+            int dueDate = dict.Options.AutoUpdateAfterNDays!.Value;
             if (dueDate is 0)
             {
                 continue;

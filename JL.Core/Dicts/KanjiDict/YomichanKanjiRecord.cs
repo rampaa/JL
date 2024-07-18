@@ -75,7 +75,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         Stats = statList.Count > 0 ? statList.ToArray() : null;
     }
 
-    public string? BuildFormattedDefinition(DictOptions? options)
+    public string? BuildFormattedDefinition(DictOptions options)
     {
         if (Definitions is null)
         {
@@ -88,7 +88,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         }
 
         StringBuilder defResult = new();
-        string separator = options?.NewlineBetweenDefinitions?.Value ?? true
+        string separator = options.NewlineBetweenDefinitions!.Value
             ? "\n"
             : "; ";
 

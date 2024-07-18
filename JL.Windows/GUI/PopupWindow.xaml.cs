@@ -482,10 +482,10 @@ internal sealed partial class PopupWindow : Window
         _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
         bool pitchDictIsActive = pitchDict?.Active ?? false;
         Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        bool showPOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
-        bool showROrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
-        bool showAOrthographyInfo = jmdict.Options?.AOrthographyInfo?.Value ?? true;
-        double pOrthographyInfoFontSize = jmdict.Options?.POrthographyInfoFontSize?.Value ?? 15;
+        bool showPOrthographyInfo = jmdict.Options.POrthographyInfo!.Value;
+        bool showROrthographyInfo = jmdict.Options.ROrthographyInfo!.Value;
+        bool showAOrthographyInfo = jmdict.Options.AOrthographyInfo!.Value;
+        double pOrthographyInfoFontSize = jmdict.Options.POrthographyInfoFontSize!.Value;
 
         int resultCount = generateAllResults
             ? LastLookupResults.Count
@@ -1888,7 +1888,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         Dict dict = (Dict)((StackPanel)item).Tag;
-        return !dict.Options?.NoAll?.Value ?? true;
+        return !dict.Options.NoAll.Value;
     }
 
     private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

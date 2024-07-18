@@ -38,7 +38,7 @@ internal static class EpwingUtils
 
         if (dict.Type is DictType.Kenkyuusha)
         {
-            if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) is ExamplesOptionValue.None)
+            if (dict.Options.Examples!.Value is ExamplesOptionValue.None)
             {
                 if (definitions.Length > 2)
                 {
@@ -52,7 +52,7 @@ internal static class EpwingUtils
                     }
                 }
             }
-            else if (dict.Options is { Examples.Value: ExamplesOptionValue.One })
+            else if (dict.Options.Examples.Value is ExamplesOptionValue.One)
             {
                 if (definitions.Length > 2)
                 {

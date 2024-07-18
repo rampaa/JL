@@ -11,112 +11,135 @@ public enum ExamplesOptionValue
     All
 }
 
-public readonly record struct ExamplesOption(ExamplesOptionValue Value)
+public sealed class ExamplesOption(ExamplesOptionValue value)
 {
+    public ExamplesOptionValue Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.Kenkyuusha];
 }
 
-public readonly record struct NewlineBetweenDefinitionsOption(bool Value)
+public sealed class NewlineBetweenDefinitionsOption(bool value)
 {
+    public bool Value { get; } = value;
+
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
         Enum.GetValues<DictType>().Except([DictType.PitchAccentYomichan, DictType.Kanjidic, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary])
             .ToArray();
 }
 
-public readonly record struct NoAllOption(bool Value)
+public sealed class NoAllOption(bool value)
 {
+    public bool Value { get; } = value;
+
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = Enum.GetValues<DictType>()
         .Except([DictType.PitchAccentYomichan]).ToArray();
 }
 
-public readonly record struct PitchAccentMarkerColorOption(string Value)
+public sealed class PitchAccentMarkerColorOption(string value)
 {
+    public string Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.PitchAccentYomichan];
 }
 
-public readonly record struct WordClassInfoOption(bool Value)
+public sealed class WordClassInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct DialectInfoOption(bool Value)
+public sealed class DialectInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct POrthographyInfoOption(bool Value)
+public sealed class POrthographyInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct POrthographyInfoColorOption(string Value)
+public sealed class POrthographyInfoColorOption(string value)
 {
+    public string Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct POrthographyInfoFontSizeOption(double Value)
+public sealed class POrthographyInfoFontSizeOption(double value)
 {
+    public double Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct AOrthographyInfoOption(bool Value)
+public sealed class AOrthographyInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct ROrthographyInfoOption(bool Value)
+public sealed class ROrthographyInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct WordTypeInfoOption(bool Value)
+public sealed class WordTypeInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct SpellingRestrictionInfoOption(bool Value)
+public sealed class SpellingRestrictionInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct ExtraDefinitionInfoOption(bool Value)
+public sealed class ExtraDefinitionInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct MiscInfoOption(bool Value)
+public sealed class MiscInfoOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct LoanwordEtymologyOption(bool Value)
+public sealed class LoanwordEtymologyOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct RelatedTermOption(bool Value)
+public sealed class RelatedTermOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct AntonymOption(bool Value)
+public sealed class AntonymOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public readonly record struct UseDBOption(bool Value)
+public sealed class UseDBOption(bool value)
 {
+    public bool Value { get; internal set; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = DBUtils.s_dictTypesWithDBSupport;
 }
 
-public readonly record struct ShowPitchAccentWithDottedLinesOption(bool Value)
+public sealed class ShowPitchAccentWithDottedLinesOption(bool value)
 {
+    public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.PitchAccentYomichan];
 }
 
-public readonly record struct AutoUpdateAfterNDaysOption(int Value)
+public sealed class AutoUpdateAfterNDaysOption(int value)
 {
+    public int Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict, DictType.JMnedict, DictType.Kanjidic];
 }

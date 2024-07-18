@@ -57,7 +57,7 @@ public static class FreqUtils
 
         foreach (Freq freq in FreqDicts.Values.ToList())
         {
-            bool useDB = freq.Options?.UseDB?.Value ?? true;
+            bool useDB = freq.Options.UseDB.Value;
             string dbPath = DBUtils.GetFreqDBPath(freq.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
@@ -357,8 +357,6 @@ public static class FreqUtils
                     freq.Priority = priority;
                     ++priority;
 
-                    InitFreqOptions(freq);
-
                     freq.Path = Utils.GetPath(freq.Path);
 
                     FreqDicts.Add(freq.Name, freq);
@@ -371,18 +369,4 @@ public static class FreqUtils
             }
         }
     }
-
-    private static void InitFreqOptions(Freq freq)
-    {
-        freq.Options ??= new FreqOptions();
-        if (UseDBOption.ValidFreqTypes.Contains(freq.Type))
-        {
-            freq.Options.UseDB ??= new UseDBOption(false);
-        }
-        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freq.Type))
-        {
-            freq.Options.HigherValueMeansHigherFrequency ??= new HigherValueMeansHigherFrequencyOption(false);
-        }
-    }
-
 }

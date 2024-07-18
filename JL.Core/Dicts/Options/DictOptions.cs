@@ -1,9 +1,10 @@
 namespace JL.Core.Dicts.Options;
 
 public sealed class DictOptions(
+    UseDBOption useDB,
+    NoAllOption noAll,
     NewlineBetweenDefinitionsOption? newlineBetweenDefinitions = null,
     ExamplesOption? examples = null,
-    NoAllOption? noAll = null,
     PitchAccentMarkerColorOption? pitchAccentMarkerColor = null,
     WordClassInfoOption? wordClassInfo = null,
     DialectInfoOption? dialectInfo = null,
@@ -19,13 +20,16 @@ public sealed class DictOptions(
     LoanwordEtymologyOption? loanwordEtymology = null,
     RelatedTermOption? relatedTerm = null,
     AntonymOption? antonym = null,
-    UseDBOption? useDB = null,
     ShowPitchAccentWithDottedLinesOption? showPitchAccentWithDottedLines = null,
     AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null)
 {
+    // ReSharper disable once MemberCanBeInternal
+    public DictOptions() : this(new UseDBOption(true), new NoAllOption(false)) { }
+
+    public UseDBOption UseDB { get; } = useDB;
     public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; internal set; } = newlineBetweenDefinitions;
     public ExamplesOption? Examples { get; internal set; } = examples;
-    public NoAllOption? NoAll { get; internal set; } = noAll;
+    public NoAllOption NoAll { get; internal set; } = noAll;
     public PitchAccentMarkerColorOption? PitchAccentMarkerColor { get; internal set; } = pitchAccentMarkerColor;
     public WordClassInfoOption? WordClassInfo { get; internal set; } = wordClassInfo;
     public DialectInfoOption? DialectInfo { get; internal set; } = dialectInfo;
@@ -41,7 +45,6 @@ public sealed class DictOptions(
     public RelatedTermOption? RelatedTerm { get; internal set; } = relatedTerm;
     public AntonymOption? Antonym { get; internal set; } = antonym;
     public LoanwordEtymologyOption? LoanwordEtymology { get; internal set; } = loanwordEtymology;
-    public UseDBOption? UseDB { get; internal set; } = useDB;
     public ShowPitchAccentWithDottedLinesOption? ShowPitchAccentWithDottedLines { get; internal set; } = showPitchAccentWithDottedLines;
     public AutoUpdateAfterNDaysOption? AutoUpdateAfterNDays { get; internal set; } = autoUpdateAfterNDays;
 }

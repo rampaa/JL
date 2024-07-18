@@ -26,6 +26,8 @@ internal sealed class LookupTests
         DictUtils.Dicts.Add(nameof(DictType.JMdict),
             new Dict(DictType.JMdict, nameof(DictType.JMdict), jmdictPath, true, 0, 500000, false,
                 new DictOptions(
+                    new UseDBOption(false),
+                    new NoAllOption(false),
                     new NewlineBetweenDefinitionsOption(false),
                     wordClassInfo: new WordClassInfoOption(true),
                     dialectInfo: new DialectInfoOption(true),
@@ -38,8 +40,7 @@ internal sealed class LookupTests
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
                     relatedTerm: new RelatedTermOption(false),
-                    antonym: new AntonymOption(false),
-                    useDB: new UseDBOption(false)
+                    antonym: new AntonymOption(false)
                 )));
 
         Dict dict = DictUtils.Dicts[nameof(DictType.JMdict)];
@@ -50,10 +51,7 @@ internal sealed class LookupTests
         foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
         {
             freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(StringComparer.Ordinal);
-            freq.Options = new Freqs.Options.FreqOptions
-            {
-                UseDB = new Freqs.Options.UseDBOption(false)
-            };
+            freq.Options = new Freqs.Options.FreqOptions(new Freqs.Options.UseDBOption(false), new Freqs.Options.HigherValueMeansHigherFrequencyOption(false));
             FreqUtils.FreqDicts[key] = freq;
         }
 
