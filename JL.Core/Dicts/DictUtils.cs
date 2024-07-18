@@ -42,7 +42,7 @@ public static class DictUtils
     public static readonly Dictionary<string, Dict> BuiltInDicts = new(7, StringComparer.OrdinalIgnoreCase)
     {
         {
-            "Custom Word Dictionary (Profile)", new Dict(DictType.ProfileCustomWordDictionary,
+            nameof(DictType.ProfileCustomWordDictionary), new Dict(DictType.ProfileCustomWordDictionary,
                 "Custom Word Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Words.txt"),
                 true, -1, 128, false,
@@ -52,7 +52,7 @@ public static class DictUtils
                     new NewlineBetweenDefinitionsOption(true)))
         },
         {
-            "Custom Name Dictionary (Profile)", new Dict(DictType.ProfileCustomNameDictionary,
+            nameof(DictType.ProfileCustomNameDictionary), new Dict(DictType.ProfileCustomNameDictionary,
                 "Custom Name Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Names.txt"),
                 true, 0, 128, false,
@@ -61,7 +61,7 @@ public static class DictUtils
                     new NoAllOption(false)))
         },
         {
-            "Custom Word Dictionary", new Dict(DictType.CustomWordDictionary,
+            nameof(DictType.CustomWordDictionary), new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_words.txt"),
                 true, 1, 128, false,
@@ -71,7 +71,7 @@ public static class DictUtils
                     new NewlineBetweenDefinitionsOption(true)))
         },
         {
-            "Custom Name Dictionary", new Dict(DictType.CustomNameDictionary,
+            nameof(DictType.CustomNameDictionary), new Dict(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_names.txt"),
                 true, 2, 128, false,
@@ -1441,11 +1441,11 @@ public static class DictUtils
 
             if (deserializedDicts is not null)
             {
-                foreach ((string key, Dict dict) in BuiltInDicts)
+                foreach (Dict dict in BuiltInDicts.Values)
                 {
                     if (deserializedDicts.Values.All(d => d.Type != dict.Type))
                     {
-                        deserializedDicts.Add(key, dict);
+                        deserializedDicts.Add(dict.Name, dict);
                     }
                 }
 
@@ -1533,7 +1533,7 @@ public static class DictUtils
         }
         else if (dict.Type is DictType.CustomWordDictionary or DictType.ProfileCustomWordDictionary)
         {
-            DictOptions builtInCustomWordOptions = BuiltInDicts["Custom Word Dictionary"].Options;
+            DictOptions builtInCustomWordOptions = BuiltInDicts[nameof(DictType.CustomWordDictionary)].Options;
             dict.Options.NewlineBetweenDefinitions ??= builtInCustomWordOptions.NewlineBetweenDefinitions;
         }
         else
