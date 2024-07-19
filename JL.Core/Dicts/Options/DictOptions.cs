@@ -27,9 +27,9 @@ public sealed class DictOptions(
     public DictOptions() : this(new UseDBOption(true), new NoAllOption(false)) { }
 
     public UseDBOption UseDB { get; } = useDB;
+    public NoAllOption NoAll { get; } = noAll;
     public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; internal set; } = newlineBetweenDefinitions;
     public ExamplesOption? Examples { get; internal set; } = examples;
-    public NoAllOption NoAll { get; internal set; } = noAll;
     public PitchAccentMarkerColorOption? PitchAccentMarkerColor { get; internal set; } = pitchAccentMarkerColor;
     public WordClassInfoOption? WordClassInfo { get; internal set; } = wordClassInfo;
     public DialectInfoOption? DialectInfo { get; internal set; } = dialectInfo;
