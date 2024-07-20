@@ -15,7 +15,9 @@ internal static class FrequencyYomichanLoader
             return;
         }
 
-        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly);
+        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
+            .Where(static s => s.StartsWith("term", StringComparison.Ordinal) || s.StartsWith("kanji", StringComparison.Ordinal));
+
         foreach (string jsonFile in jsonFiles)
         {
             List<List<JsonElement>>? frequencyJson;

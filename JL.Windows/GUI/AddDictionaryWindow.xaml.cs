@@ -79,7 +79,9 @@ internal sealed partial class AddDictionaryWindow : Window
             }
             else
             {
-                bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+                bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
+                    .Any(static s => s.StartsWith("term", StringComparison.Ordinal) || s.StartsWith("kanji", StringComparison.Ordinal));
+
                 if (!validPath)
                 {
                     TextBlockPath.BorderBrush = Brushes.Red;
