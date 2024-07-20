@@ -67,7 +67,7 @@ internal sealed partial class EditFrequencyWindow : Window
             if (_freq.Type is FreqType.Yomichan or FreqType.YomichanKanji)
             {
                 bool hasValidFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-                    .Any(static s => s.StartsWith("term", StringComparison.Ordinal) || s.StartsWith("kanji", StringComparison.Ordinal));
+                    .Any(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal));
 
                 if (!hasValidFiles)
                 {
