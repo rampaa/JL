@@ -37,7 +37,8 @@ internal sealed partial class EditDictionaryWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        bool isValid = true;
+        TextBlockPath.ClearValue(BorderBrushProperty);
+        NameTextBox.ClearValue(BorderBrushProperty);
 
         string path = TextBlockPath.Text;
         string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
@@ -47,11 +48,7 @@ internal sealed partial class EditDictionaryWindow : Window
                 && (!Path.Exists(fullPath) || DictUtils.Dicts.Values.Any(dict => dict.Path == path))))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (TextBlockPath.BorderBrush == Brushes.Red)
-        {
-            TextBlockPath.ClearValue(BorderBrushProperty);
+            return;
         }
 
         string name = NameTextBox.Text;
@@ -61,89 +58,103 @@ internal sealed partial class EditDictionaryWindow : Window
             || (!_dict.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && DictUtils.Dicts.ContainsKey(name)))
         {
             NameTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
+            return;
         }
-        else if (NameTextBox.BorderBrush == Brushes.Red)
+
+        string dbPath = DBUtils.GetDictDBPath(_dict.Name);
+        bool dbExists = File.Exists(dbPath);
+
+        if (_dict.Path != path)
         {
-            NameTextBox.ClearValue(BorderBrushProperty);
+            if (DictUtils.YomichanDictTypes.Contains(_dict.Type))
+            {
+                if (_dict.Type is DictType.NonspecificKanjiYomichan)
+                {
+                    bool validPath = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+                    if (!validPath)
+                    {
+                        TextBlockPath.BorderBrush = Brushes.Red;
+                        return;
+                    }
+                }
+                else
+                {
+                    bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+                    if (!validPath)
+                    {
+                        TextBlockPath.BorderBrush = Brushes.Red;
+                        return;
+                    }
+                }
+            }
+
+            _dict.Path = path;
+            _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+            _dict.Ready = false;
+
+            if (dbExists)
+            {
+                DBUtils.SendOptimizePragmaToAllDBs();
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+                dbExists = false;
+            }
         }
 
-        if (isValid)
+        DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
+        if (_dict.Type is DictType.PitchAccentYomichan)
         {
-            string dbPath = DBUtils.GetDictDBPath(_dict.Name);
-            bool dbExists = File.Exists(dbPath);
+            bool oldDottedLinesOption = _dict.Options.ShowPitchAccentWithDottedLines!.Value;
+            bool newDottedLinesOption = options.ShowPitchAccentWithDottedLines!.Value;
 
-            if (_dict.Path != path)
+            if (oldDottedLinesOption != newDottedLinesOption)
             {
-                _dict.Path = path;
-                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                _dict.Ready = false;
-
-                if (dbExists)
-                {
-                    DBUtils.SendOptimizePragmaToAllDBs();
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(dbPath);
-                    dbExists = false;
-                }
+                PopupWindowUtils.SetStrokeDashArray(newDottedLinesOption);
             }
-
-            DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
-
-            if (_dict.Type is DictType.PitchAccentYomichan)
-            {
-                bool oldDottedLinesOption = _dict.Options.ShowPitchAccentWithDottedLines!.Value;
-                bool newDottedLinesOption = options.ShowPitchAccentWithDottedLines!.Value;
-
-                if (oldDottedLinesOption != newDottedLinesOption)
-                {
-                    PopupWindowUtils.SetStrokeDashArray(newDottedLinesOption);
-                }
-            }
-
-            if (_dict.Options.Examples?.Value != options.Examples?.Value)
-            {
-                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-
-                if (dbExists)
-                {
-                    DBUtils.SendOptimizePragmaToAllDBs();
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(dbPath);
-                    dbExists = false;
-                }
-            }
-
-            if (_dict.Options.UseDB.Value != options.UseDB.Value)
-            {
-                _dict.Ready = false;
-                //if (dbExists && !(options.UseDB?.Value ?? false))
-                //{
-                //    DBUtils.SendOptimizePragmaToAllDBs();
-                //    SqliteConnection.ClearAllPools();
-                //    File.Delete(dbPath);
-                //    dbExists = false;
-                //}
-            }
-
-            if (_dict.Name != name)
-            {
-                if (dbExists)
-                {
-                    DBUtils.SendOptimizePragmaToAllDBs();
-                    SqliteConnection.ClearAllPools();
-                    File.Move(dbPath, DBUtils.GetDictDBPath(name));
-                }
-
-                _ = DictUtils.Dicts.Remove(_dict.Name);
-                _dict.Name = name;
-                DictUtils.Dicts.Add(name, _dict);
-            }
-
-            _dict.Options = options;
-
-            Close();
         }
+
+        if (_dict.Options.Examples?.Value != options.Examples?.Value)
+        {
+            _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+            if (dbExists)
+            {
+                DBUtils.SendOptimizePragmaToAllDBs();
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+                dbExists = false;
+            }
+        }
+
+        if (_dict.Options.UseDB.Value != options.UseDB.Value)
+        {
+            _dict.Ready = false;
+            //if (dbExists && !(options.UseDB?.Value ?? false))
+            //{
+            //    DBUtils.SendOptimizePragmaToAllDBs();
+            //    SqliteConnection.ClearAllPools();
+            //    File.Delete(dbPath);
+            //    dbExists = false;
+            //}
+        }
+
+        if (_dict.Name != name)
+        {
+            if (dbExists)
+            {
+                DBUtils.SendOptimizePragmaToAllDBs();
+                SqliteConnection.ClearAllPools();
+                File.Move(dbPath, DBUtils.GetDictDBPath(name));
+            }
+
+            _ = DictUtils.Dicts.Remove(_dict.Name);
+            _dict.Name = name;
+            DictUtils.Dicts.Add(name, _dict);
+        }
+
+        _dict.Options = options;
+
+        Close();
     }
 
     private void BrowseForDictionaryFile(string filter)

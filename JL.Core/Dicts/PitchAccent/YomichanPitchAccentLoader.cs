@@ -16,8 +16,7 @@ internal static class YomichanPitchAccentLoader
 
         IDictionary<string, IList<IDictRecord>> pitchDict = dict.Contents;
 
-        string[] jsonFiles = Directory.GetFiles(fullPath, "term*bank_*.json");
-
+        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term*bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
             List<List<JsonElement>>? jsonObjects;

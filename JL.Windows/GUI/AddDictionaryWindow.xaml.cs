@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -32,17 +33,15 @@ internal sealed partial class AddDictionaryWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        bool isValid = true;
+        ComboBoxDictType.ClearValue(BorderBrushProperty);
+        TextBlockPath.ClearValue(BorderBrushProperty);
+        NameTextBox.ClearValue(BorderBrushProperty);
 
         string? typeString = ComboBoxDictType.SelectionBoxItem.ToString();
         if (string.IsNullOrEmpty(typeString))
         {
             ComboBoxDictType.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (ComboBoxDictType.BorderBrush == Brushes.Red)
-        {
-            ComboBoxDictType.ClearValue(BorderBrushProperty);
+            return;
         }
 
         string path = TextBlockPath.Text;
@@ -53,11 +52,7 @@ internal sealed partial class AddDictionaryWindow : Window
             || DictUtils.Dicts.Values.Any(dict => dict.Path == path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (TextBlockPath.BorderBrush == Brushes.Red)
-        {
-            TextBlockPath.ClearValue(BorderBrushProperty);
+            return;
         }
 
         string name = NameTextBox.Text;
@@ -67,28 +62,42 @@ internal sealed partial class AddDictionaryWindow : Window
             || DictUtils.Dicts.ContainsKey(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (NameTextBox.BorderBrush == Brushes.Red)
-        {
-            NameTextBox.ClearValue(BorderBrushProperty);
+            return;
         }
 
-        if (isValid)
+        DictType type = typeString!.GetEnum<DictType>();
+        if (DictUtils.YomichanDictTypes.Contains(type))
         {
-            DictType type = typeString!.GetEnum<DictType>();
-
-            DictOptions options = _dictOptionsControl.GetDictOptions(type);
-            Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, false, options);
-            DictUtils.Dicts.Add(name, dict);
-
-            if (dict.Type is DictType.PitchAccentYomichan)
+            if (type is DictType.NonspecificKanjiYomichan)
             {
-                DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan] = dict;
+                bool validPath = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+                if (!validPath)
+                {
+                    TextBlockPath.BorderBrush = Brushes.Red;
+                    return;
+                }
             }
-
-            Close();
+            else
+            {
+                bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+                if (!validPath)
+                {
+                    TextBlockPath.BorderBrush = Brushes.Red;
+                    return;
+                }
+            }
         }
+
+        DictOptions options = _dictOptionsControl.GetDictOptions(type);
+        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, false, options);
+        DictUtils.Dicts.Add(name, dict);
+
+        if (dict.Type is DictType.PitchAccentYomichan)
+        {
+            DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan] = dict;
+        }
+
+        Close();
     }
 
     private void BrowseForDictionaryFile(string filter)

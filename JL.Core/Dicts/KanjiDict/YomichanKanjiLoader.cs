@@ -14,8 +14,7 @@ internal static class YomichanKanjiLoader
             return;
         }
 
-        List<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly).ToList();
-
+        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
             List<List<JsonElement>>? jsonObjects;

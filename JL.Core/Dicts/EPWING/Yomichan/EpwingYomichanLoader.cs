@@ -14,10 +14,7 @@ internal static class EpwingYomichanLoader
             return;
         }
 
-        List<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-            .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal))
-            .ToList();
-
+        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
             List<List<JsonElement>>? jsonElementLists;

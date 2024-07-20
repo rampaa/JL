@@ -30,17 +30,15 @@ internal sealed partial class AddFrequencyWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        bool isValid = true;
+        FreqTypeComboBox.ClearValue(BorderBrushProperty);
+        TextBlockPath.ClearValue(BorderBrushProperty);
+        NameTextBox.ClearValue(BorderBrushProperty);
 
         string? typeString = FreqTypeComboBox.SelectionBoxItem.ToString();
         if (string.IsNullOrEmpty(typeString))
         {
             FreqTypeComboBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (FreqTypeComboBox.BorderBrush == Brushes.Red)
-        {
-            FreqTypeComboBox.ClearValue(BorderBrushProperty);
+            return;
         }
 
         string path = TextBlockPath.Text;
@@ -51,11 +49,7 @@ internal sealed partial class AddFrequencyWindow : Window
             || FreqUtils.FreqDicts.Values.Any(freq => freq.Path == path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (TextBlockPath.BorderBrush == Brushes.Red)
-        {
-            TextBlockPath.ClearValue(BorderBrushProperty);
+            return;
         }
 
         string name = NameTextBox.Text;
@@ -65,24 +59,26 @@ internal sealed partial class AddFrequencyWindow : Window
             || FreqUtils.FreqDicts.ContainsKey(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
+            return;
         }
-        else if (NameTextBox.BorderBrush == Brushes.Red)
+
+        FreqType type = typeString!.GetEnum<FreqType>();
+        if (type is FreqType.Yomichan or FreqType.YomichanKanji)
         {
-            NameTextBox.ClearValue(BorderBrushProperty);
+            bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+            if (!validPath)
+            {
+                TextBlockPath.BorderBrush = Brushes.Red;
+                return;
+            }
         }
 
-        if (isValid)
-        {
-            FreqType type = typeString!.GetEnum<FreqType>();
+        FreqOptions options = _freqOptionsControl.GetFreqOptions(type);
 
-            FreqOptions options = _freqOptionsControl.GetFreqOptions(type);
+        FreqUtils.FreqDicts.Add(name,
+            new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0, 0, false, options));
 
-            FreqUtils.FreqDicts.Add(name,
-                new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0, 0, false, options));
-
-            Close();
-        }
+        Close();
     }
 
     private void BrowseForFrequencyFile(string filter)

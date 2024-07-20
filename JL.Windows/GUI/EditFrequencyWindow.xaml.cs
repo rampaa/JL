@@ -35,7 +35,8 @@ internal sealed partial class EditFrequencyWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        bool isValid = true;
+        TextBlockPath.ClearValue(BorderBrushProperty);
+        NameTextBox.ClearValue(BorderBrushProperty);
 
         string path = TextBlockPath.Text;
         string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
@@ -45,11 +46,7 @@ internal sealed partial class EditFrequencyWindow : Window
                 && (!Path.Exists(fullPath) || FreqUtils.FreqDicts.Values.Any(dict => dict.Path == path))))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (TextBlockPath.BorderBrush == Brushes.Red)
-        {
-            TextBlockPath.ClearValue(BorderBrushProperty);
+            return;
         }
 
         string name = NameTextBox.Text;
@@ -59,65 +56,68 @@ internal sealed partial class EditFrequencyWindow : Window
             || (!_freq.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && FreqUtils.FreqDicts.ContainsKey(name)))
         {
             NameTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (NameTextBox.BorderBrush == Brushes.Red)
-        {
-            NameTextBox.ClearValue(BorderBrushProperty);
+            return;
         }
 
-        if (isValid)
-        {
-            string dbPath = DBUtils.GetFreqDBPath(_freq.Name);
-            bool dbExists = File.Exists(dbPath);
+        string dbPath = DBUtils.GetFreqDBPath(_freq.Name);
+        bool dbExists = File.Exists(dbPath);
 
-            if (_freq.Path != path)
+        if (_freq.Path != path)
+        {
+            if (_freq.Type is FreqType.Yomichan or FreqType.YomichanKanji)
             {
-                _freq.Path = path;
-                _freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-                _freq.Ready = false;
-
-                if (dbExists)
+                bool hasValidFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+                if (!hasValidFiles)
                 {
-                    DBUtils.SendOptimizePragmaToAllDBs();
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(dbPath);
-                    dbExists = false;
+                    TextBlockPath.BorderBrush = Brushes.Red;
+                    return;
                 }
             }
 
-            FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
+            _freq.Path = path;
+            _freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+            _freq.Ready = false;
 
-            if (_freq.Options.UseDB.Value != options.UseDB.Value)
+            if (dbExists)
             {
-                _freq.Ready = false;
-                //if (dbExists && !(options.UseDB?.Value ?? false))
-                //{
-                //    DBUtils.SendOptimizePragmaToAllDBs();
-                //    SqliteConnection.ClearAllPools();
-                //    File.Delete(dbPath);
-                //    dbExists = false;
-                //}
+                DBUtils.SendOptimizePragmaToAllDBs();
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+                dbExists = false;
             }
-
-            if (_freq.Name != name)
-            {
-                if (dbExists)
-                {
-                    DBUtils.SendOptimizePragmaToAllDBs();
-                    SqliteConnection.ClearAllPools();
-                    File.Move(dbPath, DBUtils.GetFreqDBPath(name));
-                }
-
-                _ = FreqUtils.FreqDicts.Remove(_freq.Name);
-                _freq.Name = name;
-                FreqUtils.FreqDicts.Add(name, _freq);
-            }
-
-            _freq.Options = options;
-
-            Close();
         }
+
+        FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
+
+        if (_freq.Options.UseDB.Value != options.UseDB.Value)
+        {
+            _freq.Ready = false;
+            //if (dbExists && !(options.UseDB?.Value ?? false))
+            //{
+            //    DBUtils.SendOptimizePragmaToAllDBs();
+            //    SqliteConnection.ClearAllPools();
+            //    File.Delete(dbPath);
+            //    dbExists = false;
+            //}
+        }
+
+        if (_freq.Name != name)
+        {
+            if (dbExists)
+            {
+                DBUtils.SendOptimizePragmaToAllDBs();
+                SqliteConnection.ClearAllPools();
+                File.Move(dbPath, DBUtils.GetFreqDBPath(name));
+            }
+
+            _ = FreqUtils.FreqDicts.Remove(_freq.Name);
+            _freq.Name = name;
+            FreqUtils.FreqDicts.Add(name, _freq);
+        }
+
+        _freq.Options = options;
+
+        Close();
     }
 
     private void BrowseForFrequencyFile(string filter)
