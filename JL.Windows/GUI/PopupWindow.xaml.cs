@@ -1107,7 +1107,7 @@ internal sealed partial class PopupWindow : Window
         TextBox definitionsTextBox = (TextBox)sender;
         _lastInteractedTextBox = definitionsTextBox;
 
-        if (Keyboard.Modifiers != (ModifierKeys.Control | ModifierKeys.Alt))
+        if (!Keyboard.IsKeyDown(Key.Insert))
         {
             return;
         }
