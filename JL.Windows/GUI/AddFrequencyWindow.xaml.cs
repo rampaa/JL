@@ -62,7 +62,7 @@ internal sealed partial class AddFrequencyWindow : Window
             return;
         }
 
-        FreqType type = typeString!.GetEnum<FreqType>();
+        FreqType type = typeString.GetEnum<FreqType>();
         if (type is FreqType.Yomichan or FreqType.YomichanKanji)
         {
             bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)

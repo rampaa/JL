@@ -17,6 +17,8 @@ internal sealed partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += LogUnhandledException;
         TaskScheduler.UnobservedTaskException += LogUnobservedTaskException;
 
+        Environment.CurrentDirectory = AppContext.BaseDirectory;
+
         ProfileOptimization.SetProfileRoot(AppContext.BaseDirectory);
         ProfileOptimization.StartProfile("Startup.Profile");
 

@@ -65,7 +65,7 @@ internal sealed partial class AddDictionaryWindow : Window
             return;
         }
 
-        DictType type = typeString!.GetEnum<DictType>();
+        DictType type = typeString.GetEnum<DictType>();
         if (DictUtils.YomichanDictTypes.Contains(type))
         {
             if (type is DictType.NonspecificKanjiYomichan)
