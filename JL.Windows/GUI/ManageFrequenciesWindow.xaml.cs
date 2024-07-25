@@ -261,9 +261,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
         string dbPath = DBUtils.GetFreqDBPath(freq.Name);
         if (File.Exists(dbPath))
         {
-            DBUtils.SendOptimizePragmaToAllDBs();
-            SqliteConnection.ClearAllPools();
-            File.Delete(dbPath);
+            DBUtils.DeleteDB(dbPath);
         }
 
         int priorityOfDeletedFreq = freq.Priority;

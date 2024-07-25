@@ -119,9 +119,7 @@ public static class DictUpdater
 
             if (dbExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
+                DBUtils.DeleteDB(dbPath);
             }
 
             if (useDB || dbExists)
@@ -170,9 +168,7 @@ public static class DictUpdater
 
             if (dbExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
+                DBUtils.DeleteDB(dbPath);
             }
 
             if (useDB || dbExists)
@@ -221,9 +217,7 @@ public static class DictUpdater
 
             if (dbExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
+                DBUtils.DeleteDB(dbPath);
             }
 
             if (useDB || dbExists)

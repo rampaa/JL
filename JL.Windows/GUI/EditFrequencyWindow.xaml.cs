@@ -82,9 +82,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
             if (dbExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
+                DBUtils.DeleteDB(dbPath);
                 dbExists = false;
             }
         }
@@ -96,9 +94,7 @@ internal sealed partial class EditFrequencyWindow : Window
             _freq.Ready = false;
             //if (dbExists && !(options.UseDB?.Value ?? false))
             //{
-            //    DBUtils.SendOptimizePragmaToAllDBs();
-            //    SqliteConnection.ClearAllPools();
-            //    File.Delete(dbPath);
+            //    DBUtils.DeleteDB(dbPath);
             //    dbExists = false;
             //}
         }

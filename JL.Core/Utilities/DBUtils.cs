@@ -138,7 +138,7 @@ public static class DBUtils
         return version > GetVersionFromDB(dbPath);
     }
 
-    internal static void DeleteDB(string dbPath)
+    public static void DeleteDB(string dbPath)
     {
         SendOptimizePragmaToAllDBs();
         SqliteConnection.ClearAllPools();

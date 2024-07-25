@@ -327,9 +327,7 @@ internal sealed partial class ManageDictionariesWindow : Window
         string dbPath = DBUtils.GetDictDBPath(dict.Name);
         if (File.Exists(dbPath))
         {
-            DBUtils.SendOptimizePragmaToAllDBs();
-            SqliteConnection.ClearAllPools();
-            File.Delete(dbPath);
+            DBUtils.DeleteDB(dbPath);
         }
 
         if (dict.Type is DictType.PitchAccentYomichan)

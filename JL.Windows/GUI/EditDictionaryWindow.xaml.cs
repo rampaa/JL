@@ -96,9 +96,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
             if (dbExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
+                DBUtils.DeleteDB(dbPath);
                 dbExists = false;
             }
         }
@@ -121,9 +119,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
             if (dbExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
+                DBUtils.DeleteDB(dbPath);
                 dbExists = false;
             }
         }
@@ -133,9 +129,7 @@ internal sealed partial class EditDictionaryWindow : Window
             _dict.Ready = false;
             //if (dbExists && !(options.UseDB?.Value ?? false))
             //{
-            //    DBUtils.SendOptimizePragmaToAllDBs();
-            //    SqliteConnection.ClearAllPools();
-            //    File.Delete(dbPath);
+            //    DBUtils.DeleteDB(dbPath);
             //    dbExists = false;
             //}
         }
