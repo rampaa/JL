@@ -66,14 +66,18 @@ public static class FreqUtils
 
             if (dbJournalExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbJournalPath);
                 if (dbExists)
                 {
-                    File.Delete(dbPath);
+                    DBUtils.DeleteDB(dbPath);
                     dbExists = false;
                 }
+
+                File.Delete(dbJournalPath);
+            }
+            else if (dbExists && !DBUtils.RecordExists(dbPath))
+            {
+                DBUtils.DeleteDB(dbPath);
+                dbExists = false;
             }
 
             bool loadFromDB;
@@ -141,9 +145,7 @@ public static class FreqUtils
 
                                 if (File.Exists(dbPath))
                                 {
-                                    DBUtils.SendOptimizePragmaToAllDBs();
-                                    SqliteConnection.ClearAllPools();
-                                    File.Delete(dbPath);
+                                    DBUtils.DeleteDB(dbPath);
                                 }
                             }
                         }));
@@ -241,9 +243,7 @@ public static class FreqUtils
 
                                 if (File.Exists(dbPath))
                                 {
-                                    DBUtils.SendOptimizePragmaToAllDBs();
-                                    SqliteConnection.ClearAllPools();
-                                    File.Delete(dbPath);
+                                    DBUtils.DeleteDB(dbPath);
                                 }
                             }
                         }));

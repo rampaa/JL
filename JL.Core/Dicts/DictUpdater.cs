@@ -7,7 +7,6 @@ using JL.Core.Dicts.KANJIDIC;
 using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
-using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts;
 

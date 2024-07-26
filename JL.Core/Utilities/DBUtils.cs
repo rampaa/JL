@@ -176,6 +176,24 @@ public static class DBUtils
         return connection;
     }
 
+    internal static bool RecordExists(string dbPath)
+    {
+        using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT EXISTS
+            (
+                SELECT 1
+                FROM record
+                LIMIT 1
+            );
+            """;
+
+        return Convert.ToBoolean(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+    }
+
     //public static string GetSqliteVersion()
     //{
     //    using SqliteConnection connection = new();

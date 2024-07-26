@@ -11,7 +11,6 @@ using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
-using Microsoft.Data.Sqlite;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
