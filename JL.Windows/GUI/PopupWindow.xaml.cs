@@ -31,6 +31,8 @@ internal sealed partial class PopupWindow : Window
 
     private int _listViewItemIndex; // 0
 
+    private int _listViewItemIndexAfterContextMenuIsClosed; // 0
+
     private int _firstVisibleListViewItemIndex; // 0
 
     private int _currentCharPosition;
@@ -1080,8 +1082,15 @@ internal sealed partial class PopupWindow : Window
 
     private void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
     {
-        _listViewItemIndex = GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
-        LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
+        if (PopupContextMenu.IsVisible)
+        {
+            _listViewItemIndexAfterContextMenuIsClosed = GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
+        }
+        else
+        {
+            _listViewItemIndex = GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
+            LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
+        }
     }
 
     private static void Unselect(object sender, RoutedEventArgs e)
@@ -1893,12 +1902,18 @@ internal sealed partial class PopupWindow : Window
 
     private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (!(bool)e.NewValue
-            && !IsMouseOver
-            && !AddWordWindow.IsItVisible()
-            && !AddNameWindow.IsItVisible())
+        bool contextMenuBecameInvisible = !(bool)e.NewValue;
+        if (contextMenuBecameInvisible)
         {
-            PopupAutoHideTimer.Start();
+            _listViewItemIndex = _listViewItemIndexAfterContextMenuIsClosed;
+            LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
+
+            if (!IsMouseOver
+                && !AddWordWindow.IsItVisible()
+                && !AddNameWindow.IsItVisible())
+            {
+                PopupAutoHideTimer.Start();
+            }
         }
     }
 
