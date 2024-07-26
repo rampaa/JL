@@ -66,7 +66,7 @@ internal sealed partial class StatsWindow : Window
             StatsMode.Session => Stats.SessionStats,
             StatsMode.Profile => Stats.ProfileLifetimeStats,
             StatsMode.Lifetime => Stats.LifetimeStats,
-            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "StatsMode out of range")
         };
 
         TextBlockCharacters.Text = stats.Characters.ToString("N0", CultureInfo.InvariantCulture);
@@ -99,7 +99,7 @@ internal sealed partial class StatsWindow : Window
                     button.Content = StatsMode.Session.ToString();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(null, "StatsMode out of range");
+                    throw new ArgumentOutOfRangeException(null, mode, "StatsMode out of range");
             }
         }
 

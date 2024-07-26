@@ -169,7 +169,7 @@ public static class AudioUtils
                         return s_textToSpeechAudioResponse;
 
                     default:
-                        throw new ArgumentOutOfRangeException(null, "Invalid AudioSourceType");
+                        throw new ArgumentOutOfRangeException(null, audioSource.Type, "Invalid AudioSourceType");
                 }
 
                 if (audioResponse is not null)

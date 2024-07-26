@@ -339,7 +339,7 @@ public static class LookupUtils
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, "Invalid DictType");
+                    throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType");
             }
         });
 
@@ -722,7 +722,7 @@ public static class LookupUtils
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(null, "Invalid DictType");
+                throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType");
         }
 
         return resultsList;

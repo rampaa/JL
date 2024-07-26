@@ -285,7 +285,7 @@ public static class FreqUtils
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, "Invalid freq type");
+                    throw new ArgumentOutOfRangeException(null, freq.Type, "Invalid freq type");
             }
         }
 

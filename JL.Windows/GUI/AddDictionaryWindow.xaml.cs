@@ -220,7 +220,7 @@ internal sealed partial class AddDictionaryWindow : Window
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(null, "Invalid DictType (Add)");
+                throw new ArgumentOutOfRangeException(null, selectedDictType, "Invalid DictType (Add)");
         }
     }
 

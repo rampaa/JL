@@ -133,7 +133,7 @@ internal sealed partial class AddFrequencyWindow : Window
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(null, "Invalid FreqType (Add)");
+                throw new ArgumentOutOfRangeException(null, selectedFreqType, "Invalid FreqType (Add)");
         }
     }
 

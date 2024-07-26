@@ -116,7 +116,7 @@ public sealed class Stats
             }
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                throw new ArgumentOutOfRangeException(nameof(type), type, "Invalid StatType");
         }
     }
 
@@ -151,7 +151,7 @@ public sealed class Stats
                 SessionStats.Imoutos = 0;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(statsMode), statsMode, null);
+                throw new ArgumentOutOfRangeException(nameof(statsMode), statsMode, "Invalid StatsMode");
         }
     }
 }

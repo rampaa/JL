@@ -280,7 +280,7 @@ internal sealed partial class EditDictionaryWindow : Window
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(null, "Invalid DictType (Edit)");
+                throw new ArgumentOutOfRangeException(null, selectedDictType, "Invalid DictType (Edit)");
         }
     }
 }

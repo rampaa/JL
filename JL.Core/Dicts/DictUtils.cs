@@ -900,7 +900,7 @@ public static class DictUtils
                                         DictType.NonspecificKanjiWithWordSchemaYomichan => 250000,
                                         DictType.NonspecificNameYomichan => 250000,
                                         DictType.NonspecificYomichan => 250000,
-                                        _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
+                                        _ => throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType")
                                     };
 
                                 dict.Contents = new Dictionary<string, IList<IDictRecord>>(dictSize, StringComparer.Ordinal);
@@ -1166,7 +1166,7 @@ public static class DictUtils
                                         DictType.NonspecificKanjiNazeka => 250000,
                                         DictType.NonspecificNameNazeka => 250000,
                                         DictType.NonspecificNazeka => 250000,
-                                        _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
+                                        _ => throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType")
                                     };
 
                                 dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
@@ -1326,7 +1326,7 @@ public static class DictUtils
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, "Invalid dict type");
+                    throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid dict type");
             }
         }
 
