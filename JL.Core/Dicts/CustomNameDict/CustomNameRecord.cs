@@ -17,6 +17,10 @@ internal sealed record class CustomNameRecord : IDictRecord
 
     public string BuildFormattedDefinition()
     {
-        return $"({NameType}) {Reading ?? PrimarySpelling}\n{ExtraInfo ?? ""}";
+        string extraInfo = ExtraInfo is not null
+            ? $"\n{ExtraInfo}"
+            : "";
+
+        return $"({NameType}) {Reading ?? PrimarySpelling}{extraInfo}";
     }
 }
