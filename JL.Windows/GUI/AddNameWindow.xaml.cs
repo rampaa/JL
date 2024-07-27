@@ -50,9 +50,11 @@ internal sealed partial class AddNameWindow : Window
 
         if (isValid)
         {
+#pragma warning disable CA1308 // Normalize strings to uppercase
             string nameType =
                 NameTypeStackPanel.Children.OfType<RadioButton>()
-                    .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
+                    .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!.ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
 
             string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
 

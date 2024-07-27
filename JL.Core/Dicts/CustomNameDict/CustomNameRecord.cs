@@ -21,8 +21,6 @@ internal sealed record class CustomNameRecord : IDictRecord
             ? $"\n{ExtraInfo}"
             : "";
 
-#pragma warning disable CA1308 // Normalize strings to uppercase
-        return $"({NameType.ToLowerInvariant()}) {Reading ?? PrimarySpelling}{extraInfo}";
-#pragma warning restore CA1308 // Normalize strings to uppercase
+        return $"({NameType}) {Reading ?? PrimarySpelling}{extraInfo}";
     }
 }
