@@ -29,7 +29,7 @@ public static partial class Utils
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
 
-    [GeneratedRegex(@"\d+")]
+    [GeneratedRegex(@"\d+", RegexOptions.CultureInvariant)]
     internal static partial Regex NumberRegex();
 
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
@@ -200,7 +200,7 @@ public static partial class Utils
         return relativePath.StartsWith('.') ? fullPath : relativePath;
     }
 
-    internal static T[]? ConcatNullableArrays<T>(params T[]?[] arrays)
+    internal static T[]? ConcatNullableArrays<T>(params ReadOnlySpan<T[]?> arrays)
     {
         int position = 0;
         int length = 0;
