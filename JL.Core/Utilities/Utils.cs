@@ -200,7 +200,7 @@ public static partial class Utils
         return relativePath.StartsWith('.') ? fullPath : relativePath;
     }
 
-    internal static T[]? ConcatNullableArrays<T>(params ReadOnlySpan<T[]?> arrays)
+    internal static T[]? ConcatNullableArrays<T>(params T[]?[] arrays)
     {
         int position = 0;
         int length = 0;
