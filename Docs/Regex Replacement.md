@@ -4,5 +4,4 @@ The file format is similar to `SavedRegexReplacements.txt` used by the `Regex Re
 
 All occurrences of a RegEx pattern are replaced by the RegEx replacement functionality; thus, the `g` modifier is not used. Replacements are applied in the order in which they appear in the aforementioned file.
 
-Example RegEx replacement pattern:
-`|REGEX|^.*?"(.*?)".*?|BECOMES|$1|MODIFIER|mx|END|`
+Example RegEx replacement pattern: `|REGEX|^.*?"(.*?)".*?|BECOMES|$1|MODIFIER|mx|END|`
