@@ -95,6 +95,8 @@ internal sealed partial class MainWindow : Window
 
         ConfigManager.ApplyPreferences();
 
+        RegexReplacerUtils.PopulateRegexReplacements();
+
         if (ConfigManager.AlwaysOnTop)
         {
             WinApi.BringToFront(WindowHandle);

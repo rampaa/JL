@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using JL.Core.Config;
 
 namespace JL.Core.Utilities;
@@ -83,6 +84,14 @@ public static class TextUtils
         if (CoreConfigManager.TextBoxRemoveNewlines)
         {
             text = text.ReplaceLineEndings("");
+        }
+
+        if (RegexReplacerUtils.s_regexReplacements is not null)
+        {
+            foreach ((Regex regex, string replacement) in RegexReplacerUtils.s_regexReplacements)
+            {
+                text = regex.Replace(text, replacement);
+            }
         }
 
         return text;

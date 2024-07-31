@@ -616,6 +616,8 @@ internal sealed partial class PreferencesWindow : Window
             ConfigManager.ApplyPreferences();
             ConfigManager.LoadPreferenceWindow(this);
         });
+
+        RegexReplacerUtils.PopulateRegexReplacements();
     }
 
     private void ProfileConfigButton_Click(object sender, RoutedEventArgs e)

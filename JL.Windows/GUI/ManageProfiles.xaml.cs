@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Config;
+using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -118,6 +119,12 @@ internal sealed partial class ManageProfilesWindow : Window
         if (File.Exists(profileCustomWordsPath))
         {
             File.Delete(profileCustomWordsPath);
+        }
+
+        string profileRegexReplacementFilePath = RegexReplacerUtils.GetProfileSpecificFilePath();
+        if (File.Exists(profileRegexReplacementFilePath))
+        {
+            File.Delete(profileRegexReplacementFilePath);
         }
 
         UpdateProfilesDisplay();
