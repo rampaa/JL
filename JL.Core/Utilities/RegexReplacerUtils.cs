@@ -72,7 +72,7 @@ public static partial class RegexReplacerUtils
                     try
                     {
                         Regex regex = new(regexPattern, regexOptions);
-                        s_regexReplacements.Add(new KeyValuePair<Regex, string>(regex, match.Groups["replacement"].Value));
+                        s_regexReplacements.Add(KeyValuePair.Create(regex, match.Groups["replacement"].Value));
                     }
                     catch (ArgumentException e)
                     {
