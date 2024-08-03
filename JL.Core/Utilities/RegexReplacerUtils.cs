@@ -5,12 +5,12 @@ namespace JL.Core.Utilities;
 
 public static partial class RegexReplacerUtils
 {
-    [GeneratedRegex("\\|REGEX\\|(?<regex>.+)\\|BECOMES\\|(?<replacement>.*)\\|MODIFIER\\|(?<modifiers>.*)\\|END\\|", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"\|REGEX\|(?<regex>.+)\|BECOMES\|(?<replacement>.*)\|MODIFIER\|(?<modifiers>.*)\|END\|", RegexOptions.CultureInvariant)]
     private static partial Regex ReplacementRegex();
 
     internal static List<KeyValuePair<Regex, string>>? s_regexReplacements;
 
-    public static readonly string FilePath = Path.Join(ProfileUtils.ProfileFolderPath, $"Regex_Replacements.txt");
+    private static readonly string s_filePath = Path.Join(ProfileUtils.ProfileFolderPath, "Regex_Replacements.txt");
 
     public static string GetProfileSpecificFilePath()
     {
@@ -23,9 +23,9 @@ public static partial class RegexReplacerUtils
 
         List<string> filePaths = new(2);
 
-        if (File.Exists(FilePath))
+        if (File.Exists(s_filePath))
         {
-            filePaths.Add(FilePath);
+            filePaths.Add(s_filePath);
         }
 
         string profilePath = GetProfileSpecificFilePath();
@@ -72,7 +72,7 @@ public static partial class RegexReplacerUtils
                     try
                     {
                         Regex regex = new(regexPattern, regexOptions);
-                        s_regexReplacements.Add(new(regex, match.Groups["replacement"].Value));
+                        s_regexReplacements.Add(new KeyValuePair<Regex, string>(regex, match.Groups["replacement"].Value));
                     }
                     catch (ArgumentException e)
                     {
