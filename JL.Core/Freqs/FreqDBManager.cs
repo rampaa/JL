@@ -10,7 +10,7 @@ namespace JL.Core.Freqs;
 
 internal static class FreqDBManager
 {
-    public const int Version = 2;
+    public const int Version = 3;
 
     public static void CreateDB(string dbName)
     {

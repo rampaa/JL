@@ -8,7 +8,7 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictDBManager
 {
-    public const int Version = 0;
+    public const int Version = 1;
 
     public static void CreateDB(string dbName)
     {

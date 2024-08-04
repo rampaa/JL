@@ -191,11 +191,14 @@ public static partial class JapaneseUtils
     public static string KatakanaToHiragana(string text)
     {
         string normalizedText = text;
-        if (!text.IsNormalized(NormalizationForm.FormKC))
+        if (!normalizedText.IsNormalized(NormalizationForm.FormKC))
         {
             // Normalizes ＯＬ to OL, ｶﾞ to が, ﾜ to わ, ㍿ to 株式会社 etc.
-            normalizedText = text.Normalize(NormalizationForm.FormKC);
+            normalizedText = normalizedText.Normalize(NormalizationForm.FormKC);
         }
+
+        // Normalizes vs to VS, xxx to XXX, h to H etc.
+        normalizedText = normalizedText.ToUpperInvariant();
 
         int firstKatakanaIndex = FirstKatakanaIndex(normalizedText);
         if (firstKatakanaIndex is -1)
