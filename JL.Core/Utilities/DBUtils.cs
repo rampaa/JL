@@ -105,7 +105,7 @@ public static class DBUtils
     private static void SendOptimizePragma(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA optimize;";
+        command.CommandText = "PRAGMA optimize=0x10002;";
         _ = command.ExecuteNonQuery();
     }
 
@@ -187,7 +187,6 @@ public static class DBUtils
             (
                 SELECT 1
                 FROM record
-                LIMIT 1
             );
             """;
 

@@ -10,7 +10,7 @@
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
     <AnalysisLevel>8-all</AnalysisLevel>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.7" />
@@ -19,7 +19,7 @@
 
   <!--Transitive dependencies-->
   <ItemGroup>
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.8" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.9" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
 
