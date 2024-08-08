@@ -4,7 +4,7 @@ namespace JL.Core.Frontend;
 
 public interface IFrontend
 {
-    public void PlayAudio(byte[] audio, string audioFormat, float volume);
+    public void PlayAudio(byte[] audio, string audioFormat);
 
     public void Alert(AlertLevel alertLevel, string message);
 
@@ -20,7 +20,7 @@ public interface IFrontend
 
     public byte[]? GetImageFromClipboardAsByteArray();
 
-    public Task TextToSpeech(string voiceName, string text, int volume);
+    public Task TextToSpeech(string voiceName, string text);
 
     public Task StopTextToSpeech();
 

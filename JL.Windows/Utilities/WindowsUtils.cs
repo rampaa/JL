@@ -360,17 +360,14 @@ internal static class WindowsUtils
         }
     }
 
-    public static void PlayAudio(byte[] audio, string audioFormat, float volume)
+    public static void PlayAudio(byte[] audio, string audioFormat)
     {
         _ = Application.Current.Dispatcher.InvokeAsync(async () =>
         {
             try
             {
                 AudioPlayer?.Dispose();
-                AudioPlayer = new WaveOut
-                {
-                    Volume = volume
-                };
+                AudioPlayer = new WaveOut();
 
                 MemoryStream audioStream = new(audio);
                 await using (audioStream.ConfigureAwait(false))
@@ -427,7 +424,7 @@ internal static class WindowsUtils
 #pragma warning restore CA5394 // Do not use insecure randomness
 
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
-            PlayAudio(audioData, "mp3", 1);
+            PlayAudio(audioData, "mp3");
             Stats.IncrementStat(StatType.Imoutos);
         }
         catch (Exception ex)

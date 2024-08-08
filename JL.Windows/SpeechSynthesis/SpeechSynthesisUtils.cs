@@ -39,7 +39,7 @@ internal static class SpeechSynthesisUtils
         }
     }
 
-    public static async Task TextToSpeech(string voiceName, string text, int volume)
+    public static async Task TextToSpeech(string voiceName, string text)
     {
         if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing)
         {
@@ -58,7 +58,6 @@ internal static class SpeechSynthesisUtils
         await StopTextToSpeech().ConfigureAwait(false);
 
         Synthesizer.SelectVoice(voiceName);
-        Synthesizer.Volume = volume;
 
         Synthesizer.SetOutputToDefaultAudioDevice();
         _ = Synthesizer.SpeakAsync(text);

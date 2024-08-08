@@ -10,7 +10,7 @@ namespace JL.Windows;
 
 internal sealed class WindowsFrontend : IFrontend
 {
-    public void PlayAudio(byte[] audio, string audioFormat, float volume) => WindowsUtils.PlayAudio(audio, audioFormat, volume);
+    public void PlayAudio(byte[] audio, string audioFormat) => WindowsUtils.PlayAudio(audio, audioFormat);
 
     public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
 
@@ -29,7 +29,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public byte[]? GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
 
-    public Task TextToSpeech(string voiceName, string text, int volume) => SpeechSynthesisUtils.TextToSpeech(voiceName, text, volume);
+    public Task TextToSpeech(string voiceName, string text) => SpeechSynthesisUtils.TextToSpeech(voiceName, text);
 
     public Task StopTextToSpeech() => SpeechSynthesisUtils.StopTextToSpeech();
 

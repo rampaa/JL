@@ -19,7 +19,6 @@ public static class CoreConfigManager
     public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public static bool TextBoxRemoveNewlines { get; private set; } // = false;
     public static Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
-    public static int AudioVolume { get; private set; } = 100;
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
 
     public static void ApplyPreferences(SqliteConnection connection)
@@ -105,7 +104,6 @@ public static class CoreConfigManager
         LookupRate = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, LookupRate, nameof(LookupRate), double.TryParse);
         TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
         TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
-        AudioVolume = ConfigDBManager.GetValueFromConfig(connection, AudioVolume, nameof(AudioVolume), int.TryParse);
         CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
         CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
 

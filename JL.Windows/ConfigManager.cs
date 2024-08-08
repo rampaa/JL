@@ -837,7 +837,6 @@ internal static class ConfigManager
         preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
 
         preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value = MaxNumResultsNotInMiningMode;
-        preferenceWindow.AudioVolumeNumericUpDown.Value = CoreConfigManager.AudioVolume;
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
         preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
@@ -1135,9 +1134,6 @@ internal static class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(MaxNumResultsNotInMiningMode),
                 preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
-
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AudioVolume),
-                preferenceWindow.AudioVolumeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupMaxWidth),
                 preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));

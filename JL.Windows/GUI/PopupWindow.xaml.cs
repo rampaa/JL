@@ -1588,7 +1588,7 @@ internal sealed partial class PopupWindow : Window
                     ? _lastInteractedTextBox.SelectedText
                     : LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
-                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfigManager.AudioVolume).ConfigureAwait(false);
+                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text).ConfigureAwait(false);
             }
         }
 
