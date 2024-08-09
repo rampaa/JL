@@ -103,7 +103,7 @@ internal static class EpwingYomichanLoader
 
     private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict)
     {
-        bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiWithWordSchemaYomichan and not DictType.KanjigenYomichan;
+        bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiWithWordSchemaYomichan;
         string primarySpellingInHiragana = nonKanjiDict
             ? JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling).GetPooledString()
             : yomichanRecord.PrimarySpelling.GetPooledString();

@@ -229,15 +229,10 @@ internal sealed partial class EditDictionaryWindow : Window
                 BrowseForDictionaryFile("kanjidic2 file|kanjidic2.xml");
                 break;
 
-            case DictType.DaijirinNazeka:
-                BrowseForDictionaryFile("Daijirin file|*.json");
-                break;
             case DictType.KenkyuushaNazeka:
                 BrowseForDictionaryFile("Kenkyuusha file|*.json");
                 break;
-            case DictType.ShinmeikaiNazeka:
-                BrowseForDictionaryFile("Shinmeikai file|*.json");
-                break;
+
             case DictType.NonspecificWordNazeka:
             case DictType.NonspecificKanjiNazeka:
             case DictType.NonspecificNameNazeka:
@@ -252,8 +247,18 @@ internal sealed partial class EditDictionaryWindow : Window
                 break;
 
             case DictType.Kenkyuusha:
-            case DictType.Daijirin:
             case DictType.Daijisen:
+            case DictType.NonspecificWordYomichan:
+            case DictType.NonspecificKanjiYomichan:
+            case DictType.NonspecificKanjiWithWordSchemaYomichan:
+            case DictType.NonspecificNameYomichan:
+            case DictType.NonspecificYomichan:
+            case DictType.PitchAccentYomichan:
+                BrowseForDictionaryFolder();
+                break;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            case DictType.Daijirin:
             case DictType.Koujien:
             case DictType.Meikyou:
             case DictType.Gakken:
@@ -268,17 +273,12 @@ internal sealed partial class EditDictionaryWindow : Window
             case DictType.WeblioKogoYomichan:
             case DictType.GakkenYojijukugoYomichan:
             case DictType.ShinmeikaiYojijukugoYomichan:
-            case DictType.KanjigenYomichan:
             case DictType.KireiCakeYomichan:
-            case DictType.NonspecificWordYomichan:
-            case DictType.NonspecificKanjiYomichan:
-            case DictType.NonspecificKanjiWithWordSchemaYomichan:
-            case DictType.NonspecificNameYomichan:
-            case DictType.NonspecificYomichan:
-            case DictType.PitchAccentYomichan:
-                BrowseForDictionaryFolder();
-                break;
-
+            case DictType.KanjigenYomichan:
+            case DictType.DaijirinNazeka:
+            case DictType.ShinmeikaiNazeka:
+#pragma warning restore CS0618 // Type or member is obsolete
+                throw new ArgumentOutOfRangeException(null, selectedDictType, "Obsolete DictType (Edit)");
             default:
                 throw new ArgumentOutOfRangeException(null, selectedDictType, "Invalid DictType (Edit)");
         }

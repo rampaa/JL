@@ -68,7 +68,7 @@ public static class LookupUtils
                         }
                     }
 
-                    else if (dict.Type is DictType.KanjigenYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan)
+                    else if (dict.Type is DictType.NonspecificKanjiWithWordSchemaYomichan)
                     {
                         Dictionary<string, IntermediaryResult>? results = useDB
                             ? GetKanjiResultsFromDB(kanji, dict, EpwingYomichanDBManager.GetRecordsFromDB)
@@ -221,8 +221,7 @@ public static class LookupUtils
                     break;
 
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
-                case DictType.KanjigenYomichan:
-                    // Template-wise, Kanjigen is a word dictionary that's why its results are put into Yomichan Word Results
+                    // Template-wise, it is a word dictionary that's why its results are put into Yomichan Word Results
                     // Content-wise though it's a kanji dictionary, that's why GetKanjiResults is being used for the lookup
                     Dictionary<string, IntermediaryResult>? epwingYomichanKanjiWithWordSchemaResults = useDB
                         ? GetKanjiResultsFromDB(kanji, dict, EpwingYomichanDBManager.GetRecordsFromDB)
@@ -274,23 +273,7 @@ public static class LookupUtils
                     break;
 
                 case DictType.Kenkyuusha:
-                case DictType.Daijirin:
                 case DictType.Daijisen:
-                case DictType.Koujien:
-                case DictType.Meikyou:
-                case DictType.Gakken:
-                case DictType.Kotowaza:
-                case DictType.IwanamiYomichan:
-                case DictType.JitsuyouYomichan:
-                case DictType.ShinmeikaiYomichan:
-                case DictType.NikkokuYomichan:
-                case DictType.ShinjirinYomichan:
-                case DictType.OubunshaYomichan:
-                case DictType.ZokugoYomichan:
-                case DictType.WeblioKogoYomichan:
-                case DictType.GakkenYojijukugoYomichan:
-                case DictType.ShinmeikaiYojijukugoYomichan:
-                case DictType.KireiCakeYomichan:
                 case DictType.NonspecificWordYomichan:
                 case DictType.NonspecificYomichan:
                     Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, true, false);
@@ -322,9 +305,7 @@ public static class LookupUtils
 
                     break;
 
-                case DictType.DaijirinNazeka:
                 case DictType.KenkyuushaNazeka:
-                case DictType.ShinmeikaiNazeka:
                 case DictType.NonspecificWordNazeka:
                 case DictType.NonspecificNazeka:
                     Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, false, true);
@@ -332,11 +313,33 @@ public static class LookupUtils
                     {
                         lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResults, dbFreqs, useDBForPitchDict, pitchDict));
                     }
-
                     break;
 
                 case DictType.PitchAccentYomichan:
                     break;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+                case DictType.Daijirin:
+                case DictType.Koujien:
+                case DictType.Meikyou:
+                case DictType.Gakken:
+                case DictType.Kotowaza:
+                case DictType.IwanamiYomichan:
+                case DictType.JitsuyouYomichan:
+                case DictType.ShinmeikaiYomichan:
+                case DictType.NikkokuYomichan:
+                case DictType.ShinjirinYomichan:
+                case DictType.OubunshaYomichan:
+                case DictType.ZokugoYomichan:
+                case DictType.WeblioKogoYomichan:
+                case DictType.GakkenYojijukugoYomichan:
+                case DictType.ShinmeikaiYojijukugoYomichan:
+                case DictType.KireiCakeYomichan:
+                case DictType.KanjigenYomichan:
+                case DictType.DaijirinNazeka:
+                case DictType.ShinmeikaiNazeka:
+#pragma warning restore CS0618 // Type or member is obsolete
+                    throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolete DictType");
 
                 default:
                     throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType");
@@ -615,25 +618,8 @@ public static class LookupUtils
                 break;
             }
 
-            case DictType.Daijirin:
             case DictType.Daijisen:
-            case DictType.Gakken:
             case DictType.Kenkyuusha:
-            case DictType.Kotowaza:
-            case DictType.Koujien:
-            case DictType.Meikyou:
-            case DictType.IwanamiYomichan:
-            case DictType.JitsuyouYomichan:
-            case DictType.ShinmeikaiYomichan:
-            case DictType.NikkokuYomichan:
-            case DictType.ShinjirinYomichan:
-            case DictType.OubunshaYomichan:
-            case DictType.ZokugoYomichan:
-            case DictType.WeblioKogoYomichan:
-            case DictType.GakkenYojijukugoYomichan:
-            case DictType.ShinmeikaiYojijukugoYomichan:
-            case DictType.KanjigenYomichan:
-            case DictType.KireiCakeYomichan:
             case DictType.NonspecificWordYomichan:
             case DictType.NonspecificKanjiYomichan:
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
@@ -673,9 +659,7 @@ public static class LookupUtils
                 break;
             }
 
-            case DictType.DaijirinNazeka:
             case DictType.KenkyuushaNazeka:
-            case DictType.ShinmeikaiNazeka:
             case DictType.NonspecificWordNazeka:
             case DictType.NonspecificKanjiNazeka:
             case DictType.NonspecificNameNazeka:
@@ -720,6 +704,29 @@ public static class LookupUtils
             case DictType.CustomNameDictionary:
             case DictType.ProfileCustomNameDictionary:
                 break;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            case DictType.Daijirin:
+            case DictType.Koujien:
+            case DictType.Meikyou:
+            case DictType.Gakken:
+            case DictType.Kotowaza:
+            case DictType.IwanamiYomichan:
+            case DictType.JitsuyouYomichan:
+            case DictType.ShinmeikaiYomichan:
+            case DictType.NikkokuYomichan:
+            case DictType.ShinjirinYomichan:
+            case DictType.OubunshaYomichan:
+            case DictType.ZokugoYomichan:
+            case DictType.WeblioKogoYomichan:
+            case DictType.GakkenYojijukugoYomichan:
+            case DictType.ShinmeikaiYojijukugoYomichan:
+            case DictType.KireiCakeYomichan:
+            case DictType.KanjigenYomichan:
+            case DictType.DaijirinNazeka:
+            case DictType.ShinmeikaiNazeka:
+#pragma warning restore CS0618 // Type or member is obsolete
+                throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolete DictType");
 
             default:
                 throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType");

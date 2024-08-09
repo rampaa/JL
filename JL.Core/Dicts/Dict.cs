@@ -6,7 +6,7 @@ namespace JL.Core.Dicts;
 
 public sealed class Dict(DictType type, string name, string path, bool active, int priority, int size, bool ready, DictOptions? options)
 {
-    public DictType Type { get; } = type;
+    public DictType Type { get; internal set; } = type;
     public string Name { get; set; } = name;
     public string Path { get; set; } = path;
     public bool Active { get; set; } = active;

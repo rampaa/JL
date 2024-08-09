@@ -164,24 +164,7 @@ internal sealed partial class AddDictionaryWindow : Window
         {
             // not providing a description for the filter causes the filename returned to be empty
             case DictType.Kenkyuusha:
-            case DictType.Daijirin:
             case DictType.Daijisen:
-            case DictType.Koujien:
-            case DictType.Meikyou:
-            case DictType.Gakken:
-            case DictType.Kotowaza:
-            case DictType.IwanamiYomichan:
-            case DictType.JitsuyouYomichan:
-            case DictType.ShinmeikaiYomichan:
-            case DictType.NikkokuYomichan:
-            case DictType.ShinjirinYomichan:
-            case DictType.OubunshaYomichan:
-            case DictType.ZokugoYomichan:
-            case DictType.WeblioKogoYomichan:
-            case DictType.GakkenYojijukugoYomichan:
-            case DictType.ShinmeikaiYojijukugoYomichan:
-            case DictType.KanjigenYomichan:
-            case DictType.KireiCakeYomichan:
             case DictType.NonspecificWordYomichan:
             case DictType.NonspecificKanjiYomichan:
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
@@ -194,14 +177,8 @@ internal sealed partial class AddDictionaryWindow : Window
                 BrowseForDictionaryFolder();
                 break;
 
-            case DictType.DaijirinNazeka:
-                BrowseForDictionaryFile("Daijirin file|*.json");
-                break;
             case DictType.KenkyuushaNazeka:
                 BrowseForDictionaryFile("Kenkyuusha file|*.json");
-                break;
-            case DictType.ShinmeikaiNazeka:
-                BrowseForDictionaryFile("Shinmeikai file|*.json");
                 break;
             case DictType.NonspecificWordNazeka:
             case DictType.NonspecificKanjiNazeka:
@@ -218,6 +195,29 @@ internal sealed partial class AddDictionaryWindow : Window
             case DictType.ProfileCustomWordDictionary:
             case DictType.ProfileCustomNameDictionary:
                 break;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            case DictType.Daijirin:
+            case DictType.Koujien:
+            case DictType.Meikyou:
+            case DictType.Gakken:
+            case DictType.Kotowaza:
+            case DictType.IwanamiYomichan:
+            case DictType.JitsuyouYomichan:
+            case DictType.ShinmeikaiYomichan:
+            case DictType.NikkokuYomichan:
+            case DictType.ShinjirinYomichan:
+            case DictType.OubunshaYomichan:
+            case DictType.ZokugoYomichan:
+            case DictType.WeblioKogoYomichan:
+            case DictType.GakkenYojijukugoYomichan:
+            case DictType.ShinmeikaiYojijukugoYomichan:
+            case DictType.KireiCakeYomichan:
+            case DictType.KanjigenYomichan:
+            case DictType.DaijirinNazeka:
+            case DictType.ShinmeikaiNazeka:
+#pragma warning restore CS0618 // Type or member is obsolete
+                throw new ArgumentOutOfRangeException(null, selectedDictType, "Obsolete DictType (Add)");
 
             default:
                 throw new ArgumentOutOfRangeException(null, selectedDictType, "Invalid DictType (Add)");
