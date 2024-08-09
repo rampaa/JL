@@ -39,13 +39,6 @@
                                TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
                 </DockPanel>
 
-                <DockPanel Name="ExamplesDockPanel" Visibility="Collapsed">
-                    <TextBlock Text="Examples" TextWrapping="Wrap" Margin="10, 10, 5, 10"
-                               FontSize="12" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <ComboBox Name="ExamplesComboBox" Margin="0, 0, 10, 0" Height="30" Width="80"
-                              HorizontalAlignment="Left" FontSize="12" />
-                </DockPanel>
-
                 <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
                     <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Left"
                             Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"
