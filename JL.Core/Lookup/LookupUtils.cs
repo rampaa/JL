@@ -80,7 +80,7 @@ public static class LookupUtils
                         }
                     }
 
-                    else if (DictUtils.s_yomichanKanjiDictTypeSet.Contains(dict.Type))
+                    else if (dict.Type is DictType.NonspecificKanjiYomichan)
                     {
                         Dictionary<string, IntermediaryResult>? results = useDB
                             ? GetKanjiResultsFromDB(kanji, dict, EpwingYomichanDBManager.GetRecordsFromDB)
@@ -92,7 +92,7 @@ public static class LookupUtils
                         }
                     }
 
-                    else if (DictUtils.s_nazekaKanjiDictTypeSet.Contains(dict.Type))
+                    else if (dict.Type is DictType.NonspecificKanjiNazeka)
                     {
                         Dictionary<string, IntermediaryResult>? results = useDB
                             ? GetKanjiResultsFromDB(kanji, dict, EpwingNazekaDBManager.GetRecordsFromDB)
