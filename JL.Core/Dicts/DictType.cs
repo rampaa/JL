@@ -19,7 +19,7 @@ public enum DictType
     [Description("Kanji Dictionary with Word Schema")] NonspecificKanjiWithWordSchemaYomichan,
     [Description("Name Dictionary with Word Schema")] NonspecificNameYomichan,
     [Description("Pitch Accent Dictionary")] PitchAccentYomichan,
-    [Description("Nonspecific Dictionary with Word Schema")] NonspecificYomichan,
+    [Description("Nonspecific Dictionary")] NonspecificYomichan,
 
     [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Kenkyuusha")] Kenkyuusha,
     [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Daijisen")] Daijisen,
