@@ -27,15 +27,6 @@ internal sealed partial class DictOptionsControl : UserControl
             newlineOption = new NewlineBetweenDefinitionsOption(NewlineCheckBox.IsChecked!.Value);
         }
 
-        ExamplesOption? examplesOption = null;
-        if (ExamplesOption.ValidDictTypes.Contains(type))
-        {
-            if (Enum.TryParse(ExamplesComboBox.SelectedValue?.ToString(), out ExamplesOptionValue eov))
-            {
-                examplesOption = new ExamplesOption(eov);
-            }
-        }
-
         NoAllOption noAllOption = NoAllOption.ValidDictTypes.Contains(type)
             ? new NoAllOption(NoAllCheckBox.IsChecked!.Value)
             : new NoAllOption(false);
@@ -157,7 +148,6 @@ internal sealed partial class DictOptionsControl : UserControl
             useDBOption,
             noAllOption,
             newlineOption,
-            examplesOption,
             pitchAccentMarkerColorOption,
             wordClassOption,
             dialectOption,
@@ -186,14 +176,6 @@ internal sealed partial class DictOptionsControl : UserControl
         {
             NewlineCheckBox.IsChecked = true;
             NewlineCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-
-        if (ExamplesOption.ValidDictTypes.Contains(dictType))
-        {
-            ExamplesComboBox.ItemsSource = Enum.GetValues<ExamplesOptionValue>();
-            ExamplesComboBox.SelectedValue = ExamplesOptionValue.None;
-            ExamplesDockPanel.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
 
@@ -344,14 +326,6 @@ internal sealed partial class DictOptionsControl : UserControl
         {
             NewlineCheckBox.IsChecked = dict.Options.NewlineBetweenDefinitions!.Value;
             NewlineCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-
-        if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
-        {
-            ExamplesComboBox.ItemsSource = Enum.GetValues<ExamplesOptionValue>();
-            ExamplesComboBox.SelectedValue = dict.Options.Examples!.Value;
-            ExamplesDockPanel.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
 

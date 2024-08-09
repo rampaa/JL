@@ -20,9 +20,9 @@ public enum DictType
     [Description("Name Dictionary with Word Schema")] NonspecificNameYomichan,
     [Description("Pitch Accent Dictionary")] PitchAccentYomichan,
     [Description("Nonspecific Dictionary with Word Schema")] NonspecificYomichan,
-    [Description("Kenkyuusha")] Kenkyuusha,
-    [Description("Daijisen")] Daijisen,
 
+    [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Kenkyuusha")] Kenkyuusha,
+    [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Daijisen")] Daijisen,
     [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Daijirin (Yomichan)")] Daijirin,
     [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Koujien (Yomichan)")] Koujien,
     [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Meikyou (Yomichan)")] Meikyou,
@@ -45,9 +45,9 @@ public enum DictType
     [Description("Word Dictionary")] NonspecificWordNazeka,
     [Description("Kanji Dictionary")] NonspecificKanjiNazeka,
     [Description("Name Dictionary")] NonspecificNameNazeka,
-    [Description("Nonspecific Dictionary with Word Schema")] NonspecificNazeka,
-    [Description("Kenkyuusha")] KenkyuushaNazeka,
+    [Description("Nonspecific Dictionary")] NonspecificNazeka,
 
+    [Obsolete("Will be replaced by NonspecificWordNazeka")][Description("Kenkyuusha")] KenkyuushaNazeka,
     [Obsolete("Will be replaced by NonspecificWordNazeka")][Description("Daijirin (Nazeka)")] DaijirinNazeka,
     [Obsolete("Will be replaced by NonspecificWordNazeka")][Description("Shinmeikai (Nazeka)")] ShinmeikaiNazeka
 }

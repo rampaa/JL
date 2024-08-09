@@ -113,17 +113,6 @@ internal sealed partial class EditDictionaryWindow : Window
             }
         }
 
-        if (_dict.Options.Examples?.Value != options.Examples?.Value)
-        {
-            _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-
-            if (dbExists)
-            {
-                DBUtils.DeleteDB(dbPath);
-                dbExists = false;
-            }
-        }
-
         if (_dict.Options.UseDB.Value != options.UseDB.Value)
         {
             _dict.Ready = false;
@@ -229,10 +218,6 @@ internal sealed partial class EditDictionaryWindow : Window
                 BrowseForDictionaryFile("kanjidic2 file|kanjidic2.xml");
                 break;
 
-            case DictType.KenkyuushaNazeka:
-                BrowseForDictionaryFile("Kenkyuusha file|*.json");
-                break;
-
             case DictType.NonspecificWordNazeka:
             case DictType.NonspecificKanjiNazeka:
             case DictType.NonspecificNameNazeka:
@@ -246,8 +231,6 @@ internal sealed partial class EditDictionaryWindow : Window
             case DictType.ProfileCustomNameDictionary:
                 break;
 
-            case DictType.Kenkyuusha:
-            case DictType.Daijisen:
             case DictType.NonspecificWordYomichan:
             case DictType.NonspecificKanjiYomichan:
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
@@ -258,6 +241,8 @@ internal sealed partial class EditDictionaryWindow : Window
                 break;
 
 #pragma warning disable CS0618 // Type or member is obsolete
+            case DictType.Kenkyuusha:
+            case DictType.Daijisen:
             case DictType.Daijirin:
             case DictType.Koujien:
             case DictType.Meikyou:
@@ -277,6 +262,7 @@ internal sealed partial class EditDictionaryWindow : Window
             case DictType.KanjigenYomichan:
             case DictType.DaijirinNazeka:
             case DictType.ShinmeikaiNazeka:
+            case DictType.KenkyuushaNazeka:
 #pragma warning restore CS0618 // Type or member is obsolete
                 throw new ArgumentOutOfRangeException(null, selectedDictType, "Obsolete DictType (Edit)");
             default:

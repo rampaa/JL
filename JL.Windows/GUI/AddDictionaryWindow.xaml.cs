@@ -163,8 +163,6 @@ internal sealed partial class AddDictionaryWindow : Window
         switch (selectedDictType)
         {
             // not providing a description for the filter causes the filename returned to be empty
-            case DictType.Kenkyuusha:
-            case DictType.Daijisen:
             case DictType.NonspecificWordYomichan:
             case DictType.NonspecificKanjiYomichan:
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
@@ -177,9 +175,6 @@ internal sealed partial class AddDictionaryWindow : Window
                 BrowseForDictionaryFolder();
                 break;
 
-            case DictType.KenkyuushaNazeka:
-                BrowseForDictionaryFile("Kenkyuusha file|*.json");
-                break;
             case DictType.NonspecificWordNazeka:
             case DictType.NonspecificKanjiNazeka:
             case DictType.NonspecificNameNazeka:
@@ -197,6 +192,8 @@ internal sealed partial class AddDictionaryWindow : Window
                 break;
 
 #pragma warning disable CS0618 // Type or member is obsolete
+            case DictType.Kenkyuusha:
+            case DictType.Daijisen:
             case DictType.Daijirin:
             case DictType.Koujien:
             case DictType.Meikyou:
@@ -216,6 +213,7 @@ internal sealed partial class AddDictionaryWindow : Window
             case DictType.KanjigenYomichan:
             case DictType.DaijirinNazeka:
             case DictType.ShinmeikaiNazeka:
+            case DictType.KenkyuushaNazeka:
 #pragma warning restore CS0618 // Type or member is obsolete
                 throw new ArgumentOutOfRangeException(null, selectedDictType, "Obsolete DictType (Add)");
 

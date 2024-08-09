@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING;
@@ -31,58 +30,6 @@ internal static class EpwingUtils
         foreach (char c in primarySpelling)
         {
             if (s_invalidCharacters.Contains(c) || char.IsWhiteSpace(c))
-            {
-                return false;
-            }
-        }
-
-        if (dict.Type is DictType.Kenkyuusha)
-        {
-            if (dict.Options.Examples!.Value is ExamplesOptionValue.None)
-            {
-                if (definitions.Length > 2)
-                {
-                    for (int i = 2; i < definitions.Length; i++)
-                    {
-                        if (!char.IsDigit(definitions[i][0]))
-                        {
-                            definitions = definitions.RemoveAt(i)!;
-                            --i;
-                        }
-                    }
-                }
-            }
-            else if (dict.Options.Examples.Value is ExamplesOptionValue.One)
-            {
-                if (definitions.Length > 2)
-                {
-                    bool isMainExample = true;
-
-                    for (int i = 2; i < definitions.Length; i++)
-                    {
-                        if (char.IsDigit(definitions[i][0]))
-                        {
-                            isMainExample = true;
-                        }
-
-                        else
-                        {
-                            if (!isMainExample)
-                            {
-                                definitions = definitions.RemoveAt(i)!;
-                                --i;
-                            }
-
-                            isMainExample = false;
-                        }
-                    }
-                }
-            }
-        }
-        else if (dict.Type is DictType.Daijisen)
-        {
-            // Kanji definitions
-            if (definitions.Any(static def => def.Contains("［音］", StringComparison.Ordinal)))
             {
                 return false;
             }

@@ -3,20 +3,6 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.Options;
 
-public enum ExamplesOptionValue
-{
-    None,
-    One,
-    // ReSharper disable once UnusedMember.Global
-    All
-}
-
-public sealed class ExamplesOption(ExamplesOptionValue value)
-{
-    public ExamplesOptionValue Value { get; } = value;
-    [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.Kenkyuusha];
-}
-
 public sealed class NewlineBetweenDefinitionsOption(bool value)
 {
     public bool Value { get; } = value;

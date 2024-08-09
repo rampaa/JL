@@ -272,8 +272,6 @@ public static class LookupUtils
 
                     break;
 
-                case DictType.Kenkyuusha:
-                case DictType.Daijisen:
                 case DictType.NonspecificWordYomichan:
                 case DictType.NonspecificYomichan:
                     Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, true, false);
@@ -305,7 +303,6 @@ public static class LookupUtils
 
                     break;
 
-                case DictType.KenkyuushaNazeka:
                 case DictType.NonspecificWordNazeka:
                 case DictType.NonspecificNazeka:
                     Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, false, true);
@@ -319,6 +316,8 @@ public static class LookupUtils
                     break;
 
 #pragma warning disable CS0618 // Type or member is obsolete
+                case DictType.Kenkyuusha:
+                case DictType.Daijisen:
                 case DictType.Daijirin:
                 case DictType.Koujien:
                 case DictType.Meikyou:
@@ -338,6 +337,7 @@ public static class LookupUtils
                 case DictType.KanjigenYomichan:
                 case DictType.DaijirinNazeka:
                 case DictType.ShinmeikaiNazeka:
+                case DictType.KenkyuushaNazeka:
 #pragma warning restore CS0618 // Type or member is obsolete
                     throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolete DictType");
 
@@ -618,8 +618,6 @@ public static class LookupUtils
                 break;
             }
 
-            case DictType.Daijisen:
-            case DictType.Kenkyuusha:
             case DictType.NonspecificWordYomichan:
             case DictType.NonspecificKanjiYomichan:
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
@@ -659,7 +657,6 @@ public static class LookupUtils
                 break;
             }
 
-            case DictType.KenkyuushaNazeka:
             case DictType.NonspecificWordNazeka:
             case DictType.NonspecificKanjiNazeka:
             case DictType.NonspecificNameNazeka:
@@ -706,6 +703,8 @@ public static class LookupUtils
                 break;
 
 #pragma warning disable CS0618 // Type or member is obsolete
+            case DictType.Daijisen:
+            case DictType.Kenkyuusha:
             case DictType.Daijirin:
             case DictType.Koujien:
             case DictType.Meikyou:
@@ -725,6 +724,7 @@ public static class LookupUtils
             case DictType.KanjigenYomichan:
             case DictType.DaijirinNazeka:
             case DictType.ShinmeikaiNazeka:
+            case DictType.KenkyuushaNazeka:
 #pragma warning restore CS0618 // Type or member is obsolete
                 throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolete DictType");
 

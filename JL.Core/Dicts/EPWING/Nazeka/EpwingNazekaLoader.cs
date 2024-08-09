@@ -52,11 +52,6 @@ internal static class EpwingNazekaLoader
                 string? definition = definitionJsonElement.GetString();
                 if (!string.IsNullOrWhiteSpace(definition))
                 {
-                    if (dict.Type is DictType.KenkyuushaNazeka)
-                    {
-                        definition = definition.Replace("┏", "", StringComparison.Ordinal);
-                    }
-
                     definitionList.Add(definition.GetPooledString());
                 }
             }

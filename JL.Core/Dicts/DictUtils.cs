@@ -427,13 +427,10 @@ public static class DictUtils
         DictType.NonspecificNameYomichan,
         DictType.NonspecificYomichan,
         DictType.PitchAccentYomichan,
-        DictType.Daijisen,
-        DictType.Kenkyuusha
     ];
 
     public static readonly DictType[] NazekaDictTypes =
     [
-        DictType.KenkyuushaNazeka,
         DictType.NonspecificWordNazeka,
         DictType.NonspecificKanjiNazeka,
         DictType.NonspecificNameNazeka,
@@ -475,10 +472,7 @@ public static class DictUtils
         DictType.CustomWordDictionary,
         DictType.ProfileCustomWordDictionary,
         DictType.JMdict,
-        DictType.Daijisen,
-        DictType.Kenkyuusha,
         DictType.NonspecificWordYomichan,
-        DictType.KenkyuushaNazeka,
         DictType.NonspecificWordNazeka
     ];
 
@@ -793,8 +787,6 @@ public static class DictUtils
 
                     break;
 
-                case DictType.Kenkyuusha:
-                case DictType.Daijisen:
                 case DictType.NonspecificWordYomichan:
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
                 case DictType.NonspecificNameYomichan:
@@ -817,8 +809,6 @@ public static class DictUtils
                                     ? dict.Size
                                     : dict.Type switch
                                     {
-                                        DictType.Daijisen => 679115,
-                                        DictType.Kenkyuusha => 303677,
                                         DictType.NonspecificWordYomichan => 250000,
                                         DictType.NonspecificKanjiWithWordSchemaYomichan => 250000,
                                         DictType.NonspecificNameYomichan => 250000,
@@ -1057,7 +1047,6 @@ public static class DictUtils
 
                     break;
 
-                case DictType.KenkyuushaNazeka:
                 case DictType.NonspecificWordNazeka:
                 case DictType.NonspecificKanjiNazeka:
                 case DictType.NonspecificNameNazeka:
@@ -1080,7 +1069,6 @@ public static class DictUtils
                                     ? dict.Size
                                     : dict.Type switch
                                     {
-                                        DictType.KenkyuushaNazeka => 191804,
                                         DictType.NonspecificWordNazeka => 250000,
                                         DictType.NonspecificKanjiNazeka => 250000,
                                         DictType.NonspecificNameNazeka => 250000,
@@ -1245,6 +1233,8 @@ public static class DictUtils
                     break;
 
 #pragma warning disable CS0618 // Type or member is obsolete
+                case DictType.Kenkyuusha:
+                case DictType.Daijisen:
                 case DictType.Daijirin:
                 case DictType.Koujien:
                 case DictType.Meikyou:
@@ -1264,6 +1254,7 @@ public static class DictUtils
                 case DictType.KanjigenYomichan:
                 case DictType.DaijirinNazeka:
                 case DictType.ShinmeikaiNazeka:
+                case DictType.KenkyuushaNazeka:
                     throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolote dict type");
 #pragma warning restore CS0618 // Type or member is obsolete
 
@@ -1438,6 +1429,8 @@ public static class DictUtils
         switch (dict.Type)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
+            case DictType.Kenkyuusha:
+            case DictType.Daijisen:
             case DictType.Daijirin:
             case DictType.Koujien:
             case DictType.Meikyou:
@@ -1461,6 +1454,7 @@ public static class DictUtils
                 dict.Type = DictType.NonspecificKanjiWithWordSchemaYomichan;
                 break;
 
+            case DictType.KenkyuushaNazeka:
             case DictType.DaijirinNazeka:
             case DictType.ShinmeikaiNazeka:
                 dict.Type = DictType.NonspecificWordNazeka;
@@ -1480,13 +1474,10 @@ public static class DictUtils
             case DictType.NonspecificNameYomichan:
             case DictType.PitchAccentYomichan:
             case DictType.NonspecificYomichan:
-            case DictType.Kenkyuusha:
-            case DictType.Daijisen:
             case DictType.NonspecificWordNazeka:
             case DictType.NonspecificKanjiNazeka:
             case DictType.NonspecificNameNazeka:
             case DictType.NonspecificNazeka:
-            case DictType.KenkyuushaNazeka:
                 break;
 
             default:
@@ -1544,10 +1535,6 @@ public static class DictUtils
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
             {
                 dict.Options.NewlineBetweenDefinitions ??= new NewlineBetweenDefinitionsOption(true);
-            }
-            if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
-            {
-                dict.Options.Examples ??= new ExamplesOption(ExamplesOptionValue.None);
             }
             if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
             {
