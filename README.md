@@ -21,7 +21,7 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 * Custom word and name dictionaries
 * Supports lots of dictionaries (see the [Supported Dictionaries](https://github.com/rampaa/JL/blob/master/Docs/Supported%20Dictionaries.md) page for details)
 * Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
-* Allows customizing the displayed info per dictionary (not showing PoS info for JMdict, showing no/only one/all example sentences for Kenkyuusha, choosing whether to put newlines between definitions etc. through "Manage Dictionaries"->"Edit" button of the dictionary->"Options" section)
+* Allows customizing the displayed info per dictionary (not showing PoS info for JMdict, choosing whether to put newlines between definitions etc. through "Manage Dictionaries"->"Edit" button of the dictionary->"Options" section)
 * Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Docs/Deconjugation%20Support.md) page for the list of supported  adjective and verb types)
 * Anki mining (allows different configurations for word/kanji/name mining)
 * Allows different opacity level on un/hover
@@ -32,7 +32,7 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 * Hiragana -> Katakana conversions (and vice-versa)
 * Chouonpu conversions (e.g. can find 清掃 from セーソー)
 * Text normalization (e.g. can find 株式会社 when ㍿ is looked up)
-* Has a backlog (using the arrow keys will show items in the backlog one by one, scrolling up will show all the backlog at once)
+* Has a backlog
 * Touch screen support (i.e. Left Click/Touch lookup mode)
 * Can work without stealing the focus away from other windows
 * Can keep itself as the topmost window (i.e. JL can be used with programs like [Magpie](https://github.com/Blinue/Magpie))
@@ -60,10 +60,10 @@ Disable the "Preferences>Popup>Focus on lookup" option.
 
 Optional if you use the "Mouse move" look up mode, required otherwise: Disable the "Preferences>General>Focusable" option. When this option is disabled, JL won't steal the focus away from other windows, even in case of a mouse click. This allows you to open popups within popups without Magpie exiting the fullscreen mode. Note that if this option is disabled, you won't be able to use hotkeys unless you enable the global hotkeys option and assign valid global hotkeys, because JL won't have the keyboard focus. You can also use the middle mouse button to activate the mining mode.
 
-### How do I add EPWING dictionaries?
+### How do I add new dictionaries?
 
 #### [Yomichan Import]
-Select the folder containing the **unzipped** (so you should have a folder of files named like term_bank_1.json, term_bank_2.json...)  contents of a dictionary converted with [Yomichan Import](https://github.com/FooSoft/yomichan-import/), on the Manage Dictionaries window.
+Select the folder containing the **unzipped** (so you should have a folder of files named like term_bank_1.json, term_bank_2.json...)  contents of a dictionary that was converted with [Yomichan Import](https://github.com/FooSoft/yomichan-import/), on the Manage Dictionaries window.
 #### [Nazeka EPWING Converter]
 Select the file you got from [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter), on the Manage Dictionaries window.
 
