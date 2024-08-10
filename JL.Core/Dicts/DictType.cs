@@ -14,15 +14,15 @@ public enum DictType
     [Description("Custom Name Dictionary (Profile)")] ProfileCustomNameDictionary,
 
     // Yomichan Import
-    [Description("Word Dictionary")] NonspecificWordYomichan,
-    [Description("Kanji Dictionary")] NonspecificKanjiYomichan,
-    [Description("Kanji Dictionary with Word Schema")] NonspecificKanjiWithWordSchemaYomichan,
-    [Description("Name Dictionary")] NonspecificNameYomichan,
-    [Description("Pitch Accent Dictionary")] PitchAccentYomichan,
-    [Description("Nonspecific Dictionary")] NonspecificYomichan,
+    [Description("Word Dictionary (Yomichan)")] NonspecificWordYomichan,
+    [Description("Kanji Dictionary (Yomichan)")] NonspecificKanjiYomichan,
+    [Description("Kanji Dictionary with Word Schema (Yomichan)")] NonspecificKanjiWithWordSchemaYomichan,
+    [Description("Name Dictionary (Yomichan)")] NonspecificNameYomichan,
+    [Description("Pitch Accent Dictionary (Yomichan)")] PitchAccentYomichan,
+    [Description("Nonspecific Dictionary (Yomichan)")] NonspecificYomichan,
 
-    [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Kenkyuusha")] Kenkyuusha,
-    [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Daijisen")] Daijisen,
+    [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Kenkyuusha (Yomichan)")] Kenkyuusha,
+    [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Daijisen (Yomichan)")] Daijisen,
     [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Daijirin (Yomichan)")] Daijirin,
     [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Koujien (Yomichan)")] Koujien,
     [Obsolete("Will be replaced by NonspecificWordYomichan")][Description("Meikyou (Yomichan)")] Meikyou,
@@ -42,12 +42,12 @@ public enum DictType
     [Obsolete("Will be replaced by NonspecificKanjiWithWordSchemaYomichan")][Description("Kanjigen (Yomichan)")] KanjigenYomichan,
 
     // Nazeka Epwing Converter
-    [Description("Word Dictionary")] NonspecificWordNazeka,
-    [Description("Kanji Dictionary")] NonspecificKanjiNazeka,
-    [Description("Name Dictionary")] NonspecificNameNazeka,
-    [Description("Nonspecific Dictionary")] NonspecificNazeka,
+    [Description("Word Dictionary (Nazeka)")] NonspecificWordNazeka,
+    [Description("Kanji Dictionary (Nazeka)")] NonspecificKanjiNazeka,
+    [Description("Name Dictionary (Nazeka)")] NonspecificNameNazeka,
+    [Description("Nonspecific Dictionary (Nazeka)")] NonspecificNazeka,
 
-    [Obsolete("Will be replaced by NonspecificWordNazeka")][Description("Kenkyuusha")] KenkyuushaNazeka,
+    [Obsolete("Will be replaced by NonspecificWordNazeka")][Description("Kenkyuusha (Nazeka)")] KenkyuushaNazeka,
     [Obsolete("Will be replaced by NonspecificWordNazeka")][Description("Daijirin (Nazeka)")] DaijirinNazeka,
     [Obsolete("Will be replaced by NonspecificWordNazeka")][Description("Shinmeikai (Nazeka)")] ShinmeikaiNazeka
 }

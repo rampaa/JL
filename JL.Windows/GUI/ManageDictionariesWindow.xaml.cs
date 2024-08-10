@@ -118,7 +118,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
             TextBlock dictNameTextBlock = new()
             {
-                Width = 150,
+                Width = 180,
                 Text = dict.Name,
                 TextWrapping = TextWrapping.Wrap,
                 HorizontalAlignment = HorizontalAlignment.Left,
