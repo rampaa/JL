@@ -19,10 +19,10 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 ## Features
 * Highly customizable (i.e. You can change the size/color/opacity/hotkey of pretty much everything)
 * Custom word and name dictionaries
-* Supports lots of dictionaries (see the [Supported Dictionaries](https://github.com/rampaa/JL/blob/master/Supported%20Dictionaries.md) page for details)
+* Supports lots of dictionaries (see the [Supported Dictionaries](https://github.com/rampaa/JL/blob/master/Docs/Supported%20Dictionaries.md) page for details)
 * Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
 * Allows customizing the displayed info per dictionary (not showing PoS info for JMdict, showing no/only one/all example sentences for Kenkyuusha, choosing whether to put newlines between definitions etc. through "Manage Dictionaries"->"Edit" button of the dictionary->"Options" section)
-* Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Deconjugation%20Support.md) page for the list of supported  adjective and verb types)
+* Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Docs/Deconjugation%20Support.md) page for the list of supported  adjective and verb types)
 * Anki mining (allows different configurations for word/kanji/name mining)
 * Allows different opacity level on un/hover
 * Pass-through mode (i.e. mouse clicks will pass through JL)
@@ -52,7 +52,7 @@ Press the opacity slider button located top-left of the main window. You can als
 ### How can I use JL with Magpie?
 Enable the "Preferences>General>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
 
-Optional: Give UI Access to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [UI Access](https://github.com/rampaa/JL/blob/master/UI%20Access.md) page for more details.
+Optional: Give UI Access to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [UI Access](https://github.com/rampaa/JL/blob/master/Docs/UI%20Access.md) page for more details.
 
 Disable the "Preferences>Main Window>Focus on hover" option.
 
