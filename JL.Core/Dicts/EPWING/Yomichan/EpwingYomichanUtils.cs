@@ -94,7 +94,7 @@ internal static class EpwingYomichanUtils
                             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\t{contentResult.Content}");
                             break;
 
-                        // "div" or "a" or "tr" or "p" or "summary" or "details" or "dfn" or "img"
+                        // "div" or "a" or "tr" or "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot" or "img"
                         default:
                             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content}");
                             break;
