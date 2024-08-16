@@ -361,22 +361,16 @@ internal static class ConfigManager
         PopupWindow.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
 
         PopupXOffset = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupXOffset, nameof(PopupXOffset), double.TryParse);
-        WindowsUtils.DpiAwareXOffset = PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareXOffset = PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
 
         PopupYOffset = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupYOffset, nameof(PopupYOffset), double.TryParse);
-        WindowsUtils.DpiAwareYOffset = PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
+        WindowsUtils.DpiAwareYOffset = PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
 
         PopupMaxWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMaxWidth, nameof(PopupMaxWidth), double.TryParse);
-        WindowsUtils.DpiAwarePopupMaxWidth = PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
-
         PopupMaxHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMaxHeight, nameof(PopupMaxHeight), double.TryParse);
-        WindowsUtils.DpiAwarePopupMaxHeight = PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
 
         FixedPopupXPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FixedPopupXPosition, nameof(FixedPopupXPosition), double.TryParse);
-        WindowsUtils.DpiAwareFixedPopupXPosition = FixedPopupXPosition / WindowsUtils.Dpi.DpiScaleX;
-
         FixedPopupYPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FixedPopupYPosition, nameof(FixedPopupYPosition), double.TryParse);
-        WindowsUtils.DpiAwareFixedPopupYPosition = FixedPopupYPosition / WindowsUtils.Dpi.DpiScaleY;
 
         MainWindow.Instance.OpacitySlider.Value = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.OpacitySlider.Value, "MainWindowOpacity", double.TryParse);
         MainWindow.Instance.FontSizeSlider.Value = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.FontSizeSlider.Value, "MainWindowFontSize", double.TryParse);
@@ -390,8 +384,9 @@ internal static class ConfigManager
         MainWindow.Instance.WidthBeforeResolutionChange = MainWindowWidth;
         MainWindow.Instance.HeightBeforeResolutionChange = MainWindowHeight;
 
-        MainWindow.Instance.Top = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.Top, "MainWindowTopPosition", double.TryParse);
-        MainWindow.Instance.Left = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.Left, "MainWindowLeftPosition", double.TryParse);
+        double mainWindowTop = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.Top, "MainWindowTopPosition", double.TryParse);
+        double mainWindowLeft = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.Left, "MainWindowLeftPosition", double.TryParse);
+        WinApi.MoveWindowToPosition(MainWindow.Instance.WindowHandle, mainWindowLeft, mainWindowTop);
 
         MainWindow.Instance.TopPositionBeforeResolutionChange = MainWindow.Instance.Top;
         MainWindow.Instance.LeftPositionBeforeResolutionChange = MainWindow.Instance.Left;
@@ -651,7 +646,7 @@ internal static class ConfigManager
             currentPopupWindow.Foreground = DefinitionsColor;
             currentPopupWindow.FontFamily = PopupFont;
 
-            WindowsUtils.SetSizeToContent(PopupDynamicWidth, PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, currentPopupWindow);
+            WindowsUtils.SetSizeToContent(PopupDynamicWidth, PopupDynamicHeight, PopupMaxWidth, PopupMaxHeight, currentPopupWindow);
 
             currentPopupWindow.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
             currentPopupWindow.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);

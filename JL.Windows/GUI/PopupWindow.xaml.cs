@@ -101,7 +101,7 @@ internal sealed partial class PopupWindow : Window
         Foreground = ConfigManager.DefinitionsColor;
         FontFamily = ConfigManager.PopupFont;
 
-        WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, this);
+        WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, ConfigManager.PopupMaxWidth, ConfigManager.PopupMaxHeight, this);
 
         AddNameMenuItem.SetInputGestureText(ConfigManager.ShowAddNameWindowKeyGesture);
         AddWordMenuItem.SetInputGestureText(ConfigManager.ShowAddWordWindowKeyGesture);
@@ -218,7 +218,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
             {
-                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
             }
 
             else
@@ -274,7 +274,7 @@ internal sealed partial class PopupWindow : Window
 
             if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
             {
-                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
             }
 
             else
@@ -339,7 +339,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
             {
-                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
             }
 
             else
@@ -376,7 +376,7 @@ internal sealed partial class PopupWindow : Window
 
             if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
             {
-                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
             }
 
             else
@@ -408,11 +408,14 @@ internal sealed partial class PopupWindow : Window
 
     private void UpdatePosition(Point cursorPosition)
     {
-        double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
-        double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
+        double mouseX = cursorPosition.X;
+        double mouseY = cursorPosition.Y;
 
-        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth;
-        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight;
+        double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
+        double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
+
+        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + currentWidth > WindowsUtils.ActiveScreen.Bounds.Right;
+        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + currentHeight > WindowsUtils.ActiveScreen.Bounds.Bottom;
 
         double newLeft;
         double newTop;
@@ -422,7 +425,7 @@ internal sealed partial class PopupWindow : Window
         if (needsFlipX)
         {
             // flip Leftwards while preventing -OOB
-            newLeft = mouseX - (ActualWidth + WindowsUtils.DpiAwareXOffset);
+            newLeft = mouseX - (currentWidth + WindowsUtils.DpiAwareXOffset);
             if (newLeft < WindowsUtils.ActiveScreen.Bounds.X)
             {
                 newLeft = WindowsUtils.ActiveScreen.Bounds.X;
@@ -437,7 +440,7 @@ internal sealed partial class PopupWindow : Window
         if (needsFlipY)
         {
             // flip Upwards while preventing -OOB
-            newTop = mouseY - (ActualHeight + WindowsUtils.DpiAwareYOffset);
+            newTop = mouseY - (currentHeight + WindowsUtils.DpiAwareYOffset);
             if (newTop < WindowsUtils.ActiveScreen.Bounds.Y)
             {
                 newTop = WindowsUtils.ActiveScreen.Bounds.Y;
@@ -450,29 +453,27 @@ internal sealed partial class PopupWindow : Window
         }
 
         // stick to edges if +OOB
-        if (newLeft + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth)
+        if (newLeft + currentWidth > WindowsUtils.ActiveScreen.Bounds.Right)
         {
-            newLeft = WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth - ActualWidth;
+            newLeft = WindowsUtils.ActiveScreen.Bounds.Right - currentWidth;
         }
 
-        if (newTop + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight)
+        if (newTop + currentHeight > WindowsUtils.ActiveScreen.Bounds.Bottom)
         {
-            newTop = WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight - ActualHeight;
+            newTop = WindowsUtils.ActiveScreen.Bounds.Bottom - currentHeight;
         }
 
-        if (mouseX >= newLeft && mouseX <= newLeft + ActualWidth && mouseY >= newTop && mouseY <= newTop + ActualHeight)
+        if (mouseX >= newLeft && mouseX <= newLeft + currentWidth && mouseY >= newTop && mouseY <= newTop + currentHeight)
         {
             UnavoidableMouseEnter = true;
         }
 
-        Left = newLeft;
-        Top = newTop;
+        WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
     }
 
     private void UpdatePosition(double x, double y)
     {
-        Left = x;
-        Top = y;
+        WinApi.MoveWindowToPosition(WindowHandle, x, y);
     }
 
     public void DisplayResults(bool generateAllResults)
@@ -1662,7 +1663,7 @@ internal sealed partial class PopupWindow : Window
 
                 else if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
                 {
-                    UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                    UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
                 }
 
                 else

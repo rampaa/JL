@@ -22,6 +22,7 @@ internal sealed partial class WinApi
         internal const int SWP_NOACTIVATE = 0x0010;
         internal const int SWP_NOMOVE = 0x0002;
         internal const int SWP_NOSIZE = 0x0001;
+        internal const int SWP_NOZORDER = 0x0004;
         internal const int SWP_SHOWWINDOW = 0x0040;
         internal const int SW_SHOWNOACTIVATE = 4;
         internal const int SW_SHOWMINNOACTIVE = 7;
@@ -332,6 +333,11 @@ internal sealed partial class WinApi
         return FindWindowW(lpClassName, null);
     }
 
+    public static void MoveWindowToPosition(nint windowHandle, double x, double y)
+    {
+        _ = SetWindowPos(windowHandle, 0, (int)x, (int)y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+    }
+
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
     {
         if (msg is WM_CLIPBOARDUPDATE)
@@ -354,9 +360,10 @@ internal sealed partial class WinApi
             MagpieUtils.IsMagpieScaling = wParam is 1;
             if (MagpieUtils.IsMagpieScaling)
             {
-                MagpieUtils.DpiAwareMagpieWindowLeftEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowLeftEdgePosition(lParam);
-                MagpieUtils.DpiAwareMagpieWindowRightEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowRightEdgePosition(lParam);
-                MagpieUtils.DpiAwareMagpieWindowTopEdgePosition = MagpieUtils.GetDpiAwareMagpieWindowTopEdgePosition(lParam);
+                MagpieUtils.MagpieWindowTopEdgePosition = MagpieUtils.GetMagpieWindowTopEdgePosition(lParam);
+                MagpieUtils.MagpieWindowLeftEdgePosition = MagpieUtils.GetMagpieWindowLeftEdgePosition(lParam);
+                MagpieUtils.MagpieWindowRightEdgePosition = MagpieUtils.GetMagpieWindowRightEdgePosition(lParam);
+                MagpieUtils.DpiAwareMagpieWindowWidth = (MagpieUtils.MagpieWindowRightEdgePosition - MagpieUtils.MagpieWindowLeftEdgePosition) / WindowsUtils.Dpi.DpiScaleX;
                 MainWindow.Instance.BringToFront();
             }
 

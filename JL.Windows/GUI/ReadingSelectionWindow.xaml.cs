@@ -33,6 +33,7 @@ internal sealed partial class ReadingSelectionWindow : Window
         currentInstance.ReadingsListView.ItemsSource = readings;
         currentInstance.ReadingsListView.Background = ConfigManager.PopupBackgroundColor;
         currentInstance.ReadingsListView.Foreground = ConfigManager.ReadingsColor;
+        currentInstance.ReadingsListView.FontSize = 18;
         currentInstance.Background = ConfigManager.PopupBackgroundColor;
         currentInstance.Foreground = ConfigManager.DefinitionsColor;
         currentInstance.FontFamily = ConfigManager.PopupFont;
@@ -71,11 +72,17 @@ internal sealed partial class ReadingSelectionWindow : Window
 
     private void UpdatePosition(Point cursorPosition)
     {
-        double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
-        double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
+        double mouseX = cursorPosition.X;
+        double mouseY = cursorPosition.Y;
 
-        bool needsFlipX = mouseX + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth;
-        bool needsFlipY = mouseY + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight;
+        double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
+        double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
+
+        double dpiAwareXOffSet = 5 * WindowsUtils.Dpi.DpiScaleX;
+        double dpiAwareYOffset = 15 * WindowsUtils.Dpi.DpiScaleY;
+
+        bool needsFlipX = mouseX + currentWidth > WindowsUtils.ActiveScreen.Bounds.Right;
+        bool needsFlipY = mouseY + currentHeight > WindowsUtils.ActiveScreen.Bounds.Bottom;
 
         double newLeft;
         double newTop;
@@ -83,7 +90,7 @@ internal sealed partial class ReadingSelectionWindow : Window
         if (needsFlipX)
         {
             // flip Leftwards while preventing -OOB
-            newLeft = mouseX - ActualWidth - 5;
+            newLeft = mouseX - currentWidth - dpiAwareXOffSet;
             if (newLeft < WindowsUtils.ActiveScreen.Bounds.X)
             {
                 newLeft = WindowsUtils.ActiveScreen.Bounds.X;
@@ -92,13 +99,13 @@ internal sealed partial class ReadingSelectionWindow : Window
         else
         {
             // no flip
-            newLeft = mouseX - 5;
+            newLeft = mouseX - dpiAwareXOffSet;
         }
 
         if (needsFlipY)
         {
             // flip Upwards while preventing -OOB
-            newTop = mouseY - (ActualHeight + 15);
+            newTop = mouseY - (currentHeight + dpiAwareYOffset);
             if (newTop < WindowsUtils.ActiveScreen.Bounds.Y)
             {
                 newTop = WindowsUtils.ActiveScreen.Bounds.Y;
@@ -107,22 +114,21 @@ internal sealed partial class ReadingSelectionWindow : Window
         else
         {
             // no flip
-            newTop = mouseY + 15;
+            newTop = mouseY + dpiAwareYOffset;
         }
 
         // stick to edges if +OOB
-        if (newLeft + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth)
+        if (newLeft + currentWidth > WindowsUtils.ActiveScreen.Bounds.Right)
         {
-            newLeft = WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth - ActualWidth;
+            newLeft = WindowsUtils.ActiveScreen.Bounds.Right - currentWidth;
         }
 
-        if (newTop + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight)
+        if (newTop + currentHeight > WindowsUtils.ActiveScreen.Bounds.Bottom)
         {
-            newTop = WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight - ActualHeight;
+            newTop = WindowsUtils.ActiveScreen.Bounds.Bottom - currentHeight;
         }
 
-        Left = newLeft;
-        Top = newTop;
+        WinApi.MoveWindowToPosition(_windowHandle, newLeft, newTop);
     }
 
     public static void HideWindow()

@@ -7,6 +7,8 @@ namespace JL.Windows.GUI;
 
 internal sealed partial class AlertWindow : Window
 {
+    public nint WindowHandle { get; private set; }
+
     public AlertWindow()
     {
         InitializeComponent();
@@ -15,7 +17,8 @@ internal sealed partial class AlertWindow : Window
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-        WinApi.BringToFront(new WindowInteropHelper(this).Handle);
+        WindowHandle = new WindowInteropHelper(this).Handle;
+        WinApi.BringToFront(WindowHandle);
     }
 
     public void SetAlert(AlertLevel alertLevel, string message)

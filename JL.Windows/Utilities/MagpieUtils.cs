@@ -4,9 +4,10 @@ internal static class MagpieUtils
 {
     public static int MagpieScalingChangedWindowMessage { get; private set; } = -1;
     public static bool IsMagpieScaling { get; set; } // = false;
-    public static double DpiAwareMagpieWindowLeftEdgePosition { get; set; }
-    public static double DpiAwareMagpieWindowRightEdgePosition { get; set; }
-    public static double DpiAwareMagpieWindowTopEdgePosition { get; set; }
+    public static double MagpieWindowLeftEdgePosition { get; set; }
+    public static double MagpieWindowRightEdgePosition { get; set; }
+    public static double MagpieWindowTopEdgePosition { get; set; }
+    public static double DpiAwareMagpieWindowWidth { get; set; }
 
     public static void RegisterToMagpieScalingChangedMessage(nint windowHandle)
     {
@@ -24,19 +25,19 @@ internal static class MagpieUtils
         WinApi.RemoveProp(windowHandle, "Magpie.ToolWindow");
     }
 
-    public static double GetDpiAwareMagpieWindowLeftEdgePosition(nint windowHandle)
+    public static double GetMagpieWindowLeftEdgePosition(nint windowHandle)
     {
-        return WinApi.GetProp(windowHandle, "Magpie.DestLeft") / WindowsUtils.Dpi.DpiScaleX;
+        return WinApi.GetProp(windowHandle, "Magpie.DestLeft");
     }
 
-    public static double GetDpiAwareMagpieWindowRightEdgePosition(nint windowHandle)
+    public static double GetMagpieWindowRightEdgePosition(nint windowHandle)
     {
-        return WinApi.GetProp(windowHandle, "Magpie.DestRight") / WindowsUtils.Dpi.DpiScaleX;
+        return WinApi.GetProp(windowHandle, "Magpie.DestRight");
     }
 
-    public static double GetDpiAwareMagpieWindowTopEdgePosition(nint windowHandle)
+    public static double GetMagpieWindowTopEdgePosition(nint windowHandle)
     {
-        return WinApi.GetProp(windowHandle, "Magpie.DestTop") / WindowsUtils.Dpi.DpiScaleY;
+        return WinApi.GetProp(windowHandle, "Magpie.DestTop");
     }
 
     //private static double GetDpiAwareMagpieWindowBottomEdgePosition(nint windowHandle)

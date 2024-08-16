@@ -46,14 +46,10 @@ internal static class WindowsUtils
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
 
     public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
-    public static double DpiAwareWorkAreaWidth { get; set; } = ActiveScreen.Bounds.Width / Dpi.DpiScaleX;
-    public static double DpiAwareWorkAreaHeight { get; set; } = ActiveScreen.Bounds.Height / Dpi.DpiScaleY;
-    public static double DpiAwarePopupMaxWidth { get; set; } = ConfigManager.PopupMaxWidth / Dpi.DpiScaleX;
-    public static double DpiAwarePopupMaxHeight { get; set; } = ConfigManager.PopupMaxHeight / Dpi.DpiScaleY;
-    public static double DpiAwareXOffset { get; set; } = ConfigManager.PopupXOffset / Dpi.DpiScaleX;
-    public static double DpiAwareYOffset { get; set; } = ConfigManager.PopupYOffset / Dpi.DpiScaleY;
-    public static double DpiAwareFixedPopupXPosition { get; set; } = ConfigManager.FixedPopupXPosition / Dpi.DpiScaleX;
-    public static double DpiAwareFixedPopupYPosition { get; set; } = ConfigManager.FixedPopupYPosition / Dpi.DpiScaleY;
+    public static double DpiAwareScreenWidth { get; set; } = ActiveScreen.Bounds.Width / Dpi.DpiScaleX;
+    public static double DpiAwareScreenHeight { get; set; } = ActiveScreen.Bounds.Height / Dpi.DpiScaleY;
+    public static double DpiAwareXOffset { get; set; } = ConfigManager.PopupXOffset * Dpi.DpiScaleX;
+    public static double DpiAwareYOffset { get; set; } = ConfigManager.PopupYOffset * Dpi.DpiScaleY;
 
     public static ComboBoxItem[] FindJapaneseFonts()
     {
@@ -453,12 +449,16 @@ internal static class WindowsUtils
             List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 
             AlertWindow alertWindow = new();
+            alertWindow.Show();
 
-            alertWindow.Left = DpiAwareWorkAreaWidth - alertWindow.Width - 30;
-            alertWindow.Top = alertWindowList.Sum(static aw => aw.ActualHeight + 2) + 30;
+            double offset = 30 * Dpi.DpiScaleX;
+            double offsetBetweenAlerts = 2 * Dpi.DpiScaleY;
+            double x = ActiveScreen.WorkingArea.Right - offset - (alertWindow.Width * Dpi.DpiScaleX);
+            double y = ActiveScreen.WorkingArea.Top + offset + alertWindowList.Sum(aw => (aw.ActualHeight * Dpi.DpiScaleX) + offsetBetweenAlerts);
+            WinApi.MoveWindowToPosition(alertWindow.WindowHandle, x, y);
 
             alertWindow.SetAlert(alertLevel, message);
-            alertWindow.Show();
+
             await Task.Delay(4004).ConfigureAwait(true);
             alertWindow.Close();
         });
