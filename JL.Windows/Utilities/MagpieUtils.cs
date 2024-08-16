@@ -40,7 +40,7 @@ internal static class MagpieUtils
         return WinApi.GetProp(windowHandle, "Magpie.DestTop");
     }
 
-    //private static double GetDpiAwareMagpieWindowBottomEdgePosition(nint windowHandle)
+    //public static double GetMagpieWindowBottomEdgePosition(nint windowHandle)
     //{
     //    return WinApi.GetProp(windowHandle, "Magpie.DestBottom") / WindowsUtils.Dpi.DpiScaleY;
     //}
