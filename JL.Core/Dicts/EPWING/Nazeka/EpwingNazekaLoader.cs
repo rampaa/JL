@@ -26,6 +26,9 @@ internal static class EpwingNazekaLoader
 
         IDictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
 
+        bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
+        bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
+
         foreach (JsonElement jsonObj in jsonObjects!.Skip(1))
         {
             string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
@@ -72,15 +75,13 @@ internal static class EpwingNazekaLoader
                     continue;
                 }
 
-                bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
-
                 string primarySpellingInHiragana = nonKanjiDict
                     ? JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString()
                     : primarySpelling.GetPooledString();
 
                 EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions);
                 AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict);
-                if (nonKanjiDict && dict.Type is not DictType.NonspecificNameNazeka)
+                if (nonKanjiDict && nonNameDict)
                 {
                     string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
                     if (primarySpellingInHiragana != readingInHiragana)
@@ -117,7 +118,7 @@ internal static class EpwingNazekaLoader
                 }
 
                 EpwingNazekaRecord record = new(reading, null, null, definitions);
-                AddRecordToDictionary(JapaneseUtils.KatakanaToHiragana(reading).GetPooledString(), record, nazekaEpwingDict);
+                AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.KatakanaToHiragana(reading).GetPooledString() : reading, record, nazekaEpwingDict);
             }
         }
 

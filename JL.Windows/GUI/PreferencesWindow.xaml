@@ -321,14 +321,14 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Merge sequential texts when they match"
+                            <TextBlock HorizontalAlignment="Left" Text="Mergse sequential texts when they match"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="If the new text found in Clipboard/WebSocket starts with the current text
-                                       &#10;then simply append the subsequent text to the current text, instead of copying it as a new text.
+                                       &#10;then the subsequent text is simply appended to the current text, instead of being copied as a new text.
                                        &#10;For example, if the current text is 我が and 我が妹よ is the next text found in Clipboard/WebSocket, 妹よ is appended to 我が.
-                                       &#10;This is useful when you feed JL with real-time generated text as it is being generated.
+                                       &#10;This is mainly useful when you feed JL with real-time generated text as it is being generated.
                                        &#10;It keeps the statistics accurate and prevents unwanted scroll up." />
                             <CheckBox x:Name="MergeSequentialTextsWhenTheyMatchCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>

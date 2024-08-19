@@ -17,6 +17,9 @@ internal static class EpwingYomichanLoader
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
             .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal));
 
+        bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiWithWordSchemaYomichan;
+        bool nonNameDict = dict.Type is not DictType.NonspecificNameYomichan;
+
         foreach (string jsonFile in jsonFiles)
         {
             List<List<JsonElement>>? jsonElementLists;
@@ -39,7 +42,7 @@ internal static class EpwingYomichanLoader
                 EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElements, dict);
                 if (record is not null)
                 {
-                    AddToDictionary(record, dict);
+                    AddToDictionary(record, dict, nonKanjiDict, nonNameDict);
                 }
             }
         }
@@ -101,9 +104,8 @@ internal static class EpwingYomichanLoader
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
     }
 
-    private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict)
+    private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict, bool nonKanjiDict, bool nonNameDict)
     {
-        bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiWithWordSchemaYomichan;
         string primarySpellingInHiragana = nonKanjiDict
             ? JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling).GetPooledString()
             : yomichanRecord.PrimarySpelling.GetPooledString();
@@ -117,7 +119,7 @@ internal static class EpwingYomichanLoader
             dict.Contents[primarySpellingInHiragana] = [yomichanRecord];
         }
 
-        if (nonKanjiDict && dict.Type is not DictType.NonspecificNameYomichan && !string.IsNullOrEmpty(yomichanRecord.Reading))
+        if (nonKanjiDict && nonNameDict && yomichanRecord.Reading is not null)
         {
             string readingInHiragana = JapaneseUtils.KatakanaToHiragana(yomichanRecord.Reading).GetPooledString();
             if (primarySpellingInHiragana != readingInHiragana)

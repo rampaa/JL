@@ -160,8 +160,8 @@ internal sealed partial class MainWindow : Window
             return false;
         }
 
-        text = TextUtils.SanitizeText(text);
-        if (text.Length is 0)
+        string sanitizedText = TextUtils.SanitizeText(text);
+        if (sanitizedText.Length is 0)
         {
             return false;
         }
@@ -175,13 +175,13 @@ internal sealed partial class MainWindow : Window
 
             mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
                           || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                         && text.StartsWith(MainTextBox.Text, StringComparison.Ordinal);
+                         && sanitizedText.StartsWith(MainTextBox.Text, StringComparison.Ordinal);
 
             s_lastTextCopyTime = preciseTimeNow;
 
             if (mergeTexts)
             {
-                subsequentText = text[MainTextBox.Text.Length..];
+                subsequentText = sanitizedText[MainTextBox.Text.Length..];
             }
         }
 
@@ -193,7 +193,7 @@ internal sealed partial class MainWindow : Window
             }
             else
             {
-                MainTextBox.Text = text;
+                MainTextBox.Text = sanitizedText;
             }
 
             MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
@@ -215,7 +215,7 @@ internal sealed partial class MainWindow : Window
             BringToFront();
         }, DispatcherPriority.Send);
 
-        HandlePostCopy(text, subsequentText);
+        HandlePostCopy(sanitizedText, subsequentText);
 
         return true;
     }
