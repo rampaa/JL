@@ -1283,11 +1283,11 @@ internal static class ConfigManager
             : MainWindow.Instance.MinWidth.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", MainWindow.Instance.Top >= SystemParameters.VirtualScreenTop
-            ? MainWindow.Instance.Top.ToString(CultureInfo.InvariantCulture)
+            ? (MainWindow.Instance.Top * WindowsUtils.Dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture)
             : WindowsUtils.ActiveScreen.Bounds.Y.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
-            ? MainWindow.Instance.Left.ToString(CultureInfo.InvariantCulture)
+            ? (MainWindow.Instance.Left * WindowsUtils.Dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture)
             : WindowsUtils.ActiveScreen.Bounds.X.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.AnalyzeAndVacuum(connection);
