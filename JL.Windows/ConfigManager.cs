@@ -1249,10 +1249,10 @@ internal static class ConfigManager
                 preferenceWindow.CopyPrimarySpellingToClipboardMouseButtonComboBox.SelectedValue.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition",
-                MainWindow.Instance.Top.ToString(CultureInfo.InvariantCulture));
+                (MainWindow.Instance.Top * WindowsUtils.Dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition",
-                MainWindow.Instance.Left.ToString(CultureInfo.InvariantCulture));
+                (MainWindow.Instance.Left * WindowsUtils.Dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
         }
 
         ApplyPreferences();

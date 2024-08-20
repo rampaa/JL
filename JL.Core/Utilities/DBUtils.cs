@@ -123,10 +123,10 @@ public static class DBUtils
         File.Delete(dbPath);
     }
 
-    internal static string GetParameter(List<string> terms)
+    internal static string GetParameter(int parameterCount)
     {
         StringBuilder parameterBuilder = new("(@1");
-        for (int i = 1; i < terms.Count; i++)
+        for (int i = 1; i < parameterCount; i++)
         {
             _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }

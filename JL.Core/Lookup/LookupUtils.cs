@@ -149,7 +149,7 @@ public static class LookupUtils
 
         if (DictUtils.DBIsUsedForAtLeastOneDict)
         {
-            parameter = DBUtils.GetParameter(textInHiraganaList);
+            parameter = DBUtils.GetParameter(textInHiraganaList.Count);
 
             deconjugatedTexts = deconjugationResultsList
                 .SelectMany(static lf => lf.Select(static f => f.Text))
@@ -157,7 +157,7 @@ public static class LookupUtils
 
             if (deconjugatedTexts.Count > 0)
             {
-                verbParameter = DBUtils.GetParameter(deconjugatedTexts);
+                verbParameter = DBUtils.GetParameter(deconjugatedTexts.Count);
             }
 
             if (DictUtils.DBIsUsedForAtLeastOneYomichanDict)
@@ -561,7 +561,7 @@ public static class LookupUtils
                         }
                         else
                         {
-                            longVowelQueryOrParameter = DBUtils.GetParameter(textWithoutLongVowelMarkList);
+                            longVowelQueryOrParameter = DBUtils.GetParameter(textWithoutLongVowelMarkList.Count);
                         }
 
                         dbWordDictForLongVowelConversion = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, longVowelQueryOrParameter);
