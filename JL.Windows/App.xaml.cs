@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime;
 using System.Windows;
@@ -39,11 +40,21 @@ internal sealed partial class App : Application
             for (int i = 0; i < processes.Length; i++)
             {
                 Process process = processes[i];
-                if (currentProcess.Id != process.Id && process.MainModule?.FileName == Environment.ProcessPath)
+                if (currentProcess.Id != process.Id)
                 {
-                    WinApi.RestoreWindow(process.MainWindowHandle);
-                    Shutdown();
-                    return false;
+                    try
+                    {
+                        if (process.MainModule?.FileName == Environment.ProcessPath)
+                        {
+                            WinApi.RestoreWindow(process.MainWindowHandle);
+                            Shutdown();
+                            return false;
+                        }
+                    }
+                    catch (Win32Exception e)
+                    {
+                        Utils.Logger.Information(e, "Couldn't get the path of the process, probably because it has a higher integrity level than this instance of JL");
+                    }
                 }
             }
         }
