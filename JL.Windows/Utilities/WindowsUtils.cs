@@ -46,8 +46,6 @@ internal static class WindowsUtils
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
 
     public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
-    public static double DpiAwareScreenWidth { get; set; } = ActiveScreen.Bounds.Width / Dpi.DpiScaleX;
-    public static double DpiAwareScreenHeight { get; set; } = ActiveScreen.Bounds.Height / Dpi.DpiScaleY;
     public static double DpiAwareXOffset { get; set; } = ConfigManager.PopupXOffset * Dpi.DpiScaleX;
     public static double DpiAwareYOffset { get; set; } = ConfigManager.PopupYOffset * Dpi.DpiScaleY;
 
@@ -323,7 +321,7 @@ internal static class WindowsUtils
                 archive.ExtractToDirectory(tmpDirectory);
             }
 
-            Application.Current.Dispatcher.Invoke(ConfigManager.SaveBeforeClosing);
+            await Application.Current.Dispatcher.Invoke(async () => await MainWindow.Instance.HandleAppClosing().ConfigureAwait(false)).ConfigureAwait(false);
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",

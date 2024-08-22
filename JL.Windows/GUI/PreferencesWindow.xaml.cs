@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -205,6 +207,30 @@ internal sealed partial class PreferencesWindow : Window
         CheckForJLUpdatesButton.IsEnabled = false;
         await Networking.CheckForJLUpdates(false).ConfigureAwait(true);
         CheckForJLUpdatesButton.IsEnabled = true;
+    }
+
+    // ReSharper disable once AsyncVoidMethod
+    private async void ResetPreferencesButton_Click(object sender, RoutedEventArgs e)
+    {
+        ResetPreferencesButton.IsEnabled = false;
+        if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile? If you select yes, JL will be restarted.", "Reset preferences?"))
+        {
+            await MainWindow.Instance.HandleAppClosing().ConfigureAwait(false);
+
+            ConfigDBManager.DeleteAllSettingsFromProfile(["MainWindowTopPosition", "MainWindowLeftPosition"]);
+
+            _ = Process.Start(
+                new ProcessStartInfo("cmd",
+                    string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Restarter\" \"{Path.Join(Utils.ApplicationPath, "restart-helper.cmd")}\" {Environment.ProcessId}"))
+                {
+                    UseShellExecute = true,
+                    Verb = "runas"
+                });
+        }
+        else
+        {
+            ResetPreferencesButton.IsEnabled = true;
+        }
     }
 
     #endregion

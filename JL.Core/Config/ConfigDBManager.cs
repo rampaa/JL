@@ -111,6 +111,34 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
+    public static void DeleteAllSettingsFromProfile(params string[] excludedSettings)
+    {
+        using SqliteConnection connection = CreateReadWriteDBConnection();
+        using SqliteCommand command = connection.CreateCommand();
+
+        string parameter = DBUtils.GetParameter(excludedSettings.Length + 1);
+
+        string query = string.Create(CultureInfo.InvariantCulture,
+            $"""
+            DELETE FROM setting
+            WHERE profile_id = @profileId AND name NOT IN {parameter}
+            """);
+
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+        command.CommandText = query;
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
+        _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
+        _ = command.Parameters.AddWithValue("@1", nameof(ProfileUtils.CurrentProfileId));
+
+        for (int i = 0; i < excludedSettings.Length; i++)
+        {
+            _ = command.Parameters.AddWithValue($"@{i + 2}", excludedSettings[i]);
+        }
+
+        _ = command.ExecuteNonQuery();
+    }
+
     public static string? GetSettingValue(SqliteConnection connection, string settingName, int? profileId = null)
     {
         using SqliteCommand command = connection.CreateCommand();

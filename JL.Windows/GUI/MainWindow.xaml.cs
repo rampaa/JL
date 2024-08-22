@@ -56,6 +56,8 @@ internal sealed partial class MainWindow : Window
 
     private static DateTime s_lastTextCopyTime;
 
+    private static DpiScale? s_previousDpi;
+
     private MainWindow()
     {
         s_instance = this;
@@ -422,6 +424,11 @@ internal sealed partial class MainWindow : Window
 
     // ReSharper disable once AsyncVoidMethod
     private async void MainWindow_Closing(object sender, CancelEventArgs e)
+    {
+        await HandleAppClosing().ConfigureAwait(false);
+    }
+
+    public async Task HandleAppClosing()
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
@@ -1133,25 +1140,21 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void DisplaySettingsChanged(object? sender, EventArgs? e)
+    private void AdjustWindowsSize(Screen previousActiveScreen, DpiScale previousDpi)
     {
-        Size oldResolution = new(WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX, WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY);
-        WindowsUtils.ActiveScreen = Screen.FromHandle(new WindowInteropHelper(this).Handle);
-        WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
-        WindowsUtils.DpiAwareScreenWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
-        WindowsUtils.DpiAwareScreenHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
+        double oldDpiAwareScreenWidth = previousActiveScreen.Bounds.Width / previousDpi.DpiScaleX;
+        double oldDpiAwareScreenHeight = previousActiveScreen.Bounds.Height / previousDpi.DpiScaleY;
 
-        if (Math.Abs(oldResolution.Width - WindowsUtils.DpiAwareScreenWidth) <= 1 && Math.Abs(oldResolution.Height - WindowsUtils.DpiAwareScreenHeight) <= 1)
+        double newDpiAwareScreenWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
+        double newDpiAwareScreenHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
+
+        double ratioX = oldDpiAwareScreenWidth / newDpiAwareScreenWidth;
+        double ratioY = oldDpiAwareScreenHeight / newDpiAwareScreenHeight;
+
+        if (ratioX is 1 && ratioY is 1)
         {
             return;
         }
-
-        double ratioX = oldResolution.Width / WindowsUtils.DpiAwareScreenWidth;
-        double ratioY = oldResolution.Height / WindowsUtils.DpiAwareScreenHeight;
-
-        double fontScale = ratioX * ratioY > 1
-            ? Math.Min(ratioX, ratioY) * 0.75
-            : Math.Max(ratioX, ratioY) / 0.75;
 
         ConfigManager.MainWindowMaxDynamicHeight = Math.Round(ConfigManager.MainWindowMaxDynamicHeight / ratioY);
         ConfigManager.MainWindowMaxDynamicWidth = Math.Round(ConfigManager.MainWindowMaxDynamicWidth / ratioX);
@@ -1167,22 +1170,36 @@ internal sealed partial class MainWindow : Window
             }
         }
 
-        Left = LeftPositionBeforeResolutionChange / ratioX;
-        LeftPositionBeforeResolutionChange = Left;
-
-        Top = TopPositionBeforeResolutionChange / ratioY;
-        TopPositionBeforeResolutionChange = Top;
-
-        Width = Math.Round(WidthBeforeResolutionChange / ratioX);
+        Width = Math.Round(Math.Min(WidthBeforeResolutionChange / ratioX, newDpiAwareScreenWidth));
         WidthBeforeResolutionChange = Width;
 
-        Height = Math.Round(HeightBeforeResolutionChange / ratioY);
+        Height = Math.Round(Math.Min(HeightBeforeResolutionChange / ratioY, newDpiAwareScreenHeight));
         HeightBeforeResolutionChange = Height;
 
-        FontSizeSlider.Value = Math.Round(FontSizeSlider.Value / fontScale);
+        double newLeft = Math.Round(LeftPositionBeforeResolutionChange * previousDpi.DpiScaleX / ratioX);
+        if (WindowsUtils.ActiveScreen.Bounds.X > newLeft)
+        {
+            newLeft = WindowsUtils.ActiveScreen.Bounds.X;
+        }
+        else if (newLeft > WindowsUtils.ActiveScreen.Bounds.Right)
+        {
+            newLeft = WindowsUtils.ActiveScreen.Bounds.Right - (Width * WindowsUtils.Dpi.DpiScaleX);
+        }
 
-        ConfigManager.PopupMaxHeight = Math.Round(ConfigManager.PopupMaxHeight / ratioY);
-        ConfigManager.PopupMaxWidth = Math.Round(ConfigManager.PopupMaxWidth / ratioX);
+        double newTop = Math.Round(TopPositionBeforeResolutionChange * previousDpi.DpiScaleY / ratioY);
+        if (WindowsUtils.ActiveScreen.Bounds.Y > newTop)
+        {
+            newTop = WindowsUtils.ActiveScreen.Bounds.Y;
+        }
+        else if (newTop > WindowsUtils.ActiveScreen.Bounds.Bottom)
+        {
+            newTop = WindowsUtils.ActiveScreen.Bounds.Bottom - (Height * WindowsUtils.Dpi.DpiScaleY);
+        }
+
+        WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
+
+        ConfigManager.PopupMaxHeight = Math.Round(Math.Min(ConfigManager.PopupMaxHeight / ratioY, newDpiAwareScreenHeight));
+        ConfigManager.PopupMaxWidth = Math.Round(Math.Min(ConfigManager.PopupMaxWidth / ratioX, newDpiAwareScreenWidth));
 
         ConfigManager.PopupYOffset = Math.Round(ConfigManager.PopupYOffset / ratioY);
         ConfigManager.PopupXOffset = Math.Round(ConfigManager.PopupXOffset / ratioX);
@@ -1190,7 +1207,24 @@ internal sealed partial class MainWindow : Window
         WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
 
         ConfigManager.FixedPopupYPosition = Math.Round(ConfigManager.FixedPopupYPosition / ratioY);
+        if (WindowsUtils.ActiveScreen.Bounds.Y > ConfigManager.FixedPopupYPosition)
+        {
+            ConfigManager.FixedPopupYPosition = WindowsUtils.ActiveScreen.Bounds.Y;
+        }
+        else if (ConfigManager.FixedPopupYPosition > WindowsUtils.ActiveScreen.Bounds.Bottom)
+        {
+            ConfigManager.FixedPopupYPosition = WindowsUtils.ActiveScreen.Bounds.Bottom - (ConfigManager.PopupMaxHeight * WindowsUtils.Dpi.DpiScaleY);
+        }
+
         ConfigManager.FixedPopupXPosition = Math.Round(ConfigManager.FixedPopupXPosition / ratioX);
+        if (WindowsUtils.ActiveScreen.Bounds.X > ConfigManager.FixedPopupXPosition)
+        {
+            ConfigManager.FixedPopupXPosition = WindowsUtils.ActiveScreen.Bounds.X;
+        }
+        else if (ConfigManager.FixedPopupXPosition > WindowsUtils.ActiveScreen.Bounds.Right)
+        {
+            ConfigManager.FixedPopupXPosition = WindowsUtils.ActiveScreen.Bounds.Right - (ConfigManager.PopupMaxWidth * WindowsUtils.Dpi.DpiScaleX);
+        }
 
         PopupWindow? currentPopupWindow = FirstPopupWindow;
         while (currentPopupWindow is not null)
@@ -1201,6 +1235,12 @@ internal sealed partial class MainWindow : Window
 
         if (ConfigManager.AutoAdjustFontSizesOnResolutionChange)
         {
+            double fontScale = ratioX * ratioY > 1
+                ? Math.Min(ratioX, ratioY) * 0.75
+                : Math.Max(ratioX, ratioY) / 0.75;
+
+            FontSizeSlider.Value = Math.Round(FontSizeSlider.Value / fontScale);
+
             ConfigManager.AlternativeSpellingsFontSize = Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
             ConfigManager.DeconjugationInfoFontSize = Math.Round(ConfigManager.DeconjugationInfoFontSize / fontScale);
             ConfigManager.DefinitionsFontSize = Math.Round(ConfigManager.DefinitionsFontSize / fontScale);
@@ -1211,14 +1251,48 @@ internal sealed partial class MainWindow : Window
         }
     }
 
+    private void DisplaySettingsChanged(object? sender, EventArgs? e)
+    {
+        _ = Dispatcher.Invoke(DispatcherPriority.Background, () =>
+        {
+            Screen previousActiveScreen = WindowsUtils.ActiveScreen;
+
+            WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
+            WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
+            WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
+            WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
+
+            if (Math.Abs(previousActiveScreen.Bounds.Width - WindowsUtils.ActiveScreen.Bounds.Width) <= 1 && Math.Abs(previousActiveScreen.Bounds.Height - WindowsUtils.ActiveScreen.Bounds.Height) <= 1)
+            {
+                return;
+            }
+
+            DpiScale previousDpi = s_previousDpi ?? WindowsUtils.Dpi;
+            s_previousDpi = null;
+
+            AdjustWindowsSize(previousActiveScreen, previousDpi);
+        });
+    }
+
     private void Window_DpiChanged(object sender, DpiChangedEventArgs e)
     {
         WindowsUtils.Dpi = e.NewDpi;
-        WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
-        WindowsUtils.DpiAwareScreenWidth = WindowsUtils.ActiveScreen.Bounds.Width / e.NewDpi.DpiScaleX;
-        WindowsUtils.DpiAwareScreenHeight = WindowsUtils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
         WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset * e.NewDpi.DpiScaleX;
         WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * e.NewDpi.DpiScaleY;
+        s_previousDpi = e.OldDpi;
+    }
+
+    private void Window_LocationChanged(object sender, EventArgs e)
+    {
+        if (WindowsUtils.ActiveScreen.DeviceName == Screen.FromHandle(WindowHandle).DeviceName)
+        {
+            return;
+        }
+
+        WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
+        WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
+        WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
     }
 
     private void Border_OnMouseEnter(object sender, MouseEventArgs e)
@@ -1357,7 +1431,7 @@ internal sealed partial class MainWindow : Window
             if (!MagpieUtils.IsMagpieScaling)
             {
                 WinApi.MoveWindowToPosition(WindowHandle, WindowsUtils.ActiveScreen.Bounds.X, WindowsUtils.ActiveScreen.Bounds.Y);
-                width = WindowsUtils.DpiAwareScreenWidth;
+                width = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
             }
             else
             {
@@ -1548,29 +1622,6 @@ internal sealed partial class MainWindow : Window
             {
                 WinApi.BringToFront(WindowHandle);
             }
-        }
-    }
-
-    private void Window_LocationChanged(object sender, EventArgs e)
-    {
-        Screen newScreen = Screen.FromHandle(WindowHandle);
-        if (WindowsUtils.ActiveScreen.DeviceName == newScreen.DeviceName)
-        {
-            return;
-        }
-
-        WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
-        WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
-        WindowsUtils.DpiAwareScreenWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
-        WindowsUtils.DpiAwareScreenHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
-        WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
-        WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
-
-        PopupWindow? currentPopupWindow = FirstPopupWindow;
-        while (currentPopupWindow is not null)
-        {
-            WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, ConfigManager.PopupMaxWidth, ConfigManager.PopupMaxHeight, currentPopupWindow);
-            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
     }
 

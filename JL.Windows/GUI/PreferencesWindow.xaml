@@ -1564,6 +1564,10 @@
                                 <ComboBoxItem Content="Verbose" />
                             </ComboBox>
                         </DockPanel>
+
+                        <Button x:Name="ResetPreferencesButton" Content="Reset preferences"
+                                    HorizontalAlignment="Center" Click="ResetPreferencesButton_Click" />
+                        
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
