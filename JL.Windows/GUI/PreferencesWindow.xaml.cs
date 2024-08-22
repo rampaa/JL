@@ -213,7 +213,7 @@ internal sealed partial class PreferencesWindow : Window
     private async void ResetPreferencesButton_Click(object sender, RoutedEventArgs e)
     {
         ResetPreferencesButton.IsEnabled = false;
-        if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile? If you select yes, JL will be restarted.", "Reset preferences?"))
+        if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile? If you select yes, JL will be restarted.", "Reset preferences for the current profile?"))
         {
             await MainWindow.Instance.HandleAppClosing().ConfigureAwait(false);
 
