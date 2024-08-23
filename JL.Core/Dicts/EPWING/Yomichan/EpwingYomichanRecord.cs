@@ -98,7 +98,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             for (int i = 0; i < readingFreqResultCount; i++)
             {
                 FrequencyRecord readingFreqResult = readingFreqResults[i];
-                if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
+                if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading[0]))
                 {
                     if (frequency > readingFreqResult.Frequency)
                     {
@@ -138,7 +138,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
                 for (int i = 0; i < readingFreqResultCount; i++)
                 {
                     FrequencyRecord readingFreqResult = readingFreqResults[i];
-                    if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
+                    if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading[0]))
                     {
                         if (frequency > readingFreqResult.Frequency)
                         {

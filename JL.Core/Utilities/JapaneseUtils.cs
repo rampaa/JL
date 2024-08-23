@@ -300,9 +300,9 @@ public static partial class JapaneseUtils
         return combinedForm;
     }
 
-    internal static bool IsKatakana(ReadOnlySpan<char> text)
+    internal static bool IsKatakana(char character)
     {
-        return s_katakanaToHiraganaDict.ContainsKey(text[0]);
+        return s_katakanaToHiraganaDict.ContainsKey(character);
     }
 
     public static int FindExpressionBoundary(ReadOnlySpan<char> text, int position)

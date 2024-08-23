@@ -99,7 +99,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
                 for (int i = 0; i < readingFreqResultCount; i++)
                 {
                     FrequencyRecord readingFreqResult = readingFreqResults[i];
-                    if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
+                    if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading[0]))
                         || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                     {
                         if (frequency > readingFreqResult.Frequency)
@@ -165,7 +165,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
                 {
                     FrequencyRecord readingFreqResult = readingFreqResults[i];
 
-                    if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
+                    if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading[0]))
                         || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                     {
                         if (frequency > readingFreqResult.Frequency)
