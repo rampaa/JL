@@ -379,7 +379,7 @@ public static class LookupUtils
                     ? Array.IndexOf(lookupResult.Readings, lookupResult.MatchedText)
                     : -1;
 
-                if (index is -1)
+                if (index < 0)
                 {
                     return 3;
                 }
@@ -429,7 +429,7 @@ public static class LookupUtils
                     ? Array.IndexOf(lookupResult.Readings, lookupResult.MatchedText)
                     : -1;
 
-                return index is not -1
+                return index >= 0
                     ? index
                     : int.MaxValue;
             })
@@ -473,7 +473,7 @@ public static class LookupUtils
                             if (r.MatchedText == deconjugationResult.OriginalText)
                             {
                                 int index = r.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
-                                if (index is not -1)
+                                if (index >= 0)
                                 {
                                     //if (!r.Processes?[index].Any(p => p.SequenceEqual(deconjugationResult.Process)) ?? false)
                                     r.Processes?[index].Add(deconjugationResult.Process);

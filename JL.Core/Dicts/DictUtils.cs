@@ -1323,7 +1323,7 @@ public static class DictUtils
                     int endIndex = lParts[2].IndexOf('[', StringComparison.Ordinal);
 
                     KanjiCompositionDict.Add(lParts[1].GetPooledString(),
-                        endIndex is -1 ? lParts[2] : lParts[2][..endIndex]);
+                        endIndex < 0 ? lParts[2] : lParts[2][..endIndex]);
                 }
 
                 else if (lParts.Length > 3)
@@ -1333,7 +1333,7 @@ public static class DictUtils
                         if (lParts[j].Contains('J', StringComparison.Ordinal))
                         {
                             int endIndex = lParts[j].IndexOf('[', StringComparison.Ordinal);
-                            if (endIndex is not -1)
+                            if (endIndex >= 0)
                             {
                                 KanjiCompositionDict.Add(lParts[1].GetPooledString(), lParts[j][..endIndex]);
                                 break;

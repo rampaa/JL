@@ -307,7 +307,7 @@ internal sealed partial class PopupWindow : Window
     {
         int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
 
-        if (charPosition is not -1)
+        if (charPosition >= 0)
         {
             if (charPosition > 0 && char.IsHighSurrogate(textBox.Text[charPosition - 1]))
             {
@@ -1281,7 +1281,7 @@ internal sealed partial class PopupWindow : Window
 
     private void SelectPreviousLookupResult()
     {
-        int nextItemIndex = PopupListView.SelectedIndex - 1 > -1
+        int nextItemIndex = PopupListView.SelectedIndex - 1 >= 0
             ? PopupListView.SelectedIndex - 1
             : PopupListView.Items.Count - 1;
 

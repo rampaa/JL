@@ -958,7 +958,7 @@ internal sealed partial class MainWindow : Window
     {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
-            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) >= 0
               || (FirstPopupWindow.LastSelectedText is not null
                   && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                 ? FirstPopupWindow.LastSelectedText
@@ -991,7 +991,7 @@ internal sealed partial class MainWindow : Window
     {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
-            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) >= 0
               || (FirstPopupWindow.LastSelectedText is not null
                   && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                 ? FirstPopupWindow.LastSelectedText
@@ -1014,7 +1014,7 @@ internal sealed partial class MainWindow : Window
     {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
-            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) >= 0
               || (FirstPopupWindow.LastSelectedText is not null
                   && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                 ? FirstPopupWindow.LastSelectedText

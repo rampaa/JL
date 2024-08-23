@@ -71,7 +71,7 @@ public static class TextUtils
     public static string SanitizeText(string text)
     {
         int firstInvalidUnicodeCharIndex = FirstInvalidUnicodeSequenceIndex(text);
-        if (firstInvalidUnicodeCharIndex is not -1)
+        if (firstInvalidUnicodeCharIndex >= 0)
         {
             text = RemoveInvalidUnicodeSequences(text, firstInvalidUnicodeCharIndex);
         }

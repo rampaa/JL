@@ -814,7 +814,7 @@ internal static class ConfigManager
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, static f =>
             f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
 
-        if (preferenceWindow.MainWindowFontComboBox.SelectedIndex is -1)
+        if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
             preferenceWindow.MainWindowFontComboBox.SelectedIndex = 0;
         }
@@ -823,7 +823,7 @@ internal static class ConfigManager
         preferenceWindow.PopupFontComboBox.SelectedIndex =
             Array.FindIndex(s_popupJapaneseFonts, static f => f.Content.ToString() == PopupFont.Source);
 
-        if (preferenceWindow.PopupFontComboBox.SelectedIndex is -1)
+        if (preferenceWindow.PopupFontComboBox.SelectedIndex < 0)
         {
             preferenceWindow.PopupFontComboBox.SelectedIndex = 0;
         }
@@ -855,7 +855,7 @@ internal static class ConfigManager
         preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
         preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
 
-        if (preferenceWindow.LookupModeComboBox.SelectedIndex is -1)
+        if (preferenceWindow.LookupModeComboBox.SelectedIndex < 0)
         {
             preferenceWindow.LookupModeComboBox.SelectedIndex = 0;
         }

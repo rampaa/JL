@@ -201,7 +201,7 @@ public static partial class JapaneseUtils
         normalizedText = normalizedText.ToUpperInvariant();
 
         int firstKatakanaIndex = FirstKatakanaIndex(normalizedText);
-        if (firstKatakanaIndex is -1)
+        if (firstKatakanaIndex < 0)
         {
             return normalizedText;
         }
@@ -339,7 +339,7 @@ public static partial class JapaneseUtils
 
             tempIndex = text.IndexOf(terminatingCharacter, position);
 
-            if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
+            if (tempIndex >= 0 && (endPosition < 0 || tempIndex < endPosition))
             {
                 endPosition = tempIndex;
             }
@@ -347,7 +347,7 @@ public static partial class JapaneseUtils
 
         ++startPosition;
 
-        if (endPosition is -1)
+        if (endPosition < 0)
         {
             endPosition = text.Length - 1;
         }
@@ -431,7 +431,7 @@ public static partial class JapaneseUtils
     public static string RemovePunctuation(string text)
     {
         int index = FirstPunctuationIndex(text);
-        if (index is -1)
+        if (index < 0)
         {
             return text;
         }
