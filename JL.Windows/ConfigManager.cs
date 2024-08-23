@@ -1274,21 +1274,33 @@ internal static class ConfigManager
         ConfigDBManager.UpdateSetting(connection, "MainWindowOpacity",
             MainWindow.Instance.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture));
 
-        ConfigDBManager.UpdateSetting(connection, nameof(MainWindowHeight), MainWindowHeight > MainWindow.Instance.MinHeight
-            ? MainWindowHeight.ToString(CultureInfo.InvariantCulture)
-            : MainWindow.Instance.MinHeight.ToString(CultureInfo.InvariantCulture));
+        double mainWindowHeight = MainWindowHeight > MainWindow.Instance.MinHeight
+            ? MainWindowHeight <= SystemParameters.VirtualScreenHeight
+                ? MainWindowHeight
+                : SystemParameters.VirtualScreenHeight
+            : MainWindow.Instance.MinHeight;
+        ConfigDBManager.UpdateSetting(connection, nameof(MainWindowHeight), mainWindowHeight.ToString(CultureInfo.InvariantCulture));
 
-        ConfigDBManager.UpdateSetting(connection, nameof(MainWindowWidth), MainWindowWidth > MainWindow.Instance.MinWidth
-            ? MainWindowWidth.ToString(CultureInfo.InvariantCulture)
-            : MainWindow.Instance.MinWidth.ToString(CultureInfo.InvariantCulture));
+        double mainWindowWidth = MainWindowWidth > MainWindow.Instance.MinWidth
+            ? MainWindowWidth <= SystemParameters.VirtualScreenWidth
+                ? MainWindowWidth
+                : SystemParameters.VirtualScreenWidth
+            : MainWindow.Instance.MinWidth;
+        ConfigDBManager.UpdateSetting(connection, nameof(MainWindowWidth), mainWindowWidth.ToString(CultureInfo.InvariantCulture));
 
-        ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", MainWindow.Instance.Top >= SystemParameters.VirtualScreenTop
-            ? (MainWindow.Instance.Top * WindowsUtils.Dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture)
-            : WindowsUtils.ActiveScreen.Bounds.Y.ToString(CultureInfo.InvariantCulture));
+        double mainWindowTopPosition = MainWindow.Instance.Top >= SystemParameters.VirtualScreenTop
+            ? MainWindow.Instance.Top + MainWindow.Instance.Height <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight
+                ? (MainWindow.Instance.Top * WindowsUtils.Dpi.DpiScaleY)
+                : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - MainWindow.Instance.Height) * WindowsUtils.Dpi.DpiScaleY
+            : WindowsUtils.ActiveScreen.Bounds.Y;
+        ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", mainWindowTopPosition.ToString(CultureInfo.InvariantCulture));
 
-        ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
-            ? (MainWindow.Instance.Left * WindowsUtils.Dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture)
-            : WindowsUtils.ActiveScreen.Bounds.X.ToString(CultureInfo.InvariantCulture));
+        double mainWindowLeftPosition = MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
+            ? MainWindow.Instance.Left + MainWindow.Instance.Width <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
+                ? (MainWindow.Instance.Left * WindowsUtils.Dpi.DpiScaleX)
+                : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - MainWindow.Instance.Width) * WindowsUtils.Dpi.DpiScaleX
+            : WindowsUtils.ActiveScreen.Bounds.X;
+        ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.AnalyzeAndVacuum(connection);
     }
