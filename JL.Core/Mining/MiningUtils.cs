@@ -330,7 +330,7 @@ public static class MiningUtils
         return pitchAccents.Count > 0 ? pitchAccents : null;
     }
 
-    private static StringBuilder GetExpressionWithPitchAccent(string expression, byte position)
+    private static StringBuilder GetExpressionWithPitchAccent(ReadOnlySpan<char> expression, byte position)
     {
         bool lowPitch = false;
         StringBuilder expressionWithPitchAccentStringBuilder = new();
