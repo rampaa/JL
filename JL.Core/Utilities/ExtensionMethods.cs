@@ -39,22 +39,29 @@ public static class ExtensionMethods
         // return default;
     }
 
-    internal static List<string> ListUnicodeCharacters(this string s)
+    internal static List<string> ListUnicodeCharacters(this ReadOnlySpan<char> text)
     {
-        List<string> textBlocks = new(s.Length);
-        for (int i = 0; i < s.Length; i++)
+        List<string> textBlocks = new(text.Length);
+        for (int i = 0; i < text.Length; i++)
         {
-            if (char.IsHighSurrogate(s, i)
-                && s.Length > i + 1
-                && char.IsLowSurrogate(s, i + 1))
+            char highSurrogateCandidate = text[i];
+            if (char.IsHighSurrogate(highSurrogateCandidate)
+                && text.Length > i + 1)
             {
-                textBlocks.Add(char.ConvertFromUtf32(char.ConvertToUtf32(s, i)));
-
-                ++i;
+                char lowSurragateCandidate = text[i + 1];
+                if (char.IsLowSurrogate(lowSurragateCandidate))
+                {
+                    textBlocks.Add(char.ConvertFromUtf32(char.ConvertToUtf32(highSurrogateCandidate, lowSurragateCandidate)));
+                    ++i;
+                }
+                else
+                {
+                    textBlocks.Add(highSurrogateCandidate.ToString());
+                }
             }
             else
             {
-                textBlocks.Add(s[i].ToString());
+                textBlocks.Add(highSurrogateCandidate.ToString());
             }
         }
 

@@ -174,7 +174,7 @@ public static partial class JapaneseUtils
 
     private static readonly FrozenSet<char> s_expressionTerminatingCharacters = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters).ToFrozenSet();
 
-    private static int FirstKatakanaIndex(string text)
+    private static int FirstKatakanaIndex(ReadOnlySpan<char> text)
     {
         int textLength = text.Length;
         for (int i = 0; i < textLength; i++)
@@ -219,7 +219,7 @@ public static partial class JapaneseUtils
         return textInHiragana.ToString();
     }
 
-    internal static List<string> LongVowelMarkToKana(string text)
+    internal static List<string> LongVowelMarkToKana(ReadOnlySpan<char> text)
     {
         List<string> unicodeTextList = text.ListUnicodeCharacters();
 
@@ -278,7 +278,7 @@ public static partial class JapaneseUtils
         return stringBuilders.ConvertAll(static sb => sb.ToString());
     }
 
-    public static List<string> CreateCombinedForm(string text)
+    public static List<string> CreateCombinedForm(ReadOnlySpan<char> text)
     {
         List<string> combinedForm = new(text.Length);
 
@@ -300,12 +300,12 @@ public static partial class JapaneseUtils
         return combinedForm;
     }
 
-    internal static bool IsKatakana(string text)
+    internal static bool IsKatakana(ReadOnlySpan<char> text)
     {
         return s_katakanaToHiraganaDict.ContainsKey(text[0]);
     }
 
-    public static int FindExpressionBoundary(string text, int position)
+    public static int FindExpressionBoundary(ReadOnlySpan<char> text, int position)
     {
         int endPosition = text.Length;
         for (int i = position; i < text.Length; i++)
@@ -412,7 +412,7 @@ public static partial class JapaneseUtils
         return sentence;
     }
 
-    private static int FirstPunctuationIndex(string text)
+    private static int FirstPunctuationIndex(ReadOnlySpan<char> text)
     {
         int charIndex = 0;
         foreach (Rune rune in text.EnumerateRunes())

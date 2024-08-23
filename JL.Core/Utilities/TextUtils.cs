@@ -6,7 +6,7 @@ namespace JL.Core.Utilities;
 
 public static class TextUtils
 {
-    private static int FirstInvalidUnicodeSequenceIndex(string text)
+    private static int FirstInvalidUnicodeSequenceIndex(ReadOnlySpan<char> text)
     {
         for (int i = 0; i < text.Length; i++)
         {
