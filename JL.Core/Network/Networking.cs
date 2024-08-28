@@ -19,9 +19,16 @@ public static class Networking
     internal const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
     private static readonly Timer s_updaterTimer = new();
+    private static bool s_updatingJL; // false
 
     public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
+        if (s_updatingJL)
+        {
+            return;
+        }
+
+        s_updatingJL = true;
         try
         {
             using HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, s_gitHubApiUrlForLatestJLRelease);
@@ -95,6 +102,8 @@ public static class Networking
             Utils.Logger.Error(ex, "Couldn't check for JL updates");
             Utils.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
         }
+
+        s_updatingJL = false;
     }
 
     internal static void StartUpdaterTimer()

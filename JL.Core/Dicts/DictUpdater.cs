@@ -271,18 +271,30 @@ public static class DictUpdater
                 continue;
             }
 
-            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
             if (dict.Type is DictType.JMdict)
             {
-                await UpdateJmdict(pathExists, true).ConfigureAwait(false);
+                if (!DictUtils.UpdatingJmdict)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
+                    await UpdateJmdict(pathExists, true).ConfigureAwait(false);
+                }
+
             }
             else if (dict.Type is DictType.JMnedict)
             {
-                await UpdateJmnedict(pathExists, true).ConfigureAwait(false);
+                if (!DictUtils.UpdatingJmnedict)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
+                    await UpdateJmnedict(pathExists, true).ConfigureAwait(false);
+                }
             }
             else
             {
-                await UpdateKanjidic(pathExists, true).ConfigureAwait(false);
+                if (!DictUtils.UpdatingKanjidic)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
+                    await UpdateKanjidic(pathExists, true).ConfigureAwait(false);
+                }
             }
         }
     }
