@@ -12,7 +12,7 @@ namespace JL.Core.Dicts;
 
 public static class DictUpdater
 {
-    internal static async Task<bool> UpdateDict(string dictPath, Uri dictDownloadUri, string dictName,
+    internal static async Task<bool> DownloadDict(string dictPath, Uri dictDownloadUri, string dictName,
         bool isUpdate, bool noPrompt)
     {
         try
@@ -93,10 +93,15 @@ public static class DictUpdater
 
     public static async Task UpdateJmdict(bool isUpdate, bool noPrompt)
     {
+        if (DictUtils.UpdatingJmdict)
+        {
+            return;
+        }
+
         DictUtils.UpdatingJmdict = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        bool downloaded = await UpdateDict(dict.Path,
+        bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_jmdictUrl,
                 DictType.JMdict.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
@@ -145,10 +150,15 @@ public static class DictUpdater
 
     public static async Task UpdateJmnedict(bool isUpdate, bool noPrompt)
     {
+        if (DictUtils.UpdatingJmnedict)
+        {
+            return;
+        }
+
         DictUtils.UpdatingJmnedict = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
-        bool downloaded = await UpdateDict(dict.Path,
+        bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
@@ -194,10 +204,15 @@ public static class DictUpdater
 
     public static async Task UpdateKanjidic(bool isUpdate, bool noPrompt)
     {
+        if (DictUtils.UpdatingKanjidic)
+        {
+            return;
+        }
+
         DictUtils.UpdatingKanjidic = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
-        bool downloaded = await UpdateDict(dict.Path,
+        bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
@@ -271,30 +286,18 @@ public static class DictUpdater
                 continue;
             }
 
+            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
             if (dict.Type is DictType.JMdict)
             {
-                if (!DictUtils.UpdatingJmdict)
-                {
-                    Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
-                    await UpdateJmdict(pathExists, true).ConfigureAwait(false);
-                }
-
+                await UpdateJmdict(pathExists, true).ConfigureAwait(false);
             }
             else if (dict.Type is DictType.JMnedict)
             {
-                if (!DictUtils.UpdatingJmnedict)
-                {
-                    Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
-                    await UpdateJmnedict(pathExists, true).ConfigureAwait(false);
-                }
+                await UpdateJmnedict(pathExists, true).ConfigureAwait(false);
             }
             else
             {
-                if (!DictUtils.UpdatingKanjidic)
-                {
-                    Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
-                    await UpdateKanjidic(pathExists, true).ConfigureAwait(false);
-                }
+                await UpdateKanjidic(pathExists, true).ConfigureAwait(false);
             }
         }
     }

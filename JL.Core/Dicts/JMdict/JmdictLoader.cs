@@ -42,26 +42,36 @@ internal static class JmdictLoader
             dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
-        else if (Utils.Frontend.ShowYesNoDialog(
-                     "Couldn't find JMdict.xml. Would you like to download it now?",
-                     "Download JMdict?"))
-        {
-            bool downloaded = await DictUpdater.UpdateDict(fullPath,
-                DictUtils.s_jmdictUrl,
-                DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
-
-            if (downloaded)
-            {
-                await Load(dict).ConfigureAwait(false);
-
-                await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
-                await JmdictWordClassUtils.Load().ConfigureAwait(false);
-            }
-        }
-
         else
         {
-            dict.Active = false;
+            if (DictUtils.UpdatingJmdict)
+            {
+                return;
+            }
+
+            DictUtils.UpdatingJmdict = true;
+            if (Utils.Frontend.ShowYesNoDialog(
+                "Couldn't find JMdict.xml. Would you like to download it now?",
+                "Download JMdict?"))
+            {
+                bool downloaded = await DictUpdater.DownloadDict(fullPath,
+                    DictUtils.s_jmdictUrl,
+                    DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
+
+                if (downloaded)
+                {
+                    await Load(dict).ConfigureAwait(false);
+
+                    await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
+                    await JmdictWordClassUtils.Load().ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                dict.Active = false;
+            }
+
+            DictUtils.UpdatingJmdict = false;
         }
     }
 

@@ -38,22 +38,32 @@ internal static class JmnedictLoader
             dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
-        else if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
-                     "Download JMnedict?"))
-        {
-            bool downloaded = await DictUpdater.UpdateDict(fullPath,
-                DictUtils.s_jmnedictUrl,
-                DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
-
-            if (downloaded)
-            {
-                await Load(dict).ConfigureAwait(false);
-            }
-        }
-
         else
         {
-            dict.Active = false;
+            if (DictUtils.UpdatingJmnedict)
+            {
+                return;
+            }
+
+            DictUtils.UpdatingJmnedict = true;
+            if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
+                "Download JMnedict?"))
+            {
+                bool downloaded = await DictUpdater.DownloadDict(fullPath,
+                    DictUtils.s_jmnedictUrl,
+                    DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
+
+                if (downloaded)
+                {
+                    await Load(dict).ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                dict.Active = false;
+            }
+
+            DictUtils.UpdatingJmnedict = false;
         }
     }
 

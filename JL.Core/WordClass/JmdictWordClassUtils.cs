@@ -122,7 +122,7 @@ internal static class JmdictWordClassUtils
                 if (!File.Exists(fullPath))
                 {
                     deleteJmdictFile = true;
-                    bool downloaded = await DictUpdater.UpdateDict(fullPath,
+                    bool downloaded = await DictUpdater.DownloadDict(fullPath,
                         DictUtils.s_jmdictUrl,
                         dict.Type.ToString(), false, true).ConfigureAwait(false);
 

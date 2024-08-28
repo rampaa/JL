@@ -29,23 +29,33 @@ internal static class KanjidicLoader
             dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
-        else if (Utils.Frontend.ShowYesNoDialog(
-                     "Couldn't find kanjidic2.xml. Would you like to download it now?",
-                     "Download KANJIDIC2?"))
-        {
-            bool downloaded = await DictUpdater.UpdateDict(fullPath,
-                DictUtils.s_kanjidicUrl,
-                DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
-
-            if (downloaded)
-            {
-                await Load(dict).ConfigureAwait(false);
-            }
-        }
-
         else
         {
-            dict.Active = false;
+            if (DictUtils.UpdatingKanjidic)
+            {
+                return;
+            }
+
+            DictUtils.UpdatingKanjidic = true;
+            if (Utils.Frontend.ShowYesNoDialog(
+                "Couldn't find kanjidic2.xml. Would you like to download it now?",
+                "Download KANJIDIC2?"))
+            {
+                bool downloaded = await DictUpdater.DownloadDict(fullPath,
+                    DictUtils.s_kanjidicUrl,
+                    DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
+
+                if (downloaded)
+                {
+                    await Load(dict).ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                dict.Active = false;
+            }
+
+            DictUtils.UpdatingKanjidic = false;
         }
     }
 
