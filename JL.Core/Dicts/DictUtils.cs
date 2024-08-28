@@ -506,6 +506,9 @@ public static class DictUtils
         CheckIfDBIsUsedForAtLeastOneDict(dicts);
         AtLeastOneKanjiDictIsActive = CheckIfAnyKanjiDictIsUsed(dicts);
 
+        int customDictionaryTaskCount = 0;
+        bool anyCustomDictionaryTaskIsActuallyUsed = false;
+
         foreach (Dict dict in dicts)
         {
             bool useDB = dict.Options.UseDB.Value;
@@ -977,6 +980,8 @@ public static class DictUtils
                     {
                         tasks.Add(Task.Run(() =>
                         {
+                            ++customDictionaryTaskCount;
+
                             int size = dict.Size > 0
                                 ? dict.Size
                                 : dict.Type is DictType.CustomWordDictionary
@@ -991,6 +996,7 @@ public static class DictUtils
                                     : ProfileCustomWordsCancellationTokenSource.Token);
 
                             dict.Size = dict.Contents.Count;
+                            anyCustomDictionaryTaskIsActuallyUsed = dict.Size > 0 || anyCustomDictionaryTaskIsActuallyUsed;
                             dict.Ready = true;
                         }));
                     }
@@ -1015,6 +1021,8 @@ public static class DictUtils
                     {
                         tasks.Add(Task.Run(() =>
                         {
+                            ++customDictionaryTaskCount;
+
                             int size = dict.Size is not 0
                                 ? dict.Size
                                 : dict.Type is DictType.CustomNameDictionary
@@ -1029,6 +1037,7 @@ public static class DictUtils
                                     : ProfileCustomNamesCancellationTokenSource.Token);
 
                             dict.Size = dict.Contents.Count;
+                            anyCustomDictionaryTaskIsActuallyUsed = dict.Size > 0 || anyCustomDictionaryTaskIsActuallyUsed;
                             dict.Ready = true;
                         }));
                     }
@@ -1297,7 +1306,10 @@ public static class DictUtils
             CheckIfDBIsUsedForAtLeastOneDict(dicts);
             AtLeastOneKanjiDictIsActive = CheckIfAnyKanjiDictIsUsed(dicts);
 
-            if (!UpdatingJmdict && !UpdatingJmnedict && !UpdatingKanjidic)
+            if (!UpdatingJmdict
+                && !UpdatingJmnedict
+                && !UpdatingKanjidic
+                && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed))
             {
                 Utils.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
             }

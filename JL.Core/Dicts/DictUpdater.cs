@@ -140,12 +140,12 @@ public static class DictUpdater
                 dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             }
 
-            Utils.ClearStringPoolIfDictsAreReady();
             dict.Ready = true;
             Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMdict");
         }
 
         DictUtils.UpdatingJmdict = false;
+        Utils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateJmnedict(bool isUpdate, bool noPrompt)
@@ -194,12 +194,12 @@ public static class DictUpdater
                 dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             }
 
-            Utils.ClearStringPoolIfDictsAreReady();
             dict.Ready = true;
             Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMnedict");
         }
 
         DictUtils.UpdatingJmnedict = false;
+        Utils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateKanjidic(bool isUpdate, bool noPrompt)
@@ -248,12 +248,12 @@ public static class DictUpdater
                 dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             }
 
-            Utils.ClearStringPoolIfDictsAreReady();
             dict.Ready = true;
             Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
         }
 
         DictUtils.UpdatingKanjidic = false;
+        Utils.ClearStringPoolIfDictsAreReady();
     }
 
     internal static async Task AutoUpdateBuiltInDicts()
