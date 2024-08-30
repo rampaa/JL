@@ -12,7 +12,6 @@ using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
-using Timer = System.Timers.Timer;
 
 namespace JL.Windows.GUI;
 
@@ -61,8 +60,6 @@ internal sealed partial class PopupWindow : Window
     public string? LastText { get; set; }
 
     public bool MiningMode { get; private set; }
-
-    public static Timer PopupAutoHideTimer { get; } = new();
 
     private ScrollViewer? _popupListViewScrollViewer;
 
@@ -480,7 +477,7 @@ internal sealed partial class PopupWindow : Window
     {
         _dictsWithResults.Clear();
 
-        PopupListView.Items.Filter = NoAllDictFilter;
+        PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
 
         _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
         bool pitchDictIsActive = pitchDict?.Active ?? false;
@@ -1066,18 +1063,13 @@ internal sealed partial class PopupWindow : Window
         return stackPanel;
     }
 
-    private static int GetIndexOfListViewItemFromStackPanel(StackPanel stackPanel)
-    {
-        return (int)((WrapPanel)stackPanel.Children[0]).Tag;
-    }
-
     private int GetFirstVisibleListViewItemIndex()
     {
         StackPanel? firstVisibleStackPanel = PopupListView.Items.Cast<StackPanel>()
             .FirstOrDefault(static stackPanel => stackPanel.Visibility is Visibility.Visible);
 
         return firstVisibleStackPanel is not null
-            ? GetIndexOfListViewItemFromStackPanel(firstVisibleStackPanel)
+            ? PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(firstVisibleStackPanel)
             : 0;
     }
 
@@ -1085,16 +1077,16 @@ internal sealed partial class PopupWindow : Window
     {
         if (PopupContextMenu.IsVisible)
         {
-            _listViewItemIndexAfterContextMenuIsClosed = GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
+            _listViewItemIndexAfterContextMenuIsClosed = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
         }
         else
         {
-            _listViewItemIndex = GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
+            _listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
             LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
         }
     }
 
-    private static void Unselect(object sender, RoutedEventArgs e)
+    private void Unselect(object sender, RoutedEventArgs e)
     {
         WindowsUtils.Unselect((TextBox)sender);
     }
@@ -1215,7 +1207,7 @@ internal sealed partial class PopupWindow : Window
         int listViewItemIndex = _listViewItemIndex;
         TextBox? definitionsTextBox = GetDefinitionTextBox(listViewItemIndex);
         string? formattedDefinitions = definitionsTextBox?.Text;
-        string? selectedDefinitions = GetSelectedDefinitions(definitionsTextBox);
+        string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
 
         HidePopup();
 
@@ -1406,7 +1398,7 @@ internal sealed partial class PopupWindow : Window
                     ShowAddNameWindow();
                 }
 
-                PopupAutoHideTimer.Start();
+                PopupWindowUtils.PopupAutoHideTimer.Start();
             }
         }
 
@@ -1436,7 +1428,7 @@ internal sealed partial class PopupWindow : Window
                     ShowAddWordWindow();
                 }
 
-                PopupAutoHideTimer.Start();
+                PopupWindowUtils.PopupAutoHideTimer.Start();
             }
         }
 
@@ -1619,10 +1611,10 @@ internal sealed partial class PopupWindow : Window
 
             if (MiningMode && PopupListView.SelectedItem is not null)
             {
-                int index = GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+                int index = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
                 TextBox? definitionsTextBox = GetDefinitionTextBox(index);
                 string? formattedDefinitions = definitionsTextBox?.Text;
-                string? selectedDefinitions = GetSelectedDefinitions(definitionsTextBox);
+                string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
 
                 HidePopup();
 
@@ -1733,7 +1725,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (!ChildPopupWindow?.IsVisible ?? true)
             {
-                PopupAutoHideTimer.Stop();
+                PopupWindowUtils.PopupAutoHideTimer.Stop();
             }
 
             return;
@@ -1799,13 +1791,13 @@ internal sealed partial class PopupWindow : Window
                     || AddWordWindow.IsItVisible()
                     || AddNameWindow.IsItVisible())
                 {
-                    PopupAutoHideTimer.Stop();
+                    PopupWindowUtils.PopupAutoHideTimer.Stop();
                 }
 
                 else if (!ChildPopupWindow?.IsVisible ?? true)
                 {
-                    PopupAutoHideTimer.Stop();
-                    PopupAutoHideTimer.Start();
+                    PopupWindowUtils.PopupAutoHideTimer.Stop();
+                    PopupWindowUtils.PopupAutoHideTimer.Start();
                 }
             }
         }
@@ -1866,7 +1858,7 @@ internal sealed partial class PopupWindow : Window
         bool isAllButton = button == _buttonAll;
         if (isAllButton)
         {
-            PopupListView.Items.Filter = NoAllDictFilter;
+            PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
         }
 
         else
@@ -1890,17 +1882,6 @@ internal sealed partial class PopupWindow : Window
         return (Dict)items.Tag == _filteredDict;
     }
 
-    private static bool NoAllDictFilter(object item)
-    {
-        if (CoreConfigManager.KanjiMode)
-        {
-            return true;
-        }
-
-        Dict dict = (Dict)((StackPanel)item).Tag;
-        return !dict.Options.NoAll.Value;
-    }
-
     private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         bool contextMenuBecameInvisible = !(bool)e.NewValue;
@@ -1913,7 +1894,7 @@ internal sealed partial class PopupWindow : Window
                 && !AddWordWindow.IsItVisible()
                 && !AddNameWindow.IsItVisible())
             {
-                PopupAutoHideTimer.Start();
+                PopupWindowUtils.PopupAutoHideTimer.Start();
             }
         }
     }
@@ -1991,7 +1972,7 @@ internal sealed partial class PopupWindow : Window
         _firstVisibleListViewItemIndex = 0;
         _lastInteractedTextBox = null;
 
-        PopupAutoHideTimer.Stop();
+        PopupWindowUtils.PopupAutoHideTimer.Stop();
 
         UpdateLayout();
         Hide();
@@ -2043,13 +2024,6 @@ internal sealed partial class PopupWindow : Window
     {
         PopupListView.Items.Filter = null;
         return ((StackPanel)((StackPanel)PopupListView.Items[listViewIndex]!).Children[1]).GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));
-    }
-
-    private static string? GetSelectedDefinitions(TextBox? definitionsTextBox)
-    {
-        return definitionsTextBox?.SelectionLength > 0
-            ? definitionsTextBox.SelectedText
-            : null;
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)

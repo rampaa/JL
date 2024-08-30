@@ -623,6 +623,39 @@ internal static class WindowsUtils
         } while (retry);
     }
 
+    public static void HandlePostCopy(string text, string? subsequentText)
+    {
+        bool newText = subsequentText is null;
+        if (newText)
+        {
+            BacklogUtils.AddToBacklog(text);
+        }
+        else
+        {
+            BacklogUtils.ReplaceLastBacklogText(text);
+        }
+
+        if (ConfigManager.TextToSpeechOnTextChange
+            && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
+        {
+            _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text).ConfigureAwait(false);
+        }
+
+        string strippedText = ConfigManager.StripPunctuationBeforeCalculatingCharacterCount
+            ? JapaneseUtils.RemovePunctuation(subsequentText ?? text)
+            : subsequentText ?? text;
+
+        if (strippedText.Length > 0)
+        {
+            Stats.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
+
+            if (newText)
+            {
+                Stats.IncrementStat(StatType.Lines);
+            }
+        }
+    }
+
     public static void UpdateMainWindowVisibility()
     {
         if (!MainWindow.Instance.FirstPopupWindow.IsVisible)

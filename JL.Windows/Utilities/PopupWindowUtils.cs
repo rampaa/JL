@@ -5,21 +5,23 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using JL.Core.Audio;
+using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.GUI.UserControls;
 using NAudio.Wave;
+using Timer = System.Timers.Timer;
 
 namespace JL.Windows.Utilities;
 
 internal static class PopupWindowUtils
 {
     private static string? s_primarySpellingOfLastPlayedAudio;
-
     private static string? s_readingOfLastPlayedAudio;
     private static DoubleCollection StrokeDashArray { get; set; } = [1, 1];
+    public static readonly Timer PopupAutoHideTimer = new();
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
@@ -177,10 +179,10 @@ internal static class PopupWindowUtils
 
     public static void SetPopupAutoHideTimer()
     {
-        PopupWindow.PopupAutoHideTimer.Interval = ConfigManager.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
-        PopupWindow.PopupAutoHideTimer.Elapsed += PopupAutoHideTimerEvent;
-        PopupWindow.PopupAutoHideTimer.AutoReset = false;
-        PopupWindow.PopupAutoHideTimer.Enabled = true;
+        PopupAutoHideTimer.Interval = ConfigManager.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
+        PopupAutoHideTimer.Elapsed += PopupAutoHideTimerEvent;
+        PopupAutoHideTimer.AutoReset = false;
+        PopupAutoHideTimer.Enabled = true;
     }
 
     private static void PopupAutoHideTimerEvent(object? sender, ElapsedEventArgs e)
@@ -258,5 +260,28 @@ internal static class PopupWindowUtils
     public static void SetStrokeDashArray(bool showPitchAccentWithDottedLines)
     {
         StrokeDashArray = showPitchAccentWithDottedLines ? [1, 1] : [1, 0];
+    }
+
+    public static int GetIndexOfListViewItemFromStackPanel(StackPanel stackPanel)
+    {
+        return (int)((WrapPanel)stackPanel.Children[0]).Tag;
+    }
+
+    public static bool NoAllDictFilter(object item)
+    {
+        if (CoreConfigManager.KanjiMode)
+        {
+            return true;
+        }
+
+        Dict dict = (Dict)((StackPanel)item).Tag;
+        return !dict.Options.NoAll.Value;
+    }
+
+    public static string? GetSelectedDefinitions(TextBox? definitionsTextBox)
+    {
+        return definitionsTextBox?.SelectionLength > 0
+            ? definitionsTextBox.SelectedText
+            : null;
     }
 }
