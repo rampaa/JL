@@ -181,7 +181,7 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.SearchWithBrowser(text);
     }
 
-    public async Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode)
+    public Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode)
     {
         string textBoxText = textBox.Text;
 
@@ -195,7 +195,7 @@ internal sealed partial class PopupWindow : Window
                   && !JapaneseUtils.JapaneseRegex().IsMatch(textBoxText[charPosition].ToString()))
         {
             HidePopup();
-            return;
+            return Task.CompletedTask;
         }
 
         string text = textBoxText.Length - charPosition > ConfigManager.MaxSearchLength
@@ -208,7 +208,7 @@ internal sealed partial class PopupWindow : Window
         if (string.IsNullOrEmpty(text))
         {
             HidePopup();
-            return;
+            return Task.CompletedTask;
         }
 
         if (text == LastText && IsVisible)
@@ -223,7 +223,7 @@ internal sealed partial class PopupWindow : Window
                 UpdatePosition(WinApi.GetMousePosition());
             }
 
-            return;
+            return Task.CompletedTask;
         }
 
         LastText = text;
@@ -291,13 +291,15 @@ internal sealed partial class PopupWindow : Window
 
             if (ConfigManager.AutoPlayAudio)
             {
-                await PlayAudio().ConfigureAwait(false);
+                return PlayAudio();
             }
         }
         else
         {
             HidePopup();
         }
+
+        return Task.CompletedTask;
     }
 
     public Task LookupOnMouseMoveOrClick(TextBox textBox)
@@ -318,13 +320,13 @@ internal sealed partial class PopupWindow : Window
         return Task.CompletedTask;
     }
 
-    public async Task LookupOnSelect(TextBox textBox)
+    public Task LookupOnSelect(TextBox textBox)
     {
         string text = textBox.SelectedText;
         if (string.IsNullOrWhiteSpace(text))
         {
             HidePopup();
-            return;
+            return Task.CompletedTask;
         }
 
         int charPosition = textBox.SelectionStart;
@@ -344,7 +346,7 @@ internal sealed partial class PopupWindow : Window
                 UpdatePosition(WinApi.GetMousePosition());
             }
 
-            return;
+            return Task.CompletedTask;
         }
 
         LastText = text;
@@ -394,13 +396,15 @@ internal sealed partial class PopupWindow : Window
 
             if (ConfigManager.AutoPlayAudio)
             {
-                await PlayAudio().ConfigureAwait(false);
+                return PlayAudio();
             }
         }
         else
         {
             HidePopup();
         }
+
+        return Task.CompletedTask;
     }
 
     private void UpdatePosition(Point cursorPosition)
@@ -1133,7 +1137,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    private async Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs? e)
+    private Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs? e)
     {
         if (ConfigManager.InactiveLookupMode
             || ConfigManager.LookupOnSelectOnly
@@ -1144,7 +1148,7 @@ internal sealed partial class PopupWindow : Window
             || (ConfigManager.RequireLookupKeyPress
                 && !ConfigManager.LookupKeyKeyGesture.IsPressed()))
         {
-            return;
+            return Task.CompletedTask;
         }
 
         ChildPopupWindow ??= new PopupWindow
@@ -1154,7 +1158,7 @@ internal sealed partial class PopupWindow : Window
 
         if (ChildPopupWindow.MiningMode)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         if (MiningMode)
@@ -1162,14 +1166,16 @@ internal sealed partial class PopupWindow : Window
             _lastInteractedTextBox = textBox;
             if (JapaneseUtils.JapaneseRegex().IsMatch(textBox.Text))
             {
-                await ChildPopupWindow.LookupOnMouseMoveOrClick(textBox).ConfigureAwait(false);
+                return ChildPopupWindow.LookupOnMouseMoveOrClick(textBox);
             }
 
-            else if (ConfigManager.HighlightLongestMatch)
+            if (ConfigManager.HighlightLongestMatch)
             {
                 WindowsUtils.Unselect(ChildPopupWindow._previousTextBox);
             }
         }
+
+        return Task.CompletedTask;
     }
 
     // ReSharper disable once AsyncVoidMethod
