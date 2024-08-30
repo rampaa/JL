@@ -1264,7 +1264,7 @@ public static class DictUtils
                 case DictType.DaijirinNazeka:
                 case DictType.ShinmeikaiNazeka:
                 case DictType.KenkyuushaNazeka:
-                    throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolote dict type");
+                    throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolete dict type");
 #pragma warning restore CS0618 // Type or member is obsolete
 
                 default:
