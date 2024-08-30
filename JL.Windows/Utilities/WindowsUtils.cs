@@ -321,7 +321,7 @@ internal static class WindowsUtils
                 archive.ExtractToDirectory(tmpDirectory);
             }
 
-            await Application.Current.Dispatcher.Invoke(async () => await MainWindow.Instance.HandleAppClosing().ConfigureAwait(false)).ConfigureAwait(false);
+            await Application.Current.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",

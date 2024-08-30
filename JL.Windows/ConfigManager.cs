@@ -1290,14 +1290,14 @@ internal static class ConfigManager
 
         double mainWindowTopPosition = MainWindow.Instance.Top >= SystemParameters.VirtualScreenTop
             ? MainWindow.Instance.Top + MainWindow.Instance.Height <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight
-                ? (MainWindow.Instance.Top * WindowsUtils.Dpi.DpiScaleY)
+                ? MainWindow.Instance.Top * WindowsUtils.Dpi.DpiScaleY
                 : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - MainWindow.Instance.Height) * WindowsUtils.Dpi.DpiScaleY
             : WindowsUtils.ActiveScreen.Bounds.Y;
         ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", mainWindowTopPosition.ToString(CultureInfo.InvariantCulture));
 
         double mainWindowLeftPosition = MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
             ? MainWindow.Instance.Left + MainWindow.Instance.Width <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
-                ? (MainWindow.Instance.Left * WindowsUtils.Dpi.DpiScaleX)
+                ? MainWindow.Instance.Left * WindowsUtils.Dpi.DpiScaleX
                 : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - MainWindow.Instance.Width) * WindowsUtils.Dpi.DpiScaleX
             : WindowsUtils.ActiveScreen.Bounds.X;
         ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));

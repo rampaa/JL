@@ -1086,6 +1086,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
+    // ReSharper disable once MemberCanBeMadeStatic.Local
     private void Unselect(object sender, RoutedEventArgs e)
     {
         WindowsUtils.Unselect((TextBox)sender);
