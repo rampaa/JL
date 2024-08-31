@@ -12,6 +12,7 @@ using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace JL.Windows.GUI;
 
@@ -415,59 +416,48 @@ internal sealed partial class PopupWindow : Window
         double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
         double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
 
-        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + currentWidth > WindowsUtils.ActiveScreen.Bounds.Right;
-        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + currentHeight > WindowsUtils.ActiveScreen.Bounds.Bottom;
+        double newLeft = ConfigManager.PositionPopupLeftOfCursor
+            ? mouseX - (currentWidth + WindowsUtils.DpiAwareXOffset)
+            : mouseX + WindowsUtils.DpiAwareXOffset;
 
-        double newLeft;
-        double newTop;
+        double newTop = ConfigManager.PositionPopupAboveCursor
+            ? mouseY - (currentHeight + WindowsUtils.DpiAwareYOffset)
+            : mouseY + WindowsUtils.DpiAwareYOffset;
 
-        UnavoidableMouseEnter = false;
+        Rectangle screenBounds = WindowsUtils.ActiveScreen.Bounds;
 
-        if (needsFlipX)
+        if (ConfigManager.PopupFlipX)
         {
-            // flip Leftwards while preventing -OOB
-            newLeft = mouseX - (currentWidth + WindowsUtils.DpiAwareXOffset);
-            if (newLeft < WindowsUtils.ActiveScreen.Bounds.X)
+            if (ConfigManager.PositionPopupLeftOfCursor && newLeft < screenBounds.Left)
             {
-                newLeft = WindowsUtils.ActiveScreen.Bounds.X;
+                newLeft = mouseX + WindowsUtils.DpiAwareXOffset;
+            }
+            else if (!ConfigManager.PositionPopupLeftOfCursor && newLeft + currentWidth > screenBounds.Right)
+            {
+                newLeft = mouseX - (currentWidth + WindowsUtils.DpiAwareXOffset);
             }
         }
-        else
-        {
-            // no flip
-            newLeft = mouseX + WindowsUtils.DpiAwareXOffset;
-        }
 
-        if (needsFlipY)
+        newLeft = Math.Max(screenBounds.Left, Math.Min(newLeft, screenBounds.Right - currentWidth));
+
+        if (ConfigManager.PopupFlipY)
         {
-            // flip Upwards while preventing -OOB
-            newTop = mouseY - (currentHeight + WindowsUtils.DpiAwareYOffset);
-            if (newTop < WindowsUtils.ActiveScreen.Bounds.Y)
+            if (ConfigManager.PositionPopupAboveCursor && newTop < screenBounds.Top)
             {
-                newTop = WindowsUtils.ActiveScreen.Bounds.Y;
+                newTop = mouseY + WindowsUtils.DpiAwareYOffset;
+            }
+            else if (!ConfigManager.PositionPopupAboveCursor && newTop + currentHeight > screenBounds.Bottom)
+            {
+                newTop = mouseY - (currentHeight + WindowsUtils.DpiAwareYOffset);
             }
         }
-        else
-        {
-            // no flip
-            newTop = mouseY + WindowsUtils.DpiAwareYOffset;
-        }
 
-        // stick to edges if +OOB
-        if (newLeft + currentWidth > WindowsUtils.ActiveScreen.Bounds.Right)
-        {
-            newLeft = WindowsUtils.ActiveScreen.Bounds.Right - currentWidth;
-        }
+        newTop = Math.Max(screenBounds.Top, Math.Min(newTop, screenBounds.Bottom - currentHeight));
 
-        if (newTop + currentHeight > WindowsUtils.ActiveScreen.Bounds.Bottom)
-        {
-            newTop = WindowsUtils.ActiveScreen.Bounds.Bottom - currentHeight;
-        }
-
-        if (mouseX >= newLeft && mouseX <= newLeft + currentWidth && mouseY >= newTop && mouseY <= newTop + currentHeight)
-        {
-            UnavoidableMouseEnter = true;
-        }
+        UnavoidableMouseEnter = mouseX >= newLeft
+            && mouseX <= newLeft + currentWidth
+            && mouseY >= newTop
+            && mouseY <= newTop + currentHeight;
 
         WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
     }

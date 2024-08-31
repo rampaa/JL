@@ -638,6 +638,19 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Popup position relative to cursor"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox x:Name="PopupPositionRelativeToCursorComboBox" HorizontalAlignment="Right"
+                                      SelectedValuePath="Tag">
+                                <ComboBoxItem Content="Top left" Tag="TopLeft" />
+                                <ComboBoxItem Content="Top right" Tag="TopRight" />
+                                <ComboBoxItem Content="Bottom left" Tag="BottomLeft" />
+                                <ComboBoxItem Content="Bottom right" Tag="BottomRight" />
+                            </ComboBox>
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Flip"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />

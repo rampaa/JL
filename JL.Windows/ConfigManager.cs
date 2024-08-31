@@ -87,6 +87,8 @@ internal static class ConfigManager
     };
     public static double PopupXOffset { get; set; } = 10;
     public static double PopupYOffset { get; set; } = 20;
+    public static bool PositionPopupLeftOfCursor { get; private set; } // = false;
+    public static bool PositionPopupAboveCursor { get; private set; } // = false;
     public static bool PopupFlipX { get; private set; } = true;
     public static bool PopupFlipY { get; private set; } = true;
     public static Brush PrimarySpellingColor { get; private set; } = Brushes.Chocolate;
@@ -563,6 +565,43 @@ internal static class ConfigManager
         }
 
         {
+            string? popupPositionRelativeToCursorStr = ConfigDBManager.GetSettingValue(connection, "PopupPositionRelativeToCursor");
+            if (popupPositionRelativeToCursorStr is null)
+            {
+                popupPositionRelativeToCursorStr = "BottomRight";
+                ConfigDBManager.InsertSetting(connection, "PopupPositionRelativeToCursor", popupPositionRelativeToCursorStr);
+            }
+
+            switch (popupPositionRelativeToCursorStr)
+            {
+                case "TopLeft":
+                    PositionPopupAboveCursor = true;
+                    PositionPopupLeftOfCursor = true;
+                    break;
+
+                case "TopRight":
+                    PositionPopupAboveCursor = true;
+                    PositionPopupLeftOfCursor = false;
+                    break;
+
+                case "BottomLeft":
+                    PositionPopupAboveCursor = false;
+                    PositionPopupLeftOfCursor = true;
+                    break;
+
+                case "BottomRight":
+                    PositionPopupAboveCursor = false;
+                    PositionPopupLeftOfCursor = false;
+                    break;
+
+                default:
+                    PositionPopupAboveCursor = false;
+                    PositionPopupLeftOfCursor = false;
+                    break;
+            }
+        }
+
+        {
             string? popupFlipStr = ConfigDBManager.GetSettingValue(connection, "PopupFlip");
             if (popupFlipStr is null)
             {
@@ -879,6 +918,7 @@ internal static class ConfigManager
         preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "Theme");
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "MinimumLogLevel");
+        preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupPositionRelativeToCursor");
         preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupFlip");
         preferenceWindow.LookupModeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "LookupMode");
     }
@@ -1207,6 +1247,8 @@ internal static class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupYOffset),
                 preferenceWindow.PopupYOffsetNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursor", preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, "PopupFlip", preferenceWindow.PopupFlipComboBox.SelectedValue.ToString()!);
 
