@@ -199,7 +199,7 @@ internal sealed partial class MainWindow : Window
 
             MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
 
-            if (!mergeTexts && SizeToContent is SizeToContent.Manual
+            if (!mergeTexts && SizeToContent is SizeToContent.Manual && WindowState is not WindowState.Minimized
                             && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
                 WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
@@ -1474,7 +1474,8 @@ internal sealed partial class MainWindow : Window
         // Prevents main window background flicker
         await Task.Delay(5).ConfigureAwait(true);
 
-        if (IsMouseOver
+        if (WindowState is WindowState.Minimized
+            || IsMouseOver
             || FirstPopupWindow.IsMouseOver
             || FirstPopupWindow.IsVisible
             || ManageDictionariesWindow.IsItVisible()
@@ -1582,6 +1583,11 @@ internal sealed partial class MainWindow : Window
             if (ConfigManager.GlobalHotKeys)
             {
                 WinApi.RegisterAllHotKeys(WindowHandle);
+            }
+
+            if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+            {
+                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
             }
 
             if (ConfigManager.AlwaysOnTop)
