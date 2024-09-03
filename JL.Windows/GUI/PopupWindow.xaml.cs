@@ -1941,13 +1941,10 @@ internal sealed partial class PopupWindow : Window
 
         ReadingSelectionWindow.HideWindow();
 
-        if (isFirstPopup)
+        if (isFirstPopup && ChildPopupWindow is not null)
         {
-            if (ChildPopupWindow is not null)
-            {
-                ChildPopupWindow.Close();
-                ChildPopupWindow = null;
-            }
+            ChildPopupWindow.Close();
+            ChildPopupWindow = null;
         }
 
         MiningMode = false;
