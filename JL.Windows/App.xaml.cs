@@ -65,7 +65,10 @@ internal sealed partial class App : Application
     private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
     {
         Utils.Logger.Fatal((Exception)args.ExceptionObject, "Unhandled exception");
-        Shutdown();
+        if (!args.IsTerminating)
+        {
+            Shutdown();
+        }
     }
 
     private void LogUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
