@@ -361,6 +361,7 @@ internal sealed partial class WinApi
             if (MagpieUtils.IsMagpieScaling)
             {
                 MagpieUtils.MagpieWindowTopEdgePosition = MagpieUtils.GetMagpieWindowTopEdgePosition(lParam);
+                MagpieUtils.MagpieWindowBottomEdgePosition = MagpieUtils.GetMagpieWindowBottomEdgePosition(lParam);
                 MagpieUtils.MagpieWindowLeftEdgePosition = MagpieUtils.GetMagpieWindowLeftEdgePosition(lParam);
                 MagpieUtils.MagpieWindowRightEdgePosition = MagpieUtils.GetMagpieWindowRightEdgePosition(lParam);
                 MagpieUtils.DpiAwareMagpieWindowWidth = (MagpieUtils.MagpieWindowRightEdgePosition - MagpieUtils.MagpieWindowLeftEdgePosition) / WindowsUtils.Dpi.DpiScaleX;

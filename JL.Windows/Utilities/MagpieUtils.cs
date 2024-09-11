@@ -7,6 +7,7 @@ internal static class MagpieUtils
     public static double MagpieWindowLeftEdgePosition { get; set; }
     public static double MagpieWindowRightEdgePosition { get; set; }
     public static double MagpieWindowTopEdgePosition { get; set; }
+    public static double MagpieWindowBottomEdgePosition { get; set; }
     public static double DpiAwareMagpieWindowWidth { get; set; }
 
     public static void RegisterToMagpieScalingChangedMessage(nint windowHandle)
@@ -40,10 +41,10 @@ internal static class MagpieUtils
         return WinApi.GetProp(windowHandle, "Magpie.DestTop");
     }
 
-    //public static double GetMagpieWindowBottomEdgePosition(nint windowHandle)
-    //{
-    //    return WinApi.GetProp(windowHandle, "Magpie.DestBottom");
-    //}
+    public static double GetMagpieWindowBottomEdgePosition(nint windowHandle)
+    {
+        return WinApi.GetProp(windowHandle, "Magpie.DestBottom");
+    }
 
     public static bool IsMagpieReallyScaling()
     {

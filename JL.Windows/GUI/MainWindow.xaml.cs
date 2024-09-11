@@ -24,6 +24,7 @@ using Cursors = System.Windows.Input.Cursors;
 using DpiChangedEventArgs = System.Windows.DpiChangedEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using Rectangle = System.Drawing.Rectangle;
 using Window = System.Windows.Window;
 
 namespace JL.Windows.GUI;
@@ -1393,17 +1394,51 @@ internal sealed partial class MainWindow : Window
                 MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
             }
 
+            double xPosition;
+            double yPosition;
             double width;
+            double maxDynamicHeight = ConfigManager.MainWindowMaxDynamicHeight * WindowsUtils.Dpi.DpiScaleY;
             if (!MagpieUtils.IsMagpieScaling)
             {
-                WinApi.MoveWindowToPosition(WindowHandle, WindowsUtils.ActiveScreen.Bounds.X, WindowsUtils.ActiveScreen.Bounds.Y);
-                width = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
+                Rectangle workingArea = WindowsUtils.ActiveScreen.WorkingArea;
+                xPosition = workingArea.X;
+
+                if (ConfigManager.PositionPopupAboveCursor)
+                {
+                    yPosition = workingArea.Bottom - maxDynamicHeight;
+                    if (yPosition < workingArea.Top)
+                    {
+                        yPosition = workingArea.Top;
+                    }
+                }
+                else
+                {
+                    yPosition = workingArea.Y;
+                }
+
+                width = workingArea.Width / WindowsUtils.Dpi.DpiScaleX;
             }
             else
             {
-                WinApi.MoveWindowToPosition(WindowHandle, MagpieUtils.MagpieWindowLeftEdgePosition, MagpieUtils.MagpieWindowTopEdgePosition);
+                xPosition = MagpieUtils.MagpieWindowLeftEdgePosition;
+
+                if (ConfigManager.PositionPopupAboveCursor)
+                {
+                    yPosition = MagpieUtils.MagpieWindowBottomEdgePosition - maxDynamicHeight;
+                    if (yPosition < MagpieUtils.MagpieWindowTopEdgePosition)
+                    {
+                        yPosition = MagpieUtils.MagpieWindowTopEdgePosition;
+                    }
+                }
+                else
+                {
+                    yPosition = MagpieUtils.MagpieWindowTopEdgePosition;
+                }
+
                 width = MagpieUtils.DpiAwareMagpieWindowWidth;
             }
+
+            WinApi.MoveWindowToPosition(WindowHandle, xPosition, yPosition);
 
             if (ConfigManager.MainWindowMaxDynamicWidth < width)
             {
