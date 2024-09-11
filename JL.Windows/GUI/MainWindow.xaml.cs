@@ -171,24 +171,24 @@ internal sealed partial class MainWindow : Window
         bool mergeTexts = false;
         string? subsequentText = null;
 
-        if (ConfigManager.MergeSequentialTextsWhenTheyMatch)
-        {
-            DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-
-            mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
-                          || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                         && sanitizedText.StartsWith(MainTextBox.Text, StringComparison.Ordinal);
-
-            s_lastTextCopyTime = preciseTimeNow;
-
-            if (mergeTexts)
-            {
-                subsequentText = sanitizedText[MainTextBox.Text.Length..];
-            }
-        }
-
         Dispatcher.Invoke(() =>
         {
+            if (ConfigManager.MergeSequentialTextsWhenTheyMatch)
+            {
+                DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
+
+                mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
+                              || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
+                             && sanitizedText.StartsWith(MainTextBox.Text, StringComparison.Ordinal);
+
+                s_lastTextCopyTime = preciseTimeNow;
+
+                if (mergeTexts)
+                {
+                    subsequentText = sanitizedText[MainTextBox.Text.Length..];
+                }
+            }
+
             if (mergeTexts)
             {
                 MainTextBox.AppendText(subsequentText);
