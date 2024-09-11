@@ -10,7 +10,7 @@
         SizeToContent="Height"
         Focusable="False"
         ShowInTaskbar="False"
-        Title="AlertWindow" MaxHeight="200" Width="500" Topmost="True" Background="{DynamicResource RegionBrush}"
+        Title="AlertWindow" Width="500" Topmost="True" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal">
     <Grid>
         <Border Name="AlertBorder" BorderThickness="2">

@@ -177,15 +177,16 @@ internal sealed partial class MainWindow : Window
             {
                 DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
 
+                string currentText = MainTextBox.Text;
                 mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
                               || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                             && sanitizedText.StartsWith(MainTextBox.Text, StringComparison.Ordinal);
+                             && sanitizedText.StartsWith(currentText, StringComparison.Ordinal);
 
                 s_lastTextCopyTime = preciseTimeNow;
 
                 if (mergeTexts)
                 {
-                    subsequentText = sanitizedText[MainTextBox.Text.Length..];
+                    subsequentText = sanitizedText[currentText.Length..];
                 }
             }
 
