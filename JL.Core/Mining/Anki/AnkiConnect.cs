@@ -101,14 +101,14 @@ internal static class AnkiConnect
         }
         catch (HttpRequestException ex)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Communication error: Is Anki open?");
-            Utils.Logger.Error(ex, "Communication error: Is Anki open?");
+            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
+            Utils.Logger.Error(ex, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
             return null;
         }
         catch (Exception ex)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Communication error: Unknown error");
-            Utils.Logger.Error(ex, "Communication error: Unknown error");
+            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to AnkiConnect");
+            Utils.Logger.Error(ex, "Couldn't connect to AnkiConnect");
             return null;
         }
     }
