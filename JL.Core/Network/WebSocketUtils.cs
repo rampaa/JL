@@ -40,41 +40,67 @@ public static class WebSocketUtils
     {
         s_webSocketTask = Task.Run(async () =>
         {
-            try
+            do
             {
-                using ClientWebSocket webSocketClient = new();
-                await webSocketClient.ConnectAsync(CoreConfigManager.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
-                byte[] buffer = new byte[1024];
-
-                while (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
+                try
                 {
-                    try
+                    using ClientWebSocket webSocketClient = new();
+                    await webSocketClient.ConnectAsync(CoreConfigManager.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
+                    Memory<byte> buffer = new byte[1024];
+
+                    while (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
                     {
-                        WebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
-
-                        if (!CoreConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
+                        try
                         {
-                            return;
-                        }
-
-                        if (result.MessageType is WebSocketMessageType.Text)
-                        {
-                            using MemoryStream memoryStream = new();
-                            await memoryStream.WriteAsync(buffer.AsMemory(0, result.Count), cancellationToken).ConfigureAwait(false);
-
-                            while (!result.EndOfMessage)
+                            ValueWebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
+                            if (!CoreConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
                             {
-                                result = await webSocketClient.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
-                                await memoryStream.WriteAsync(buffer.AsMemory(0, result.Count), cancellationToken).ConfigureAwait(false);
+                                return;
                             }
 
-                            _ = memoryStream.Seek(0, SeekOrigin.Begin);
+                            if (result.MessageType is WebSocketMessageType.Text)
+                            {
+                                using MemoryStream memoryStream = new();
+                                await memoryStream.WriteAsync(buffer[..result.Count], cancellationToken).ConfigureAwait(false);
 
-                            string text = s_utf8NoBom.GetString(memoryStream.ToArray());
-                            _ = Task.Run(async () => await Utils.Frontend.CopyFromWebSocket(text).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
+                                while (!result.EndOfMessage)
+                                {
+                                    result = await webSocketClient.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
+                                    await memoryStream.WriteAsync(buffer[..result.Count], cancellationToken).ConfigureAwait(false);
+                                }
+
+                                _ = memoryStream.Seek(0, SeekOrigin.Begin);
+
+                                string text = s_utf8NoBom.GetString(memoryStream.ToArray());
+                                _ = Task.Run(async () => await Utils.Frontend.CopyFromWebSocket(text).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
+                            }
+                        }
+                        catch (WebSocketException webSocketException)
+                        {
+                            Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
+                            Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
+
+                            if (!CoreConfigManager.AutoReconnectToWebSocket)
+                            {
+                                if (!CoreConfigManager.CaptureTextFromClipboard)
+                                {
+                                    StatsUtils.StatsStopWatch.Stop();
+                                    StatsUtils.StopStatsTimer();
+                                }
+                                else
+                                {
+                                    await Task.Delay(200).ConfigureAwait(false);
+                                }
+                            }
+
+                            break;
                         }
                     }
-                    catch (WebSocketException webSocketException)
+                }
+
+                catch (WebSocketException webSocketException)
+                {
+                    if (!CoreConfigManager.AutoReconnectToWebSocket)
                     {
                         if (!CoreConfigManager.CaptureTextFromClipboard)
                         {
@@ -82,25 +108,17 @@ public static class WebSocketUtils
                             StatsUtils.StopStatsTimer();
                         }
 
-                        Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
-                        Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
-
-                        break;
+                        Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
+                        Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
+                    }
+                    else
+                    {
+                        Utils.Logger.Verbose(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
+                        await Task.Delay(200).ConfigureAwait(false);
                     }
                 }
             }
-
-            catch (WebSocketException webSocketException)
-            {
-                if (!CoreConfigManager.CaptureTextFromClipboard)
-                {
-                    StatsUtils.StatsStopWatch.Stop();
-                    StatsUtils.StopStatsTimer();
-                }
-
-                Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
-            }
+            while (CoreConfigManager.AutoReconnectToWebSocket && CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested);
         }, cancellationToken);
     }
 }

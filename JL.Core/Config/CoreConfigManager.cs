@@ -16,6 +16,7 @@ public static class CoreConfigManager
     public static double LookupRate { get; private set; } // = 0;
     public static bool CaptureTextFromClipboard { get; set; } = true;
     public static bool CaptureTextFromWebSocket { get; set; } // = false;
+    public static bool AutoReconnectToWebSocket { get; private set; } // = false;
     public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public static bool TextBoxRemoveNewlines { get; private set; } // = false;
     public static Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
@@ -71,6 +72,7 @@ public static class CoreConfigManager
 
         {
             CaptureTextFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket), bool.TryParse);
+            AutoReconnectToWebSocket = ConfigDBManager.GetValueFromConfig(connection, AutoReconnectToWebSocket, nameof(AutoReconnectToWebSocket), bool.TryParse);
 
             string? webSocketUriStr = ConfigDBManager.GetSettingValue(connection, nameof(WebSocketUri));
             if (webSocketUriStr is null)

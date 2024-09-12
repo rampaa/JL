@@ -307,6 +307,15 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Auto reconnect to WebSocket"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="If this option is enabled, JL will *continously* try connecting to the specified WebSocket"/>
+                            <CheckBox x:Name="AutoReconnectToWebSocketCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Enable clipboard text capture"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />

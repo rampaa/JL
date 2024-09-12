@@ -838,6 +838,7 @@ internal static class ConfigManager
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CoreConfigManager.CaptureTextFromClipboard;
         preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CoreConfigManager.CaptureTextFromWebSocket;
+        preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked = CoreConfigManager.AutoReconnectToWebSocket;
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked = OnlyCaptureTextWithJapaneseChars;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
@@ -1063,6 +1064,9 @@ internal static class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CaptureTextFromWebSocket),
                 preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AutoReconnectToWebSocket),
+                preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(OnlyCaptureTextWithJapaneseChars),
                 preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked.ToString()!);
