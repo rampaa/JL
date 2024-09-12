@@ -77,9 +77,6 @@ public static class WebSocketUtils
                         }
                         catch (WebSocketException webSocketException)
                         {
-                            Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
-                            Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
-
                             if (!CoreConfigManager.AutoReconnectToWebSocket)
                             {
                                 if (!CoreConfigManager.CaptureTextFromClipboard)
@@ -87,10 +84,19 @@ public static class WebSocketUtils
                                     StatsUtils.StatsStopWatch.Stop();
                                     StatsUtils.StopStatsTimer();
                                 }
-                                else
+                            }
+                            else
+                            {
+                                if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
                                 {
                                     await Task.Delay(200).ConfigureAwait(false);
                                 }
+                            }
+
+                            if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
+                            {
+                                Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
+                                Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
                             }
 
                             break;
@@ -108,13 +114,19 @@ public static class WebSocketUtils
                             StatsUtils.StopStatsTimer();
                         }
 
-                        Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
-                        Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
+                        if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
+                        {
+                            Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
+                            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
+                        }
                     }
                     else
                     {
                         Utils.Logger.Verbose(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
-                        await Task.Delay(200).ConfigureAwait(false);
+                        if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
+                        {
+                            await Task.Delay(200).ConfigureAwait(false);
+                        }
                     }
                 }
             }
