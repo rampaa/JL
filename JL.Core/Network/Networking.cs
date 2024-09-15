@@ -16,7 +16,7 @@ public static class Networking
         CheckCertificateRevocationList = true
     });
 
-    internal const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
+    internal const string Jpod101NoAudioMd5Hash = "7E2C2F954EF6051373BA916F000168DC";
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
     private static readonly Timer s_updaterTimer = new();
     private static bool s_updatingJL; // false

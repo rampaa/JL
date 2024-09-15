@@ -96,9 +96,7 @@ public static partial class Utils
     internal static string GetMd5String(byte[] bytes)
     {
         byte[] hash = MD5.HashData(bytes);
-        string encoded = BitConverter.ToString(hash);
-
-        return encoded;
+        return Convert.ToHexString(hash);
     }
 #pragma warning restore CA5351
 
