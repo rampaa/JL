@@ -28,37 +28,22 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 
     public string BuildFormattedDefinition(DictOptions options)
     {
-        string? tempWordClass = null;
-        for (int i = 0; i < WordClasses.Length; i++)
+        string tempWordClass;
+        if (HasUserDefinedWordClass)
         {
-            string wordClass = WordClasses[i];
-            if (wordClass is "adj-i")
-            {
-                tempWordClass = "adjective";
-                break;
-            }
-            else if (wordClass is "noun")
-            {
-                tempWordClass = "noun";
-                break;
-            }
-            else if (wordClass is "other")
-            {
-                tempWordClass = "other";
-                break;
-            }
+            tempWordClass = string.Join(", ", WordClasses);
         }
-
-        if (tempWordClass is null)
+        else
         {
-            if (HasUserDefinedWordClass)
+            string wordClass = WordClasses[0];
+            tempWordClass = wordClass switch
             {
-                tempWordClass = string.Join(", ", WordClasses);
-            }
-            else
-            {
-                tempWordClass = "verb";
-            }
+                "adj-i" => "adjective",
+                "noun" => "noun",
+                "other" => "other",
+                "v1" => "verb",
+                _ => "other",
+            };
         }
 
         if (Definitions.Length is 1)
