@@ -62,18 +62,18 @@ internal sealed partial class App : Application
         return true;
     }
 
-    private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
+    private static void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
     {
         Utils.Logger.Fatal((Exception)args.ExceptionObject, "Unhandled exception");
-        if (!args.IsTerminating)
-        {
-            Shutdown();
-        }
+        //if (!args.IsTerminating)
+        //{
+        //    Shutdown();
+        //}
     }
 
-    private void LogUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
+    private static void LogUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
     {
         Utils.Logger.Fatal(args.Exception, "Unobserved task exception");
-        Shutdown();
+        // Shutdown();
     }
 }
