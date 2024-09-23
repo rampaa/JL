@@ -16,11 +16,8 @@ internal static class BacklogUtils
 
     public static void AddToBacklog(string text)
     {
-        if (ConfigManager.EnableBacklog)
-        {
-            Backlog.Add(text);
-            s_currentTextIndex = Backlog.Count - 1;
-        }
+        Backlog.Add(text);
+        s_currentTextIndex = Backlog.Count - 1;
     }
 
     public static void ReplaceLastBacklogText(string text)

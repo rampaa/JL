@@ -626,13 +626,16 @@ internal static class WindowsUtils
     public static void HandlePostCopy(string text, string? subsequentText)
     {
         bool newText = subsequentText is null;
-        if (newText)
+        if (ConfigManager.EnableBacklog)
         {
-            BacklogUtils.AddToBacklog(text);
-        }
-        else
-        {
-            BacklogUtils.ReplaceLastBacklogText(text);
+            if (newText)
+            {
+                BacklogUtils.AddToBacklog(text);
+            }
+            else
+            {
+                BacklogUtils.ReplaceLastBacklogText(text);
+            }
         }
 
         if (ConfigManager.TextToSpeechOnTextChange
