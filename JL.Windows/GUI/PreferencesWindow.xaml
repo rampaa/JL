@@ -1568,7 +1568,13 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Search URL" VerticalAlignment="Center" TextWrapping="Wrap" Style="{StaticResource TextBlockDefault}" />
+                            <TextBlock HorizontalAlignment="Left"
+                                       Text="Search URL"
+                                       Cursor="Help"
+                                       ToolTip="The {SearchTerm} marker will be replaced with the text selected for searching"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Style="{StaticResource TextBlockDefault}" />
                             <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap" />
                         </DockPanel>
 
