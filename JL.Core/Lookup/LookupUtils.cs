@@ -409,6 +409,7 @@ public static class LookupUtils
 
                 return 1;
             })
+            .ThenByDescending(static lookupResult => lookupResult.PrimarySpelling.Length)
             .ThenBy(static lookupResult =>
             {
                 if (lookupResult.Frequencies?.Count > 0)
