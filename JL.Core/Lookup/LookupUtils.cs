@@ -357,6 +357,7 @@ public static class LookupUtils
             .OrderByDescending(static lookupResult => lookupResult.MatchedText.Length)
             .ThenByDescending(static lookupResult => lookupResult.PrimarySpelling == lookupResult.MatchedText)
             .ThenByDescending(static lookupResult => lookupResult.Readings?.Contains(lookupResult.MatchedText) ?? false)
+            .ThenByDescending(static lookupResult => lookupResult.DeconjugationProcess is null ? int.MaxValue : lookupResult.PrimarySpelling.Length)
             .ThenBy(static lookupResult => lookupResult.Dict.Priority)
             .ThenBy(static lookupResult =>
             {
@@ -409,7 +410,6 @@ public static class LookupUtils
 
                 return 1;
             })
-            .ThenByDescending(static lookupResult => lookupResult.PrimarySpelling.Length)
             .ThenBy(static lookupResult =>
             {
                 if (lookupResult.Frequencies?.Count > 0)
