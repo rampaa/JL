@@ -22,9 +22,6 @@ public sealed class DictOptions(
     ShowPitchAccentWithDottedLinesOption? showPitchAccentWithDottedLines = null,
     AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null)
 {
-    // ReSharper disable once MemberCanBeInternal
-    public DictOptions() : this(new UseDBOption(true), new NoAllOption(false)) { }
-
     public UseDBOption UseDB { get; } = useDB;
     public NoAllOption NoAll { get; } = noAll;
     public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; internal set; } = newlineBetweenDefinitions;

@@ -4,7 +4,7 @@ using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts;
 
-public sealed class Dict(DictType type, string name, string path, bool active, int priority, int size, bool ready, DictOptions? options)
+public sealed class Dict(DictType type, string name, string path, bool active, int priority, int size, bool ready, DictOptions options)
 {
     public DictType Type { get; internal set; } = type;
     public string Name { get; set; } = name;
@@ -21,5 +21,5 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
     [JsonIgnore] public IDictionary<string, IList<IDictRecord>> Contents { get; set; } = FrozenDictionary<string, IList<IDictRecord>>.Empty;
 #pragma warning restore CA2227
 
-    public DictOptions Options { get; set; } = options ?? new DictOptions();
+    public DictOptions Options { get; set; } = options;
 }
