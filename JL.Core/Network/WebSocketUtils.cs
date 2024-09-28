@@ -46,7 +46,9 @@ public static class WebSocketUtils
                 {
                     using ClientWebSocket webSocketClient = new();
                     await webSocketClient.ConnectAsync(CoreConfigManager.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
-                    Memory<byte> buffer = new byte[1024];
+
+                    // 256-4096
+                    Memory<byte> buffer = new byte[1024 * 4];
 
                     while (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
                     {
@@ -85,13 +87,6 @@ public static class WebSocketUtils
                                     StatsUtils.StopStatsTimer();
                                 }
                             }
-                            else
-                            {
-                                if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
-                                {
-                                    await Task.Delay(200).ConfigureAwait(false);
-                                }
-                            }
 
                             if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
                             {
@@ -123,10 +118,6 @@ public static class WebSocketUtils
                     else
                     {
                         Utils.Logger.Verbose(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
-                        if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
-                        {
-                            await Task.Delay(200).ConfigureAwait(false);
-                        }
                     }
                 }
             }
