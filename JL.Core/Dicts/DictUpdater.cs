@@ -256,7 +256,7 @@ public static class DictUpdater
         Utils.ClearStringPoolIfDictsAreReady();
     }
 
-    internal static async Task AutoUpdateBuiltInDicts()
+    internal static Task AutoUpdateBuiltInDicts()
     {
         DictType[] dicts =
         [
@@ -287,19 +287,14 @@ public static class DictUpdater
             }
 
             Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
-            if (dict.Type is DictType.JMdict)
-            {
-                await UpdateJmdict(pathExists, true).ConfigureAwait(false);
-            }
-            else if (dict.Type is DictType.JMnedict)
-            {
-                await UpdateJmnedict(pathExists, true).ConfigureAwait(false);
-            }
-            else
-            {
-                await UpdateKanjidic(pathExists, true).ConfigureAwait(false);
-            }
+            return dict.Type is DictType.JMdict
+                ? UpdateJmdict(pathExists, true)
+                : dict.Type is DictType.JMnedict
+                    ? UpdateJmnedict(pathExists, true)
+                    : UpdateKanjidic(pathExists, true);
         }
+
+        return Task.CompletedTask;
     }
 
 }
