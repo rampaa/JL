@@ -469,6 +469,27 @@
                             <CheckBox x:Name="SteppedBacklogWithMouseWheelCheckBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Use custom line height"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       Cursor="Help"
+                                       ToolTip="If enabled, main window will use the specified line height below.
+                                       &#10;If disabled, the line height will be determined automatically from the current font characteristics.
+                                       &#10;Custom line height does not affect the height of the text, it changes the height of the line that contains the text.
+                                       &#10;To change the size of the text, use the Font size option.
+                                       &#10;Enabling this option is *not* recommended."/>
+                            <CheckBox x:Name="TextBoxUseCustomLineHeightCheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Custom line height"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="TextBoxCustomLineHeightNumericUpDown" Minimum="1" Maximum="1000" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

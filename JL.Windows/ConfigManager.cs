@@ -65,6 +65,8 @@ internal static class ConfigManager
     private static bool HorizontallyCenterMainWindowText { get; set; } // = false;
     public static bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
     public static double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
+    public static bool TextBoxUseCustomLineHeight { get; private set; } // = false;
+    public static double TextBoxCustomLineHeight { get; private set; } = 75;
 
     #endregion
 
@@ -357,6 +359,19 @@ internal static class ConfigManager
         DictTypeFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DictTypeFontSize, nameof(DictTypeFontSize), double.TryParse);
         MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds), double.TryParse);
         MaxNumResultsNotInMiningMode = ConfigDBManager.GetValueFromConfig(connection, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
+
+        TextBoxUseCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, TextBoxUseCustomLineHeight, nameof(TextBoxUseCustomLineHeight), bool.TryParse);
+        TextBoxCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, TextBoxCustomLineHeight, nameof(TextBoxCustomLineHeight), double.TryParse);
+        if (TextBoxUseCustomLineHeight)
+        {
+            MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.BlockLineHeight);
+            MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineHeightProperty, TextBoxCustomLineHeight);
+        }
+        else
+        {
+            MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.MaxHeight);
+            MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineHeightProperty, double.NaN);
+        }
 
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
         PopupWindowUtils.PopupAutoHideTimer.Enabled = false;
@@ -848,6 +863,7 @@ internal static class ConfigManager
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
         preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked = MergeSequentialTextsWhenTheyMatch;
+        preferenceWindow.TextBoxUseCustomLineHeightCheckBox.IsChecked = TextBoxUseCustomLineHeight;
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
@@ -885,6 +901,7 @@ internal static class ConfigManager
         preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value = DeconjugationInfoFontSize;
         preferenceWindow.DictTypeFontSizeNumericUpDown.Value = DictTypeFontSize;
         preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value = MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds;
+        preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value = TextBoxCustomLineHeight;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
         preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
         preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
@@ -1094,6 +1111,9 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MergeSequentialTextsWhenTheyMatch),
                 preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked.ToString()!);
 
+            ConfigDBManager.UpdateSetting(connection, nameof(TextBoxUseCustomLineHeight),
+                preferenceWindow.TextBoxUseCustomLineHeightCheckBox.IsChecked.ToString()!);
+
             ConfigDBManager.UpdateSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar),
                 preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked.ToString()!);
 
@@ -1238,6 +1258,9 @@ internal static class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds),
                 preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(TextBoxCustomLineHeight),
+                preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(SeparatorColor), preferenceWindow.SeparatorColorButton.Tag.ToString()!);
 

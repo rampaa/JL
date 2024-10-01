@@ -44,14 +44,14 @@
 
         <uc:TouchScreenTextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                  Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}" 
-                 IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
+                 IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
                  MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" PreviewTouchDown="MainTextBox_PreviewTouchDown" PreviewTouchUp="MainTextBox_PreviewTouchUp"
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" UndoLimit="0"
                  PreviewMouseUp="MainTextBox_PreviewMouseUp" ContextMenuOpening="MainTextBox_ContextMenuOpening" AcceptsReturn="True" AcceptsTab="True">
 
             <uc:TouchScreenTextBox.ContextMenu>
-                <ContextMenu Name="MainTextBoxContextMenu">
+                <ContextMenu Name="MainTextBoxContextMenu" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight">
                     <MenuItem
                         Name="AddNameMenuItem"
                         Header="Add name"
