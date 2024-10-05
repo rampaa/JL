@@ -140,28 +140,29 @@ internal static class FreqDBManager
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        if (dataReader.HasRows)
+        if (!dataReader.HasRows)
         {
-            Dictionary<string, List<FrequencyRecord>> results = new(StringComparer.Ordinal);
-            while (dataReader.Read())
-            {
-                FrequencyRecord record = GetRecord(dataReader);
-
-                string searchKey = dataReader.GetString(nameof(searchKey));
-                if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
-                {
-                    result.Add(record);
-                }
-                else
-                {
-                    results[searchKey] = [record];
-                }
-            }
-
-            return results;
+            return null;
         }
 
-        return null;
+        Dictionary<string, List<FrequencyRecord>> results = new(StringComparer.Ordinal);
+        while (dataReader.Read())
+        {
+            FrequencyRecord record = GetRecord(dataReader);
+
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
+            {
+                result.Add(record);
+            }
+            else
+            {
+                results[searchKey] = [record];
+            }
+        }
+
+        return results;
+
     }
 
     public static List<FrequencyRecord>? GetRecordsFromDB(string dbName, string term)

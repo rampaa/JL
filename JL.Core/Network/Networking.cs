@@ -59,8 +59,6 @@ public static class Networking
                         foreach (JsonElement asset in assets.EnumerateArray())
                         {
                             string latestReleaseUrl = asset.GetProperty("browser_download_url").GetString()!;
-
-                            // Add OS check?
                             if (latestReleaseUrl.Contains(architecture, StringComparison.Ordinal))
                             {
                                 foundRelease = true;

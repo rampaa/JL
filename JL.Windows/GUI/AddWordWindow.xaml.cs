@@ -61,49 +61,51 @@ internal sealed partial class AddWordWindow
             DefinitionsTextBox.ClearValue(BorderBrushProperty);
         }
 
-        if (isValid)
+        if (!isValid)
         {
-            string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
-            string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
-            string rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
-                .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
-            string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
-
-            string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-            string[]? readings = rawReadings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            if (readings.Length is 0
-                || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
-            {
-                readings = null;
-            }
-
-            string[]? wordClasses = rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            if (wordClasses.Length is 0)
-            {
-                wordClasses = null;
-            }
-
-            DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
-                ? DictType.CustomWordDictionary
-                : DictType.ProfileCustomWordDictionary;
-
-            Dict dict = DictUtils.SingleDictTypeDicts[dictType];
-            if (dict.Active)
-            {
-                CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);
-            }
-
-            PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
-            Close();
-
-            string line = string.IsNullOrWhiteSpace(rawWordClasses)
-                ? $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\n"
-                : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
-
-            string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-            await File.AppendAllTextAsync(path, line).ConfigureAwait(false);
+            return;
         }
+
+        string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+        string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+        string rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
+            .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
+        string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+
+        string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        string[]? readings = rawReadings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (readings.Length is 0
+            || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
+        {
+            readings = null;
+        }
+
+        string[]? wordClasses = rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (wordClasses.Length is 0)
+        {
+            wordClasses = null;
+        }
+
+        DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
+            ? DictType.CustomWordDictionary
+            : DictType.ProfileCustomWordDictionary;
+
+        Dict dict = DictUtils.SingleDictTypeDicts[dictType];
+        if (dict.Active)
+        {
+            CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);
+        }
+
+        PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
+        Close();
+
+        string line = string.IsNullOrWhiteSpace(rawWordClasses)
+            ? $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\n"
+            : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
+
+        string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        await File.AppendAllTextAsync(path, line).ConfigureAwait(false);
     }
 
     private void Window_Closed(object sender, EventArgs e)

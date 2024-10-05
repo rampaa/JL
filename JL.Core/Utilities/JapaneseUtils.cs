@@ -356,55 +356,57 @@ public static partial class JapaneseUtils
             ? text[startPosition..(endPosition + 1)].Trim()
             : "";
 
-        if (sentence.Length > 1)
+        if (sentence.Length <= 1)
         {
-            if (s_rightToLeftBracketDict.ContainsKey(sentence[0]))
+            return sentence;
+        }
+
+        if (s_rightToLeftBracketDict.ContainsKey(sentence[0]))
+        {
+            sentence = sentence[1..];
+        }
+
+        if (s_leftToRightBracketDict.ContainsKey(sentence.LastOrDefault()))
+        {
+            sentence = sentence[..^1];
+        }
+
+        if (s_leftToRightBracketDict.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
+        {
+            if (sentence[^1] == rightBracket)
+            {
+                sentence = sentence[1..^1];
+            }
+            else if (!sentence.Contains(rightBracket, StringComparison.Ordinal))
             {
                 sentence = sentence[1..];
             }
-
-            if (s_leftToRightBracketDict.ContainsKey(sentence.LastOrDefault()))
+            else
             {
-                sentence = sentence[..^1];
-            }
+                int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
+                int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
 
-            if (s_leftToRightBracketDict.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
-            {
-                if (sentence[^1] == rightBracket)
-                {
-                    sentence = sentence[1..^1];
-                }
-                else if (!sentence.Contains(rightBracket, StringComparison.Ordinal))
+                if (numberOfLeftBrackets == numberOfRightBrackets + 1)
                 {
                     sentence = sentence[1..];
                 }
-                else
-                {
-                    int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
-                    int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
-
-                    if (numberOfLeftBrackets == numberOfRightBrackets + 1)
-                    {
-                        sentence = sentence[1..];
-                    }
-                }
             }
+        }
 
-            else if (s_rightToLeftBracketDict.TryGetValue(sentence.LastOrDefault(), out char leftBracket))
+        else if (s_rightToLeftBracketDict.TryGetValue(sentence.LastOrDefault(), out char leftBracket))
+        {
+            if (!sentence.Contains(leftBracket, StringComparison.Ordinal))
             {
-                if (!sentence.Contains(leftBracket, StringComparison.Ordinal))
+                sentence = sentence[..^1];
+            }
+            else
+            {
+                int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
+                int numberOfRightBrackets = sentence.Count(p => p == sentence[^1]);
+
+                if (numberOfRightBrackets == numberOfLeftBrackets + 1)
                 {
                     sentence = sentence[..^1];
-                }
-                else
-                {
-                    int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
-                    int numberOfRightBrackets = sentence.Count(p => p == sentence[^1]);
-
-                    if (numberOfRightBrackets == numberOfLeftBrackets + 1)
-                    {
-                        sentence = sentence[..^1];
-                    }
                 }
             }
         }

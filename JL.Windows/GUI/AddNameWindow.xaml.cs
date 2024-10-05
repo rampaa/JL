@@ -48,45 +48,47 @@ internal sealed partial class AddNameWindow
             SpellingTextBox.ClearValue(BorderBrushProperty);
         }
 
-        if (isValid)
+        if (!isValid)
         {
+            return;
+        }
+
 #pragma warning disable CA1308 // Normalize strings to uppercase
-            string nameType =
-                NameTypeStackPanel.Children.OfType<RadioButton>()
-                    .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!.ToLowerInvariant();
+        string nameType =
+            NameTypeStackPanel.Children.OfType<RadioButton>()
+                .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!.ToLowerInvariant();
 #pragma warning restore CA1308 // Normalize strings to uppercase
 
-            string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+        string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
 
-            string? reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
-            if (reading.Length is 0 || reading == spelling)
-            {
-                reading = null;
-            }
-
-            string? extraInfo = ExtraInfoTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
-            if (extraInfo.Length is 0)
-            {
-                extraInfo = null;
-            }
-
-            DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
-                ? DictType.CustomNameDictionary
-                : DictType.ProfileCustomNameDictionary;
-
-            Dict dict = DictUtils.SingleDictTypeDicts[dictType];
-            if (dict.Active)
-            {
-                CustomNameLoader.AddToDictionary(spelling, reading, nameType, extraInfo, dict.Contents);
-            }
-
-            PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
-            Close();
-
-            string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-            string line = $"{spelling}\t{reading}\t{nameType}\t{extraInfo}\n";
-            await File.AppendAllTextAsync(path, line).ConfigureAwait(false);
+        string? reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+        if (reading.Length is 0 || reading == spelling)
+        {
+            reading = null;
         }
+
+        string? extraInfo = ExtraInfoTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+        if (extraInfo.Length is 0)
+        {
+            extraInfo = null;
+        }
+
+        DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
+            ? DictType.CustomNameDictionary
+            : DictType.ProfileCustomNameDictionary;
+
+        Dict dict = DictUtils.SingleDictTypeDicts[dictType];
+        if (dict.Active)
+        {
+            CustomNameLoader.AddToDictionary(spelling, reading, nameType, extraInfo, dict.Contents);
+        }
+
+        PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
+        Close();
+
+        string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        string line = $"{spelling}\t{reading}\t{nameType}\t{extraInfo}\n";
+        await File.AppendAllTextAsync(path, line).ConfigureAwait(false);
     }
 
     private void Window_Closed(object sender, EventArgs e)

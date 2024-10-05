@@ -256,23 +256,25 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 }
             }
 
-            if (frequency is int.MaxValue && AlternativeSpellings is not null)
+            if (frequency is not int.MaxValue || AlternativeSpellings is null)
             {
-                for (int i = 0; i < AlternativeSpellings.Length; i++)
+                return frequency;
+            }
+
+            for (int i = 0; i < AlternativeSpellings.Length; i++)
+            {
+                if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
+                        out IList<FrequencyRecord>? alternativeSpellingFreqResults))
                 {
-                    if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
-                            out IList<FrequencyRecord>? alternativeSpellingFreqResults))
+                    int alternativeSpellingFreqResultCount = alternativeSpellingFreqResults.Count;
+                    for (int j = 0; j < alternativeSpellingFreqResultCount; j++)
                     {
-                        int alternativeSpellingFreqResultCount = alternativeSpellingFreqResults.Count;
-                        for (int j = 0; j < alternativeSpellingFreqResultCount; j++)
+                        FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+                        if (Readings?.Contains(alternativeSpellingFreqResult.Spelling) ?? false)
                         {
-                            FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
-                            if (Readings?.Contains(alternativeSpellingFreqResult.Spelling) ?? false)
+                            if (frequency > alternativeSpellingFreqResult.Frequency)
                             {
-                                if (frequency > alternativeSpellingFreqResult.Frequency)
-                                {
-                                    frequency = alternativeSpellingFreqResult.Frequency;
-                                }
+                                frequency = alternativeSpellingFreqResult.Frequency;
                             }
                         }
                     }
@@ -285,7 +287,6 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
             for (int i = 0; i < Readings.Length; i++)
             {
                 string reading = Readings[i];
-
                 if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading),
                         out IList<FrequencyRecord>? readingFreqResults))
                 {
@@ -318,7 +319,6 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-
                 if (PrimarySpelling == freqResult.Spelling || (Readings?.Contains(freqResult.Spelling) ?? false))
                 {
                     if (frequency > freqResult.Frequency)
@@ -328,22 +328,24 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 }
             }
 
-            if (frequency is int.MaxValue && AlternativeSpellings is not null)
+            if (frequency is not int.MaxValue || AlternativeSpellings is null)
             {
-                for (int i = 0; i < AlternativeSpellings.Length; i++)
+                return frequency;
+            }
+
+            for (int i = 0; i < AlternativeSpellings.Length; i++)
+            {
+                if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]), out List<FrequencyRecord>? alternativeSpellingFreqResults))
                 {
-                    if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]), out List<FrequencyRecord>? alternativeSpellingFreqResults))
+                    int alternativeSpellingFreqResultCount = alternativeSpellingFreqResults.Count;
+                    for (int j = 0; j < alternativeSpellingFreqResultCount; j++)
                     {
-                        int alternativeSpellingFreqResultCount = alternativeSpellingFreqResults.Count;
-                        for (int j = 0; j < alternativeSpellingFreqResultCount; j++)
+                        FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+                        if (Readings?.Contains(alternativeSpellingFreqResult.Spelling) ?? false)
                         {
-                            FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
-                            if (Readings?.Contains(alternativeSpellingFreqResult.Spelling) ?? false)
+                            if (frequency > alternativeSpellingFreqResult.Frequency)
                             {
-                                if (frequency > alternativeSpellingFreqResult.Frequency)
-                                {
-                                    frequency = alternativeSpellingFreqResult.Frequency;
-                                }
+                                frequency = alternativeSpellingFreqResult.Frequency;
                             }
                         }
                     }

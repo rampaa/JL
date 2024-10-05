@@ -131,19 +131,19 @@ internal static class BacklogUtils
 
     public static Task WriteBacklog()
     {
-        if (ConfigManager.EnableBacklog
-            && ConfigManager.AutoSaveBacklogBeforeClosing
-            && Backlog.Count > 0)
+        if (!ConfigManager.EnableBacklog
+            || !ConfigManager.AutoSaveBacklogBeforeClosing
+            || Backlog.Count is 0)
         {
-            string directory = Path.Join(Utils.ApplicationPath, "Backlogs");
-            if (!Directory.Exists(directory))
-            {
-                _ = Directory.CreateDirectory(directory);
-            }
-
-            return File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{ProfileUtils.CurrentProfileName}_{Process.GetCurrentProcess().StartTime:yyyy.MM.dd_HH.mm.ss}-{DateTime.Now:yyyy.MM.dd_HH.mm.ss}.txt")), Backlog);
+            return Task.CompletedTask;
         }
 
-        return Task.CompletedTask;
+        string directory = Path.Join(Utils.ApplicationPath, "Backlogs");
+        if (!Directory.Exists(directory))
+        {
+            _ = Directory.CreateDirectory(directory);
+        }
+
+        return File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{ProfileUtils.CurrentProfileName}_{Process.GetCurrentProcess().StartTime:yyyy.MM.dd_HH.mm.ss}-{DateTime.Now:yyyy.MM.dd_HH.mm.ss}.txt")), Backlog);
     }
 }
