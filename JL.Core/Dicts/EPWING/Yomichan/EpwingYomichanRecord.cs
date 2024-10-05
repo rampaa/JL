@@ -162,8 +162,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
     {
         unchecked
         {
-            int hash = 17;
-            hash = (hash * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
+            int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
 
             foreach (string definition in Definitions)

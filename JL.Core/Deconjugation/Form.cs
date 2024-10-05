@@ -27,9 +27,7 @@ internal sealed class Form(
     {
         unchecked
         {
-            int hash = 17;
-
-            hash = (hash * 37) + Text.GetHashCode(StringComparison.Ordinal);
+            int hash = (17 * 37) + Text.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + OriginalText.GetHashCode(StringComparison.Ordinal);
 
             foreach (string tag in Tags)
