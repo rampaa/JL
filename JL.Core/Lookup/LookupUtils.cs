@@ -382,7 +382,7 @@ public static class LookupUtils
 
                 if (index < 0)
                 {
-                    return 3;
+                    return 2;
                 }
 
                 if (lookupResult.MiscList is not null)
@@ -403,7 +403,7 @@ public static class LookupUtils
                     {
                         if (readingsOrthographyInfo[i] is "ok" or "ik" or "rk")
                         {
-                            return 2;
+                            return 3;
                         }
                     }
                 }
