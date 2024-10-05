@@ -1534,7 +1534,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Max number of results when not in mining mode"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Style="{StaticResource TextBlockDefault}"
-                                       ToolTip="Improves performance when using a lot of dictionaries at the same time"
+                                       ToolTip="Setting it to a small number improves the performance of mouse move lookup mode"
                                        Cursor="Help"/>
                             <hc:NumericUpDown x:Name="MaxNumResultsNotInMiningModeNumericUpDown" Maximum="100"
                                               Minimum="1"
