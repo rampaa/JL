@@ -474,11 +474,12 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
-                                       ToolTip="If enabled, main window will use the specified line height below.
+                                       ToolTip="If enabled, the main window will use the specified custom line height.
                                        &#10;If disabled, the line height will be determined automatically from the current font characteristics.
-                                       &#10;Custom line height does not affect the height of the text, it changes the height of the line that contains the text.
-                                       &#10;To change the size of the text, use the Font size option.
-                                       &#10;Enabling this option is *not* recommended."/>
+                                       &#10;Custom line height does not affect the height of the text; it changes the height of the line that contains the text.
+                                       &#10;To change the size of the text, use the &quot;Font size&quot; option.
+                                       &#10;If you enable this option, you may need to manually adjust the value of the &quot;Custom line height&quot; option each time you change the &quot;Font&quot; or &quot;Font size&quot; options.
+                                       &#10;Therefore, enabling this option is *not* recommended."/>
                             <CheckBox x:Name="TextBoxUseCustomLineHeightCheckBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
