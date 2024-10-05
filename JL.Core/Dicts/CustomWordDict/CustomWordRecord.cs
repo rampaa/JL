@@ -104,24 +104,26 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
                 }
             }
 
-            if (frequency is int.MaxValue && AlternativeSpellings is not null)
+            if (frequency is not int.MaxValue || AlternativeSpellings is null)
             {
-                for (int i = 0; i < AlternativeSpellings.Length; i++)
+                return frequency;
+            }
+
+            for (int i = 0; i < AlternativeSpellings.Length; i++)
+            {
+                if (freq.Contents.TryGetValue(
+                        JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
+                        out IList<FrequencyRecord>? alternativeSpellingFreqResults))
                 {
-                    if (freq.Contents.TryGetValue(
-                            JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
-                            out IList<FrequencyRecord>? alternativeSpellingFreqResults))
+                    int alternativeSpellingFreqResultCount = alternativeSpellingFreqResults.Count;
+                    for (int j = 0; j < alternativeSpellingFreqResultCount; j++)
                     {
-                        int alternativeSpellingFreqResultCount = alternativeSpellingFreqResults.Count;
-                        for (int j = 0; j < alternativeSpellingFreqResultCount; j++)
+                        FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+                        if (Readings?.Contains(alternativeSpellingFreqResult.Spelling) ?? false)
                         {
-                            FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
-                            if (Readings?.Contains(alternativeSpellingFreqResult.Spelling) ?? false)
+                            if (frequency > alternativeSpellingFreqResult.Frequency)
                             {
-                                if (frequency > alternativeSpellingFreqResult.Frequency)
-                                {
-                                    frequency = alternativeSpellingFreqResult.Frequency;
-                                }
+                                frequency = alternativeSpellingFreqResult.Frequency;
                             }
                         }
                     }
@@ -244,10 +246,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
     {
         unchecked
         {
-            int hash = 17;
-
-            hash = (hash * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
-
+            int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             if (AlternativeSpellings is not null)
             {
                 foreach (string alternativeSpelling in AlternativeSpellings)

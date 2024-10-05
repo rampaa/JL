@@ -162,7 +162,6 @@ internal static class FreqDBManager
         }
 
         return results;
-
     }
 
     public static List<FrequencyRecord>? GetRecordsFromDB(string dbName, string term)
