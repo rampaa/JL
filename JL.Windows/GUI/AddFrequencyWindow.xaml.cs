@@ -13,7 +13,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddFrequencyWindow.xaml
 /// </summary>
-internal sealed partial class AddFrequencyWindow : Window
+internal sealed partial class AddFrequencyWindow
 {
     private readonly FreqOptionsControl _freqOptionsControl;
     public AddFrequencyWindow()

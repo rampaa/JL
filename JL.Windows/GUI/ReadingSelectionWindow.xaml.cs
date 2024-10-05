@@ -9,7 +9,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for ReadingSelectionWindow.xaml
 /// </summary>
-internal sealed partial class ReadingSelectionWindow : Window
+internal sealed partial class ReadingSelectionWindow
 {
     private string? _primarySpelling;
     private nint _windowHandle;

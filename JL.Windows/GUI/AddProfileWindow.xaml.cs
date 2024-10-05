@@ -10,7 +10,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddProfileWindow.xaml
 /// </summary>
-internal sealed partial class AddProfileWindow : Window
+internal sealed partial class AddProfileWindow
 {
     public AddProfileWindow()
     {

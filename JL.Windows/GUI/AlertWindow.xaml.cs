@@ -1,11 +1,10 @@
-using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Utilities;
 
 namespace JL.Windows.GUI;
 
-internal sealed partial class AlertWindow : Window
+internal sealed partial class AlertWindow
 {
     public nint WindowHandle { get; private set; }
 

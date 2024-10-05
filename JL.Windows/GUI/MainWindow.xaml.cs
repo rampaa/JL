@@ -25,7 +25,6 @@ using DpiChangedEventArgs = System.Windows.DpiChangedEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Rectangle = System.Drawing.Rectangle;
-using Window = System.Windows.Window;
 
 namespace JL.Windows.GUI;
 
@@ -33,7 +32,7 @@ namespace JL.Windows.GUI;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 #pragma warning disable CA1812 // Internal class that is apparently never instantiated
-internal sealed partial class MainWindow : Window
+internal sealed partial class MainWindow
 #pragma warning restore CA1812 // Internal class that is apparently never instantiated
 {
     private WinApi? _winApi;

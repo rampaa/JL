@@ -24,7 +24,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for PreferenceWindow.xaml
 /// </summary>
-internal sealed partial class PreferencesWindow : Window
+internal sealed partial class PreferencesWindow
 {
     private static PreferencesWindow? s_instance;
     public static PreferencesWindow Instance => s_instance ??= new PreferencesWindow();
@@ -217,7 +217,7 @@ internal sealed partial class PreferencesWindow : Window
         {
             await MainWindow.Instance.HandleAppClosing().ConfigureAwait(false);
 
-            ConfigDBManager.DeleteAllSettingsFromProfile(["MainWindowTopPosition", "MainWindowLeftPosition"]);
+            ConfigDBManager.DeleteAllSettingsFromProfile("MainWindowTopPosition", "MainWindowLeftPosition");
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",

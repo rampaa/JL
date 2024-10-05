@@ -15,7 +15,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for EditFrequencyWindow.xaml
 /// </summary>
-internal sealed partial class EditFrequencyWindow : Window
+internal sealed partial class EditFrequencyWindow
 {
     private readonly Freq _freq;
     private readonly FreqOptionsControl _freqOptionsControl;

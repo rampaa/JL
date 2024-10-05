@@ -15,7 +15,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddDictionaryWindow.xaml
 /// </summary>
-internal sealed partial class AddDictionaryWindow : Window
+internal sealed partial class AddDictionaryWindow
 {
     private readonly DictOptionsControl _dictOptionsControl;
 

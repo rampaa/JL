@@ -157,15 +157,10 @@ public static class FreqUtils
                         {
                             FreqDBManager.CreateDB(freq.Name);
                             FreqDBManager.InsertRecordsToDB(freq);
-                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-                            freq.Ready = true;
-                        }
-                        else
-                        {
-                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-                            freq.Ready = true;
                         }
 
+                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                        freq.Ready = true;
                         freqCleared = true;
                     }
 
@@ -255,14 +250,10 @@ public static class FreqUtils
                         {
                             FreqDBManager.CreateDB(freq.Name);
                             FreqDBManager.InsertRecordsToDB(freq);
-                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-                            freq.Ready = true;
                         }
-                        else
-                        {
-                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-                            freq.Ready = true;
-                        }
+
+                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                        freq.Ready = true;
 
                         freqCleared = true;
                     }

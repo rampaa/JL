@@ -13,7 +13,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddWordWindow.xaml
 /// </summary>
-internal sealed partial class AddWordWindow : Window
+internal sealed partial class AddWordWindow
 {
     private static AddWordWindow? s_instance;
 

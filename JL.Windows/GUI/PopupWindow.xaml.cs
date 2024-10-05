@@ -19,7 +19,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for PopupWindow.xaml
 /// </summary>
-internal sealed partial class PopupWindow : Window
+internal sealed partial class PopupWindow
 {
     public PopupWindow? ChildPopupWindow { get; private set; }
 

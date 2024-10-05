@@ -13,7 +13,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddNameWindow.xaml
 /// </summary>
-internal sealed partial class AddNameWindow : Window
+internal sealed partial class AddNameWindow
 {
     private static AddNameWindow? s_instance;
     public static AddNameWindow Instance => s_instance ??= new AddNameWindow();

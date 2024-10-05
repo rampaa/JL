@@ -20,7 +20,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for ManageDictionariesWindow.xaml
 /// </summary>
-internal sealed partial class ManageDictionariesWindow : Window
+internal sealed partial class ManageDictionariesWindow
 {
     private static ManageDictionariesWindow? s_instance;
 

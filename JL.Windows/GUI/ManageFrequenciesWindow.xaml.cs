@@ -15,7 +15,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for ManageFrequenciesWindow.xaml
 /// </summary>
-internal sealed partial class ManageFrequenciesWindow : Window
+internal sealed partial class ManageFrequenciesWindow
 {
     private static ManageFrequenciesWindow? s_instance;
 

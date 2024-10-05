@@ -13,7 +13,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for ManageAudioSourcesWindow.xaml
 /// </summary>
-internal sealed partial class ManageAudioSourcesWindow : Window
+internal sealed partial class ManageAudioSourcesWindow
 {
     private static ManageAudioSourcesWindow? s_instance;
 

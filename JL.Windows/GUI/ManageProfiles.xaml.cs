@@ -14,7 +14,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for ManageProfilesWindow.xaml
 /// </summary>
-internal sealed partial class ManageProfilesWindow : Window
+internal sealed partial class ManageProfilesWindow
 {
     private nint _windowHandle;
     public ManageProfilesWindow()

@@ -42,7 +42,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
                 "noun" => "noun",
                 "other" => "other",
                 "v1" => "verb",
-                _ => "other",
+                _ => "other"
             };
         }
 

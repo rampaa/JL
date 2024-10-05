@@ -11,7 +11,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for EditAudioSourceWindow.xaml
 /// </summary>
-internal sealed partial class EditAudioSourceWindow : Window
+internal sealed partial class EditAudioSourceWindow
 {
     private readonly string _uri;
     private readonly AudioSource _audioSource;

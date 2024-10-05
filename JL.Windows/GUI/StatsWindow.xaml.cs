@@ -13,7 +13,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for StatsWindow.xaml
 /// </summary>
-internal sealed partial class StatsWindow : Window
+internal sealed partial class StatsWindow
 {
     private static StatsWindow? s_instance;
     private nint _windowHandle;

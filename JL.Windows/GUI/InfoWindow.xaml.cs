@@ -1,4 +1,3 @@
-using System.Windows;
 using System.Windows.Interop;
 
 namespace JL.Windows.GUI;
@@ -6,7 +5,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AbbreviationWindow.xaml
 /// </summary>
-internal sealed partial class InfoWindow : Window
+internal sealed partial class InfoWindow
 {
     private nint _windowHandle;
 

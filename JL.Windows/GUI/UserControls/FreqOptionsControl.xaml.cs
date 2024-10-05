@@ -1,11 +1,10 @@
 using System.Windows;
-using System.Windows.Controls;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
 
 namespace JL.Windows.GUI.UserControls;
 
-internal sealed partial class FreqOptionsControl : UserControl
+internal sealed partial class FreqOptionsControl
 {
     public FreqOptionsControl()
     {

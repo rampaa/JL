@@ -12,7 +12,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddAudioSourceWindow.xaml
 /// </summary>
-internal sealed partial class AddAudioSourceWindow : Window
+internal sealed partial class AddAudioSourceWindow
 {
     private static readonly string[] s_audioSourceTypes = Enum.GetValues<AudioSourceType>().Select(static audioSourceType => audioSourceType.GetDescription() ?? audioSourceType.ToString()).ToArray();
 
