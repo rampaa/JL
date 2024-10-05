@@ -287,12 +287,11 @@ public static class DictUpdater
             }
 
             Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
-            return dict.Type switch
-            {
-                DictType.JMdict => UpdateJmdict(pathExists, true),
-                DictType.JMnedict => UpdateJmnedict(pathExists, true),
-                _ => UpdateKanjidic(pathExists, true)
-            };
+            return dict.Type is DictType.JMdict
+                ? UpdateJmdict(pathExists, true)
+                : dict.Type is DictType.JMnedict
+                    ? UpdateJmnedict(pathExists, true)
+                    : UpdateKanjidic(pathExists, true);
         }
 
         return Task.CompletedTask;

@@ -282,7 +282,19 @@ public static class FreqUtils
 
         if (freqDBPathDict.Count > 0)
         {
-            DBUtils.FreqDBPaths = DBUtils.FreqDBPaths.Union(freqDBPathDict).ToFrozenDictionary(StringComparer.Ordinal);
+            Dictionary<string, string> tempFreqDBPathDict = new(DBUtils.FreqDBPaths.Count + freqDBPathDict.Count, StringComparer.Ordinal);
+
+            foreach ((string key, string value) in DBUtils.FreqDBPaths)
+            {
+                tempFreqDBPathDict[key] = value;
+            }
+
+            foreach ((string key, string value) in freqDBPathDict)
+            {
+                tempFreqDBPathDict[key] = value;
+            }
+
+            DBUtils.FreqDBPaths = tempFreqDBPathDict.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
         if (tasks.Count > 0 || freqCleared)

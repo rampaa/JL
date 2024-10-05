@@ -52,7 +52,7 @@ internal sealed class LookupTests
         // Arrange
         List<LookupResult> expected =
         [
-            new LookupResult
+            new
             (
                 matchedText: "始まる",
                 dict: DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
