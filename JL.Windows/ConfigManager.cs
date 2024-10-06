@@ -183,27 +183,18 @@ internal static class ConfigManager
 
     private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
     private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneJapaneseFontComboBoxItems(s_japaneseFonts);
-    private static SkinType s_theme = SkinType.Dark;
+    private static SkinType Theme { get; set; } = SkinType.Dark;
 
     public static void ApplyPreferences()
     {
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         CoreConfigManager.ApplyPreferences(connection);
 
+        SkinType skinType = ConfigDBManager.GetValueFromConfig(connection, Theme, nameof(Theme), Enum.TryParse);
+        if (skinType != Theme)
         {
-            string? themeStr = ConfigDBManager.GetSettingValue(connection, "Theme");
-            if (themeStr is null)
-            {
-                themeStr = nameof(SkinType.Dark);
-                ConfigDBManager.InsertSetting(connection, "Theme", themeStr);
-            }
-
-            SkinType skinType = themeStr is nameof(SkinType.Dark) ? SkinType.Dark : SkinType.Default;
-            if (s_theme != skinType)
-            {
-                s_theme = skinType;
-                WindowsUtils.ChangeTheme(s_theme);
-            }
+            Theme = skinType;
+            WindowsUtils.ChangeTheme(Theme);
         }
 
         if (CoreConfigManager.CaptureTextFromClipboard)
@@ -950,7 +941,7 @@ internal static class ConfigManager
         using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
         preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
         preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
-        preferenceWindow.ThemeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "Theme");
+        preferenceWindow.ThemeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, nameof(Theme));
         preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, nameof(MainWindowTextVerticalAlignment));
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "MinimumLogLevel");
         preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupPositionRelativeToCursor");
@@ -1154,7 +1145,7 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, "MainWindowOpacity",
                 preferenceWindow.MainWindowOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, "Theme", preferenceWindow.ThemeComboBox.SelectedValue.ToString()!);
+            ConfigDBManager.UpdateSetting(connection, nameof(Theme), preferenceWindow.ThemeComboBox.SelectedValue.ToString()!);
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowTextVerticalAlignment), preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, "MinimumLogLevel", preferenceWindow.MinimumLogLevelComboBox.SelectedValue.ToString()!);

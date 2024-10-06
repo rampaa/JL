@@ -30,7 +30,8 @@
                             <ComboBox x:Name="ThemeComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
                                 <ComboBoxItem Content="Dark" Tag="Dark" />
-                                <ComboBoxItem Content="Light" Tag="Light" />
+                                <ComboBoxItem Content="Light" Tag="Default" />
+                                <ComboBoxItem Content="Violet" Tag="Violet" />
                             </ComboBox>
                         </DockPanel>
 
