@@ -61,12 +61,15 @@ internal static class ConfigManager
     public static bool AlwaysShowMainTextBoxCaret { get; set; } // = false;
     public static double MainWindowMaxDynamicWidth { get; set; } = 800;
     public static double MainWindowMaxDynamicHeight { get; set; } = 269;
+    public static double MainWindowMinDynamicWidth { get; set; } = 100;
+    public static double MainWindowMinDynamicHeight { get; set; } = 50;
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     private static bool HorizontallyCenterMainWindowText { get; set; } // = false;
     public static bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
     public static double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
     public static bool TextBoxUseCustomLineHeight { get; private set; } // = false;
     public static double TextBoxCustomLineHeight { get; private set; } = 75;
+    private static VerticalAlignment MainWindowTextVerticalAlignment { get; set; } = VerticalAlignment.Top;
 
     #endregion
 
@@ -75,6 +78,8 @@ internal static class ConfigManager
     public static FontFamily PopupFont { get; private set; } = new("Meiryo");
     public static double PopupMaxWidth { get; set; } = 700;
     public static double PopupMaxHeight { get; set; } = 520;
+    public static double PopupMinWidth { get; set; } // = 0;
+    public static double PopupMinHeight { get; set; } // = 0;
     public static bool PopupDynamicHeight { get; private set; } = true;
     public static bool PopupDynamicWidth { get; private set; } = true;
     public static bool FixedPopupPositioning { get; private set; } // = false;
@@ -189,11 +194,11 @@ internal static class ConfigManager
             string? themeStr = ConfigDBManager.GetSettingValue(connection, "Theme");
             if (themeStr is null)
             {
-                themeStr = "Dark";
+                themeStr = nameof(SkinType.Dark);
                 ConfigDBManager.InsertSetting(connection, "Theme", themeStr);
             }
 
-            SkinType skinType = themeStr is "Dark" ? SkinType.Dark : SkinType.Default;
+            SkinType skinType = themeStr is nameof(SkinType.Dark) ? SkinType.Dark : SkinType.Default;
             if (s_theme != skinType)
             {
                 s_theme = skinType;
@@ -249,6 +254,9 @@ internal static class ConfigManager
         MiningModeMouseButton = ConfigDBManager.GetValueFromConfig(connection, MiningModeMouseButton, nameof(MiningModeMouseButton), Enum.TryParse);
         MineMouseButton = ConfigDBManager.GetValueFromConfig(connection, MineMouseButton, nameof(MineMouseButton), Enum.TryParse);
         CopyPrimarySpellingToClipboardMouseButton = ConfigDBManager.GetValueFromConfig(connection, CopyPrimarySpellingToClipboardMouseButton, nameof(CopyPrimarySpellingToClipboardMouseButton), Enum.TryParse);
+
+        MainWindowTextVerticalAlignment = ConfigDBManager.GetValueFromConfig(connection, MainWindowTextVerticalAlignment, nameof(MainWindowTextVerticalAlignment), Enum.TryParse);
+        MainWindow.Instance.MainTextBox.VerticalContentAlignment = MainWindowTextVerticalAlignment;
 
         AutoAdjustFontSizesOnResolutionChange = ConfigDBManager.GetValueFromConfig(connection, AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
         HighlightLongestMatch = ConfigDBManager.GetValueFromConfig(connection, HighlightLongestMatch, nameof(HighlightLongestMatch), bool.TryParse);
@@ -385,6 +393,8 @@ internal static class ConfigManager
 
         PopupMaxWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMaxWidth, nameof(PopupMaxWidth), double.TryParse);
         PopupMaxHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMaxHeight, nameof(PopupMaxHeight), double.TryParse);
+        PopupMinWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMinWidth, nameof(PopupMinWidth), double.TryParse);
+        PopupMinHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMinHeight, nameof(PopupMinHeight), double.TryParse);
 
         FixedPopupXPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FixedPopupXPosition, nameof(FixedPopupXPosition), double.TryParse);
         FixedPopupYPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FixedPopupYPosition, nameof(FixedPopupYPosition), double.TryParse);
@@ -397,7 +407,9 @@ internal static class ConfigManager
         MainWindowWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowWidth, nameof(MainWindowWidth), double.TryParse);
         MainWindowMaxDynamicWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMaxDynamicWidth, nameof(MainWindowMaxDynamicWidth), double.TryParse);
         MainWindowMaxDynamicHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMaxDynamicHeight, nameof(MainWindowMaxDynamicHeight), double.TryParse);
-        WindowsUtils.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowWidth, MainWindowHeight, MainWindow.Instance);
+        MainWindowMinDynamicWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMinDynamicWidth, nameof(MainWindowMinDynamicWidth), double.TryParse);
+        MainWindowMinDynamicHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMinDynamicHeight, nameof(MainWindowMinDynamicHeight), double.TryParse);
+        WindowsUtils.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowMinDynamicWidth, MainWindowMinDynamicHeight, MainWindowWidth, MainWindowHeight, MainWindow.Instance);
         MainWindow.Instance.WidthBeforeResolutionChange = MainWindowWidth;
         MainWindow.Instance.HeightBeforeResolutionChange = MainWindowHeight;
 
@@ -700,7 +712,7 @@ internal static class ConfigManager
             currentPopupWindow.Foreground = DefinitionsColor;
             currentPopupWindow.FontFamily = PopupFont;
 
-            WindowsUtils.SetSizeToContent(PopupDynamicWidth, PopupDynamicHeight, PopupMaxWidth, PopupMaxHeight, currentPopupWindow);
+            WindowsUtils.SetSizeToContent(PopupDynamicWidth, PopupDynamicHeight, PopupMaxWidth, PopupMaxHeight, PopupMinWidth, PopupMinHeight, currentPopupWindow);
 
             currentPopupWindow.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
             currentPopupWindow.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);
@@ -837,6 +849,8 @@ internal static class ConfigManager
 
         preferenceWindow.MainWindowMaxDynamicWidthNumericUpDown.Value = MainWindowMaxDynamicWidth;
         preferenceWindow.MainWindowMaxDynamicHeightNumericUpDown.Value = MainWindowMaxDynamicHeight;
+        preferenceWindow.MainWindowMinDynamicWidthNumericUpDown.Value = MainWindowMinDynamicWidth;
+        preferenceWindow.MainWindowMinDynamicHeightNumericUpDown.Value = MainWindowMinDynamicHeight;
 
         preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
         preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
@@ -891,6 +905,8 @@ internal static class ConfigManager
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
         preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
+        preferenceWindow.PopupMinHeightNumericUpDown.Value = PopupMinHeight;
+        preferenceWindow.PopupMinWidthNumericUpDown.Value = PopupMinWidth;
         preferenceWindow.FixedPopupPositioningCheckBox.IsChecked = FixedPopupPositioning;
         preferenceWindow.FixedPopupXPositionNumericUpDown.Value = FixedPopupXPosition;
         preferenceWindow.FixedPopupYPositionNumericUpDown.Value = FixedPopupYPosition;
@@ -935,6 +951,7 @@ internal static class ConfigManager
         preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
         preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "Theme");
+        preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, nameof(MainWindowTextVerticalAlignment));
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "MinimumLogLevel");
         preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupPositionRelativeToCursor");
         preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupFlip");
@@ -1045,6 +1062,12 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMaxDynamicHeight),
                 preferenceWindow.MainWindowMaxDynamicHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMinDynamicWidth),
+                preferenceWindow.MainWindowMinDynamicWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMinDynamicHeight),
+                preferenceWindow.MainWindowMinDynamicHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowWidth),
                 preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
@@ -1132,6 +1155,7 @@ internal static class ConfigManager
                 preferenceWindow.MainWindowOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, "Theme", preferenceWindow.ThemeComboBox.SelectedValue.ToString()!);
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowTextVerticalAlignment), preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, "MinimumLogLevel", preferenceWindow.MinimumLogLevelComboBox.SelectedValue.ToString()!);
 
@@ -1199,6 +1223,12 @@ internal static class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupMaxHeight),
                 preferenceWindow.PopupMaxHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupMinWidth),
+                preferenceWindow.PopupMinWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupMinHeight),
+                preferenceWindow.PopupMinHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(FixedPopupPositioning),
                 preferenceWindow.FixedPopupPositioningCheckBox.IsChecked.ToString()!);

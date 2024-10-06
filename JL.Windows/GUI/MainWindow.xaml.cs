@@ -203,7 +203,7 @@ internal sealed partial class MainWindow
             if (!mergeTexts && SizeToContent is SizeToContent.Manual && WindowState is not WindowState.Minimized
                             && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
-                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
+                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowMinDynamicWidth, ConfigManager.MainWindowMinDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
             }
 
             TitleBarContextMenu.IsOpen = false;
@@ -1196,7 +1196,7 @@ internal sealed partial class MainWindow
         PopupWindow? currentPopupWindow = FirstPopupWindow;
         while (currentPopupWindow is not null)
         {
-            WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, ConfigManager.PopupMaxWidth, ConfigManager.PopupMaxHeight, currentPopupWindow);
+            WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, ConfigManager.PopupMaxWidth, ConfigManager.PopupMaxHeight, ConfigManager.PopupMinWidth, ConfigManager.PopupMinHeight, currentPopupWindow);
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
 
@@ -1359,6 +1359,8 @@ internal sealed partial class MainWindow
             {
                 MaxWidth = double.PositiveInfinity;
                 MaxHeight = double.PositiveInfinity;
+                MinWidth = 100;
+                MinHeight = 50;
             }
 
             WinApi.ResizeWindow(WindowHandle, wParam);
@@ -1622,7 +1624,7 @@ internal sealed partial class MainWindow
 
             if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
-                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
+                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowMinDynamicWidth, ConfigManager.MainWindowMinDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
             }
 
             if (ConfigManager.AlwaysOnTop)

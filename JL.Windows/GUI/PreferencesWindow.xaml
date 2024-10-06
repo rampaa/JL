@@ -221,10 +221,26 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Min dynamic width"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainWindowMinDynamicWidthNumericUpDown" Minimum="100"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max dynamic height"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowMaxDynamicHeightNumericUpDown" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Min dynamic height"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainWindowMinDynamicHeightNumericUpDown" Minimum="50"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -285,6 +301,17 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="HorizontallyCenterMainWindowTextCheckBox"
                                               HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Vertical text alignment" Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox x:Name="MainWindowTextVerticalAlignmentComboBox" HorizontalAlignment="Right"
+                                      SelectedValuePath="Tag" Width="Auto">
+                                <ComboBoxItem Content="Top" Tag="Top" />
+                                <ComboBoxItem Content="Center" Tag="Center" />
+                                <ComboBoxItem Content="Bottom" Tag="Bottom" />
+                            </ComboBox>
                         </DockPanel>
 
                         <DockPanel>
@@ -512,22 +539,6 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Max width"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Max height"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic width"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -535,10 +546,46 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Max width"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="If &quot;Dynamic width&quot; option is disabled, this value is set as the popup's width" />
+                            <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Min width"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="PopupMinWidthNumericUpDown" Minimum="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic height"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="PopupDynamicHeightCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Max height"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="If &quot;Dynamic height&quot; option is disabled, this value is set as the popup's height" />
+                            <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Min height"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="PopupMinHeightNumericUpDown" Minimum="0"
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>

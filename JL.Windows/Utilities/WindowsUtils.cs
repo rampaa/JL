@@ -534,10 +534,12 @@ internal static class WindowsUtils
         textBox.ScrollToVerticalOffset(verticalOffset);
     }
 
-    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, PopupWindow window)
+    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double minWidth, double minHeight, PopupWindow window)
     {
         window.MaxHeight = maxHeight;
         window.MaxWidth = maxWidth;
+        window.MinHeight = minHeight;
+        window.MinWidth = minWidth;
 
         if (dynamicWidth && dynamicHeight)
         {
@@ -564,19 +566,23 @@ internal static class WindowsUtils
         }
     }
 
-    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double width, double height, MainWindow window)
+    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double minWidth, double minHeight, double width, double height, MainWindow window)
     {
         if (dynamicWidth && dynamicHeight)
         {
             window.MaxHeight = maxHeight;
             window.MaxWidth = maxWidth;
+            window.MinHeight = minHeight;
+            window.MinWidth = minWidth;
             window.SizeToContent = SizeToContent.WidthAndHeight;
         }
 
         else if (dynamicHeight)
         {
             window.MaxHeight = maxHeight;
+            window.MinHeight = minHeight;
             window.MaxWidth = double.PositiveInfinity;
+            window.MinWidth = 100;
             window.SizeToContent = SizeToContent.Height;
             window.Width = width;
         }
@@ -584,7 +590,9 @@ internal static class WindowsUtils
         else if (dynamicWidth)
         {
             window.MaxHeight = double.PositiveInfinity;
+            window.MinHeight = 50;
             window.MaxWidth = maxWidth;
+            window.MinWidth = minWidth;
             window.SizeToContent = SizeToContent.Width;
             window.Height = height;
         }
@@ -594,6 +602,8 @@ internal static class WindowsUtils
             window.SizeToContent = SizeToContent.Manual;
             window.MaxHeight = double.PositiveInfinity;
             window.MaxWidth = double.PositiveInfinity;
+            window.MinHeight = 50;
+            window.MinWidth = 100;
             window.Width = width;
             window.Height = height;
         }

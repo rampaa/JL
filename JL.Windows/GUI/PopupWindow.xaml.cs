@@ -99,7 +99,7 @@ internal sealed partial class PopupWindow
         Foreground = ConfigManager.DefinitionsColor;
         FontFamily = ConfigManager.PopupFont;
 
-        WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, ConfigManager.PopupMaxWidth, ConfigManager.PopupMaxHeight, this);
+        WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, ConfigManager.PopupMaxWidth, ConfigManager.PopupMaxHeight, ConfigManager.PopupMinWidth, ConfigManager.PopupMinHeight, this);
 
         AddNameMenuItem.SetInputGestureText(ConfigManager.ShowAddNameWindowKeyGesture);
         AddWordMenuItem.SetInputGestureText(ConfigManager.ShowAddWordWindowKeyGesture);
