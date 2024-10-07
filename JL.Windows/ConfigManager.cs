@@ -190,10 +190,10 @@ internal static class ConfigManager
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         CoreConfigManager.ApplyPreferences(connection);
 
-        SkinType skinType = ConfigDBManager.GetValueFromConfig(connection, Theme, nameof(Theme), Enum.TryParse);
-        if (skinType != Theme)
+        SkinType theme = ConfigDBManager.GetValueFromConfig(connection, Theme, nameof(Theme), Enum.TryParse);
+        if (theme != Theme)
         {
-            Theme = skinType;
+            Theme = theme;
             WindowsUtils.ChangeTheme(Theme);
         }
 
@@ -938,11 +938,12 @@ internal static class ConfigManager
         preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromWebSocketCheckBox.IsChecked = AutoLookupFirstTermWhenTextIsCopiedFromWebSocket;
         preferenceWindow.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimizedCheckBox.IsChecked = AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized;
 
+        preferenceWindow.ThemeComboBox.SelectedValue = Theme;
+        preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue = MainWindowTextVerticalAlignment;
+
         using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
         preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
         preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
-        preferenceWindow.ThemeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, nameof(Theme));
-        preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, nameof(MainWindowTextVerticalAlignment));
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "MinimumLogLevel");
         preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupPositionRelativeToCursor");
         preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupFlip");
