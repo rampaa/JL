@@ -124,15 +124,11 @@ internal sealed partial class MainWindow
 
     private async Task<bool> CopyFromClipboard()
     {
-        bool gotTextFromClipboard = false;
-        while (Clipboard.ContainsText() && !gotTextFromClipboard)
+        while (Clipboard.ContainsText())
         {
             try
             {
-                string text = Clipboard.GetText();
-                gotTextFromClipboard = true;
-
-                return CopyText(text);
+                return CopyText(Clipboard.GetText());
             }
             catch (ExternalException ex)
             {
