@@ -106,7 +106,7 @@ internal sealed partial class MainWindow
         if (CoreConfigManager.CaptureTextFromClipboard)
         {
             s_clipboardSequenceNo = WinApi.GetClipboardSequenceNo();
-            _ = CopyFromClipboard();
+            _ = await CopyFromClipboard().ConfigureAwait(true);
         }
 
         FirstPopupWindow.Owner = this;
@@ -122,7 +122,7 @@ internal sealed partial class MainWindow
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
 
-    private bool CopyFromClipboard()
+    private async Task<bool> CopyFromClipboard()
     {
         bool gotTextFromClipboard = false;
         while (Clipboard.ContainsText() && !gotTextFromClipboard)
@@ -137,6 +137,7 @@ internal sealed partial class MainWindow
             catch (ExternalException ex)
             {
                 Utils.Logger.Warning(ex, "CopyFromClipboard failed");
+                await Task.Delay(5).ConfigureAwait(true);
             }
         }
 
@@ -250,7 +251,7 @@ internal sealed partial class MainWindow
         }
 
         s_clipboardSequenceNo = currentClipboardSequenceNo;
-        bool gotTextFromClipboard = CopyFromClipboard();
+        bool gotTextFromClipboard = await CopyFromClipboard().ConfigureAwait(true);
 
         if (gotTextFromClipboard
             && ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard
