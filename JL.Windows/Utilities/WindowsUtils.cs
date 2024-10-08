@@ -617,7 +617,6 @@ internal static class WindowsUtils
         }
 
         bool captureTextFromClipboard = CoreConfigManager.CaptureTextFromClipboard;
-        CoreConfigManager.CaptureTextFromClipboard = false;
         if (captureTextFromClipboard)
         {
             WinApi.UnsubscribeFromClipboardChanged(MainWindow.Instance.WindowHandle);
@@ -639,7 +638,6 @@ internal static class WindowsUtils
             }
         } while (retry);
 
-        CoreConfigManager.CaptureTextFromClipboard = captureTextFromClipboard;
         if (captureTextFromClipboard)
         {
             WinApi.SubscribeToClipboardChanged(MainWindow.Instance.WindowHandle);
