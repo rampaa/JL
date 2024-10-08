@@ -616,6 +616,13 @@ internal static class WindowsUtils
             return;
         }
 
+        bool captureTextFromClipboard = CoreConfigManager.CaptureTextFromClipboard;
+        CoreConfigManager.CaptureTextFromClipboard = false;
+        if (captureTextFromClipboard)
+        {
+            WinApi.UnsubscribeFromClipboardChanged(MainWindow.Instance.WindowHandle);
+        }
+
         bool retry = true;
         do
         {
@@ -631,6 +638,12 @@ internal static class WindowsUtils
                 Utils.Logger.Warning(ex, "CopyTextToClipboard failed");
             }
         } while (retry);
+
+        CoreConfigManager.CaptureTextFromClipboard = captureTextFromClipboard;
+        if (captureTextFromClipboard)
+        {
+            WinApi.SubscribeToClipboardChanged(MainWindow.Instance.WindowHandle);
+        }
     }
 
     public static void HandlePostCopy(string text, string? subsequentText)

@@ -1194,6 +1194,8 @@ internal sealed partial class PopupWindow
         if (e.ChangedButton == ConfigManager.CopyPrimarySpellingToClipboardMouseButton)
         {
             WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
+            HidePopup();
+            return;
         }
 
         if (!MiningMode || e.ChangedButton != ConfigManager.MineMouseButton)
