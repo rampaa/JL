@@ -18,7 +18,7 @@ public interface IFrontend
 
     public void ApplyDictOptions();
 
-    public byte[]? GetImageFromClipboardAsByteArray();
+    public Task<byte[]?> GetImageFromClipboardAsByteArray();
 
     public Task TextToSpeech(string voiceName, string text);
 

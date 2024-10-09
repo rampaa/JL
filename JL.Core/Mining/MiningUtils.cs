@@ -508,7 +508,7 @@ public static class MiningUtils
         List<string> imageFields = FindFields(JLField.Image, userFields);
         bool needsImage = imageFields.Count > 0;
         byte[]? imageBytes = needsImage
-            ? Utils.Frontend.GetImageFromClipboardAsByteArray()
+            ? await Utils.Frontend.GetImageFromClipboardAsByteArray().ConfigureAwait(false)
             : null;
 
         if (imageBytes is not null)

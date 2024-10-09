@@ -722,16 +722,15 @@ internal static class WindowsUtils
         });
     }
 
-    public static byte[]? GetImageFromClipboardAsByteArray()
+    public static Task<byte[]?> GetImageFromClipboardAsByteArray()
     {
-        return Application.Current.Dispatcher.Invoke(static () =>
+        return Application.Current.Dispatcher.Invoke(static async () =>
         {
             while (Clipboard.ContainsImage())
             {
                 try
                 {
                     BitmapSource? image = Clipboard.GetImage();
-
                     if (image is null)
                     {
                         return null;
@@ -747,6 +746,7 @@ internal static class WindowsUtils
                 catch (Exception ex)
                 {
                     Utils.Logger.Warning(ex, "GetImageFromClipboard failed");
+                    await Task.Delay(5).ConfigureAwait(true);
                 }
             }
 

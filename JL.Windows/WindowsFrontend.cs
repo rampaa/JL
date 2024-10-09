@@ -27,7 +27,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public Task CopyFromWebSocket(string text) => MainWindow.Instance.CopyFromWebSocket(text);
 
-    public byte[]? GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
+    public Task<byte[]?> GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
 
     public Task TextToSpeech(string voiceName, string text) => SpeechSynthesisUtils.TextToSpeech(voiceName, text);
 
