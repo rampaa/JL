@@ -158,14 +158,15 @@ internal sealed partial class MainWindow
             return false;
         }
 
-        string sanitizedText = TextUtils.SanitizeText(text);
-        if (sanitizedText.Length is 0)
+        string sanitizedNewText = TextUtils.SanitizeText(text);
+        if (sanitizedNewText.Length is 0)
         {
             return false;
         }
 
         bool mergeTexts = false;
         string? subsequentText = null;
+        string? mergedText = null;
 
         Dispatcher.Invoke(() =>
         {
@@ -173,26 +174,57 @@ internal sealed partial class MainWindow
             {
                 DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
 
-                string currentText = MainTextBox.Text;
+                string previousText = MainTextBox.Text;
+
                 mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
-                              || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds < ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                             && sanitizedText.StartsWith(currentText, StringComparison.Ordinal);
+                              || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
+                              && previousText.Length > 0;
 
                 s_lastTextCopyTime = preciseTimeNow;
 
                 if (mergeTexts)
                 {
-                    subsequentText = sanitizedText[currentText.Length..];
+                    if (!ConfigManager.AllowPartialMatchingForTextMerge)
+                    {
+                        if (sanitizedNewText.StartsWith(previousText, StringComparison.Ordinal))
+                        {
+                            subsequentText = sanitizedNewText[previousText.Length..];
+                            mergedText = sanitizedNewText;
+                        }
+                    }
+                    else
+                    {
+                        int startIndex = Math.Max(previousText.Length - sanitizedNewText.Length, 0);
+                        for (int i = startIndex; i < previousText.Length; i++)
+                        {
+                            if (sanitizedNewText.StartsWith(previousText[i..], StringComparison.Ordinal))
+                            {
+                                subsequentText = sanitizedNewText[(previousText.Length - i)..];
+                                if (subsequentText.Length is 0 && sanitizedNewText != previousText)
+                                {
+                                    subsequentText = null;
+                                }
+                                else
+                                {
+                                    mergedText = previousText + subsequentText;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
+            mergeTexts = mergeTexts && subsequentText is not null;
             if (mergeTexts)
             {
                 MainTextBox.AppendText(subsequentText);
             }
             else
             {
-                MainTextBox.Text = sanitizedText;
+                MainTextBox.Text = sanitizedNewText;
+                mergedText = null;
             }
 
             MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
@@ -214,7 +246,7 @@ internal sealed partial class MainWindow
             BringToFront();
         }, DispatcherPriority.Send);
 
-        WindowsUtils.HandlePostCopy(sanitizedText, subsequentText);
+        WindowsUtils.HandlePostCopy(sanitizedNewText, subsequentText, mergedText);
 
         return true;
     }

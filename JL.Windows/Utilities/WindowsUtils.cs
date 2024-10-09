@@ -644,9 +644,9 @@ internal static class WindowsUtils
         }
     }
 
-    public static void HandlePostCopy(string text, string? subsequentText)
+    public static void HandlePostCopy(string text, string? subsequentText, string? mergedText)
     {
-        bool newText = subsequentText is null;
+        bool newText = mergedText is null;
         if (ConfigManager.EnableBacklog)
         {
             if (newText)
@@ -655,7 +655,7 @@ internal static class WindowsUtils
             }
             else
             {
-                BacklogUtils.ReplaceLastBacklogText(text);
+                BacklogUtils.ReplaceLastBacklogText(mergedText!);
             }
         }
 

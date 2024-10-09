@@ -371,6 +371,18 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Allow partial text matches to be merged"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="This option only takes effect if the &quot;Merge sequential texts when they match&quot; option is enabled.
+                                       &#10;Enabling this option allows XYZ and ZTVR to be merged into XYZTVR, and XYZ and YZTVR will also be merged into XYZTVR.
+                                       &#10;When this option is disabled, texts will only be merged if the new text found in Clipboard/WebSocket starts with the current text.
+                                       &#10;For example, when this option is disabled, XYZ and YZTVR won't be merged, but XYZ and XYZTVR will be merged into XYZTVR."/>
+                            <CheckBox x:Name="AllowPartialMatchingForTextMergeCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max delay between copies to merge sequential texts when they match (in milliseconds)"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"

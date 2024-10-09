@@ -66,6 +66,7 @@ internal static class ConfigManager
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     private static bool HorizontallyCenterMainWindowText { get; set; } // = false;
     public static bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
+    public static bool AllowPartialMatchingForTextMerge { get; private set; } = true; // = false;
     public static double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
     public static bool TextBoxUseCustomLineHeight { get; private set; } // = false;
     public static double TextBoxCustomLineHeight { get; private set; } = 75;
@@ -323,6 +324,7 @@ internal static class ConfigManager
         HidePopupsOnTextChange = ConfigDBManager.GetValueFromConfig(connection, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange), bool.TryParse);
 
         MergeSequentialTextsWhenTheyMatch = ConfigDBManager.GetValueFromConfig(connection, MergeSequentialTextsWhenTheyMatch, nameof(MergeSequentialTextsWhenTheyMatch), bool.TryParse);
+        AllowPartialMatchingForTextMerge = ConfigDBManager.GetValueFromConfig(connection, AllowPartialMatchingForTextMerge, nameof(AllowPartialMatchingForTextMerge), bool.TryParse);
 
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = ConfigDBManager.GetValueFromConfig(connection, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
         MainWindow.Instance.ChangeVisibilityOfTitleBarButtons();
@@ -868,6 +870,7 @@ internal static class ConfigManager
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
         preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked = MergeSequentialTextsWhenTheyMatch;
+        preferenceWindow.AllowPartialMatchingForTextMergeCheckBox.IsChecked = AllowPartialMatchingForTextMerge;
         preferenceWindow.TextBoxUseCustomLineHeightCheckBox.IsChecked = TextBoxUseCustomLineHeight;
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
@@ -1125,6 +1128,9 @@ internal static class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(MergeSequentialTextsWhenTheyMatch),
                 preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(AllowPartialMatchingForTextMerge),
+                preferenceWindow.AllowPartialMatchingForTextMergeCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(TextBoxUseCustomLineHeight),
                 preferenceWindow.TextBoxUseCustomLineHeightCheckBox.IsChecked.ToString()!);
