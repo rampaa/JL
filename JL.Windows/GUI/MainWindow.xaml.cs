@@ -189,7 +189,6 @@ internal sealed partial class MainWindow
                         if (sanitizedNewText.StartsWith(previousText, StringComparison.Ordinal))
                         {
                             subsequentText = sanitizedNewText[previousText.Length..];
-                            mergedText = sanitizedNewText;
                         }
                     }
                     else
@@ -204,10 +203,6 @@ internal sealed partial class MainWindow
                                 {
                                     subsequentText = null;
                                 }
-                                else
-                                {
-                                    mergedText = previousText + subsequentText;
-                                }
 
                                 break;
                             }
@@ -220,11 +215,11 @@ internal sealed partial class MainWindow
             if (mergeTexts)
             {
                 MainTextBox.AppendText(subsequentText);
+                mergedText = MainTextBox.Text;
             }
             else
             {
                 MainTextBox.Text = sanitizedNewText;
-                mergedText = null;
             }
 
             MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
