@@ -1902,14 +1902,12 @@ internal sealed partial class PopupWindow
     {
         ReadingSelectionWindow.HideWindow();
 
-        if (ChildPopupWindow is { MiningMode: true })
+        if (ChildPopupWindow is not null
+            && e.ChangedButton is not MouseButton.Right
+            && e.ChangedButton != ConfigManager.MiningModeMouseButton)
         {
-            if (e.ChangedButton is not MouseButton.Right)
-            {
-                PopupWindowUtils.HidePopups(ChildPopupWindow);
-            }
+            PopupWindowUtils.HidePopups(ChildPopupWindow);
         }
-
         else if (e.ChangedButton == ConfigManager.MiningModeMouseButton)
         {
             if (!MiningMode)

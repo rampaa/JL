@@ -64,7 +64,9 @@ internal static class PopupWindowUtils
             IsUndoEnabled = false,
             UndoLimit = 0,
             BorderThickness = new Thickness(0),
-            Padding = new Thickness(0)
+            Padding = new Thickness(0),
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled
         };
 
         // Scrolling doesn’t work when touching a TextBox inside a ListView
