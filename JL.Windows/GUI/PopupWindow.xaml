@@ -54,7 +54,7 @@
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
-                  HorizontalContentAlignment="Stretch" MouseLeave="PopupListView_MouseLeave"
+                  HorizontalContentAlignment="Stretch" MouseLeave="PopupListView_MouseLeave" ScrollViewer.PanningMode="VerticalFirst"
                   Background="Transparent"
                   x:Name="PopupListView">
             <ListView.ItemContainerStyle>

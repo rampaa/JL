@@ -44,7 +44,7 @@ internal static class PopupWindowUtils
 
     public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
-        return new TouchScreenTextBox
+        TouchScreenTextBox textBox = new()
         {
             Name = name,
             Text = text,
@@ -66,6 +66,12 @@ internal static class PopupWindowUtils
             BorderThickness = new Thickness(0),
             Padding = new Thickness(0)
         };
+
+        // Scrolling doesn’t work when touching a TextBox inside a ListView
+        // unless the TextBox's PanningMode is set to None explicitly.
+        ScrollViewer.SetPanningMode(textBox, PanningMode.None);
+
+        return textBox;
     }
 
     public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? alternativeSpellings,
