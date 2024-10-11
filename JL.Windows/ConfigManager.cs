@@ -362,7 +362,7 @@ internal static class ConfigManager
         MaxNumResultsNotInMiningMode = ConfigDBManager.GetValueFromConfig(connection, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
 
         TextBoxUseCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, TextBoxUseCustomLineHeight, nameof(TextBoxUseCustomLineHeight), bool.TryParse);
-        TextBoxCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, TextBoxCustomLineHeight, nameof(TextBoxCustomLineHeight), double.TryParse);
+        TextBoxCustomLineHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, TextBoxCustomLineHeight, nameof(TextBoxCustomLineHeight), double.TryParse);
         if (TextBoxUseCustomLineHeight)
         {
             MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.BlockLineHeight);
