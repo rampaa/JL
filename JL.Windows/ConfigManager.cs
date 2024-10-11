@@ -574,24 +574,12 @@ internal static class ConfigManager
         }
 
         {
-            string? mainWindowFontStr = ConfigDBManager.GetSettingValue(connection, "MainWindowFont");
-            if (mainWindowFontStr is null)
-            {
-                ConfigDBManager.InsertSetting(connection, "MainWindowFont", "Meiryo");
-                mainWindowFontStr = "Meiryo";
-            }
-
+            string mainWindowFontStr = ConfigDBManager.GetValueFromConfig(connection, "Meiryo", "MainWindowFont");
             MainWindow.Instance.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
         }
 
         {
-            string? popupPositionRelativeToCursorStr = ConfigDBManager.GetSettingValue(connection, "PopupPositionRelativeToCursor");
-            if (popupPositionRelativeToCursorStr is null)
-            {
-                popupPositionRelativeToCursorStr = "BottomRight";
-                ConfigDBManager.InsertSetting(connection, "PopupPositionRelativeToCursor", popupPositionRelativeToCursorStr);
-            }
-
+            string popupPositionRelativeToCursorStr = ConfigDBManager.GetValueFromConfig(connection, "BottomRight", "PopupPositionRelativeToCursor");
             switch (popupPositionRelativeToCursorStr)
             {
                 case "TopLeft":
@@ -622,13 +610,7 @@ internal static class ConfigManager
         }
 
         {
-            string? popupFlipStr = ConfigDBManager.GetSettingValue(connection, "PopupFlip");
-            if (popupFlipStr is null)
-            {
-                popupFlipStr = "Both";
-                ConfigDBManager.InsertSetting(connection, "PopupFlip", popupFlipStr);
-            }
-
+            string popupFlipStr = ConfigDBManager.GetValueFromConfig(connection, "Both", "PopupFlip");
             switch (popupFlipStr)
             {
                 case "X":
@@ -654,13 +636,7 @@ internal static class ConfigManager
         }
 
         {
-            string? lookupModeStr = ConfigDBManager.GetSettingValue(connection, "LookupMode");
-            if (lookupModeStr is null)
-            {
-                lookupModeStr = "Hover";
-                ConfigDBManager.InsertSetting(connection, "LookupMode", lookupModeStr);
-            }
-
+            string lookupModeStr = ConfigDBManager.GetValueFromConfig(connection, "Hover", "LookupMode");
             switch (lookupModeStr)
             {
                 case "Hover":
@@ -686,16 +662,9 @@ internal static class ConfigManager
         }
 
         {
-            string? popupFontStr = ConfigDBManager.GetSettingValue(connection, nameof(PopupFont));
-            if (popupFontStr is null)
-            {
-                ConfigDBManager.InsertSetting(connection, nameof(PopupFont), PopupFont.Source);
-            }
-            else
-            {
-                PopupFont = new FontFamily(popupFontStr);
-                WindowsUtils.PopupFontTypeFace = new Typeface(popupFontStr);
-            }
+            string popupFontStr = ConfigDBManager.GetValueFromConfig(connection, PopupFont.Source, nameof(PopupFont));
+            PopupFont = new FontFamily(popupFontStr);
+            WindowsUtils.PopupFontTypeFace = new Typeface(popupFontStr);
         }
 
         PopupWindow? currentPopupWindow = MainWindow.Instance.FirstPopupWindow;

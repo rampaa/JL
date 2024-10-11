@@ -172,7 +172,7 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static T GetValueFromConfig<T>(SqliteConnection connection, T variable, string configKey, TryParseHandler<T> tryParseHandler) where T : struct
+    public static T GetValueFromConfig<T>(SqliteConnection connection, T defaultValue, string configKey, TryParseHandler<T> tryParseHandler) where T : struct
     {
         string? configValue = GetSettingValue(connection, configKey);
         if (configValue is not null && tryParseHandler(configValue, out T value))
@@ -182,14 +182,26 @@ public static class ConfigDBManager
 
         if (configValue is null)
         {
-            InsertSetting(connection, configKey, Convert.ToString(variable, CultureInfo.InvariantCulture)!);
+            InsertSetting(connection, configKey, Convert.ToString(defaultValue, CultureInfo.InvariantCulture)!);
         }
         else
         {
-            UpdateSetting(connection, configKey, Convert.ToString(variable, CultureInfo.InvariantCulture)!);
+            UpdateSetting(connection, configKey, Convert.ToString(defaultValue, CultureInfo.InvariantCulture)!);
         }
 
-        return variable;
+        return defaultValue;
+    }
+
+    public static string GetValueFromConfig(SqliteConnection connection, string defaultValue, string configKey)
+    {
+        string? configValue = GetSettingValue(connection, configKey);
+        if (configValue is not null)
+        {
+            return configValue;
+        }
+
+        InsertSetting(connection, configKey, defaultValue);
+        return defaultValue;
     }
 
     public static T GetNumberWithDecimalPointFromConfig<T>(SqliteConnection connection, T number, string configKey, TryParseHandlerWithCultureInfo<T> tryParseHandler) where T : struct

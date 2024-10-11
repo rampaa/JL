@@ -24,26 +24,7 @@ public static class CoreConfigManager
 
     public static void ApplyPreferences(SqliteConnection connection)
     {
-        {
-            string? minimumLogLevelStr = ConfigDBManager.GetSettingValue(connection, "MinimumLogLevel");
-            if (minimumLogLevelStr is null)
-            {
-                ConfigDBManager.InsertSetting(connection, "MinimumLogLevel", "Error");
-            }
-            else
-            {
-                Utils.s_loggingLevelSwitch.MinimumLevel = minimumLogLevelStr switch
-                {
-                    "Fatal" => LogEventLevel.Fatal,
-                    "Error" => LogEventLevel.Error,
-                    "Warning" => LogEventLevel.Warning,
-                    "Information" => LogEventLevel.Information,
-                    "Debug" => LogEventLevel.Debug,
-                    "Verbose" => LogEventLevel.Verbose,
-                    _ => LogEventLevel.Error
-                };
-            }
-        }
+        Utils.s_loggingLevelSwitch.MinimumLevel = ConfigDBManager.GetValueFromConfig(connection, LogEventLevel.Error, "MinimumLogLevel", Enum.TryParse);
 
         {
             string? ankiConnectUriStr = ConfigDBManager.GetSettingValue(connection, nameof(AnkiConnectUri));
