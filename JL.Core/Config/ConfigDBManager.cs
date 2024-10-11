@@ -204,7 +204,7 @@ public static class ConfigDBManager
         return defaultValue;
     }
 
-    public static T GetNumberWithDecimalPointFromConfig<T>(SqliteConnection connection, T number, string configKey, TryParseHandlerWithCultureInfo<T> tryParseHandler) where T : struct
+    public static T GetNumberWithDecimalPointFromConfig<T>(SqliteConnection connection, T defaultValue, string configKey, TryParseHandlerWithCultureInfo<T> tryParseHandler) where T : struct
     {
         string? configValue = GetSettingValue(connection, configKey);
         if (configValue is not null && tryParseHandler(configValue, NumberStyles.Number, CultureInfo.InvariantCulture, out T value))
@@ -214,14 +214,14 @@ public static class ConfigDBManager
 
         if (configValue is null)
         {
-            InsertSetting(connection, configKey, Convert.ToString(number, CultureInfo.InvariantCulture)!);
+            InsertSetting(connection, configKey, Convert.ToString(defaultValue, CultureInfo.InvariantCulture)!);
         }
         else
         {
-            UpdateSetting(connection, configKey, Convert.ToString(number, CultureInfo.InvariantCulture)!);
+            UpdateSetting(connection, configKey, Convert.ToString(defaultValue, CultureInfo.InvariantCulture)!);
         }
 
-        return number;
+        return defaultValue;
     }
 
     internal static void SendOptimizePragma()
