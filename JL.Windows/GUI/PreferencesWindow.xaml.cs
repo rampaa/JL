@@ -289,7 +289,9 @@ internal sealed partial class PreferencesWindow
             ankiConfig.ModelName
         };
         modelNamesComboBox.SelectedItem = ankiConfig.ModelName;
-        tagTextBox.Text = string.Join(", ", ankiConfig.Tags);
+        tagTextBox.Text = ankiConfig.Tags is not null
+            ? string.Join(", ", ankiConfig.Tags)
+            : "";
     }
 
     private async Task PopulateDeckAndModelNames()
@@ -432,8 +434,8 @@ internal sealed partial class PreferencesWindow
         }
 
         string rawTags = tagsTextBox.Text;
-        string[] tags = string.IsNullOrEmpty(rawTags)
-            ? []
+        string[]? tags = string.IsNullOrWhiteSpace(rawTags)
+            ? null
             : rawTags.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
 
         return new AnkiConfig(deckName, modelName, dict, tags);
