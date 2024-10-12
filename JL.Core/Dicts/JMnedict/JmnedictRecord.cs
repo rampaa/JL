@@ -22,7 +22,7 @@ internal sealed class JmnedictRecord : IDictRecord
         Readings = readings;
         Definitions = definitions;
         NameTypes = nameTypes;
-        //RelatedTerms = new List<List<string>?>();
+        //RelatedTerms = relatedTerms;
     }
 
     public string BuildFormattedDefinition(DictOptions options)
@@ -65,7 +65,7 @@ internal sealed class JmnedictRecord : IDictRecord
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            // if (options.RelatedTerm!.Value)
+            // if (showRelatedTerms)
             // {
             //     string[]? relatedTerms = RelatedTerms?[i];
             //     if (relatedTerms?.Length > 0)

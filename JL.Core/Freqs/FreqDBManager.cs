@@ -227,7 +227,7 @@ internal static class FreqDBManager
         {
             FrequencyRecord record = GetRecord(dataReader);
 
-            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
+            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_defaultJso)!;
             for (int i = 0; i < searchKeys.Length; i++)
             {
                 string searchKey = searchKeys[i];
