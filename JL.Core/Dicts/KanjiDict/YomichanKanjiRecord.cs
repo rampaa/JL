@@ -72,7 +72,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             statList.Add(string.Create(CultureInfo.InvariantCulture, $"{stat.Name}: {stat.Value}"));
         }
 
-        Stats = statList.Count > 0 ? statList.ToArray() : null;
+        Stats = statList.TrimListToArray();
     }
 
     public string? BuildFormattedDefinition(DictOptions options)

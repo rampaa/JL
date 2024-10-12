@@ -31,7 +31,7 @@ internal static class JmnedictRecordBuilder
 
                     definitionList.Add(translation.TransDetList.ToArray());
                     nameTypeList.Add(translation.NameTypeList.ToArray());
-                    //relatedTermList.Add(translation.XRefList > 0 ? translation.XRefList.ToArray() : null);
+                    //relatedTermList.Add(translation.XRefList.TrimListToArray());
                 }
 
                 JmnedictRecord record = new(entry.Id, entry.KebList[i], entry.KebList.RemoveAtToArray(i), entry.RebList.TrimListToArray(), definitionList.ToArray(), nameTypeList.ToArray());
@@ -63,7 +63,7 @@ internal static class JmnedictRecordBuilder
 
                     definitionList.Add(translation.TransDetList.ToArray());
                     nameTypeList.Add(translation.NameTypeList.ToArray());
-                    // relatedTermList.Add(translation.XRefList > 0 ? translation.XRefList.ToArray() : null);
+                    // relatedTermList.Add(translation.XRefList.TrimListToArray());
                 }
 
                 JmnedictRecord record = new(entry.Id, entry.RebList[i], entry.RebList.RemoveAtToArray(i), null, definitionList.ToArray(), nameTypeList.ToArray());
