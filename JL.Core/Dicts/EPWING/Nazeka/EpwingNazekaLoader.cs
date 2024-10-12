@@ -20,8 +20,7 @@ internal static class EpwingNazekaLoader
         FileStream fileStream = File.OpenRead(fullPath);
         await using (fileStream.ConfigureAwait(false))
         {
-            jsonObjects = await JsonSerializer.DeserializeAsync<List<JsonElement>>(fileStream)
-                .ConfigureAwait(false);
+            jsonObjects = await JsonSerializer.DeserializeAsync<List<JsonElement>>(fileStream, Utils.s_jsoNotIgnoringNull).ConfigureAwait(false);
         }
 
         IDictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;

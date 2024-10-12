@@ -333,13 +333,13 @@ public static class FreqUtils
     {
         _ = Directory.CreateDirectory(Utils.ConfigPath);
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-            JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoIgnoringNullWithEnumConverterAndIndentation));
     }
 
     public static Task SerializeFreqs()
     {
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-            JsonSerializer.Serialize(FreqDicts, Utils.s_jsoWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(FreqDicts, Utils.s_jsoIgnoringNullWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeFreqs()
@@ -348,7 +348,7 @@ public static class FreqUtils
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Freq>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                .DeserializeAsync<Dictionary<string, Freq>>(fileStream, Utils.s_jsoIgnoringNullWithEnumConverter).ConfigureAwait(false);
 
             if (deserializedFreqs is not null)
             {

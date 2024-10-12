@@ -127,15 +127,15 @@ internal static class JmdictDBManager
             insertRecordCommand.Parameters["@id"].Value = id;
             insertRecordCommand.Parameters["@edict_id"].Value = record.Id;
             insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
-            insertRecordCommand.Parameters["@primary_spelling_orthography_info"].Value = record.PrimarySpellingOrthographyInfo is not null ? JsonSerializer.Serialize(record.PrimarySpellingOrthographyInfo, Utils.s_defaultJso) : DBNull.Value;
-            insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_defaultJso) : DBNull.Value;
+            insertRecordCommand.Parameters["@primary_spelling_orthography_info"].Value = record.PrimarySpellingOrthographyInfo is not null ? JsonSerializer.Serialize(record.PrimarySpellingOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
             insertRecordCommand.Parameters["@alternative_spellings_orthography_info"].Value = record.AlternativeSpellingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
-            insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_defaultJso) : DBNull.Value;
+            insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
             insertRecordCommand.Parameters["@readings_orthography_info"].Value = record.ReadingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.ReadingsOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
             insertRecordCommand.Parameters["@reading_restrictions"].Value = record.ReadingRestrictions is not null ? JsonSerializer.Serialize(record.ReadingRestrictions, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
-            insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_defaultJso);
+            insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull);
             insertRecordCommand.Parameters["@glossary_info"].Value = record.DefinitionInfo is not null ? JsonSerializer.Serialize(record.DefinitionInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
-            insertRecordCommand.Parameters["@part_of_speech"].Value = JsonSerializer.Serialize(record.WordClasses, Utils.s_defaultJso);
+            insertRecordCommand.Parameters["@part_of_speech"].Value = JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull);
             insertRecordCommand.Parameters["@spelling_restrictions"].Value = record.SpellingRestrictions is not null ? JsonSerializer.Serialize(record.SpellingRestrictions, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
             insertRecordCommand.Parameters["@fields"].Value = record.Fields is not null ? JsonSerializer.Serialize(record.Fields, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
             insertRecordCommand.Parameters["@misc"].Value = record.Misc is not null ? JsonSerializer.Serialize(record.Misc, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
@@ -272,7 +272,7 @@ internal static class JmdictDBManager
         {
             JmdictRecord record = GetRecord(dataReader);
 
-            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_defaultJso)!;
+            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
             for (int i = 0; i < searchKeys.Length; i++)
             {
                 string searchKey = searchKeys[i];
@@ -303,7 +303,7 @@ internal static class JmdictDBManager
         string[]? primarySpellingOrthographyInfo = null;
         if (dataReader[nameof(primarySpellingOrthographyInfo)] is string primarySpellingOrthographyInfoFromDB)
         {
-            primarySpellingOrthographyInfo = JsonSerializer.Deserialize<string[]>(primarySpellingOrthographyInfoFromDB, Utils.s_defaultJso);
+            primarySpellingOrthographyInfo = JsonSerializer.Deserialize<string[]>(primarySpellingOrthographyInfoFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
         string[]?[]? spellingRestrictions = null;
@@ -315,7 +315,7 @@ internal static class JmdictDBManager
         string[]? alternativeSpellings = null;
         if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
         {
-            alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_defaultJso);
+            alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
         string[]?[]? alternativeSpellingsOrthographyInfo = null;
@@ -327,7 +327,7 @@ internal static class JmdictDBManager
         string[]? readings = null;
         if (dataReader[nameof(readings)] is string readingsFromDB)
         {
-            readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_defaultJso);
+            readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
         string[]?[]? readingRestrictions = null;
@@ -342,8 +342,8 @@ internal static class JmdictDBManager
             readingsOrthographyInfo = JsonSerializer.Deserialize<string[]?[]>(readingsOrthographyInfoFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
-        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(definitions)), Utils.s_defaultJso)!;
-        string[][] wordClasses = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(wordClasses)), Utils.s_defaultJso)!;
+        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
+        string[][] wordClasses = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(wordClasses)), Utils.s_jsoNotIgnoringNull)!;
 
         string[]?[]? fields = null;
         if (dataReader[nameof(fields)] is string fieldsFromDB)

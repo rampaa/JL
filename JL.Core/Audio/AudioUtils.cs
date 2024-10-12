@@ -200,14 +200,14 @@ public static class AudioUtils
     public static Task SerializeAudioSources()
     {
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-            JsonSerializer.Serialize(AudioSources, Utils.s_jsoWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(AudioSources, Utils.s_jsoIgnoringNullWithEnumConverterAndIndentation));
     }
 
     public static Task CreateDefaultAudioSourceConfig()
     {
         _ = Directory.CreateDirectory(Utils.ConfigPath);
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-            JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoIgnoringNullWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeAudioSources()
@@ -216,7 +216,7 @@ public static class AudioUtils
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, AudioSource>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                .DeserializeAsync<Dictionary<string, AudioSource>>(fileStream, Utils.s_jsoIgnoringNullWithEnumConverter).ConfigureAwait(false);
 
             if (deserializedAudioSources is not null)
             {

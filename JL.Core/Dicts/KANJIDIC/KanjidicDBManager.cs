@@ -83,11 +83,11 @@ internal static class KanjidicDBManager
             {
                 KanjidicRecord kanjidicRecord = (KanjidicRecord)record;
                 _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
-                _ = insertRecordCommand.Parameters["@on_readings"].Value = kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_defaultJso) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@kun_readings"].Value = kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_defaultJso) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@nanori_readings"].Value = kanjidicRecord.NanoriReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.NanoriReadings, Utils.s_defaultJso) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@radical_names"].Value = kanjidicRecord.RadicalNames is not null ? JsonSerializer.Serialize(kanjidicRecord.RadicalNames, Utils.s_defaultJso) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@glossary"].Value = kanjidicRecord.Definitions is not null ? JsonSerializer.Serialize(kanjidicRecord.Definitions, Utils.s_defaultJso) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@on_readings"].Value = kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@kun_readings"].Value = kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@nanori_readings"].Value = kanjidicRecord.NanoriReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.NanoriReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@radical_names"].Value = kanjidicRecord.RadicalNames is not null ? JsonSerializer.Serialize(kanjidicRecord.RadicalNames, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@glossary"].Value = kanjidicRecord.Definitions is not null ? JsonSerializer.Serialize(kanjidicRecord.Definitions, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
                 _ = insertRecordCommand.Parameters["@stroke_count"].Value = kanjidicRecord.StrokeCount;
                 _ = insertRecordCommand.Parameters["@grade"].Value = kanjidicRecord.Grade;
                 _ = insertRecordCommand.Parameters["@frequency"].Value = kanjidicRecord.Frequency;
@@ -164,31 +164,31 @@ internal static class KanjidicDBManager
         string[]? onReadings = null;
         if (dataReader[nameof(onReadings)] is string onReadingsFromDB)
         {
-            onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_defaultJso);
+            onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
         string[]? kunReadings = null;
         if (dataReader[nameof(kunReadings)] is string kunReadingsFromDB)
         {
-            kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_defaultJso);
+            kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
         string[]? nanoriReadings = null;
         if (dataReader[nameof(nanoriReadings)] is string nanoriReadingsFromDB)
         {
-            nanoriReadings = JsonSerializer.Deserialize<string[]>(nanoriReadingsFromDB, Utils.s_defaultJso);
+            nanoriReadings = JsonSerializer.Deserialize<string[]>(nanoriReadingsFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
         string[]? radicalNames = null;
         if (dataReader[nameof(radicalNames)] is string radicalNamesFromDB)
         {
-            radicalNames = JsonSerializer.Deserialize<string[]>(radicalNamesFromDB, Utils.s_defaultJso);
+            radicalNames = JsonSerializer.Deserialize<string[]>(radicalNamesFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
         string[]? definitions = null;
         if (dataReader[nameof(definitions)] is string definitionsFromDB)
         {
-            definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_defaultJso);
+            definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
         byte strokeCount = dataReader.GetByte(nameof(strokeCount));

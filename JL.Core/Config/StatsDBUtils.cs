@@ -9,7 +9,7 @@ public static class StatsDBUtils
 {
     public static void InsertStats(SqliteConnection connection, Stats stats, int profileId)
     {
-        InsertStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
+        InsertStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoNotIgnoringNullWithEnumConverterAndIndentation), profileId);
     }
 
     public static void InsertStats(SqliteConnection connection, string stats, int profileId)
@@ -28,7 +28,7 @@ public static class StatsDBUtils
 
     private static void UpdateStats(SqliteConnection connection, Stats stats, int profileId)
     {
-        UpdateStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
+        UpdateStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoNotIgnoringNullWithEnumConverterAndIndentation), profileId);
     }
 
     public static void UpdateStats(SqliteConnection connection, string stats, int profileId)
@@ -61,7 +61,7 @@ public static class StatsDBUtils
         string? statsValue = (string?)command.ExecuteScalar();
 
         return statsValue is not null
-            ? JsonSerializer.Deserialize<Stats>(statsValue, Utils.s_jsoWithEnumConverter)
+            ? JsonSerializer.Deserialize<Stats>(statsValue, Utils.s_jsoNotIgnoringNullWithEnumConverter)
             : null;
     }
 

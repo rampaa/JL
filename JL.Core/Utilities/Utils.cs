@@ -48,13 +48,27 @@ public static partial class Utils
             shared: true)
         .CreateLogger();
 
-    internal static readonly JsonSerializerOptions s_defaultJso = new()
+    internal static readonly JsonSerializerOptions s_jsoNotIgnoringNull = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    };
+
+    internal static readonly JsonSerializerOptions s_jsoIgnoringNull = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    internal static readonly JsonSerializerOptions s_jsoWithEnumConverter = new()
+    internal static readonly JsonSerializerOptions s_jsoNotIgnoringNullWithEnumConverter = new()
+    {
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        },
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    internal static readonly JsonSerializerOptions s_jsoIgnoringNullWithEnumConverter = new()
     {
         Converters =
         {
@@ -64,12 +78,17 @@ public static partial class Utils
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    internal static readonly JsonSerializerOptions s_jsoNotIgnoringNull = new()
+    internal static readonly JsonSerializerOptions s_jsoNotIgnoringNullWithEnumConverterAndIndentation = new()
     {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        },
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true
     };
 
-    internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndentation = new()
+    internal static readonly JsonSerializerOptions s_jsoIgnoringNullWithEnumConverterAndIndentation = new()
     {
         Converters =
         {

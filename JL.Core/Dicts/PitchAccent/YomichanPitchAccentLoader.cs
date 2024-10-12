@@ -24,7 +24,8 @@ internal static class YomichanPitchAccentLoader
             FileStream fileStream = File.OpenRead(jsonFile);
             await using (fileStream.ConfigureAwait(false))
             {
-                jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(fileStream)
+                jsonObjects = await JsonSerializer
+                    .DeserializeAsync<List<List<JsonElement>>>(fileStream, Utils.s_jsoNotIgnoringNull)
                     .ConfigureAwait(false);
             }
 

@@ -23,7 +23,7 @@ internal static class YomichanKanjiLoader
             await using (fileStream.ConfigureAwait(false))
             {
                 jsonObjects = await JsonSerializer
-                    .DeserializeAsync<List<List<JsonElement>>>(fileStream)
+                    .DeserializeAsync<List<List<JsonElement>>>(fileStream, Utils.s_jsoNotIgnoringNull)
                     .ConfigureAwait(false);
             }
 

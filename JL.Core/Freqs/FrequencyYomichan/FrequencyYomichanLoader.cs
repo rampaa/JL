@@ -24,7 +24,8 @@ internal static class FrequencyYomichanLoader
             FileStream fileStream = File.OpenRead(jsonFile);
             await using (fileStream.ConfigureAwait(false))
             {
-                frequencyJson = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(fileStream)
+                frequencyJson = await JsonSerializer
+                    .DeserializeAsync<List<List<JsonElement>>>(fileStream, Utils.s_jsoNotIgnoringNull)
                     .ConfigureAwait(false);
             }
 

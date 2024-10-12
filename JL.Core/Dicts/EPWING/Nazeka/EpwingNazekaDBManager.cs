@@ -95,8 +95,8 @@ internal static class EpwingNazekaDBManager
             _ = insertRecordCommand.Parameters["@id"].Value = id;
             _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_defaultJso) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_defaultJso);
+            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull);
             _ = insertRecordCommand.ExecuteNonQuery();
 
             _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
@@ -170,10 +170,10 @@ internal static class EpwingNazekaDBManager
             string[]? alternativeSpellings = null;
             if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
             {
-                alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_defaultJso);
+                alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
             }
 
-            string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_defaultJso)!;
+            string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
 
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
@@ -234,7 +234,7 @@ internal static class EpwingNazekaDBManager
         while (dataReader.Read())
         {
             EpwingNazekaRecord record = GetRecord(dataReader);
-            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_defaultJso)!;
+            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
             for (int i = 0; i < searchKeys.Length; i++)
             {
                 string searchKey = searchKeys[i];
@@ -270,10 +270,10 @@ internal static class EpwingNazekaDBManager
         string[]? alternativeSpellings = null;
         if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
         {
-            alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_defaultJso);
+            alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
-        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_defaultJso)!;
+        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
     }

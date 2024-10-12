@@ -19,7 +19,8 @@ internal static class FrequencyNazekaLoader
         FileStream fileStream = File.OpenRead(fullPath);
         await using (fileStream.ConfigureAwait(false))
         {
-            frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(fileStream)
+            frequencyJson = await JsonSerializer
+                .DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(fileStream, Utils.s_jsoNotIgnoringNull)
                 .ConfigureAwait(false);
         }
 

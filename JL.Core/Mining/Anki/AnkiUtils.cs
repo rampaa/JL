@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JL.Core.Utilities;
 
 namespace JL.Core.Mining.Anki;
 
@@ -10,7 +11,7 @@ public static class AnkiUtils
         string? resultString = response?.Result?.ToString() ?? null;
 
         return resultString is not null
-            ? JsonSerializer.Deserialize<List<string>>(resultString)
+            ? JsonSerializer.Deserialize<List<string>>(resultString, Utils.s_jsoNotIgnoringNull)
             : null;
     }
 
@@ -20,7 +21,7 @@ public static class AnkiUtils
         string? resultString = response?.Result?.ToString() ?? null;
 
         return resultString is not null
-            ? JsonSerializer.Deserialize<List<string>>(resultString)
+            ? JsonSerializer.Deserialize<List<string>>(resultString, Utils.s_jsoNotIgnoringNull)
             : null;
     }
 
@@ -30,7 +31,7 @@ public static class AnkiUtils
         string? resultString = response?.Result?.ToString() ?? null;
 
         return resultString is not null
-            ? JsonSerializer.Deserialize<List<string>>(resultString)
+            ? JsonSerializer.Deserialize<List<string>>(resultString, Utils.s_jsoNotIgnoringNull)
             : null;
     }
 
