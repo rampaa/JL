@@ -23,7 +23,11 @@ internal static class JmdictRecordBuilder
             string key = JapaneseUtils.KatakanaToHiragana(kanjiElement.Keb).GetPooledString();
             if (recordDictionary.ContainsKey(key))
             {
-                ++index;
+                if (!kanjiElement.KeInfList.Contains("sK"))
+                {
+                    ++index;
+                }
+
                 continue;
             }
 
@@ -121,7 +125,11 @@ internal static class JmdictRecordBuilder
 
             if (recordDictionary.ContainsKey(key))
             {
-                ++index;
+                if (!readingElement.ReInfList.Contains("sk"))
+                {
+                    ++index;
+                }
+
                 continue;
             }
 
