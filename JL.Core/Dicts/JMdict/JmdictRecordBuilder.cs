@@ -84,7 +84,7 @@ internal static class JmdictRecordBuilder
                     definitionInfoList.Add(sense.SInf);
                     relatedTermList.Add(sense.XRefList.TrimListToArray());
                     antonymList.Add(sense.AntList.TrimListToArray());
-                    loanwordSourceList.Add(sense.LSourceList.Count > 0 ? sense.LSourceList.ToArray() : null);
+                    loanwordSourceList.Add(sense.LSourceList.TrimListToArray());
                 }
             }
 
@@ -212,7 +212,7 @@ internal static class JmdictRecordBuilder
                     definitionInfoList.Add(sense.SInf);
                     relatedTermList.Add(sense.XRefList.TrimListToArray());
                     antonymList.Add(sense.AntList.TrimListToArray());
-                    loanwordSourceList.Add(sense.LSourceList.Count > 0 ? sense.LSourceList.ToArray() : null);
+                    loanwordSourceList.Add(sense.LSourceList.TrimListToArray());
                 }
             }
 
