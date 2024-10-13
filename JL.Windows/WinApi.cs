@@ -186,7 +186,7 @@ internal sealed partial class WinApi
         return GetClipboardSequenceNumber();
     }
 
-    public static void AddHotKeyToKeyGestureDict(string hotkeyName, KeyGesture keyGesture)
+    public static void AddHotKeyToGlobalKeyGestureDict(string hotkeyName, KeyGesture keyGesture)
     {
         int id = KeyGestureUtils.GlobalKeyGestureDict.Count;
 
@@ -208,7 +208,7 @@ internal sealed partial class WinApi
         }
     }
 
-    public static void RegisterAllHotKeys(nint windowHandle)
+    public static void RegisterAllGlobalHotKeys(nint windowHandle)
     {
         foreach (KeyValuePair<int, KeyGesture> keyValuePair in KeyGestureUtils.GlobalKeyGestureDict)
         {
@@ -216,7 +216,7 @@ internal sealed partial class WinApi
         }
     }
 
-    public static void UnregisterAllHotKeys(nint windowHandle)
+    public static void UnregisterAllGlobalHotKeys(nint windowHandle)
     {
         foreach (int id in KeyGestureUtils.GlobalKeyGestureDict.Keys)
         {
@@ -224,7 +224,7 @@ internal sealed partial class WinApi
         }
     }
 
-    public static void UnregisterAllHotKeys(nint windowHandle, int keyGestureIdToIgnore)
+    public static void UnregisterAllGlobalHotKeys(nint windowHandle, int keyGestureIdToIgnore)
     {
         foreach (int id in KeyGestureUtils.GlobalKeyGestureDict.Keys)
         {
@@ -237,7 +237,7 @@ internal sealed partial class WinApi
         }
     }
 
-    public static void UnregisterAllHotKeys(nint windowHandle, List<int> keyGestureIdsToIgnore)
+    public static void UnregisterAllGlobalHotKeys(nint windowHandle, List<int> keyGestureIdsToIgnore)
     {
         foreach (int id in KeyGestureUtils.GlobalKeyGestureDict.Keys)
         {

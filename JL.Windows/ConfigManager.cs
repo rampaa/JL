@@ -450,7 +450,7 @@ internal static class ConfigManager
             ? MainWindowBackgroundOpacityOnUnhover / 100
             : MainWindow.Instance.OpacitySlider.Value / 100;
 
-        WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+        WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         KeyGestureUtils.GlobalKeyGestureDict.Clear();
         KeyGestureUtils.GlobalKeyGestureNameToIntDict.Clear();
 
@@ -520,7 +520,7 @@ internal static class ConfigManager
 
         if (GlobalHotKeys && !DisableHotkeys)
         {
-            WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.RegisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         MainWindow.Instance.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);

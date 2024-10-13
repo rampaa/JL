@@ -150,7 +150,7 @@ internal static class WindowsUtils
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = addNameWindowInstance.ShowDialog();
@@ -166,7 +166,7 @@ internal static class WindowsUtils
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = addWordWindowInstance.ShowDialog();
@@ -182,7 +182,7 @@ internal static class WindowsUtils
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = preferencesWindow.ShowDialog();
@@ -214,7 +214,7 @@ internal static class WindowsUtils
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageDictionariesWindow.ShowDialog();
@@ -234,7 +234,7 @@ internal static class WindowsUtils
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageFrequenciesWindow.ShowDialog();
@@ -251,7 +251,7 @@ internal static class WindowsUtils
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = statsWindow.ShowDialog();
@@ -271,7 +271,7 @@ internal static class WindowsUtils
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageAudioSourcesWindow.ShowDialog();
@@ -702,7 +702,7 @@ internal static class WindowsUtils
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.RegisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
     }
 

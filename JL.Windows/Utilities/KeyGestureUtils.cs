@@ -181,7 +181,7 @@ internal static class KeyGestureUtils
             KeyGesture newKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromInvariantString(keyGestureString)!;
             if (ConfigManager.GlobalHotKeys)
             {
-                WinApi.AddHotKeyToKeyGestureDict(keyGestureName, newKeyGesture);
+                WinApi.AddHotKeyToGlobalKeyGestureDict(keyGestureName, newKeyGesture);
             }
 
             return newKeyGesture;
@@ -190,7 +190,7 @@ internal static class KeyGestureUtils
         ConfigDBManager.InsertSetting(connection, keyGestureName, defaultKeyGesture.ToFormattedString());
         if (ConfigManager.GlobalHotKeys)
         {
-            WinApi.AddHotKeyToKeyGestureDict(keyGestureName, defaultKeyGesture);
+            WinApi.AddHotKeyToGlobalKeyGestureDict(keyGestureName, defaultKeyGesture);
         }
 
         return defaultKeyGesture;

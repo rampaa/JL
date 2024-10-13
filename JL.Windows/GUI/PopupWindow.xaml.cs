@@ -1299,11 +1299,11 @@ internal sealed partial class PopupWindow
             {
                 if (ConfigManager.DisableHotkeys)
                 {
-                    WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+                    WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
                 }
                 else
                 {
-                    WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
+                    WinApi.RegisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
                 }
             }
         }

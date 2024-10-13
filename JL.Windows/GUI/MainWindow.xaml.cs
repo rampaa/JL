@@ -474,16 +474,16 @@ internal sealed partial class MainWindow
                 {
                     if (KeyGestureUtils.GlobalKeyGestureNameToIntDict.TryGetValue(nameof(ConfigManager.DisableHotkeys), out int id))
                     {
-                        WinApi.UnregisterAllHotKeys(WindowHandle, id);
+                        WinApi.UnregisterAllGlobalHotKeys(WindowHandle, id);
                     }
                     else
                     {
-                        WinApi.UnregisterAllHotKeys(WindowHandle);
+                        WinApi.UnregisterAllGlobalHotKeys(WindowHandle);
                     }
                 }
                 else
                 {
-                    WinApi.RegisterAllHotKeys(WindowHandle);
+                    WinApi.RegisterAllGlobalHotKeys(WindowHandle);
                 }
             }
         }
@@ -1624,11 +1624,11 @@ internal sealed partial class MainWindow
 
                 if (keyGestureIdsToIgnore.Count > 0)
                 {
-                    WinApi.UnregisterAllHotKeys(WindowHandle, keyGestureIdsToIgnore);
+                    WinApi.UnregisterAllGlobalHotKeys(WindowHandle, keyGestureIdsToIgnore);
                 }
                 else
                 {
-                    WinApi.UnregisterAllHotKeys(WindowHandle);
+                    WinApi.UnregisterAllGlobalHotKeys(WindowHandle);
                 }
             }
         }
@@ -1643,7 +1643,7 @@ internal sealed partial class MainWindow
 
             if (ConfigManager.GlobalHotKeys)
             {
-                WinApi.RegisterAllHotKeys(WindowHandle);
+                WinApi.RegisterAllGlobalHotKeys(WindowHandle);
             }
 
             if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
