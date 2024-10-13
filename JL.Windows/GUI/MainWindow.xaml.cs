@@ -472,7 +472,7 @@ internal sealed partial class MainWindow
             {
                 if (ConfigManager.DisableHotkeys)
                 {
-                    if (KeyGestureUtils.KeyGestureNameToIntDict.TryGetValue(nameof(ConfigManager.DisableHotkeys), out int id))
+                    if (KeyGestureUtils.GlobalKeyGestureNameToIntDict.TryGetValue(nameof(ConfigManager.DisableHotkeys), out int id))
                     {
                         WinApi.UnregisterAllHotKeys(WindowHandle, id);
                     }
@@ -1616,7 +1616,7 @@ internal sealed partial class MainWindow
                 List<int> keyGestureIdsToIgnore = new(KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length);
                 for (int i = 0; i < KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length; i++)
                 {
-                    if (KeyGestureUtils.KeyGestureNameToIntDict.TryGetValue(KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized[i], out int id))
+                    if (KeyGestureUtils.GlobalKeyGestureNameToIntDict.TryGetValue(KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized[i], out int id))
                     {
                         keyGestureIdsToIgnore.Add(id);
                     }

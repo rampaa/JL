@@ -10,10 +10,10 @@ namespace JL.Windows.Utilities;
 
 internal static class KeyGestureUtils
 {
-    public static readonly Dictionary<int, KeyGesture> KeyGestureDict = [];
-    public static readonly Dictionary<string, int> KeyGestureNameToIntDict = [];
+    public static readonly Dictionary<int, KeyGesture> GlobalKeyGestureDict = [];
+    public static readonly Dictionary<string, int> GlobalKeyGestureNameToIntDict = [];
 
-    public static readonly FrozenSet<Key> ValidKeys = FrozenSet.ToFrozenSet(
+    public static readonly FrozenSet<Key> ValidGlobalKeys = FrozenSet.ToFrozenSet(
     [
         #pragma warning disable format
 
@@ -165,7 +165,7 @@ internal static class KeyGestureUtils
             : "None";
     }
 
-    public static KeyGesture SetKeyGesture(SqliteConnection connection, string keyGestureName, KeyGesture keyGesture, bool setAsGlobalHotKey = true)
+    public static KeyGesture GetKeyGestureFromConfig(SqliteConnection connection, string keyGestureName, KeyGesture defaultKeyGesture)
     {
         string? rawKeyGesture = ConfigDBManager.GetSettingValue(connection, keyGestureName);
         if (rawKeyGesture is not null)
@@ -179,8 +179,7 @@ internal static class KeyGestureUtils
                 : $"Win+{rawKeyGesture}";
 
             KeyGesture newKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromInvariantString(keyGestureString)!;
-
-            if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
+            if (ConfigManager.GlobalHotKeys)
             {
                 WinApi.AddHotKeyToKeyGestureDict(keyGestureName, newKeyGesture);
             }
@@ -188,14 +187,13 @@ internal static class KeyGestureUtils
             return newKeyGesture;
         }
 
-        ConfigDBManager.InsertSetting(connection, keyGestureName, keyGesture.ToFormattedString());
-
-        if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
+        ConfigDBManager.InsertSetting(connection, keyGestureName, defaultKeyGesture.ToFormattedString());
+        if (ConfigManager.GlobalHotKeys)
         {
-            WinApi.AddHotKeyToKeyGestureDict(keyGestureName, keyGesture);
+            WinApi.AddHotKeyToKeyGestureDict(keyGestureName, defaultKeyGesture);
         }
 
-        return keyGesture;
+        return defaultKeyGesture;
     }
 
     public static void SetInputGestureText(this MenuItem menuItem, KeyGesture keyGesture)
@@ -207,7 +205,7 @@ internal static class KeyGestureUtils
             : "";
     }
 
-    public static void SaveKeyGesture(SqliteConnection connection, string key, string rawKeyGesture)
+    public static void UpdateKeyGesture(SqliteConnection connection, string key, string rawKeyGesture)
     {
         string value = rawKeyGesture.StartsWith("Win+", StringComparison.Ordinal)
             ? rawKeyGesture[4..]

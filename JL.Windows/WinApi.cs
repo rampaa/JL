@@ -188,13 +188,13 @@ internal sealed partial class WinApi
 
     public static void AddHotKeyToKeyGestureDict(string hotkeyName, KeyGesture keyGesture)
     {
-        int id = KeyGestureUtils.KeyGestureDict.Count;
+        int id = KeyGestureUtils.GlobalKeyGestureDict.Count;
 
         ModifierKeys modifierKeys = keyGesture.Modifiers is ModifierKeys.Windows
             ? ModifierKeys.None
             : keyGesture.Modifiers;
 
-        if (modifierKeys is not ModifierKeys.None || KeyGestureUtils.ValidKeys.Contains(keyGesture.Key))
+        if (modifierKeys is not ModifierKeys.None || KeyGestureUtils.ValidGlobalKeys.Contains(keyGesture.Key))
         {
             KeyGesture newKeyGesture = keyGesture;
 
@@ -203,14 +203,14 @@ internal sealed partial class WinApi
                 newKeyGesture = new KeyGesture(keyGesture.Key, ModifierKeys.None);
             }
 
-            KeyGestureUtils.KeyGestureDict.Add(id, newKeyGesture);
-            KeyGestureUtils.KeyGestureNameToIntDict.Add(hotkeyName, id);
+            KeyGestureUtils.GlobalKeyGestureDict.Add(id, newKeyGesture);
+            KeyGestureUtils.GlobalKeyGestureNameToIntDict.Add(hotkeyName, id);
         }
     }
 
     public static void RegisterAllHotKeys(nint windowHandle)
     {
-        foreach (KeyValuePair<int, KeyGesture> keyValuePair in KeyGestureUtils.KeyGestureDict)
+        foreach (KeyValuePair<int, KeyGesture> keyValuePair in KeyGestureUtils.GlobalKeyGestureDict)
         {
             _ = RegisterHotKey(windowHandle, keyValuePair.Key, (uint)keyValuePair.Value.Modifiers | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(keyValuePair.Value.Key));
         }
@@ -218,7 +218,7 @@ internal sealed partial class WinApi
 
     public static void UnregisterAllHotKeys(nint windowHandle)
     {
-        foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
+        foreach (int id in KeyGestureUtils.GlobalKeyGestureDict.Keys)
         {
             _ = UnregisterHotKey(windowHandle, id);
         }
@@ -226,7 +226,7 @@ internal sealed partial class WinApi
 
     public static void UnregisterAllHotKeys(nint windowHandle, int keyGestureIdToIgnore)
     {
-        foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
+        foreach (int id in KeyGestureUtils.GlobalKeyGestureDict.Keys)
         {
             if (keyGestureIdToIgnore == id)
             {
@@ -239,7 +239,7 @@ internal sealed partial class WinApi
 
     public static void UnregisterAllHotKeys(nint windowHandle, List<int> keyGestureIdsToIgnore)
     {
-        foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
+        foreach (int id in KeyGestureUtils.GlobalKeyGestureDict.Keys)
         {
             if (keyGestureIdsToIgnore.Contains(id))
             {
@@ -348,7 +348,7 @@ internal sealed partial class WinApi
 
         else if (msg is WM_HOTKEY)
         {
-            if (KeyGestureUtils.KeyGestureDict.TryGetValue((int)wParam, out KeyGesture? keyGesture))
+            if (KeyGestureUtils.GlobalKeyGestureDict.TryGetValue((int)wParam, out KeyGesture? keyGesture))
             {
                 _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
                 handled = true;

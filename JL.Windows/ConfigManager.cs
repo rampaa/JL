@@ -451,72 +451,72 @@ internal static class ConfigManager
             : MainWindow.Instance.OpacitySlider.Value / 100;
 
         WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
-        KeyGestureUtils.KeyGestureDict.Clear();
-        KeyGestureUtils.KeyGestureNameToIntDict.Clear();
+        KeyGestureUtils.GlobalKeyGestureDict.Clear();
+        KeyGestureUtils.GlobalKeyGestureNameToIntDict.Clear();
 
-        DisableHotkeysKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
-        MiningModeKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(MiningModeKeyGesture), MiningModeKeyGesture);
-        PlayAudioKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(PlayAudioKeyGesture), PlayAudioKeyGesture);
-        KanjiModeKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(KanjiModeKeyGesture), KanjiModeKeyGesture);
-        LookupKeyKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(LookupKeyKeyGesture), LookupKeyKeyGesture, false);
-        ClosePopupKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(ClosePopupKeyGesture), ClosePopupKeyGesture);
-        ShowStatsKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(ShowStatsKeyGesture), ShowStatsKeyGesture);
-        NextDictKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(NextDictKeyGesture), NextDictKeyGesture);
-        PreviousDictKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(PreviousDictKeyGesture), PreviousDictKeyGesture);
-        AlwaysOnTopKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
-        TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
-        ToggleAlwaysShowMainTextBoxCaretKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture), ToggleAlwaysShowMainTextBoxCaretKeyGesture);
-        MoveCaretLeftKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(MoveCaretLeftKeyGesture), MoveCaretLeftKeyGesture);
-        MoveCaretRightKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(MoveCaretRightKeyGesture), MoveCaretRightKeyGesture);
-        MoveCaretUpKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(MoveCaretUpKeyGesture), MoveCaretUpKeyGesture);
-        MoveCaretDownKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(MoveCaretDownKeyGesture), MoveCaretDownKeyGesture);
-        LookupTermAtCaretIndexKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(LookupTermAtCaretIndexKeyGesture), LookupTermAtCaretIndexKeyGesture);
-        LookupFirstTermKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(LookupFirstTermKeyGesture), LookupFirstTermKeyGesture);
-        LookupSelectedTextKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(LookupSelectedTextKeyGesture), LookupSelectedTextKeyGesture);
-        SelectNextLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(SelectNextLookupResultKeyGesture), SelectNextLookupResultKeyGesture);
-        SelectPreviousLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(SelectPreviousLookupResultKeyGesture), SelectPreviousLookupResultKeyGesture);
-        MineSelectedLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(MineSelectedLookupResultKeyGesture), MineSelectedLookupResultKeyGesture);
-        CaptureTextFromClipboardKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
-        CaptureTextFromWebSocketKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
-        ReconnectToWebSocketServerKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
-        DeleteCurrentLineKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
+        DisableHotkeysKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
+        MiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MiningModeKeyGesture), MiningModeKeyGesture);
+        PlayAudioKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(PlayAudioKeyGesture), PlayAudioKeyGesture);
+        KanjiModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(KanjiModeKeyGesture), KanjiModeKeyGesture);
+        LookupKeyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupKeyKeyGesture), LookupKeyKeyGesture);
+        ClosePopupKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ClosePopupKeyGesture), ClosePopupKeyGesture);
+        ShowStatsKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowStatsKeyGesture), ShowStatsKeyGesture);
+        NextDictKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(NextDictKeyGesture), NextDictKeyGesture);
+        PreviousDictKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(PreviousDictKeyGesture), PreviousDictKeyGesture);
+        AlwaysOnTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
+        TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
+        ToggleAlwaysShowMainTextBoxCaretKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture), ToggleAlwaysShowMainTextBoxCaretKeyGesture);
+        MoveCaretLeftKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MoveCaretLeftKeyGesture), MoveCaretLeftKeyGesture);
+        MoveCaretRightKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MoveCaretRightKeyGesture), MoveCaretRightKeyGesture);
+        MoveCaretUpKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MoveCaretUpKeyGesture), MoveCaretUpKeyGesture);
+        MoveCaretDownKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MoveCaretDownKeyGesture), MoveCaretDownKeyGesture);
+        LookupTermAtCaretIndexKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupTermAtCaretIndexKeyGesture), LookupTermAtCaretIndexKeyGesture);
+        LookupFirstTermKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupFirstTermKeyGesture), LookupFirstTermKeyGesture);
+        LookupSelectedTextKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupSelectedTextKeyGesture), LookupSelectedTextKeyGesture);
+        SelectNextLookupResultKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SelectNextLookupResultKeyGesture), SelectNextLookupResultKeyGesture);
+        SelectPreviousLookupResultKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SelectPreviousLookupResultKeyGesture), SelectPreviousLookupResultKeyGesture);
+        MineSelectedLookupResultKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MineSelectedLookupResultKeyGesture), MineSelectedLookupResultKeyGesture);
+        CaptureTextFromClipboardKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
+        CaptureTextFromWebSocketKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
+        ReconnectToWebSocketServerKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
+        DeleteCurrentLineKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
 
         ShowPreferencesWindowKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(ShowPreferencesWindowKeyGesture), ShowPreferencesWindowKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowPreferencesWindowKeyGesture), ShowPreferencesWindowKeyGesture);
         ShowAddNameWindowKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(ShowAddNameWindowKeyGesture), ShowAddNameWindowKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowAddNameWindowKeyGesture), ShowAddNameWindowKeyGesture);
         ShowAddWordWindowKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(ShowAddWordWindowKeyGesture), ShowAddWordWindowKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowAddWordWindowKeyGesture), ShowAddWordWindowKeyGesture);
         SearchWithBrowserKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(SearchWithBrowserKeyGesture), SearchWithBrowserKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SearchWithBrowserKeyGesture), SearchWithBrowserKeyGesture);
         MousePassThroughModeKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(MousePassThroughModeKeyGesture), MousePassThroughModeKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MousePassThroughModeKeyGesture), MousePassThroughModeKeyGesture);
         SteppedBacklogBackwardsKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(SteppedBacklogBackwardsKeyGesture), SteppedBacklogBackwardsKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SteppedBacklogBackwardsKeyGesture), SteppedBacklogBackwardsKeyGesture);
         SteppedBacklogForwardsKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(SteppedBacklogForwardsKeyGesture), SteppedBacklogForwardsKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SteppedBacklogForwardsKeyGesture), SteppedBacklogForwardsKeyGesture);
         InactiveLookupModeKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(InactiveLookupModeKeyGesture), InactiveLookupModeKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(InactiveLookupModeKeyGesture), InactiveLookupModeKeyGesture);
         MotivationKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(MotivationKeyGesture), MotivationKeyGesture);
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MotivationKeyGesture), MotivationKeyGesture);
 
         ShowManageDictionariesWindowKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(ShowManageDictionariesWindowKeyGesture),
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowManageDictionariesWindowKeyGesture),
                 ShowManageDictionariesWindowKeyGesture);
 
         ShowManageFrequenciesWindowKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(ShowManageFrequenciesWindowKeyGesture),
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowManageFrequenciesWindowKeyGesture),
                 ShowManageFrequenciesWindowKeyGesture);
 
         ShowManageAudioSourcesWindowKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(ShowManageAudioSourcesWindowKeyGesture),
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowManageAudioSourcesWindowKeyGesture),
                 ShowManageAudioSourcesWindowKeyGesture);
 
         ToggleMinimizedStateKeyGesture =
-            KeyGestureUtils.SetKeyGesture(connection, nameof(ToggleMinimizedStateKeyGesture),
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ToggleMinimizedStateKeyGesture),
                 ToggleMinimizedStateKeyGesture);
 
-        SelectedTextToSpeechKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(SelectedTextToSpeechKeyGesture), SelectedTextToSpeechKeyGesture);
+        SelectedTextToSpeechKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SelectedTextToSpeechKeyGesture), SelectedTextToSpeechKeyGesture);
 
         if (GlobalHotKeys && !DisableHotkeys)
         {
@@ -927,81 +927,81 @@ internal static class ConfigManager
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(true))
         {
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(MiningModeKeyGesture), preferenceWindow.MiningModeKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(PlayAudioKeyGesture), preferenceWindow.PlayAudioKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(KanjiModeKeyGesture), preferenceWindow.KanjiModeKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(LookupKeyKeyGesture), preferenceWindow.LookupKeyKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MiningModeKeyGesture), preferenceWindow.MiningModeKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(PlayAudioKeyGesture), preferenceWindow.PlayAudioKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(KanjiModeKeyGesture), preferenceWindow.KanjiModeKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(LookupKeyKeyGesture), preferenceWindow.LookupKeyKeyGestureTextBox.Text);
 
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ShowManageDictionariesWindowKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowManageDictionariesWindowKeyGesture),
                 preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ShowManageFrequenciesWindowKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowManageFrequenciesWindowKeyGesture),
                 preferenceWindow.ShowManageFrequenciesWindowKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ShowManageAudioSourcesWindowKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowManageAudioSourcesWindowKeyGesture),
                 preferenceWindow.ShowManageAudioSourcesWindowKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ShowPreferencesWindowKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowPreferencesWindowKeyGesture),
                 preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ShowAddNameWindowKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowAddNameWindowKeyGesture),
                 preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ShowAddWordWindowKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowAddWordWindowKeyGesture),
                 preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(SearchWithBrowserKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SearchWithBrowserKeyGesture),
                 preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(MousePassThroughModeKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MousePassThroughModeKeyGesture),
                 preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(SteppedBacklogBackwardsKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SteppedBacklogBackwardsKeyGesture),
                 preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(SteppedBacklogForwardsKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SteppedBacklogForwardsKeyGesture),
                 preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(InactiveLookupModeKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(InactiveLookupModeKeyGesture),
                 preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(MotivationKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MotivationKeyGesture),
                 preferenceWindow.MotivationKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ClosePopupKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ClosePopupKeyGesture),
                 preferenceWindow.ClosePopupKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ShowStatsKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowStatsKeyGesture),
                 preferenceWindow.ShowStatsKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(NextDictKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(NextDictKeyGesture),
                 preferenceWindow.NextDictKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(PreviousDictKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(PreviousDictKeyGesture),
                 preferenceWindow.PreviousDictKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(AlwaysOnTopKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(AlwaysOnTopKeyGesture),
                 preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(TextBoxIsReadOnlyKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(TextBoxIsReadOnlyKeyGesture),
                 preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture),
                 preferenceWindow.ToggleAlwaysShowMainTextBoxCaretKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(MoveCaretLeftKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MoveCaretLeftKeyGesture),
                 preferenceWindow.MoveCaretLeftKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(MoveCaretRightKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MoveCaretRightKeyGesture),
                 preferenceWindow.MoveCaretRightKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(MoveCaretUpKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MoveCaretUpKeyGesture),
                 preferenceWindow.MoveCaretUpKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(MoveCaretDownKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MoveCaretDownKeyGesture),
                 preferenceWindow.MoveCaretDownKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(LookupTermAtCaretIndexKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(LookupTermAtCaretIndexKeyGesture),
                 preferenceWindow.LookupTermAtCaretIndexKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(LookupFirstTermKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(LookupFirstTermKeyGesture),
                 preferenceWindow.LookupFirstTermKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(LookupSelectedTextKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(LookupSelectedTextKeyGesture),
                 preferenceWindow.LookupSelectedTextKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(SelectNextLookupResultKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SelectNextLookupResultKeyGesture),
                 preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(SelectPreviousLookupResultKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SelectPreviousLookupResultKeyGesture),
                 preferenceWindow.SelectPreviousLookupResultKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(MineSelectedLookupResultKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MineSelectedLookupResultKeyGesture),
                 preferenceWindow.MineSelectedLookupResultKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(CaptureTextFromClipboardKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(CaptureTextFromClipboardKeyGesture),
                 preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(CaptureTextFromWebSocketKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(CaptureTextFromWebSocketKeyGesture),
                 preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ReconnectToWebSocketServerKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ReconnectToWebSocketServerKeyGesture),
                 preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(DeleteCurrentLineKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(DeleteCurrentLineKeyGesture),
                 preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(ToggleMinimizedStateKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ToggleMinimizedStateKeyGesture),
                 preferenceWindow.ToggleMinimizedStateKeyGestureTextBox.Text);
-            KeyGestureUtils.SaveKeyGesture(connection, nameof(SelectedTextToSpeechKeyGesture),
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SelectedTextToSpeechKeyGesture),
                 preferenceWindow.SelectedTextToSpeechTextBox.Text);
 
             ConfigDBManager.UpdateSetting(connection, nameof(SearchUrl), preferenceWindow.SearchUrlTextBox.Text);
