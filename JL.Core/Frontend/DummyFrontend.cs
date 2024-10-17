@@ -26,7 +26,7 @@ internal sealed class DummyFrontend : IFrontend
 
     public Task CopyFromWebSocket(string text) => Task.CompletedTask;
 
-    public Task<byte[]?> GetImageFromClipboardAsByteArray() => new(() => null);
+    public Task<byte[]?> GetImageFromClipboardAsByteArray() => new(static () => null);
 
     public Task TextToSpeech(string voiceName, string text) => Task.CompletedTask;
 

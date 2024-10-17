@@ -50,7 +50,7 @@ public static partial class Utils
 
     internal static readonly JsonSerializerOptions s_jsoNotIgnoringNull = new()
     {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
     internal static readonly JsonSerializerOptions s_jsoIgnoringNull = new()

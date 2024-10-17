@@ -69,7 +69,7 @@ internal static class PopupWindowUtils
             VerticalScrollBarVisibility = ScrollBarVisibility.Disabled
         };
 
-        // Scrolling doesn’t work when touching a TextBox inside a ListView
+        // Scrolling doesn't work when touching a TextBox inside a ListView
         // unless the TextBox's PanningMode is set to None explicitly.
         textBox.SetValue(ScrollViewer.PanningModeProperty, PanningMode.None);
 
