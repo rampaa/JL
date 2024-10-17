@@ -1,9 +1,9 @@
 namespace JL.Core.Dicts.JMdict;
 
-internal ref struct JmdictEntry()
+internal readonly ref struct JmdictEntry(int id, List<KanjiElement> kanjiElements, List<ReadingElement> readingElements, List<Sense> senseList)
 {
-    public int Id { get; set; } = 0;
-    public List<KanjiElement> KanjiElements { get; } = [];
-    public List<ReadingElement> ReadingElements { get; } = [];
-    public List<Sense> SenseList { get; } = [];
+    public int Id { get; } = id;
+    public List<KanjiElement> KanjiElements { get; } = kanjiElements;
+    public List<ReadingElement> ReadingElements { get; } = readingElements;
+    public List<Sense> SenseList { get; } = senseList;
 }

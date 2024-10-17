@@ -1,8 +1,8 @@
 namespace JL.Core.Dicts.JMdict;
 
-internal sealed class KanjiElement
+internal sealed class KanjiElement(string keb, List<string> keInfList)
 {
-    public string Keb { get; set; } = ""; //e.g. 娘
-    public List<string> KeInfList { get; } = []; //e.g. Ateji.
-    // public List<string> KePriList { get; } = [] // e.g. gai1
+    public string Keb { get; } = keb; // e.g. 娘
+    public List<string> KeInfList { get; } = keInfList; // e.g. Ateji.
+    // public List<string> KePriList { get; } // e.g. gai1
 }
