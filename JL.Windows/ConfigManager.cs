@@ -1020,17 +1020,16 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowDynamicHeight),
                 preferenceWindow.MainWindowDynamicHeightCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMaxDynamicWidth),
-                preferenceWindow.MainWindowMaxDynamicWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            double mainWindowMinDynamicWidth = preferenceWindow.MainWindowMinDynamicWidthNumericUpDown.Value;
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMinDynamicWidth), mainWindowMinDynamicWidth.ToString(CultureInfo.InvariantCulture));
+            double mainWindowMaxDynamicWidth = Math.Max(preferenceWindow.MainWindowMaxDynamicWidthNumericUpDown.Value, mainWindowMinDynamicWidth);
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMaxDynamicWidth), mainWindowMaxDynamicWidth.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMaxDynamicHeight),
-                preferenceWindow.MainWindowMaxDynamicHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMinDynamicWidth),
-                preferenceWindow.MainWindowMinDynamicWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
-
-            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMinDynamicHeight),
-                preferenceWindow.MainWindowMinDynamicHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            double mainWindowMinDynamicHeight = preferenceWindow.MainWindowMinDynamicHeightNumericUpDown.Value;
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMinDynamicHeight), mainWindowMinDynamicHeight.ToString(CultureInfo.InvariantCulture));
+            double mainWindowMaxDynamicHeight = Math.Max(preferenceWindow.MainWindowMaxDynamicHeightNumericUpDown.Value, mainWindowMinDynamicHeight);
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowMaxDynamicHeight), mainWindowMaxDynamicHeight.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowWidth),
                 preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
@@ -1185,17 +1184,15 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MaxNumResultsNotInMiningMode),
                 preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, nameof(PopupMaxWidth),
-                preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            double popupMinWidth = preferenceWindow.PopupMinWidthNumericUpDown.Value;
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupMinWidth), popupMinWidth.ToString(CultureInfo.InvariantCulture));
+            double popupMaxWidth = Math.Max(preferenceWindow.PopupMaxWidthNumericUpDown.Value, popupMinWidth);
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupMaxWidth), popupMaxWidth.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, nameof(PopupMaxHeight),
-                preferenceWindow.PopupMaxHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
-
-            ConfigDBManager.UpdateSetting(connection, nameof(PopupMinWidth),
-                preferenceWindow.PopupMinWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
-
-            ConfigDBManager.UpdateSetting(connection, nameof(PopupMinHeight),
-                preferenceWindow.PopupMinHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            double popupMinHeight = preferenceWindow.PopupMinHeightNumericUpDown.Value;
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupMinHeight), popupMinHeight.ToString(CultureInfo.InvariantCulture));
+            double popupMaxHeight = Math.Max(preferenceWindow.PopupMaxHeightNumericUpDown.Value, popupMinHeight);
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupMaxHeight), popupMaxHeight.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(FixedPopupPositioning),
                 preferenceWindow.FixedPopupPositioningCheckBox.IsChecked.ToString()!);
