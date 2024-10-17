@@ -19,7 +19,6 @@ internal sealed class Form(
                && Text == form.Text
                && OriginalText == form.OriginalText
                && Tags.SequenceEqual(form.Tags)
-               && SeenText.SetEquals(form.SeenText)
                && Process.SequenceEqual(form.Process);
     }
 
@@ -29,7 +28,6 @@ internal sealed class Form(
                && Text == other.Text
                && OriginalText == other.OriginalText
                && Tags.SequenceEqual(other.Tags)
-               && SeenText.SetEquals(other.SeenText)
                && Process.SequenceEqual(other.Process);
     }
 
@@ -48,11 +46,6 @@ internal sealed class Form(
             foreach (string process in Process)
             {
                 hash = (hash * 37) + process.GetHashCode(StringComparison.Ordinal);
-            }
-
-            foreach (string seenText in SeenText)
-            {
-                hash = (hash * 37) + seenText.GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;
