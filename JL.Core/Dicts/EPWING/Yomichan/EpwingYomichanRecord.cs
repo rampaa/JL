@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
 
-internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
+internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEquatable<EpwingYomichanRecord>
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
@@ -156,6 +156,14 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
                && PrimarySpelling == epwingYomichanRecord.PrimarySpelling
                && Reading == epwingYomichanRecord.Reading
                && epwingYomichanRecord.Definitions.SequenceEqual(Definitions);
+    }
+
+    public bool Equals(EpwingYomichanRecord? other)
+    {
+        return other is not null
+               && PrimarySpelling == other.PrimarySpelling
+               && Reading == other.Reading
+               && other.Definitions.SequenceEqual(Definitions);
     }
 
     public override int GetHashCode()

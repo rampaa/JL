@@ -4,7 +4,7 @@ using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.JMnedict;
 
-internal sealed class JmnedictRecord : IDictRecord
+internal sealed class JmnedictRecord : IDictRecord, IEquatable<JmnedictRecord>
 {
     public int Id { get; }
     public string PrimarySpelling { get; }
@@ -90,6 +90,13 @@ internal sealed class JmnedictRecord : IDictRecord
         return obj is JmnedictRecord jmnedictObj
                && Id == jmnedictObj.Id
                && PrimarySpelling == jmnedictObj.PrimarySpelling;
+    }
+
+    public bool Equals(JmnedictRecord? other)
+    {
+        return other is not null
+               && Id == other.Id
+               && PrimarySpelling == other.PrimarySpelling;
     }
 
     public override int GetHashCode()

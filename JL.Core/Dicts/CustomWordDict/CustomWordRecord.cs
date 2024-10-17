@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.CustomWordDict;
 
-internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
+internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<CustomWordRecord>
 {
     public string PrimarySpelling { get; }
     public string[]? AlternativeSpellings { get; }
@@ -240,6 +240,18 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
                && ((Readings is not null && customWordRecord.Readings is not null && customWordRecord.Readings.SequenceEqual(Readings))
                    || (Readings is null && customWordRecord.Readings is null))
                && customWordRecord.WordClasses.SequenceEqual(WordClasses);
+    }
+
+    public bool Equals(CustomWordRecord? other)
+    {
+        return other is not null
+               && PrimarySpelling == other.PrimarySpelling
+               && other.Definitions.SequenceEqual(Definitions)
+               && ((AlternativeSpellings is not null && other.AlternativeSpellings is not null && other.AlternativeSpellings.SequenceEqual(AlternativeSpellings))
+                   || (AlternativeSpellings is null && other.AlternativeSpellings is null))
+               && ((Readings is not null && other.Readings is not null && other.Readings.SequenceEqual(Readings))
+                   || (Readings is null && other.Readings is null))
+               && other.WordClasses.SequenceEqual(WordClasses);
     }
 
     public override int GetHashCode()

@@ -5,7 +5,7 @@ internal sealed class Form(
     string originalText,
     List<string> tags,
     HashSet<string> seenText,
-    List<string> process)
+    List<string> process) : IEquatable<Form>
 {
     public string Text { get; } = text;
     public string OriginalText { get; } = originalText;
@@ -21,6 +21,16 @@ internal sealed class Form(
                && Tags.SequenceEqual(form.Tags)
                && SeenText.SetEquals(form.SeenText)
                && Process.SequenceEqual(form.Process);
+    }
+
+    public bool Equals(Form? other)
+    {
+        return other is not null
+               && Text == other.Text
+               && OriginalText == other.OriginalText
+               && Tags.SequenceEqual(other.Tags)
+               && SeenText.SetEquals(other.SeenText)
+               && Process.SequenceEqual(other.Process);
     }
 
     public override int GetHashCode()

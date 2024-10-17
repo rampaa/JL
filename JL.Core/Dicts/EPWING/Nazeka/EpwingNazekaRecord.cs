@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 
-internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
+internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquatable<EpwingNazekaRecord>
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
@@ -183,6 +183,14 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
                && PrimarySpelling == epwingNazekaRecord.PrimarySpelling
                && Reading == epwingNazekaRecord.Reading
                && epwingNazekaRecord.Definitions.SequenceEqual(Definitions);
+    }
+
+    public bool Equals(EpwingNazekaRecord? other)
+    {
+        return other is not null
+               && PrimarySpelling == other.PrimarySpelling
+               && Reading == other.Reading
+               && other.Definitions.SequenceEqual(Definitions);
     }
 
     public override int GetHashCode()

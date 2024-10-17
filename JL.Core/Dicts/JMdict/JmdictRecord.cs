@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMdict;
 
-internal sealed class JmdictRecord : IDictRecord, IGetFrequency
+internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<JmdictRecord>
 {
     public int Id { get; }
     public string PrimarySpelling { get; }
@@ -385,6 +385,13 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
         return obj is JmdictRecord jmdictRecord
                && Id == jmdictRecord.Id
                && PrimarySpelling == jmdictRecord.PrimarySpelling;
+    }
+
+    public bool Equals(JmdictRecord? other)
+    {
+        return other is not null
+            && Id == other.Id
+            && PrimarySpelling == other.PrimarySpelling;
     }
 
     public override int GetHashCode()
