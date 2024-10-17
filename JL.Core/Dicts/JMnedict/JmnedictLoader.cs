@@ -69,7 +69,11 @@ internal static class JmnedictLoader
 
     private static JmnedictEntry ReadEntry(XmlTextReader xmlReader)
     {
-        JmnedictEntry entry = new();
+        int id = 0;
+        List<string> kebList = [];
+        List<string> rebList = [];
+        List<Translation> translationList = [];
+
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "entry", NodeType: XmlNodeType.EndElement })
@@ -82,19 +86,19 @@ internal static class JmnedictLoader
                 switch (xmlReader.Name)
                 {
                     case "ent_seq":
-                        entry.Id = xmlReader.ReadElementContentAsInt();
+                        id = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "k_ele":
-                        entry.KebList.Add(ReadKEle(xmlReader).GetPooledString());
+                        kebList.Add(ReadKEle(xmlReader).GetPooledString());
                         break;
 
                     case "r_ele":
-                        entry.RebList.Add(ReadREle(xmlReader).GetPooledString());
+                        rebList.Add(ReadREle(xmlReader).GetPooledString());
                         break;
 
                     case "trans":
-                        entry.TranslationList.Add(ReadTrans(xmlReader));
+                        translationList.Add(ReadTrans(xmlReader));
                         break;
 
                     default:
@@ -109,7 +113,7 @@ internal static class JmnedictLoader
             }
         }
 
-        return entry;
+        return new JmnedictEntry(id, kebList, rebList, translationList);
     }
 
     private static string ReadKEle(XmlTextReader xmlReader)
@@ -126,7 +130,9 @@ internal static class JmnedictLoader
 
     private static Translation ReadTrans(XmlTextReader xmlReader)
     {
-        Translation translation = new();
+        List<string> nameTypeList = [];
+        List<string> transDetList = [];
+
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "trans", NodeType: XmlNodeType.EndElement })
@@ -139,11 +145,11 @@ internal static class JmnedictLoader
                 switch (xmlReader.Name)
                 {
                     case "name_type":
-                        translation.NameTypeList.Add(ReadEntity(xmlReader));
+                        nameTypeList.Add(ReadEntity(xmlReader));
                         break;
 
                     case "trans_det":
-                        translation.TransDetList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
+                        transDetList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
                     //case "xref":
@@ -162,7 +168,7 @@ internal static class JmnedictLoader
             }
         }
 
-        return translation;
+        return new Translation(nameTypeList, transDetList);
     }
 
     private static string ReadEntity(XmlTextReader xmlReader)
