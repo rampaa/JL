@@ -22,7 +22,7 @@ internal sealed class DeconjugatorTests
         const string expectedProcess = "negative";
 
         // Act
-        HashSet<Form> result = Deconjugator.Deconjugate("わからない");
+        List<Form> result = Deconjugator.Deconjugate("わからない");
 
         bool success = false;
         foreach (Form form in result)
@@ -45,7 +45,7 @@ internal sealed class DeconjugatorTests
         const string expectedText = "泳ぐ";
 
         // Act
-        HashSet<Form> result = Deconjugator.Deconjugate("泳げなかった");
+        List<Form> result = Deconjugator.Deconjugate("泳げなかった");
 
         bool success = false;
         foreach (Form form in result)

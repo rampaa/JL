@@ -4,13 +4,11 @@ internal sealed class Form(
     string text,
     string originalText,
     List<string> tags,
-    HashSet<string> seenText,
     List<string> process) : IEquatable<Form>
 {
     public string Text { get; } = text;
     public string OriginalText { get; } = originalText;
     public List<string> Tags { get; } = tags;
-    public HashSet<string> SeenText { get; } = seenText;
     public List<string> Process { get; } = process;
 
     public override bool Equals(object? obj)

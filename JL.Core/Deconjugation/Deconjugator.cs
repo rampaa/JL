@@ -34,7 +34,6 @@ internal static class Deconjugator
             newText,
             myForm.OriginalText,
             myForm.Tags.ToList(),
-            myForm.SeenText.ToHashSet(StringComparer.Ordinal),
             myForm.Process.ToList()
         );
 
@@ -47,17 +46,10 @@ internal static class Deconjugator
 
         newForm.Tags.Add(myRule.DecTag);
 
-        if (newForm.SeenText.Count is 0)
-        {
-            _ = newForm.SeenText.Add(myForm.Text);
-        }
-
-        _ = newForm.SeenText.Add(newText);
-
         return newForm;
     }
 
-    private static HashSet<Form>? StdruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? StdruleDeconjugate(Form myForm, Rule myRule)
     {
         // can't deconjugate nothingness
         if (myForm.Text.Length is 0)
@@ -106,7 +98,7 @@ internal static class Deconjugator
                 : null;
         }
 
-        HashSet<Form> collection = [];
+        List<Form> collection = [];
         string maybeDecEnd = myRule.DecEnd[0];
         string maybeConEnd = myRule.ConEnd[0];
         string maybeDecTag = myRule.DecTag![0];
@@ -130,7 +122,7 @@ internal static class Deconjugator
             Form? ret = StdruleDeconjugateInner(myForm, virtualRule);
             if (ret is not null)
             {
-                _ = collection.Add(ret);
+                collection.Add(ret);
             }
         }
 
@@ -139,28 +131,28 @@ internal static class Deconjugator
             : null;
     }
 
-    private static HashSet<Form>? RewriteruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? RewriteruleDeconjugate(Form myForm, Rule myRule)
     {
         return myForm.Text != myRule.ConEnd[0]
             ? null
             : StdruleDeconjugate(myForm, myRule);
     }
 
-    private static HashSet<Form>? OnlyfinalruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? OnlyfinalruleDeconjugate(Form myForm, Rule myRule)
     {
         return myForm.Tags.Count is not 0
             ? null
             : StdruleDeconjugate(myForm, myRule);
     }
 
-    private static HashSet<Form>? NeverfinalruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? NeverfinalruleDeconjugate(Form myForm, Rule myRule)
     {
         return myForm.Tags.Count is 0
             ? null
             : StdruleDeconjugate(myForm, myRule);
     }
 
-    private static HashSet<Form>? ContextruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? ContextruleDeconjugate(Form myForm, Rule myRule)
     {
         bool result = myRule.ContextRule switch
         {
@@ -183,28 +175,18 @@ internal static class Deconjugator
         }
 
         string newText = myForm.Text.Replace(conEnd, myRule.DecEnd[0], StringComparison.Ordinal);
-
         Form newForm = new(
             newText,
             myForm.OriginalText,
             myForm.Tags.ToList(),
-            myForm.SeenText.ToHashSet(StringComparer.Ordinal),
             myForm.Process.ToList()
         );
 
         newForm.Process.Add(myRule.Detail);
-
-        if (newForm.SeenText.Count is 0)
-        {
-            _ = newForm.SeenText.Add(myForm.Text);
-        }
-
-        _ = newForm.SeenText.Add(newText);
-
         return newForm;
     }
 
-    private static HashSet<Form>? SubstitutionDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? SubstitutionDeconjugate(Form myForm, Rule myRule)
     {
         if (myForm.Process.Count is not 0)
         {
@@ -231,7 +213,7 @@ internal static class Deconjugator
                 : null;
         }
 
-        HashSet<Form> collection = [];
+        List<Form> collection = [];
         string maybeDecEnd = myRule.DecEnd[0];
         string maybeConEnd = myRule.ConEnd[0];
 
@@ -253,7 +235,7 @@ internal static class Deconjugator
             Form? ret = SubstitutionInner(myForm, virtualRule);
             if (ret is not null)
             {
-                _ = collection.Add(ret);
+                collection.Add(ret);
             }
         }
 
@@ -284,29 +266,31 @@ internal static class Deconjugator
         return !baseText.EndsWith('さ');
     }
 
-    public static HashSet<Form> Deconjugate(string text)
+    public static List<Form> Deconjugate(string text)
     {
-        HashSet<Form> processed = [];
-        HashSet<Form> novel = [];
+        List<Form> processed = [];
+        List<Form> novel = [];
 
         Form startForm = new
         (
             text,
             text,
             [],
-            [],
             []
         );
-        _ = novel.Add(startForm);
+        novel.Add(startForm);
 
+        int rulesLength = Rules.Length;
         while (novel.Count > 0)
         {
-            HashSet<Form> newNovel = [];
+            List<Form> newNovel = [];
             foreach (Form form in novel)
             {
-                foreach (Rule rule in Rules)
+                for (int j = 0; j < rulesLength; j++)
                 {
-                    HashSet<Form>? newForm = rule.Type switch
+                    Rule rule = Rules[j];
+
+                    List<Form>? newForm = rule.Type switch
                     {
                         "stdrule" => StdruleDeconjugate(form, rule),
                         "rewriterule" => RewriteruleDeconjugate(form, rule),
@@ -324,21 +308,24 @@ internal static class Deconjugator
 
                     foreach (Form myForm in newForm)
                     {
-                        if (!processed.Contains(myForm)
-                            && !novel.Contains(myForm)
-                            && !newNovel.Contains(myForm))
+                        if (!newNovel.Contains(myForm))
                         {
-                            _ = newNovel.Add(myForm);
+                            newNovel.Add(myForm);
                         }
                     }
                 }
             }
 
-            processed.UnionWith(novel);
+            for (int i = 0; i < novel.Count; i++)
+            {
+                if (processed.Count > 0 || i > 0)
+                {
+                    processed.Add(novel[i]);
+                }
+            }
+
             novel = newNovel;
         }
-
-        _ = processed.Remove(startForm);
 
         return processed;
     }

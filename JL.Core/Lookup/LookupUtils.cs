@@ -118,7 +118,7 @@ public static class LookupUtils
 
         List<string> textList = [];
         List<string> textInHiraganaList = [];
-        List<HashSet<Form>> deconjugationResultsList = [];
+        List<List<Form>> deconjugationResultsList = [];
 
         for (int i = 0; i < text.Length; i++)
         {
@@ -439,7 +439,7 @@ public static class LookupUtils
 
     private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(Dict dict,
         Dictionary<string, IntermediaryResult> results,
-        HashSet<Form>? deconjugationResults,
+        List<Form>? deconjugationResults,
         string matchedText,
         string textInHiragana,
         int succAttempt,
@@ -508,7 +508,7 @@ public static class LookupUtils
     }
 
     private static Dictionary<string, IntermediaryResult> GetWordResults(List<string> textList,
-        List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList, List<string>? deconjugatedTexts, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB, string? queryOrParameter, string? verbQueryOrParameter, bool isYomichan, bool isNazeka)
+        List<string> textInHiraganaList, List<List<Form>> deconjugationResultsList, List<string>? deconjugatedTexts, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB, string? queryOrParameter, string? verbQueryOrParameter, bool isYomichan, bool isNazeka)
     {
         Dictionary<string, IList<IDictRecord>>? dbWordDict = null;
         Dictionary<string, IList<IDictRecord>>? dbVerbDict = null;
@@ -582,9 +582,7 @@ public static class LookupUtils
 
     private static List<IDictRecord> GetValidDeconjugatedResults(Dict dict, Form deconjugationResult, IList<IDictRecord> dictResults)
     {
-        string? lastTag = deconjugationResult.Tags.Count > 0
-            ? deconjugationResult.Tags[^1]
-            : null;
+        string lastTag = deconjugationResult.Tags[^1];
 
         List<IDictRecord> resultsList = [];
         int dictResultCount = dictResults.Count;
@@ -595,7 +593,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     JmdictRecord dictResult = (JmdictRecord)dictResults[i];
-                    if (lastTag is null || dictResult.WordClasses.Any(wordClasses => wordClasses.Contains(lastTag)))
+                    if (dictResult.WordClasses.Any(wordClasses => wordClasses.Contains(lastTag)))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -610,7 +608,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
-                    if (lastTag is null || dictResult.WordClasses.Contains(lastTag))
+                    if (dictResult.WordClasses.Contains(lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -628,7 +626,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     EpwingYomichanRecord dictResult = (EpwingYomichanRecord)dictResults[i];
-                    if (lastTag is null || (dictResult.WordClasses?.Contains(lastTag) ?? false))
+                    if (dictResult.WordClasses?.Contains(lastTag) ?? false)
                     {
                         resultsList.Add(dictResult);
                     }
@@ -666,13 +664,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     EpwingNazekaRecord dictResult = (EpwingNazekaRecord)dictResults[i];
-                    if (lastTag is null)
-                    {
-                        resultsList.Add(dictResult);
-                    }
-
-                    else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
-                                 out IList<JmdictWordClass>? jmdictWcResults))
+                    if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text, out IList<JmdictWordClass>? jmdictWcResults))
                     {
                         int jmdictWCResultCount = jmdictWcResults.Count;
                         for (int j = 0; j < jmdictWCResultCount; j++)
