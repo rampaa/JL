@@ -157,6 +157,8 @@ internal sealed partial class WinApi
     }
 #pragma warning restore IDE1006
 
+    private static ulong s_clipboardSequenceNo;
+
     public event EventHandler? ClipboardChanged;
 
     public void SubscribeToWndProc(Window windowSource)
@@ -173,17 +175,13 @@ internal sealed partial class WinApi
 
     public static void SubscribeToClipboardChanged(nint windowHandle)
     {
+        s_clipboardSequenceNo = GetClipboardSequenceNumber();
         _ = AddClipboardFormatListener(windowHandle);
     }
 
     public static void UnsubscribeFromClipboardChanged(nint windowHandle)
     {
         _ = RemoveClipboardFormatListener(windowHandle);
-    }
-
-    public static ulong GetClipboardSequenceNo()
-    {
-        return GetClipboardSequenceNumber();
     }
 
     public static void AddHotKeyToGlobalKeyGestureDict(string hotkeyName, KeyGesture keyGesture)
@@ -248,11 +246,6 @@ internal sealed partial class WinApi
 
             _ = UnregisterHotKey(windowHandle, id);
         }
-    }
-
-    private void OnClipboardChanged()
-    {
-        ClipboardChanged!.Invoke(this, EventArgs.Empty);
     }
 
     public static void ResizeWindow(nint windowHandle, nint wParam)
@@ -342,8 +335,13 @@ internal sealed partial class WinApi
     {
         if (msg is WM_CLIPBOARDUPDATE)
         {
-            OnClipboardChanged();
-            handled = true;
+            ulong clipboardSequenceNo = GetClipboardSequenceNumber();
+            if (s_clipboardSequenceNo != clipboardSequenceNo)
+            {
+                s_clipboardSequenceNo = clipboardSequenceNo;
+                ClipboardChanged!.Invoke(null, EventArgs.Empty);
+                handled = true;
+            }
         }
 
         else if (msg is WM_HOTKEY)

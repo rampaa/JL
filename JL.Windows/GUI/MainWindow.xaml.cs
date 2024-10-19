@@ -47,8 +47,6 @@ internal sealed partial class MainWindow
     public double TopPositionBeforeResolutionChange { get; set; }
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
-
-    private static ulong s_clipboardSequenceNo;
     public bool ContextMenuIsOpening { get; private set; } // = false;
 
     private Point _swipeStartPoint;
@@ -105,7 +103,6 @@ internal sealed partial class MainWindow
 
         if (CoreConfigManager.CaptureTextFromClipboard)
         {
-            s_clipboardSequenceNo = WinApi.GetClipboardSequenceNo();
             _ = await CopyFromClipboard().ConfigureAwait(true);
         }
 
@@ -265,15 +262,8 @@ internal sealed partial class MainWindow
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void ClipboardChanged(object? sender, EventArgs? e)
+    private async void ClipboardChanged(object? sender, EventArgs e)
     {
-        ulong currentClipboardSequenceNo = WinApi.GetClipboardSequenceNo();
-        if (s_clipboardSequenceNo == currentClipboardSequenceNo)
-        {
-            return;
-        }
-
-        s_clipboardSequenceNo = currentClipboardSequenceNo;
         bool gotTextFromClipboard = await CopyFromClipboard().ConfigureAwait(true);
 
         if (gotTextFromClipboard
