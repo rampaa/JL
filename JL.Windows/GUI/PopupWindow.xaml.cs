@@ -2010,8 +2010,11 @@ internal sealed partial class PopupWindow
 
     private void PopupListView_MouseLeave(object sender, MouseEventArgs e)
     {
-        _listViewItemIndex = _firstVisibleListViewItemIndex;
-        LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
+        if (!PopupContextMenu.IsVisible)
+        {
+            _listViewItemIndex = _firstVisibleListViewItemIndex;
+            LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
+        }
     }
 
     private TextBox? GetDefinitionTextBox(int listViewIndex)
