@@ -281,6 +281,7 @@ internal static class Deconjugator
         novel.Add(startForm);
 
         int rulesLength = Rules.Length;
+        bool addFormToProcess = false;
         while (novel.Count > 0)
         {
             List<Form> newNovel = [];
@@ -318,9 +319,13 @@ internal static class Deconjugator
 
             for (int i = 0; i < novel.Count; i++)
             {
-                if (processed.Count > 0 || i > 0)
+                if (addFormToProcess)
                 {
                     processed.Add(novel[i]);
+                }
+                else
+                {
+                    addFormToProcess = true;
                 }
             }
 
