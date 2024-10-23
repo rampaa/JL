@@ -1527,7 +1527,6 @@ internal sealed partial class MainWindow
 
         if (WindowState is WindowState.Minimized
             || IsMouseOver
-            || FirstPopupWindow.IsMouseOver
             || FirstPopupWindow.IsVisible
             || ManageDictionariesWindow.IsItVisible()
             || ManageFrequenciesWindow.IsItVisible()
