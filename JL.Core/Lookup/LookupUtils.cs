@@ -139,8 +139,8 @@ public static class LookupUtils
         List<List<Form>> deconjugationResultsList = new(text.Length);
         List<List<string>?>? textWithoutLongVowelMarkList = null;
 
-        bool doesNotStartWithLongVowelSymbol = text[0] is not 'ー';
-        bool countLongVowelSymbol = doesNotStartWithLongVowelSymbol;
+        bool doesNotStartWithLongVowelMark = text[0] is not 'ー';
+        bool countLongVowelMark = doesNotStartWithLongVowelMark;
         for (int i = 0; i < text.Length; i++)
         {
             if (char.IsHighSurrogate(text[text.Length - i - 1]))
@@ -157,31 +157,31 @@ public static class LookupUtils
 
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
 
-            if (doesNotStartWithLongVowelSymbol)
+            if (doesNotStartWithLongVowelMark)
             {
-                int longVowelSymbolCount = 0;
-                if (countLongVowelSymbol)
+                int longVowelMarkCount = 0;
+                if (countLongVowelMark)
                 {
                     foreach (char c in textInHiraganaList[i])
                     {
                         if (c is 'ー')
                         {
-                            ++longVowelSymbolCount;
+                            ++longVowelMarkCount;
                         }
                     }
                 }
 
-                if (longVowelSymbolCount > 0)
+                if (longVowelMarkCount > 0)
                 {
                     textWithoutLongVowelMarkList ??= new List<List<string>?>(text.Length);
-                    textWithoutLongVowelMarkList.Add(longVowelSymbolCount < 5
+                    textWithoutLongVowelMarkList.Add(longVowelMarkCount < 5
                         ? JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i])
                         : null);
                 }
                 else
                 {
                     textWithoutLongVowelMarkList?.Add(null);
-                    countLongVowelSymbol = false;
+                    countLongVowelMark = false;
                 }
             }
         }
