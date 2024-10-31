@@ -34,6 +34,7 @@ public static class DictUtils
     internal static bool DBIsUsedForAtLeastOneDict { get; private set; }
     internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; }
     internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; }
+    internal static bool DBIsUsedForJmdict { get; private set; }
     internal static bool AtLeastOneKanjiDictIsActive { get; private set; }
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
@@ -1587,6 +1588,7 @@ public static class DictUtils
         DBIsUsedForAtLeastOneDict = dicts.Any(static dict => dict.Options.UseDB.Value);
         DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
         DBIsUsedForAtLeastOneNazekaDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
+        DBIsUsedForJmdict = SingleDictTypeDicts[DictType.JMdict] is { Active: true, Options.UseDB.Value: true };
     }
 
     private static bool CheckIfAnyKanjiDictIsUsed(IReadOnlyList<Dict> dicts)

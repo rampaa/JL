@@ -134,9 +134,10 @@ public static class LookupUtils
             .Where(static f => f is { Options.UseDB.Value: true, Ready: true })
             .ToList();
 
-        List<string> textList = [];
-        List<string> textInHiraganaList = [];
-        List<List<Form>> deconjugationResultsList = [];
+        List<string> textList = new(text.Length);
+        List<string> textInHiraganaList = new(text.Length);
+        List<List<Form>> deconjugationResultsList = new(text.Length);
+        List<List<string>?>? textWithoutLongVowelMarkList = null;
 
         for (int i = 0; i < text.Length; i++)
         {
@@ -153,6 +154,35 @@ public static class LookupUtils
             textInHiraganaList.Add(textInHiragana);
 
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
+
+            if (textInHiragana[0] is not 'ー')
+            {
+                int count = 0;
+                foreach (char c in textInHiraganaList[i])
+                {
+                    if (c is 'ー')
+                    {
+                        ++count;
+                    }
+                }
+
+                if (count > 0)
+                {
+                    textWithoutLongVowelMarkList ??= new(text.Length);
+                    if (count < 5)
+                    {
+                        textWithoutLongVowelMarkList.Add(JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]));
+                    }
+                    else
+                    {
+                        textWithoutLongVowelMarkList?.Add(null);
+                    }
+                }
+                else
+                {
+                    textWithoutLongVowelMarkList?.Add(null);
+                }
+            }
         }
 
         List<string>? deconjugatedTexts = null;
@@ -162,6 +192,9 @@ public static class LookupUtils
         string? yomichanVerbQuery = null;
         string? nazekaWordQuery = null;
         string? nazekaVerbQuery = null;
+        List<string?>? nazekaTextWithoutLongVowelMarkQueries = null;
+        List<string?>? yomichanTextWithoutLongVowelMarkQueries = null;
+        List<string?>? jmdictTextWithoutLongVowelMarkParameters = null;
 
         List<Dict> dicts = DictUtils.Dicts.Values.ToList();
 
@@ -176,6 +209,49 @@ public static class LookupUtils
             if (deconjugatedTexts.Count > 0)
             {
                 verbParameter = DBUtils.GetParameter(deconjugatedTexts.Count);
+            }
+
+            if (textWithoutLongVowelMarkList is not null &&
+                (DictUtils.DBIsUsedForJmdict || DictUtils.DBIsUsedForAtLeastOneYomichanDict || DictUtils.DBIsUsedForAtLeastOneNazekaDict))
+            {
+                if (DictUtils.DBIsUsedForJmdict)
+                {
+                    jmdictTextWithoutLongVowelMarkParameters ??= new(textWithoutLongVowelMarkList.Count);
+                }
+                if (DictUtils.DBIsUsedForAtLeastOneYomichanDict)
+                {
+                    yomichanTextWithoutLongVowelMarkQueries ??= new(textWithoutLongVowelMarkList.Count);
+                }
+                if (DictUtils.DBIsUsedForAtLeastOneNazekaDict)
+                {
+                    nazekaTextWithoutLongVowelMarkQueries ??= new(textWithoutLongVowelMarkList.Count);
+                }
+
+                for (int i = 0; i < textWithoutLongVowelMarkList.Count; i++)
+                {
+                    List<string>? textWithoutLongVowelMark = textWithoutLongVowelMarkList[i];
+                    if (textWithoutLongVowelMark is not null)
+                    {
+                        if (DictUtils.DBIsUsedForJmdict)
+                        {
+                            jmdictTextWithoutLongVowelMarkParameters!.Add(DBUtils.GetParameter(textWithoutLongVowelMark.Count));
+                        }
+                        if (DictUtils.DBIsUsedForAtLeastOneYomichanDict)
+                        {
+                            yomichanTextWithoutLongVowelMarkQueries!.Add(EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMark));
+                        }
+                        if (DictUtils.DBIsUsedForAtLeastOneNazekaDict)
+                        {
+                            nazekaTextWithoutLongVowelMarkQueries!.Add(EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMark));
+                        }
+                    }
+                    else
+                    {
+                        jmdictTextWithoutLongVowelMarkParameters?.Add(null);
+                        yomichanTextWithoutLongVowelMarkQueries?.Add(null);
+                        nazekaTextWithoutLongVowelMarkQueries?.Add(null);
+                    }
+                }
             }
 
             if (DictUtils.DBIsUsedForAtLeastOneYomichanDict)
@@ -210,7 +286,7 @@ public static class LookupUtils
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    Dictionary<string, IntermediaryResult> jmdictResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, dict, useDB, JmdictDBManager.GetRecordsFromDB, parameter, verbParameter, false, false);
+                    Dictionary<string, IntermediaryResult> jmdictResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarkList, dict, useDB, JmdictDBManager.GetRecordsFromDB, parameter, verbParameter, jmdictTextWithoutLongVowelMarkParameters);
                     if (jmdictResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildJmdictResult(jmdictResults, wordFreqs, dbWordFreqs, useDBForPitchDict, pitchDict));
@@ -253,7 +329,7 @@ public static class LookupUtils
 
                 case DictType.CustomWordDictionary:
                 case DictType.ProfileCustomWordDictionary:
-                    Dictionary<string, IntermediaryResult> customWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, dict, false, null, parameter, verbParameter, false, false);
+                    Dictionary<string, IntermediaryResult> customWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarkList, dict, false, null, parameter, verbParameter, null);
                     if (customWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildCustomWordResult(customWordResults, wordFreqs, dbWordFreqs, useDBForPitchDict, pitchDict));
@@ -292,7 +368,7 @@ public static class LookupUtils
 
                 case DictType.NonspecificWordYomichan:
                 case DictType.NonspecificYomichan:
-                    Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, true, false);
+                    Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarkList, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, yomichanTextWithoutLongVowelMarkQueries);
                     if (epwingYomichanWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResults, wordFreqs, dbWordFreqs, useDBForPitchDict, pitchDict, dict.Type));
@@ -323,7 +399,7 @@ public static class LookupUtils
 
                 case DictType.NonspecificWordNazeka:
                 case DictType.NonspecificNazeka:
-                    Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, false, true);
+                    Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarkList, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQueries);
                     if (epwingNazekaWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResults, wordFreqs, dbWordFreqs, useDBForPitchDict, pitchDict, dict.Type));
@@ -455,29 +531,25 @@ public static class LookupUtils
             .ToList();
     }
 
-    private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(Dict dict,
+    private static void GetWordResultsHelper(Dict dict,
         Dictionary<string, IntermediaryResult> results,
         List<Form>? deconjugationResults,
         string matchedText,
         string textInHiragana,
-        int succAttempt,
         IDictionary<string, IList<IDictRecord>>? dbWordDict,
         IDictionary<string, IList<IDictRecord>>? dbVerbDict)
     {
         IDictionary<string, IList<IDictRecord>> wordDict = dbWordDict ?? dict.Contents;
         IDictionary<string, IList<IDictRecord>> verbDict = dbVerbDict ?? dict.Contents;
 
-        bool tryLongVowelConversion = true;
-
         if (wordDict.TryGetValue(textInHiragana, out IList<IDictRecord>? tempResult))
         {
             _ = results.TryAdd(textInHiragana,
                 new IntermediaryResult([tempResult], null, matchedText, matchedText,
                     dict));
-            tryLongVowelConversion = false;
         }
 
-        if (deconjugationResults is not null && succAttempt < 3)
+        if (deconjugationResults is not null)
         {
             foreach (Form deconjugationResult in deconjugationResults)
             {
@@ -514,19 +586,15 @@ public static class LookupUtils
                                     dict)
                             );
                         }
-
-                        ++succAttempt;
-                        tryLongVowelConversion = false;
                     }
                 }
             }
         }
-
-        return (tryLongVowelConversion, succAttempt);
     }
 
-    private static Dictionary<string, IntermediaryResult> GetWordResults(List<string> textList,
-        List<string> textInHiraganaList, List<List<Form>> deconjugationResultsList, List<string>? deconjugatedTexts, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB, string? queryOrParameter, string? verbQueryOrParameter, bool isYomichan, bool isNazeka)
+    private static Dictionary<string, IntermediaryResult> GetWordResults(List<string> textList, List<string> textInHiraganaList,
+        List<List<Form>> deconjugationResultsList, List<string>? deconjugatedTexts, List<List<string>?>? textWithoutLongVowelMarkList, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB,
+        string? queryOrParameter, string? verbQueryOrParameter, List<string?>? longVowelQueryOrParameters)
     {
         Dictionary<string, IList<IDictRecord>>? dbWordDict = null;
         Dictionary<string, IList<IDictRecord>>? dbVerbDict = null;
@@ -545,51 +613,23 @@ public static class LookupUtils
         }
 
         Dictionary<string, IntermediaryResult> results = new(StringComparer.Ordinal);
-        int succAttempt = 0;
         int textListCount = textList.Count;
         for (int i = 0; i < textListCount; i++)
         {
-            (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dict, results,
-                deconjugationResultsList[i], textList[i], textInHiraganaList[i], succAttempt, dbWordDict, dbVerbDict);
+            GetWordResultsHelper(dict, results, deconjugationResultsList[i], textList[i], textInHiraganaList[i], dbWordDict, dbVerbDict);
 
-            if (tryLongVowelConversion && textInHiraganaList[i][0] is not 'ー')
+            if (textWithoutLongVowelMarkList is not null)
             {
-                int count = 0;
-                foreach (char c in textInHiraganaList[i])
+                List<string>? textWithoutLongVowelMark = textWithoutLongVowelMarkList[i];
+                if (textWithoutLongVowelMark is not null)
                 {
-                    if (c is 'ー')
-                    {
-                        ++count;
-                    }
-                }
+                    Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = useDB
+                        ? getRecordsFromDB!(dict.Name, textWithoutLongVowelMark, longVowelQueryOrParameters![i]!)
+                        : null;
 
-                if (count is > 0 and < 4)
-                {
-                    List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
-                    Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = null;
-                    if (useDB)
+                    for (int j = 0; j < textWithoutLongVowelMark.Count; j++)
                     {
-                        string longVowelQueryOrParameter;
-                        if (isYomichan)
-                        {
-                            longVowelQueryOrParameter = EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarkList);
-                        }
-                        else if (isNazeka)
-                        {
-                            longVowelQueryOrParameter = EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarkList);
-                        }
-                        else
-                        {
-                            longVowelQueryOrParameter = DBUtils.GetParameter(textWithoutLongVowelMarkList.Count);
-                        }
-
-                        dbWordDictForLongVowelConversion = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, longVowelQueryOrParameter);
-                    }
-
-                    int textWithoutLongVowelMarkListCount = textWithoutLongVowelMarkList.Count;
-                    for (int j = 0; j < textWithoutLongVowelMarkListCount; j++)
-                    {
-                        _ = GetWordResultsHelper(dict, results, null, textList[i], textWithoutLongVowelMarkList[j], succAttempt, useDB ? dbWordDictForLongVowelConversion : dbWordDict, null);
+                        GetWordResultsHelper(dict, results, null, textList[i], textWithoutLongVowelMark[j], dbWordDictForLongVowelConversion, null);
                     }
                 }
             }
