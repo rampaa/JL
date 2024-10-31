@@ -619,7 +619,7 @@ public static class LookupUtils
             GetWordResultsHelper(dict, results, deconjugationResultsList[i], textList[i], textInHiraganaList[i], dbWordDict, dbVerbDict);
 
             List<string>? textWithoutLongVowelMark = textWithoutLongVowelMarkList?[i];
-            if (textWithoutLongVowelMark != null)
+            if (textWithoutLongVowelMark is not null)
             {
                 Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = useDB
                     ? getRecordsFromDB!(dict.Name, textWithoutLongVowelMark, longVowelQueryOrParameters![i]!)
