@@ -139,6 +139,9 @@ public static class LookupUtils
         List<List<Form>> deconjugationResultsList = new(text.Length);
         List<List<string>?>? textWithoutLongVowelMarkList = null;
 
+
+        bool doesNotStartWithLongVowelSymbol = text[0] is not 'ー';
+        bool countLongVowelSymbol = doesNotStartWithLongVowelSymbol;
         for (int i = 0; i < text.Length; i++)
         {
             if (char.IsHighSurrogate(text[text.Length - i - 1]))
@@ -155,21 +158,24 @@ public static class LookupUtils
 
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
 
-            if (textInHiragana[0] is not 'ー')
+            if (doesNotStartWithLongVowelSymbol)
             {
-                int count = 0;
-                foreach (char c in textInHiraganaList[i])
+                int longVowelSymbolCount = 0;
+                if (countLongVowelSymbol)
                 {
-                    if (c is 'ー')
+                    foreach (char c in textInHiraganaList[i])
                     {
-                        ++count;
+                        if (c is 'ー')
+                        {
+                            ++longVowelSymbolCount;
+                        }
                     }
                 }
 
-                if (count > 0)
+                if (longVowelSymbolCount > 0)
                 {
                     textWithoutLongVowelMarkList ??= new(text.Length);
-                    if (count < 5)
+                    if (longVowelSymbolCount < 5)
                     {
                         textWithoutLongVowelMarkList.Add(JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]));
                     }
@@ -181,6 +187,7 @@ public static class LookupUtils
                 else
                 {
                     textWithoutLongVowelMarkList?.Add(null);
+                    countLongVowelSymbol = false;
                 }
             }
         }
@@ -211,8 +218,7 @@ public static class LookupUtils
                 verbParameter = DBUtils.GetParameter(deconjugatedTexts.Count);
             }
 
-            if (textWithoutLongVowelMarkList is not null &&
-                (DictUtils.DBIsUsedForJmdict || DictUtils.DBIsUsedForAtLeastOneYomichanDict || DictUtils.DBIsUsedForAtLeastOneNazekaDict))
+            if (textWithoutLongVowelMarkList is not null)
             {
                 if (DictUtils.DBIsUsedForJmdict)
                 {
