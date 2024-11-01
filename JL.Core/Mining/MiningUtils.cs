@@ -136,7 +136,7 @@ public static class MiningUtils
                 int firstFrequency = lookupResult.Frequencies[0].Freq;
                 if (firstFrequency is > 0 and < int.MaxValue)
                 {
-                    miningParams[JLField.Frequencies] = firstFrequency.ToString(CultureInfo.InvariantCulture);
+                    miningParams[JLField.PreferredFrequency] = firstFrequency.ToString(CultureInfo.InvariantCulture);
                 }
             }
         }
