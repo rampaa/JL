@@ -1523,11 +1523,6 @@ public static class DictUtils
 
     private static void InitDictOptions(Dict dict)
     {
-        if (!UseDBOption.ValidDictTypes.Contains(dict.Type) && dict.Options.UseDB.Value)
-        {
-            dict.Options.UseDB.Value = false;
-        }
-
         if (dict.Type is DictType.JMdict)
         {
             DictOptions builtInJmdictOptions = BuiltInDicts[nameof(DictType.JMdict)].Options;
