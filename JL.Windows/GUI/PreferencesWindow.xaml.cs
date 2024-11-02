@@ -72,10 +72,10 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.DeconjugationProcess.GetDescription()}: Deconjugation path from the "Matched Text" to "Deconjugated Matched Text".
                                             • {JLField.Frequencies.GetDescription()}: Frequency info for the mined word, e.g., "VN: 77, jpdb: 666".
                                             • {JLField.RawFrequencies.GetDescription()}: Raw frequency info for the mined word, e.g., "77, 666".
-                                            • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., 666
-                                            • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., 666
+                                            • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., "666".
+                                            • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., "666".
                                             • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                            • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., おんな: 3、おみな: 0、おうな: 1
+                                            • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3、おみな: 0、おうな: 1".
                                             • {JLField.EdictId.GetDescription()}: JMDict entry ID.
                                             • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                             """;
@@ -104,10 +104,10 @@ internal sealed partial class PreferencesWindow
                                              • {JLField.TrailingSentencePart.GetDescription()}: Part of the sentence that appears after the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Trailing Sentence Part" will be "好きです".
                                              • {JLField.Frequencies.GetDescription()}: Frequency info for the kanji, e.g., "KANJIDIC2: 77, jpdb: 666".
                                              • {JLField.RawFrequencies.GetDescription()}: Raw frequency info for the mined word, e.g., "77, 666".
-                                             • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., 666
-                                             • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., 666
+                                             • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., "666".
+                                             • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., "666".
                                              • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., おんな: 3、おみな: 0、おうな: 1
+                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3、おみな: 0、おうな: 1".
                                              • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                              """;
 
@@ -130,7 +130,7 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.LeadingSentencePart.GetDescription()}: Part of the sentence that appears before the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Leading Sentence Part" will be "俺は".
                                             • {JLField.TrailingSentencePart.GetDescription()}: Part of the sentence that appears after the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Trailing Sentence Part" will be "のことが大好き".
                                             • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                            • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., おんな: 3、おみな: 0、おうな: 1
+                                            • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3、おみな: 0、おうな: 1".
                                             • {JLField.EdictId.GetDescription()}: JMnedict entry ID.
                                             • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                             """;
