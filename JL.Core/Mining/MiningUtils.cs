@@ -100,7 +100,7 @@ public static class MiningUtils
         miningParams[JLField.TrailingSourceTextPart] = trailingSourcePart;
 
         miningParams[JLField.SourceText] = useHtmlTags
-                ? string.Create(CultureInfo.InvariantCulture, $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}").ReplaceLineEndings("<br/>")
+                ? $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}".ReplaceLineEndings("<br/>")
                 : currentText;
 
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
@@ -117,7 +117,7 @@ public static class MiningUtils
         miningParams[JLField.TrailingSentencePart] = trailingSentencePart;
 
         miningParams[JLField.Sentence] = useHtmlTags
-            ? string.Create(CultureInfo.InvariantCulture, $"{leadingSentencePart}<b>{lookupResult.MatchedText}</b>{trailingSentencePart}")
+            ? $"{leadingSentencePart}<b>{lookupResult.MatchedText}</b>{trailingSentencePart}"
             : sentence;
 
         if (lookupResult.Readings is not null)
@@ -129,11 +129,11 @@ public static class MiningUtils
                 ? LookupResultUtils.ElementWithOrthographyInfoToText(lookupResult.Readings, lookupResult.ReadingsOrthographyInfoList)
                 : readings;
 
-            miningParams[JLField.PrimarySpellingAndReadings] = string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling}[{readings}]");
+            miningParams[JLField.PrimarySpellingAndReadings] = $"{lookupResult.PrimarySpelling}[{readings}]";
 
             string firstReading = lookupResult.Readings[0];
             miningParams[JLField.FirstReading] = firstReading;
-            miningParams[JLField.PrimarySpellingAndFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling}[{firstReading}]");
+            miningParams[JLField.PrimarySpellingAndFirstReading] = $"{lookupResult.PrimarySpelling}[{firstReading}]";
         }
 
         if (lookupResult.AlternativeSpellings is not null)

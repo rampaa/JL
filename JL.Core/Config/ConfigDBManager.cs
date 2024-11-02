@@ -118,11 +118,11 @@ public static class ConfigDBManager
 
         string parameter = DBUtils.GetParameter(excludedSettings.Length + 1);
 
-        string query = string.Create(CultureInfo.InvariantCulture,
+        string query =
             $"""
             DELETE FROM setting
             WHERE profile_id = @profileId AND name NOT IN {parameter}
-            """);
+            """;
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = query;
