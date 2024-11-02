@@ -37,9 +37,9 @@ internal sealed class JmnedictRecord : IDictRecord, IEquatable<JmnedictRecord>
 
         bool newlines = options.NewlineBetweenDefinitions!.Value;
 
-        string separator = newlines
-            ? "\n"
-            : "; ";
+        char separator = newlines
+            ? '\n'
+            : '；';
 
         StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)

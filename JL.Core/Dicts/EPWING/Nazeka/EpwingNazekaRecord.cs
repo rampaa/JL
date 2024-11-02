@@ -28,9 +28,9 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
             return Definitions[0];
         }
 
-        string separator = options is { NewlineBetweenDefinitions.Value: false }
-            ? "; "
-            : "\n";
+        char separator = options is { NewlineBetweenDefinitions.Value: false }
+            ? '；'
+            : '\n';
 
         StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)

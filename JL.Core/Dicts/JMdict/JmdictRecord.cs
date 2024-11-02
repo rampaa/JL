@@ -71,7 +71,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
     {
         bool newlines = options.NewlineBetweenDefinitions!.Value;
 
-        string separator = newlines ? "\n" : "; ";
+        char separator = newlines ? '\n' : '；';
 
         StringBuilder defResult = new();
 
@@ -230,7 +230,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (i + 1 != Definitions.Length)
             {
-                _ = defResult.Replace(" ", separator, defResult.Length - 1, 1);
+                _ = defResult.Replace(' ', separator, defResult.Length - 1, 1);
             }
         }
 

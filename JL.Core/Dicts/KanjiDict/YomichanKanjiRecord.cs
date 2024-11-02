@@ -88,9 +88,9 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         }
 
         StringBuilder defResult = new();
-        string separator = options.NewlineBetweenDefinitions!.Value
-            ? "\n"
-            : "; ";
+        char separator = options.NewlineBetweenDefinitions!.Value
+            ? '\n'
+            : '；';
 
         for (int i = 0; i < Definitions.Length; i++)
         {
