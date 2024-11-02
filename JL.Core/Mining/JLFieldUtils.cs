@@ -50,6 +50,7 @@ public static class JLFieldUtils
         JLField.StrokeCount,
         JLField.KanjiGrade,
         JLField.KanjiComposition,
+        JLField.KanjiStats,
         JLField.Definitions,
         JLField.SelectedDefinitions,
         JLField.DictionaryName,
