@@ -79,7 +79,9 @@ public static class MiningUtils
         Dictionary<JLField, string> miningParams = new()
         {
             [JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture),
-            [JLField.SourceText] = useHtmlTags ? currentText.ReplaceLineEndings("<br/>") : currentText,
+            [JLField.SourceText] = useHtmlTags
+                ? string.Create(CultureInfo.InvariantCulture, $"{currentText[..currentCharPosition]}<b>{lookupResult.MatchedText}</b>{currentText[(currentCharPosition + lookupResult.MatchedText.Length)..]}").ReplaceLineEndings("<br/>")
+                : currentText,
             [JLField.DictionaryName] = lookupResult.Dict.Name,
             [JLField.MatchedText] = lookupResult.MatchedText,
             [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
