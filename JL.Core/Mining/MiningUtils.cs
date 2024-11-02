@@ -515,6 +515,7 @@ public static class MiningUtils
         byte[]? audioData = audioResponse?.AudioData;
         if (audioResponse?.AudioSource is AudioSourceType.TextToSpeech)
         {
+            await Utils.Frontend.StopTextToSpeech().ConfigureAwait(false);
             audioData = Utils.Frontend.GetAudioResponseFromTextToSpeech(reading);
         }
 
