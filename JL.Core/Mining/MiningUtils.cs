@@ -481,7 +481,7 @@ public static class MiningUtils
 
         Dictionary<string, JLField> userFields = ankiConfig.Fields;
         Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResult, currentText, formattedDefinitions, selectedDefinitions, currentCharPosition, true);
-        Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
+        Dictionary<string, string> fields = ConvertFields(userFields, miningParams);
 
         // Audio/Picture/Video shouldn't be set here
         // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
@@ -601,15 +601,14 @@ public static class MiningUtils
     /// Value is the actual content of a mining field (e.g. if the field name is LocalTime, then it should contain the current time) <br/>
     /// UserField is the name of the user's field in Anki (e.g. Expression) <br/>
     /// </summary>
-    private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> userFields, IReadOnlyDictionary<JLField, string> miningParams)
+    private static Dictionary<string, string> ConvertFields(Dictionary<string, JLField> userFields, Dictionary<JLField, string> miningParams)
     {
-        Dictionary<string, object> dict = new(StringComparer.Ordinal);
+        Dictionary<string, string> dict = new(StringComparer.Ordinal);
         foreach ((string key, JLField value) in userFields)
         {
-            string? fieldName = miningParams.GetValueOrDefault(value);
-            if (!string.IsNullOrEmpty(fieldName))
+            if (miningParams.TryGetValue(value, out string? fieldValue) && !string.IsNullOrEmpty(fieldValue))
             {
-                dict.Add(key, fieldName);
+                dict.Add(key, fieldValue);
             }
         }
 

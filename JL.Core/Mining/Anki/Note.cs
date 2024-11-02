@@ -7,7 +7,7 @@ namespace JL.Core.Mining.Anki;
 internal sealed class Note(
     string deckName,
     string modelName,
-    Dictionary<string, object> fields,
+    Dictionary<string, string> fields,
     string[]? tags,
     Dictionary<string, object>? options,
     Dictionary<string, object>? audio,
@@ -16,7 +16,7 @@ internal sealed class Note(
 {
     [JsonPropertyName("deckName")] public string DeckName { get; } = deckName;
     [JsonPropertyName("modelName")] public string ModelName { get; } = modelName;
-    [JsonPropertyName("fields")] public Dictionary<string, object> Fields { get; } = fields;
+    [JsonPropertyName("fields")] public Dictionary<string, string> Fields { get; } = fields;
     [JsonPropertyName("tags")] public string[]? Tags { get; } = tags;
     [JsonPropertyName("options")] public Dictionary<string, object>? Options { get; set; } = options;
     [JsonPropertyName("audio")] public Dictionary<string, object>? Audio { get; set; } = audio;
