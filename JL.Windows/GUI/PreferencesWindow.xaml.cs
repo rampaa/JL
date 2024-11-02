@@ -50,6 +50,7 @@ internal sealed partial class PreferencesWindow
                                             • Primary Spelling: It's the spelling you click to mine the word, e.g., if you look up "わかりました", its primary spelling will be "分かる".
                                             • Primary Spelling with Orthography Info: It's the spelling you click to mine the word with its orthography Info, e.g., if you look up "珈琲", its "Primary Spelling with Orthography Info" will be "珈琲 (ateji)".
                                             • Readings: Readings of the mined word, e.g., if you look up "従妹", its "Readings" will be "じゅうまい、いとこ".
+                                            • First Reading: First reading of the mined word, e.g., if you look up "従妹", its "first reading" will be "じゅうまい".
                                             • Readings with Orthography Info: Readings of the mined word with their orthography info, e.g. if you look up "従妹", its "Readings with Orthography Info" will be "じゅうまい、いとこ (gikun)".
                                             • Alternative Spellings: Alternative spellings of the mined word, e.g., if you look up "わかりました", its alternative spellings will be "解る、判る、分る".
                                             • Alternative Spellings with Orthography Info: Alternative spellings of the mined word with their orthography info, e.g., if you look up "嫁" its "Alternative Spellings with Orthography Info" will be "娵 (rK)、婦 (rK)、媳 (rK)".
@@ -112,6 +113,7 @@ internal sealed partial class PreferencesWindow
     private const string NameJLFieldsInfo = """
                                             • Primary Spelling: It's the spelling you click to mine the name.
                                             • Readings: Readings of the name.
+                                            • First Reading: First reading of the name.
                                             • Alternative Spellings: Alternative spellings of the mined name.
                                             • Definitions: Translations of the name. You can edit the definitions in the popup window by pressing Insert key and clicking on the definitions text box with the left mouse button.
                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
