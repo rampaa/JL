@@ -31,7 +31,7 @@ public enum JLField
     [Description("Pitch Accents")] PitchAccents,
     [Description("Pitch Accents (Numeric)")] NumericPitchAccents,
 
-    // JMdict, JMnedict, KANJIDIC2
+    // JMdict, JMnedict
     [Description("Entry ID")] EdictId,
 
     // Word dictionaries
