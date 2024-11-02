@@ -74,12 +74,12 @@ public static class MiningUtils
         </style>
         """;
 
-    private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, bool replaceLineBreakWithBrTag)
+    private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, bool useHtmlTags)
     {
         Dictionary<JLField, string> miningParams = new()
         {
             [JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture),
-            [JLField.SourceText] = replaceLineBreakWithBrTag ? currentText.ReplaceLineEndings("<br/>") : currentText,
+            [JLField.SourceText] = useHtmlTags ? currentText.ReplaceLineEndings("<br/>") : currentText,
             [JLField.DictionaryName] = lookupResult.Dict.Name,
             [JLField.MatchedText] = lookupResult.MatchedText,
             [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
@@ -90,8 +90,6 @@ public static class MiningUtils
         };
 
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
-        miningParams[JLField.Sentence] = sentence;
-
         int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
         if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
         {
@@ -99,22 +97,34 @@ public static class MiningUtils
         }
 
         int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
-        miningParams[JLField.LeadingSentencePart] = currentText[sentenceStartIndex..currentCharPosition];
-        miningParams[JLField.TrailingSentencePart] = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
+        string leadingSentencePart = currentText[sentenceStartIndex..currentCharPosition];
+        miningParams[JLField.LeadingSentencePart] = leadingSentencePart;
+        string trailingSentencePart = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
+        miningParams[JLField.TrailingSentencePart] = trailingSentencePart;
+
+        miningParams[JLField.Sentence] = useHtmlTags
+            ? string.Create(CultureInfo.InvariantCulture, $"{leadingSentencePart}<b>{lookupResult.MatchedText}</b>{trailingSentencePart}")
+            : sentence;
 
         if (lookupResult.Readings is not null)
         {
-            string readings = string.Join(", ", lookupResult.Readings);
+            string readings = string.Join('、', lookupResult.Readings);
             miningParams[JLField.Readings] = readings;
 
             miningParams[JLField.ReadingsWithOrthographyInfo] = lookupResult.ReadingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToText(lookupResult.Readings, lookupResult.ReadingsOrthographyInfoList)
                 : readings;
+
+            miningParams[JLField.PrimarySpellingAndReadings] = string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling}[{readings}]");
+
+            string firstReading = lookupResult.Readings[0];
+            miningParams[JLField.FirstReading] = firstReading;
+            miningParams[JLField.PrimarySpellingAndFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling}[{firstReading}]");
         }
 
         if (lookupResult.AlternativeSpellings is not null)
         {
-            string alternativeSpellings = string.Join(", ", lookupResult.AlternativeSpellings);
+            string alternativeSpellings = string.Join('、', lookupResult.AlternativeSpellings);
             miningParams[JLField.AlternativeSpellings] = alternativeSpellings;
 
             miningParams[JLField.AlternativeSpellingsWithOrthographyInfo] = lookupResult.AlternativeSpellingsOrthographyInfoList is not null
@@ -143,7 +153,7 @@ public static class MiningUtils
 
         if (formattedDefinitions is not null)
         {
-            formattedDefinitions = replaceLineBreakWithBrTag
+            formattedDefinitions = useHtmlTags
                 ? formattedDefinitions.ReplaceLineEndings("<br/>")
                 : formattedDefinitions;
 
@@ -157,7 +167,7 @@ public static class MiningUtils
 
         if (selectedDefinitions is not null)
         {
-            miningParams[JLField.SelectedDefinitions] = replaceLineBreakWithBrTag
+            miningParams[JLField.SelectedDefinitions] = useHtmlTags
                 ? selectedDefinitions.ReplaceLineEndings("<br/>")
                 : selectedDefinitions;
         }
@@ -194,22 +204,22 @@ public static class MiningUtils
 
         if (lookupResult.OnReadings is not null)
         {
-            miningParams[JLField.OnReadings] = string.Join(", ", lookupResult.OnReadings);
+            miningParams[JLField.OnReadings] = string.Join('、', lookupResult.OnReadings);
         }
 
         if (lookupResult.KunReadings is not null)
         {
-            miningParams[JLField.KunReadings] = string.Join(", ", lookupResult.KunReadings);
+            miningParams[JLField.KunReadings] = string.Join('、', lookupResult.KunReadings);
         }
 
         if (lookupResult.NanoriReadings is not null)
         {
-            miningParams[JLField.NanoriReadings] = string.Join(", ", lookupResult.NanoriReadings);
+            miningParams[JLField.NanoriReadings] = string.Join('、', lookupResult.NanoriReadings);
         }
 
         if (lookupResult.RadicalNames is not null)
         {
-            miningParams[JLField.RadicalNames] = string.Join(", ", lookupResult.RadicalNames);
+            miningParams[JLField.RadicalNames] = string.Join('、', lookupResult.RadicalNames);
         }
 
         if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict) && pitchDict.Active)
@@ -230,8 +240,8 @@ public static class MiningUtils
 
                     if (i + 1 != pitchAccentCount)
                     {
-                        _ = numericPitchAccentBuilder.Append(", ");
-                        _ = expressionsWithPitchAccentBuilder.Append(", ");
+                        _ = numericPitchAccentBuilder.Append('、');
+                        _ = expressionsWithPitchAccentBuilder.Append('、');
                     }
                 }
 

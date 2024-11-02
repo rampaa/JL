@@ -113,7 +113,7 @@ public static class LookupResultUtils
 
             if (index + 1 != elements.Length)
             {
-                _ = sb.Append(", ");
+                _ = sb.Append('、');
             }
         }
 
@@ -141,7 +141,7 @@ public static class LookupResultUtils
 
             if (index + 1 != alternativeSpellings.Length)
             {
-                _ = sb.Append(", ");
+                _ = sb.Append('、');
             }
         }
 

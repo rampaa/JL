@@ -49,12 +49,14 @@ internal sealed partial class PreferencesWindow
     private const string WordJLFieldsInfo = """
                                             • Primary Spelling: It's the spelling you click to mine the word, e.g., if you look up "わかりました", its primary spelling will be "分かる".
                                             • Primary Spelling with Orthography Info: It's the spelling you click to mine the word with its orthography Info, e.g., if you look up "珈琲", its "Primary Spelling with Orthography Info" will be "珈琲 (ateji)".
-                                            • Readings: Readings of the mined word, e.g., if you look up "従妹", its "Readings" will be "じゅうまい, いとこ".
-                                            • Readings with Orthography Info: Readings of the mined word with their orthography info, e.g. if you look up "従妹", its "Readings with Orthography Info" will be "じゅうまい, いとこ (gikun)".
-                                            • Alternative Spellings: Alternative spellings of the mined word, e.g., if you look up "わかりました", its alternative spellings will be "解る, 判る, 分る".
-                                            • Alternative Spellings with Orthography Info: Alternative spellings of the mined word with their orthography info, e.g., if you look up "嫁" its "Alternative Spellings with Orthography Info" will be "娵 (rK), 婦 (rK), 媳 (rK)".
+                                            • Readings: Readings of the mined word, e.g., if you look up "従妹", its "Readings" will be "じゅうまい、いとこ".
+                                            • Readings with Orthography Info: Readings of the mined word with their orthography info, e.g. if you look up "従妹", its "Readings with Orthography Info" will be "じゅうまい、いとこ (gikun)".
+                                            • Alternative Spellings: Alternative spellings of the mined word, e.g., if you look up "わかりました", its alternative spellings will be "解る、判る、分る".
+                                            • Alternative Spellings with Orthography Info: Alternative spellings of the mined word with their orthography info, e.g., if you look up "嫁" its "Alternative Spellings with Orthography Info" will be "娵 (rK)、婦 (rK)、媳 (rK)".
                                             • Definitions: Definitions of the mined word. You can edit the definitions in the popup window by pressing Insert key and clicking on the definitions text box with the left mouse button.
                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
+                                            • Primary Spelling and Readings: Primary spelling and its readings in the format "Primary Spelling[Reading 1、Reading 2、...、Reading N]" format.
+                                            • Primary Spelling and First Reading: Primary spelling and its first reading in the format "Primary Spelling[Reading 1]" format.
                                             • Dictionary Name: Name of the dictionary, e.g., JMDict.
                                             • Audio: Audio for the first reading of the mined word.
                                             • Image: Image found in clipboard at the time of mining.
@@ -70,7 +72,7 @@ internal sealed partial class PreferencesWindow
                                             • Preferred Frequency: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., 666
                                             • Frequency (Harmonic Mean): Harmonic mean of the raw frequencies, e.g., 666
                                             • Pitch Accents: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                            • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
+                                            • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3、おみな: 0、おうな: 1
                                             • Entry ID: JMDict entry ID.
                                             • Local Time: Mining date and time expressed in local timezone.
                                             """;
@@ -99,7 +101,7 @@ internal sealed partial class PreferencesWindow
                                              • Preferred Frequency: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., 666
                                              • Frequency (Harmonic Mean): Harmonic mean of the raw frequencies, e.g., 666
                                              • Pitch Accents: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                             • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
+                                             • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3、おみな: 0、おうな: 1
                                              • Local Time: Mining date and time expressed in local timezone.
                                              """;
 
@@ -109,6 +111,8 @@ internal sealed partial class PreferencesWindow
                                             • Alternative Spellings: Alternative spellings of the mined name.
                                             • Definitions: Translations of the name. You can edit the definitions in the popup window by pressing Insert key and clicking on the definitions text box with the left mouse button.
                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
+                                            • Primary Spelling and Readings: Primary spelling and its readings in the format "Primary Spelling[Reading 1、Reading 2、...、Reading N]" format.
+                                            • Primary Spelling and First Reading: Primary spelling and its first reading in the format "Primary Spelling[Reading 1]" format.
                                             • Dictionary Name: Name of the dictionary, e.g., "JMnedict".
                                             • Audio: Audio for the first reading of the mined word.
                                             • Image: Image found in clipboard at the time of mining.
@@ -117,7 +121,7 @@ internal sealed partial class PreferencesWindow
                                             • Leading Sentence Part: Part of the sentence that appears before the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Leading Sentence Part" will be "俺は".
                                             • Trailing Sentence Part: Part of the sentence that appears after the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Trailing Sentence Part" will be "のことが大好き".
                                             • Pitch Accents: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                            • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
+                                            • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3、おみな: 0、おうな: 1
                                             • Entry ID: JMnedict entry ID.
                                             • Local Time: Mining date and time expressed in local timezone.
                                             """;
