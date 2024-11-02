@@ -261,6 +261,14 @@ public static class MiningUtils
 
                 miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString();
                 miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString();
+
+                KeyValuePair<string, byte> firstPitchAccentKeyValuePair = pitchAccents[0];
+                if ((lookupResult.Readings is not null && firstPitchAccentKeyValuePair.Key == lookupResult.Readings[0])
+                    || (lookupResult.Readings is null && firstPitchAccentKeyValuePair.Key == lookupResult.PrimarySpelling))
+                {
+                    miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstPitchAccentKeyValuePair.Key, firstPitchAccentKeyValuePair.Value)}");
+                    miningParams[JLField.NumericPitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{firstPitchAccentKeyValuePair.Key}: {firstPitchAccentKeyValuePair.Value}");
+                }
             }
         }
 
@@ -410,7 +418,7 @@ public static class MiningUtils
         for (int i = 1; i < jlFields.Length; i++)
         {
             JLField jlField = jlFields[i];
-            if (jlField is JLField.Audio or JLField.Image or JLField.PitchAccents)
+            if (jlField is JLField.Audio or JLField.Image or JLField.PitchAccents or JLField.PitchAccentForFirstReading)
             {
                 continue;
             }

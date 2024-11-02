@@ -34,6 +34,8 @@ public static class JLFieldUtils
         JLField.FrequencyHarmonicMean,
         JLField.PitchAccents,
         JLField.NumericPitchAccents,
+        JLField.PitchAccentForFirstReading,
+        JLField.NumericPitchAccentForFirstReading,
         JLField.EdictId,
         JLField.LocalTime
     ];
@@ -93,6 +95,8 @@ public static class JLFieldUtils
         JLField.TrailingSentencePart,
         JLField.PitchAccents,
         JLField.NumericPitchAccents,
+        JLField.PitchAccentForFirstReading,
+        JLField.NumericPitchAccentForFirstReading,
         JLField.EdictId,
         JLField.LocalTime
     ];
