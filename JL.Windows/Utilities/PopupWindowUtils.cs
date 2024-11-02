@@ -77,7 +77,7 @@ internal static class PopupWindowUtils
     }
 
     public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? alternativeSpellings,
-        string[]? readings, string[] splitReadingsWithRInfo, double leftMargin, Dict dict, IDictionary<string, IList<IDictRecord>>? pitchRecordDict)
+        string[]? readings, string[]? splitReadingsWithRInfo, double leftMargin, Dict dict, IDictionary<string, IList<IDictRecord>>? pitchRecordDict)
     {
         Grid pitchAccentGrid = new();
 
@@ -106,7 +106,7 @@ internal static class PopupWindowUtils
             if (i > 0)
             {
                 horizontalOffsetForReading +=
-                    WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo[i - 1]}, ", fontSize).Width;
+                    WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo![i - 1]}、", fontSize).Width;
             }
 
             PitchAccentRecord? chosenPitchAccentDictResult = null;

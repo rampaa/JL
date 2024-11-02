@@ -547,7 +547,7 @@ internal sealed partial class PopupWindow
             Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                 result.AlternativeSpellings,
                 null,
-                primarySpellingTextBlock.Text.Split(", "),
+                null,
                 primarySpellingTextBlock.Margin.Left,
                 pitchDict!,
                 result.PitchAccentDict);
@@ -586,7 +586,7 @@ internal sealed partial class PopupWindow
         {
             string readingsText = showROrthographyInfo && result.ReadingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, result.ReadingsOrthographyInfoList)
-                : string.Join(", ", result.Readings);
+                : string.Join('、', result.Readings);
 
             if (MiningMode)
             {
@@ -602,7 +602,7 @@ internal sealed partial class PopupWindow
                     Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                         result.AlternativeSpellings,
                         result.Readings,
-                        readingTextBox.Text.Split(", "),
+                        readingTextBox.Text.Split('、'),
                         readingTextBox.Margin.Left,
                         pitchDict!,
                         result.PitchAccentDict);
@@ -641,7 +641,7 @@ internal sealed partial class PopupWindow
                     Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                         result.AlternativeSpellings,
                         result.Readings,
-                        readingTextBlock.Text.Split(", "),
+                        readingTextBlock.Text.Split('、'),
                         readingTextBlock.Margin.Left,
                         pitchDict!,
                         result.PitchAccentDict);
@@ -691,7 +691,7 @@ internal sealed partial class PopupWindow
         {
             string alternativeSpellingsText = showAOrthographyInfo && result.AlternativeSpellingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
-                : $"({string.Join(", ", result.AlternativeSpellings)})";
+                : $"({string.Join('、', result.AlternativeSpellings)})";
 
             if (MiningMode)
             {
@@ -822,7 +822,7 @@ internal sealed partial class PopupWindow
             if (MiningMode)
             {
                 TextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.OnReadings),
-                    $"On: {string.Join(", ", result.OnReadings)}",
+                    $"On: {string.Join('、', result.OnReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -837,7 +837,7 @@ internal sealed partial class PopupWindow
             else
             {
                 TextBlock onReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.OnReadings),
-                    $"On: {string.Join(", ", result.OnReadings)}",
+                    $"On: {string.Join('、', result.OnReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -853,7 +853,7 @@ internal sealed partial class PopupWindow
             if (MiningMode)
             {
                 TextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KunReadings),
-                    $"Kun: {string.Join(", ", result.KunReadings)}",
+                    $"Kun: {string.Join('、', result.KunReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -868,7 +868,7 @@ internal sealed partial class PopupWindow
             else
             {
                 TextBlock kunReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KunReadings),
-                    $"Kun: {string.Join(", ", result.KunReadings)}",
+                    $"Kun: {string.Join('、', result.KunReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -884,7 +884,7 @@ internal sealed partial class PopupWindow
             if (MiningMode)
             {
                 TextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.NanoriReadings),
-                    $"Nanori: {string.Join(", ", result.NanoriReadings)}",
+                    $"Nanori: {string.Join('、', result.NanoriReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -899,7 +899,7 @@ internal sealed partial class PopupWindow
             else
             {
                 TextBlock nanoriReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.NanoriReadings),
-                    $"Nanori: {string.Join(", ", result.NanoriReadings)}",
+                    $"Nanori: {string.Join('、', result.NanoriReadings)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -915,7 +915,7 @@ internal sealed partial class PopupWindow
             if (MiningMode)
             {
                 TextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(result.RadicalNames),
-                    $"Radical names: {string.Join(", ", result.RadicalNames)}",
+                    $"Radical names: {string.Join('、', result.RadicalNames)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -930,7 +930,7 @@ internal sealed partial class PopupWindow
             else
             {
                 TextBlock radicalNameTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.RadicalNames),
-                    $"Radical names: {string.Join(", ", result.RadicalNames)}",
+                    $"Radical names: {string.Join('、', result.RadicalNames)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
