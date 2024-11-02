@@ -61,6 +61,8 @@ internal sealed partial class PreferencesWindow
                                             • Audio: Audio for the first reading of the mined word.
                                             • Image: Image found in clipboard at the time of mining.
                                             • Source Text: Whole text in which the mined word appears in.
+                                            • Leading Source Text Part: Part of the source text that appears before the matched text.
+                                            • Trailing Sentence Text Part: Part of the source that appears after the matched text.
                                             • Sentence: Sentence in which the mined word appears in.
                                             • Leading Sentence Part: Part of the sentence that appears before the matched text. e.g., if the mined word is "大好き" while the sentence is "妹が大好きです", "Leading Sentence Part" will be "妹が".
                                             • Trailing Sentence Part: Part of the sentence that appears after the matched text. e.g., if the mined word is "大好き" while the sentence is "妹が大好きです", "Trailing Sentence Part" will be "です".
@@ -93,6 +95,8 @@ internal sealed partial class PreferencesWindow
                                              • Audio: Audio for the first reading of the mined word.
                                              • Image: Image found in clipboard at the time of mining.
                                              • Source Text: Whole text in which the mined kanji appears in.
+                                             • Leading Source Text Part: Part of the source text that appears before the mined kanji.
+                                             • Trailing Sentence Text Part: Part of the source that appears after the mined kanji.
                                              • Sentence: Sentence in which the mined kanji appears in.
                                              • Leading Sentence Part: Part of the sentence that appears before the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Leading Sentence Part" will be "妹が".
                                              • Trailing Sentence Part: Part of the sentence that appears after the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Trailing Sentence Part" will be "好きです".
@@ -117,6 +121,8 @@ internal sealed partial class PreferencesWindow
                                             • Audio: Audio for the first reading of the mined word.
                                             • Image: Image found in clipboard at the time of mining.
                                             • Source Text: Whole text in which the mined name appears in.
+                                            • Leading Source Text Part: Part of the source text that appears before the mined name.
+                                            • Trailing Sentence Text Part: Part of the source that appears after the mined name.
                                             • Sentence: Sentence in which the mined name appears in.
                                             • Leading Sentence Part: Part of the sentence that appears before the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Leading Sentence Part" will be "俺は".
                                             • Trailing Sentence Part: Part of the sentence that appears after the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Trailing Sentence Part" will be "のことが大好き".

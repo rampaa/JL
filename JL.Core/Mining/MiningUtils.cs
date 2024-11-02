@@ -79,9 +79,6 @@ public static class MiningUtils
         Dictionary<JLField, string> miningParams = new()
         {
             [JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture),
-            [JLField.SourceText] = useHtmlTags
-                ? string.Create(CultureInfo.InvariantCulture, $"{currentText[..currentCharPosition]}<b>{lookupResult.MatchedText}</b>{currentText[(currentCharPosition + lookupResult.MatchedText.Length)..]}").ReplaceLineEndings("<br/>")
-                : currentText,
             [JLField.DictionaryName] = lookupResult.Dict.Name,
             [JLField.MatchedText] = lookupResult.MatchedText,
             [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
@@ -90,6 +87,21 @@ public static class MiningUtils
                 ? $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})"
                 : lookupResult.PrimarySpelling
         };
+
+        string leadingSourcePart = currentText[..currentCharPosition];
+        string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..];
+        if (useHtmlTags)
+        {
+            leadingSourcePart = leadingSourcePart.ReplaceLineEndings("<br/>");
+            trailingSourcePart = trailingSourcePart.ReplaceLineEndings("<br/>");
+        }
+
+        miningParams[JLField.LeadingSourceTextPart] = leadingSourcePart;
+        miningParams[JLField.TrailingSourceTextPart] = trailingSourcePart;
+
+        miningParams[JLField.SourceText] = useHtmlTags
+                ? string.Create(CultureInfo.InvariantCulture, $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}").ReplaceLineEndings("<br/>")
+                : currentText;
 
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
         int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
