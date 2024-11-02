@@ -75,7 +75,7 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., "666".
                                             • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., "666".
                                             • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                            • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3、おみな: 0、おうな: 1".
+                                            • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: ３, おみな: 0, おうな: 1".
                                             • {JLField.PitchAccentForFirstReading.GetDescription()}: Pitch accent for the first reading of the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                             • {JLField.NumericPitchAccentForFirstReading.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3".
                                             • {JLField.EdictId.GetDescription()}: JMDict entry ID.
@@ -109,7 +109,7 @@ internal sealed partial class PreferencesWindow
                                              • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., "666".
                                              • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., "666".
                                              • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3、おみな: 0、おうな: 1".
+                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3, おみな: 0, おうな: 1".
                                              • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                              """;
 
@@ -132,7 +132,7 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.LeadingSentencePart.GetDescription()}: Part of the sentence that appears before the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Leading Sentence Part" will be "俺は".
                                             • {JLField.TrailingSentencePart.GetDescription()}: Part of the sentence that appears after the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Trailing Sentence Part" will be "のことが大好き".
                                             • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                            • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3、おみな: 0、おうな: 1".
+                                            • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3, おみな: 0, おうな: 1".
                                             • {JLField.PitchAccentForFirstReading.GetDescription()}: Pitch accent for the first reading of the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                             • {JLField.NumericPitchAccentForFirstReading.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3".
                                             • {JLField.EdictId.GetDescription()}: JMnedict entry ID.

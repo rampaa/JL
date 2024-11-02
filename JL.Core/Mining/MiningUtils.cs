@@ -254,7 +254,7 @@ public static class MiningUtils
 
                     if (i + 1 != pitchAccentCount)
                     {
-                        _ = numericPitchAccentBuilder.Append('、');
+                        _ = numericPitchAccentBuilder.Append(", ");
                         _ = expressionsWithPitchAccentBuilder.Append('、');
                     }
                 }
