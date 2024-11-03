@@ -7,6 +7,20 @@ namespace JL.Core.Config;
 
 public static class ConfigDBManager
 {
+    private const string GetSettingValueQuery =
+        """
+        SELECT value
+        FROM setting
+        WHERE profile_id = @profileId AND name = @name;
+        """;
+
+    private const string UpdateSettingQuery =
+        """
+        UPDATE setting
+        SET value = @value
+        WHERE profile_id = @profileId AND name = @name;
+        """;
+
     private static readonly string s_configsPath = Path.Join(Utils.ConfigPath, "Configs.sqlite");
     public delegate bool TryParseHandler<T>(string value, out T? result);
     public delegate bool TryParseHandlerWithCultureInfo<T>(string value, NumberStyles numberStyles, CultureInfo cultureInfo, out T result);
@@ -98,13 +112,7 @@ public static class ConfigDBManager
     public static void UpdateSetting(SqliteConnection connection, string settingName, string value, int? profileId = null)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
-            """
-            UPDATE setting
-            SET value = @value
-            WHERE profile_id = @profileId AND name = @name;
-            """;
-
+        command.CommandText = UpdateSettingQuery;
         _ = command.Parameters.AddWithValue("@profileId", profileId ?? ProfileUtils.CurrentProfileId);
         _ = command.Parameters.AddWithValue("@name", settingName);
         _ = command.Parameters.AddWithValue("@value", value);
@@ -139,20 +147,12 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static string? GetSettingValue(SqliteConnection connection, string settingName, int? profileId = null)
+    public static string? GetSettingValue(SqliteConnection connection, string settingName)
     {
         using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
-            """
-            SELECT value
-            FROM setting
-            WHERE profile_id = @profileId AND name = @name;
-            """;
-
-        _ = command.Parameters.AddWithValue("@profileId", profileId ?? ProfileUtils.CurrentProfileId);
+        command.CommandText = GetSettingValueQuery;
+        _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
         _ = command.Parameters.AddWithValue("@name", settingName);
-
         return (string?)command.ExecuteScalar();
     }
 
