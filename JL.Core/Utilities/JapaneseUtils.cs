@@ -19,7 +19,7 @@ public static partial class JapaneseUtils
     // Katakana (30A0–30FF)
     // Kanbun (3190–319F)
     // CJK Strokes (31C0–31EF)
-    // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so they’re included in the regex.
+    // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included in the regex.
     // Enclosed CJK Letters and Months (3200–32FF)
     // CJK Compatibility (3300–33FF)
     // CJK Unified Ideographs Extension A (3400–4DBF)
