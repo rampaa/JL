@@ -9,8 +9,8 @@ public static partial class JapaneseUtils
 {
     // Matches the following Unicode ranges:
     // × (\u00D7)
-    // General Punctuation (2000-206F) ‥, …, •, ※
-    // Geometric Shapes (25A0-U+25FF) ◦, ◎, ○, △, ◉
+    // General Punctuation (2000-206F): ‥, …, •, ※
+    // Geometric Shapes (25A0-U+25FF): ◦, ◎, ○, △, ◉
     // CJK Radicals Supplement (2E80–2EFF)
     // Kangxi Radicals (2F00–2FDF)
     // Ideographic Description Characters (2FF0–2FFF)
@@ -19,7 +19,7 @@ public static partial class JapaneseUtils
     // Katakana (30A0–30FF)
     // Kanbun (3190–319F)
     // CJK Strokes (31C0–31EF)
-    // Katakana Phonetic Extensions (31F0–31FF)
+    // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so they’re included in the regex.
     // Enclosed CJK Letters and Months (3200–32FF)
     // CJK Compatibility (3300–33FF)
     // CJK Unified Ideographs Extension A (3400–4DBF)
@@ -27,8 +27,8 @@ public static partial class JapaneseUtils
     // CJK Compatibility Ideographs (F900–FAFF)
     // CJK Compatibility Forms (FE30–FE4F)
     // Halfwidth and Fullwidth Forms (FF00–FFEF)
-    // Ideographic Symbols and Punctuation (16FE0-16FFF) does not contain any Japanese character, so it's not included in the regex
-    // Kana Extended-B (1AFF0-1AFFF) does not contain any Japanese character, it only includes Taiwanese kana, so it's not included in the regex
+    // Ideographic Symbols and Punctuation (16FE0-16FFF): It does not contain any Japanese characters, so it's not included in the regex.
+    // Kana Extended-B (1AFF0-1AFFF): The range does not contain any Japanese characters; it only includes Taiwanese kana, so it's not included in the regex.
     // Kana Supplement (1B000-1B0FF)
     // Kana Extended-A (1B100-1B12F)
     // Small Kana Extension (1B130-1B16F)
@@ -38,7 +38,7 @@ public static partial class JapaneseUtils
     // CJK Unified Ideographs Extension D (2B740–2B81F)
     // CJK Unified Ideographs Extension E (2B820–2CEAF)
     // CJK Unified Ideographs Extension F (2CEB0–2EBEF)
-    // CJK Unified Ideographs Extension I (2EBF0–2EE5F) is a Chinese-only range, so it's not included in the regex
+    // CJK Unified Ideographs Extension I (2EBF0–2EE5F): It's a Chinese-only range, so it's not included in the regex.
     // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
