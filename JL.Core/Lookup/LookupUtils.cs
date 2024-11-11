@@ -35,7 +35,7 @@ public static class LookupUtils
 
         s_lastLookupTime = preciseTimeNow;
 
-        Dict? pitchDict = DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan];
+        Dict? pitchDict = DictUtils.SingleDictTypeDicts.GetValueOrDefault(DictType.PitchAccentYomichan);
         bool useDBForPitchDict = pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
 
         ConcurrentBag<LookupResult> lookupResults = [];
@@ -1167,7 +1167,7 @@ public static class LookupUtils
 
         IntermediaryResult intermediaryResult = kanjiResults.First().Value;
 
-        string? kanjiComposition = DictUtils.KanjiCompositionDict[dictResult.Key];
+        _ = DictUtils.KanjiCompositionDict.TryGetValue(dictResult.Key, out string? kanjiComposition);
 
         LookupResult result = new
         (
@@ -1535,7 +1535,7 @@ public static class LookupUtils
             }
             else
             {
-                freqResultList = kanjiFreq.Contents[kanji];
+                _ = kanjiFreq.Contents.TryGetValue(kanji, out freqResultList);
             }
 
             if (freqResultList is not null)

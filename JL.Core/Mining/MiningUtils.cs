@@ -458,19 +458,19 @@ public static class MiningUtils
         AnkiConfig? ankiConfig;
         if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {
-            ankiConfig = ankiConfigDict[MineType.Word];
+            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
         }
         else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
-            ankiConfig = ankiConfigDict[MineType.Kanji];
+            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
         }
         else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
         {
-            ankiConfig = ankiConfigDict[MineType.Name];
+            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
         }
         else
         {
-            ankiConfig = ankiConfigDict[MineType.Other];
+            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
         }
 
         if (ankiConfig is null)
