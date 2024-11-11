@@ -1212,7 +1212,7 @@ public static class LookupUtils
 
                     string[]? allReadings = Utils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
 
-                    string? kanjiComposition = DictUtils.KanjiCompositionDict[kanjiResult.Key];
+                    _ = DictUtils.KanjiCompositionDict.TryGetValue(kanjiResult.Key, out string? kanjiComposition);
 
                     LookupResult result = new
                     (
