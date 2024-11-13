@@ -13,14 +13,13 @@
   
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.2" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
   
   <!--Transitive dependencies-->
   <ItemGroup>
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.10" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Memory" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
