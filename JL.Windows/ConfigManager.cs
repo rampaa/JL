@@ -70,6 +70,11 @@ internal static class ConfigManager
     public static double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
     public static bool TextBoxUseCustomLineHeight { get; private set; } // = false;
     public static double TextBoxCustomLineHeight { get; private set; } = 75;
+    public static Color MainTextBoxDropShadowEffectColor { get; private set; } = Colors.Black;
+    public static double MainTextBoxDropShadowEffectShadowDepth { get; private set; } = 1.3;
+    public static int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 4;
+    public static int MainTextBoxDropShadowEffectBlurOpacity { get; private set; } = 80;
+    public static int MainTextBoxDropShadowEffectDirection { get; private set; } = 320;
     private static VerticalAlignment MainWindowTextVerticalAlignment { get; set; } = VerticalAlignment.Top;
 
     #endregion
@@ -329,15 +334,21 @@ internal static class ConfigManager
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = ConfigDBManager.GetValueFromConfig(connection, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
         MainWindow.Instance.ChangeVisibilityOfTitleBarButtons();
 
+        MainTextBoxDropShadowEffectShadowDepth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainTextBoxDropShadowEffectShadowDepth, nameof(MainTextBoxDropShadowEffectShadowDepth), double.TryParse);
+        MainTextBoxDropShadowEffectDirection = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectDirection, nameof(MainTextBoxDropShadowEffectDirection), int.TryParse);
+        MainTextBoxDropShadowEffectBlurRadius = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectBlurRadius, nameof(MainTextBoxDropShadowEffectBlurRadius), int.TryParse);
+        MainTextBoxDropShadowEffectBlurOpacity = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectBlurOpacity, nameof(MainTextBoxDropShadowEffectBlurOpacity), int.TryParse);
+        MainTextBoxDropShadowEffectColor = GetColorFromConfig(connection, MainTextBoxDropShadowEffectColor, nameof(MainTextBoxDropShadowEffectColor));
         TextBoxApplyDropShadowEffect = ConfigDBManager.GetValueFromConfig(connection, TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect), bool.TryParse);
         if (TextBoxApplyDropShadowEffect)
         {
             DropShadowEffect dropShadowEffect = new()
             {
-                Direction = 320,
-                BlurRadius = 4,
-                ShadowDepth = 1.3,
-                Opacity = 0.8,
+                Direction = MainTextBoxDropShadowEffectDirection,
+                BlurRadius = MainTextBoxDropShadowEffectBlurRadius,
+                ShadowDepth = MainTextBoxDropShadowEffectShadowDepth,
+                Opacity = MainTextBoxDropShadowEffectBlurOpacity / 100.0,
+                Color = MainTextBoxDropShadowEffectColor,
                 RenderingBias = RenderingBias.Quality
             };
 
@@ -415,7 +426,7 @@ internal static class ConfigManager
 
         MainWindow.Instance.MainGrid.Opacity = TextOnlyVisibleOnHover && !MainWindow.Instance.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0 : 1;
 
-        // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
+        // MAKE SURE YOU FREEZE ANY NEW FREEZABLE OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
         MainWindowTextColor = GetFrozenBrushFromConfig(connection, MainWindowTextColor, nameof(MainWindowTextColor));
         MainWindowBacklogTextColor = GetFrozenBrushFromConfig(connection, MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
@@ -771,6 +782,7 @@ internal static class ConfigManager
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, MainWindow.Instance.Background.CloneCurrentValue());
         WindowsUtils.SetButtonColor(preferenceWindow.TextBoxTextColorButton, MainWindowTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.TextBoxBacklogTextColorButton, MainWindowBacklogTextColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.MainTextBoxDropShadowEffectColorButton, MainTextBoxDropShadowEffectColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DeconjugationInfoColorButton, DeconjugationInfoColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DefinitionsColorButton, DefinitionsColor);
         WindowsUtils.SetButtonColor(preferenceWindow.FrequencyColorButton, FrequencyColor);
@@ -821,6 +833,11 @@ internal static class ConfigManager
 
         preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked = ChangeMainWindowBackgroundOpacityOnUnhover;
         preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value = MainWindowBackgroundOpacityOnUnhover;
+
+        preferenceWindow.MainTextBoxDropShadowEffectDirectionNumericUpDown.Value = MainTextBoxDropShadowEffectDirection;
+        preferenceWindow.MainTextBoxDropShadowEffectBlurRadiusNumericUpDown.Value = MainTextBoxDropShadowEffectBlurRadius;
+        preferenceWindow.MainTextBoxDropShadowEffectShadowDepthNumericUpDown.Value = MainTextBoxDropShadowEffectShadowDepth;
+        preferenceWindow.MainTextBoxDropShadowEffectBlurOpacityNumericUpDown.Value = MainTextBoxDropShadowEffectBlurOpacity;
 
         preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked = TextBoxIsReadOnly;
         preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked = AlwaysShowMainTextBoxCaret;
@@ -1036,6 +1053,12 @@ internal static class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowHeight),
                 preferenceWindow.MainWindowHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(MainTextBoxDropShadowEffectDirection), preferenceWindow.MainTextBoxDropShadowEffectDirectionNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            ConfigDBManager.UpdateSetting(connection, nameof(MainTextBoxDropShadowEffectBlurRadius), preferenceWindow.MainTextBoxDropShadowEffectBlurRadiusNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            ConfigDBManager.UpdateSetting(connection, nameof(MainTextBoxDropShadowEffectShadowDepth), preferenceWindow.MainTextBoxDropShadowEffectShadowDepthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            ConfigDBManager.UpdateSetting(connection, nameof(MainTextBoxDropShadowEffectBlurOpacity), preferenceWindow.MainTextBoxDropShadowEffectBlurOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            ConfigDBManager.UpdateSetting(connection, nameof(MainTextBoxDropShadowEffectColor), preferenceWindow.MainTextBoxDropShadowEffectColorButton.Tag.ToString()!);
 
             // We want the opaque color here
             ConfigDBManager.UpdateSetting(connection, "MainWindowBackgroundColor",
@@ -1381,6 +1404,18 @@ internal static class ConfigManager
         return solidColorBrush.IsFrozen
             ? WindowsUtils.BrushFromHex(solidColorBrush.ToString(CultureInfo.InvariantCulture))
             : solidColorBrush;
+    }
+
+    private static Color GetColorFromConfig(SqliteConnection connection, Color color, string configKey)
+    {
+        string? configValue = ConfigDBManager.GetSettingValue(connection, configKey);
+        if (configValue is not null)
+        {
+            return WindowsUtils.ColorFromHex(configValue);
+        }
+
+        ConfigDBManager.InsertSetting(connection, configKey, color.ToString(CultureInfo.InvariantCulture));
+        return WindowsUtils.ColorFromHex(color.ToString(CultureInfo.InvariantCulture));
     }
 
     private static Brush GetFrozenBrushFromConfig(SqliteConnection connection, Brush solidColorBrush, string configKey)

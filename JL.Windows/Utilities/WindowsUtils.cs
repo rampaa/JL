@@ -440,6 +440,11 @@ internal static class WindowsUtils
         return brush;
     }
 
+    public static Color ColorFromHex(string hexColorString)
+    {
+        return (Color)ColorConverter.ConvertFromString(hexColorString);
+    }
+
     public static void Alert(AlertLevel alertLevel, string message)
     {
         _ = Application.Current.Dispatcher.InvokeAsync(async () =>
@@ -513,6 +518,12 @@ internal static class WindowsUtils
         Color selectedBrushColor = ((SolidColorBrush)selectedBrush).Color;
 
         button.Background = CreateFrozenOpaqueBrush(selectedBrushColor);
+    }
+
+    public static void SetButtonColor(Button button, Color selectedColor)
+    {
+        button.Tag = new SolidColorBrush(selectedColor);
+        button.Background = CreateFrozenOpaqueBrush(selectedColor);
     }
 
     private static Brush CreateFrozenOpaqueBrush(Color color)

@@ -407,6 +407,47 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Shadow color"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <Button x:Name="MainTextBoxDropShadowEffectColorButton"  HorizontalAlignment="Right"
+                                    Width="60" Height="32" BorderThickness="5,5,5,5"
+                                    Click="ShowColorPicker" BorderBrush="#FF707070" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Shadow depth"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectShadowDepthNumericUpDown" Maximum="10" Minimum="0" DecimalPlaces="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Shadow blur radius"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectBlurRadiusNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Shadow opacity"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectBlurOpacityNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Shadow direction (in degrees)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectDirectionNumericUpDown" Maximum="360" Minimum="0" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Focus on hover"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
