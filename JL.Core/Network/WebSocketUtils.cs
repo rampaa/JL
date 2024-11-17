@@ -17,20 +17,16 @@ public static class WebSocketUtils
 
     public static void HandleWebSocket()
     {
-        if (!CoreConfigManager.CaptureTextFromWebSocket)
+        s_webSocketCancellationTokenSource?.Cancel();
+        s_webSocketCancellationTokenSource?.Dispose();
+        s_webSocketCancellationTokenSource = null;
+
+        if (!CoreConfigManager.Instance.CaptureTextFromWebSocket)
         {
             s_webSocketTask = null;
         }
-        else if (s_webSocketTask is null)
-        {
-            s_webSocketCancellationTokenSource?.Dispose();
-            s_webSocketCancellationTokenSource = new CancellationTokenSource();
-            ListenWebSocket(s_webSocketCancellationTokenSource.Token);
-        }
         else
         {
-            s_webSocketCancellationTokenSource!.Cancel();
-            s_webSocketCancellationTokenSource.Dispose();
             s_webSocketCancellationTokenSource = new CancellationTokenSource();
             ListenWebSocket(s_webSocketCancellationTokenSource.Token);
         }
@@ -38,6 +34,7 @@ public static class WebSocketUtils
 
     private static void ListenWebSocket(CancellationToken cancellationToken)
     {
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         s_webSocketTask = Task.Run(async () =>
         {
             do
@@ -45,17 +42,17 @@ public static class WebSocketUtils
                 try
                 {
                     using ClientWebSocket webSocketClient = new();
-                    await webSocketClient.ConnectAsync(CoreConfigManager.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
+                    await webSocketClient.ConnectAsync(coreConfigManager.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
 
                     // 256-4096
                     Memory<byte> buffer = new byte[1024 * 4];
 
-                    while (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
+                    while (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
                     {
                         try
                         {
                             ValueWebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
-                            if (!CoreConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
+                            if (!coreConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
                             {
                                 return;
                             }
@@ -79,16 +76,16 @@ public static class WebSocketUtils
                         }
                         catch (WebSocketException webSocketException)
                         {
-                            if (!CoreConfigManager.AutoReconnectToWebSocket)
+                            if (!coreConfigManager.AutoReconnectToWebSocket)
                             {
-                                if (!CoreConfigManager.CaptureTextFromClipboard)
+                                if (!coreConfigManager.CaptureTextFromClipboard)
                                 {
                                     StatsUtils.StatsStopWatch.Stop();
                                     StatsUtils.StopStatsTimer();
                                 }
                             }
 
-                            if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
+                            if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
                             {
                                 Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
                                 Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
@@ -101,15 +98,15 @@ public static class WebSocketUtils
 
                 catch (WebSocketException webSocketException)
                 {
-                    if (!CoreConfigManager.AutoReconnectToWebSocket)
+                    if (!coreConfigManager.AutoReconnectToWebSocket)
                     {
-                        if (!CoreConfigManager.CaptureTextFromClipboard)
+                        if (!coreConfigManager.CaptureTextFromClipboard)
                         {
                             StatsUtils.StatsStopWatch.Stop();
                             StatsUtils.StopStatsTimer();
                         }
 
-                        if (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
+                        if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
                         {
                             Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
                             Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
@@ -121,7 +118,7 @@ public static class WebSocketUtils
                     }
                 }
             }
-            while (CoreConfigManager.AutoReconnectToWebSocket && CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested);
+            while (coreConfigManager.AutoReconnectToWebSocket && coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested);
         }, cancellationToken);
     }
 }

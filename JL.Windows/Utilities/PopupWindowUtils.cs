@@ -57,7 +57,7 @@ internal static class PopupWindowUtils
             HorizontalAlignment = HorizontalAlignment.Left,
             Background = Brushes.Transparent,
             Cursor = Cursors.Arrow,
-            SelectionBrush = ConfigManager.HighlightColor,
+            SelectionBrush = ConfigManager.Instance.HighlightColor,
             IsInactiveSelectionHighlightEnabled = true,
             TextWrapping = TextWrapping.Wrap,
             IsReadOnly = true,
@@ -83,9 +83,10 @@ internal static class PopupWindowUtils
 
         bool hasReading = readings?.Length > 0;
 
+        ConfigManager configManager = ConfigManager.Instance;
         double fontSize = hasReading
-            ? ConfigManager.ReadingsFontSize
-            : ConfigManager.PrimarySpellingFontSize;
+            ? configManager.ReadingsFontSize
+            : configManager.PrimarySpellingFontSize;
 
         string[] expressions = hasReading ? readings! : [primarySpelling];
 
@@ -187,7 +188,7 @@ internal static class PopupWindowUtils
 
     public static void SetPopupAutoHideTimer()
     {
-        PopupAutoHideTimer.Interval = ConfigManager.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
+        PopupAutoHideTimer.Interval = ConfigManager.Instance.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
         PopupAutoHideTimer.Elapsed += PopupAutoHideTimerEvent;
         PopupAutoHideTimer.AutoReset = false;
         PopupAutoHideTimer.Enabled = true;
@@ -197,8 +198,9 @@ internal static class PopupWindowUtils
     {
         _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.InvokeAsync(static () =>
         {
+            MainWindow mainWindow = MainWindow.Instance;
             PopupWindow? hoveredPopup = null;
-            PopupWindow currentPopupWindow = MainWindow.Instance.FirstPopupWindow;
+            PopupWindow currentPopupWindow = mainWindow.FirstPopupWindow;
             while (currentPopupWindow.ChildPopupWindow is not null)
             {
                 if (currentPopupWindow.IsMouseOver)
@@ -210,7 +212,7 @@ internal static class PopupWindowUtils
                 currentPopupWindow = currentPopupWindow.ChildPopupWindow;
             }
 
-            HidePopups(hoveredPopup?.ChildPopupWindow ?? MainWindow.Instance.FirstPopupWindow);
+            HidePopups(hoveredPopup?.ChildPopupWindow ?? mainWindow.FirstPopupWindow);
         });
     }
 
@@ -237,14 +239,15 @@ internal static class PopupWindowUtils
         WinApi.BringToFront(popupWindow.WindowHandle);
         popupWindow.DisplayResults(true);
 
-        if (ConfigManager.Focusable)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.Focusable)
         {
             _ = popupWindow.Activate();
         }
 
         _ = popupWindow.Focus();
 
-        if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+        if (configManager.AutoHidePopupIfMouseIsNotOverIt)
         {
             SetPopupAutoHideTimer();
         }
@@ -277,7 +280,7 @@ internal static class PopupWindowUtils
 
     public static bool NoAllDictFilter(object item)
     {
-        if (CoreConfigManager.KanjiMode)
+        if (CoreConfigManager.Instance.KanjiMode)
         {
             return true;
         }

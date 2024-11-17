@@ -27,7 +27,9 @@ internal static class BacklogUtils
 
     public static void ShowPreviousBacklogItem()
     {
-        if (!ConfigManager.EnableBacklog || MainWindow.Instance.FirstPopupWindow.MiningMode || Backlog.Count is 0)
+        ConfigManager configManager = ConfigManager.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        if (!configManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
         {
             return;
         }
@@ -35,15 +37,17 @@ internal static class BacklogUtils
         if (s_currentTextIndex > 0)
         {
             --s_currentTextIndex;
-            MainWindow.Instance.MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+            mainWindow.MainTextBox.Foreground = configManager.MainWindowBacklogTextColor;
         }
 
-        MainWindow.Instance.MainTextBox.Text = Backlog[s_currentTextIndex];
+        mainWindow.MainTextBox.Text = Backlog[s_currentTextIndex];
     }
 
     public static void ShowNextBacklogItem()
     {
-        if (!ConfigManager.EnableBacklog || MainWindow.Instance.FirstPopupWindow.MiningMode || Backlog.Count is 0)
+        ConfigManager configManager = ConfigManager.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        if (!configManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
         {
             return;
         }
@@ -51,15 +55,15 @@ internal static class BacklogUtils
         if (s_currentTextIndex < Backlog.Count - 1)
         {
             ++s_currentTextIndex;
-            MainWindow.Instance.MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+            mainWindow.MainTextBox.Foreground = configManager.MainWindowBacklogTextColor;
         }
 
         if (s_currentTextIndex == Backlog.Count - 1)
         {
-            MainWindow.Instance.MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+            mainWindow.MainTextBox.Foreground = configManager.MainWindowTextColor;
         }
 
-        MainWindow.Instance.MainTextBox.Text = Backlog[s_currentTextIndex];
+        mainWindow.MainTextBox.Text = Backlog[s_currentTextIndex];
     }
 
     public static void DeleteCurrentLine()
@@ -76,7 +80,8 @@ internal static class BacklogUtils
             return;
         }
 
-        if (ConfigManager.StripPunctuationBeforeCalculatingCharacterCount)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.StripPunctuationBeforeCalculatingCharacterCount)
         {
             text = JapaneseUtils.RemovePunctuation(text);
         }
@@ -96,8 +101,8 @@ internal static class BacklogUtils
         }
 
         mainTextBox.Foreground = s_currentTextIndex < Backlog.Count - 1
-            ? ConfigManager.MainWindowBacklogTextColor
-            : ConfigManager.MainWindowTextColor;
+            ? configManager.MainWindowBacklogTextColor
+            : configManager.MainWindowTextColor;
 
         mainTextBox.Text = Backlog.Count > 0
             ? Backlog[s_currentTextIndex]
@@ -106,33 +111,36 @@ internal static class BacklogUtils
 
     public static void ShowAllBacklog()
     {
-        if (!ConfigManager.EnableBacklog || MainWindow.Instance.FirstPopupWindow.MiningMode || Backlog.Count is 0)
+        ConfigManager configManager = ConfigManager.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        if (!configManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
         {
             return;
         }
 
         string allBacklogText = string.Join('\n', Backlog);
-        if (MainWindow.Instance.MainTextBox.Text != allBacklogText
-            && MainWindow.Instance.MainTextBox.GetFirstVisibleLineIndex() is 0)
+        if (mainWindow.MainTextBox.Text != allBacklogText
+            && mainWindow.MainTextBox.GetFirstVisibleLineIndex() is 0)
         {
-            int caretIndex = allBacklogText.Length - MainWindow.Instance.MainTextBox.Text.Length;
+            int caretIndex = allBacklogText.Length - mainWindow.MainTextBox.Text.Length;
 
-            MainWindow.Instance.MainTextBox.Text = allBacklogText;
-            MainWindow.Instance.MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+            mainWindow.MainTextBox.Text = allBacklogText;
+            mainWindow.MainTextBox.Foreground = configManager.MainWindowBacklogTextColor;
 
             if (caretIndex >= 0)
             {
-                MainWindow.Instance.MainTextBox.CaretIndex = caretIndex;
+                mainWindow.MainTextBox.CaretIndex = caretIndex;
             }
 
-            MainWindow.Instance.MainTextBox.ScrollToEnd();
+            mainWindow.MainTextBox.ScrollToEnd();
         }
     }
 
     public static Task WriteBacklog()
     {
-        if (!ConfigManager.EnableBacklog
-            || !ConfigManager.AutoSaveBacklogBeforeClosing
+        ConfigManager configManager = ConfigManager.Instance;
+        if (!configManager.EnableBacklog
+            || !configManager.AutoSaveBacklogBeforeClosing
             || Backlog.Count is 0)
         {
             return Task.CompletedTask;

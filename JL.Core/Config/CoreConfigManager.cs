@@ -6,23 +6,34 @@ using Serilog.Events;
 
 namespace JL.Core.Config;
 
-public static class CoreConfigManager
+public sealed class CoreConfigManager
 {
-    public static Uri AnkiConnectUri { get; set; } = new("http://127.0.0.1:8765");
-    public static bool KanjiMode { get; set; } // = false;
-    public static bool AnkiIntegration { get; set; } // = false;
-    public static bool ForceSyncAnki { get; private set; } // = false;
-    public static bool AllowDuplicateCards { get; private set; } // = false;
-    public static double LookupRate { get; private set; } // = 0;
-    public static bool CaptureTextFromClipboard { get; set; } = true;
-    public static bool CaptureTextFromWebSocket { get; set; } // = false;
-    public static bool AutoReconnectToWebSocket { get; private set; } // = false;
-    public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
-    public static bool TextBoxRemoveNewlines { get; private set; } // = false;
-    public static Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
-    public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
+    public static CoreConfigManager Instance { get; private set; } = new();
 
-    public static void ApplyPreferences(SqliteConnection connection)
+    public Uri AnkiConnectUri { get; set; } = new("http://127.0.0.1:8765");
+    public bool KanjiMode { get; set; } // = false;
+    public bool AnkiIntegration { get; set; } // = false;
+    public bool ForceSyncAnki { get; private set; } // = false;
+    public bool AllowDuplicateCards { get; private set; } // = false;
+    public double LookupRate { get; private set; } // = 0;
+    public bool CaptureTextFromClipboard { get; set; } = true;
+    public bool CaptureTextFromWebSocket { get; set; } // = false;
+    public bool AutoReconnectToWebSocket { get; private set; } // = false;
+    public bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
+    public bool TextBoxRemoveNewlines { get; private set; } // = false;
+    public Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
+    public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
+
+    private CoreConfigManager()
+    {
+    }
+
+    public static void CreateNewCoreConfigManager()
+    {
+        Instance = new CoreConfigManager();
+    }
+
+    public void ApplyPreferences(SqliteConnection connection)
     {
         Utils.s_loggingLevelSwitch.MinimumLevel = ConfigDBManager.GetValueFromConfig(connection, LogEventLevel.Error, "MinimumLogLevel", Enum.TryParse);
 

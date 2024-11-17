@@ -83,7 +83,7 @@ internal sealed partial class PopupWindow
     {
         base.OnActivated(e);
 
-        if (ConfigManager.Focusable)
+        if (ConfigManager.Instance.Focusable)
         {
             WinApi.AllowActivation(WindowHandle);
         }
@@ -95,22 +95,23 @@ internal sealed partial class PopupWindow
 
     private void Init()
     {
-        Background = ConfigManager.PopupBackgroundColor;
-        Foreground = ConfigManager.DefinitionsColor;
-        FontFamily = ConfigManager.PopupFont;
+        ConfigManager configManager = ConfigManager.Instance;
+        Background = configManager.PopupBackgroundColor;
+        Foreground = configManager.DefinitionsColor;
+        FontFamily = configManager.PopupFont;
 
-        WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, ConfigManager.PopupMaxWidth, ConfigManager.PopupMaxHeight, ConfigManager.PopupMinWidth, ConfigManager.PopupMinHeight, this);
+        WindowsUtils.SetSizeToContent(configManager.PopupDynamicWidth, configManager.PopupDynamicHeight, configManager.PopupMaxWidth, configManager.PopupMaxHeight, configManager.PopupMinWidth, configManager.PopupMinHeight, this);
 
-        AddNameMenuItem.SetInputGestureText(ConfigManager.ShowAddNameWindowKeyGesture);
-        AddWordMenuItem.SetInputGestureText(ConfigManager.ShowAddWordWindowKeyGesture);
-        SearchMenuItem.SetInputGestureText(ConfigManager.SearchWithBrowserKeyGesture);
+        AddNameMenuItem.SetInputGestureText(configManager.ShowAddNameWindowKeyGesture);
+        AddWordMenuItem.SetInputGestureText(configManager.ShowAddWordWindowKeyGesture);
+        SearchMenuItem.SetInputGestureText(configManager.SearchWithBrowserKeyGesture);
 
         AddMenuItemsToEditableTextBoxContextMenu();
 
-        if (ConfigManager.ShowMiningModeReminder)
+        if (configManager.ShowMiningModeReminder)
         {
             TextBlockMiningModeReminder.Text = string.Create(CultureInfo.InvariantCulture,
-                $"Click on an entry's main spelling to mine it,\nor press {ConfigManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
+                $"Click on an entry's main spelling to mine it,\nor press {configManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
         }
     }
 
@@ -189,18 +190,20 @@ internal sealed partial class PopupWindow
         _currentText = textBoxText;
         _currentCharPosition = charPosition;
 
-        if (this != MainWindow.Instance.FirstPopupWindow
-                ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
+        ConfigManager configManager = ConfigManager.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        if (this != mainWindow.FirstPopupWindow
+                ? configManager.DisableLookupsForNonJapaneseCharsInPopups
                   && !JapaneseUtils.JapaneseRegex().IsMatch(textBoxText[charPosition].ToString())
-                : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
+                : configManager.DisableLookupsForNonJapaneseCharsInMainWindow
                   && !JapaneseUtils.JapaneseRegex().IsMatch(textBoxText[charPosition].ToString()))
         {
             HidePopup();
             return Task.CompletedTask;
         }
 
-        string text = textBoxText.Length - charPosition > ConfigManager.MaxSearchLength
-            ? textBoxText[..(charPosition + ConfigManager.MaxSearchLength)]
+        string text = textBoxText.Length - charPosition > configManager.MaxSearchLength
+            ? textBoxText[..(charPosition + configManager.MaxSearchLength)]
             : textBoxText;
 
         int endPosition = JapaneseUtils.FindExpressionBoundary(text, charPosition);
@@ -214,9 +217,9 @@ internal sealed partial class PopupWindow
 
         if (text == LastText && IsVisible)
         {
-            if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+            if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
-                UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
+                UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
             }
 
             else
@@ -237,10 +240,10 @@ internal sealed partial class PopupWindow
             _previousTextBox = textBox;
             LastSelectedText = lookupResults[0].MatchedText;
 
-            if (ConfigManager.HighlightLongestMatch)
+            if (configManager.HighlightLongestMatch)
             {
-                WinApi.ActivateWindow(this == MainWindow.Instance.FirstPopupWindow
-                    ? MainWindow.Instance.WindowHandle
+                WinApi.ActivateWindow(this == mainWindow.FirstPopupWindow
+                    ? mainWindow.WindowHandle
                     : ((PopupWindow)Owner).WindowHandle);
 
                 _ = textBox.Focus();
@@ -254,7 +257,7 @@ internal sealed partial class PopupWindow
                 EnableMiningMode();
                 DisplayResults(true);
 
-                if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+                if (configManager.AutoHidePopupIfMouseIsNotOverIt)
                 {
                     PopupWindowUtils.SetPopupAutoHideTimer();
                 }
@@ -270,9 +273,9 @@ internal sealed partial class PopupWindow
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
-            if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+            if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
-                UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
+                UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
             }
 
             else
@@ -280,8 +283,8 @@ internal sealed partial class PopupWindow
                 UpdatePosition(WinApi.GetMousePosition());
             }
 
-            if (ConfigManager.Focusable
-                && (enableMiningMode || ConfigManager.PopupFocusOnLookup))
+            if (configManager.Focusable
+                && (enableMiningMode || configManager.PopupFocusOnLookup))
             {
                 _ = Activate();
             }
@@ -290,7 +293,7 @@ internal sealed partial class PopupWindow
 
             WinApi.BringToFront(WindowHandle);
 
-            if (ConfigManager.AutoPlayAudio)
+            if (configManager.AutoPlayAudio)
             {
                 return PlayAudio();
             }
@@ -314,7 +317,7 @@ internal sealed partial class PopupWindow
                 --charPosition;
             }
 
-            return LookupOnCharPosition(textBox, charPosition, ConfigManager.LookupOnMouseClickOnly);
+            return LookupOnCharPosition(textBox, charPosition, ConfigManager.Instance.LookupOnMouseClickOnly);
         }
 
         HidePopup();
@@ -335,11 +338,13 @@ internal sealed partial class PopupWindow
         _currentText = text;
         _currentCharPosition = charPosition;
 
+        ConfigManager configManager = ConfigManager.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
         if (text == LastText && IsVisible)
         {
-            if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+            if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
-                UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
+                UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
             }
 
             else
@@ -364,7 +369,7 @@ internal sealed partial class PopupWindow
             EnableMiningMode();
             DisplayResults(true);
 
-            if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+            if (configManager.AutoHidePopupIfMouseIsNotOverIt)
             {
                 PopupWindowUtils.SetPopupAutoHideTimer();
             }
@@ -374,9 +379,9 @@ internal sealed partial class PopupWindow
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
-            if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+            if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
-                UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
+                UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
             }
 
             else
@@ -386,7 +391,7 @@ internal sealed partial class PopupWindow
 
             _ = textBox.Focus();
 
-            if (ConfigManager.Focusable)
+            if (configManager.Focusable)
             {
                 _ = Activate();
             }
@@ -395,7 +400,7 @@ internal sealed partial class PopupWindow
 
             WinApi.BringToFront(WindowHandle);
 
-            if (ConfigManager.AutoPlayAudio)
+            if (configManager.AutoPlayAudio)
             {
                 return PlayAudio();
             }
@@ -416,23 +421,25 @@ internal sealed partial class PopupWindow
         double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
         double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
 
-        double newLeft = ConfigManager.PositionPopupLeftOfCursor
+        ConfigManager configManager = ConfigManager.Instance;
+
+        double newLeft = configManager.PositionPopupLeftOfCursor
             ? mouseX - (currentWidth + WindowsUtils.DpiAwareXOffset)
             : mouseX + WindowsUtils.DpiAwareXOffset;
 
-        double newTop = ConfigManager.PositionPopupAboveCursor
+        double newTop = configManager.PositionPopupAboveCursor
             ? mouseY - (currentHeight + WindowsUtils.DpiAwareYOffset)
             : mouseY + WindowsUtils.DpiAwareYOffset;
 
         Rectangle screenBounds = WindowsUtils.ActiveScreen.Bounds;
 
-        if (ConfigManager.PopupFlipX)
+        if (configManager.PopupFlipX)
         {
-            if (ConfigManager.PositionPopupLeftOfCursor && newLeft < screenBounds.Left)
+            if (configManager.PositionPopupLeftOfCursor && newLeft < screenBounds.Left)
             {
                 newLeft = mouseX + WindowsUtils.DpiAwareXOffset;
             }
-            else if (!ConfigManager.PositionPopupLeftOfCursor && newLeft + currentWidth > screenBounds.Right)
+            else if (!configManager.PositionPopupLeftOfCursor && newLeft + currentWidth > screenBounds.Right)
             {
                 newLeft = mouseX - (currentWidth + WindowsUtils.DpiAwareXOffset);
             }
@@ -440,13 +447,13 @@ internal sealed partial class PopupWindow
 
         newLeft = Math.Max(screenBounds.Left, Math.Min(newLeft, screenBounds.Right - currentWidth));
 
-        if (ConfigManager.PopupFlipY)
+        if (configManager.PopupFlipY)
         {
-            if (ConfigManager.PositionPopupAboveCursor && newTop < screenBounds.Top)
+            if (configManager.PositionPopupAboveCursor && newTop < screenBounds.Top)
             {
                 newTop = mouseY + WindowsUtils.DpiAwareYOffset;
             }
-            else if (!ConfigManager.PositionPopupAboveCursor && newTop + currentHeight > screenBounds.Bottom)
+            else if (!configManager.PositionPopupAboveCursor && newTop + currentHeight > screenBounds.Bottom)
             {
                 newTop = mouseY - (currentHeight + WindowsUtils.DpiAwareYOffset);
             }
@@ -483,7 +490,7 @@ internal sealed partial class PopupWindow
 
         int resultCount = generateAllResults
             ? LastLookupResults.Count
-            : Math.Min(LastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
+            : Math.Min(LastLookupResults.Count, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
 
         StackPanel[] popupItemSource = new StackPanel[resultCount];
 
@@ -532,10 +539,12 @@ internal sealed partial class PopupWindow
             Tag = index
         };
 
+        ConfigManager configManager = ConfigManager.Instance;
+
         TextBlock primarySpellingTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpelling),
             result.PrimarySpelling,
-            ConfigManager.PrimarySpellingColor,
-            ConfigManager.PrimarySpellingFontSize,
+            configManager.PrimarySpellingColor,
+            configManager.PrimarySpellingFontSize,
             PopupContextMenu,
             VerticalAlignment.Center,
             new Thickness(2, 0, 0, 0));
@@ -581,7 +590,7 @@ internal sealed partial class PopupWindow
             _ = top.Children.Add(textBlockPOrthographyInfo);
         }
 
-        if (result.Readings is not null && ConfigManager.ReadingsFontSize > 0
+        if (result.Readings is not null && configManager.ReadingsFontSize > 0
                                         && (pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)))
         {
             string readingsText = showROrthographyInfo && result.ReadingsOrthographyInfoList is not null
@@ -591,8 +600,8 @@ internal sealed partial class PopupWindow
             if (MiningMode)
             {
                 TextBox readingTextBox = PopupWindowUtils.CreateTextBox(nameof(result.Readings),
-                    readingsText, ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    readingsText, configManager.ReadingsColor,
+                    configManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(5, 0, 0, 0));
@@ -630,8 +639,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock readingTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Readings),
                     readingsText,
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    configManager.ReadingsColor,
+                    configManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(7, 0, 0, 0));
@@ -671,7 +680,7 @@ internal sealed partial class PopupWindow
             {
                 Name = nameof(audioButton),
                 Content = "🔊",
-                Foreground = ConfigManager.DefinitionsColor,
+                Foreground = configManager.DefinitionsColor,
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(3, 0, 0, 0),
                 HorizontalAlignment = HorizontalAlignment.Left,
@@ -687,7 +696,7 @@ internal sealed partial class PopupWindow
             _ = top.Children.Add(audioButton);
         }
 
-        if (result.AlternativeSpellings is not null && ConfigManager.AlternativeSpellingsFontSize > 0)
+        if (result.AlternativeSpellings is not null && configManager.AlternativeSpellingsFontSize > 0)
         {
             string alternativeSpellingsText = showAOrthographyInfo && result.AlternativeSpellingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
@@ -697,8 +706,8 @@ internal sealed partial class PopupWindow
             {
                 TextBox alternativeSpellingsTexBox = PopupWindowUtils.CreateTextBox(nameof(result.AlternativeSpellings),
                     alternativeSpellingsText,
-                    ConfigManager.AlternativeSpellingsColor,
-                    ConfigManager.AlternativeSpellingsFontSize,
+                    configManager.AlternativeSpellingsColor,
+                    configManager.AlternativeSpellingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(5, 0, 0, 0));
@@ -711,8 +720,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock alternativeSpellingsTexBlock = PopupWindowUtils.CreateTextBlock(nameof(result.AlternativeSpellings),
                     alternativeSpellingsText,
-                    ConfigManager.AlternativeSpellingsColor,
-                    ConfigManager.AlternativeSpellingsFontSize,
+                    configManager.AlternativeSpellingsColor,
+                    configManager.AlternativeSpellingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(7, 0, 0, 0));
@@ -721,14 +730,14 @@ internal sealed partial class PopupWindow
             }
         }
 
-        if (result.DeconjugationProcess is not null && ConfigManager.DeconjugationInfoFontSize > 0)
+        if (result.DeconjugationProcess is not null && configManager.DeconjugationInfoFontSize > 0)
         {
             if (MiningMode)
             {
                 TextBox deconjugationProcessTextBox = PopupWindowUtils.CreateTextBox(nameof(result.DeconjugationProcess),
                     $"{result.MatchedText} {result.DeconjugationProcess}",
-                    ConfigManager.DeconjugationInfoColor,
-                    ConfigManager.DeconjugationInfoFontSize,
+                    configManager.DeconjugationInfoColor,
+                    configManager.DeconjugationInfoFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Top,
                     new Thickness(5, 0, 0, 0));
@@ -741,8 +750,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock deconjugationProcessTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.DeconjugationProcess),
                     $"{result.MatchedText} {result.DeconjugationProcess}",
-                    ConfigManager.DeconjugationInfoColor,
-                    ConfigManager.DeconjugationInfoFontSize,
+                    configManager.DeconjugationInfoColor,
+                    configManager.DeconjugationInfoFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Top,
                     new Thickness(7, 0, 0, 0));
@@ -760,8 +769,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock frequencyTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Frequencies),
                     LookupResultUtils.FrequenciesToText(validFrequencies, false, result.Frequencies.Count is 1),
-                    ConfigManager.FrequencyColor,
-                    ConfigManager.FrequencyFontSize,
+                    configManager.FrequencyColor,
+                    configManager.FrequencyFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Top,
                     new Thickness(7, 0, 0, 0));
@@ -770,12 +779,12 @@ internal sealed partial class PopupWindow
             }
         }
 
-        if (ConfigManager.DictTypeFontSize > 0)
+        if (configManager.DictTypeFontSize > 0)
         {
             TextBlock dictTypeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Dict.Name),
                 result.Dict.Name,
-                ConfigManager.DictTypeColor,
-                ConfigManager.DictTypeFontSize,
+                configManager.DictTypeColor,
+                configManager.DictTypeFontSize,
                 PopupContextMenu,
                 VerticalAlignment.Top,
                 new Thickness(7, 0, 0, 0));
@@ -792,8 +801,8 @@ internal sealed partial class PopupWindow
             {
                 TextBox definitionsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.FormattedDefinitions),
                     result.FormattedDefinitions,
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
@@ -806,8 +815,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock definitionsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.FormattedDefinitions),
                     result.FormattedDefinitions,
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -823,8 +832,8 @@ internal sealed partial class PopupWindow
             {
                 TextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.OnReadings),
                     $"On: {string.Join('、', result.OnReadings)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
@@ -838,8 +847,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock onReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.OnReadings),
                     $"On: {string.Join('、', result.OnReadings)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -854,8 +863,8 @@ internal sealed partial class PopupWindow
             {
                 TextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KunReadings),
                     $"Kun: {string.Join('、', result.KunReadings)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
@@ -869,8 +878,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock kunReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KunReadings),
                     $"Kun: {string.Join('、', result.KunReadings)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -885,8 +894,8 @@ internal sealed partial class PopupWindow
             {
                 TextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.NanoriReadings),
                     $"Nanori: {string.Join('、', result.NanoriReadings)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
@@ -900,8 +909,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock nanoriReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.NanoriReadings),
                     $"Nanori: {string.Join('、', result.NanoriReadings)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -916,8 +925,8 @@ internal sealed partial class PopupWindow
             {
                 TextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(result.RadicalNames),
                     $"Radical names: {string.Join('、', result.RadicalNames)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
@@ -931,8 +940,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock radicalNameTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.RadicalNames),
                     $"Radical names: {string.Join('、', result.RadicalNames)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -945,8 +954,8 @@ internal sealed partial class PopupWindow
         {
             TextBlock gradeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiGrade),
                 $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}",
-                ConfigManager.DefinitionsColor,
-                ConfigManager.DefinitionsFontSize,
+                configManager.DefinitionsColor,
+                configManager.DefinitionsFontSize,
                 PopupContextMenu,
                 VerticalAlignment.Center,
                 new Thickness(2));
@@ -958,8 +967,8 @@ internal sealed partial class PopupWindow
         {
             TextBlock strokeCountTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.StrokeCount),
                 string.Create(CultureInfo.InvariantCulture, $"Stroke count: {result.StrokeCount}"),
-                ConfigManager.DefinitionsColor,
-                ConfigManager.DefinitionsFontSize,
+                configManager.DefinitionsColor,
+                configManager.DefinitionsFontSize,
                 PopupContextMenu,
                 VerticalAlignment.Center,
                 new Thickness(2));
@@ -973,8 +982,8 @@ internal sealed partial class PopupWindow
             {
                 TextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KanjiComposition),
                     $"Composition: {result.KanjiComposition}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
@@ -988,8 +997,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock compositionTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiComposition),
                     $"Composition: {result.KanjiComposition}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -1004,8 +1013,8 @@ internal sealed partial class PopupWindow
             {
                 TextBox kanjiStatsTextBlock = PopupWindowUtils.CreateTextBox(nameof(result.KanjiStats),
                     $"Statistics:\n{result.KanjiStats}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
@@ -1019,8 +1028,8 @@ internal sealed partial class PopupWindow
             {
                 TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiStats),
                     $"Statistics:\n{result.KanjiStats}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
+                    configManager.DefinitionsColor,
+                    configManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -1034,7 +1043,7 @@ internal sealed partial class PopupWindow
             _ = bottom.Children.Add(new Separator
             {
                 Height = 2,
-                Background = ConfigManager.SeparatorColor,
+                Background = configManager.SeparatorColor,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Center
             });
@@ -1129,14 +1138,15 @@ internal sealed partial class PopupWindow
 
     private Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs? e)
     {
-        if (ConfigManager.InactiveLookupMode
-            || ConfigManager.LookupOnSelectOnly
-            || ConfigManager.LookupOnMouseClickOnly
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.InactiveLookupMode
+            || configManager.LookupOnSelectOnly
+            || configManager.LookupOnMouseClickOnly
             || e?.LeftButton is MouseButtonState.Pressed
             || PopupContextMenu.IsVisible
             || ReadingSelectionWindow.IsItVisible()
-            || (ConfigManager.RequireLookupKeyPress
-                && !ConfigManager.LookupKeyKeyGesture.IsPressed()))
+            || (configManager.RequireLookupKeyPress
+                && !configManager.LookupKeyKeyGesture.IsPressed()))
         {
             return Task.CompletedTask;
         }
@@ -1159,7 +1169,7 @@ internal sealed partial class PopupWindow
                 return ChildPopupWindow.LookupOnMouseMoveOrClick(textBox);
             }
 
-            if (ConfigManager.HighlightLongestMatch)
+            if (configManager.HighlightLongestMatch)
             {
                 WindowsUtils.Unselect(ChildPopupWindow._previousTextBox);
             }
@@ -1191,14 +1201,15 @@ internal sealed partial class PopupWindow
     // ReSharper disable once AsyncVoidMethod
     private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == ConfigManager.CopyPrimarySpellingToClipboardMouseButton)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (e.ChangedButton == configManager.CopyPrimarySpellingToClipboardMouseButton)
         {
             WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
             HidePopup();
             return;
         }
 
-        if (!MiningMode || e.ChangedButton != ConfigManager.MineMouseButton)
+        if (!MiningMode || e.ChangedButton != configManager.MineMouseButton)
         {
             return;
         }
@@ -1210,7 +1221,7 @@ internal sealed partial class PopupWindow
 
         HidePopup();
 
-        if (ConfigManager.MineToFileInsteadOfAnki)
+        if (configManager.MineToFileInsteadOfAnki)
         {
             await MiningUtils.MineToFile(LastLookupResults[listViewItemIndex], _currentText, formattedDefinitions, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
         }
@@ -1283,8 +1294,11 @@ internal sealed partial class PopupWindow
 
     public async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e)
     {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
         bool handled = false;
-        if (keyGesture.IsEqual(ConfigManager.DisableHotkeysKeyGesture))
+        if (keyGesture.IsEqual(configManager.DisableHotkeysKeyGesture))
         {
             if (e is not null)
             {
@@ -1293,27 +1307,27 @@ internal sealed partial class PopupWindow
 
             handled = true;
 
-            ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
+            configManager.DisableHotkeys = !configManager.DisableHotkeys;
 
-            if (ConfigManager.GlobalHotKeys)
+            if (configManager.GlobalHotKeys)
             {
-                if (ConfigManager.DisableHotkeys)
+                if (configManager.DisableHotkeys)
                 {
-                    WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+                    WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
                 }
                 else
                 {
-                    WinApi.RegisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+                    WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
                 }
             }
         }
 
-        if (ConfigManager.DisableHotkeys || handled)
+        if (configManager.DisableHotkeys || handled)
         {
             return;
         }
 
-        if (keyGesture.IsEqual(ConfigManager.MiningModeKeyGesture))
+        if (keyGesture.IsEqual(configManager.MiningModeKeyGesture))
         {
             handled = true;
 
@@ -1324,7 +1338,7 @@ internal sealed partial class PopupWindow
 
             EnableMiningMode();
 
-            if (ConfigManager.Focusable)
+            if (configManager.Focusable)
             {
                 _ = Activate();
             }
@@ -1333,45 +1347,45 @@ internal sealed partial class PopupWindow
 
             DisplayResults(true);
 
-            if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+            if (configManager.AutoHidePopupIfMouseIsNotOverIt)
             {
                 PopupWindowUtils.SetPopupAutoHideTimer();
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.PlayAudioKeyGesture))
+        else if (keyGesture.IsEqual(configManager.PlayAudioKeyGesture))
         {
             handled = true;
 
             await PlayAudio().ConfigureAwait(false);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ClosePopupKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
         {
             handled = true;
 
             HidePopup();
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.KanjiModeKeyGesture))
+        else if (keyGesture.IsEqual(configManager.KanjiModeKeyGesture))
         {
             handled = true;
 
-            CoreConfigManager.KanjiMode = !CoreConfigManager.KanjiMode;
+            coreConfigManager.KanjiMode = !coreConfigManager.KanjiMode;
             LastText = "";
 
-            if (this != MainWindow.Instance.FirstPopupWindow)
+            if (this != mainWindow.FirstPopupWindow)
             {
                 await HandleTextBoxMouseMove(_previousTextBox!, null).ConfigureAwait(false);
             }
 
             else
             {
-                await MainWindow.Instance.HandleMouseMove(null).ConfigureAwait(false);
+                await mainWindow.HandleMouseMove(null).ConfigureAwait(false);
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowAddNameWindowKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
             handled = true;
 
@@ -1386,7 +1400,7 @@ internal sealed partial class PopupWindow
 
                     else
                     {
-                        MainWindow.Instance.ShowAddNameWindow();
+                        mainWindow.ShowAddNameWindow();
                     }
 
                     HidePopup();
@@ -1401,7 +1415,7 @@ internal sealed partial class PopupWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowAddWordWindowKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowAddWordWindowKeyGesture))
         {
             handled = true;
 
@@ -1416,7 +1430,7 @@ internal sealed partial class PopupWindow
 
                     else
                     {
-                        MainWindow.Instance.ShowAddWordWindow();
+                        mainWindow.ShowAddWordWindow();
                     }
 
                     HidePopup();
@@ -1431,7 +1445,7 @@ internal sealed partial class PopupWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.SearchWithBrowserKeyGesture))
+        else if (keyGesture.IsEqual(configManager.SearchWithBrowserKeyGesture))
         {
             handled = true;
 
@@ -1444,7 +1458,7 @@ internal sealed partial class PopupWindow
 
                 else
                 {
-                    MainWindow.Instance.SearchWithBrowser();
+                    mainWindow.SearchWithBrowser();
                 }
 
                 HidePopup();
@@ -1456,21 +1470,21 @@ internal sealed partial class PopupWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.InactiveLookupModeKeyGesture))
+        else if (keyGesture.IsEqual(configManager.InactiveLookupModeKeyGesture))
         {
             handled = true;
 
-            ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
+            configManager.InactiveLookupMode = !configManager.InactiveLookupMode;
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.MotivationKeyGesture))
+        else if (keyGesture.IsEqual(configManager.MotivationKeyGesture))
         {
             handled = true;
 
             await WindowsUtils.Motivate().ConfigureAwait(false);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.NextDictKeyGesture))
+        else if (keyGesture.IsEqual(configManager.NextDictKeyGesture))
         {
             handled = true;
 
@@ -1498,7 +1512,7 @@ internal sealed partial class PopupWindow
             ClickDictTypeButton(nextButton ?? _buttonAll);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.PreviousDictKeyGesture))
+        else if (keyGesture.IsEqual(configManager.PreviousDictKeyGesture))
         {
             handled = true;
 
@@ -1542,34 +1556,34 @@ internal sealed partial class PopupWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ToggleMinimizedStateKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
             handled = true;
 
-            PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
+            PopupWindowUtils.HidePopups(mainWindow.FirstPopupWindow);
 
-            if (ConfigManager.Focusable)
+            if (configManager.Focusable)
             {
-                MainWindow.Instance.WindowState = MainWindow.Instance.WindowState is WindowState.Minimized
+                mainWindow.WindowState = mainWindow.WindowState is WindowState.Minimized
                     ? WindowState.Normal
                     : WindowState.Minimized;
             }
 
             else
             {
-                if (MainWindow.Instance.WindowState is WindowState.Minimized)
+                if (mainWindow.WindowState is WindowState.Minimized)
                 {
-                    WinApi.RestoreWindow(MainWindow.Instance.WindowHandle);
+                    WinApi.RestoreWindow(mainWindow.WindowHandle);
                 }
 
                 else
                 {
-                    WinApi.MinimizeWindow(MainWindow.Instance.WindowHandle);
+                    WinApi.MinimizeWindow(mainWindow.WindowHandle);
                 }
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.SelectedTextToSpeechKeyGesture))
+        else if (keyGesture.IsEqual(configManager.SelectedTextToSpeechKeyGesture))
         {
             handled = true;
 
@@ -1584,7 +1598,7 @@ internal sealed partial class PopupWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.SelectNextLookupResultKeyGesture))
+        else if (keyGesture.IsEqual(configManager.SelectNextLookupResultKeyGesture))
         {
             handled = true;
 
@@ -1594,7 +1608,7 @@ internal sealed partial class PopupWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.SelectPreviousLookupResultKeyGesture))
+        else if (keyGesture.IsEqual(configManager.SelectPreviousLookupResultKeyGesture))
         {
             handled = true;
 
@@ -1604,7 +1618,7 @@ internal sealed partial class PopupWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.MineSelectedLookupResultKeyGesture))
+        else if (keyGesture.IsEqual(configManager.MineSelectedLookupResultKeyGesture))
         {
             handled = true;
 
@@ -1617,7 +1631,7 @@ internal sealed partial class PopupWindow
 
                 HidePopup();
 
-                if (ConfigManager.MineToFileInsteadOfAnki)
+                if (configManager.MineToFileInsteadOfAnki)
                 {
                     await MiningUtils.MineToFile(LastLookupResults[index], _currentText, formattedDefinitions, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
                 }
@@ -1628,15 +1642,15 @@ internal sealed partial class PopupWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
         {
             handled = true;
 
-            ConfigManager.AlwaysShowMainTextBoxCaret = !ConfigManager.AlwaysShowMainTextBoxCaret;
-            MainWindow.Instance.MainTextBox.IsReadOnlyCaretVisible = ConfigManager.AlwaysShowMainTextBoxCaret;
+            configManager.AlwaysShowMainTextBoxCaret = !configManager.AlwaysShowMainTextBoxCaret;
+            mainWindow.MainTextBox.IsReadOnlyCaretVisible = configManager.AlwaysShowMainTextBoxCaret;
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.LookupSelectedTextKeyGesture))
+        else if (keyGesture.IsEqual(configManager.LookupSelectedTextKeyGesture))
         {
             handled = true;
 
@@ -1652,9 +1666,9 @@ internal sealed partial class PopupWindow
                     await ChildPopupWindow.LookupOnSelect(_lastInteractedTextBox).ConfigureAwait(false);
                 }
 
-                else if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+                else if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
                 {
-                    UpdatePosition(ConfigManager.FixedPopupXPosition, ConfigManager.FixedPopupYPosition);
+                    UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
                 }
 
                 else
@@ -1673,7 +1687,7 @@ internal sealed partial class PopupWindow
 
             else
             {
-                await MainWindow.Instance.FirstPopupWindow.LookupOnSelect(MainWindow.Instance.MainTextBox).ConfigureAwait(false);
+                await mainWindow.FirstPopupWindow.LookupOnSelect(mainWindow.MainTextBox).ConfigureAwait(false);
             }
         }
 
@@ -1688,8 +1702,7 @@ internal sealed partial class PopupWindow
         MiningMode = true;
 
         TitleBarGrid.Visibility = Visibility.Visible;
-
-        if (ConfigManager.ShowMiningModeReminder && this == MainWindow.Instance.FirstPopupWindow)
+        if (ConfigManager.Instance.ShowMiningModeReminder && this == MainWindow.Instance.FirstPopupWindow)
         {
             TextBlockMiningModeReminder.Visibility = Visibility.Visible;
         }
@@ -1713,8 +1726,9 @@ internal sealed partial class PopupWindow
 
     private void OnMouseEnter(object sender, MouseEventArgs e)
     {
-        if (!ConfigManager.LookupOnSelectOnly
-            && !ConfigManager.LookupOnMouseClickOnly
+        ConfigManager configManager = ConfigManager.Instance;
+        if (!configManager.LookupOnSelectOnly
+            && !configManager.LookupOnMouseClickOnly
             && ChildPopupWindow is { IsVisible: true, MiningMode: false })
         {
             ChildPopupWindow.HidePopup();
@@ -1731,7 +1745,7 @@ internal sealed partial class PopupWindow
         }
 
         if (UnavoidableMouseEnter
-            || (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow))
+            || (configManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow))
         {
             return;
         }
@@ -1745,10 +1759,11 @@ internal sealed partial class PopupWindow
         _lastInteractedTextBox = (TextBox)sender;
         LastSelectedText = _lastInteractedTextBox.SelectedText;
 
-        if (ConfigManager.InactiveLookupMode
-            || (ConfigManager.RequireLookupKeyPress && !ConfigManager.LookupKeyKeyGesture.IsPressed())
-            || ((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
-                && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton)))
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.InactiveLookupMode
+            || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
+            || ((!configManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
+                && (!configManager.LookupOnMouseClickOnly || e.ChangedButton != configManager.LookupOnClickMouseButton)))
         {
             return;
         }
@@ -1758,7 +1773,7 @@ internal sealed partial class PopupWindow
             Owner = this
         };
 
-        if (ConfigManager.LookupOnSelectOnly)
+        if (configManager.LookupOnSelectOnly)
         {
             await ChildPopupWindow.LookupOnSelect((TextBox)sender).ConfigureAwait(false);
         }
@@ -1783,7 +1798,7 @@ internal sealed partial class PopupWindow
 
         if (MiningMode)
         {
-            if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+            if (ConfigManager.Instance.AutoHidePopupIfMouseIsNotOverIt)
             {
                 if (PopupContextMenu.IsVisible
                     || ReadingSelectionWindow.IsItVisible()
@@ -1816,7 +1831,7 @@ internal sealed partial class PopupWindow
 
         foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
         {
-            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
+            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.Instance.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
             {
                 continue;
             }
@@ -1902,13 +1917,14 @@ internal sealed partial class PopupWindow
     {
         ReadingSelectionWindow.HideWindow();
 
+        ConfigManager configManager = ConfigManager.Instance;
         if (ChildPopupWindow is not null
             && e.ChangedButton is not MouseButton.Right
-            && e.ChangedButton != ConfigManager.MiningModeMouseButton)
+            && e.ChangedButton != configManager.MiningModeMouseButton)
         {
             PopupWindowUtils.HidePopups(ChildPopupWindow);
         }
-        else if (e.ChangedButton == ConfigManager.MiningModeMouseButton)
+        else if (e.ChangedButton == configManager.MiningModeMouseButton)
         {
             if (!MiningMode)
             {
@@ -1924,14 +1940,16 @@ internal sealed partial class PopupWindow
 
     public void HidePopup()
     {
-        bool isFirstPopup = this == MainWindow.Instance.FirstPopupWindow;
+        MainWindow mainWindow = MainWindow.Instance;
+        bool isFirstPopup = this == mainWindow.FirstPopupWindow;
 
+        ConfigManager configManager = ConfigManager.Instance;
         if (isFirstPopup
-            && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            && (configManager.TextOnlyVisibleOnHover || configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
             && !AddNameWindow.IsItVisible()
             && !AddWordWindow.IsItVisible())
         {
-            _ = MainWindow.Instance.ChangeVisibility().ConfigureAwait(true);
+            _ = mainWindow.ChangeVisibility().ConfigureAwait(true);
         }
 
         if (!IsVisible)
@@ -1978,9 +1996,9 @@ internal sealed partial class PopupWindow
 
         if (isFirstPopup)
         {
-            WinApi.ActivateWindow(MainWindow.Instance.WindowHandle);
+            WinApi.ActivateWindow(mainWindow.WindowHandle);
 
-            if (ConfigManager.HighlightLongestMatch && !MainWindow.Instance.ContextMenuIsOpening)
+            if (configManager.HighlightLongestMatch && !mainWindow.ContextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_previousTextBox);
             }
@@ -1994,7 +2012,7 @@ internal sealed partial class PopupWindow
                 WinApi.ActivateWindow(previousPopup.WindowHandle);
             }
 
-            if (ConfigManager.HighlightLongestMatch && !previousPopup._contextMenuIsOpening)
+            if (configManager.HighlightLongestMatch && !previousPopup._contextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_previousTextBox);
             }

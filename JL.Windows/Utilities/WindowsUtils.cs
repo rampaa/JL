@@ -39,15 +39,15 @@ namespace JL.Windows.Utilities;
 internal static class WindowsUtils
 {
     private static readonly Random s_random = new();
-    public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.PopupFont.Source);
+    public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
     private static DateTime s_lastAudioPlayTime;
     public static WaveOut? AudioPlayer { get; private set; }
 
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
 
     public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
-    public static double DpiAwareXOffset { get; set; } = ConfigManager.PopupXOffset * Dpi.DpiScaleX;
-    public static double DpiAwareYOffset { get; set; } = ConfigManager.PopupYOffset * Dpi.DpiScaleY;
+    public static double DpiAwareXOffset { get; set; } = ConfigManager.Instance.PopupXOffset * Dpi.DpiScaleX;
+    public static double DpiAwareYOffset { get; set; } = ConfigManager.Instance.PopupYOffset * Dpi.DpiScaleY;
 
     public static ComboBoxItem[] FindJapaneseFonts()
     {
@@ -148,7 +148,8 @@ internal static class WindowsUtils
         addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
-        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
         {
             WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
@@ -164,7 +165,8 @@ internal static class WindowsUtils
         addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
-        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
         {
             WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
@@ -175,14 +177,16 @@ internal static class WindowsUtils
     public static void ShowPreferencesWindow()
     {
         PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
-        ConfigManager.LoadPreferenceWindow(preferencesWindow);
-        preferencesWindow.Owner = MainWindow.Instance;
+        ConfigManager configManager = ConfigManager.Instance;
+        configManager.LoadPreferenceWindow(preferencesWindow);
+        MainWindow mainWindow = MainWindow.Instance;
+        preferencesWindow.Owner = mainWindow;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
-        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
 
         _ = preferencesWindow.ShowDialog();
@@ -208,13 +212,15 @@ internal static class WindowsUtils
         }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
-        manageDictionariesWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        manageDictionariesWindow.Owner = mainWindow;
         manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
-        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
 
         _ = manageDictionariesWindow.ShowDialog();
@@ -228,13 +234,15 @@ internal static class WindowsUtils
         }
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
-        manageFrequenciesWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        manageFrequenciesWindow.Owner = mainWindow;
         manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
-        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
 
         _ = manageFrequenciesWindow.ShowDialog();
@@ -246,12 +254,14 @@ internal static class WindowsUtils
         StatsUtils.StatsStopWatch.Reset();
 
         StatsWindow statsWindow = StatsWindow.Instance;
-        statsWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        statsWindow.Owner = mainWindow;
         statsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
-        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
 
         _ = statsWindow.ShowDialog();
@@ -265,13 +275,15 @@ internal static class WindowsUtils
         }
 
         ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
-        manageAudioSourcesWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        manageAudioSourcesWindow.Owner = mainWindow;
         manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StatsStopWatch.Stop();
 
-        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
 
         _ = manageAudioSourcesWindow.ShowDialog();
@@ -280,16 +292,17 @@ internal static class WindowsUtils
     public static void SearchWithBrowser(string? selectedText)
     {
         string browserPath = "";
-        if (!string.IsNullOrWhiteSpace(ConfigManager.BrowserPath))
+        ConfigManager configManager = ConfigManager.Instance;
+        if (!string.IsNullOrWhiteSpace(configManager.BrowserPath))
         {
-            browserPath = $"\"{ConfigManager.BrowserPath}\"";
+            browserPath = $"\"{configManager.BrowserPath}\"";
         }
 
         if (selectedText?.Length > 0)
         {
             string urlToBeSearched = Uri.IsWellFormedUriString(selectedText, UriKind.Absolute)
                 ? selectedText
-                : ConfigManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal);
+                : configManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal);
 
             _ = Process.Start(new ProcessStartInfo("cmd",
                 $"/c start \"\" {browserPath} \"{urlToBeSearched}\"")
@@ -345,7 +358,7 @@ internal static class WindowsUtils
 
         await Utils.CoreInitialize().ConfigureAwait(true);
 
-        if (CoreConfigManager.CheckForJLUpdatesOnStartUp)
+        if (CoreConfigManager.Instance.CheckForJLUpdatesOnStartUp)
         {
             PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
             preferencesWindow.CheckForJLUpdatesButton.IsEnabled = false;
@@ -627,10 +640,11 @@ internal static class WindowsUtils
             return;
         }
 
-        bool captureTextFromClipboard = CoreConfigManager.CaptureTextFromClipboard;
+        MainWindow mainWindow = MainWindow.Instance;
+        bool captureTextFromClipboard = CoreConfigManager.Instance.CaptureTextFromClipboard;
         if (captureTextFromClipboard)
         {
-            WinApi.UnsubscribeFromClipboardChanged(MainWindow.Instance.WindowHandle);
+            WinApi.UnsubscribeFromClipboardChanged(mainWindow.WindowHandle);
         }
 
         bool retry = true;
@@ -651,14 +665,16 @@ internal static class WindowsUtils
 
         if (captureTextFromClipboard)
         {
-            WinApi.SubscribeToClipboardChanged(MainWindow.Instance.WindowHandle);
+            WinApi.SubscribeToClipboardChanged(mainWindow.WindowHandle);
         }
     }
 
     public static void HandlePostCopy(string text, string? subsequentText, string? mergedText)
     {
         bool newText = mergedText is null;
-        if (ConfigManager.EnableBacklog)
+
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.EnableBacklog)
         {
             if (newText)
             {
@@ -670,13 +686,13 @@ internal static class WindowsUtils
             }
         }
 
-        if (ConfigManager.TextToSpeechOnTextChange
+        if (configManager.TextToSpeechOnTextChange
             && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
         {
             _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text).ConfigureAwait(false);
         }
 
-        string strippedText = ConfigManager.StripPunctuationBeforeCalculatingCharacterCount
+        string strippedText = configManager.StripPunctuationBeforeCalculatingCharacterCount
             ? JapaneseUtils.RemovePunctuation(subsequentText ?? text)
             : subsequentText ?? text;
 
@@ -693,27 +709,29 @@ internal static class WindowsUtils
 
     public static void UpdateMainWindowVisibility()
     {
-        if (!MainWindow.Instance.FirstPopupWindow.IsVisible)
+        ConfigManager configManager = ConfigManager.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        if (!mainWindow.FirstPopupWindow.IsVisible)
         {
-            if (!MainWindow.Instance.IsMouseOver)
+            if (!mainWindow.IsMouseOver)
             {
-                if (ConfigManager.TextOnlyVisibleOnHover)
+                if (configManager.TextOnlyVisibleOnHover)
                 {
-                    MainWindow.Instance.MainGrid.Opacity = 0;
+                    mainWindow.MainGrid.Opacity = 0;
                 }
 
-                if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+                if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
                 {
-                    MainWindow.Instance.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                    mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
                 }
             }
         }
 
         StatsUtils.StatsStopWatch.Start();
 
-        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
         {
-            WinApi.RegisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
     }
 
@@ -722,7 +740,7 @@ internal static class WindowsUtils
         ResourceDictionary resources = Application.Current.Resources;
 
         //resources.MergedDictionaries.Clear();
-        //resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) });
+        resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) });
         resources.MergedDictionaries.Add(new ResourceDictionary
         {
             Source = new Uri(string.Create(CultureInfo.InvariantCulture, $"pack://application:,,,/HandyControl;component/Themes/Skin{skin}.xaml"))

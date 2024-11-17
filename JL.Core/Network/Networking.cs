@@ -120,7 +120,7 @@ public static class Networking
     {
         await DictUpdater.AutoUpdateBuiltInDicts().ConfigureAwait(false);
 
-        if (CoreConfigManager.CheckForJLUpdatesOnStartUp)
+        if (CoreConfigManager.Instance.CheckForJLUpdatesOnStartUp)
         {
             await CheckForJLUpdates(true).ConfigureAwait(false);
         }

@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -149,7 +147,7 @@ internal sealed partial class PreferencesWindow
     // ReSharper disable once AsyncVoidMethod
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        await ConfigManager.SavePreferences(this).ConfigureAwait(true);
+        await ConfigManager.Instance.SavePreferences(this).ConfigureAwait(true);
         Close();
     }
 
@@ -208,7 +206,7 @@ internal sealed partial class PreferencesWindow
     {
         if (!SetAnkiConfig)
         {
-            if (CoreConfigManager.AnkiIntegration)
+            if (CoreConfigManager.Instance.AnkiIntegration)
             {
                 await SetPreviousMiningConfig().ConfigureAwait(true);
                 await PopulateDeckAndModelNames().ConfigureAwait(true);
@@ -226,23 +224,15 @@ internal sealed partial class PreferencesWindow
         CheckForJLUpdatesButton.IsEnabled = true;
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void ResetPreferencesButton_Click(object sender, RoutedEventArgs e)
+    private void ResetPreferencesButton_Click(object sender, RoutedEventArgs e)
     {
         ResetPreferencesButton.IsEnabled = false;
-        if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile? If you select yes, JL will be restarted.", "Reset preferences for the current profile?"))
+        if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile?", "Reset preferences for the current profile?"))
         {
-            await MainWindow.Instance.HandleAppClosing().ConfigureAwait(false);
-
-            ConfigDBManager.DeleteAllSettingsFromProfile("MainWindowTopPosition", "MainWindowLeftPosition");
-
-            _ = Process.Start(
-                new ProcessStartInfo("cmd",
-                    string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Restarter\" \"{Path.Join(Utils.ApplicationPath, "restart-helper.cmd")}\" {Environment.ProcessId}"))
-                {
-                    UseShellExecute = true,
-                    Verb = "runas"
-                });
+            IsEnabled = false;
+            ConfigManager.ResetConfigs();
+            MainWindow.Instance.UpdateLayout();
+            Close();
         }
         else
         {
@@ -460,7 +450,8 @@ internal sealed partial class PreferencesWindow
 
     public Task SaveMiningSetup()
     {
-        if (!CoreConfigManager.AnkiIntegration)
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        if (!coreConfigManager.AnkiIntegration)
         {
             return Task.CompletedTask;
         }
@@ -498,7 +489,7 @@ internal sealed partial class PreferencesWindow
 
         WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
         Utils.Logger.Error("Error saving AnkiConfig");
-        CoreConfigManager.AnkiIntegration = false;
+        coreConfigManager.AnkiIntegration = false;
         return Task.CompletedTask;
     }
 
@@ -585,7 +576,7 @@ internal sealed partial class PreferencesWindow
             string normalizedUrl = AnkiUriTextBox.Text
                 .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
                 .Replace("://localhost:", "://127.0.0.1:", StringComparison.Ordinal);
-            CoreConfigManager.AnkiConnectUri = new Uri(normalizedUrl);
+            CoreConfigManager.Instance.AnkiConnectUri = new Uri(normalizedUrl);
             AnkiUriTextBox.Text = normalizedUrl;
         }
 
@@ -656,10 +647,11 @@ internal sealed partial class PreferencesWindow
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
         }
 
+        ConfigManager configManager = ConfigManager.Instance;
         Application.Current.Dispatcher.Invoke(() =>
         {
-            ConfigManager.ApplyPreferences();
-            ConfigManager.LoadPreferenceWindow(this);
+            configManager.ApplyPreferences();
+            configManager.LoadPreferenceWindow(this);
         });
 
         RegexReplacerUtils.PopulateRegexReplacements();

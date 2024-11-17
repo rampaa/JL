@@ -35,7 +35,7 @@ internal sealed partial class StatsWindow
     {
         base.OnActivated(e);
 
-        if (ConfigManager.Focusable)
+        if (ConfigManager.Instance.Focusable)
         {
             WinApi.AllowActivation(_windowHandle);
         }

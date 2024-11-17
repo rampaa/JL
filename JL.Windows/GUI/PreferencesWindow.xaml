@@ -186,7 +186,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Width"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="MainWindowWidthNumericUpDown" Minimum="1"
+                            <hc:NumericUpDown x:Name="MainWindowWidthNumericUpDown" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -214,10 +214,33 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Reposition window to fixed right edge position on text change"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       ToolTip="Only takes effect if dynamic height is enabled"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="RepositionMainWindowOnTextChangeByRightPositionCheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Fixed right edge position"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="Specifies the right edge position of the main window relative to the active screen's origin.
+                                       &#10;This option takes effect only if the &quot;Reposition window to specified right position on text change&quot; option is enabled.
+                                       &#10;When set to -2, the main window will be positioned at the right edge of the screen.
+                                       &#10;When set to -1, the main window will be positioned at the right edge of the working area.
+                                       &#10;When set to 0, the main window will be centered horizontally on the screen.
+                                       &#10;Any other value sets the main window's right edge at that specified number of pixels from the left edge of the active screen." />
+                            <hc:NumericUpDown x:Name="MainWindowFixedRightPositionNumericUpDown" Minimum="-2"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Height"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="MainWindowHeightNumericUpDown" Minimum="1"
+                            <hc:NumericUpDown x:Name="MainWindowHeightNumericUpDown" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -242,6 +265,29 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowMinDynamicHeightNumericUpDown" Minimum="50"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Reposition window to fixed bottom position on text change"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       ToolTip="Only takes effect if dynamic width is enabled"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="RepositionMainWindowOnTextChangeByBottomPositionCheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Fixed bottom position"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="Specifies the bottom edge position of the main window relative to the active screen's origin.
+                                       &#10;This option takes effect only if the  &quot;Reposition window to specified bottom position on text change&quot; option is enabled.
+                                       &#10;When set to -2, the main window will be positioned at the bottom of the screen.
+                                       &#10;When set to -1, the main window will be positioned at the bottom of the working area.
+                                       &#10;When set to 0, the main window will be centered vertically on the screen.
+                                       &#10;Any other value sets the main window's bottom edge at that specified number of pixels from the top of the active screen." />
+                            <hc:NumericUpDown x:Name="MainWindowFixedBottomPositionNumericUpDown" Minimum="-2"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -285,14 +331,6 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowOpacityNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Hide all buttons when mouse is not over the title bar"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -475,6 +513,14 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowBackgroundOpacityOnUnhoverNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Hide all buttons when mouse is not over the title bar"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 

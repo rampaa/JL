@@ -15,201 +15,236 @@ using Microsoft.Data.Sqlite;
 
 namespace JL.Windows;
 
-internal static class ConfigManager
+internal sealed class ConfigManager
 {
+    public static ConfigManager Instance { get; private set; } = new();
+
     #region General
 
-    public static bool InactiveLookupMode { get; set; } // = false;
-    public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
-    public static bool RequireLookupKeyPress { get; private set; } // = false;
-    public static bool LookupOnSelectOnly { get; private set; } // = false;
-    public static bool LookupOnMouseClickOnly { get; private set; } // = false;
-    public static bool AutoAdjustFontSizesOnResolutionChange { get; private set; } // = false;
+    public bool InactiveLookupMode { get; set; } // = false;
+    public Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
+    public bool RequireLookupKeyPress { get; private set; } // = false;
+    public bool LookupOnSelectOnly { get; private set; } // = false;
+    public bool LookupOnMouseClickOnly { get; private set; } // = false;
+    public bool AutoAdjustFontSizesOnResolutionChange { get; private set; } // = false;
 
-    public static KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
-    public static bool HighlightLongestMatch { get; private set; } // = false;
-    public static bool AutoPlayAudio { get; private set; } // = false;
-    public static bool DisableHotkeys { get; set; } // = false;
-    public static bool Focusable { get; private set; } = true;
-    public static MouseButton MiningModeMouseButton { get; private set; } = MouseButton.Middle;
-    public static MouseButton LookupOnClickMouseButton { get; private set; } = MouseButton.Left;
+    public KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
+    public bool HighlightLongestMatch { get; private set; } // = false;
+    public bool AutoPlayAudio { get; private set; } // = false;
+    public bool DisableHotkeys { get; set; } // = false;
+    public bool Focusable { get; private set; } = true;
+    public MouseButton MiningModeMouseButton { get; private set; } = MouseButton.Middle;
+    public MouseButton LookupOnClickMouseButton { get; private set; } = MouseButton.Left;
 
     #endregion
 
     #region MainWindow
 
-    public static double MainWindowWidth { get; set; } = 800;
-    public static double MainWindowHeight { get; set; } = 200;
-    public static bool MainWindowDynamicHeight { get; private set; } = true;
-    public static bool MainWindowDynamicWidth { get; private set; } // = false;
-    public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
-    public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
-    public static bool AlwaysOnTop { get; set; } = true;
-    public static bool TextOnlyVisibleOnHover { get; set; } // = false;
-    public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } // = false;
-    public static double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100
-    public static bool TextBoxIsReadOnly { get; set; } = true;
-    public static bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
-    public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } // = false;
-    public static bool MainWindowFocusOnHover { get; private set; } // = false;
-    public static bool SteppedBacklogWithMouseWheel { get; private set; } = true;
-    public static bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } // = false;
-    public static bool EnableBacklog { get; private set; } = true;
-    public static bool AutoSaveBacklogBeforeClosing { get; private set; } // = false;
-    public static bool TextToSpeechOnTextChange { get; private set; } // = false;
-    public static bool HidePopupsOnTextChange { get; private set; } = true;
-    public static bool AlwaysShowMainTextBoxCaret { get; set; } // = false;
-    public static double MainWindowMaxDynamicWidth { get; set; } = 800;
-    public static double MainWindowMaxDynamicHeight { get; set; } = 269;
-    public static double MainWindowMinDynamicWidth { get; set; } = 100;
-    public static double MainWindowMinDynamicHeight { get; set; } = 50;
-    private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
-    private static bool HorizontallyCenterMainWindowText { get; set; } // = false;
-    public static bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
-    public static bool AllowPartialMatchingForTextMerge { get; private set; } = true; // = false;
-    public static double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
-    public static bool TextBoxUseCustomLineHeight { get; private set; } // = false;
-    public static double TextBoxCustomLineHeight { get; private set; } = 75;
-    public static Color MainTextBoxDropShadowEffectColor { get; private set; } = Colors.Black;
-    public static double MainTextBoxDropShadowEffectShadowDepth { get; private set; } = 1.3;
-    public static int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 4;
-    public static int MainTextBoxDropShadowEffectBlurOpacity { get; private set; } = 80;
-    public static int MainTextBoxDropShadowEffectDirection { get; private set; } = 320;
-    private static VerticalAlignment MainWindowTextVerticalAlignment { get; set; } = VerticalAlignment.Top;
+    public double MainWindowWidth { get; set; } = 800;
+    public double MainWindowHeight { get; set; } = 200;
+    public bool MainWindowDynamicHeight { get; private set; } = true;
+    public bool MainWindowDynamicWidth { get; private set; } // = false;
+    public Brush MainWindowTextColor { get; private set; } = Brushes.White;
+    public Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
+    public bool AlwaysOnTop { get; set; } = true;
+    public bool TextOnlyVisibleOnHover { get; set; } // = false;
+    public bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } // = false;
+    public double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100
+    public bool TextBoxIsReadOnly { get; set; } = true;
+    public bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
+    public bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } // = false;
+    public bool MainWindowFocusOnHover { get; private set; } // = false;
+    public bool SteppedBacklogWithMouseWheel { get; private set; } = true;
+    public bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } // = false;
+    public bool EnableBacklog { get; private set; } = true;
+    public bool AutoSaveBacklogBeforeClosing { get; private set; } // = false;
+    public bool TextToSpeechOnTextChange { get; private set; } // = false;
+    public bool HidePopupsOnTextChange { get; private set; } = true;
+    public bool AlwaysShowMainTextBoxCaret { get; set; } // = false;
+    public double MainWindowMaxDynamicWidth { get; set; } = 800;
+    public double MainWindowMaxDynamicHeight { get; set; } = 269;
+    public double MainWindowMinDynamicWidth { get; set; } = 100;
+    public double MainWindowMinDynamicHeight { get; set; } = 50;
+    private bool TextBoxApplyDropShadowEffect { get; set; } = true;
+    private bool HorizontallyCenterMainWindowText { get; set; } // = false;
+    public bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
+    public bool AllowPartialMatchingForTextMerge { get; private set; } // = false;
+    public double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
+    public bool TextBoxUseCustomLineHeight { get; private set; } // = false;
+    public double TextBoxCustomLineHeight { get; private set; } = 75;
+    public bool RepositionMainWindowOnTextChangeByBottomPosition { get; private set; } // = false;
+    public double MainWindowFixedBottomPosition { get; private set; } = -2;
+    public bool RepositionMainWindowOnTextChangeByRightPosition { get; private set; } // = false;
+    public double MainWindowFixedRightPosition { get; private set; } // = 0;
+    public Color MainTextBoxDropShadowEffectColor { get; private set; } = Colors.Black;
+    public double MainTextBoxDropShadowEffectShadowDepth { get; private set; } = 1.3;
+    public int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 4;
+    public int MainTextBoxDropShadowEffectBlurOpacity { get; private set; } = 80;
+    public int MainTextBoxDropShadowEffectDirection { get; private set; } = 320;
+    private VerticalAlignment MainWindowTextVerticalAlignment { get; set; } = VerticalAlignment.Top;
 
     #endregion
 
     #region Popup
 
-    public static FontFamily PopupFont { get; private set; } = new("Meiryo");
-    public static double PopupMaxWidth { get; set; } = 700;
-    public static double PopupMaxHeight { get; set; } = 520;
-    public static double PopupMinWidth { get; set; } // = 0;
-    public static double PopupMinHeight { get; set; } // = 0;
-    public static bool PopupDynamicHeight { get; private set; } = true;
-    public static bool PopupDynamicWidth { get; private set; } = true;
-    public static bool FixedPopupPositioning { get; private set; } // = false;
-    public static double FixedPopupXPosition { get; set; } // = 0;
-    public static double FixedPopupYPosition { get; set; } // = 0;
-    public static bool PopupFocusOnLookup { get; private set; } // = false;
-    public static bool ShowMiningModeReminder { get; private set; } = true;
-    public static bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
-    public static Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0))
+    public FontFamily PopupFont { get; private set; } = new("Meiryo");
+    public double PopupMaxWidth { get; set; } = 700;
+    public double PopupMaxHeight { get; set; } = 520;
+    public double PopupMinWidth { get; set; } // = 0;
+    public double PopupMinHeight { get; set; } // = 0;
+    public bool PopupDynamicHeight { get; private set; } = true;
+    public bool PopupDynamicWidth { get; private set; } = true;
+    public bool FixedPopupPositioning { get; private set; } // = false;
+    public double FixedPopupXPosition { get; set; } // = 0;
+    public double FixedPopupYPosition { get; set; } // = 0;
+    public bool PopupFocusOnLookup { get; private set; } // = false;
+    public bool ShowMiningModeReminder { get; private set; } = true;
+    public bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
+    public Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0))
     {
         Opacity = 0.8
     };
-    public static double PopupXOffset { get; set; } = 10;
-    public static double PopupYOffset { get; set; } = 20;
-    public static bool PositionPopupLeftOfCursor { get; private set; } // = false;
-    public static bool PositionPopupAboveCursor { get; private set; } // = false;
-    public static bool PopupFlipX { get; private set; } = true;
-    public static bool PopupFlipY { get; private set; } = true;
-    public static Brush PrimarySpellingColor { get; private set; } = Brushes.Chocolate;
-    public static double PrimarySpellingFontSize { get; set; } = 21;
-    public static Brush ReadingsColor { get; private set; } = Brushes.Goldenrod;
-    public static double ReadingsFontSize { get; set; } = 19;
-    public static Brush AlternativeSpellingsColor { get; private set; } = Brushes.LightYellow;
-    public static double AlternativeSpellingsFontSize { get; set; } = 17;
-    public static Brush DefinitionsColor { get; private set; } = Brushes.White;
-    public static double DefinitionsFontSize { get; set; } = 17;
-    public static Brush FrequencyColor { get; private set; } = Brushes.Yellow;
-    public static double FrequencyFontSize { get; set; } = 17;
-    public static Brush DeconjugationInfoColor { get; private set; } = Brushes.LightSteelBlue;
-    public static double DeconjugationInfoFontSize { get; set; } = 17;
-    public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
-    public static double DictTypeFontSize { get; set; } = 15;
-    public static Brush SeparatorColor { get; private set; } = Brushes.White;
-    public static bool HideDictTabsWithNoResults { get; private set; } = true;
-    public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } // = false;
-    public static double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
-    public static bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } // = false;
-    public static bool AutoLookupFirstTermWhenTextIsCopiedFromWebSocket { get; private set; } // = false;
-    public static bool AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized { get; private set; } = true;
-    public static MouseButton MineMouseButton { get; private set; } = MouseButton.Left;
-    public static MouseButton CopyPrimarySpellingToClipboardMouseButton { get; private set; } = MouseButton.Middle;
+    public double PopupXOffset { get; set; } = 10;
+    public double PopupYOffset { get; set; } = 20;
+    public bool PositionPopupLeftOfCursor { get; private set; } // = false;
+    public bool PositionPopupAboveCursor { get; private set; } // = false;
+    public bool PopupFlipX { get; private set; } = true;
+    public bool PopupFlipY { get; private set; } = true;
+    public Brush PrimarySpellingColor { get; private set; } = Brushes.Chocolate;
+    public double PrimarySpellingFontSize { get; set; } = 21;
+    public Brush ReadingsColor { get; private set; } = Brushes.Goldenrod;
+    public double ReadingsFontSize { get; set; } = 19;
+    public Brush AlternativeSpellingsColor { get; private set; } = Brushes.LightYellow;
+    public double AlternativeSpellingsFontSize { get; set; } = 17;
+    public Brush DefinitionsColor { get; private set; } = Brushes.White;
+    public double DefinitionsFontSize { get; set; } = 17;
+    public Brush FrequencyColor { get; private set; } = Brushes.Yellow;
+    public double FrequencyFontSize { get; set; } = 17;
+    public Brush DeconjugationInfoColor { get; private set; } = Brushes.LightSteelBlue;
+    public double DeconjugationInfoFontSize { get; set; } = 17;
+    public Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
+    public double DictTypeFontSize { get; set; } = 15;
+    public Brush SeparatorColor { get; private set; } = Brushes.White;
+    public bool HideDictTabsWithNoResults { get; private set; } = true;
+    public bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } // = false;
+    public double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
+    public bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } // = false;
+    public bool AutoLookupFirstTermWhenTextIsCopiedFromWebSocket { get; private set; } // = false;
+    public bool AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized { get; private set; } = true;
+    public MouseButton MineMouseButton { get; private set; } = MouseButton.Left;
+    public MouseButton CopyPrimarySpellingToClipboardMouseButton { get; private set; } = MouseButton.Middle;
 
     #endregion
 
     #region Hotkeys
 
-    public static KeyGesture DisableHotkeysKeyGesture { get; private set; } = new(Key.Pause, ModifierKeys.Alt);
-    public static KeyGesture MiningModeKeyGesture { get; private set; } = new(Key.M, ModifierKeys.Alt);
-    public static KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Alt);
-    public static KeyGesture KanjiModeKeyGesture { get; private set; } = new(Key.K, ModifierKeys.Alt);
-    public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
-    public static KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
-    public static KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Alt);
-    public static KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.N, ModifierKeys.Alt);
-    public static KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.W, ModifierKeys.Alt);
-    public static KeyGesture SearchWithBrowserKeyGesture { get; private set; } = new(Key.S, ModifierKeys.Alt);
-    public static KeyGesture MousePassThroughModeKeyGesture { get; private set; } = new(Key.T, ModifierKeys.Alt);
-    public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; private set; } = new(Key.Left, ModifierKeys.Alt);
-    public static KeyGesture SteppedBacklogForwardsKeyGesture { get; private set; } = new(Key.Right, ModifierKeys.Alt);
-    public static KeyGesture InactiveLookupModeKeyGesture { get; private set; } = new(Key.Q, ModifierKeys.Alt);
-    public static KeyGesture MotivationKeyGesture { get; private set; } = new(Key.O, ModifierKeys.Alt);
-    public static KeyGesture ClosePopupKeyGesture { get; private set; } = new(Key.Escape, ModifierKeys.Windows);
-    public static KeyGesture ShowStatsKeyGesture { get; private set; } = new(Key.Y, ModifierKeys.Alt);
-    public static KeyGesture NextDictKeyGesture { get; private set; } = new(Key.PageDown, ModifierKeys.Alt);
-    public static KeyGesture PreviousDictKeyGesture { get; private set; } = new(Key.PageUp, ModifierKeys.Alt);
-    public static KeyGesture AlwaysOnTopKeyGesture { get; private set; } = new(Key.J, ModifierKeys.Alt);
-    public static KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.U, ModifierKeys.Alt);
-    public static KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F10, ModifierKeys.Alt);
-    public static KeyGesture CaptureTextFromWebSocketKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Alt);
-    public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Alt);
-    public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Alt);
-    public static KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.A, ModifierKeys.Alt);
-    public static KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.X, ModifierKeys.Alt);
-    public static KeyGesture SelectedTextToSpeechKeyGesture { get; private set; } = new(Key.F6, ModifierKeys.Alt);
-    public static KeyGesture ToggleAlwaysShowMainTextBoxCaretKeyGesture { get; private set; } = new(Key.G, ModifierKeys.Alt);
-    public static KeyGesture MoveCaretLeftKeyGesture { get; private set; } = new(Key.NumPad4, ModifierKeys.Alt);
-    public static KeyGesture MoveCaretRightKeyGesture { get; private set; } = new(Key.NumPad6, ModifierKeys.Alt);
-    public static KeyGesture MoveCaretUpKeyGesture { get; private set; } = new(Key.NumPad8, ModifierKeys.Alt);
-    public static KeyGesture MoveCaretDownKeyGesture { get; private set; } = new(Key.NumPad2, ModifierKeys.Alt);
-    public static KeyGesture LookupTermAtCaretIndexKeyGesture { get; private set; } = new(Key.NumPad5, ModifierKeys.Alt);
-    public static KeyGesture LookupFirstTermKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
-    public static KeyGesture LookupSelectedTextKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
-    public static KeyGesture SelectNextLookupResultKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Alt);
-    public static KeyGesture SelectPreviousLookupResultKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Alt);
-    public static KeyGesture MineSelectedLookupResultKeyGesture { get; private set; } = new(Key.D5, ModifierKeys.Alt);
+    public KeyGesture DisableHotkeysKeyGesture { get; private set; } = new(Key.Pause, ModifierKeys.Alt);
+    public KeyGesture MiningModeKeyGesture { get; private set; } = new(Key.M, ModifierKeys.Alt);
+    public KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Alt);
+    public KeyGesture KanjiModeKeyGesture { get; private set; } = new(Key.K, ModifierKeys.Alt);
+    public KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
+    public KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
+    public KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Alt);
+    public KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.N, ModifierKeys.Alt);
+    public KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.W, ModifierKeys.Alt);
+    public KeyGesture SearchWithBrowserKeyGesture { get; private set; } = new(Key.S, ModifierKeys.Alt);
+    public KeyGesture MousePassThroughModeKeyGesture { get; private set; } = new(Key.T, ModifierKeys.Alt);
+    public KeyGesture SteppedBacklogBackwardsKeyGesture { get; private set; } = new(Key.Left, ModifierKeys.Alt);
+    public KeyGesture SteppedBacklogForwardsKeyGesture { get; private set; } = new(Key.Right, ModifierKeys.Alt);
+    public KeyGesture InactiveLookupModeKeyGesture { get; private set; } = new(Key.Q, ModifierKeys.Alt);
+    public KeyGesture MotivationKeyGesture { get; private set; } = new(Key.O, ModifierKeys.Alt);
+    public KeyGesture ClosePopupKeyGesture { get; private set; } = new(Key.Escape, ModifierKeys.Windows);
+    public KeyGesture ShowStatsKeyGesture { get; private set; } = new(Key.Y, ModifierKeys.Alt);
+    public KeyGesture NextDictKeyGesture { get; private set; } = new(Key.PageDown, ModifierKeys.Alt);
+    public KeyGesture PreviousDictKeyGesture { get; private set; } = new(Key.PageUp, ModifierKeys.Alt);
+    public KeyGesture AlwaysOnTopKeyGesture { get; private set; } = new(Key.J, ModifierKeys.Alt);
+    public KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.U, ModifierKeys.Alt);
+    public KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F10, ModifierKeys.Alt);
+    public KeyGesture CaptureTextFromWebSocketKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Alt);
+    public KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Alt);
+    public KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Alt);
+    public KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.A, ModifierKeys.Alt);
+    public KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.X, ModifierKeys.Alt);
+    public KeyGesture SelectedTextToSpeechKeyGesture { get; private set; } = new(Key.F6, ModifierKeys.Alt);
+    public KeyGesture ToggleAlwaysShowMainTextBoxCaretKeyGesture { get; private set; } = new(Key.G, ModifierKeys.Alt);
+    public KeyGesture MoveCaretLeftKeyGesture { get; private set; } = new(Key.NumPad4, ModifierKeys.Alt);
+    public KeyGesture MoveCaretRightKeyGesture { get; private set; } = new(Key.NumPad6, ModifierKeys.Alt);
+    public KeyGesture MoveCaretUpKeyGesture { get; private set; } = new(Key.NumPad8, ModifierKeys.Alt);
+    public KeyGesture MoveCaretDownKeyGesture { get; private set; } = new(Key.NumPad2, ModifierKeys.Alt);
+    public KeyGesture LookupTermAtCaretIndexKeyGesture { get; private set; } = new(Key.NumPad5, ModifierKeys.Alt);
+    public KeyGesture LookupFirstTermKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
+    public KeyGesture LookupSelectedTextKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
+    public KeyGesture SelectNextLookupResultKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Alt);
+    public KeyGesture SelectPreviousLookupResultKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Alt);
+    public KeyGesture MineSelectedLookupResultKeyGesture { get; private set; } = new(Key.D5, ModifierKeys.Alt);
 
     #endregion
 
     #region Advanced
 
-    public static int MaxSearchLength { get; private set; } = 37;
-    public static int MaxNumResultsNotInMiningMode { get; private set; } = 7;
-    public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
-    public static string BrowserPath { get; private set; } = "";
-    public static bool GlobalHotKeys { get; private set; } = true;
-    public static bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
-    public static bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
-    public static bool MineToFileInsteadOfAnki { get; private set; } // = false;
+    public int MaxSearchLength { get; private set; } = 37;
+    public int MaxNumResultsNotInMiningMode { get; private set; } = 7;
+    public string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
+    public string BrowserPath { get; private set; } = "";
+    public bool GlobalHotKeys { get; private set; } = true;
+    public bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
+    public bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
+    public bool MineToFileInsteadOfAnki { get; private set; } // = false;
 
     #endregion
 
     private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
     private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneJapaneseFontComboBoxItems(s_japaneseFonts);
-    private static SkinType Theme { get; set; } = SkinType.Dark;
+    private SkinType Theme { get; set; } = SkinType.Dark;
 
-    public static void ApplyPreferences()
+    private ConfigManager()
+    {
+    }
+
+    public static void ResetConfigs()
+    {
+        Instance.SaveBeforeClosing();
+        ConfigDBManager.DeleteAllSettingsFromProfile("MainWindowTopPosition", "MainWindowLeftPosition");
+
+        ConfigManager newInstance = new();
+        using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
+        {
+            ConfigDBManager.InsertSetting(connection, nameof(Theme), newInstance.Theme.ToString());
+            ConfigDBManager.InsertSetting(connection, nameof(StripPunctuationBeforeCalculatingCharacterCount), newInstance.StripPunctuationBeforeCalculatingCharacterCount.ToString());
+        }
+
+        newInstance.Theme = Instance.Theme;
+        newInstance.StripPunctuationBeforeCalculatingCharacterCount = Instance.StripPunctuationBeforeCalculatingCharacterCount;
+
+        Instance = newInstance;
+        CoreConfigManager.CreateNewCoreConfigManager();
+        Instance.ApplyPreferences();
+    }
+
+    public void ApplyPreferences()
     {
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-        CoreConfigManager.ApplyPreferences(connection);
+
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        coreConfigManager.ApplyPreferences(connection);
+
+        MainWindow mainWindow = MainWindow.Instance;
 
         SkinType theme = ConfigDBManager.GetValueFromConfig(connection, Theme, nameof(Theme), Enum.TryParse);
         if (theme != Theme)
         {
             Theme = theme;
             WindowsUtils.ChangeTheme(Theme);
+            mainWindow.UpdateLayout();
         }
 
-        if (CoreConfigManager.CaptureTextFromClipboard)
+        if (coreConfigManager.CaptureTextFromClipboard)
         {
-            WinApi.SubscribeToClipboardChanged(MainWindow.Instance.WindowHandle);
+            WinApi.SubscribeToClipboardChanged(mainWindow.WindowHandle);
         }
         else
         {
-            WinApi.UnsubscribeFromClipboardChanged(MainWindow.Instance.WindowHandle);
+            WinApi.UnsubscribeFromClipboardChanged(mainWindow.WindowHandle);
         }
 
         bool stripPunctuationBeforeCalculatingCharacterCount = StripPunctuationBeforeCalculatingCharacterCount;
@@ -253,7 +288,7 @@ internal static class ConfigManager
         CopyPrimarySpellingToClipboardMouseButton = ConfigDBManager.GetValueFromConfig(connection, CopyPrimarySpellingToClipboardMouseButton, nameof(CopyPrimarySpellingToClipboardMouseButton), Enum.TryParse);
 
         MainWindowTextVerticalAlignment = ConfigDBManager.GetValueFromConfig(connection, MainWindowTextVerticalAlignment, nameof(MainWindowTextVerticalAlignment), Enum.TryParse);
-        MainWindow.Instance.MainTextBox.VerticalContentAlignment = MainWindowTextVerticalAlignment;
+        mainWindow.MainTextBox.VerticalContentAlignment = MainWindowTextVerticalAlignment;
 
         AutoAdjustFontSizesOnResolutionChange = ConfigDBManager.GetValueFromConfig(connection, AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
         HighlightLongestMatch = ConfigDBManager.GetValueFromConfig(connection, HighlightLongestMatch, nameof(HighlightLongestMatch), bool.TryParse);
@@ -262,7 +297,7 @@ internal static class ConfigManager
         StopIncreasingTimeStatWhenMinimized = ConfigDBManager.GetValueFromConfig(connection, StopIncreasingTimeStatWhenMinimized, nameof(StopIncreasingTimeStatWhenMinimized), bool.TryParse);
         MineToFileInsteadOfAnki = ConfigDBManager.GetValueFromConfig(connection, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki), bool.TryParse);
         AlwaysOnTop = ConfigDBManager.GetValueFromConfig(connection, AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
-        MainWindow.Instance.Topmost = AlwaysOnTop;
+        mainWindow.Topmost = AlwaysOnTop;
 
         RequireLookupKeyPress = ConfigDBManager.GetValueFromConfig(connection, RequireLookupKeyPress, nameof(RequireLookupKeyPress), bool.TryParse);
         DisableHotkeys = ConfigDBManager.GetValueFromConfig(connection, DisableHotkeys, nameof(DisableHotkeys), bool.TryParse);
@@ -270,11 +305,11 @@ internal static class ConfigManager
         Focusable = ConfigDBManager.GetValueFromConfig(connection, Focusable, nameof(Focusable), bool.TryParse);
         if (Focusable)
         {
-            WinApi.AllowActivation(MainWindow.Instance.WindowHandle);
+            WinApi.AllowActivation(mainWindow.WindowHandle);
         }
         else
         {
-            WinApi.PreventActivation(MainWindow.Instance.WindowHandle);
+            WinApi.PreventActivation(mainWindow.WindowHandle);
         }
 
         PopupFocusOnLookup = ConfigDBManager.GetValueFromConfig(connection, PopupFocusOnLookup, nameof(PopupFocusOnLookup), bool.TryParse);
@@ -298,20 +333,20 @@ internal static class ConfigManager
         AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized), bool.TryParse);
 
         TextBoxIsReadOnly = ConfigDBManager.GetValueFromConfig(connection, TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
-        if (MainWindow.Instance.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
+        if (mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
         {
-            MainWindow.Instance.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
-            MainWindow.Instance.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
-            MainWindow.Instance.MainTextBox.AcceptsReturn = !TextBoxIsReadOnly;
-            MainWindow.Instance.MainTextBox.AcceptsTab = !TextBoxIsReadOnly;
-            MainWindow.Instance.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
+            mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
+            mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
+            mainWindow.MainTextBox.AcceptsReturn = !TextBoxIsReadOnly;
+            mainWindow.MainTextBox.AcceptsTab = !TextBoxIsReadOnly;
+            mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
         }
 
         AlwaysShowMainTextBoxCaret = ConfigDBManager.GetValueFromConfig(connection, AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret), bool.TryParse);
-        MainWindow.Instance.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
+        mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
 
         HorizontallyCenterMainWindowText = ConfigDBManager.GetValueFromConfig(connection, HorizontallyCenterMainWindowText, nameof(HorizontallyCenterMainWindowText), bool.TryParse);
-        MainWindow.Instance.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
+        mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
             ? HorizontalAlignment.Center
             : HorizontalAlignment.Left;
 
@@ -332,14 +367,14 @@ internal static class ConfigManager
         AllowPartialMatchingForTextMerge = ConfigDBManager.GetValueFromConfig(connection, AllowPartialMatchingForTextMerge, nameof(AllowPartialMatchingForTextMerge), bool.TryParse);
 
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = ConfigDBManager.GetValueFromConfig(connection, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
-        MainWindow.Instance.ChangeVisibilityOfTitleBarButtons();
+        mainWindow.ChangeVisibilityOfTitleBarButtons();
 
         MainTextBoxDropShadowEffectShadowDepth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainTextBoxDropShadowEffectShadowDepth, nameof(MainTextBoxDropShadowEffectShadowDepth), double.TryParse);
         MainTextBoxDropShadowEffectDirection = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectDirection, nameof(MainTextBoxDropShadowEffectDirection), int.TryParse);
         MainTextBoxDropShadowEffectBlurRadius = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectBlurRadius, nameof(MainTextBoxDropShadowEffectBlurRadius), int.TryParse);
         MainTextBoxDropShadowEffectBlurOpacity = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectBlurOpacity, nameof(MainTextBoxDropShadowEffectBlurOpacity), int.TryParse);
-        MainTextBoxDropShadowEffectColor = GetColorFromConfig(connection, MainTextBoxDropShadowEffectColor, nameof(MainTextBoxDropShadowEffectColor));
         TextBoxApplyDropShadowEffect = ConfigDBManager.GetValueFromConfig(connection, TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect), bool.TryParse);
+        MainTextBoxDropShadowEffectColor = ConfigUtils.GetColorFromConfig(connection, MainTextBoxDropShadowEffectColor, nameof(MainTextBoxDropShadowEffectColor));
         if (TextBoxApplyDropShadowEffect)
         {
             DropShadowEffect dropShadowEffect = new()
@@ -353,12 +388,12 @@ internal static class ConfigManager
             };
 
             dropShadowEffect.Freeze();
-            MainWindow.Instance.MainTextBox.Effect = dropShadowEffect;
+            mainWindow.MainTextBox.Effect = dropShadowEffect;
         }
 
         else
         {
-            MainWindow.Instance.MainTextBox.Effect = null;
+            mainWindow.MainTextBox.Effect = null;
         }
 
         MaxSearchLength = ConfigDBManager.GetValueFromConfig(connection, MaxSearchLength, nameof(MaxSearchLength), int.TryParse);
@@ -376,13 +411,13 @@ internal static class ConfigManager
         TextBoxCustomLineHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, TextBoxCustomLineHeight, nameof(TextBoxCustomLineHeight), double.TryParse);
         if (TextBoxUseCustomLineHeight)
         {
-            MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.BlockLineHeight);
-            MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineHeightProperty, TextBoxCustomLineHeight);
+            mainWindow.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.BlockLineHeight);
+            mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, TextBoxCustomLineHeight);
         }
         else
         {
-            MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.MaxHeight);
-            MainWindow.Instance.MainTextBox.SetValue(TextBlock.LineHeightProperty, double.NaN);
+            mainWindow.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.MaxHeight);
+            mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, double.NaN);
         }
 
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
@@ -403,8 +438,8 @@ internal static class ConfigManager
         FixedPopupXPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FixedPopupXPosition, nameof(FixedPopupXPosition), double.TryParse);
         FixedPopupYPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FixedPopupYPosition, nameof(FixedPopupYPosition), double.TryParse);
 
-        MainWindow.Instance.OpacitySlider.Value = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.OpacitySlider.Value, "MainWindowOpacity", double.TryParse);
-        MainWindow.Instance.FontSizeSlider.Value = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.FontSizeSlider.Value, "MainWindowFontSize", double.TryParse);
+        mainWindow.OpacitySlider.Value = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, mainWindow.OpacitySlider.Value, "MainWindowOpacity", double.TryParse);
+        mainWindow.FontSizeSlider.Value = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, mainWindow.FontSizeSlider.Value, "MainWindowFontSize", double.TryParse);
         MainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowBackgroundOpacityOnUnhover, nameof(MainWindowBackgroundOpacityOnUnhover), double.TryParse);
 
         MainWindowHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowHeight, nameof(MainWindowHeight), double.TryParse);
@@ -413,55 +448,61 @@ internal static class ConfigManager
         MainWindowMaxDynamicHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMaxDynamicHeight, nameof(MainWindowMaxDynamicHeight), double.TryParse);
         MainWindowMinDynamicWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMinDynamicWidth, nameof(MainWindowMinDynamicWidth), double.TryParse);
         MainWindowMinDynamicHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMinDynamicHeight, nameof(MainWindowMinDynamicHeight), double.TryParse);
-        WindowsUtils.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowMinDynamicWidth, MainWindowMinDynamicHeight, MainWindowWidth, MainWindowHeight, MainWindow.Instance);
-        MainWindow.Instance.WidthBeforeResolutionChange = MainWindowWidth;
-        MainWindow.Instance.HeightBeforeResolutionChange = MainWindowHeight;
+        WindowsUtils.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowMinDynamicWidth, MainWindowMinDynamicHeight, MainWindowWidth, MainWindowHeight, mainWindow);
+        mainWindow.WidthBeforeResolutionChange = MainWindowWidth;
+        mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
 
-        double mainWindowTop = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.Top, "MainWindowTopPosition", double.TryParse);
-        double mainWindowLeft = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindow.Instance.Left, "MainWindowLeftPosition", double.TryParse);
-        WinApi.MoveWindowToPosition(MainWindow.Instance.WindowHandle, mainWindowLeft, mainWindowTop);
+        double mainWindowTop = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, mainWindow.Top, "MainWindowTopPosition", double.TryParse);
+        double mainWindowLeft = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, mainWindow.Left, "MainWindowLeftPosition", double.TryParse);
+        WinApi.MoveWindowToPosition(mainWindow.WindowHandle, mainWindowLeft, mainWindowTop);
 
-        MainWindow.Instance.TopPositionBeforeResolutionChange = MainWindow.Instance.Top;
-        MainWindow.Instance.LeftPositionBeforeResolutionChange = MainWindow.Instance.Left;
+        mainWindow.TopPositionBeforeResolutionChange = mainWindow.Top;
+        mainWindow.LeftPositionBeforeResolutionChange = mainWindow.Left;
 
-        MainWindow.Instance.MainGrid.Opacity = TextOnlyVisibleOnHover && !MainWindow.Instance.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0 : 1;
+        RepositionMainWindowOnTextChangeByBottomPosition = ConfigDBManager.GetValueFromConfig(connection, RepositionMainWindowOnTextChangeByBottomPosition, nameof(RepositionMainWindowOnTextChangeByBottomPosition), bool.TryParse);
+        RepositionMainWindowOnTextChangeByRightPosition = ConfigDBManager.GetValueFromConfig(connection, RepositionMainWindowOnTextChangeByRightPosition, nameof(RepositionMainWindowOnTextChangeByRightPosition), bool.TryParse);
+        MainWindowFixedBottomPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowFixedBottomPosition, nameof(MainWindowFixedBottomPosition), double.TryParse);
+        MainWindowFixedRightPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowFixedRightPosition, nameof(MainWindowFixedRightPosition), double.TryParse);
+        mainWindow.UpdatePosition();
+
+        mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0 : 1;
 
         // MAKE SURE YOU FREEZE ANY NEW FREEZABLE OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
-        MainWindowTextColor = GetFrozenBrushFromConfig(connection, MainWindowTextColor, nameof(MainWindowTextColor));
-        MainWindowBacklogTextColor = GetFrozenBrushFromConfig(connection, MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
+        MainWindowTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, MainWindowTextColor, nameof(MainWindowTextColor));
+        MainWindowBacklogTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
 
-        MainWindow.Instance.MainTextBox.Foreground = !EnableBacklog || MainWindow.Instance.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
+        mainWindow.MainTextBox.Foreground = !EnableBacklog || mainWindow.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
             ? MainWindowTextColor
             : MainWindowBacklogTextColor;
 
-        MainWindow.Instance.MainTextBox.CaretBrush = MainWindowTextColor;
+        mainWindow.MainTextBox.CaretBrush = MainWindowTextColor;
 
-        PrimarySpellingColor = GetFrozenBrushFromConfig(connection, PrimarySpellingColor, nameof(PrimarySpellingColor));
-        ReadingsColor = GetFrozenBrushFromConfig(connection, ReadingsColor, nameof(ReadingsColor));
-        AlternativeSpellingsColor = GetFrozenBrushFromConfig(connection, AlternativeSpellingsColor, nameof(AlternativeSpellingsColor));
-        DefinitionsColor = GetFrozenBrushFromConfig(connection, DefinitionsColor, nameof(DefinitionsColor));
-        FrequencyColor = GetFrozenBrushFromConfig(connection, FrequencyColor, nameof(FrequencyColor));
-        DeconjugationInfoColor = GetFrozenBrushFromConfig(connection, DeconjugationInfoColor, nameof(DeconjugationInfoColor));
+        PrimarySpellingColor = ConfigUtils.GetFrozenBrushFromConfig(connection, PrimarySpellingColor, nameof(PrimarySpellingColor));
+        ReadingsColor = ConfigUtils.GetFrozenBrushFromConfig(connection, ReadingsColor, nameof(ReadingsColor));
+        AlternativeSpellingsColor = ConfigUtils.GetFrozenBrushFromConfig(connection, AlternativeSpellingsColor, nameof(AlternativeSpellingsColor));
+        DefinitionsColor = ConfigUtils.GetFrozenBrushFromConfig(connection, DefinitionsColor, nameof(DefinitionsColor));
+        FrequencyColor = ConfigUtils.GetFrozenBrushFromConfig(connection, FrequencyColor, nameof(FrequencyColor));
+        DeconjugationInfoColor = ConfigUtils.GetFrozenBrushFromConfig(connection, DeconjugationInfoColor, nameof(DeconjugationInfoColor));
 
-        SeparatorColor = GetFrozenBrushFromConfig(connection, SeparatorColor, nameof(SeparatorColor));
+        SeparatorColor = ConfigUtils.GetFrozenBrushFromConfig(connection, SeparatorColor, nameof(SeparatorColor));
 
-        DictTypeColor = GetFrozenBrushFromConfig(connection, DictTypeColor, nameof(DictTypeColor));
+        DictTypeColor = ConfigUtils.GetFrozenBrushFromConfig(connection, DictTypeColor, nameof(DictTypeColor));
 
-        HighlightColor = GetFrozenBrushFromConfig(connection, HighlightColor, nameof(HighlightColor));
-        MainWindow.Instance.MainTextBox.SelectionBrush = HighlightColor;
+        HighlightColor = ConfigUtils.GetFrozenBrushFromConfig(connection, HighlightColor, nameof(HighlightColor));
+        mainWindow.MainTextBox.SelectionBrush = HighlightColor;
 
-        PopupBackgroundColor = GetBrushFromConfig(connection, PopupBackgroundColor, nameof(PopupBackgroundColor));
+        PopupBackgroundColor = ConfigUtils.GetBrushFromConfig(connection, PopupBackgroundColor, nameof(PopupBackgroundColor));
         PopupBackgroundColor.Opacity = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, 80.0, "PopupOpacity", double.TryParse) / 100;
         PopupBackgroundColor.Freeze();
 
-        MainWindow.Instance.Background = GetBrushFromConfig(connection, MainWindow.Instance.Background, "MainWindowBackgroundColor");
+        mainWindow.Background = ConfigUtils.GetBrushFromConfig(connection, mainWindow.Background, "MainWindowBackgroundColor");
 
-        MainWindow.Instance.Background.Opacity = ChangeMainWindowBackgroundOpacityOnUnhover && !MainWindow.Instance.IsMouseOver && !PreferencesWindow.IsItVisible()
+        mainWindow.Background.Opacity = ChangeMainWindowBackgroundOpacityOnUnhover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible()
             ? MainWindowBackgroundOpacityOnUnhover / 100
-            : MainWindow.Instance.OpacitySlider.Value / 100;
+            : mainWindow.OpacitySlider.Value / 100;
 
-        WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+        WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         KeyGestureUtils.GlobalKeyGestureDict.Clear();
         KeyGestureUtils.GlobalKeyGestureNameToIntDict.Clear();
 
@@ -531,17 +572,17 @@ internal static class ConfigManager
 
         if (GlobalHotKeys && !DisableHotkeys)
         {
-            WinApi.RegisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
 
-        MainWindow.Instance.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
-        MainWindow.Instance.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);
-        MainWindow.Instance.SearchMenuItem.SetInputGestureText(SearchWithBrowserKeyGesture);
-        MainWindow.Instance.PreferencesMenuItem.SetInputGestureText(ShowPreferencesWindowKeyGesture);
-        MainWindow.Instance.ManageDictionariesMenuItem.SetInputGestureText(ShowManageDictionariesWindowKeyGesture);
-        MainWindow.Instance.ManageFrequenciesMenuItem.SetInputGestureText(ShowManageFrequenciesWindowKeyGesture);
-        MainWindow.Instance.ManageAudioSourcesMenuItem.SetInputGestureText(ShowManageAudioSourcesWindowKeyGesture);
-        MainWindow.Instance.StatsMenuItem.SetInputGestureText(ShowStatsKeyGesture);
+        mainWindow.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
+        mainWindow.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);
+        mainWindow.SearchMenuItem.SetInputGestureText(SearchWithBrowserKeyGesture);
+        mainWindow.PreferencesMenuItem.SetInputGestureText(ShowPreferencesWindowKeyGesture);
+        mainWindow.ManageDictionariesMenuItem.SetInputGestureText(ShowManageDictionariesWindowKeyGesture);
+        mainWindow.ManageFrequenciesMenuItem.SetInputGestureText(ShowManageFrequenciesWindowKeyGesture);
+        mainWindow.ManageAudioSourcesMenuItem.SetInputGestureText(ShowManageAudioSourcesWindowKeyGesture);
+        mainWindow.StatsMenuItem.SetInputGestureText(ShowStatsKeyGesture);
 
         {
             string? searchUrlStr = ConfigDBManager.GetSettingValue(connection, nameof(SearchUrl));
@@ -586,7 +627,7 @@ internal static class ConfigManager
 
         {
             string mainWindowFontStr = ConfigDBManager.GetValueFromConfig(connection, "Meiryo", "MainWindowFont");
-            MainWindow.Instance.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
+            mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
         }
 
         {
@@ -678,7 +719,7 @@ internal static class ConfigManager
             WindowsUtils.PopupFontTypeFace = new Typeface(popupFontStr);
         }
 
-        PopupWindow? currentPopupWindow = MainWindow.Instance.FirstPopupWindow;
+        PopupWindow? currentPopupWindow = mainWindow.FirstPopupWindow;
         while (currentPopupWindow is not null)
         {
             currentPopupWindow.Background = PopupBackgroundColor;
@@ -695,7 +736,7 @@ internal static class ConfigManager
         }
     }
 
-    public static void LoadPreferenceWindow(PreferencesWindow preferenceWindow)
+    public void LoadPreferenceWindow(PreferencesWindow preferenceWindow)
     {
         ConfigDBManager.CreateDB();
 
@@ -778,8 +819,10 @@ internal static class ConfigManager
         preferenceWindow.SelectedTextToSpeechTextBox.Text =
             SelectedTextToSpeechKeyGesture.ToFormattedString();
 
+        MainWindow mainWindow = MainWindow.Instance;
+
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
-        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, MainWindow.Instance.Background.CloneCurrentValue());
+        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
         WindowsUtils.SetButtonColor(preferenceWindow.TextBoxTextColorButton, MainWindowTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.TextBoxBacklogTextColorButton, MainWindowBacklogTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainTextBoxDropShadowEffectColorButton, MainTextBoxDropShadowEffectColor);
@@ -793,19 +836,21 @@ internal static class ConfigManager
         WindowsUtils.SetButtonColor(preferenceWindow.SeparatorColorButton, SeparatorColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DictTypeColorButton, DictTypeColor);
 
+
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         preferenceWindow.SearchUrlTextBox.Text = SearchUrl;
         preferenceWindow.BrowserPathTextBox.Text = BrowserPath;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
-        preferenceWindow.AnkiUriTextBox.Text = CoreConfigManager.AnkiConnectUri.OriginalString;
-        preferenceWindow.WebSocketUriTextBox.Text = CoreConfigManager.WebSocketUri.OriginalString;
-        preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = CoreConfigManager.ForceSyncAnki;
-        preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = CoreConfigManager.AllowDuplicateCards;
-        preferenceWindow.LookupRateNumericUpDown.Value = CoreConfigManager.LookupRate;
-        preferenceWindow.KanjiModeCheckBox.IsChecked = CoreConfigManager.KanjiMode;
+        preferenceWindow.AnkiUriTextBox.Text = coreConfigManager.AnkiConnectUri.OriginalString;
+        preferenceWindow.WebSocketUriTextBox.Text = coreConfigManager.WebSocketUri.OriginalString;
+        preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
+        preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;
+        preferenceWindow.LookupRateNumericUpDown.Value = coreConfigManager.LookupRate;
+        preferenceWindow.KanjiModeCheckBox.IsChecked = coreConfigManager.KanjiMode;
         preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
-        preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CoreConfigManager.CheckForJLUpdatesOnStartUp;
+        preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = coreConfigManager.CheckForJLUpdatesOnStartUp;
         preferenceWindow.GlobalHotKeysCheckBox.IsChecked = GlobalHotKeys;
         preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked = StopIncreasingTimeStatWhenMinimized;
         preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked = StripPunctuationBeforeCalculatingCharacterCount;
@@ -815,8 +860,8 @@ internal static class ConfigManager
         preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
         preferenceWindow.FocusableCheckBox.IsChecked = Focusable;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
-        preferenceWindow.AnkiIntegrationCheckBox.IsChecked = CoreConfigManager.AnkiIntegration;
-        preferenceWindow.LookupRateNumericUpDown.Value = CoreConfigManager.LookupRate;
+        preferenceWindow.AnkiIntegrationCheckBox.IsChecked = coreConfigManager.AnkiIntegration;
+        preferenceWindow.LookupRateNumericUpDown.Value = coreConfigManager.LookupRate;
 
         preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked = MainWindowDynamicWidth;
         preferenceWindow.MainWindowDynamicHeightCheckBox.IsChecked = MainWindowDynamicHeight;
@@ -828,8 +873,8 @@ internal static class ConfigManager
 
         preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
         preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
-        preferenceWindow.TextBoxFontSizeNumericUpDown.Value = MainWindow.Instance.FontSizeSlider.Value;
-        preferenceWindow.MainWindowOpacityNumericUpDown.Value = MainWindow.Instance.OpacitySlider.Value;
+        preferenceWindow.TextBoxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
+        preferenceWindow.MainWindowOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
 
         preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked = ChangeMainWindowBackgroundOpacityOnUnhover;
         preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value = MainWindowBackgroundOpacityOnUnhover;
@@ -841,12 +886,12 @@ internal static class ConfigManager
 
         preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked = TextBoxIsReadOnly;
         preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked = AlwaysShowMainTextBoxCaret;
-        preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = CoreConfigManager.TextBoxTrimWhiteSpaceCharacters;
-        preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = CoreConfigManager.TextBoxRemoveNewlines;
+        preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = coreConfigManager.TextBoxTrimWhiteSpaceCharacters;
+        preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = coreConfigManager.TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
-        preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CoreConfigManager.CaptureTextFromClipboard;
-        preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CoreConfigManager.CaptureTextFromWebSocket;
-        preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked = CoreConfigManager.AutoReconnectToWebSocket;
+        preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = coreConfigManager.CaptureTextFromClipboard;
+        preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = coreConfigManager.CaptureTextFromWebSocket;
+        preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked = coreConfigManager.AutoReconnectToWebSocket;
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked = OnlyCaptureTextWithJapaneseChars;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
@@ -861,8 +906,8 @@ internal static class ConfigManager
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, static f =>
-            f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f =>
+            f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
 
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
@@ -871,7 +916,7 @@ internal static class ConfigManager
 
         preferenceWindow.PopupFontComboBox.ItemsSource = s_popupJapaneseFonts;
         preferenceWindow.PopupFontComboBox.SelectedIndex =
-            Array.FindIndex(s_popupJapaneseFonts, static f => f.Content.ToString() == PopupFont.Source);
+            Array.FindIndex(s_popupJapaneseFonts, f => f.Content.ToString() == PopupFont.Source);
 
         if (preferenceWindow.PopupFontComboBox.SelectedIndex < 0)
         {
@@ -892,6 +937,8 @@ internal static class ConfigManager
         preferenceWindow.FixedPopupYPositionNumericUpDown.Value = FixedPopupYPosition;
         preferenceWindow.PopupDynamicHeightCheckBox.IsChecked = PopupDynamicHeight;
         preferenceWindow.PopupDynamicWidthCheckBox.IsChecked = PopupDynamicWidth;
+        preferenceWindow.RepositionMainWindowOnTextChangeByBottomPositionCheckBox.IsChecked = RepositionMainWindowOnTextChangeByBottomPosition;
+        preferenceWindow.RepositionMainWindowOnTextChangeByRightPositionCheckBox.IsChecked = RepositionMainWindowOnTextChangeByRightPosition;
 
         preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value = AlternativeSpellingsFontSize;
         preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value = DeconjugationInfoFontSize;
@@ -907,6 +954,8 @@ internal static class ConfigManager
         preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked = PopupFocusOnLookup;
         preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
         preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
+        preferenceWindow.MainWindowFixedRightPositionNumericUpDown.Value = MainWindowFixedRightPosition;
+        preferenceWindow.MainWindowFixedBottomPositionNumericUpDown.Value = MainWindowFixedBottomPosition;
 
         if (preferenceWindow.LookupModeComboBox.SelectedIndex < 0)
         {
@@ -939,7 +988,7 @@ internal static class ConfigManager
         preferenceWindow.LookupModeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "LookupMode");
     }
 
-    public static async Task SavePreferences(PreferencesWindow preferenceWindow)
+    public async Task SavePreferences(PreferencesWindow preferenceWindow)
     {
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(true))
@@ -1027,9 +1076,9 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MaxSearchLength),
                 preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiConnectUri), preferenceWindow.AnkiUriTextBox.Text);
-
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.WebSocketUri), preferenceWindow.WebSocketUriTextBox.Text);
+            CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.AnkiConnectUri), preferenceWindow.AnkiUriTextBox.Text);
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.WebSocketUri), preferenceWindow.WebSocketUriTextBox.Text);
 
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowDynamicWidth),
                 preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked.ToString()!);
@@ -1076,22 +1125,22 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(AlwaysShowMainTextBoxCaret),
                 preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.TextBoxTrimWhiteSpaceCharacters),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.TextBoxTrimWhiteSpaceCharacters),
                 preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.TextBoxRemoveNewlines),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.TextBoxRemoveNewlines),
                 preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(TextBoxApplyDropShadowEffect),
                 preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.CaptureTextFromClipboard),
                 preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CaptureTextFromWebSocket),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.CaptureTextFromWebSocket),
                 preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AutoReconnectToWebSocket),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.AutoReconnectToWebSocket),
                 preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(OnlyCaptureTextWithJapaneseChars),
@@ -1152,16 +1201,16 @@ internal static class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupFont), preferenceWindow.PopupFontComboBox.SelectedValue.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.KanjiMode),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.KanjiMode),
                 preferenceWindow.KanjiModeCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.ForceSyncAnki),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.ForceSyncAnki),
                 preferenceWindow.ForceSyncAnkiCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AllowDuplicateCards),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.AllowDuplicateCards),
                 preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.LookupRate),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.LookupRate),
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoAdjustFontSizesOnResolutionChange),
@@ -1183,7 +1232,7 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MineToFileInsteadOfAnki),
                 preferenceWindow.MineToFileInsteadOfAnkiCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckForJLUpdatesOnStartUp),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.CheckForJLUpdatesOnStartUp),
                 preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(AlwaysOnTop), preferenceWindow.AlwaysOnTopCheckBox.IsChecked.ToString()!);
@@ -1198,7 +1247,7 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(TextOnlyVisibleOnHover),
                 preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiIntegration),
+            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.AnkiIntegration),
                 preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(HighlightColor),
@@ -1292,6 +1341,18 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(PopupYOffset),
                 preferenceWindow.PopupYOffsetNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
+            ConfigDBManager.UpdateSetting(connection, nameof(RepositionMainWindowOnTextChangeByBottomPosition),
+                preferenceWindow.RepositionMainWindowOnTextChangeByBottomPositionCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(RepositionMainWindowOnTextChangeByRightPosition),
+                preferenceWindow.RepositionMainWindowOnTextChangeByRightPositionCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowFixedBottomPosition),
+                preferenceWindow.MainWindowFixedBottomPositionNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowFixedRightPosition),
+                preferenceWindow.MainWindowFixedRightPositionNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
             ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursor", preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, "PopupFlip", preferenceWindow.PopupFlipComboBox.SelectedValue.ToString()!);
@@ -1334,11 +1395,12 @@ internal static class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(CopyPrimarySpellingToClipboardMouseButton),
                 preferenceWindow.CopyPrimarySpellingToClipboardMouseButtonComboBox.SelectedValue.ToString()!);
 
+            MainWindow mainWindow = MainWindow.Instance;
             ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition",
-                (MainWindow.Instance.Top * WindowsUtils.Dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture));
+                (mainWindow.Top * WindowsUtils.Dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition",
-                (MainWindow.Instance.Left * WindowsUtils.Dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
+                (mainWindow.Left * WindowsUtils.Dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
         }
 
         ApplyPreferences();
@@ -1349,79 +1411,46 @@ internal static class ConfigManager
         }
     }
 
-    public static void SaveBeforeClosing()
+    public void SaveBeforeClosing()
     {
         ConfigDBManager.CreateDB();
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
 
+        MainWindow mainWindow = MainWindow.Instance;
         ConfigDBManager.UpdateSetting(connection, "MainWindowFontSize",
-            MainWindow.Instance.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));
+            mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.UpdateSetting(connection, "MainWindowOpacity",
-            MainWindow.Instance.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture));
+            mainWindow.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture));
 
-        double mainWindowHeight = MainWindowHeight > MainWindow.Instance.MinHeight
+        double mainWindowHeight = MainWindowHeight > mainWindow.MinHeight
             ? MainWindowHeight <= SystemParameters.VirtualScreenHeight
                 ? MainWindowHeight
                 : SystemParameters.VirtualScreenHeight
-            : MainWindow.Instance.MinHeight;
+            : mainWindow.MinHeight;
         ConfigDBManager.UpdateSetting(connection, nameof(MainWindowHeight), mainWindowHeight.ToString(CultureInfo.InvariantCulture));
 
-        double mainWindowWidth = MainWindowWidth > MainWindow.Instance.MinWidth
+        double mainWindowWidth = MainWindowWidth > mainWindow.MinWidth
             ? MainWindowWidth <= SystemParameters.VirtualScreenWidth
                 ? MainWindowWidth
                 : SystemParameters.VirtualScreenWidth
-            : MainWindow.Instance.MinWidth;
+            : mainWindow.MinWidth;
         ConfigDBManager.UpdateSetting(connection, nameof(MainWindowWidth), mainWindowWidth.ToString(CultureInfo.InvariantCulture));
 
-        double mainWindowTopPosition = MainWindow.Instance.Top >= SystemParameters.VirtualScreenTop
-            ? MainWindow.Instance.Top + MainWindow.Instance.Height <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight
-                ? MainWindow.Instance.Top * WindowsUtils.Dpi.DpiScaleY
-                : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - MainWindow.Instance.Height) * WindowsUtils.Dpi.DpiScaleY
+        double mainWindowTopPosition = mainWindow.Top >= SystemParameters.VirtualScreenTop
+            ? mainWindow.Top + mainWindow.Height <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight
+                ? mainWindow.Top * WindowsUtils.Dpi.DpiScaleY
+                : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - mainWindow.Height) * WindowsUtils.Dpi.DpiScaleY
             : WindowsUtils.ActiveScreen.Bounds.Y;
         ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", mainWindowTopPosition.ToString(CultureInfo.InvariantCulture));
 
-        double mainWindowLeftPosition = MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
-            ? MainWindow.Instance.Left + MainWindow.Instance.Width <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
-                ? MainWindow.Instance.Left * WindowsUtils.Dpi.DpiScaleX
-                : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - MainWindow.Instance.Width) * WindowsUtils.Dpi.DpiScaleX
+        double mainWindowLeftPosition = mainWindow.Left >= SystemParameters.VirtualScreenLeft
+            ? mainWindow.Left + mainWindow.Width <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
+                ? mainWindow.Left * WindowsUtils.Dpi.DpiScaleX
+                : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - mainWindow.Width) * WindowsUtils.Dpi.DpiScaleX
             : WindowsUtils.ActiveScreen.Bounds.X;
         ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.AnalyzeAndVacuum(connection);
-    }
-
-    private static Brush GetBrushFromConfig(SqliteConnection connection, Brush solidColorBrush, string configKey)
-    {
-        string? configValue = ConfigDBManager.GetSettingValue(connection, configKey);
-        if (configValue is not null)
-        {
-            return WindowsUtils.BrushFromHex(configValue);
-        }
-
-        ConfigDBManager.InsertSetting(connection, configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));
-
-        return solidColorBrush.IsFrozen
-            ? WindowsUtils.BrushFromHex(solidColorBrush.ToString(CultureInfo.InvariantCulture))
-            : solidColorBrush;
-    }
-
-    private static Color GetColorFromConfig(SqliteConnection connection, Color color, string configKey)
-    {
-        string? configValue = ConfigDBManager.GetSettingValue(connection, configKey);
-        if (configValue is not null)
-        {
-            return WindowsUtils.ColorFromHex(configValue);
-        }
-
-        ConfigDBManager.InsertSetting(connection, configKey, color.ToString(CultureInfo.InvariantCulture));
-        return WindowsUtils.ColorFromHex(color.ToString(CultureInfo.InvariantCulture));
-    }
-
-    private static Brush GetFrozenBrushFromConfig(SqliteConnection connection, Brush solidColorBrush, string configKey)
-    {
-        Brush brush = GetBrushFromConfig(connection, solidColorBrush, configKey);
-        brush.Freeze();
-        return brush;
     }
 }

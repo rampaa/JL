@@ -442,7 +442,8 @@ public static class MiningUtils
 
     public static async Task Mine(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition)
     {
-        if (!CoreConfigManager.AnkiIntegration)
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        if (!coreConfigManager.AnkiIntegration)
         {
             Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
             return;
@@ -486,7 +487,7 @@ public static class MiningUtils
         // Audio/Picture/Video shouldn't be set here
         // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
         Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, ankiConfig.Tags, null, null, null, null);
-        if (!CoreConfigManager.AllowDuplicateCards)
+        if (!coreConfigManager.AllowDuplicateCards)
         {
             bool? canAddNote = await AnkiUtils.CanAddNote(note).ConfigureAwait(false);
             if (canAddNote is null)
@@ -563,7 +564,7 @@ public static class MiningUtils
         note.Options = new Dictionary<string, object>(1, StringComparer.Ordinal)
         {
             {
-                "allowDuplicate", CoreConfigManager.AllowDuplicateCards
+                "allowDuplicate", coreConfigManager.AllowDuplicateCards
             }
         };
 
@@ -587,7 +588,7 @@ public static class MiningUtils
             Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
         }
 
-        if (CoreConfigManager.ForceSyncAnki)
+        if (coreConfigManager.ForceSyncAnki)
         {
             await AnkiConnect.Sync().ConfigureAwait(false);
         }

@@ -29,14 +29,15 @@ internal sealed partial class ReadingSelectionWindow
     public static void Show(Window owner, string primarySpelling, string[] readings)
     {
         ReadingSelectionWindow currentInstance = s_instance ??= new ReadingSelectionWindow();
+        ConfigManager configManager = ConfigManager.Instance;
         currentInstance._primarySpelling = primarySpelling;
         currentInstance.ReadingsListView.ItemsSource = readings;
-        currentInstance.ReadingsListView.Background = ConfigManager.PopupBackgroundColor;
-        currentInstance.ReadingsListView.Foreground = ConfigManager.ReadingsColor;
+        currentInstance.ReadingsListView.Background = configManager.PopupBackgroundColor;
+        currentInstance.ReadingsListView.Foreground = configManager.ReadingsColor;
         currentInstance.ReadingsListView.FontSize = 18;
-        currentInstance.Background = ConfigManager.PopupBackgroundColor;
-        currentInstance.Foreground = ConfigManager.DefinitionsColor;
-        currentInstance.FontFamily = ConfigManager.PopupFont;
+        currentInstance.Background = configManager.PopupBackgroundColor;
+        currentInstance.Foreground = configManager.DefinitionsColor;
+        currentInstance.FontFamily = configManager.PopupFont;
         currentInstance.Owner = owner;
         currentInstance.Show();
         currentInstance.UpdatePosition(WinApi.GetMousePosition());
@@ -52,7 +53,7 @@ internal sealed partial class ReadingSelectionWindow
     {
         base.OnActivated(e);
 
-        if (ConfigManager.Focusable)
+        if (ConfigManager.Instance.Focusable)
         {
             WinApi.AllowActivation(_windowHandle);
         }

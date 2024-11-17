@@ -27,8 +27,9 @@ public static class LookupUtils
 
     public static List<LookupResult>? LookupText(string text)
     {
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-        if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < CoreConfigManager.LookupRate)
+        if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < coreConfigManager.LookupRate)
         {
             return null;
         }
@@ -55,7 +56,7 @@ public static class LookupUtils
                 .ToList();
 
             kanji = text.EnumerateRunes().First().ToString();
-            if (CoreConfigManager.KanjiMode)
+            if (coreConfigManager.KanjiMode)
             {
                 _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
                 {
@@ -120,7 +121,7 @@ public static class LookupUtils
             }
         }
 
-        else if (CoreConfigManager.KanjiMode)
+        else if (coreConfigManager.KanjiMode)
         {
             return null;
         }

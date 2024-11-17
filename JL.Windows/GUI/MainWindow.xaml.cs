@@ -92,16 +92,17 @@ internal sealed partial class MainWindow
             StatsDBUtils.SetStatsFromDB(readOnlyConnection);
         }
 
-        ConfigManager.ApplyPreferences();
+        ConfigManager configManager = ConfigManager.Instance;
+        configManager.ApplyPreferences();
 
         RegexReplacerUtils.PopulateRegexReplacements();
 
-        if (ConfigManager.AlwaysOnTop)
+        if (configManager.AlwaysOnTop)
         {
             WinApi.BringToFront(WindowHandle);
         }
 
-        if (CoreConfigManager.CaptureTextFromClipboard)
+        if (CoreConfigManager.Instance.CaptureTextFromClipboard)
         {
             _ = await CopyFromClipboard().ConfigureAwait(true);
         }
@@ -139,9 +140,10 @@ internal sealed partial class MainWindow
 
     public Task CopyFromWebSocket(string text)
     {
+        ConfigManager configManager = ConfigManager.Instance;
         return CopyText(text)
-            ? Dispatcher.Invoke(() => ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
-                                      && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+            ? Dispatcher.Invoke(() => configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
+                                      && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                                           || WindowState is WindowState.Minimized)
                 ? FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true)
                 : Task.CompletedTask)
@@ -150,7 +152,8 @@ internal sealed partial class MainWindow
 
     private bool CopyText(string text)
     {
-        if (ConfigManager.OnlyCaptureTextWithJapaneseChars && !JapaneseUtils.JapaneseRegex().IsMatch(text))
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.OnlyCaptureTextWithJapaneseChars && !JapaneseUtils.JapaneseRegex().IsMatch(text))
         {
             return false;
         }
@@ -167,21 +170,21 @@ internal sealed partial class MainWindow
 
         Dispatcher.Invoke(() =>
         {
-            if (ConfigManager.MergeSequentialTextsWhenTheyMatch)
+            if (configManager.MergeSequentialTextsWhenTheyMatch)
             {
                 DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
 
                 string previousText = MainTextBox.Text;
 
-                mergeTexts = (ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
-                              || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= ConfigManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
+                mergeTexts = (configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
+                              || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
                               && previousText.Length > 0;
 
                 s_lastTextCopyTime = preciseTimeNow;
 
                 if (mergeTexts)
                 {
-                    if (!ConfigManager.AllowPartialMatchingForTextMerge)
+                    if (!configManager.AllowPartialMatchingForTextMerge)
                     {
                         if (sanitizedNewText.StartsWith(previousText, StringComparison.Ordinal))
                         {
@@ -219,21 +222,23 @@ internal sealed partial class MainWindow
                 MainTextBox.Text = sanitizedNewText;
             }
 
-            MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+            MainTextBox.Foreground = configManager.MainWindowTextColor;
 
             if (!mergeTexts && SizeToContent is SizeToContent.Manual && WindowState is not WindowState.Minimized
-                            && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+                            && (configManager.MainWindowDynamicHeight || configManager.MainWindowDynamicWidth))
             {
-                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowMinDynamicWidth, ConfigManager.MainWindowMinDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
+                WindowsUtils.SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight, this);
             }
 
             TitleBarContextMenu.IsOpen = false;
             MainTextBoxContextMenu.IsOpen = false;
 
-            if (ConfigManager.HidePopupsOnTextChange)
+            if (configManager.HidePopupsOnTextChange)
             {
                 PopupWindowUtils.HidePopups(FirstPopupWindow);
             }
+
+            UpdatePosition();
 
             BringToFront();
         }, DispatcherPriority.Send);
@@ -245,7 +250,7 @@ internal sealed partial class MainWindow
 
     public void BringToFront()
     {
-        if (ConfigManager.AlwaysOnTop
+        if (ConfigManager.Instance.AlwaysOnTop
             && !FirstPopupWindow.IsVisible
             && !ManageDictionariesWindow.IsItVisible()
             && !ManageFrequenciesWindow.IsItVisible()
@@ -266,9 +271,10 @@ internal sealed partial class MainWindow
     {
         bool gotTextFromClipboard = await CopyFromClipboard().ConfigureAwait(true);
 
+        ConfigManager configManager = ConfigManager.Instance;
         if (gotTextFromClipboard
-            && ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard
-            && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+            && configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard
+            && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                 || WindowState is WindowState.Minimized))
         {
             await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
@@ -277,17 +283,18 @@ internal sealed partial class MainWindow
 
     public Task HandleMouseMove(MouseEventArgs? e)
     {
-        return ConfigManager.InactiveLookupMode
-               || ConfigManager.LookupOnSelectOnly
-               || ConfigManager.LookupOnMouseClickOnly
+        ConfigManager configManager = ConfigManager.Instance;
+        return configManager.InactiveLookupMode
+               || configManager.LookupOnSelectOnly
+               || configManager.LookupOnMouseClickOnly
                || e?.LeftButton is MouseButtonState.Pressed
                || MainTextBoxContextMenu.IsVisible
                || TitleBarContextMenu.IsVisible
                || FontSizeSlider.IsVisible
                || OpacitySlider.IsVisible
                || FirstPopupWindow.MiningMode
-               || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
-               || (ConfigManager.RequireLookupKeyPress && !ConfigManager.LookupKeyKeyGesture.IsPressed())
+               || (!configManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
+               || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
             ? Task.CompletedTask
             : FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox);
     }
@@ -313,7 +320,7 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (ConfigManager.SteppedBacklogWithMouseWheel)
+        else if (ConfigManager.Instance.SteppedBacklogWithMouseWheel)
         {
             if (e.Delta > 0)
             {
@@ -341,10 +348,11 @@ internal sealed partial class MainWindow
     {
         ((TextBlock)sender).Foreground = Brushes.White;
 
-        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
+        ConfigManager configManager = ConfigManager.Instance;
+        if (!configManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
             || FontSizeSlider.IsVisible
             || OpacitySlider.IsVisible
-            || (Background.Opacity is 0 && !ConfigManager.GlobalHotKeys))
+            || (Background.Opacity is 0 && !configManager.GlobalHotKeys))
         {
             return;
         }
@@ -413,7 +421,7 @@ internal sealed partial class MainWindow
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
-        ConfigManager.SaveBeforeClosing();
+        ConfigManager.Instance.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
 
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
@@ -446,8 +454,10 @@ internal sealed partial class MainWindow
 
     public async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e)
     {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         bool handled = false;
-        if (keyGesture.IsEqual(ConfigManager.DisableHotkeysKeyGesture))
+        if (keyGesture.IsEqual(configManager.DisableHotkeysKeyGesture))
         {
             if (e is not null)
             {
@@ -456,13 +466,13 @@ internal sealed partial class MainWindow
 
             handled = true;
 
-            ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
+            configManager.DisableHotkeys = !configManager.DisableHotkeys;
 
-            if (ConfigManager.GlobalHotKeys)
+            if (configManager.GlobalHotKeys)
             {
-                if (ConfigManager.DisableHotkeys)
+                if (configManager.DisableHotkeys)
                 {
-                    if (KeyGestureUtils.GlobalKeyGestureNameToIntDict.TryGetValue(nameof(ConfigManager.DisableHotkeys), out int id))
+                    if (KeyGestureUtils.GlobalKeyGestureNameToIntDict.TryGetValue(nameof(configManager.DisableHotkeys), out int id))
                     {
                         WinApi.UnregisterAllGlobalHotKeys(WindowHandle, id);
                     }
@@ -478,33 +488,36 @@ internal sealed partial class MainWindow
             }
         }
 
-        if (ConfigManager.DisableHotkeys || handled)
+        if (configManager.DisableHotkeys || handled)
         {
             return;
         }
 
-        if (keyGesture.IsEqual(ConfigManager.SteppedBacklogBackwardsKeyGesture))
+        if (keyGesture.IsEqual(configManager.SteppedBacklogBackwardsKeyGesture))
         {
             handled = true;
 
             BacklogUtils.ShowPreviousBacklogItem();
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.SteppedBacklogForwardsKeyGesture))
+        else if (keyGesture.IsEqual(configManager.SteppedBacklogForwardsKeyGesture))
         {
             handled = true;
 
             BacklogUtils.ShowNextBacklogItem();
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowPreferencesWindowKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowPreferencesWindowKeyGesture))
         {
             handled = true;
 
-            WindowsUtils.ShowPreferencesWindow();
+            if (PreferencesMenuItem.IsEnabled)
+            {
+                WindowsUtils.ShowPreferencesWindow();
+            }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.MousePassThroughModeKeyGesture))
+        else if (keyGesture.IsEqual(configManager.MousePassThroughModeKeyGesture))
         {
             handled = true;
 
@@ -514,7 +527,7 @@ internal sealed partial class MainWindow
                 FontSizeSlider.Visibility = Visibility.Collapsed;
                 OpacitySlider.Visibility = Visibility.Collapsed;
 
-                if (!ConfigManager.GlobalHotKeys)
+                if (!configManager.GlobalHotKeys)
                 {
                     ShowTitleBarButtons();
                 }
@@ -529,16 +542,16 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.KanjiModeKeyGesture))
+        else if (keyGesture.IsEqual(configManager.KanjiModeKeyGesture))
         {
             handled = true;
 
-            CoreConfigManager.KanjiMode = !CoreConfigManager.KanjiMode;
+            coreConfigManager.KanjiMode = !coreConfigManager.KanjiMode;
             FirstPopupWindow.LastText = "";
             MainTextBox_MouseMove(null, null);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowAddNameWindowKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
             handled = true;
 
@@ -560,7 +573,7 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowAddWordWindowKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowAddWordWindowKeyGesture))
         {
             handled = true;
 
@@ -582,7 +595,7 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowManageDictionariesWindowKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowManageDictionariesWindowKeyGesture))
         {
             handled = true;
 
@@ -595,7 +608,7 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowManageFrequenciesWindowKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowManageFrequenciesWindowKeyGesture))
         {
             handled = true;
 
@@ -605,7 +618,7 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.SearchWithBrowserKeyGesture))
+        else if (keyGesture.IsEqual(configManager.SearchWithBrowserKeyGesture))
         {
             handled = true;
 
@@ -613,56 +626,56 @@ internal sealed partial class MainWindow
             WindowsUtils.UpdateMainWindowVisibility();
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.InactiveLookupModeKeyGesture))
+        else if (keyGesture.IsEqual(configManager.InactiveLookupModeKeyGesture))
         {
             handled = true;
 
-            ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
+            configManager.InactiveLookupMode = !configManager.InactiveLookupMode;
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.MotivationKeyGesture))
+        else if (keyGesture.IsEqual(configManager.MotivationKeyGesture))
         {
             handled = true;
 
             await WindowsUtils.Motivate().ConfigureAwait(false);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ClosePopupKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
         {
             handled = true;
 
             FirstPopupWindow.HidePopup();
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowStatsKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowStatsKeyGesture))
         {
             handled = true;
 
             WindowsUtils.ShowStatsWindow();
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ShowManageAudioSourcesWindowKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ShowManageAudioSourcesWindowKeyGesture))
         {
             handled = true;
 
             await WindowsUtils.ShowManageAudioSourcesWindow().ConfigureAwait(false);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.AlwaysOnTopKeyGesture))
+        else if (keyGesture.IsEqual(configManager.AlwaysOnTopKeyGesture))
         {
             handled = true;
 
-            ConfigManager.AlwaysOnTop = !ConfigManager.AlwaysOnTop;
+            configManager.AlwaysOnTop = !configManager.AlwaysOnTop;
 
-            Topmost = ConfigManager.AlwaysOnTop;
+            Topmost = configManager.AlwaysOnTop;
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.CaptureTextFromClipboardKeyGesture))
+        else if (keyGesture.IsEqual(configManager.CaptureTextFromClipboardKeyGesture))
         {
             handled = true;
 
-            CoreConfigManager.CaptureTextFromClipboard = !CoreConfigManager.CaptureTextFromClipboard;
-            if (CoreConfigManager.CaptureTextFromClipboard)
+            coreConfigManager.CaptureTextFromClipboard = !coreConfigManager.CaptureTextFromClipboard;
+            if (coreConfigManager.CaptureTextFromClipboard)
             {
                 WinApi.SubscribeToClipboardChanged(WindowHandle);
             }
@@ -671,44 +684,44 @@ internal sealed partial class MainWindow
                 WinApi.UnsubscribeFromClipboardChanged(WindowHandle);
             }
 
-            if (!CoreConfigManager.CaptureTextFromWebSocket && !CoreConfigManager.CaptureTextFromClipboard)
+            if (!coreConfigManager.CaptureTextFromWebSocket && !coreConfigManager.CaptureTextFromClipboard)
             {
                 StatsUtils.StatsStopWatch.Stop();
                 StatsUtils.StopStatsTimer();
             }
-            else if (!ConfigManager.StopIncreasingTimeStatWhenMinimized || WindowState is not WindowState.Minimized)
+            else if (!configManager.StopIncreasingTimeStatWhenMinimized || WindowState is not WindowState.Minimized)
             {
                 StatsUtils.StatsStopWatch.Start();
                 StatsUtils.StartStatsTimer();
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.CaptureTextFromWebSocketKeyGesture))
+        else if (keyGesture.IsEqual(configManager.CaptureTextFromWebSocketKeyGesture))
         {
             handled = true;
 
-            CoreConfigManager.CaptureTextFromWebSocket = !CoreConfigManager.CaptureTextFromWebSocket;
+            coreConfigManager.CaptureTextFromWebSocket = !coreConfigManager.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();
 
-            if (!CoreConfigManager.CaptureTextFromWebSocket && !CoreConfigManager.CaptureTextFromClipboard)
+            if (!coreConfigManager.CaptureTextFromWebSocket && !coreConfigManager.CaptureTextFromClipboard)
             {
                 StatsUtils.StatsStopWatch.Stop();
                 StatsUtils.StopStatsTimer();
             }
-            else if (!ConfigManager.StopIncreasingTimeStatWhenMinimized || WindowState is not WindowState.Minimized)
+            else if (!configManager.StopIncreasingTimeStatWhenMinimized || WindowState is not WindowState.Minimized)
             {
                 StatsUtils.StatsStopWatch.Start();
                 StatsUtils.StartStatsTimer();
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ReconnectToWebSocketServerKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ReconnectToWebSocketServerKeyGesture))
         {
             handled = true;
 
             if (!WebSocketUtils.Connected)
             {
-                CoreConfigManager.CaptureTextFromWebSocket = true;
+                coreConfigManager.CaptureTextFromWebSocket = true;
 
                 if (!StatsUtils.StatsStopWatch.IsRunning)
                 {
@@ -720,30 +733,30 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.TextBoxIsReadOnlyKeyGesture))
+        else if (keyGesture.IsEqual(configManager.TextBoxIsReadOnlyKeyGesture))
         {
             handled = true;
 
-            ConfigManager.TextBoxIsReadOnly = !ConfigManager.TextBoxIsReadOnly;
-            MainTextBox.IsReadOnly = ConfigManager.TextBoxIsReadOnly;
-            MainTextBox.IsUndoEnabled = !ConfigManager.TextBoxIsReadOnly;
-            MainTextBox.UndoLimit = ConfigManager.TextBoxIsReadOnly ? 0 : -1;
+            configManager.TextBoxIsReadOnly = !configManager.TextBoxIsReadOnly;
+            MainTextBox.IsReadOnly = configManager.TextBoxIsReadOnly;
+            MainTextBox.IsUndoEnabled = !configManager.TextBoxIsReadOnly;
+            MainTextBox.UndoLimit = configManager.TextBoxIsReadOnly ? 0 : -1;
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.DeleteCurrentLineKeyGesture))
+        else if (keyGesture.IsEqual(configManager.DeleteCurrentLineKeyGesture))
         {
             handled = true;
 
             BacklogUtils.DeleteCurrentLine();
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ToggleMinimizedStateKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
             handled = true;
 
             PopupWindowUtils.HidePopups(FirstPopupWindow);
 
-            if (ConfigManager.Focusable)
+            if (configManager.Focusable)
             {
                 WindowState = WindowState is WindowState.Minimized
                     ? WindowState.Normal
@@ -768,7 +781,7 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.SelectedTextToSpeechKeyGesture))
+        else if (keyGesture.IsEqual(configManager.SelectedTextToSpeechKeyGesture))
         {
             handled = true;
 
@@ -785,41 +798,41 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.MoveCaretLeftKeyGesture))
+        else if (keyGesture.IsEqual(configManager.MoveCaretLeftKeyGesture))
         {
             handled = true;
 
             MoveCaret(Key.Left);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.MoveCaretRightKeyGesture))
+        else if (keyGesture.IsEqual(configManager.MoveCaretRightKeyGesture))
         {
             handled = true;
 
             MoveCaret(Key.Right);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.MoveCaretUpKeyGesture))
+        else if (keyGesture.IsEqual(configManager.MoveCaretUpKeyGesture))
         {
             handled = true;
 
             MoveCaret(Key.Up);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.MoveCaretDownKeyGesture))
+        else if (keyGesture.IsEqual(configManager.MoveCaretDownKeyGesture))
         {
             handled = true;
 
             MoveCaret(Key.Down);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.LookupTermAtCaretIndexKeyGesture))
+        else if (keyGesture.IsEqual(configManager.LookupTermAtCaretIndexKeyGesture))
         {
             handled = true;
 
             if (MainTextBox.Text.Length > 0)
             {
-                if (ConfigManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
+                if (configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
                 {
                     await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
                 }
@@ -831,7 +844,7 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.LookupFirstTermKeyGesture))
+        else if (keyGesture.IsEqual(configManager.LookupFirstTermKeyGesture))
         {
             handled = true;
 
@@ -841,19 +854,19 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.LookupSelectedTextKeyGesture))
+        else if (keyGesture.IsEqual(configManager.LookupSelectedTextKeyGesture))
         {
             handled = true;
 
             await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
         }
 
-        else if (keyGesture.IsEqual(ConfigManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
         {
             handled = true;
 
-            ConfigManager.AlwaysShowMainTextBoxCaret = !ConfigManager.AlwaysShowMainTextBoxCaret;
-            MainTextBox.IsReadOnlyCaretVisible = ConfigManager.AlwaysShowMainTextBoxCaret;
+            configManager.AlwaysShowMainTextBoxCaret = !configManager.AlwaysShowMainTextBoxCaret;
+            MainTextBox.IsReadOnlyCaretVisible = configManager.AlwaysShowMainTextBoxCaret;
         }
 
         if (handled && e is not null)
@@ -880,12 +893,13 @@ internal sealed partial class MainWindow
 
     public void ChangeVisibilityOfTitleBarButtons()
     {
-        if (Background.Opacity is 0 && !ConfigManager.GlobalHotKeys)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (Background.Opacity is 0 && !configManager.GlobalHotKeys)
         {
             return;
         }
 
-        if (ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
+        if (configManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
         {
             if (TitleBar.IsMouseOver
                 || FontSizeButton.IsMouseOver
@@ -920,7 +934,7 @@ internal sealed partial class MainWindow
         OpacitySlider.Visibility = Visibility.Collapsed;
         FontSizeSlider.Visibility = Visibility.Collapsed;
 
-        if (ConfigManager.Focusable)
+        if (ConfigManager.Instance.Focusable)
         {
             WindowState = WindowState.Minimized;
         }
@@ -1032,7 +1046,7 @@ internal sealed partial class MainWindow
     {
         OpacitySlider.Visibility = Visibility.Collapsed;
 
-        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || FontSizeSlider.IsVisible)
+        if (!ConfigManager.Instance.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || FontSizeSlider.IsVisible)
         {
             return;
         }
@@ -1044,7 +1058,7 @@ internal sealed partial class MainWindow
     {
         OpacitySlider.Visibility = Visibility.Collapsed;
 
-        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || FontSizeSlider.IsVisible)
+        if (!ConfigManager.Instance.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || FontSizeSlider.IsVisible)
         {
             return;
         }
@@ -1056,7 +1070,7 @@ internal sealed partial class MainWindow
     {
         FontSizeSlider.Visibility = Visibility.Collapsed;
 
-        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || OpacitySlider.IsVisible)
+        if (!ConfigManager.Instance.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || OpacitySlider.IsVisible)
         {
             return;
         }
@@ -1068,7 +1082,7 @@ internal sealed partial class MainWindow
     {
         FontSizeSlider.Visibility = Visibility.Collapsed;
 
-        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || OpacitySlider.IsVisible)
+        if (!ConfigManager.Instance.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || OpacitySlider.IsVisible)
         {
             return;
         }
@@ -1081,23 +1095,25 @@ internal sealed partial class MainWindow
         if (e.PreviousSize.Width is not 0)
         {
             Size newSize = e.NewSize;
-            ConfigManager.MainWindowWidth = newSize.Width;
-            ConfigManager.MainWindowHeight = newSize.Height;
+            ConfigManager configManager = ConfigManager.Instance;
+            configManager.MainWindowWidth = newSize.Width;
+            configManager.MainWindowHeight = newSize.Height;
         }
     }
 
     // ReSharper disable once AsyncVoidMethod
     private async void MainTextBox_PreviewMouseUp(object? sender, MouseButtonEventArgs e)
     {
-        if (ConfigManager.InactiveLookupMode
-            || (ConfigManager.RequireLookupKeyPress && !ConfigManager.LookupKeyKeyGesture.IsPressed())
-            || ((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
-                && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton)))
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.InactiveLookupMode
+            || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
+            || ((!configManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
+                && (!configManager.LookupOnMouseClickOnly || e.ChangedButton != configManager.LookupOnClickMouseButton)))
         {
             return;
         }
 
-        if (ConfigManager.LookupOnSelectOnly)
+        if (configManager.LookupOnSelectOnly)
         {
             await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
         }
@@ -1110,7 +1126,7 @@ internal sealed partial class MainWindow
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == ConfigManager.MiningModeMouseButton && FirstPopupWindow is { IsVisible: true, MiningMode: false })
+        if (e.ChangedButton == ConfigManager.Instance.MiningModeMouseButton && FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             e.Handled = true;
             PopupWindowUtils.ShowMiningModeResults(FirstPopupWindow);
@@ -1137,17 +1153,18 @@ internal sealed partial class MainWindow
             return;
         }
 
-        ConfigManager.MainWindowMaxDynamicHeight = Math.Round(ConfigManager.MainWindowMaxDynamicHeight / ratioY);
-        ConfigManager.MainWindowMaxDynamicWidth = Math.Round(ConfigManager.MainWindowMaxDynamicWidth / ratioX);
+        ConfigManager configManager = ConfigManager.Instance;
+        configManager.MainWindowMaxDynamicHeight = Math.Round(configManager.MainWindowMaxDynamicHeight / ratioY);
+        configManager.MainWindowMaxDynamicWidth = Math.Round(configManager.MainWindowMaxDynamicWidth / ratioX);
         if (SizeToContent is not SizeToContent.Manual)
         {
-            if (ConfigManager.MainWindowDynamicHeight)
+            if (configManager.MainWindowDynamicHeight)
             {
-                MaxHeight = ConfigManager.MainWindowMaxDynamicHeight;
+                MaxHeight = configManager.MainWindowMaxDynamicHeight;
             }
-            if (ConfigManager.MainWindowDynamicWidth)
+            if (configManager.MainWindowDynamicWidth)
             {
-                MaxWidth = ConfigManager.MainWindowMaxDynamicWidth;
+                MaxWidth = configManager.MainWindowMaxDynamicWidth;
             }
         }
 
@@ -1179,42 +1196,42 @@ internal sealed partial class MainWindow
 
         WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
 
-        ConfigManager.PopupMaxHeight = Math.Round(Math.Min(ConfigManager.PopupMaxHeight / ratioY, newDpiAwareScreenHeight));
-        ConfigManager.PopupMaxWidth = Math.Round(Math.Min(ConfigManager.PopupMaxWidth / ratioX, newDpiAwareScreenWidth));
+        configManager.PopupMaxHeight = Math.Round(Math.Min(configManager.PopupMaxHeight / ratioY, newDpiAwareScreenHeight));
+        configManager.PopupMaxWidth = Math.Round(Math.Min(configManager.PopupMaxWidth / ratioX, newDpiAwareScreenWidth));
 
-        ConfigManager.PopupYOffset = Math.Round(ConfigManager.PopupYOffset / ratioY);
-        ConfigManager.PopupXOffset = Math.Round(ConfigManager.PopupXOffset / ratioX);
-        WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
-        WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
+        configManager.PopupYOffset = Math.Round(configManager.PopupYOffset / ratioY);
+        configManager.PopupXOffset = Math.Round(configManager.PopupXOffset / ratioX);
+        WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
 
-        ConfigManager.FixedPopupYPosition = Math.Round(ConfigManager.FixedPopupYPosition / ratioY);
-        if (WindowsUtils.ActiveScreen.Bounds.Y > ConfigManager.FixedPopupYPosition)
+        configManager.FixedPopupYPosition = Math.Round(configManager.FixedPopupYPosition / ratioY);
+        if (WindowsUtils.ActiveScreen.Bounds.Y > configManager.FixedPopupYPosition)
         {
-            ConfigManager.FixedPopupYPosition = WindowsUtils.ActiveScreen.Bounds.Y;
+            configManager.FixedPopupYPosition = WindowsUtils.ActiveScreen.Bounds.Y;
         }
-        else if (ConfigManager.FixedPopupYPosition > WindowsUtils.ActiveScreen.Bounds.Bottom)
+        else if (configManager.FixedPopupYPosition > WindowsUtils.ActiveScreen.Bounds.Bottom)
         {
-            ConfigManager.FixedPopupYPosition = WindowsUtils.ActiveScreen.Bounds.Bottom - (ConfigManager.PopupMaxHeight * WindowsUtils.Dpi.DpiScaleY);
+            configManager.FixedPopupYPosition = WindowsUtils.ActiveScreen.Bounds.Bottom - (configManager.PopupMaxHeight * WindowsUtils.Dpi.DpiScaleY);
         }
 
-        ConfigManager.FixedPopupXPosition = Math.Round(ConfigManager.FixedPopupXPosition / ratioX);
-        if (WindowsUtils.ActiveScreen.Bounds.X > ConfigManager.FixedPopupXPosition)
+        configManager.FixedPopupXPosition = Math.Round(configManager.FixedPopupXPosition / ratioX);
+        if (WindowsUtils.ActiveScreen.Bounds.X > configManager.FixedPopupXPosition)
         {
-            ConfigManager.FixedPopupXPosition = WindowsUtils.ActiveScreen.Bounds.X;
+            configManager.FixedPopupXPosition = WindowsUtils.ActiveScreen.Bounds.X;
         }
-        else if (ConfigManager.FixedPopupXPosition > WindowsUtils.ActiveScreen.Bounds.Right)
+        else if (configManager.FixedPopupXPosition > WindowsUtils.ActiveScreen.Bounds.Right)
         {
-            ConfigManager.FixedPopupXPosition = WindowsUtils.ActiveScreen.Bounds.Right - (ConfigManager.PopupMaxWidth * WindowsUtils.Dpi.DpiScaleX);
+            configManager.FixedPopupXPosition = WindowsUtils.ActiveScreen.Bounds.Right - (configManager.PopupMaxWidth * WindowsUtils.Dpi.DpiScaleX);
         }
 
         PopupWindow? currentPopupWindow = FirstPopupWindow;
         while (currentPopupWindow is not null)
         {
-            WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, ConfigManager.PopupMaxWidth, ConfigManager.PopupMaxHeight, ConfigManager.PopupMinWidth, ConfigManager.PopupMinHeight, currentPopupWindow);
+            WindowsUtils.SetSizeToContent(configManager.PopupDynamicWidth, configManager.PopupDynamicHeight, configManager.PopupMaxWidth, configManager.PopupMaxHeight, configManager.PopupMinWidth, configManager.PopupMinHeight, currentPopupWindow);
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
 
-        if (ConfigManager.AutoAdjustFontSizesOnResolutionChange)
+        if (configManager.AutoAdjustFontSizesOnResolutionChange)
         {
             double fontScale = ratioX * ratioY > 1
                 ? Math.Min(ratioX, ratioY) * 0.75
@@ -1222,26 +1239,28 @@ internal sealed partial class MainWindow
 
             FontSizeSlider.Value = Math.Round(FontSizeSlider.Value / fontScale);
 
-            ConfigManager.AlternativeSpellingsFontSize = Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
-            ConfigManager.DeconjugationInfoFontSize = Math.Round(ConfigManager.DeconjugationInfoFontSize / fontScale);
-            ConfigManager.DefinitionsFontSize = Math.Round(ConfigManager.DefinitionsFontSize / fontScale);
-            ConfigManager.DictTypeFontSize = Math.Round(ConfigManager.DictTypeFontSize / fontScale);
-            ConfigManager.FrequencyFontSize = Math.Round(ConfigManager.FrequencyFontSize / fontScale);
-            ConfigManager.PrimarySpellingFontSize = Math.Round(ConfigManager.PrimarySpellingFontSize / fontScale);
-            ConfigManager.ReadingsFontSize = Math.Round(ConfigManager.ReadingsFontSize / fontScale);
+            configManager.AlternativeSpellingsFontSize = Math.Round(configManager.AlternativeSpellingsFontSize / fontScale);
+            configManager.DeconjugationInfoFontSize = Math.Round(configManager.DeconjugationInfoFontSize / fontScale);
+            configManager.DefinitionsFontSize = Math.Round(configManager.DefinitionsFontSize / fontScale);
+            configManager.DictTypeFontSize = Math.Round(configManager.DictTypeFontSize / fontScale);
+            configManager.FrequencyFontSize = Math.Round(configManager.FrequencyFontSize / fontScale);
+            configManager.PrimarySpellingFontSize = Math.Round(configManager.PrimarySpellingFontSize / fontScale);
+            configManager.ReadingsFontSize = Math.Round(configManager.ReadingsFontSize / fontScale);
         }
     }
 
     private void DisplaySettingsChanged(object? sender, EventArgs? e)
     {
+        ConfigManager configManager = ConfigManager.Instance;
+
         _ = Dispatcher.Invoke(DispatcherPriority.Background, () =>
         {
             Screen previousActiveScreen = WindowsUtils.ActiveScreen;
 
             WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
             WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
-            WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
-            WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
+            WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
+            WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
 
             if (Math.Abs(previousActiveScreen.Bounds.Width - WindowsUtils.ActiveScreen.Bounds.Width) <= 1 && Math.Abs(previousActiveScreen.Bounds.Height - WindowsUtils.ActiveScreen.Bounds.Height) <= 1)
             {
@@ -1257,9 +1276,10 @@ internal sealed partial class MainWindow
 
     private void Window_DpiChanged(object sender, DpiChangedEventArgs e)
     {
+        ConfigManager configManager = ConfigManager.Instance;
         WindowsUtils.Dpi = e.NewDpi;
-        WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset * e.NewDpi.DpiScaleX;
-        WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * e.NewDpi.DpiScaleY;
+        WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * e.NewDpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * e.NewDpi.DpiScaleY;
         s_previousDpi = e.OldDpi;
     }
 
@@ -1270,10 +1290,11 @@ internal sealed partial class MainWindow
             return;
         }
 
+        ConfigManager configManager = ConfigManager.Instance;
         WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
         WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
-        WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
-        WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
+        WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
     }
 
     private void Border_OnMouseEnter(object sender, MouseEventArgs e)
@@ -1397,9 +1418,10 @@ internal sealed partial class MainWindow
             DragMove();
         }
 
+        ConfigManager configManager = ConfigManager.Instance;
         if (e.ClickCount is 2
-            && !ConfigManager.MainWindowDynamicWidth
-            && ConfigManager.MainWindowDynamicHeight)
+            && !configManager.MainWindowDynamicWidth
+            && configManager.MainWindowDynamicHeight)
         {
             if (MagpieUtils.IsMagpieScaling)
             {
@@ -1413,13 +1435,13 @@ internal sealed partial class MainWindow
             double xPosition;
             double yPosition;
             double width;
-            double maxDynamicHeight = ConfigManager.MainWindowMaxDynamicHeight * WindowsUtils.Dpi.DpiScaleY;
+            double maxDynamicHeight = configManager.MainWindowMaxDynamicHeight * WindowsUtils.Dpi.DpiScaleY;
             if (!MagpieUtils.IsMagpieScaling)
             {
                 Rectangle workingArea = WindowsUtils.ActiveScreen.WorkingArea;
                 xPosition = workingArea.X;
 
-                if (ConfigManager.PositionPopupAboveCursor)
+                if (configManager.PositionPopupAboveCursor)
                 {
                     yPosition = workingArea.Bottom - maxDynamicHeight;
                     if (yPosition < workingArea.Top)
@@ -1438,7 +1460,7 @@ internal sealed partial class MainWindow
             {
                 xPosition = MagpieUtils.MagpieWindowLeftEdgePosition;
 
-                if (ConfigManager.PositionPopupAboveCursor)
+                if (configManager.PositionPopupAboveCursor)
                 {
                     yPosition = MagpieUtils.MagpieWindowBottomEdgePosition - maxDynamicHeight;
                     if (yPosition < MagpieUtils.MagpieWindowTopEdgePosition)
@@ -1456,9 +1478,9 @@ internal sealed partial class MainWindow
 
             WinApi.MoveWindowToPosition(WindowHandle, xPosition, yPosition);
 
-            if (ConfigManager.MainWindowMaxDynamicWidth < width)
+            if (configManager.MainWindowMaxDynamicWidth < width)
             {
-                ConfigManager.MainWindowMaxDynamicWidth = width;
+                configManager.MainWindowMaxDynamicWidth = width;
                 MaxWidth = width;
             }
 
@@ -1525,6 +1547,7 @@ internal sealed partial class MainWindow
         // Prevents main window background flicker
         await Task.Delay(5).ConfigureAwait(true);
 
+        ConfigManager configManager = ConfigManager.Instance;
         if (WindowState is WindowState.Minimized
             || IsMouseOver
             || FirstPopupWindow.IsVisible
@@ -1538,21 +1561,21 @@ internal sealed partial class MainWindow
             || MainTextBoxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || Mouse.LeftButton is MouseButtonState.Pressed
-            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On))
+            || (!configManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On))
         {
             return;
         }
 
         if (Background.Opacity is not 0)
         {
-            if (ConfigManager.TextOnlyVisibleOnHover)
+            if (configManager.TextOnlyVisibleOnHover)
             {
                 MainGrid.Opacity = 0;
             }
 
-            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
             {
-                Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
             }
         }
     }
@@ -1562,7 +1585,7 @@ internal sealed partial class MainWindow
         if (IsMouseOver
             || FirstPopupWindow.MiningMode
             || (FirstPopupWindow.IsMouseOver
-                && (ConfigManager.FixedPopupPositioning
+                && (ConfigManager.Instance.FixedPopupPositioning
                     || FirstPopupWindow.UnavoidableMouseEnter)))
         {
             return;
@@ -1573,19 +1596,20 @@ internal sealed partial class MainWindow
 
     private void Window_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (ConfigManager.TextOnlyVisibleOnHover)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.TextOnlyVisibleOnHover)
         {
             MainGrid.Opacity = 1;
         }
 
-        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
         {
             Background.Opacity = OpacitySlider.Value / 100;
         }
 
-        if (ConfigManager.Focusable
+        if (configManager.Focusable
             && !FirstPopupWindow.IsVisible
-            && ConfigManager.MainWindowFocusOnHover)
+            && configManager.MainWindowFocusOnHover)
         {
             _ = Activate();
         }
@@ -1593,14 +1617,16 @@ internal sealed partial class MainWindow
 
     private void Window_StateChanged(object sender, EventArgs e)
     {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (WindowState is WindowState.Minimized)
         {
-            if (ConfigManager.StopIncreasingTimeStatWhenMinimized)
+            if (configManager.StopIncreasingTimeStatWhenMinimized)
             {
                 StatsUtils.StatsStopWatch.Stop();
             }
 
-            if (ConfigManager.GlobalHotKeys)
+            if (configManager.GlobalHotKeys)
             {
                 List<int> keyGestureIdsToIgnore = new(KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length);
                 for (int i = 0; i < KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length; i++)
@@ -1624,23 +1650,23 @@ internal sealed partial class MainWindow
 
         else
         {
-            if (ConfigManager.StopIncreasingTimeStatWhenMinimized
-                && (CoreConfigManager.CaptureTextFromClipboard || (CoreConfigManager.CaptureTextFromWebSocket && WebSocketUtils.Connected)))
+            if (configManager.StopIncreasingTimeStatWhenMinimized
+                && (coreConfigManager.CaptureTextFromClipboard || (coreConfigManager.CaptureTextFromWebSocket && WebSocketUtils.Connected)))
             {
                 StatsUtils.StatsStopWatch.Start();
             }
 
-            if (ConfigManager.GlobalHotKeys)
+            if (configManager.GlobalHotKeys)
             {
                 WinApi.RegisterAllGlobalHotKeys(WindowHandle);
             }
 
-            if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+            if (SizeToContent is SizeToContent.Manual && (configManager.MainWindowDynamicHeight || configManager.MainWindowDynamicWidth))
             {
-                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowMinDynamicWidth, ConfigManager.MainWindowMinDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
+                WindowsUtils.SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight, this);
             }
 
-            if (ConfigManager.AlwaysOnTop)
+            if (configManager.AlwaysOnTop)
             {
                 WinApi.BringToFront(WindowHandle);
             }
@@ -1654,7 +1680,7 @@ internal sealed partial class MainWindow
             FirstPopupWindow.HidePopup();
         }
 
-        if (ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
+        if (ConfigManager.Instance.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
         {
             ShowTitleBarButtons();
         }
@@ -1662,7 +1688,7 @@ internal sealed partial class MainWindow
 
     private void TitleBar_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
+        if (!ConfigManager.Instance.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
             || FontSizeButton.IsMouseOver
             || OpacityButton.IsMouseOver
             || MinimizeButton.IsMouseOver
@@ -1678,10 +1704,11 @@ internal sealed partial class MainWindow
 
     private void TitleBarButtonMouseLeave(object sender, MouseEventArgs e)
     {
-        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
+        ConfigManager configManager = ConfigManager.Instance;
+        if (!configManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
             || FontSizeSlider.IsVisible
             || OpacitySlider.IsVisible
-            || (Background.Opacity is 0 && !ConfigManager.GlobalHotKeys))
+            || (Background.Opacity is 0 && !configManager.GlobalHotKeys))
         {
             return;
         }
@@ -1732,5 +1759,76 @@ internal sealed partial class MainWindow
     private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         PopupWindowUtils.HidePopups(FirstPopupWindow);
+    }
+
+    public void UpdatePosition()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        if ((configManager.RepositionMainWindowOnTextChangeByBottomPosition && configManager.MainWindowDynamicHeight)
+            || (configManager.RepositionMainWindowOnTextChangeByRightPosition && configManager.MainWindowDynamicWidth))
+        {
+            UpdateLayout();
+
+            double newTop = Top * WindowsUtils.Dpi.DpiScaleY;
+            if (configManager.RepositionMainWindowOnTextChangeByBottomPosition && configManager.MainWindowDynamicHeight)
+            {
+                newTop = GetDynamicYPosition(configManager.MainWindowFixedBottomPosition);
+            }
+
+            double newLeft = Left * WindowsUtils.Dpi.DpiScaleX;
+            if (configManager.RepositionMainWindowOnTextChangeByRightPosition && configManager.MainWindowDynamicWidth)
+            {
+                newLeft = GetDynamicXPosition(configManager.MainWindowFixedRightPosition);
+            }
+
+            WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
+
+            LeftPositionBeforeResolutionChange = Left;
+            TopPositionBeforeResolutionChange = Top;
+            HeightBeforeResolutionChange = Height;
+            WidthBeforeResolutionChange = Width;
+        }
+    }
+
+    private double GetDynamicXPosition(double rightPosition)
+    {
+        double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
+
+        Screen activeScreen = WindowsUtils.ActiveScreen;
+        if (rightPosition is 0)
+        {
+            rightPosition = (activeScreen.Bounds.Left + activeScreen.Bounds.Right + currentWidth) / 2;
+        }
+        else if (rightPosition is -1)
+        {
+            rightPosition = activeScreen.WorkingArea.Right;
+        }
+        else if (rightPosition is -2)
+        {
+            rightPosition = activeScreen.Bounds.Right;
+        }
+
+        return Math.Max(rightPosition is not -1 ? activeScreen.Bounds.Left : activeScreen.WorkingArea.Left, rightPosition - currentWidth);
+    }
+
+    private double GetDynamicYPosition(double bottomPosition)
+    {
+        double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
+
+        Screen activeScreen = WindowsUtils.ActiveScreen;
+        if (bottomPosition is -2)
+        {
+            bottomPosition = activeScreen.Bounds.Bottom;
+        }
+        else if (bottomPosition is -1)
+        {
+            bottomPosition = activeScreen.WorkingArea.Bottom;
+        }
+        else if (bottomPosition is 0)
+        {
+            bottomPosition = (activeScreen.Bounds.Top + activeScreen.Bounds.Bottom + currentHeight) / 2;
+        }
+
+        return Math.Max(bottomPosition is not -1 ? activeScreen.Bounds.Top : activeScreen.WorkingArea.Top, bottomPosition - currentHeight);
     }
 }

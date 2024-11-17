@@ -37,26 +37,26 @@ internal static class KeyGestureUtils
 
     public static readonly string[] NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized =
     [
-        nameof(ConfigManager.ToggleMinimizedStateKeyGesture),
-        nameof(ConfigManager.ClosePopupKeyGesture),
-        nameof(ConfigManager.DisableHotkeysKeyGesture),
-        nameof(ConfigManager.PlayAudioKeyGesture),
-        nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
-        nameof(ConfigManager.SearchWithBrowserKeyGesture),
-        nameof(ConfigManager.LookupFirstTermKeyGesture),
-        nameof(ConfigManager.MineSelectedLookupResultKeyGesture),
-        nameof(ConfigManager.MotivationKeyGesture),
-        nameof(ConfigManager.NextDictKeyGesture),
-        nameof(ConfigManager.PreviousDictKeyGesture),
-        nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
-        nameof(ConfigManager.SelectNextLookupResultKeyGesture),
-        nameof(ConfigManager.SelectPreviousLookupResultKeyGesture),
-        nameof(ConfigManager.CaptureTextFromClipboardKeyGesture),
-        nameof(ConfigManager.CaptureTextFromWebSocketKeyGesture),
-        nameof(ConfigManager.ReconnectToWebSocketServerKeyGesture),
-        nameof(ConfigManager.KanjiModeKeyGesture),
-        nameof(ConfigManager.ShowAddNameWindowKeyGesture),
-        nameof(ConfigManager.ShowAddWordWindowKeyGesture)
+        nameof(ConfigManager.Instance.ToggleMinimizedStateKeyGesture),
+        nameof(ConfigManager.Instance.ClosePopupKeyGesture),
+        nameof(ConfigManager.Instance.DisableHotkeysKeyGesture),
+        nameof(ConfigManager.Instance.PlayAudioKeyGesture),
+        nameof(ConfigManager.Instance.SelectedTextToSpeechKeyGesture),
+        nameof(ConfigManager.Instance.SearchWithBrowserKeyGesture),
+        nameof(ConfigManager.Instance.LookupFirstTermKeyGesture),
+        nameof(ConfigManager.Instance.MineSelectedLookupResultKeyGesture),
+        nameof(ConfigManager.Instance.MotivationKeyGesture),
+        nameof(ConfigManager.Instance.NextDictKeyGesture),
+        nameof(ConfigManager.Instance.PreviousDictKeyGesture),
+        nameof(ConfigManager.Instance.SelectedTextToSpeechKeyGesture),
+        nameof(ConfigManager.Instance.SelectNextLookupResultKeyGesture),
+        nameof(ConfigManager.Instance.SelectPreviousLookupResultKeyGesture),
+        nameof(ConfigManager.Instance.CaptureTextFromClipboardKeyGesture),
+        nameof(ConfigManager.Instance.CaptureTextFromWebSocketKeyGesture),
+        nameof(ConfigManager.Instance.ReconnectToWebSocketServerKeyGesture),
+        nameof(ConfigManager.Instance.KanjiModeKeyGesture),
+        nameof(ConfigManager.Instance.ShowAddNameWindowKeyGesture),
+        nameof(ConfigManager.Instance.ShowAddWordWindowKeyGesture)
     ];
 
     public static Task HandleKeyDown(KeyEventArgs e)
@@ -93,7 +93,8 @@ internal static class KeyGestureUtils
     public static Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e = null)
     {
         PopupWindow? lastPopup = null;
-        PopupWindow? currentPopup = MainWindow.Instance.FirstPopupWindow;
+        MainWindow mainWindow = MainWindow.Instance;
+        PopupWindow? currentPopup = mainWindow.FirstPopupWindow;
         while (currentPopup?.IsVisible ?? false)
         {
             lastPopup = currentPopup;
@@ -102,7 +103,7 @@ internal static class KeyGestureUtils
 
         return lastPopup is not null
             ? lastPopup.HandleHotKey(keyGesture, e)
-            : MainWindow.Instance.HandleHotKey(keyGesture, e);
+            : mainWindow.HandleHotKey(keyGesture, e);
     }
 
     public static bool IsEqual(this KeyGesture sourceKeyGesture, KeyGesture targetKeyGesture)
@@ -167,6 +168,7 @@ internal static class KeyGestureUtils
 
     public static KeyGesture GetKeyGestureFromConfig(SqliteConnection connection, string keyGestureName, KeyGesture defaultKeyGesture)
     {
+        ConfigManager configManager = ConfigManager.Instance;
         string? rawKeyGesture = ConfigDBManager.GetSettingValue(connection, keyGestureName);
         if (rawKeyGesture is not null)
         {
@@ -179,7 +181,7 @@ internal static class KeyGestureUtils
                 : $"Win+{rawKeyGesture}";
 
             KeyGesture newKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromInvariantString(keyGestureString)!;
-            if (ConfigManager.GlobalHotKeys)
+            if (configManager.GlobalHotKeys)
             {
                 WinApi.AddHotKeyToGlobalKeyGestureDict(keyGestureName, newKeyGesture);
             }
@@ -188,7 +190,7 @@ internal static class KeyGestureUtils
         }
 
         ConfigDBManager.InsertSetting(connection, keyGestureName, defaultKeyGesture.ToFormattedString());
-        if (ConfigManager.GlobalHotKeys)
+        if (configManager.GlobalHotKeys)
         {
             WinApi.AddHotKeyToGlobalKeyGestureDict(keyGestureName, defaultKeyGesture);
         }

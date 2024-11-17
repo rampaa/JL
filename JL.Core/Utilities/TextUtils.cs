@@ -76,12 +76,13 @@ public static class TextUtils
             text = RemoveInvalidUnicodeSequences(text, firstInvalidUnicodeCharIndex);
         }
 
-        if (CoreConfigManager.TextBoxTrimWhiteSpaceCharacters)
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        if (coreConfigManager.TextBoxTrimWhiteSpaceCharacters)
         {
             text = text.Trim();
         }
 
-        if (CoreConfigManager.TextBoxRemoveNewlines)
+        if (coreConfigManager.TextBoxRemoveNewlines)
         {
             text = text.ReplaceLineEndings("");
         }

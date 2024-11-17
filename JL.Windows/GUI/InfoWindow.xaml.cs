@@ -24,7 +24,7 @@ internal sealed partial class InfoWindow
     {
         base.OnActivated(e);
 
-        if (ConfigManager.Focusable)
+        if (ConfigManager.Instance.Focusable)
         {
             WinApi.AllowActivation(_windowHandle);
         }
