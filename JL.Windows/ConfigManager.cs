@@ -424,11 +424,13 @@ internal sealed class ConfigManager
         PopupWindowUtils.PopupAutoHideTimer.Enabled = false;
         PopupWindowUtils.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
 
+        DpiScale dpi = WindowsUtils.Dpi;
+
         PopupXOffset = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupXOffset, nameof(PopupXOffset), double.TryParse);
-        WindowsUtils.DpiAwareXOffset = PopupXOffset * WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwareXOffset = PopupXOffset * dpi.DpiScaleX;
 
         PopupYOffset = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupYOffset, nameof(PopupYOffset), double.TryParse);
-        WindowsUtils.DpiAwareYOffset = PopupYOffset * WindowsUtils.Dpi.DpiScaleY;
+        WindowsUtils.DpiAwareYOffset = PopupYOffset * dpi.DpiScaleY;
 
         PopupMaxWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMaxWidth, nameof(PopupMaxWidth), double.TryParse);
         PopupMaxHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMaxHeight, nameof(PopupMaxHeight), double.TryParse);
@@ -923,8 +925,9 @@ internal sealed class ConfigManager
             preferenceWindow.PopupFontComboBox.SelectedIndex = 0;
         }
 
-        preferenceWindow.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
-        preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
+        System.Drawing.Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
+        preferenceWindow.PopupMaxHeightNumericUpDown.Maximum = bounds.Height;
+        preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = bounds.Width;
 
         preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value = MaxNumResultsNotInMiningMode;
 
@@ -1076,9 +1079,8 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MaxSearchLength),
                 preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.AnkiConnectUri), preferenceWindow.AnkiUriTextBox.Text);
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.WebSocketUri), preferenceWindow.WebSocketUriTextBox.Text);
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiConnectUri), preferenceWindow.AnkiUriTextBox.Text);
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.WebSocketUri), preferenceWindow.WebSocketUriTextBox.Text);
 
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowDynamicWidth),
                 preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked.ToString()!);
@@ -1125,22 +1127,22 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(AlwaysShowMainTextBoxCaret),
                 preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.TextBoxTrimWhiteSpaceCharacters),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.TextBoxTrimWhiteSpaceCharacters),
                 preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.TextBoxRemoveNewlines),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.TextBoxRemoveNewlines),
                 preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(TextBoxApplyDropShadowEffect),
                 preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.CaptureTextFromClipboard),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard),
                 preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.CaptureTextFromWebSocket),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CaptureTextFromWebSocket),
                 preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.AutoReconnectToWebSocket),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AutoReconnectToWebSocket),
                 preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(OnlyCaptureTextWithJapaneseChars),
@@ -1201,16 +1203,16 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupFont), preferenceWindow.PopupFontComboBox.SelectedValue.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.KanjiMode),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.KanjiMode),
                 preferenceWindow.KanjiModeCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.ForceSyncAnki),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.ForceSyncAnki),
                 preferenceWindow.ForceSyncAnkiCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.AllowDuplicateCards),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AllowDuplicateCards),
                 preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.LookupRate),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.LookupRate),
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoAdjustFontSizesOnResolutionChange),
@@ -1232,7 +1234,7 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MineToFileInsteadOfAnki),
                 preferenceWindow.MineToFileInsteadOfAnkiCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.CheckForJLUpdatesOnStartUp),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckForJLUpdatesOnStartUp),
                 preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(AlwaysOnTop), preferenceWindow.AlwaysOnTopCheckBox.IsChecked.ToString()!);
@@ -1247,7 +1249,7 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(TextOnlyVisibleOnHover),
                 preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(coreConfigManager.AnkiIntegration),
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiIntegration),
                 preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(HighlightColor),
@@ -1396,11 +1398,12 @@ internal sealed class ConfigManager
                 preferenceWindow.CopyPrimarySpellingToClipboardMouseButtonComboBox.SelectedValue.ToString()!);
 
             MainWindow mainWindow = MainWindow.Instance;
+            DpiScale dpi = WindowsUtils.Dpi;
             ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition",
-                (mainWindow.Top * WindowsUtils.Dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture));
+                (mainWindow.Top * dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition",
-                (mainWindow.Left * WindowsUtils.Dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
+                (mainWindow.Left * dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
         }
 
         ApplyPreferences();
@@ -1437,18 +1440,20 @@ internal sealed class ConfigManager
             : mainWindow.MinWidth;
         ConfigDBManager.UpdateSetting(connection, nameof(MainWindowWidth), mainWindowWidth.ToString(CultureInfo.InvariantCulture));
 
+        System.Drawing.Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
+        DpiScale dpi = WindowsUtils.Dpi;
         double mainWindowTopPosition = mainWindow.Top >= SystemParameters.VirtualScreenTop
             ? mainWindow.Top + mainWindow.Height <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight
-                ? mainWindow.Top * WindowsUtils.Dpi.DpiScaleY
-                : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - mainWindow.Height) * WindowsUtils.Dpi.DpiScaleY
-            : WindowsUtils.ActiveScreen.Bounds.Y;
+                ? mainWindow.Top * dpi.DpiScaleY
+                : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - mainWindow.Height) * dpi.DpiScaleY
+            : bounds.Y;
         ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", mainWindowTopPosition.ToString(CultureInfo.InvariantCulture));
 
         double mainWindowLeftPosition = mainWindow.Left >= SystemParameters.VirtualScreenLeft
             ? mainWindow.Left + mainWindow.Width <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
-                ? mainWindow.Left * WindowsUtils.Dpi.DpiScaleX
-                : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - mainWindow.Width) * WindowsUtils.Dpi.DpiScaleX
-            : WindowsUtils.ActiveScreen.Bounds.X;
+                ? mainWindow.Left * dpi.DpiScaleX
+                : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - mainWindow.Width) * dpi.DpiScaleX
+            : bounds.X;
         ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.AnalyzeAndVacuum(connection);

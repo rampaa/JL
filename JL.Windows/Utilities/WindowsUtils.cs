@@ -149,7 +149,7 @@ internal static class WindowsUtils
         StatsUtils.StatsStopWatch.Stop();
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
+        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
             WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
@@ -166,7 +166,7 @@ internal static class WindowsUtils
         StatsUtils.StatsStopWatch.Stop();
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
+        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
             WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
@@ -184,7 +184,7 @@ internal static class WindowsUtils
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
-        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
+        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
             WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
@@ -218,7 +218,7 @@ internal static class WindowsUtils
         StatsUtils.StatsStopWatch.Stop();
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
+        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
             WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
@@ -240,7 +240,7 @@ internal static class WindowsUtils
         StatsUtils.StatsStopWatch.Stop();
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
+        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
             WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
@@ -259,7 +259,7 @@ internal static class WindowsUtils
         statsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
+        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
             WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
@@ -281,7 +281,7 @@ internal static class WindowsUtils
         StatsUtils.StatsStopWatch.Stop();
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
+        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
             WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }
@@ -729,7 +729,7 @@ internal static class WindowsUtils
 
         StatsUtils.StatsStopWatch.Start();
 
-        if (configManager.GlobalHotKeys && !configManager.DisableHotkeys)
+        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
             WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
         }

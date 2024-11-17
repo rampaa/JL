@@ -76,13 +76,10 @@ public static class WebSocketUtils
                         }
                         catch (WebSocketException webSocketException)
                         {
-                            if (!coreConfigManager.AutoReconnectToWebSocket)
+                            if (coreConfigManager is { AutoReconnectToWebSocket: false, CaptureTextFromClipboard: false })
                             {
-                                if (!coreConfigManager.CaptureTextFromClipboard)
-                                {
-                                    StatsUtils.StatsStopWatch.Stop();
-                                    StatsUtils.StopStatsTimer();
-                                }
+                                StatsUtils.StatsStopWatch.Stop();
+                                StatsUtils.StopStatsTimer();
                             }
 
                             if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
@@ -118,7 +115,7 @@ public static class WebSocketUtils
                     }
                 }
             }
-            while (coreConfigManager.AutoReconnectToWebSocket && coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested);
+            while (coreConfigManager is { AutoReconnectToWebSocket: true, CaptureTextFromWebSocket: true } && !cancellationToken.IsCancellationRequested);
         }, cancellationToken);
     }
 }

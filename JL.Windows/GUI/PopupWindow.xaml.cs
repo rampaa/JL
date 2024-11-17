@@ -418,8 +418,9 @@ internal sealed partial class PopupWindow
         double mouseX = cursorPosition.X;
         double mouseY = cursorPosition.Y;
 
-        double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
-        double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
+        DpiScale dpi = WindowsUtils.Dpi;
+        double currentWidth = ActualWidth * dpi.DpiScaleX;
+        double currentHeight = ActualHeight * dpi.DpiScaleY;
 
         ConfigManager configManager = ConfigManager.Instance;
 
@@ -1727,8 +1728,7 @@ internal sealed partial class PopupWindow
     private void OnMouseEnter(object sender, MouseEventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (!configManager.LookupOnSelectOnly
-            && !configManager.LookupOnMouseClickOnly
+        if (configManager is { LookupOnSelectOnly: false, LookupOnMouseClickOnly: false }
             && ChildPopupWindow is { IsVisible: true, MiningMode: false })
         {
             ChildPopupWindow.HidePopup();

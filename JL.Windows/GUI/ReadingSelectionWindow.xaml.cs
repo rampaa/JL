@@ -76,14 +76,16 @@ internal sealed partial class ReadingSelectionWindow
         double mouseX = cursorPosition.X;
         double mouseY = cursorPosition.Y;
 
-        double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
-        double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
+        DpiScale dpi = WindowsUtils.Dpi;
+        double currentWidth = ActualWidth * dpi.DpiScaleX;
+        double currentHeight = ActualHeight * dpi.DpiScaleY;
 
-        double dpiAwareXOffSet = 5 * WindowsUtils.Dpi.DpiScaleX;
-        double dpiAwareYOffset = 15 * WindowsUtils.Dpi.DpiScaleY;
+        double dpiAwareXOffSet = 5 * dpi.DpiScaleX;
+        double dpiAwareYOffset = 15 * dpi.DpiScaleY;
 
-        bool needsFlipX = mouseX + currentWidth > WindowsUtils.ActiveScreen.Bounds.Right;
-        bool needsFlipY = mouseY + currentHeight > WindowsUtils.ActiveScreen.Bounds.Bottom;
+        System.Drawing.Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
+        bool needsFlipX = mouseX + currentWidth > bounds.Right;
+        bool needsFlipY = mouseY + currentHeight > bounds.Bottom;
 
         double newLeft;
         double newTop;
@@ -92,9 +94,9 @@ internal sealed partial class ReadingSelectionWindow
         {
             // flip Leftwards while preventing -OOB
             newLeft = mouseX - currentWidth - dpiAwareXOffSet;
-            if (newLeft < WindowsUtils.ActiveScreen.Bounds.X)
+            if (newLeft < bounds.X)
             {
-                newLeft = WindowsUtils.ActiveScreen.Bounds.X;
+                newLeft = bounds.X;
             }
         }
         else
@@ -107,9 +109,9 @@ internal sealed partial class ReadingSelectionWindow
         {
             // flip Upwards while preventing -OOB
             newTop = mouseY - (currentHeight + dpiAwareYOffset);
-            if (newTop < WindowsUtils.ActiveScreen.Bounds.Y)
+            if (newTop < bounds.Y)
             {
-                newTop = WindowsUtils.ActiveScreen.Bounds.Y;
+                newTop = bounds.Y;
             }
         }
         else
@@ -119,14 +121,14 @@ internal sealed partial class ReadingSelectionWindow
         }
 
         // stick to edges if +OOB
-        if (newLeft + currentWidth > WindowsUtils.ActiveScreen.Bounds.Right)
+        if (newLeft + currentWidth > bounds.Right)
         {
-            newLeft = WindowsUtils.ActiveScreen.Bounds.Right - currentWidth;
+            newLeft = bounds.Right - currentWidth;
         }
 
-        if (newTop + currentHeight > WindowsUtils.ActiveScreen.Bounds.Bottom)
+        if (newTop + currentHeight > bounds.Bottom)
         {
-            newTop = WindowsUtils.ActiveScreen.Bounds.Bottom - currentHeight;
+            newTop = bounds.Bottom - currentHeight;
         }
 
         WinApi.MoveWindowToPosition(_windowHandle, newLeft, newTop);
