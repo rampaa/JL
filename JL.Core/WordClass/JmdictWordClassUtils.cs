@@ -105,12 +105,15 @@ internal static class JmdictWordClassUtils
 
     internal static async Task Initialize()
     {
-        if (!File.Exists(Path.Join(Utils.ResourcesPath, "PoS.json")))
-        {
-            Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-            bool useDB = dict.Options.UseDB.Value;
+        Dict jmdictDict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+        string jmdictPath = Path.GetFullPath(jmdictDict.Path, Utils.ApplicationPath);
+        string partOfSpeechFilePath = Path.Join(Utils.ResourcesPath, "PoS.json");
 
-            if (dict.Active && !useDB)
+        if (!File.Exists(partOfSpeechFilePath)
+            || (File.Exists(jmdictPath) && File.GetLastWriteTime(jmdictPath) > File.GetLastWriteTime(partOfSpeechFilePath)))
+        {
+            bool useDB = jmdictDict.Options.UseDB.Value;
+            if (jmdictDict.Active && !useDB)
             {
                 await Serialize().ConfigureAwait(false);
             }
@@ -118,13 +121,12 @@ internal static class JmdictWordClassUtils
             else
             {
                 bool deleteJmdictFile = false;
-                string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                if (!File.Exists(fullPath))
+                if (!File.Exists(jmdictPath))
                 {
                     deleteJmdictFile = true;
-                    bool downloaded = await DictUpdater.DownloadDict(fullPath,
+                    bool downloaded = await DictUpdater.DownloadDict(jmdictPath,
                         DictUtils.s_jmdictUrl,
-                        dict.Type.ToString(), false, true).ConfigureAwait(false);
+                        jmdictDict.Type.ToString(), false, true).ConfigureAwait(false);
 
                     if (!downloaded)
                     {
@@ -132,14 +134,14 @@ internal static class JmdictWordClassUtils
                     }
                 }
 
-                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 450000, StringComparer.Ordinal);
-                await Task.Run(async () => await JmdictLoader.Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+                jmdictDict.Contents = new Dictionary<string, IList<IDictRecord>>(jmdictDict.Size > 0 ? jmdictDict.Size : 450000, StringComparer.Ordinal);
+                await JmdictLoader.Load(jmdictDict).ConfigureAwait(false);
                 await Serialize().ConfigureAwait(false);
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                jmdictDict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
 
                 if (deleteJmdictFile)
                 {
-                    File.Delete(fullPath);
+                    File.Delete(jmdictPath);
                 }
             }
         }
