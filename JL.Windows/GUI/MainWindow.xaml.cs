@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -19,12 +18,8 @@ using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
-using Clipboard = System.Windows.Clipboard;
-using Cursors = System.Windows.Input.Cursors;
-using DpiChangedEventArgs = System.Windows.DpiChangedEventArgs;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Rectangle = System.Drawing.Rectangle;
+using Screen = System.Windows.Forms.Screen;
 
 namespace JL.Windows.GUI;
 

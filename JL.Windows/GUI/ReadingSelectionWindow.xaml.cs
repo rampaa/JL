@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using JL.Windows.Utilities;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace JL.Windows.GUI;
 
@@ -83,7 +84,7 @@ internal sealed partial class ReadingSelectionWindow
         double dpiAwareXOffSet = 5 * dpi.DpiScaleX;
         double dpiAwareYOffset = 15 * dpi.DpiScaleY;
 
-        System.Drawing.Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
+        Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
         bool needsFlipX = mouseX + currentWidth > bounds.Right;
         bool needsFlipY = mouseY + currentHeight > bounds.Bottom;
 

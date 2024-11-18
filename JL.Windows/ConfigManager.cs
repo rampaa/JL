@@ -12,6 +12,7 @@ using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace JL.Windows;
 
@@ -925,7 +926,7 @@ internal sealed class ConfigManager
             preferenceWindow.PopupFontComboBox.SelectedIndex = 0;
         }
 
-        System.Drawing.Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
+        Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
         preferenceWindow.PopupMaxHeightNumericUpDown.Maximum = bounds.Height;
         preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = bounds.Width;
 
@@ -1440,7 +1441,7 @@ internal sealed class ConfigManager
             : mainWindow.MinWidth;
         ConfigDBManager.UpdateSetting(connection, nameof(MainWindowWidth), mainWindowWidth.ToString(CultureInfo.InvariantCulture));
 
-        System.Drawing.Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
+        Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
         DpiScale dpi = WindowsUtils.Dpi;
         double mainWindowTopPosition = mainWindow.Top >= SystemParameters.VirtualScreenTop
             ? mainWindow.Top + mainWindow.Height <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight

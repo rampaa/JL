@@ -13,9 +13,6 @@ using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
-using Button = System.Windows.Controls.Button;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using TextBox = System.Windows.Controls.TextBox;
 
 namespace JL.Windows.GUI;
 

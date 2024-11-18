@@ -8,11 +8,9 @@ using System.Text.Json;
 using System.Web;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
 using JL.Core.Audio;
@@ -26,13 +24,8 @@ using JL.Windows.GUI;
 using JL.Windows.SpeechSynthesis;
 using NAudio.Vorbis;
 using NAudio.Wave;
-using Application = System.Windows.Application;
-using Button = System.Windows.Controls.Button;
-using Clipboard = System.Windows.Clipboard;
-using FlowDirection = System.Windows.FlowDirection;
-using PopupWindow = JL.Windows.GUI.PopupWindow;
-using TextBox = System.Windows.Controls.TextBox;
-using Window = System.Windows.Window;
+using ColorPicker = HandyControl.Controls.ColorPicker;
+using Screen = System.Windows.Forms.Screen;
 
 namespace JL.Windows.Utilities;
 
