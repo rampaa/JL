@@ -7,7 +7,6 @@ using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using Microsoft.Win32;
-using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
 

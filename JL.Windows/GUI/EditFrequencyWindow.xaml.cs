@@ -8,7 +8,6 @@ using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
-using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
 

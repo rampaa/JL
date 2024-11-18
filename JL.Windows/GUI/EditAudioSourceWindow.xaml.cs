@@ -4,7 +4,6 @@ using System.Windows.Media;
 using JL.Core.Audio;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
-using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
 
