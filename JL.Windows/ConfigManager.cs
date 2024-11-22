@@ -73,6 +73,15 @@ internal sealed class ConfigManager
     public double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
     public bool TextBoxUseCustomLineHeight { get; private set; } // = false;
     public double TextBoxCustomLineHeight { get; private set; } = 75;
+    //MINE defs
+    public bool ShowButton1 { get; private set; } = true;
+    public bool ShowButton2 { get; private set; } = true;
+    public bool ShowButton3 { get; private set; } // = false;
+    public bool NameTextBox_Use { get; private set; } = true;
+    public double NameTextBox_Height { get; private set; } = 56;
+    public double NameTextBox_MainTextBoxLeftOffset { get; private set; } = 34;
+    public double NameTextBox_MainTextBoxLeftOffset_WhenNoName { get; private set; } // = 0;
+    //MINEEND
     public bool RepositionMainWindowOnTextChangeByBottomPosition { get; private set; } // = false;
     public double MainWindowFixedBottomPosition { get; private set; } = -2;
     public bool RepositionMainWindowOnTextChangeByRightPosition { get; private set; } // = false;
@@ -421,6 +430,50 @@ internal sealed class ConfigManager
             mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, double.NaN);
         }
 
+        //MINE ApplyPreferences
+        ShowButton1 = ConfigDBManager.GetValueFromConfig(connection, ShowButton1, nameof(ShowButton1), bool.TryParse);
+        ShowButton2 = ConfigDBManager.GetValueFromConfig(connection, ShowButton2, nameof(ShowButton2), bool.TryParse);
+        ShowButton3 = ConfigDBManager.GetValueFromConfig(connection, ShowButton3, nameof(ShowButton3), bool.TryParse);
+#pragma warning disable format
+        mainWindow.OpacityButtonStackPanel.Visibility  = ShowButton1 ? Visibility.Visible : Visibility.Collapsed;
+        mainWindow.FontSizeButtonStackPanel.Visibility = ShowButton2 ? Visibility.Visible : Visibility.Collapsed;
+        mainWindow.ButtonHideStackPanel.Visibility     = ShowButton3 ? Visibility.Visible : Visibility.Collapsed;
+#pragma warning restore format
+
+        NameTextBox_Use = ConfigDBManager.GetValueFromConfig(connection, NameTextBox_Use, nameof(NameTextBox_Use), bool.TryParse);
+        NameTextBox_Height = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, NameTextBox_Height, nameof(NameTextBox_Height), double.TryParse);
+        NameTextBox_MainTextBoxLeftOffset = ConfigDBManager.GetNumberWithDecimalPointFromConfig(
+            connection, NameTextBox_MainTextBoxLeftOffset, nameof(NameTextBox_MainTextBoxLeftOffset), double.TryParse
+            );
+        NameTextBox_MainTextBoxLeftOffset_WhenNoName = ConfigDBManager.GetNumberWithDecimalPointFromConfig(
+            connection, NameTextBox_MainTextBoxLeftOffset_WhenNoName, nameof(NameTextBox_MainTextBoxLeftOffset_WhenNoName), double.TryParse
+            );
+        //TODO: maybe add extra checks here? So negatives, numbers like 0.5, and numbers too large get normalized.
+        if (NameTextBox_Use)
+        {
+            mainWindow.NameTextBox.Visibility = Visibility.Visible;
+            Thickness th = mainWindow.MainTextBox.Margin;
+            if (mainWindow.NameTextBox.Text.Length == 0)
+            {
+                th.Left = 5 + NameTextBox_MainTextBoxLeftOffset_WhenNoName;
+            }
+            else
+            {
+                th.Left = 5 + NameTextBox_MainTextBoxLeftOffset;
+            }
+            th.Top = 30 + NameTextBox_Height;
+            mainWindow.MainTextBox.Margin = th;
+        }
+        else
+        {
+            mainWindow.NameTextBox.Visibility = Visibility.Collapsed;
+            Thickness th = mainWindow.MainTextBox.Margin;
+            th.Left = 5;
+            th.Top = 20;
+            mainWindow.MainTextBox.Margin = th;
+        }
+        //MINEEND
+
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
         PopupWindowUtils.PopupAutoHideTimer.Enabled = false;
         PopupWindowUtils.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
@@ -631,6 +684,7 @@ internal sealed class ConfigManager
         {
             string mainWindowFontStr = ConfigDBManager.GetValueFromConfig(connection, "Meiryo", "MainWindowFont");
             mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
+            mainWindow.NameTextBox.FontFamily = new FontFamily(mainWindowFontStr);
         }
 
         {
@@ -949,6 +1003,14 @@ internal sealed class ConfigManager
         preferenceWindow.DictTypeFontSizeNumericUpDown.Value = DictTypeFontSize;
         preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value = MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds;
         preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value = TextBoxCustomLineHeight;
+        //MINE LoadPreferenceWindow
+        preferenceWindow.ShowButton1CheckBox.IsChecked = ShowButton1;
+        preferenceWindow.ShowButton2CheckBox.IsChecked = ShowButton2;
+        preferenceWindow.ShowButton3CheckBox.IsChecked = ShowButton3;
+        preferenceWindow.NameTextBox_Height_NumericUpDown.Value = NameTextBox_Height;
+        preferenceWindow.NameTextBox_MainTextBoxLeftOffset_NumericUpDown.Value = NameTextBox_MainTextBoxLeftOffset;
+        preferenceWindow.NameTextBox_MainTextBoxLeftOffset_WhenNoName_NumericUpDown.Value = NameTextBox_MainTextBoxLeftOffset_WhenNoName;
+        //MINEEND
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
         preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
         preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
@@ -1330,6 +1392,29 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(TextBoxCustomLineHeight),
                 preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            //MINE SavePreferences
+            ConfigDBManager.UpdateSetting(connection, nameof(ShowButton1),
+                preferenceWindow.ShowButton1CheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(ShowButton2),
+                preferenceWindow.ShowButton2CheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(ShowButton3),
+                preferenceWindow.ShowButton3CheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(NameTextBox_Use),
+                preferenceWindow.NameTextBox_Use_Checkbox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(NameTextBox_Height),
+                preferenceWindow.NameTextBox_Height_NumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(NameTextBox_MainTextBoxLeftOffset),
+                preferenceWindow.NameTextBox_MainTextBoxLeftOffset_NumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(NameTextBox_MainTextBoxLeftOffset_WhenNoName),
+                preferenceWindow.NameTextBox_MainTextBoxLeftOffset_WhenNoName_NumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            //MINEEND
 
             ConfigDBManager.UpdateSetting(connection, nameof(SeparatorColor), preferenceWindow.SeparatorColorButton.Tag.ToString()!);
 

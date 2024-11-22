@@ -618,6 +618,33 @@
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Show Button 1"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       Cursor="Help"
+                                       ToolTip="Show or hide button 1."/>
+                            <CheckBox x:Name="ShowButton1CheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Show Button 2"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       Cursor="Help"
+                                       ToolTip="Show or hide button 2."/>
+                            <CheckBox x:Name="ShowButton2CheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Show Button 3"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       Cursor="Help"
+                                       ToolTip="Show or hide button 3."/>
+                            <CheckBox x:Name="ShowButton3CheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -991,6 +1018,48 @@
                             <Button x:Name="SeparatorColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="NameTextBox" HorizontalAlignment="Left" Width="100">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
+                    <StackPanel Margin="20,10,20,10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type DockPanel}">
+                                <Setter Property="Margin" Value="0,10,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Use NameTextBox"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="NameTextBox_Use_Checkbox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="NameTextBox Height"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="NameTextBox_Height_NumericUpDown" Minimum="0"
+                                            HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="MainTextBox left offset"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="NameTextBox_MainTextBoxLeftOffset_NumericUpDown" Minimum="0"
+                                            HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="MainTextBox left offset (when no name is on screen)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="NameTextBox_MainTextBoxLeftOffset_WhenNoName_NumericUpDown" Minimum="0"
+                                            HorizontalAlignment="Right" />
                         </DockPanel>
                     </StackPanel>
                 </ScrollViewer>

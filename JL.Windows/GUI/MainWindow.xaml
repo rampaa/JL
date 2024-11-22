@@ -42,7 +42,12 @@
             </Rectangle.ContextMenu>
         </Rectangle>
 
-        <uc:TouchScreenTextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        <uc:TouchScreenTextBox x:Name="NameTextBox" Margin="5,30,5,5" VerticalContentAlignment="Top"
+                               Background="Transparent" Foreground="White" FontSize="32"
+                               IsReadOnly="True" BorderThickness="0,0,0,0" >
+        </uc:TouchScreenTextBox>
+
+        <uc:TouchScreenTextBox x:Name="MainTextBox" Margin="39,90,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                  Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}" 
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
@@ -92,7 +97,7 @@
         </uc:TouchScreenTextBox>
 
         <DockPanel Margin="10,0,0,0" HorizontalAlignment="Left">
-            <StackPanel Width="20">
+            <StackPanel Width="20" x:Name="OpacityButtonStackPanel">
                 <TextBlock x:Name="OpacityButton" HorizontalAlignment="Center" MouseLeave="TitleBarButtonMouseLeave"
                    Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI"
                    MouseDown="OpacityButton_MouseDown" ToolTip="Opacity" FontWeight="Normal" FontSize="18">
@@ -111,7 +116,7 @@
                 ScrollViewer.VerticalScrollBarVisibility="Disabled" LostFocus="OpacitySlider_LostFocus">
                 </Slider>
             </StackPanel>
-            <StackPanel Margin="5,0,0,0" Width="20">
+            <StackPanel Margin="5,0,0,0" Width="20" x:Name="FontSizeButtonStackPanel">
                 <TextBlock x:Name="FontSizeButton" HorizontalAlignment="Center" MouseLeave="TitleBarButtonMouseLeave"
                    Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI"
                    MouseDown="FontSizeButton_MouseDown" ToolTip="Font Size" FontSize="18">
@@ -129,6 +134,18 @@
                 IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled"
                 IsSnapToTickEnabled="True" LostFocus="FontSizeSlider_LostFocus">
                 </Slider>
+            </StackPanel>
+            <StackPanel Width="20" x:Name="ButtonHideStackPanel">
+                <TextBlock x:Name="ButtonHide" HorizontalAlignment="Center" MouseLeave="TitleBarButtonMouseLeave"
+                   Text="H" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI"
+                   MouseDown="ButtonHide_MouseDown" ToolTip="Opacity" FontWeight="Normal" FontSize="18">
+                    <TextBlock.Background>
+                        <SolidColorBrush Color="Black" Opacity="0.002"/>
+                    </TextBlock.Background>
+                    <TextBlock.Effect>
+                        <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
+                    </TextBlock.Effect>
+                </TextBlock>
             </StackPanel>
         </DockPanel>
 

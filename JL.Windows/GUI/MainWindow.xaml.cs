@@ -159,6 +159,55 @@ internal sealed partial class MainWindow
             return false;
         }
 
+        int nameSplitPoint = 0;
+        string? name = null;
+        if (configManager.NameTextBox_Use)
+        {
+            {
+                int quoteEnd = sanitizedNewText.LastIndexOf('」');
+                if (quoteEnd == sanitizedNewText.Length - 1)
+                {
+                    int quoteStart = sanitizedNewText.IndexOf('「', StringComparison.Ordinal);
+                    if (quoteStart >= 0)
+                    {
+                        int i = quoteStart;
+                        nameSplitPoint = i;
+                    }
+                }
+            }
+
+            if (nameSplitPoint == 0)
+            {
+                int quoteEnd = sanitizedNewText.LastIndexOf('』');
+                if (quoteEnd == sanitizedNewText.Length - 1)
+                {
+                    int quoteStart = sanitizedNewText.IndexOf('『', StringComparison.Ordinal);
+                    if (quoteStart >= 0)
+                    {
+                        int i = quoteStart;
+                        nameSplitPoint = i;
+                    }
+                }
+            }
+
+
+            if (nameSplitPoint != 0)
+            {
+                int i = nameSplitPoint;
+                name = sanitizedNewText[..i];
+                //TODO: this is done again later, but I do this here to return false quickly.
+                // Probably not necessary. Check if necessary.
+                //TODO: would be nice to pass a number nameSplitPoint instead of string name,
+                // but that requires some changes down the line.
+
+                sanitizedNewText = sanitizedNewText[(i + 1)..];
+                if (sanitizedNewText.Length is 0)
+                {
+                    return false;
+                }
+            }
+        }
+
         bool mergeTexts = false;
         string? subsequentText = null;
         string? mergedText = null;
@@ -215,6 +264,25 @@ internal sealed partial class MainWindow
             else
             {
                 MainTextBox.Text = sanitizedNewText;
+            }
+
+            if (configManager.NameTextBox_Use)
+            {
+                if (nameSplitPoint != 0)
+                {
+                    //string name = sanitizedNewText[..nameSplitPoint];
+                    NameTextBox.Text = name;
+                    Thickness th = MainTextBox.Margin;
+                    th.Left = configManager.NameTextBox_MainTextBoxLeftOffset;
+                    MainTextBox.Margin = th;
+                }
+                else
+                {
+                    NameTextBox.Text = "";
+                    Thickness th = MainTextBox.Margin;
+                    th.Left = configManager.NameTextBox_MainTextBoxLeftOffset_WhenNoName;
+                    MainTextBox.Margin = th;
+                }
             }
 
             MainTextBox.Foreground = configManager.MainWindowTextColor;
@@ -403,6 +471,25 @@ internal sealed partial class MainWindow
         else if (e.ChangedButton is MouseButton.Right)
         {
             PopupWindowUtils.HidePopups(FirstPopupWindow);
+        }
+    }
+
+    private void ButtonHide_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is MouseButton.Left)
+        {
+            if (Background.Opacity <= 0.02)
+            {
+                Background.Opacity = 0.2;
+                MainTextBox.Opacity = 1.0;
+                NameTextBox.Opacity = 1.0;
+            }
+            else
+            {
+                Background.Opacity = 0.01;
+                MainTextBox.Opacity = 0.01;
+                NameTextBox.Opacity = 0.01;
+            }
         }
     }
 
