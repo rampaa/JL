@@ -700,7 +700,6 @@ internal sealed partial class PopupWindow
             {
                 if (MiningUtils.CheckDuplicate(result).Result)
                 {
-                    Utils.Frontend.Alert(AlertLevel.Error, $"{result.PrimarySpelling} is a duplicate card");
                     Button duplicate = new()
                     {
                         Name = nameof(duplicate),
