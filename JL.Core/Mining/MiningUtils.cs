@@ -440,6 +440,77 @@ public static class MiningUtils
         Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
     }
 
+    public static async Task<bool> CheckDuplicate(LookupResult lookupResult)
+    {
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        if (!coreConfigManager.AnkiIntegration || !coreConfigManager.CheckForDuplicateCards)
+        {
+            return false;
+        }
+
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+        if (ankiConfigDict is null)
+        {
+            return false;
+        }
+
+        AnkiConfig? ankiConfig;
+        if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
+        {
+            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
+        }
+        else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
+        {
+            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
+        }
+        else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
+        {
+            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
+        }
+        else
+        {
+            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
+        }
+
+        if (ankiConfig is null)
+        {
+            return false;
+        }
+
+        Dictionary<string, JLField> userFields = ankiConfig.Fields;
+        Dictionary<JLField, string> miningParams = new()
+        {
+            [JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture),
+            [JLField.DictionaryName] = lookupResult.Dict.Name,
+            [JLField.MatchedText] = lookupResult.MatchedText,
+            [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
+            [JLField.PrimarySpelling] = lookupResult.PrimarySpelling,
+            [JLField.PrimarySpellingWithOrthographyInfo] = lookupResult.PrimarySpellingOrthographyInfoList is not null
+                ? $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})"
+                : lookupResult.PrimarySpelling
+        };
+
+        Dictionary<string, string> fields = ConvertFields(userFields, miningParams);
+
+        // Audio/Picture/Video shouldn't be set here
+        // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
+        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, ankiConfig.Tags, null, null, null, null);
+        if (!coreConfigManager.AllowDuplicateCards)
+        {
+            bool? canAddNote = await AnkiUtils.CanAddNote(note).ConfigureAwait(false);
+            if (canAddNote is null)
+            {
+                return false;
+            }
+
+            if (!canAddNote.Value)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static async Task Mine(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition)
     {
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;

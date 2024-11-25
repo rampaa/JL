@@ -15,6 +15,7 @@ public sealed class CoreConfigManager
     public bool AnkiIntegration { get; set; } // = false;
     public bool ForceSyncAnki { get; private set; } // = false;
     public bool AllowDuplicateCards { get; private set; } // = false;
+    public bool CheckForDuplicateCards { get; private set; } // = false;
     public double LookupRate { get; private set; } // = 0;
     public bool CaptureTextFromClipboard { get; set; } = true;
     public bool CaptureTextFromWebSocket { get; set; } // = false;
@@ -95,6 +96,7 @@ public sealed class CoreConfigManager
         AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);
         ForceSyncAnki = ConfigDBManager.GetValueFromConfig(connection, ForceSyncAnki, nameof(ForceSyncAnki), bool.TryParse);
         AllowDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, AllowDuplicateCards, nameof(AllowDuplicateCards), bool.TryParse);
+        CheckForDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, CheckForDuplicateCards, nameof(CheckForDuplicateCards), bool.TryParse);
         LookupRate = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, LookupRate, nameof(LookupRate), double.TryParse);
         TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
         TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);

@@ -695,6 +695,31 @@ internal sealed partial class PopupWindow
             audioButton.Click += AudioButton_Click;
 
             _ = top.Children.Add(audioButton);
+
+            if (!configManager.MineToFileInsteadOfAnki)
+            {
+                if (MiningUtils.CheckDuplicate(result).Result)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Error, $"{result.PrimarySpelling} is a duplicate card");
+                    Button duplicate = new()
+                    {
+                        Name = nameof(duplicate),
+                        Content = "⚠️",
+                        Foreground = configManager.DefinitionsColor,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = new Thickness(3, 0, 0, 0),
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Background = Brushes.Transparent,
+                        Cursor = Cursors.Arrow,
+                        BorderThickness = new Thickness(0),
+                        Padding = new Thickness(0),
+                        FontSize = 14,
+                        ToolTip = $"{result.PrimarySpelling} is already in anki deck."
+                    };
+
+                    _ = top.Children.Add(duplicate);
+                }
+            }
         }
 
         if (result.AlternativeSpellings is not null && configManager.AlternativeSpellingsFontSize > 0)
