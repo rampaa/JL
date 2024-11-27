@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -51,6 +52,7 @@ internal sealed partial class PopupWindow
     public nint WindowHandle { get; private set; }
 
     public List<LookupResult> LastLookupResults { get; private set; } = [];
+    public List<Button> DuplicateIcons { get; private set; } = [];
 
     private List<Dict> _dictsWithResults = [];
 
@@ -251,6 +253,7 @@ internal sealed partial class PopupWindow
             }
 
             LastLookupResults = lookupResults;
+            DuplicateIcons = [];
 
             if (enableMiningMode)
             {
@@ -365,6 +368,7 @@ internal sealed partial class PopupWindow
             _previousTextBox = textBox;
             LastSelectedText = lookupResults[0].MatchedText;
             LastLookupResults = lookupResults;
+            DuplicateIcons = [];
 
             EnableMiningMode();
             DisplayResults(true);
@@ -508,6 +512,7 @@ internal sealed partial class PopupWindow
         }
 
         PopupListView.ItemsSource = popupItemSource;
+        CheckResultForDuplicates();
         GenerateDictTypeButtons();
         UpdateLayout();
     }
@@ -698,26 +703,25 @@ internal sealed partial class PopupWindow
 
             if (!configManager.MineToFileInsteadOfAnki)
             {
-                if (MiningUtils.CheckDuplicate(result).Result)
+                Button duplicate = new()
                 {
-                    Button duplicate = new()
-                    {
-                        Name = nameof(duplicate),
-                        Content = "⚠️",
-                        Foreground = configManager.DefinitionsColor,
-                        VerticalAlignment = VerticalAlignment.Top,
-                        Margin = new Thickness(3, 0, 0, 0),
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Background = Brushes.Transparent,
-                        Cursor = Cursors.Arrow,
-                        BorderThickness = new Thickness(0),
-                        Padding = new Thickness(0),
-                        FontSize = 14,
-                        ToolTip = $"{result.PrimarySpelling} is already in anki deck."
-                    };
+                    Name = nameof(duplicate),
+                    Content = "⚠️",
+                    Foreground = configManager.DefinitionsColor,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new Thickness(3, 0, 0, 0),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Background = Brushes.Transparent,
+                    Cursor = Cursors.Arrow,
+                    BorderThickness = new Thickness(0),
+                    Padding = new Thickness(0),
+                    FontSize = 14,
+                    ToolTip = $"{result.PrimarySpelling} is already in anki deck.",
+                    Visibility = Visibility.Collapsed
+                };
 
-                    _ = top.Children.Add(duplicate);
-                }
+                _ = top.Children.Add(duplicate);
+                DuplicateIcons.Add(duplicate);
             }
         }
 
@@ -1089,6 +1093,30 @@ internal sealed partial class PopupWindow
         stackPanel.MouseEnter += ListViewItem_MouseEnter;
 
         return stackPanel;
+    }
+
+    private async void CheckResultForDuplicates()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        if (MiningMode && coreConfigManager.AnkiIntegration
+            && coreConfigManager.CheckForDuplicateCards
+            && !configManager.MineToFileInsteadOfAnki)
+        {
+            List<bool>? duplicateCard = await MiningUtils.CheckDuplicates(LastLookupResults, _currentText, _currentCharPosition).ConfigureAwait(false);
+
+            if (duplicateCard != null)
+            {
+                for (int i = 0; i < duplicateCard.Count; i++)
+                {
+                    if (duplicateCard[i])
+                    {
+                        await MainWindow.Instance.Dispatcher.InvokeAsync(() => { DuplicateIcons[i].Visibility = Visibility.Visible; });
+                    }
+
+                }
+            }
+        }
     }
 
     private int GetFirstVisibleListViewItemIndex()
@@ -2092,6 +2120,7 @@ internal sealed partial class PopupWindow
         PopupListView.ItemsSource = null;
         _lastInteractedTextBox = null;
         LastLookupResults = null!;
+        DuplicateIcons = null!;
         _dictsWithResults = null!;
         _currentText = null!;
         _buttonAll.Click -= DictTypeButtonOnClick;

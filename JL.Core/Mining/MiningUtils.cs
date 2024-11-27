@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Text.Json;
 using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
@@ -440,75 +441,73 @@ public static class MiningUtils
         Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
     }
 
-    public static async Task<bool> CheckDuplicate(LookupResult lookupResult)
+    public static async Task<List<bool>?> CheckDuplicates(List<LookupResult> lookupResults, string currentText, int currentCharPosition)
     {
-        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-        if (!coreConfigManager.AnkiIntegration || !coreConfigManager.CheckForDuplicateCards)
+        List<Note> notes = [];
+        List<int> positions = [];
+        List<bool> ret = [];
+        for (int i = 0; i < lookupResults.Count; i++)
         {
-            return false;
-        }
+            ret.Add(false);
+            LookupResult lookupResult = lookupResults[i];
 
-        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
-        if (ankiConfigDict is null)
-        {
-            return false;
-        }
-
-        AnkiConfig? ankiConfig;
-        if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
-        {
-            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
-        }
-        else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
-        {
-            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
-        }
-        else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
-        {
-            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
-        }
-        else
-        {
-            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
-        }
-
-        if (ankiConfig is null)
-        {
-            return false;
-        }
-
-        Dictionary<string, JLField> userFields = ankiConfig.Fields;
-        Dictionary<JLField, string> miningParams = new()
-        {
-            [JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture),
-            [JLField.DictionaryName] = lookupResult.Dict.Name,
-            [JLField.MatchedText] = lookupResult.MatchedText,
-            [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
-            [JLField.PrimarySpelling] = lookupResult.PrimarySpelling,
-            [JLField.PrimarySpellingWithOrthographyInfo] = lookupResult.PrimarySpellingOrthographyInfoList is not null
-                ? $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})"
-                : lookupResult.PrimarySpelling
-        };
-
-        Dictionary<string, string> fields = ConvertFields(userFields, miningParams);
-
-        // Audio/Picture/Video shouldn't be set here
-        // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
-        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, ankiConfig.Tags, null, null, null, null);
-        if (!coreConfigManager.AllowDuplicateCards)
-        {
-            bool? canAddNote = await AnkiUtils.CanAddNote(note).ConfigureAwait(false);
-            if (canAddNote is null)
+            Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+            if (ankiConfigDict is null)
             {
-                return false;
+                continue;
             }
 
-            if (!canAddNote.Value)
+            AnkiConfig? ankiConfig;
+            if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
             {
-                return true;
+                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
             }
+            else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
+            {
+                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
+            }
+            else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
+            {
+                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
+            }
+            else
+            {
+                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
+            }
+
+            if (ankiConfig is null)
+            {
+                continue;
+            }
+
+            Dictionary<string, JLField> userFields = ankiConfig.Fields;
+            JLField firstValue = userFields.First().Value;
+            Dictionary<JLField, string> filteredMiningParams = new()
+            {
+                { firstValue, GetMiningParameters(lookupResult, currentText, null, null, currentCharPosition, true)[firstValue] }
+            };
+            Dictionary<string, string> fields = ConvertFields(userFields, filteredMiningParams);
+
+            Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, ankiConfig.Tags, null, null, null, null);
+            notes.Add(note);
+
+            positions.Add(i);
         }
-        return false;
+
+        Utils.Logger.Error("Sending notes to anki {notes}", JsonSerializer.Serialize(notes));
+
+        bool[]? canAddNote = await AnkiUtils.CanAddNotes(notes.ToArray()).ConfigureAwait(false);
+        if (canAddNote == null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < canAddNote.Length; i++)
+        {
+            ret[positions[i]] = !canAddNote[i];
+        }
+
+        return ret;
     }
 
     public static async Task Mine(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition)
