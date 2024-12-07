@@ -74,6 +74,127 @@ public static class MiningUtils
         </style>
         """;
 
+    private static string? GetMiningParameter(JLField field, LookupResult lookupResult, string currentText, int currentCharPosition, bool useHtmlTags)
+    {
+        string readings = "";
+        if (lookupResult.Readings is not null)
+        {
+            readings = string.Join('、', lookupResult.Readings);
+        }
+        switch (field)
+        {
+            case JLField.LeadingSentencePart:
+            {
+                string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+                int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
+                if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
+                {
+                    searchStartIndex = 0;
+                }
+
+                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
+                return currentText[sentenceStartIndex..currentCharPosition];
+            }
+
+            case JLField.TrailingSentencePart:
+            {
+                string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+                int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
+                if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
+                {
+                    searchStartIndex = 0;
+                }
+
+                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
+                return currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
+            }
+
+            case JLField.Sentence:
+            {
+                string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+                int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
+                if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
+                {
+                    searchStartIndex = 0;
+                }
+
+                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
+                string leadingSentencePart = currentText[sentenceStartIndex..currentCharPosition];
+                string trailingSentencePart = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
+                return useHtmlTags ? $"{leadingSentencePart}<b>{lookupResult.MatchedText}</b>{trailingSentencePart}" : sentence;
+            }
+            case JLField.SourceText:
+                string leadingSourcePart = currentText[..currentCharPosition];
+                string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..];
+                if (useHtmlTags)
+                {
+                    leadingSourcePart = leadingSourcePart.ReplaceLineEndings("<br/>");
+                    trailingSourcePart = trailingSourcePart.ReplaceLineEndings("<br/>");
+                }
+                return useHtmlTags
+                ? $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}".ReplaceLineEndings("<br/>")
+                : currentText;
+            case JLField.Readings:
+                return readings;
+            case JLField.ReadingsWithOrthographyInfo:
+                return lookupResult.ReadingsOrthographyInfoList is not null && lookupResult.Readings is not null
+                ? LookupResultUtils.ElementWithOrthographyInfoToText(lookupResult.Readings, lookupResult.ReadingsOrthographyInfoList)
+                : readings;
+            case JLField.FirstReading:
+                return lookupResult.Readings?[0];
+            case JLField.PrimarySpellingAndReadings:
+                return $"{lookupResult.PrimarySpelling}[{readings}]";
+            case JLField.PrimarySpellingAndFirstReading:
+                return $"{lookupResult.PrimarySpelling}[{(lookupResult.Readings is not null ? lookupResult.Readings[0] : "")}]";
+            case JLField.AlternativeSpellings:
+                return lookupResult.AlternativeSpellings is not null ? string.Join('、', lookupResult.AlternativeSpellings) : null;
+            case JLField.AlternativeSpellingsWithOrthographyInfo:
+                return lookupResult.AlternativeSpellings is not null ? lookupResult.AlternativeSpellingsOrthographyInfoList is not null
+                        ? LookupResultUtils.ElementWithOrthographyInfoToText(lookupResult.AlternativeSpellings, lookupResult.AlternativeSpellingsOrthographyInfoList)
+                        : string.Join('、', lookupResult.AlternativeSpellings) : null;
+            case JLField.MatchedText:
+                return lookupResult.MatchedText;
+            case JLField.PrimarySpelling:
+                return lookupResult.PrimarySpelling;
+            case JLField.DeconjugatedMatchedText:
+                return lookupResult.DeconjugatedMatchedText;
+            case JLField.KanjiStats:
+                return lookupResult.KanjiStats;
+            case JLField.OnReadings:
+                return lookupResult.OnReadings is not null ? string.Join('、', lookupResult.OnReadings) : null;
+            case JLField.KunReadings:
+                return lookupResult.KunReadings is not null ? string.Join('、', lookupResult.KunReadings) : null;
+            case JLField.NanoriReadings:
+                return lookupResult.NanoriReadings is not null ? string.Join('、', lookupResult.NanoriReadings) : null;
+            case JLField.Nothing:
+            case JLField.Audio:
+            case JLField.Image:
+            case JLField.StrokeCount:
+            case JLField.KanjiGrade:
+            case JLField.RadicalNames:
+            case JLField.Definitions:
+            case JLField.SelectedDefinitions:
+            case JLField.DictionaryName:
+            case JLField.LeadingSourceTextPart:
+            case JLField.TrailingSourceTextPart:
+            case JLField.LocalTime:
+            case JLField.Frequencies:
+            case JLField.RawFrequencies:
+            case JLField.PreferredFrequency:
+            case JLField.FrequencyHarmonicMean:
+            case JLField.PitchAccents:
+            case JLField.NumericPitchAccents:
+            case JLField.PitchAccentForFirstReading:
+            case JLField.NumericPitchAccentForFirstReading:
+            case JLField.EdictId:
+            case JLField.DeconjugationProcess:
+            case JLField.PrimarySpellingWithOrthographyInfo:
+            case JLField.KanjiComposition:
+            default:
+                return null;
+        }
+    }
+
     private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, bool useHtmlTags)
     {
         Dictionary<JLField, string> miningParams = new()
@@ -438,6 +559,76 @@ public static class MiningUtils
 
         Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
         Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
+    }
+
+    public static async ValueTask<bool[]?> CheckDuplicates(List<LookupResult> lookupResults, string currentText, int currentCharPosition)
+    {
+        List<Note> notes = [];
+        List<int> positions = [];
+        bool[] results = new bool[lookupResults.Count];
+        for (int i = 0; i < lookupResults.Count; i++)
+        {
+            LookupResult lookupResult = lookupResults[i];
+
+            Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+            if (ankiConfigDict is null)
+            {
+                continue;
+            }
+
+            AnkiConfig? ankiConfig;
+            if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
+            {
+                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
+            }
+            else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
+            {
+                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
+            }
+            else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
+            {
+                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
+            }
+            else
+            {
+                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
+            }
+
+            if (ankiConfig is null)
+            {
+                continue;
+            }
+
+            Dictionary<string, JLField> userFields = ankiConfig.Fields;
+            JLField firstValue = userFields.First().Value;
+            string? value = GetMiningParameter(firstValue, lookupResult, currentText, currentCharPosition, true);
+            if (value is null)
+            {
+                continue;
+            }
+
+            Dictionary<string, string> fields = ConvertFields(userFields, new()
+            {
+                [firstValue] = value
+            });
+
+            Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, ankiConfig.Tags, null, null, null, null);
+            notes.Add(note);
+            positions.Add(i);
+        }
+
+        bool[]? canAddNote = await AnkiUtils.CanAddNotes(notes.ToArray()).ConfigureAwait(false);
+        if (canAddNote is null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < canAddNote.Length; i++)
+        {
+            results[positions[i]] = !canAddNote[i];
+        }
+
+        return results;
     }
 
     public static async Task Mine(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition)
