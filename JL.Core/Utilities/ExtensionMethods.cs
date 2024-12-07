@@ -124,37 +124,37 @@ public static class ExtensionMethods
         return array;
     }
 
-    internal static T?[]? RemoveAtToArrayNullable<T>(this List<T?> list, int index) where T : class
-    {
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, list.Count);
+    //internal static T?[]? RemoveAtToArrayNullable<T>(this List<T?> list, int index) where T : class
+    //{
+    //    ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, list.Count);
 
-        if (list.Count is 1 || list.All(static l => l is null))
-        {
-            return null;
-        }
+    //    if (list.Count is 1 || list.All(static l => l is null))
+    //    {
+    //        return null;
+    //    }
 
-        T?[] array = new T?[list.Count - 1];
+    //    T?[] array = new T?[list.Count - 1];
 
-        bool hasNonNullElement = false;
-        int arrayIndex = 0;
-        int listCount = list.Count;
-        for (int i = 0; i < listCount; i++)
-        {
-            if (i != index)
-            {
-                T? element = list[i];
-                array[arrayIndex] = element;
-                ++arrayIndex;
+    //    bool hasNonNullElement = false;
+    //    int arrayIndex = 0;
+    //    int listCount = list.Count;
+    //    for (int i = 0; i < listCount; i++)
+    //    {
+    //        if (i != index)
+    //        {
+    //            T? element = list[i];
+    //            array[arrayIndex] = element;
+    //            ++arrayIndex;
 
-                if (element is not null)
-                {
-                    hasNonNullElement = true;
-                }
-            }
-        }
+    //            if (element is not null)
+    //            {
+    //                hasNonNullElement = true;
+    //            }
+    //        }
+    //    }
 
-        return hasNonNullElement ? array : null;
-    }
+    //    return hasNonNullElement ? array : null;
+    //}
 
     internal static T[]? TrimListToArray<T>(this List<T> list)
     {

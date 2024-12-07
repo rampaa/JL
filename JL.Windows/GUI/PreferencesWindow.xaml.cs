@@ -300,11 +300,11 @@ internal sealed partial class PreferencesWindow
 
     private async Task PopulateDeckAndModelNames()
     {
-        string[]? deckNames = await AnkiUtils.GetDeckNames().ConfigureAwait(true);
+        List<string>? deckNames = await AnkiUtils.GetDeckNames().ConfigureAwait(true);
 
         if (deckNames is not null)
         {
-            string[]? modelNames = await AnkiUtils.GetModelNames().ConfigureAwait(true);
+            List<string>? modelNames = await AnkiUtils.GetModelNames().ConfigureAwait(true);
 
             if (modelNames is not null)
             {
@@ -343,7 +343,7 @@ internal sealed partial class PreferencesWindow
     {
         string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
-        string[]? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
+        List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
 
         if (fieldNames is not null)
         {
@@ -440,7 +440,7 @@ internal sealed partial class PreferencesWindow
         string rawTags = tagsTextBox.Text;
         string[]? tags = string.IsNullOrWhiteSpace(rawTags)
             ? null
-            : rawTags.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
+            : rawTags.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
         return new AnkiConfig(deckName, modelName, dict, tags);
     }

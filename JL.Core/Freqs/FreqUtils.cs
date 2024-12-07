@@ -55,7 +55,7 @@ public static class FreqUtils
 
         List<Task> tasks = [];
 
-        foreach (Freq freq in FreqDicts.Values.ToList())
+        foreach (Freq freq in FreqDicts.Values.ToArray())
         {
             bool useDB = freq.Options.UseDB.Value;
             string dbPath = DBUtils.GetFreqDBPath(freq.Name);
