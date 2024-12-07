@@ -396,6 +396,15 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Don't capture identical text from Clipboard/WebSocket"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="When this option is enabled, new text found in the Clipboard/WebSocket that is identical to the current text in the main window will not be copied." />
+                            <CheckBox x:Name="DiscardIdenticalTextCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Merge sequential texts when they match"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"

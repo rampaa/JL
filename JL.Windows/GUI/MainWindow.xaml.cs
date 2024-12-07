@@ -163,14 +163,22 @@ internal sealed partial class MainWindow
         string? subsequentText = null;
         string? mergedText = null;
 
-        Dispatcher.Invoke(() =>
+        bool result = Dispatcher.Invoke(() =>
         {
+            string previousText = MainTextBox.Text;
+            if (configManager.DiscardIdenticalText && sanitizedNewText == previousText)
+            {
+                if (configManager.MergeSequentialTextsWhenTheyMatch)
+                {
+                    s_lastTextCopyTime = new(Stopwatch.GetTimestamp());
+                }
+
+                return false;
+            }
+
             if (configManager.MergeSequentialTextsWhenTheyMatch)
             {
                 DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-
-                string previousText = MainTextBox.Text;
-
                 mergeTexts = (configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
                               || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
                               && previousText.Length > 0;
@@ -179,6 +187,11 @@ internal sealed partial class MainWindow
 
                 if (mergeTexts)
                 {
+                    if (!configManager.DiscardIdenticalText && previousText == sanitizedNewText)
+                    {
+                        return false;
+                    }
+
                     if (!configManager.AllowPartialMatchingForTextMerge)
                     {
                         if (sanitizedNewText.StartsWith(previousText, StringComparison.Ordinal))
@@ -234,13 +247,17 @@ internal sealed partial class MainWindow
             }
 
             UpdatePosition();
-
             BringToFront();
+
+            return true;
         }, DispatcherPriority.Send);
 
-        WindowsUtils.HandlePostCopy(sanitizedNewText, subsequentText, mergedText);
+        if (result)
+        {
+            WindowsUtils.HandlePostCopy(sanitizedNewText, subsequentText, mergedText);
+        }
 
-        return true;
+        return result;
     }
 
     public void BringToFront()

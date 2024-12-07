@@ -68,6 +68,7 @@ internal sealed class ConfigManager
     public double MainWindowMinDynamicHeight { get; set; } = 50;
     private bool TextBoxApplyDropShadowEffect { get; set; } = true;
     private bool HorizontallyCenterMainWindowText { get; set; } // = false;
+    public bool DiscardIdenticalText { get; set; } // = false;
     public bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
     public bool AllowPartialMatchingForTextMerge { get; private set; } // = false;
     public double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
@@ -364,6 +365,7 @@ internal sealed class ConfigManager
 
         HidePopupsOnTextChange = ConfigDBManager.GetValueFromConfig(connection, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange), bool.TryParse);
 
+        DiscardIdenticalText = ConfigDBManager.GetValueFromConfig(connection, DiscardIdenticalText, nameof(DiscardIdenticalText), bool.TryParse);
         MergeSequentialTextsWhenTheyMatch = ConfigDBManager.GetValueFromConfig(connection, MergeSequentialTextsWhenTheyMatch, nameof(MergeSequentialTextsWhenTheyMatch), bool.TryParse);
         AllowPartialMatchingForTextMerge = ConfigDBManager.GetValueFromConfig(connection, AllowPartialMatchingForTextMerge, nameof(AllowPartialMatchingForTextMerge), bool.TryParse);
 
@@ -903,6 +905,7 @@ internal sealed class ConfigManager
         preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
+        preferenceWindow.DiscardIdenticalTextCheckBox.IsChecked = DiscardIdenticalText;
         preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked = MergeSequentialTextsWhenTheyMatch;
         preferenceWindow.AllowPartialMatchingForTextMergeCheckBox.IsChecked = AllowPartialMatchingForTextMerge;
         preferenceWindow.TextBoxUseCustomLineHeightCheckBox.IsChecked = TextBoxUseCustomLineHeight;
@@ -1168,6 +1171,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(HidePopupsOnTextChange),
                 preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(DiscardIdenticalText),
+                preferenceWindow.DiscardIdenticalTextCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(MergeSequentialTextsWhenTheyMatch),
                 preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked.ToString()!);
