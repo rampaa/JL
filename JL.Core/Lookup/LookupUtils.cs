@@ -1484,7 +1484,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static List<LookupFrequencyResult>? GetWordFrequencies(IGetFrequency record, List<Freq> wordFreqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB)
+    private static List<LookupFrequencyResult>? GetWordFrequencies<T>(T record, List<Freq> wordFreqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB) where T : IGetFrequency
     {
         if (wordFreqs.Count is 0)
         {
