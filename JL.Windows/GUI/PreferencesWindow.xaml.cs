@@ -300,23 +300,23 @@ internal sealed partial class PreferencesWindow
 
     private async Task PopulateDeckAndModelNames()
     {
-        List<string>? deckNames = await AnkiUtils.GetDeckNames().ConfigureAwait(true);
+        string[]? deckNames = await AnkiUtils.GetDeckNames().ConfigureAwait(true);
 
         if (deckNames is not null)
         {
-            List<string>? modelNames = await AnkiUtils.GetModelNames().ConfigureAwait(true);
+            string[]? modelNames = await AnkiUtils.GetModelNames().ConfigureAwait(true);
 
             if (modelNames is not null)
             {
-                WordMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-                KanjiMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-                NameMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-                OtherMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+                WordMiningSetupComboBoxDeckNames.ItemsSource = deckNames;
+                KanjiMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToArray();
+                NameMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToArray();
+                OtherMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToArray();
 
-                WordMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-                KanjiMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-                NameMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-                OtherMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+                WordMiningSetupComboBoxModelNames.ItemsSource = modelNames;
+                KanjiMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToArray();
+                NameMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToArray();
+                OtherMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToArray();
             }
 
             else
@@ -343,7 +343,7 @@ internal sealed partial class PreferencesWindow
     {
         string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
-        List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
+        string[]? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
 
         if (fieldNames is not null)
         {
