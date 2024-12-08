@@ -27,12 +27,9 @@ internal sealed class ConfigManager
     public bool RequireLookupKeyPress { get; private set; } // = false;
     public bool LookupOnSelectOnly { get; private set; } // = false;
     public bool LookupOnMouseClickOnly { get; private set; } // = false;
-    public bool AutoAdjustFontSizesOnResolutionChange { get; private set; } // = false;
-
     public KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
     public bool HighlightLongestMatch { get; private set; } // = false;
     public bool AutoPlayAudio { get; private set; } // = false;
-    public bool DisableHotkeys { get; set; } // = false;
     public bool Focusable { get; private set; } = true;
     public MouseButton MiningModeMouseButton { get; private set; } = MouseButton.Middle;
     public MouseButton LookupOnClickMouseButton { get; private set; } = MouseButton.Left;
@@ -188,10 +185,12 @@ internal sealed class ConfigManager
     public int MaxNumResultsNotInMiningMode { get; private set; } = 7;
     public string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
     public string BrowserPath { get; private set; } = "";
+    public bool DisableHotkeys { get; set; } // = false;
     public bool GlobalHotKeys { get; private set; } = true;
     public bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
     public bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
     public bool MineToFileInsteadOfAnki { get; private set; } // = false;
+    public bool AutoAdjustFontSizesOnResolutionChange { get; private set; } // = false;
 
     #endregion
 
@@ -852,7 +851,7 @@ internal sealed class ConfigManager
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;
         preferenceWindow.LookupRateNumericUpDown.Value = coreConfigManager.LookupRate;
         preferenceWindow.KanjiModeCheckBox.IsChecked = coreConfigManager.KanjiMode;
-        preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked = AutoAdjustFontSizesOnResolutionChange;
+        preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = coreConfigManager.CheckForJLUpdatesOnStartUp;
@@ -1223,7 +1222,7 @@ internal sealed class ConfigManager
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoAdjustFontSizesOnResolutionChange),
-                preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked.ToString()!);
+                preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(HighlightLongestMatch),
                 preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString()!);

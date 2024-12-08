@@ -25,6 +25,17 @@
                         </StackPanel.Resources>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Profile"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <DockPanel HorizontalAlignment="Right">
+                                <ComboBox x:Name="ProfileComboBox" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                          SelectionChanged="ProfileComboBox_SelectionChanged" Width="207" />
+                                <Button Content="⚙️" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,0,0,0" Click="ProfileConfigButton_Click" />
+                            </DockPanel>
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Theme" Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="ThemeComboBox" HorizontalAlignment="Right"
@@ -116,32 +127,11 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Automatically adjust font sizes on resolution change"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="AutoAdjustFontSizesOnResolutionChange"  HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
                                        Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
                                        ToolTip="Ignored if lookup mode is set to text select" />
                             <CheckBox x:Name="HighlightLongestMatchCheckBox"  HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="KanjiModeCheckBox"  HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Disable hotkeys"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       ToolTip="Disables hotkeys except for Toggle Hotkeys hotkey" Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                            <CheckBox x:Name="DisableHotkeysCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -361,6 +351,36 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Text only visible on hover"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="TextOnlyVisibleOnHoverCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Change opacity on unhover"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Opacity on unhover"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainWindowBackgroundOpacityOnUnhoverNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Hide all buttons when mouse is not over the title bar"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Enable WebSocket text capture"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -447,6 +467,29 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Focus on hover"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="If Focusable is set to false, this option will have no effect."/>
+                            <CheckBox x:Name="MainWindowFocusOnHoverCheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Trim white-space characters"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="TextBoxTrimWhiteSpaceCharactersCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Remove newlines"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="TextBoxRemoveNewlinesCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Add shadow to text"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -492,59 +535,6 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectDirectionNumericUpDown" Maximum="360" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Focus on hover"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center"
-                                       Cursor="Help"
-                                       ToolTip="If Focusable is set to false, this option will have no effect."/>
-                            <CheckBox x:Name="MainWindowFocusOnHoverCheckBox" HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Text only visible on hover"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="TextOnlyVisibleOnHoverCheckBox"  HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Change opacity on unhover"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox"  HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Opacity on unhover"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="MainWindowBackgroundOpacityOnUnhoverNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Hide all buttons when mouse is not over the title bar"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Trim white-space characters"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="TextBoxTrimWhiteSpaceCharactersCheckBox"  HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Remove newlines"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="TextBoxRemoveNewlinesCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -1220,9 +1210,9 @@
                             <TextBox x:Name="DisableHotkeysKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Hotkey toggle" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Toggle disable hotkeys option" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
-                                       Cursor="Help" ToolTip="Toggle disable hotkeys option" VerticalAlignment="Center" />
+                                       Cursor="Help" VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
@@ -1351,7 +1341,7 @@
                             <TextBox x:Name="KanjiModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Toggle kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1574,7 +1564,7 @@
 
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Manage dictionaries" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Open manage dictionaries window" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1586,7 +1576,7 @@
 
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Manage frequencies" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Open manage frequencies window" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1598,7 +1588,7 @@
 
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Manage audio sources" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Open manage audio sources window" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1609,7 +1599,7 @@
                             <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox"
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Preferences" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Open preferences window" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1660,17 +1650,6 @@
                         </StackPanel.Resources>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Profile"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <DockPanel HorizontalAlignment="Right">
-                                <ComboBox x:Name="ProfileComboBox" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                          SelectionChanged="ProfileComboBox_SelectionChanged" Width="207" />
-                                <Button Content="⚙️" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,0,0,0" Click="ProfileConfigButton_Click" />
-                            </DockPanel>
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap"
@@ -1696,6 +1675,20 @@
                             <hc:NumericUpDown x:Name="MaxNumResultsNotInMiningModeNumericUpDown" Maximum="100"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="KanjiModeCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Disable hotkeys"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       ToolTip="Disables hotkeys except for 'Toggle disable hotkeys option' hotkey" Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            <CheckBox x:Name="DisableHotkeysCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel Margin="0,10,0,0">
@@ -1733,6 +1726,13 @@
                                        &#10;Resources/mined_words.txt or Resources/names.txt or Resources/kanjis.txt or Resources/others.txt
                                        &#10;depending on the dictionary type"/>
                             <CheckBox x:Name="MineToFileInsteadOfAnkiCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Automatically adjust font sizes on resolution change"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="AutoAdjustFontSizesOnResolutionChangeCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
