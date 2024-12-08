@@ -250,31 +250,25 @@ internal sealed partial class PreferencesWindow
             return;
         }
 
-        AnkiConfig? wordAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
-        AnkiConfig? kanjiAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
-        AnkiConfig? nameAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
-        AnkiConfig? otherAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
-
-
-        if (wordAnkiConfig is not null)
+        if (ankiConfigDict.TryGetValue(MineType.Word, out AnkiConfig? wordAnkiConfig))
         {
             SetPreviousMiningConfig(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordTagsTextBox, wordAnkiConfig);
             CreateFieldElements(wordAnkiConfig.Fields, JLFieldUtils.JLFieldsForWordDicts, WordMiningSetupStackPanelFields);
         }
 
-        if (kanjiAnkiConfig is not null)
+        if (ankiConfigDict.TryGetValue(MineType.Kanji, out AnkiConfig? kanjiAnkiConfig))
         {
             SetPreviousMiningConfig(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiTagsTextBox, kanjiAnkiConfig);
             CreateFieldElements(kanjiAnkiConfig.Fields, JLFieldUtils.JLFieldsForKanjiDicts, KanjiMiningSetupStackPanelFields);
         }
 
-        if (nameAnkiConfig is not null)
+        if (ankiConfigDict.TryGetValue(MineType.Name, out AnkiConfig? nameAnkiConfig))
         {
             SetPreviousMiningConfig(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameTagsTextBox, nameAnkiConfig);
             CreateFieldElements(nameAnkiConfig.Fields, JLFieldUtils.JLFieldsForNameDicts, NameMiningSetupStackPanelFields);
         }
 
-        if (otherAnkiConfig is not null)
+        if (ankiConfigDict.TryGetValue(MineType.Other, out AnkiConfig? otherAnkiConfig))
         {
             SetPreviousMiningConfig(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherTagsTextBox, otherAnkiConfig);
             CreateFieldElements(otherAnkiConfig.Fields, Enum.GetValues<JLField>(), OtherMiningSetupStackPanelFields);

@@ -36,8 +36,11 @@ public static class LookupUtils
 
         s_lastLookupTime = preciseTimeNow;
 
-        Dict? pitchDict = DictUtils.SingleDictTypeDicts.GetValueOrDefault(DictType.PitchAccentYomichan);
-        bool useDBForPitchDict = pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
+        bool useDBForPitchDict = false;
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
+        {
+            useDBForPitchDict = pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
+        }
 
         ConcurrentBag<LookupResult> lookupResults = [];
 

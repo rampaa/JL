@@ -423,12 +423,15 @@ public static class MiningUtils
                 continue;
             }
 
-            string? jlFieldContent = miningParameters.GetValueOrDefault(jlField)?.ReplaceLineEndings("\\n").Replace("\t", "  ", StringComparison.Ordinal).Trim();
-            if (!string.IsNullOrEmpty(jlFieldContent))
+            if (miningParameters.TryGetValue(jlField, out string? value))
             {
-                _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")
-                    .Append(jlFieldContent)
-                    .Append(i < jlFields.Length - 1 ? '\t' : '\n');
+                string? jlFieldContent = value.ReplaceLineEndings("\\n").Replace("\t", "  ", StringComparison.Ordinal).Trim();
+                if (!string.IsNullOrEmpty(jlFieldContent))
+                {
+                    _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")
+                        .Append(jlFieldContent)
+                        .Append(i < jlFields.Length - 1 ? '\t' : '\n');
+                }
             }
         }
 

@@ -481,8 +481,12 @@ internal sealed partial class PopupWindow
 
         PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
 
-        Dict? pitchDict = DictUtils.SingleDictTypeDicts.GetValueOrDefault(DictType.PitchAccentYomichan);
-        bool pitchDictIsActive = pitchDict?.Active ?? false;
+        bool pitchDictIsActive = false;
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
+        {
+            pitchDictIsActive = pitchDict.Active;
+        }
+
         Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         bool showPOrthographyInfo = jmdict.Options.POrthographyInfo!.Value;
         bool showROrthographyInfo = jmdict.Options.ROrthographyInfo!.Value;
