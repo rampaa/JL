@@ -344,11 +344,13 @@ internal sealed partial class PreferencesWindow
         string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
         List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
-
         if (fieldNames is not null)
         {
-            Dictionary<string, JLField> fields =
-                fieldNames.ToDictionary(static fieldName => fieldName, static _ => JLField.Nothing, StringComparer.Ordinal);
+            Dictionary<string, JLField> fields = new(fieldNames.Count, StringComparer.Ordinal);
+            for (int i = 0; i < fieldNames.Count; i++)
+            {
+                fields.Add(fieldNames[i], JLField.Nothing);
+            }
 
             CreateFieldElements(fields, fieldList, miningPanel);
         }
