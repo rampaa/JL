@@ -71,7 +71,6 @@ public static class DictUpdater
         catch (Exception ex)
         {
             Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
-
             Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
         }
 

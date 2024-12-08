@@ -174,7 +174,7 @@ internal sealed partial class MainWindow
             {
                 if (configManager.MergeSequentialTextsWhenTheyMatch)
                 {
-                    s_lastTextCopyTime = new(Stopwatch.GetTimestamp());
+                    s_lastTextCopyTime = new DateTime(Stopwatch.GetTimestamp());
                 }
 
                 return false;

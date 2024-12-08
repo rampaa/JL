@@ -644,14 +644,17 @@ internal sealed partial class PreferencesWindow
             ProfileDBUtils.UpdateCurrentProfile(connection);
             Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
-
-            ConfigManager configManager = ConfigManager.Instance;
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                configManager.ApplyPreferences(connection);
-                configManager.LoadPreferenceWindow(this);
-            });
         }
+
+        ConfigManager configManager = ConfigManager.Instance;
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            using (SqliteConnection preferencesConnection = ConfigDBManager.CreateReadWriteDBConnection())
+            {
+                configManager.ApplyPreferences(preferencesConnection);
+            }
+            configManager.LoadPreferenceWindow(this);
+        });
 
         RegexReplacerUtils.PopulateRegexReplacements();
     }
