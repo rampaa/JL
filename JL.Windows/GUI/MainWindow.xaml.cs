@@ -74,10 +74,10 @@ internal sealed partial class MainWindow
 
         ConfigDBManager.CreateDB();
 
-        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-        await using (connection.ConfigureAwait(true))
+        SqliteConnection migrationConnection = ConfigDBManager.CreateReadWriteDBConnection();
+        await using (migrationConnection.ConfigureAwait(true))
         {
-            await ConfigMigrationManager.MigrateConfig(connection).ConfigureAwait(true);
+            await ConfigMigrationManager.MigrateConfig(migrationConnection).ConfigureAwait(true);
         }
 
         SqliteConnection readOnlyConnection = ConfigDBManager.CreateReadOnlyDBConnection();
@@ -88,7 +88,11 @@ internal sealed partial class MainWindow
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        configManager.ApplyPreferences();
+        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
+        await using (connection.ConfigureAwait(true))
+        {
+            configManager.ApplyPreferences(connection);
+        }
 
         RegexReplacerUtils.PopulateRegexReplacements();
 
@@ -433,12 +437,12 @@ internal sealed partial class MainWindow
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
-        ConfigManager.Instance.SaveBeforeClosing();
-        Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
 
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(false))
         {
+            ConfigManager.Instance.SaveBeforeClosing(connection);
+            Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
             StatsDBUtils.UpdateLifetimeStats(connection);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
         }

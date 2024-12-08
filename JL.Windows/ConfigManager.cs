@@ -204,28 +204,26 @@ internal sealed class ConfigManager
 
     public static void ResetConfigs()
     {
-        Instance.SaveBeforeClosing();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
+        Instance.SaveBeforeClosing(connection);
         ConfigDBManager.DeleteAllSettingsFromProfile("MainWindowTopPosition", "MainWindowLeftPosition");
 
         ConfigManager newInstance = new();
-        using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
-        {
-            ConfigDBManager.InsertSetting(connection, nameof(Theme), newInstance.Theme.ToString());
-            ConfigDBManager.InsertSetting(connection, nameof(StripPunctuationBeforeCalculatingCharacterCount), newInstance.StripPunctuationBeforeCalculatingCharacterCount.ToString());
-        }
+        ConfigDBManager.InsertSetting(connection, nameof(Theme), newInstance.Theme.ToString());
+        ConfigDBManager.InsertSetting(connection, nameof(StripPunctuationBeforeCalculatingCharacterCount), newInstance.StripPunctuationBeforeCalculatingCharacterCount.ToString());
 
         newInstance.Theme = Instance.Theme;
         newInstance.StripPunctuationBeforeCalculatingCharacterCount = Instance.StripPunctuationBeforeCalculatingCharacterCount;
 
         Instance = newInstance;
         CoreConfigManager.CreateNewCoreConfigManager();
-        Instance.ApplyPreferences();
+        Instance.ApplyPreferences(connection);
+
+        ConfigDBManager.AnalyzeAndVacuum(connection);
     }
 
-    public void ApplyPreferences()
+    public void ApplyPreferences(SqliteConnection connection)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         coreConfigManager.ApplyPreferences(connection);
 
@@ -742,10 +740,7 @@ internal sealed class ConfigManager
 
     public void LoadPreferenceWindow(PreferencesWindow preferenceWindow)
     {
-        ConfigDBManager.CreateDB();
-
         preferenceWindow.JLVersionTextBlock.Text = string.Create(CultureInfo.InvariantCulture, $"v{Utils.JLVersion}");
-
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = DisableHotkeysKeyGesture.ToFormattedString();
         preferenceWindow.MiningModeKeyGestureTextBox.Text = MiningModeKeyGesture.ToFormattedString();
         preferenceWindow.PlayAudioKeyGestureTextBox.Text = PlayAudioKeyGesture.ToFormattedString();
@@ -1410,9 +1405,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition",
                 (mainWindow.Left * dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
-        }
 
-        ApplyPreferences();
+            ApplyPreferences(connection);
+        }
 
         if (preferenceWindow.SetAnkiConfig)
         {
@@ -1420,11 +1415,8 @@ internal sealed class ConfigManager
         }
     }
 
-    public void SaveBeforeClosing()
+    public void SaveBeforeClosing(SqliteConnection connection)
     {
-        ConfigDBManager.CreateDB();
-        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-
         MainWindow mainWindow = MainWindow.Instance;
         ConfigDBManager.UpdateSetting(connection, "MainWindowFontSize",
             mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));
