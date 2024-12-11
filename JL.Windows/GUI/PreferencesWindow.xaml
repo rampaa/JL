@@ -1032,6 +1032,13 @@
                                 <CheckBox x:Name="AllowDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
+                            <DockPanel Margin="0,10,0,0">
+                                <TextBlock HorizontalAlignment="Left" Text="Check for duplicate cards"
+                                            Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap"
+                                            ToolTip="Checks Anki for Duplicate Expressions when entering Mining Mode" Cursor="Help"/>
+                                <CheckBox x:Name="CheckForDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
+                            </DockPanel>
+
                             <TabControl Margin="0,10,0,0">
                                 <TabControl.Resources>
                                     <Style TargetType="{x:Type TabPanel}">
