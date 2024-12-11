@@ -726,12 +726,6 @@ public static class MiningUtils
             }
 
             Dictionary<string, JLField> userFields = ankiConfig.Fields;
-            foreach (KeyValuePair<string, JLField> item in userFields)
-            {
-                string? value = GetMiningParameter(item.Value, lookupResult, currentText, null, null, currentCharPosition);
-                string print = value is not null ? value : "null";
-                Utils.Logger.Error($"{item.Value} : {print}");
-            }
             (string firstFieldName, JLField firstField) = userFields.First();
             string? firstFieldValue = GetMiningParameter(firstField, lookupResult, currentText, null, null, currentCharPosition);
             if (string.IsNullOrEmpty(firstFieldValue))
