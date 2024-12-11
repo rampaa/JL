@@ -42,7 +42,7 @@ internal static class AnkiConnect
         return Send(req);
     }
 
-    public static ValueTask<Response?> GetCanAddNotesResponse(Note[] notes)
+    public static ValueTask<Response?> GetCanAddNotesResponse(List<Note> notes)
     {
         Request req = new("canAddNotes", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
         {

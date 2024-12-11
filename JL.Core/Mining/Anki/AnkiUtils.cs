@@ -45,13 +45,13 @@ public static class AnkiUtils
             : null;
     }
 
-    internal static async Task<bool[]?> CanAddNotes(Note[] notes)
+    internal static async ValueTask<List<bool>?> CanAddNotes(List<Note> notes)
     {
         Response? response = await AnkiConnect.GetCanAddNotesResponse(notes).ConfigureAwait(false);
         string? resultString = response?.Result?.ToString() ?? null;
 
         return resultString is not null
-            ? JsonSerializer.Deserialize<bool[]>(resultString)!
+            ? JsonSerializer.Deserialize<List<bool>>(resultString)!
             : null;
     }
 }
