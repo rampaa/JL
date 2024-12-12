@@ -221,8 +221,8 @@ internal static class EpwingYomichanDBManager
         while (dataReader.Read())
         {
             EpwingYomichanRecord record = GetRecord(dataReader);
-            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
-            for (int i = 0; i < searchKeys.Length; i++)
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
+            for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))

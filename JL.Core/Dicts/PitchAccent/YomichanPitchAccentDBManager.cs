@@ -129,7 +129,7 @@ internal static class YomichanPitchAccentDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, string[] terms)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -145,7 +145,7 @@ internal static class YomichanPitchAccentDBManager
             WHERE rsk.search_key IN (@1
             """);
 
-        int termCount = terms.Count;
+        int termCount = terms.Length;
         for (int i = 1; i < termCount; i++)
         {
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
@@ -241,8 +241,8 @@ internal static class YomichanPitchAccentDBManager
         while (dataReader.Read())
         {
             PitchAccentRecord record = GetRecord(dataReader);
-            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
-            for (int i = 0; i < searchKeys.Length; i++)
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
+            for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))

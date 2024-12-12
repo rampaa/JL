@@ -250,31 +250,25 @@ internal sealed partial class PreferencesWindow
             return;
         }
 
-        AnkiConfig? wordAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
-        AnkiConfig? kanjiAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
-        AnkiConfig? nameAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
-        AnkiConfig? otherAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
-
-
-        if (wordAnkiConfig is not null)
+        if (ankiConfigDict.TryGetValue(MineType.Word, out AnkiConfig? wordAnkiConfig))
         {
             SetPreviousMiningConfig(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordTagsTextBox, wordAnkiConfig);
             CreateFieldElements(wordAnkiConfig.Fields, JLFieldUtils.JLFieldsForWordDicts, WordMiningSetupStackPanelFields);
         }
 
-        if (kanjiAnkiConfig is not null)
+        if (ankiConfigDict.TryGetValue(MineType.Kanji, out AnkiConfig? kanjiAnkiConfig))
         {
             SetPreviousMiningConfig(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiTagsTextBox, kanjiAnkiConfig);
             CreateFieldElements(kanjiAnkiConfig.Fields, JLFieldUtils.JLFieldsForKanjiDicts, KanjiMiningSetupStackPanelFields);
         }
 
-        if (nameAnkiConfig is not null)
+        if (ankiConfigDict.TryGetValue(MineType.Name, out AnkiConfig? nameAnkiConfig))
         {
             SetPreviousMiningConfig(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameTagsTextBox, nameAnkiConfig);
             CreateFieldElements(nameAnkiConfig.Fields, JLFieldUtils.JLFieldsForNameDicts, NameMiningSetupStackPanelFields);
         }
 
-        if (otherAnkiConfig is not null)
+        if (ankiConfigDict.TryGetValue(MineType.Other, out AnkiConfig? otherAnkiConfig))
         {
             SetPreviousMiningConfig(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherTagsTextBox, otherAnkiConfig);
             CreateFieldElements(otherAnkiConfig.Fields, Enum.GetValues<JLField>(), OtherMiningSetupStackPanelFields);
@@ -308,15 +302,15 @@ internal sealed partial class PreferencesWindow
 
             if (modelNames is not null)
             {
-                WordMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-                KanjiMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-                NameMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-                OtherMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+                WordMiningSetupComboBoxDeckNames.ItemsSource = deckNames;
+                KanjiMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToArray();
+                NameMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToArray();
+                OtherMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToArray();
 
-                WordMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-                KanjiMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-                NameMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-                OtherMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+                WordMiningSetupComboBoxModelNames.ItemsSource = modelNames;
+                KanjiMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToArray();
+                NameMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToArray();
+                OtherMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToArray();
             }
 
             else
@@ -344,11 +338,13 @@ internal sealed partial class PreferencesWindow
         string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
         List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
-
         if (fieldNames is not null)
         {
-            Dictionary<string, JLField> fields =
-                fieldNames.ToDictionary(static fieldName => fieldName, static _ => JLField.Nothing, StringComparer.Ordinal);
+            Dictionary<string, JLField> fields = new(fieldNames.Count, StringComparer.Ordinal);
+            for (int i = 0; i < fieldNames.Count; i++)
+            {
+                fields.Add(fieldNames[i], JLField.Nothing);
+            }
 
             CreateFieldElements(fields, fieldList, miningPanel);
         }
@@ -440,7 +436,7 @@ internal sealed partial class PreferencesWindow
         string rawTags = tagsTextBox.Text;
         string[]? tags = string.IsNullOrWhiteSpace(rawTags)
             ? null
-            : rawTags.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
+            : rawTags.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
         return new AnkiConfig(deckName, modelName, dict, tags);
     }
@@ -647,7 +643,10 @@ internal sealed partial class PreferencesWindow
         ConfigManager configManager = ConfigManager.Instance;
         Application.Current.Dispatcher.Invoke(() =>
         {
-            configManager.ApplyPreferences();
+            using (SqliteConnection preferencesConnection = ConfigDBManager.CreateReadWriteDBConnection())
+            {
+                configManager.ApplyPreferences(preferencesConnection);
+            }
             configManager.LoadPreferenceWindow(this);
         });
 

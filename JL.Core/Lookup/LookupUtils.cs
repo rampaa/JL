@@ -25,7 +25,7 @@ public static class LookupUtils
     private delegate Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameterOrQuery);
     private delegate List<IDictRecord>? GetKanjiRecordsFromDB(string dbName, string term);
 
-    public static List<LookupResult>? LookupText(string text)
+    public static LookupResult[]? LookupText(string text)
     {
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
@@ -36,8 +36,11 @@ public static class LookupUtils
 
         s_lastLookupTime = preciseTimeNow;
 
-        Dict? pitchDict = DictUtils.SingleDictTypeDicts.GetValueOrDefault(DictType.PitchAccentYomichan);
-        bool useDBForPitchDict = pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
+        bool useDBForPitchDict = false;
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
+        {
+            useDBForPitchDict = pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
+        }
 
         ConcurrentBag<LookupResult> lookupResults = [];
 
@@ -58,7 +61,7 @@ public static class LookupUtils
             kanji = text.EnumerateRunes().First().ToString();
             if (coreConfigManager.KanjiMode)
             {
-                _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
+                _ = Parallel.ForEach(DictUtils.Dicts.Values.ToArray(), dict =>
                 {
                     bool useDB = dict.Options.UseDB.Value && dict.Ready;
                     if (!dict.Active)
@@ -198,7 +201,7 @@ public static class LookupUtils
         List<string?>? yomichanTextWithoutLongVowelMarkQueries = null;
         List<string?>? jmdictTextWithoutLongVowelMarkParameters = null;
 
-        List<Dict> dicts = DictUtils.Dicts.Values.ToList();
+        Dict[] dicts = DictUtils.Dicts.Values.ToArray();
 
         if (DictUtils.DBIsUsedForAtLeastOneDict)
         {
@@ -446,7 +449,7 @@ public static class LookupUtils
             : SortLookupResults(lookupResults);
     }
 
-    private static List<LookupResult> SortLookupResults(IEnumerable<LookupResult> lookupResults)
+    private static LookupResult[] SortLookupResults(IEnumerable<LookupResult> lookupResults)
     {
         return lookupResults
             .OrderByDescending(static lookupResult => lookupResult.MatchedText.Length)
@@ -529,7 +532,7 @@ public static class LookupUtils
                     ? index
                     : int.MaxValue;
             })
-            .ToList();
+            .ToArray();
     }
 
     private static void GetWordResultsHelper(Dict dict,
@@ -836,7 +839,7 @@ public static class LookupUtils
             : null;
     }
 
-    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(List<Freq> dbFreqs, List<string> searchKeys)
+    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(List<Freq> dbFreqs, string[] searchKeys)
     {
         ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(StringComparer.Ordinal);
         _ = Parallel.For(0, dbFreqs.Count, i =>
@@ -852,7 +855,7 @@ public static class LookupUtils
         return frequencyDicts;
     }
 
-    private static List<string> GetSearchKeysFromJmdictRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
+    private static string[] GetSearchKeysFromJmdictRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
         HashSet<string> searchKeys = [];
         foreach ((string key, IntermediaryResult intermediaryResult) in dictResults)
@@ -887,10 +890,10 @@ public static class LookupUtils
             }
         }
 
-        return searchKeys.ToList();
+        return searchKeys.ToArray();
     }
 
-    private static List<string> GetSearchKeysFromCustomWordRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
+    private static string[] GetSearchKeysFromCustomWordRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
         HashSet<string> searchKeys = [];
         foreach ((string key, IntermediaryResult intermediaryResult) in dictResults)
@@ -925,10 +928,10 @@ public static class LookupUtils
             }
         }
 
-        return searchKeys.ToList();
+        return searchKeys.ToArray();
     }
 
-    private static List<string> GetSearchKeysFromJmnedictRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
+    private static string[] GetSearchKeysFromJmnedictRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
         HashSet<string> searchKeys = [];
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
@@ -961,10 +964,10 @@ public static class LookupUtils
             }
         }
 
-        return searchKeys.ToList();
+        return searchKeys.ToArray();
     }
 
-    private static List<string> GetSearchKeysFromCustomNameRecord(Dictionary<string, IntermediaryResult> dictResults)
+    private static string[] GetSearchKeysFromCustomNameRecord(Dictionary<string, IntermediaryResult> dictResults)
     {
         HashSet<string> searchKeys = [];
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
@@ -987,10 +990,10 @@ public static class LookupUtils
             }
         }
 
-        return searchKeys.ToList();
+        return searchKeys.ToArray();
     }
 
-    private static List<string> GetSearchKeyForEpwingYomichanRecord(IDictionary<string, IntermediaryResult> dictResults)
+    private static string[] GetSearchKeyForEpwingYomichanRecord(IDictionary<string, IntermediaryResult> dictResults)
     {
         HashSet<string> searchKeys = [];
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
@@ -1013,10 +1016,10 @@ public static class LookupUtils
             }
         }
 
-        return searchKeys.ToList();
+        return searchKeys.ToArray();
     }
 
-    private static List<string> GetSearchKeysFromEpwingNazekaRecord(IDictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
+    private static string[] GetSearchKeysFromEpwingNazekaRecord(IDictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
         HashSet<string> searchKeys = [];
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
@@ -1046,7 +1049,7 @@ public static class LookupUtils
             }
         }
 
-        return searchKeys.ToList();
+        return searchKeys.ToArray();
     }
 
     private static List<LookupResult> BuildJmdictResult(
@@ -1059,7 +1062,7 @@ public static class LookupUtils
             {
                 if (dbWordFreqs.Count > 0)
                 {
-                    List<string> searchKeys = GetSearchKeysFromJmdictRecord(jmdictResults, true);
+                    string[] searchKeys = GetSearchKeysFromJmdictRecord(jmdictResults, true);
                     frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, searchKeys);
                 }
             },
@@ -1067,7 +1070,7 @@ public static class LookupUtils
             {
                 if (useDBForPitchDict)
                 {
-                    List<string> searchKeys = GetSearchKeysFromJmdictRecord(jmdictResults, false);
+                    string[] searchKeys = GetSearchKeysFromJmdictRecord(jmdictResults, false);
                     pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
                 }
             });
@@ -1116,7 +1119,7 @@ public static class LookupUtils
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
         if (useDBForPitchDict)
         {
-            List<string> searchKeys = GetSearchKeysFromJmnedictRecord(jmnedictResults, false);
+            string[] searchKeys = GetSearchKeysFromJmnedictRecord(jmnedictResults, false);
             pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
         }
 
@@ -1248,7 +1251,7 @@ public static class LookupUtils
             {
                 if (dbFreqs?.Count > 0)
                 {
-                    List<string> searchKeys = GetSearchKeyForEpwingYomichanRecord(epwingResults);
+                    string[] searchKeys = GetSearchKeyForEpwingYomichanRecord(epwingResults);
                     frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
                 }
             },
@@ -1256,7 +1259,7 @@ public static class LookupUtils
             {
                 if (useDBForPitchDict)
                 {
-                    List<string> searchKeys = GetSearchKeyForEpwingYomichanRecord(epwingResults);
+                    string[] searchKeys = GetSearchKeyForEpwingYomichanRecord(epwingResults);
                     pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
                 }
             });
@@ -1319,7 +1322,7 @@ public static class LookupUtils
             {
                 if (dbFreqs?.Count > 0)
                 {
-                    List<string> searchKeys = GetSearchKeysFromEpwingNazekaRecord(epwingNazekaResults, true);
+                    string[] searchKeys = GetSearchKeysFromEpwingNazekaRecord(epwingNazekaResults, true);
                     frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
                 }
             },
@@ -1327,7 +1330,7 @@ public static class LookupUtils
             {
                 if (useDBForPitchDict)
                 {
-                    List<string> searchKeys = GetSearchKeysFromEpwingNazekaRecord(epwingNazekaResults, false);
+                    string[] searchKeys = GetSearchKeysFromEpwingNazekaRecord(epwingNazekaResults, false);
                     pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
                 }
             });
@@ -1391,7 +1394,7 @@ public static class LookupUtils
             {
                 if (dbWordFreqs.Count > 0)
                 {
-                    List<string> searchKeys = GetSearchKeysFromCustomWordRecord(customWordResults, true);
+                    string[] searchKeys = GetSearchKeysFromCustomWordRecord(customWordResults, true);
                     frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, searchKeys);
                 }
             },
@@ -1399,7 +1402,7 @@ public static class LookupUtils
             {
                 if (useDBForPitchDict)
                 {
-                    List<string> searchKeys = GetSearchKeysFromCustomWordRecord(customWordResults, false);
+                    string[] searchKeys = GetSearchKeysFromCustomWordRecord(customWordResults, false);
                     pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
                 }
             });
@@ -1445,7 +1448,7 @@ public static class LookupUtils
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
         if (useDBForPitchDict)
         {
-            List<string> searchKeys = GetSearchKeysFromCustomNameRecord(customNameResults);
+            string[] searchKeys = GetSearchKeysFromCustomNameRecord(customNameResults);
             pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
         }
 
@@ -1484,7 +1487,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static List<LookupFrequencyResult>? GetWordFrequencies(IGetFrequency record, List<Freq> wordFreqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB)
+    private static List<LookupFrequencyResult>? GetWordFrequencies<T>(T record, List<Freq> wordFreqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB) where T : IGetFrequency
     {
         if (wordFreqs.Count is 0)
         {

@@ -74,10 +74,10 @@ internal sealed partial class MainWindow
 
         ConfigDBManager.CreateDB();
 
-        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-        await using (connection.ConfigureAwait(true))
+        SqliteConnection migrationConnection = ConfigDBManager.CreateReadWriteDBConnection();
+        await using (migrationConnection.ConfigureAwait(true))
         {
-            await ConfigMigrationManager.MigrateConfig(connection).ConfigureAwait(true);
+            await ConfigMigrationManager.MigrateConfig(migrationConnection).ConfigureAwait(true);
         }
 
         SqliteConnection readOnlyConnection = ConfigDBManager.CreateReadOnlyDBConnection();
@@ -88,7 +88,11 @@ internal sealed partial class MainWindow
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        configManager.ApplyPreferences();
+        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
+        await using (connection.ConfigureAwait(true))
+        {
+            configManager.ApplyPreferences(connection);
+        }
 
         RegexReplacerUtils.PopulateRegexReplacements();
 
@@ -163,14 +167,22 @@ internal sealed partial class MainWindow
         string? subsequentText = null;
         string? mergedText = null;
 
-        Dispatcher.Invoke(() =>
+        bool result = Dispatcher.Invoke(() =>
         {
+            string previousText = MainTextBox.Text;
+            if (configManager.DiscardIdenticalText && sanitizedNewText == previousText)
+            {
+                if (configManager.MergeSequentialTextsWhenTheyMatch)
+                {
+                    s_lastTextCopyTime = new DateTime(Stopwatch.GetTimestamp());
+                }
+
+                return false;
+            }
+
             if (configManager.MergeSequentialTextsWhenTheyMatch)
             {
                 DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-
-                string previousText = MainTextBox.Text;
-
                 mergeTexts = (configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
                               || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
                               && previousText.Length > 0;
@@ -179,6 +191,11 @@ internal sealed partial class MainWindow
 
                 if (mergeTexts)
                 {
+                    if (!configManager.DiscardIdenticalText && previousText == sanitizedNewText)
+                    {
+                        return false;
+                    }
+
                     if (!configManager.AllowPartialMatchingForTextMerge)
                     {
                         if (sanitizedNewText.StartsWith(previousText, StringComparison.Ordinal))
@@ -234,13 +251,17 @@ internal sealed partial class MainWindow
             }
 
             UpdatePosition();
-
             BringToFront();
+
+            return true;
         }, DispatcherPriority.Send);
 
-        WindowsUtils.HandlePostCopy(sanitizedNewText, subsequentText, mergedText);
+        if (result)
+        {
+            WindowsUtils.HandlePostCopy(sanitizedNewText, subsequentText, mergedText);
+        }
 
-        return true;
+        return result;
     }
 
     public void BringToFront()
@@ -416,12 +437,12 @@ internal sealed partial class MainWindow
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
-        ConfigManager.Instance.SaveBeforeClosing();
-        Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
 
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(false))
         {
+            ConfigManager.Instance.SaveBeforeClosing(connection);
+            Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
             StatsDBUtils.UpdateLifetimeStats(connection);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
         }

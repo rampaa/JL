@@ -502,7 +502,7 @@ public static class DictUtils
 
         List<Task> tasks = [];
 
-        List<Dict> dicts = Dicts.Values.ToList();
+        Dict[] dicts = Dicts.Values.ToArray();
 
         CheckIfDBIsUsedForAtLeastOneDict(dicts);
         AtLeastOneKanjiDictIsActive = CheckIfAnyKanjiDictIsUsed(dicts);

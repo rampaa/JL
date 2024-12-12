@@ -9,8 +9,8 @@ internal static class JmdictRecordBuilder
         Dictionary<string, JmdictRecord> recordDictionary = new(StringComparer.Ordinal);
 
         List<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.Contains("sK")).ToList();
-        List<string> allSpellingsWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.Keb).ToList();
-        List<string[]?> allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimListToArray()).ToList();
+        string[] allSpellingsWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.Keb).ToArray();
+        string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimListToArray()).ToArray();
 
         int index = 0;
         int kanjiElementCount = entry.KanjiElements.Count;
@@ -91,8 +91,8 @@ internal static class JmdictRecordBuilder
             JmdictRecord record = new(entry.Id,
                 kanjiElement.Keb,
                 allKanjiOrthographyInfoWithoutSearchOnlyForms[index],
-                allSpellingsWithoutSearchOnlyForms.RemoveAtToArray(index),
-                allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAtToArrayNullable(index),
+                allSpellingsWithoutSearchOnlyForms.RemoveAt(index),
+                allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAt(index),
                 readingList.TrimListToArray(),
                 readingsOrthographyInfoList.TrimListOfNullableArraysToArrayOfArrays(),
                 definitionList.ToArray(),
@@ -113,8 +113,8 @@ internal static class JmdictRecordBuilder
         }
 
         List<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => !ke.ReInfList.Contains("sk")).ToList();
-        List<string> allReadingsWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.Reb).ToList();
-        List<string[]?> allROrthographyInfoWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.ReInfList.TrimListToArray()).ToList();
+        string[] allReadingsWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.Reb).ToArray();
+        string[]?[] allROrthographyInfoWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.ReInfList.TrimListToArray()).ToArray();
 
         index = 0;
         for (int i = 0; i < readingElementCount; i++)
@@ -150,7 +150,7 @@ internal static class JmdictRecordBuilder
             string[]? alternativeSpellings;
             string[]?[]? alternativeSpellingsOrthographyInfo = null;
 
-            if (readingElement.ReRestrList.Count > 0 || allSpellingsWithoutSearchOnlyForms.Count > 0)
+            if (readingElement.ReRestrList.Count > 0 || allSpellingsWithoutSearchOnlyForms.Length > 0)
             {
                 if (readingElement.ReRestrList.Count > 0)
                 {
@@ -161,7 +161,7 @@ internal static class JmdictRecordBuilder
                 else
                 {
                     primarySpelling = allSpellingsWithoutSearchOnlyForms[0];
-                    alternativeSpellings = allSpellingsWithoutSearchOnlyForms.RemoveAtToArray(0);
+                    alternativeSpellings = allSpellingsWithoutSearchOnlyForms.RemoveAt(0);
                 }
 
                 if (recordDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(primarySpelling), out JmdictRecord? mainEntry))
@@ -178,8 +178,8 @@ internal static class JmdictRecordBuilder
                 primarySpelling = readingElement.Reb;
                 primarySpellingOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms[index];
 
-                alternativeSpellings = allReadingsWithoutSearchOnlyForms.RemoveAtToArray(index);
-                alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAtToArrayNullable(index);
+                alternativeSpellings = allReadingsWithoutSearchOnlyForms.RemoveAt(index);
+                alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAt(index);
             }
 
             List<string[]> definitionList = [];
@@ -241,7 +241,7 @@ internal static class JmdictRecordBuilder
 
             ++index;
 
-            if (i is 0 && allSpellingsWithoutSearchOnlyForms.Count is 0)
+            if (i is 0 && allSpellingsWithoutSearchOnlyForms.Length is 0)
             {
                 for (int j = 0; j < kanjiElementCount; j++)
                 {

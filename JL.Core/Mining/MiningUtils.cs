@@ -400,7 +400,7 @@ public static class MiningUtils
             if (validFrequencies.Count > 0)
             {
                 miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies, true, lookupResult.Frequencies.Count is 1);
-                miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencies.Select(static f => f.Freq).ToList());
+                miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencies.Select(static f => f.Freq));
                 miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
 
                 int firstFrequency = lookupResult.Frequencies[0].Freq;
@@ -669,12 +669,15 @@ public static class MiningUtils
                 continue;
             }
 
-            string? jlFieldContent = miningParameters.GetValueOrDefault(jlField)?.ReplaceLineEndings("\\n").Replace("\t", "  ", StringComparison.Ordinal).Trim();
-            if (!string.IsNullOrEmpty(jlFieldContent))
+            if (miningParameters.TryGetValue(jlField, out string? value))
             {
-                _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")
-                    .Append(jlFieldContent)
-                    .Append(i < jlFields.Length - 1 ? '\t' : '\n');
+                string jlFieldContent = value.ReplaceLineEndings("\\n").Replace("\t", "  ", StringComparison.Ordinal).Trim();
+                if (!string.IsNullOrEmpty(jlFieldContent))
+                {
+                    _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")
+                        .Append(jlFieldContent)
+                        .Append(i < jlFields.Length - 1 ? '\t' : '\n');
+                }
             }
         }
 
@@ -803,22 +806,19 @@ public static class MiningUtils
         // Audio/Picture/Video shouldn't be set here
         // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
         Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, ankiConfig.Tags, null, null, null, null);
-        if (!coreConfigManager.AllowDuplicateCards)
+        bool? canAddNote = await AnkiUtils.CanAddNote(note).ConfigureAwait(false);
+        if (canAddNote is null)
         {
-            bool? canAddNote = await AnkiUtils.CanAddNote(note).ConfigureAwait(false);
-            if (canAddNote is null)
-            {
-                Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {lookupResult.PrimarySpelling}");
-                Utils.Logger.Error("Mining failed for {PrimarySpelling}", lookupResult.PrimarySpelling);
-                return;
-            }
+            Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {lookupResult.PrimarySpelling}");
+            Utils.Logger.Error("Mining failed for {PrimarySpelling}", lookupResult.PrimarySpelling);
+            return;
+        }
 
-            if (!canAddNote.Value)
-            {
-                Utils.Frontend.Alert(AlertLevel.Error, $"Cannot mine {lookupResult.PrimarySpelling} because it is a duplicate card");
-                Utils.Logger.Information("Cannot mine {PrimarySpelling} because it is a duplicate card", lookupResult.PrimarySpelling);
-                return;
-            }
+        if (!coreConfigManager.AllowDuplicateCards && !canAddNote.Value)
+        {
+            Utils.Frontend.Alert(AlertLevel.Error, $"Cannot mine {lookupResult.PrimarySpelling} because it is a duplicate card");
+            Utils.Logger.Information("Cannot mine {PrimarySpelling} because it is a duplicate card", lookupResult.PrimarySpelling);
+            return;
         }
 
         List<string> audioFields = FindFields(JLField.Audio, userFields);
@@ -892,17 +892,10 @@ public static class MiningUtils
             return;
         }
 
-        if (needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash))
-        {
-            Utils.Frontend.Alert(AlertLevel.Warning, $"Mined {lookupResult.PrimarySpelling} (no audio)");
-            Utils.Logger.Information("Mined {PrimarySpelling} (no audio)", lookupResult.PrimarySpelling);
-        }
-
-        else
-        {
-            Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
-            Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
-        }
+        bool showNoAudioMessage = needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash);
+        string message = $"Mined {lookupResult.PrimarySpelling}{(showNoAudioMessage ? " (No Audio)" : "")}{(!canAddNote.Value ? " (Duplicate)" : "")}";
+        Utils.Frontend.Alert(AlertLevel.Warning, message);
+        Utils.Logger.Information(message);
 
         if (coreConfigManager.ForceSyncAnki)
         {

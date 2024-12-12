@@ -27,12 +27,9 @@ internal sealed class ConfigManager
     public bool RequireLookupKeyPress { get; private set; } // = false;
     public bool LookupOnSelectOnly { get; private set; } // = false;
     public bool LookupOnMouseClickOnly { get; private set; } // = false;
-    public bool AutoAdjustFontSizesOnResolutionChange { get; private set; } // = false;
-
     public KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
     public bool HighlightLongestMatch { get; private set; } // = false;
     public bool AutoPlayAudio { get; private set; } // = false;
-    public bool DisableHotkeys { get; set; } // = false;
     public bool Focusable { get; private set; } = true;
     public MouseButton MiningModeMouseButton { get; private set; } = MouseButton.Middle;
     public MouseButton LookupOnClickMouseButton { get; private set; } = MouseButton.Left;
@@ -68,6 +65,7 @@ internal sealed class ConfigManager
     public double MainWindowMinDynamicHeight { get; set; } = 50;
     private bool TextBoxApplyDropShadowEffect { get; set; } = true;
     private bool HorizontallyCenterMainWindowText { get; set; } // = false;
+    public bool DiscardIdenticalText { get; set; } // = false;
     public bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
     public bool AllowPartialMatchingForTextMerge { get; private set; } // = false;
     public double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
@@ -187,10 +185,12 @@ internal sealed class ConfigManager
     public int MaxNumResultsNotInMiningMode { get; private set; } = 7;
     public string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
     public string BrowserPath { get; private set; } = "";
+    public bool DisableHotkeys { get; set; } // = false;
     public bool GlobalHotKeys { get; private set; } = true;
     public bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
     public bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
     public bool MineToFileInsteadOfAnki { get; private set; } // = false;
+    public bool AutoAdjustFontSizesOnResolutionChange { get; private set; } // = false;
 
     #endregion
 
@@ -204,28 +204,26 @@ internal sealed class ConfigManager
 
     public static void ResetConfigs()
     {
-        Instance.SaveBeforeClosing();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
+        Instance.SaveBeforeClosing(connection);
         ConfigDBManager.DeleteAllSettingsFromProfile("MainWindowTopPosition", "MainWindowLeftPosition");
 
         ConfigManager newInstance = new();
-        using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
-        {
-            ConfigDBManager.InsertSetting(connection, nameof(Theme), newInstance.Theme.ToString());
-            ConfigDBManager.InsertSetting(connection, nameof(StripPunctuationBeforeCalculatingCharacterCount), newInstance.StripPunctuationBeforeCalculatingCharacterCount.ToString());
-        }
+        ConfigDBManager.InsertSetting(connection, nameof(Theme), newInstance.Theme.ToString());
+        ConfigDBManager.InsertSetting(connection, nameof(StripPunctuationBeforeCalculatingCharacterCount), newInstance.StripPunctuationBeforeCalculatingCharacterCount.ToString());
 
         newInstance.Theme = Instance.Theme;
         newInstance.StripPunctuationBeforeCalculatingCharacterCount = Instance.StripPunctuationBeforeCalculatingCharacterCount;
 
         Instance = newInstance;
         CoreConfigManager.CreateNewCoreConfigManager();
-        Instance.ApplyPreferences();
+        Instance.ApplyPreferences(connection);
+
+        ConfigDBManager.AnalyzeAndVacuum(connection);
     }
 
-    public void ApplyPreferences()
+    public void ApplyPreferences(SqliteConnection connection)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         coreConfigManager.ApplyPreferences(connection);
 
@@ -364,6 +362,7 @@ internal sealed class ConfigManager
 
         HidePopupsOnTextChange = ConfigDBManager.GetValueFromConfig(connection, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange), bool.TryParse);
 
+        DiscardIdenticalText = ConfigDBManager.GetValueFromConfig(connection, DiscardIdenticalText, nameof(DiscardIdenticalText), bool.TryParse);
         MergeSequentialTextsWhenTheyMatch = ConfigDBManager.GetValueFromConfig(connection, MergeSequentialTextsWhenTheyMatch, nameof(MergeSequentialTextsWhenTheyMatch), bool.TryParse);
         AllowPartialMatchingForTextMerge = ConfigDBManager.GetValueFromConfig(connection, AllowPartialMatchingForTextMerge, nameof(AllowPartialMatchingForTextMerge), bool.TryParse);
 
@@ -653,10 +652,6 @@ internal sealed class ConfigManager
                     break;
 
                 case "BottomRight":
-                    PositionPopupAboveCursor = false;
-                    PositionPopupLeftOfCursor = false;
-                    break;
-
                 default:
                     PositionPopupAboveCursor = false;
                     PositionPopupLeftOfCursor = false;
@@ -679,10 +674,6 @@ internal sealed class ConfigManager
                     break;
 
                 case "Both":
-                    PopupFlipX = true;
-                    PopupFlipY = true;
-                    break;
-
                 default:
                     PopupFlipX = true;
                     PopupFlipY = true;
@@ -741,10 +732,7 @@ internal sealed class ConfigManager
 
     public void LoadPreferenceWindow(PreferencesWindow preferenceWindow)
     {
-        ConfigDBManager.CreateDB();
-
         preferenceWindow.JLVersionTextBlock.Text = string.Create(CultureInfo.InvariantCulture, $"v{Utils.JLVersion}");
-
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = DisableHotkeysKeyGesture.ToFormattedString();
         preferenceWindow.MiningModeKeyGestureTextBox.Text = MiningModeKeyGesture.ToFormattedString();
         preferenceWindow.PlayAudioKeyGestureTextBox.Text = PlayAudioKeyGesture.ToFormattedString();
@@ -851,7 +839,7 @@ internal sealed class ConfigManager
         preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked = coreConfigManager.CheckForDuplicateCards;
         preferenceWindow.LookupRateNumericUpDown.Value = coreConfigManager.LookupRate;
         preferenceWindow.KanjiModeCheckBox.IsChecked = coreConfigManager.KanjiMode;
-        preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked = AutoAdjustFontSizesOnResolutionChange;
+        preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = coreConfigManager.CheckForJLUpdatesOnStartUp;
@@ -904,6 +892,7 @@ internal sealed class ConfigManager
         preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
+        preferenceWindow.DiscardIdenticalTextCheckBox.IsChecked = DiscardIdenticalText;
         preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked = MergeSequentialTextsWhenTheyMatch;
         preferenceWindow.AllowPartialMatchingForTextMergeCheckBox.IsChecked = AllowPartialMatchingForTextMerge;
         preferenceWindow.TextBoxUseCustomLineHeightCheckBox.IsChecked = TextBoxUseCustomLineHeight;
@@ -1170,6 +1159,9 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(HidePopupsOnTextChange),
                 preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked.ToString()!);
 
+            ConfigDBManager.UpdateSetting(connection, nameof(DiscardIdenticalText),
+                preferenceWindow.DiscardIdenticalTextCheckBox.IsChecked.ToString()!);
+
             ConfigDBManager.UpdateSetting(connection, nameof(MergeSequentialTextsWhenTheyMatch),
                 preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked.ToString()!);
 
@@ -1221,7 +1213,7 @@ internal sealed class ConfigManager
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoAdjustFontSizesOnResolutionChange),
-                preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked.ToString()!);
+                preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(HighlightLongestMatch),
                 preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString()!);
@@ -1409,9 +1401,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition",
                 (mainWindow.Left * dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
-        }
 
-        ApplyPreferences();
+            ApplyPreferences(connection);
+        }
 
         if (preferenceWindow.SetAnkiConfig)
         {
@@ -1419,11 +1411,8 @@ internal sealed class ConfigManager
         }
     }
 
-    public void SaveBeforeClosing()
+    public void SaveBeforeClosing(SqliteConnection connection)
     {
-        ConfigDBManager.CreateDB();
-        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-
         MainWindow mainWindow = MainWindow.Instance;
         ConfigDBManager.UpdateSetting(connection, "MainWindowFontSize",
             mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));

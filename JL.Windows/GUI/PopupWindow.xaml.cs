@@ -50,7 +50,7 @@ internal sealed partial class PopupWindow
 
     public nint WindowHandle { get; private set; }
 
-    public List<LookupResult> LastLookupResults { get; private set; } = [];
+    public LookupResult[] LastLookupResults { get; private set; } = [];
 
     private List<Dict> _dictsWithResults = [];
 
@@ -232,9 +232,9 @@ internal sealed partial class PopupWindow
 
         LastText = text;
 
-        List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
+        LookupResult[]? lookupResults = LookupUtils.LookupText(text);
 
-        if (lookupResults?.Count > 0)
+        if (lookupResults?.Length > 0)
         {
             Stats.IncrementStat(StatType.NumberOfLookups);
             _previousTextBox = textBox;
@@ -357,9 +357,9 @@ internal sealed partial class PopupWindow
 
         LastText = text;
 
-        List<LookupResult>? lookupResults = LookupUtils.LookupText(textBox.SelectedText);
+        LookupResult[]? lookupResults = LookupUtils.LookupText(textBox.SelectedText);
 
-        if (lookupResults?.Count > 0)
+        if (lookupResults?.Length > 0)
         {
             Stats.IncrementStat(StatType.NumberOfLookups);
             _previousTextBox = textBox;
@@ -483,8 +483,12 @@ internal sealed partial class PopupWindow
 
         PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
 
-        Dict? pitchDict = DictUtils.SingleDictTypeDicts.GetValueOrDefault(DictType.PitchAccentYomichan);
-        bool pitchDictIsActive = pitchDict?.Active ?? false;
+        bool pitchDictIsActive = false;
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
+        {
+            pitchDictIsActive = pitchDict.Active;
+        }
+
         Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         bool showPOrthographyInfo = jmdict.Options.POrthographyInfo!.Value;
         bool showROrthographyInfo = jmdict.Options.ROrthographyInfo!.Value;
@@ -492,8 +496,8 @@ internal sealed partial class PopupWindow
         double pOrthographyInfoFontSize = jmdict.Options.POrthographyInfoFontSize!.Value;
 
         int resultCount = generateAllResults
-            ? LastLookupResults.Count
-            : Math.Min(LastLookupResults.Count, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
+            ? LastLookupResults.Length
+            : Math.Min(LastLookupResults.Length, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
 
         bool checkForDuplicateCards = MiningMode
                             && coreConfigManager.CheckForDuplicateCards
@@ -1768,7 +1772,7 @@ internal sealed partial class PopupWindow
 
     private Task PlayAudio()
     {
-        if (LastLookupResults.Count is 0)
+        if (LastLookupResults.Length is 0)
         {
             return Task.CompletedTask;
         }
@@ -1884,7 +1888,7 @@ internal sealed partial class PopupWindow
         _buttonAll.Click += DictTypeButtonOnClick;
         buttons.Add(_buttonAll);
 
-        foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
+        foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToArray())
         {
             if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.Instance.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
             {
