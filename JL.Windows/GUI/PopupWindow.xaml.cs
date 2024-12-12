@@ -1111,15 +1111,14 @@ internal sealed partial class PopupWindow
 
     private async Task CheckResultForDuplicates(TextBlock[] duplicateIcons)
     {
-        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(LastLookupResults, _currentText, _currentCharPosition).ConfigureAwait(false);
-
+        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(LastLookupResults, _currentText, _currentCharPosition).ConfigureAwait(true);
         if (duplicateCard is not null)
         {
             for (int i = 0; i < duplicateCard.Length; i++)
             {
                 if (duplicateCard[i])
                 {
-                    await MainWindow.Instance.Dispatcher.InvokeAsync(() => { duplicateIcons[i].Visibility = Visibility.Visible; });
+                    duplicateIcons[i].Visibility = Visibility.Visible;
                 }
             }
         }
