@@ -824,17 +824,18 @@ internal sealed partial class PopupWindow
         {
             TextBlock duplicateIconTextBlock = new()
             {
-                Text = "⚠",
                 Name = nameof(duplicateIconTextBlock),
-                FontSize = configManager.DictTypeFontSize,
+                Text = "⚠",
                 Foreground = configManager.DefinitionsColor,
+                FontSize = configManager.DictTypeFontSize,
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(7, 0, 0, 0),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Background = Brushes.Transparent,
                 Cursor = Cursors.Arrow,
+                TextWrapping = TextWrapping.NoWrap,
                 Padding = new Thickness(0),
-                ToolTip = $"{result.PrimarySpelling} is already in the Anki deck.",
+                ToolTip = $"{result.PrimarySpelling} is already in the Anki deck",
                 Visibility = Visibility.Hidden
             };
 
