@@ -836,6 +836,7 @@ internal sealed class ConfigManager
         preferenceWindow.WebSocketUriTextBox.Text = coreConfigManager.WebSocketUri.OriginalString;
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;
+        preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked = coreConfigManager.CheckForDuplicateCards;
         preferenceWindow.LookupRateNumericUpDown.Value = coreConfigManager.LookupRate;
         preferenceWindow.KanjiModeCheckBox.IsChecked = coreConfigManager.KanjiMode;
         preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked = AutoAdjustFontSizesOnResolutionChange;
@@ -1204,6 +1205,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AllowDuplicateCards),
                 preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckForDuplicateCards),
+                preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.LookupRate),
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));

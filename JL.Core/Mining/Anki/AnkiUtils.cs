@@ -37,11 +37,21 @@ public static class AnkiUtils
 
     internal static async Task<bool?> CanAddNote(Note note)
     {
-        Response? response = await AnkiConnect.GetCanAddNotesResponse(note).ConfigureAwait(false);
+        Response? response = await AnkiConnect.GetCanAddNotesResponse([note]).ConfigureAwait(false);
         string? resultString = response?.Result?.ToString() ?? null;
 
         return resultString is not null
             ? JsonSerializer.Deserialize<List<bool>>(resultString)![0]
+            : null;
+    }
+
+    internal static async ValueTask<List<bool>?> CanAddNotes(List<Note> notes)
+    {
+        Response? response = await AnkiConnect.GetCanAddNotesResponse(notes).ConfigureAwait(false);
+        string? resultString = response?.Result?.ToString() ?? null;
+
+        return resultString is not null
+            ? JsonSerializer.Deserialize<List<bool>>(resultString)
             : null;
     }
 }
