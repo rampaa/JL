@@ -78,6 +78,12 @@ public static class MiningUtils
     {
         switch (field)
         {
+            case JLField.Nothing:
+            case JLField.Audio:
+            case JLField.Image:
+            case JLField.LocalTime:
+            default:
+                return null;
             case JLField.LeadingSentencePart:
             {
                 string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
@@ -102,7 +108,6 @@ public static class MiningUtils
                 int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
                 return currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
             }
-
             case JLField.Sentence:
             {
                 string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
@@ -118,9 +123,11 @@ public static class MiningUtils
                 return $"{leadingSentencePart}<b>{lookupResult.MatchedText}</b>{trailingSentencePart}";
             }
             case JLField.SourceText:
+            {
                 string leadingSourcePart = currentText[..currentCharPosition].ReplaceLineEndings("<br/>");
                 string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ReplaceLineEndings("<br/>");
                 return $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}".ReplaceLineEndings("<br/>");
+            }
             case JLField.Readings:
                 return lookupResult.Readings is not null ? string.Join('、', lookupResult.Readings) : null;
             case JLField.ReadingsWithOrthographyInfo:
@@ -186,18 +193,12 @@ public static class MiningUtils
                 return currentText[..currentCharPosition].ReplaceLineEndings("<br/>");
             case JLField.TrailingSourceTextPart:
                 return currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ReplaceLineEndings("<br/>");
-            case JLField.LocalTime:
-                return DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
             case JLField.DictionaryName:
                 return lookupResult.Dict.Name;
             case JLField.Frequencies:
-                if (lookupResult.Frequencies is not null)
-                {
-                    List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies
-                        .Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
-                    return LookupResultUtils.FrequenciesToText(lookupResult.Frequencies, true, lookupResult.Frequencies.Count is 1);
-                }
-                return null;
+                return lookupResult.Frequencies is not null
+                    ? LookupResultUtils.FrequenciesToText(lookupResult.Frequencies, true, lookupResult.Frequencies.Count is 1)
+                    : null;
             case JLField.RawFrequencies:
                 if (lookupResult.Frequencies is not null)
                 {
@@ -209,8 +210,6 @@ public static class MiningUtils
             case JLField.PreferredFrequency:
                 if (lookupResult.Frequencies is not null)
                 {
-                    List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies
-                        .Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
                     int firstFrequency = lookupResult.Frequencies[0].Freq;
                     if (firstFrequency is > 0 and < int.MaxValue)
                     {
@@ -312,11 +311,6 @@ public static class MiningUtils
                 }
                 return null;
             }
-            case JLField.Nothing:
-            case JLField.Audio:
-            case JLField.Image:
-            default:
-                return null;
         }
     }
 
@@ -689,11 +683,8 @@ public static class MiningUtils
         Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
     }
 
-    public static async ValueTask<bool[]?> CheckDuplicates(List<LookupResult> lookupResults, string currentText, int currentCharPosition)
+    public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, string currentText, int currentCharPosition)
     {
-        List<Note> notes = [];
-        List<int> positions = [];
-        bool[] results = new bool[lookupResults.Count];
 
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
         if (ankiConfigDict is null)
@@ -701,7 +692,11 @@ public static class MiningUtils
             return null;
         }
 
-        for (int i = 0; i < lookupResults.Count; i++)
+        List<Note> notes = [];
+        List<int> positions = [];
+        bool[] results = new bool[lookupResults.Length];
+
+        for (int i = 0; i < lookupResults.Length; i++)
         {
             LookupResult lookupResult = lookupResults[i];
 
@@ -743,6 +738,11 @@ public static class MiningUtils
             Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, null, null, null, null, null);
             notes.Add(note);
             positions.Add(i);
+        }
+
+        if (notes.Count is 0)
+        {
+            return null;
         }
 
         List<bool>? canAddNote = await AnkiUtils.CanAddNotes(notes).ConfigureAwait(false);

@@ -505,7 +505,7 @@ internal sealed partial class PopupWindow
                             && coreConfigManager.AnkiIntegration;
 
         TextBlock[]? duplicateIcons = checkForDuplicateCards
-            ? new TextBlock[LastLookupResults.Count]
+            ? new TextBlock[LastLookupResults.Length]
             : null;
 
         StackPanel[] popupItemSource = new StackPanel[resultCount];
@@ -560,7 +560,6 @@ internal sealed partial class PopupWindow
         };
 
         ConfigManager configManager = ConfigManager.Instance;
-        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
 
         TextBlock primarySpellingTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpelling),
             result.PrimarySpelling,
