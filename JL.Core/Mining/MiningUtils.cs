@@ -139,7 +139,9 @@ public static class MiningUtils
             case JLField.PrimarySpellingAndReadings:
                 return lookupResult.Readings is not null ? $"{lookupResult.PrimarySpelling}[{string.Join('、', lookupResult.Readings)}]" : null;
             case JLField.PrimarySpellingAndFirstReading:
-                return $"{lookupResult.PrimarySpelling}[{(lookupResult.Readings is not null ? lookupResult.Readings[0] : "")}]";
+                return lookupResult.Readings is not null
+                    ? $"{lookupResult.PrimarySpelling}[{lookupResult.Readings[0]}]"
+                    : null;
             case JLField.PrimarySpellingWithOrthographyInfo:
                 return lookupResult.PrimarySpellingOrthographyInfoList is not null
                 ? $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})"
