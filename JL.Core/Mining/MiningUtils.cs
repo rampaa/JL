@@ -425,7 +425,7 @@ public static class MiningUtils
 
             if (miningParameters.TryGetValue(jlField, out string? value))
             {
-                string? jlFieldContent = value.ReplaceLineEndings("\\n").Replace("\t", "  ", StringComparison.Ordinal).Trim();
+                string jlFieldContent = value.ReplaceLineEndings("\\n").Replace("\t", "  ", StringComparison.Ordinal).Trim();
                 if (!string.IsNullOrEmpty(jlFieldContent))
                 {
                     _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")

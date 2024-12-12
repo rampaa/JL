@@ -652,10 +652,6 @@ internal sealed class ConfigManager
                     break;
 
                 case "BottomRight":
-                    PositionPopupAboveCursor = false;
-                    PositionPopupLeftOfCursor = false;
-                    break;
-
                 default:
                     PositionPopupAboveCursor = false;
                     PositionPopupLeftOfCursor = false;
@@ -678,10 +674,6 @@ internal sealed class ConfigManager
                     break;
 
                 case "Both":
-                    PopupFlipX = true;
-                    PopupFlipY = true;
-                    break;
-
                 default:
                     PopupFlipX = true;
                     PopupFlipY = true;
