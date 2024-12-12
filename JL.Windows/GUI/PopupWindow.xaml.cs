@@ -572,7 +572,6 @@ internal sealed partial class PopupWindow
             result.PrimarySpelling,
             configManager.PrimarySpellingColor,
             configManager.PrimarySpellingFontSize,
-            PopupContextMenu,
             VerticalAlignment.Center,
             new Thickness(2, 0, 0, 0));
 
@@ -610,7 +609,6 @@ internal sealed partial class PopupWindow
                 $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})",
                 DictOptionManager.POrthographyInfoColor,
                 pOrthographyInfoFontSize,
-                PopupContextMenu,
                 VerticalAlignment.Center,
                 new Thickness(3, 0, 0, 0));
 
@@ -629,7 +627,6 @@ internal sealed partial class PopupWindow
                 TextBox readingTextBox = PopupWindowUtils.CreateTextBox(nameof(result.Readings),
                     readingsText, configManager.ReadingsColor,
                     configManager.ReadingsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(5, 0, 0, 0));
 
@@ -668,7 +665,6 @@ internal sealed partial class PopupWindow
                     readingsText,
                     configManager.ReadingsColor,
                     configManager.ReadingsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(7, 0, 0, 0));
 
@@ -735,7 +731,6 @@ internal sealed partial class PopupWindow
                     alternativeSpellingsText,
                     configManager.AlternativeSpellingsColor,
                     configManager.AlternativeSpellingsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(5, 0, 0, 0));
 
@@ -749,7 +744,6 @@ internal sealed partial class PopupWindow
                     alternativeSpellingsText,
                     configManager.AlternativeSpellingsColor,
                     configManager.AlternativeSpellingsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(7, 0, 0, 0));
 
@@ -765,7 +759,6 @@ internal sealed partial class PopupWindow
                     $"{result.MatchedText} {result.DeconjugationProcess}",
                     configManager.DeconjugationInfoColor,
                     configManager.DeconjugationInfoFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Top,
                     new Thickness(5, 0, 0, 0));
 
@@ -779,7 +772,6 @@ internal sealed partial class PopupWindow
                     $"{result.MatchedText} {result.DeconjugationProcess}",
                     configManager.DeconjugationInfoColor,
                     configManager.DeconjugationInfoFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Top,
                     new Thickness(7, 0, 0, 0));
 
@@ -798,7 +790,6 @@ internal sealed partial class PopupWindow
                     LookupResultUtils.FrequenciesToText(validFrequencies, false, result.Frequencies.Count is 1),
                     configManager.FrequencyColor,
                     configManager.FrequencyFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Top,
                     new Thickness(7, 0, 0, 0));
 
@@ -812,7 +803,6 @@ internal sealed partial class PopupWindow
                 result.Dict.Name,
                 configManager.DictTypeColor,
                 configManager.DictTypeFontSize,
-                PopupContextMenu,
                 VerticalAlignment.Top,
                 new Thickness(7, 0, 0, 0));
 
@@ -827,7 +817,7 @@ internal sealed partial class PopupWindow
                 Name = nameof(duplicateIconTextBlock),
                 Text = "⚠",
                 Foreground = configManager.DefinitionsColor,
-                FontSize = configManager.DictTypeFontSize,
+                FontSize = 14,
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(7, 0, 0, 0),
                 HorizontalAlignment = HorizontalAlignment.Left,
@@ -854,7 +844,6 @@ internal sealed partial class PopupWindow
                     result.FormattedDefinitions,
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
 
@@ -868,7 +857,6 @@ internal sealed partial class PopupWindow
                     result.FormattedDefinitions,
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
 
@@ -885,7 +873,6 @@ internal sealed partial class PopupWindow
                     $"On: {string.Join('、', result.OnReadings)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
 
@@ -900,7 +887,6 @@ internal sealed partial class PopupWindow
                     $"On: {string.Join('、', result.OnReadings)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
 
@@ -916,7 +902,6 @@ internal sealed partial class PopupWindow
                     $"Kun: {string.Join('、', result.KunReadings)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
 
@@ -931,7 +916,6 @@ internal sealed partial class PopupWindow
                     $"Kun: {string.Join('、', result.KunReadings)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
 
@@ -947,7 +931,6 @@ internal sealed partial class PopupWindow
                     $"Nanori: {string.Join('、', result.NanoriReadings)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
 
@@ -962,7 +945,6 @@ internal sealed partial class PopupWindow
                     $"Nanori: {string.Join('、', result.NanoriReadings)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
 
@@ -978,7 +960,6 @@ internal sealed partial class PopupWindow
                     $"Radical names: {string.Join('、', result.RadicalNames)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
 
@@ -993,7 +974,6 @@ internal sealed partial class PopupWindow
                     $"Radical names: {string.Join('、', result.RadicalNames)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
 
@@ -1007,7 +987,6 @@ internal sealed partial class PopupWindow
                 $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}",
                 configManager.DefinitionsColor,
                 configManager.DefinitionsFontSize,
-                PopupContextMenu,
                 VerticalAlignment.Center,
                 new Thickness(2));
 
@@ -1020,7 +999,6 @@ internal sealed partial class PopupWindow
                 string.Create(CultureInfo.InvariantCulture, $"Stroke count: {result.StrokeCount}"),
                 configManager.DefinitionsColor,
                 configManager.DefinitionsFontSize,
-                PopupContextMenu,
                 VerticalAlignment.Center,
                 new Thickness(2));
 
@@ -1035,7 +1013,6 @@ internal sealed partial class PopupWindow
                     $"Composition: {result.KanjiComposition}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
 
@@ -1050,7 +1027,6 @@ internal sealed partial class PopupWindow
                     $"Composition: {result.KanjiComposition}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
 
@@ -1066,7 +1042,6 @@ internal sealed partial class PopupWindow
                     $"Statistics:\n{result.KanjiStats}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(0, 2, 2, 2));
 
@@ -1081,7 +1056,6 @@ internal sealed partial class PopupWindow
                     $"Statistics:\n{result.KanjiStats}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
-                    PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
 

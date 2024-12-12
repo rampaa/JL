@@ -23,7 +23,7 @@ internal static class PopupWindowUtils
     private static DoubleCollection StrokeDashArray { get; set; } = [1, 1];
     public static readonly Timer PopupAutoHideTimer = new();
 
-    public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
+    public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin)
     {
         return new TextBlock
         {
@@ -31,7 +31,6 @@ internal static class PopupWindowUtils
             Text = text,
             Foreground = foregroundBrush,
             FontSize = fontSize,
-            ContextMenu = contextMenu,
             VerticalAlignment = verticalAlignment,
             Margin = margin,
             HorizontalAlignment = HorizontalAlignment.Left,
@@ -42,7 +41,7 @@ internal static class PopupWindowUtils
         };
     }
 
-    public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
+    public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin)
     {
         TouchScreenTextBox textBox = new()
         {
@@ -51,7 +50,6 @@ internal static class PopupWindowUtils
             Foreground = foregroundBrush,
             CaretBrush = foregroundBrush,
             FontSize = fontSize,
-            ContextMenu = contextMenu,
             VerticalAlignment = verticalAlignment,
             Margin = margin,
             HorizontalAlignment = HorizontalAlignment.Left,
