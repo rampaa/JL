@@ -255,7 +255,7 @@ internal sealed partial class PopupWindow
             if (enableMiningMode)
             {
                 EnableMiningMode();
-                DisplayResults(true);
+                DisplayResults();
 
                 if (configManager.AutoHidePopupIfMouseIsNotOverIt)
                 {
@@ -265,7 +265,7 @@ internal sealed partial class PopupWindow
 
             else
             {
-                DisplayResults(false);
+                DisplayResults();
             }
 
             Show();
@@ -367,7 +367,7 @@ internal sealed partial class PopupWindow
             LastLookupResults = lookupResults;
 
             EnableMiningMode();
-            DisplayResults(true);
+            DisplayResults();
 
             if (configManager.AutoHidePopupIfMouseIsNotOverIt)
             {
@@ -475,7 +475,7 @@ internal sealed partial class PopupWindow
         WinApi.MoveWindowToPosition(WindowHandle, x, y);
     }
 
-    public void DisplayResults(bool generateAllResults)
+    public void DisplayResults()
     {
         ConfigManager configManager = ConfigManager.Instance;
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
@@ -495,18 +495,23 @@ internal sealed partial class PopupWindow
         bool showAOrthographyInfo = jmdict.Options.AOrthographyInfo!.Value;
         double pOrthographyInfoFontSize = jmdict.Options.POrthographyInfoFontSize!.Value;
 
-        int resultCount = generateAllResults
-            ? LastLookupResults.Length
-            : Math.Min(LastLookupResults.Length, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
-
-        bool checkForDuplicateCards = MiningMode
-                            && coreConfigManager.CheckForDuplicateCards
-                            && !configManager.MineToFileInsteadOfAnki
-                            && coreConfigManager.AnkiIntegration;
-
-        TextBlock[]? duplicateIcons = checkForDuplicateCards
-            ? new TextBlock[LastLookupResults.Length]
-            : null;
+        TextBlock[]? duplicateIcons;
+        int resultCount;
+        bool checkForDuplicateCards;
+        if (MiningMode)
+        {
+            resultCount = LastLookupResults.Length;
+            checkForDuplicateCards = coreConfigManager is { CheckForDuplicateCards: true, AnkiIntegration: true } && !configManager.MineToFileInsteadOfAnki;
+            duplicateIcons = checkForDuplicateCards
+                ? new TextBlock[LastLookupResults.Length]
+                : null;
+        }
+        else
+        {
+            resultCount = Math.Min(LastLookupResults.Length, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
+            checkForDuplicateCards = false;
+            duplicateIcons = null;
+        }
 
         StackPanel[] popupItemSource = new StackPanel[resultCount];
 
@@ -523,10 +528,12 @@ internal sealed partial class PopupWindow
         }
 
         PopupListView.ItemsSource = popupItemSource;
-        if (duplicateIcons is not null)
+
+        if (checkForDuplicateCards)
         {
-            _ = CheckResultForDuplicates(duplicateIcons);
+            _ = CheckResultForDuplicates(duplicateIcons!);
         }
+
         GenerateDictTypeButtons();
         UpdateLayout();
     }
@@ -815,10 +822,10 @@ internal sealed partial class PopupWindow
         // Keep this at the bottom
         if (duplicateIcons is not null)
         {
-            TextBlock duplicate = new()
+            TextBlock duplicateIconTextBlock = new()
             {
                 Text = "⚠",
-                Name = nameof(duplicate),
+                Name = nameof(duplicateIconTextBlock),
                 FontSize = configManager.DictTypeFontSize,
                 Foreground = configManager.DefinitionsColor,
                 VerticalAlignment = VerticalAlignment.Top,
@@ -831,8 +838,8 @@ internal sealed partial class PopupWindow
                 Visibility = Visibility.Hidden
             };
 
-            _ = top.Children.Add(duplicate);
-            duplicateIcons[index] = duplicate;
+            _ = top.Children.Add(duplicateIconTextBlock);
+            duplicateIcons[index] = duplicateIconTextBlock;
         }
 
         // bottom
@@ -1395,6 +1402,7 @@ internal sealed partial class PopupWindow
             }
 
             EnableMiningMode();
+            DisplayResults();
 
             if (configManager.Focusable)
             {
@@ -1402,8 +1410,6 @@ internal sealed partial class PopupWindow
             }
 
             _ = Focus();
-
-            DisplayResults(true);
 
             if (configManager.AutoHidePopupIfMouseIsNotOverIt)
             {

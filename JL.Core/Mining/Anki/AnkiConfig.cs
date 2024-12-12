@@ -60,6 +60,8 @@ public sealed class AnkiConfig
                     s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
                         Utils.s_jsoIgnoringNullWithEnumConverter).ConfigureAwait(false);
                 }
+
+                return s_ankiConfigDict;
             }
 
             catch (Exception ex)
@@ -76,7 +78,5 @@ public sealed class AnkiConfig
             Utils.Logger.Warning("AnkiConfig.json doesn't exist");
             return null;
         }
-
-        return s_ankiConfigDict;
     }
 }

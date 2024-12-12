@@ -236,8 +236,7 @@ internal static class PopupWindowUtils
     public static void ShowMiningModeResults(PopupWindow popupWindow)
     {
         popupWindow.EnableMiningMode();
-        WinApi.BringToFront(popupWindow.WindowHandle);
-        popupWindow.DisplayResults(true);
+        popupWindow.DisplayResults();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.Focusable)
@@ -246,6 +245,8 @@ internal static class PopupWindowUtils
         }
 
         _ = popupWindow.Focus();
+
+        WinApi.BringToFront(popupWindow.WindowHandle);
 
         if (configManager.AutoHidePopupIfMouseIsNotOverIt)
         {
