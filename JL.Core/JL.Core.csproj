@@ -12,7 +12,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.2" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.4.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
@@ -20,6 +20,7 @@
   <!--Transitive dependencies-->
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.6.0" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
   </ItemGroup>
 
   <ItemGroup>
