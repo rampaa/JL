@@ -140,7 +140,6 @@ internal sealed class ConfigManager
     public KeyGesture DisableHotkeysKeyGesture { get; private set; } = new(Key.Pause, ModifierKeys.Alt);
     public KeyGesture MiningModeKeyGesture { get; private set; } = new(Key.M, ModifierKeys.Alt);
     public KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Alt);
-    public KeyGesture KanjiModeKeyGesture { get; private set; } = new(Key.K, ModifierKeys.Alt);
     public KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
     public KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
     public KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Alt);
@@ -511,7 +510,6 @@ internal sealed class ConfigManager
         DisableHotkeysKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MiningModeKeyGesture), MiningModeKeyGesture);
         PlayAudioKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(PlayAudioKeyGesture), PlayAudioKeyGesture);
-        KanjiModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(KanjiModeKeyGesture), KanjiModeKeyGesture);
         LookupKeyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupKeyKeyGesture), LookupKeyKeyGesture);
         ClosePopupKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ClosePopupKeyGesture), ClosePopupKeyGesture);
         ShowStatsKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowStatsKeyGesture), ShowStatsKeyGesture);
@@ -736,7 +734,6 @@ internal sealed class ConfigManager
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = DisableHotkeysKeyGesture.ToFormattedString();
         preferenceWindow.MiningModeKeyGestureTextBox.Text = MiningModeKeyGesture.ToFormattedString();
         preferenceWindow.PlayAudioKeyGestureTextBox.Text = PlayAudioKeyGesture.ToFormattedString();
-        preferenceWindow.KanjiModeKeyGestureTextBox.Text = KanjiModeKeyGesture.ToFormattedString();
         preferenceWindow.LookupKeyKeyGestureTextBox.Text = LookupKeyKeyGesture.ToFormattedString();
 
         preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text =
@@ -837,7 +834,6 @@ internal sealed class ConfigManager
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;
         preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked = coreConfigManager.CheckForDuplicateCards;
-        preferenceWindow.KanjiModeCheckBox.IsChecked = coreConfigManager.KanjiMode;
         preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
@@ -988,7 +984,6 @@ internal sealed class ConfigManager
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(MiningModeKeyGesture), preferenceWindow.MiningModeKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(PlayAudioKeyGesture), preferenceWindow.PlayAudioKeyGestureTextBox.Text);
-            KeyGestureUtils.UpdateKeyGesture(connection, nameof(KanjiModeKeyGesture), preferenceWindow.KanjiModeKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(LookupKeyKeyGesture), preferenceWindow.LookupKeyKeyGestureTextBox.Text);
 
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowManageDictionariesWindowKeyGesture),
@@ -1194,9 +1189,6 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, "MainWindowFont", preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupFont), preferenceWindow.PopupFontComboBox.SelectedValue.ToString()!);
-
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.KanjiMode),
-                preferenceWindow.KanjiModeCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.ForceSyncAnki),
                 preferenceWindow.ForceSyncAnkiCheckBox.IsChecked.ToString()!);

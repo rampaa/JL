@@ -5,7 +5,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using JL.Core.Audio;
-using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Utilities;
@@ -279,11 +278,6 @@ internal static class PopupWindowUtils
 
     public static bool NoAllDictFilter(object item)
     {
-        if (CoreConfigManager.Instance.KanjiMode)
-        {
-            return true;
-        }
-
         Dict dict = (Dict)((StackPanel)item).Tag;
         return !dict.Options.NoAll.Value;
     }

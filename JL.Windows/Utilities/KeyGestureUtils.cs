@@ -54,7 +54,6 @@ internal static class KeyGestureUtils
         nameof(ConfigManager.CaptureTextFromClipboardKeyGesture),
         nameof(ConfigManager.CaptureTextFromWebSocketKeyGesture),
         nameof(ConfigManager.ReconnectToWebSocketServerKeyGesture),
-        nameof(ConfigManager.KanjiModeKeyGesture),
         nameof(ConfigManager.ShowAddNameWindowKeyGesture),
         nameof(ConfigManager.ShowAddWordWindowKeyGesture)
     ];

@@ -558,15 +558,6 @@ internal sealed partial class MainWindow
             }
         }
 
-        else if (keyGesture.IsEqual(configManager.KanjiModeKeyGesture))
-        {
-            handled = true;
-
-            coreConfigManager.KanjiMode = !coreConfigManager.KanjiMode;
-            FirstPopupWindow.LastText = "";
-            MainTextBox_MouseMove(null, null);
-        }
-
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
             handled = true;

@@ -1345,17 +1345,6 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="KanjiModeKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Toggle kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="InactiveLookupModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -1674,13 +1663,6 @@
                             <hc:NumericUpDown x:Name="MaxNumResultsNotInMiningModeNumericUpDown" Maximum="100"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="KanjiModeCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>

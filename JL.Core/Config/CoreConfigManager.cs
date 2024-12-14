@@ -11,7 +11,6 @@ public sealed class CoreConfigManager
     public static CoreConfigManager Instance { get; private set; } = new();
 
     public Uri AnkiConnectUri { get; set; } = new("http://127.0.0.1:8765");
-    public bool KanjiMode { get; set; } // = false;
     public bool AnkiIntegration { get; set; } // = false;
     public bool ForceSyncAnki { get; private set; } // = false;
     public bool AllowDuplicateCards { get; private set; } // = false;
@@ -91,7 +90,6 @@ public sealed class CoreConfigManager
             WebSocketUtils.HandleWebSocket();
         }
 
-        KanjiMode = ConfigDBManager.GetValueFromConfig(connection, KanjiMode, nameof(KanjiMode), bool.TryParse);
         AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);
         ForceSyncAnki = ConfigDBManager.GetValueFromConfig(connection, ForceSyncAnki, nameof(ForceSyncAnki), bool.TryParse);
         AllowDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, AllowDuplicateCards, nameof(AllowDuplicateCards), bool.TryParse);

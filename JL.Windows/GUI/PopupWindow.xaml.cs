@@ -1334,7 +1334,6 @@ internal sealed partial class PopupWindow
     public async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
         bool handled = false;
         if (keyGesture.IsEqual(configManager.DisableHotkeysKeyGesture))
@@ -1403,24 +1402,6 @@ internal sealed partial class PopupWindow
             handled = true;
 
             HidePopup();
-        }
-
-        else if (keyGesture.IsEqual(configManager.KanjiModeKeyGesture))
-        {
-            handled = true;
-
-            coreConfigManager.KanjiMode = !coreConfigManager.KanjiMode;
-            LastText = "";
-
-            if (this != mainWindow.FirstPopupWindow)
-            {
-                await HandleTextBoxMouseMove(_previousTextBox!, null).ConfigureAwait(false);
-            }
-
-            else
-            {
-                await mainWindow.HandleMouseMove(null).ConfigureAwait(false);
-            }
         }
 
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
