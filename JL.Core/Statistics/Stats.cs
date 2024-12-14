@@ -122,36 +122,19 @@ public sealed class Stats
 
     public static void ResetStats(StatsMode statsMode)
     {
-        switch (statsMode)
+        Stats stats = statsMode switch
         {
-            case StatsMode.Lifetime:
-                LifetimeStats.Characters = 0;
-                LifetimeStats.Lines = 0;
-                LifetimeStats.Time = TimeSpan.Zero;
-                LifetimeStats.CardsMined = 0;
-                LifetimeStats.TimesPlayedAudio = 0;
-                LifetimeStats.Imoutos = 0;
-                break;
+            StatsMode.Lifetime => LifetimeStats,
+            StatsMode.Profile => ProfileLifetimeStats,
+            StatsMode.Session => SessionStats,
+            _ => throw new ArgumentOutOfRangeException(nameof(statsMode), statsMode, "Invalid StatsMode")
+        };
 
-            case StatsMode.Profile:
-                ProfileLifetimeStats.Characters = 0;
-                ProfileLifetimeStats.Lines = 0;
-                ProfileLifetimeStats.Time = TimeSpan.Zero;
-                ProfileLifetimeStats.CardsMined = 0;
-                ProfileLifetimeStats.TimesPlayedAudio = 0;
-                ProfileLifetimeStats.Imoutos = 0;
-                break;
-
-            case StatsMode.Session:
-                SessionStats.Characters = 0;
-                SessionStats.Lines = 0;
-                SessionStats.Time = TimeSpan.Zero;
-                SessionStats.CardsMined = 0;
-                SessionStats.TimesPlayedAudio = 0;
-                SessionStats.Imoutos = 0;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(statsMode), statsMode, "Invalid StatsMode");
-        }
+        stats.Characters = 0;
+        stats.Lines = 0;
+        stats.Time = TimeSpan.Zero;
+        stats.CardsMined = 0;
+        stats.TimesPlayedAudio = 0;
+        stats.Imoutos = 0;
     }
 }
