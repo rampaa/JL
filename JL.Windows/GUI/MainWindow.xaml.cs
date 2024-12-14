@@ -312,7 +312,7 @@ internal sealed partial class MainWindow
                || (!configManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
                || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
             ? Task.CompletedTask
-            : FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox);
+            : FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, false);
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -1136,7 +1136,7 @@ internal sealed partial class MainWindow
 
         else
         {
-            await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox).ConfigureAwait(false);
+            await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, true).ConfigureAwait(false);
         }
     }
 

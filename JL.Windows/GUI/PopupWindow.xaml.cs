@@ -306,22 +306,21 @@ internal sealed partial class PopupWindow
         return Task.CompletedTask;
     }
 
-    public Task LookupOnMouseMoveOrClick(TextBox textBox)
+    public Task LookupOnMouseMoveOrClick(TextBox textBox, bool enableMiningMode)
     {
         int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
-
-        if (charPosition >= 0)
+        if (charPosition < 0)
         {
-            if (charPosition > 0 && char.IsHighSurrogate(textBox.Text[charPosition - 1]))
-            {
-                --charPosition;
-            }
-
-            return LookupOnCharPosition(textBox, charPosition, ConfigManager.Instance.LookupOnMouseClickOnly);
+            HidePopup();
+            return Task.CompletedTask;
         }
 
-        HidePopup();
-        return Task.CompletedTask;
+        if (charPosition > 0 && char.IsHighSurrogate(textBox.Text[charPosition - 1]))
+        {
+            --charPosition;
+        }
+
+        return LookupOnCharPosition(textBox, charPosition, enableMiningMode);
     }
 
     public Task LookupOnSelect(TextBox textBox)
@@ -1206,7 +1205,7 @@ internal sealed partial class PopupWindow
             _lastInteractedTextBox = textBox;
             if (JapaneseUtils.JapaneseRegex().IsMatch(textBox.Text))
             {
-                return ChildPopupWindow.LookupOnMouseMoveOrClick(textBox);
+                return ChildPopupWindow.LookupOnMouseMoveOrClick(textBox, false);
             }
 
             if (configManager.HighlightLongestMatch)
@@ -1818,7 +1817,7 @@ internal sealed partial class PopupWindow
 
         else
         {
-            await ChildPopupWindow.LookupOnMouseMoveOrClick((TextBox)sender).ConfigureAwait(false);
+            await ChildPopupWindow.LookupOnMouseMoveOrClick((TextBox)sender, true).ConfigureAwait(false);
         }
     }
 
