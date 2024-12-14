@@ -749,17 +749,18 @@ public static class MiningUtils
         for (int i = 0; i < lookupResults.Length; i++)
         {
             LookupResult lookupResult = lookupResults[i];
+            DictType dictType = lookupResult.Dict.Type;
 
             AnkiConfig? ankiConfig;
-            if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
+            if (DictUtils.s_wordDictTypes.Contains(dictType))
             {
                 ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
             }
-            else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
+            else if (DictUtils.s_kanjiDictTypes.Contains(dictType))
             {
                 ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
             }
-            else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
+            else if (DictUtils.s_nameDictTypes.Contains(dictType))
             {
                 ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
             }
@@ -796,15 +797,15 @@ public static class MiningUtils
             return null;
         }
 
-        List<bool>? canAddNote = await AnkiUtils.CanAddNotes(notes).ConfigureAwait(false);
-        if (canAddNote is null)
+        List<bool>? canAddNoteList = await AnkiUtils.CanAddNotes(notes).ConfigureAwait(false);
+        if (canAddNoteList is null)
         {
             return null;
         }
 
-        for (int i = 0; i < canAddNote.Count; i++)
+        for (int i = 0; i < canAddNoteList.Count; i++)
         {
-            results[positions[i]] = !canAddNote[i];
+            results[positions[i]] = !canAddNoteList[i];
         }
 
         return results;
