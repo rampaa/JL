@@ -1629,9 +1629,8 @@ internal sealed partial class MainWindow
             Background.Opacity = OpacitySlider.Value / 100;
         }
 
-        if (configManager.Focusable
-            && !FirstPopupWindow.IsVisible
-            && configManager.MainWindowFocusOnHover)
+        if (!FirstPopupWindow.IsVisible
+            && configManager is { Focusable: true, MainWindowFocusOnHover: true })
         {
             _ = Activate();
         }
