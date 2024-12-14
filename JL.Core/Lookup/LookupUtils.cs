@@ -1158,24 +1158,21 @@ public static class LookupUtils
 
     private static List<LookupResult> BuildKanjidicResult(IDictionary<string, IntermediaryResult> kanjiResults, bool useDBForPitchDict, Dict? pitchDict, List<Freq> kanjiFreqs)
     {
-        KeyValuePair<string, IntermediaryResult> dictResult = kanjiResults.First();
+        (string kanji, IntermediaryResult intermediaryResult) = kanjiResults.First();
 
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = useDBForPitchDict
-            ? YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, dictResult.Key)
+            ? YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, kanji)
             : null;
 
-        List<IList<IDictRecord>> iResult = dictResult.Value.Results;
-        KanjidicRecord kanjiRecord = (KanjidicRecord)iResult[0][0];
+        KanjidicRecord kanjiRecord = (KanjidicRecord)intermediaryResult.Results[0][0];
 
         string[]? allReadings = Utils.ConcatNullableArrays(kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings);
 
-        IntermediaryResult intermediaryResult = kanjiResults.First().Value;
-
-        _ = DictUtils.KanjiCompositionDict.TryGetValue(dictResult.Key, out string? kanjiComposition);
+        _ = DictUtils.KanjiCompositionDict.TryGetValue(kanji, out string? kanjiComposition);
 
         LookupResult result = new
         (
-            primarySpelling: dictResult.Key,
+            primarySpelling: kanji,
             readings: allReadings,
             onReadings: kanjiRecord.OnReadings,
             kunReadings: kanjiRecord.KunReadings,
@@ -1184,7 +1181,7 @@ public static class LookupUtils
             strokeCount: kanjiRecord.StrokeCount,
             kanjiGrade: kanjiRecord.Grade,
             kanjiComposition: kanjiComposition,
-            frequencies: GetKanjidicFrequencies(dictResult.Key, kanjiRecord.Frequency, kanjiFreqs),
+            frequencies: GetKanjidicFrequencies(kanji, kanjiRecord.Frequency, kanjiFreqs),
             matchedText: intermediaryResult.MatchedText,
             deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
             dict: intermediaryResult.Dict,

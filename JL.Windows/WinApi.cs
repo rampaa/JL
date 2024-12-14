@@ -208,9 +208,9 @@ internal sealed partial class WinApi
 
     public static void RegisterAllGlobalHotKeys(nint windowHandle)
     {
-        foreach (KeyValuePair<int, KeyGesture> keyValuePair in KeyGestureUtils.GlobalKeyGestureDict)
+        foreach ((int id, KeyGesture keyGesture) in KeyGestureUtils.GlobalKeyGestureDict)
         {
-            _ = RegisterHotKey(windowHandle, keyValuePair.Key, (uint)keyValuePair.Value.Modifiers | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(keyValuePair.Value.Key));
+            _ = RegisterHotKey(windowHandle, id, (uint)keyGesture.Modifiers | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(keyGesture.Key));
         }
     }
 

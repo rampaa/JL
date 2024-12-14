@@ -279,8 +279,8 @@ public static class MiningUtils
                         int pitchAccentCount = pitchAccents.Count;
                         for (int i = 0; i < pitchAccentCount; i++)
                         {
-                            KeyValuePair<string, byte> pitchAccent = pitchAccents[i];
-                            _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(pitchAccent.Key, pitchAccent.Value));
+                            (string expression, byte position) = pitchAccents[i];
+                            _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, position));
 
                             if (i + 1 != pitchAccentCount)
                             {
@@ -305,8 +305,8 @@ public static class MiningUtils
                         int pitchAccentCount = pitchAccents.Count;
                         for (int i = 0; i < pitchAccentCount; i++)
                         {
-                            KeyValuePair<string, byte> pitchAccent = pitchAccents[i];
-                            _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{pitchAccent.Key}: {pitchAccent.Value}");
+                            (string expression, byte position) = pitchAccents[i];
+                            _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {position}");
 
                             if (i + 1 != pitchAccentCount)
                             {
@@ -327,11 +327,11 @@ public static class MiningUtils
                     List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
                     if (pitchAccents is not null)
                     {
-                        KeyValuePair<string, byte> firstPitchAccentKeyValuePair = pitchAccents[0];
-                        if ((lookupResult.Readings is not null && firstPitchAccentKeyValuePair.Key == lookupResult.Readings[0])
-                            || (lookupResult.Readings is null && firstPitchAccentKeyValuePair.Key == lookupResult.PrimarySpelling))
+                        (string expression, byte position) = pitchAccents[0];
+                        if ((lookupResult.Readings is not null && expression == lookupResult.Readings[0])
+                            || (lookupResult.Readings is null && expression == lookupResult.PrimarySpelling))
                         {
-                            return string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstPitchAccentKeyValuePair.Key, firstPitchAccentKeyValuePair.Value)}");
+                            return string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(expression, position)}");
                         }
                     }
                 }
@@ -345,11 +345,11 @@ public static class MiningUtils
                     List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
                     if (pitchAccents is not null)
                     {
-                        KeyValuePair<string, byte> firstPitchAccentKeyValuePair = pitchAccents[0];
-                        if ((lookupResult.Readings is not null && firstPitchAccentKeyValuePair.Key == lookupResult.Readings[0])
-                            || (lookupResult.Readings is null && firstPitchAccentKeyValuePair.Key == lookupResult.PrimarySpelling))
+                        (string expression, byte position) = pitchAccents[0];
+                        if ((lookupResult.Readings is not null && expression == lookupResult.Readings[0])
+                            || (lookupResult.Readings is null && expression == lookupResult.PrimarySpelling))
                         {
-                            return string.Create(CultureInfo.InvariantCulture, $"{firstPitchAccentKeyValuePair.Key}: {firstPitchAccentKeyValuePair.Value}");
+                            return string.Create(CultureInfo.InvariantCulture, $"{expression}: {position}");
                         }
                     }
                 }
@@ -539,9 +539,9 @@ public static class MiningUtils
                 int pitchAccentCount = pitchAccents.Count;
                 for (int i = 0; i < pitchAccentCount; i++)
                 {
-                    KeyValuePair<string, byte> pitchAccent = pitchAccents[i];
-                    _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{pitchAccent.Key}: {pitchAccent.Value}");
-                    _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(pitchAccent.Key, pitchAccent.Value));
+                    (string expression, byte position) = pitchAccents[i];
+                    _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {position}");
+                    _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, position));
 
                     if (i + 1 != pitchAccentCount)
                     {
@@ -553,12 +553,12 @@ public static class MiningUtils
                 miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString();
                 miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString();
 
-                KeyValuePair<string, byte> firstPitchAccentKeyValuePair = pitchAccents[0];
-                if ((lookupResult.Readings is not null && firstPitchAccentKeyValuePair.Key == lookupResult.Readings[0])
-                    || (lookupResult.Readings is null && firstPitchAccentKeyValuePair.Key == lookupResult.PrimarySpelling))
+                (string firstExpression, byte firstPosition) = pitchAccents[0];
+                if ((lookupResult.Readings is not null && firstExpression == lookupResult.Readings[0])
+                    || (lookupResult.Readings is null && firstExpression == lookupResult.PrimarySpelling))
                 {
-                    miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstPitchAccentKeyValuePair.Key, firstPitchAccentKeyValuePair.Value)}");
-                    miningParams[JLField.NumericPitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{firstPitchAccentKeyValuePair.Key}: {firstPitchAccentKeyValuePair.Value}");
+                    miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstExpression, firstPosition)}");
+                    miningParams[JLField.NumericPitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{firstExpression}: {firstPosition}");
                 }
             }
         }

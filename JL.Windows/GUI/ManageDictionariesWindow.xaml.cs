@@ -430,9 +430,9 @@ internal sealed partial class ManageDictionariesWindow
 
         StringBuilder sb = new();
         IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(static e => e.Key, StringComparer.InvariantCulture);
-        foreach (KeyValuePair<string, string> entity in sortedJmdictEntities)
+        foreach ((string name, string description) in sortedJmdictEntities)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{entity.Key}: {entity.Value}\n");
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{name}: {description}\n");
         }
 
         return sb.ToString(0, sb.Length - 1);
