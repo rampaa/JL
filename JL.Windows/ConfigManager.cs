@@ -837,7 +837,6 @@ internal sealed class ConfigManager
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;
         preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked = coreConfigManager.CheckForDuplicateCards;
-        preferenceWindow.LookupRateNumericUpDown.Value = coreConfigManager.LookupRate;
         preferenceWindow.KanjiModeCheckBox.IsChecked = coreConfigManager.KanjiMode;
         preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
@@ -853,7 +852,6 @@ internal sealed class ConfigManager
         preferenceWindow.FocusableCheckBox.IsChecked = Focusable;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = coreConfigManager.AnkiIntegration;
-        preferenceWindow.LookupRateNumericUpDown.Value = coreConfigManager.LookupRate;
 
         preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked = MainWindowDynamicWidth;
         preferenceWindow.MainWindowDynamicHeightCheckBox.IsChecked = MainWindowDynamicHeight;
@@ -1208,9 +1206,6 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckForDuplicateCards),
                 preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked.ToString()!);
-
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.LookupRate),
-                preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoAdjustFontSizesOnResolutionChange),
                 preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked.ToString()!);

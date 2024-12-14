@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using JL.Core.Config;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -20,22 +19,12 @@ namespace JL.Core.Lookup;
 
 public static class LookupUtils
 {
-    private static DateTime s_lastLookupTime;
-
     private delegate Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameterOrQuery);
     private delegate List<IDictRecord>? GetKanjiRecordsFromDB(string dbName, string term);
 
     public static LookupResult[]? LookupText(string text)
     {
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-        DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-        if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < coreConfigManager.LookupRate)
-        {
-            return null;
-        }
-
-        s_lastLookupTime = preciseTimeNow;
-
         bool useDBForPitchDict = false;
         if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
         {

@@ -1666,14 +1666,6 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Lookup throttle (ms)"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="100" Minimum="0"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max number of results when not in mining mode"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Style="{StaticResource TextBlockDefault}"
