@@ -594,9 +594,9 @@ internal sealed class ConfigManager
             {
                 searchUrlStr = searchUrlStr
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
-                    .Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
+                    .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase);
 
-                if (Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", "", StringComparison.Ordinal), UriKind.Absolute))
+                if (Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", "", StringComparison.OrdinalIgnoreCase), UriKind.Absolute))
                 {
                     SearchUrl = searchUrlStr;
                 }

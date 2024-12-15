@@ -117,9 +117,9 @@ internal sealed partial class EditAudioSourceWindow
             case AudioSourceType.UrlJson:
                 uri = TextBlockUri.Text
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
-                    .Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
+                    .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase);
                 if (string.IsNullOrEmpty(uri)
-                    || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.Ordinal).Replace("{Reading}", "", StringComparison.Ordinal), UriKind.Absolute)
+                    || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.OrdinalIgnoreCase).Replace("{Reading}", "", StringComparison.OrdinalIgnoreCase), UriKind.Absolute)
                     || (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri)))
                 {
                     TextBlockUri.BorderBrush = Brushes.Red;

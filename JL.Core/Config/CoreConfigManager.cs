@@ -47,7 +47,7 @@ public sealed class CoreConfigManager
             {
                 ankiConnectUriStr = ankiConnectUriStr
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
-                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.Ordinal);
+                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase);
 
                 if (Uri.TryCreate(ankiConnectUriStr, UriKind.Absolute, out Uri? ankiConnectUri))
                 {
@@ -74,7 +74,7 @@ public sealed class CoreConfigManager
             {
                 webSocketUriStr = webSocketUriStr
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
-                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.Ordinal);
+                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase);
 
                 if (Uri.TryCreate(webSocketUriStr, UriKind.Absolute, out Uri? webSocketUri))
                 {

@@ -568,7 +568,7 @@ internal sealed partial class PreferencesWindow
         {
             string normalizedUrl = AnkiUriTextBox.Text
                 .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
-                .Replace("://localhost:", "://127.0.0.1:", StringComparison.Ordinal);
+                .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase);
             CoreConfigManager.Instance.AnkiConnectUri = new Uri(normalizedUrl);
             AnkiUriTextBox.Text = normalizedUrl;
         }

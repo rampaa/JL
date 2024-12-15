@@ -84,7 +84,7 @@ public static class AudioUtils
 
                             if (urlStr is not null)
                             {
-                                urlStr = urlStr.Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
+                                urlStr = urlStr.Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase);
                                 if (Uri.TryCreate(urlStr, UriKind.Absolute, out Uri? resultUrl))
                                 {
                                     AudioResponse? audioResponse = await GetAudioFromUrl(resultUrl).ConfigureAwait(false);
@@ -138,12 +138,12 @@ public static class AudioUtils
                     case AudioSourceType.Url:
                     case AudioSourceType.UrlJson:
                     {
-                        StringBuilder stringBuilder = new StringBuilder(uri)
-                            .Replace("://localhost", "://127.0.0.1")
-                            .Replace("{Term}", spelling)
-                            .Replace("{Reading}", reading);
+                        string normalizedUriStr = uri
+                            .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase)
+                            .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
+                            .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
 
-                        Uri normalizedUri = new(stringBuilder.ToString());
+                        Uri normalizedUri = new(normalizedUriStr);
                         audioResponse = audioSource.Type is AudioSourceType.Url
                             ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
                             : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
@@ -153,11 +153,11 @@ public static class AudioUtils
 
                     case AudioSourceType.LocalPath:
                     {
-                        StringBuilder stringBuilder = new StringBuilder(uri)
-                            .Replace("{Term}", spelling)
-                            .Replace("{Reading}", reading);
+                        string normalizedUriStr = uri
+                            .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
+                            .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
 
-                        Uri normalizedUri = new(stringBuilder.ToString());
+                        Uri normalizedUri = new(normalizedUriStr);
                         audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
 
                         break;

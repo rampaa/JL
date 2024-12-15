@@ -295,7 +295,7 @@ internal static class WindowsUtils
         {
             string urlToBeSearched = Uri.IsWellFormedUriString(selectedText, UriKind.Absolute)
                 ? selectedText
-                : configManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal);
+                : configManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.OrdinalIgnoreCase);
 
             _ = Process.Start(new ProcessStartInfo("cmd",
                 $"/c start \"\" {browserPath} \"{urlToBeSearched}\"")
