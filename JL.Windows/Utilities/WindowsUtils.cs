@@ -110,16 +110,16 @@ internal static class WindowsUtils
             .ToArray();
     }
 
-    public static ComboBoxItem[] CloneJapaneseFontComboBoxItems(ComboBoxItem[] japaneseFontsComboBoxItems)
+    public static ComboBoxItem[] CloneComboBoxItems(ComboBoxItem[] comboBoxItems)
     {
-        ComboBoxItem[] clone = new ComboBoxItem[japaneseFontsComboBoxItems.Length];
-        for (int i = 0; i < japaneseFontsComboBoxItems.Length; i++)
+        ComboBoxItem[] clone = new ComboBoxItem[comboBoxItems.Length];
+        for (int i = 0; i < comboBoxItems.Length; i++)
         {
-            ComboBoxItem comboBoxItem = japaneseFontsComboBoxItems[i];
+            ComboBoxItem comboBoxItem = comboBoxItems[i];
 
             clone[i] = new ComboBoxItem
             {
-                Content = comboBoxItem.FontFamily.Source,
+                Content = comboBoxItem.Content,
                 FontFamily = comboBoxItem.FontFamily
             };
 

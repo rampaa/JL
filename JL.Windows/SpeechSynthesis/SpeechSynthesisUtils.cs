@@ -15,9 +15,9 @@ internal static class SpeechSynthesisUtils
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
     private static SpeechSynthesizer Synthesizer { get; } = new();
 
-    public static ComboBoxItem[]? InstalledVoices { get; } = GetInstalledJapaneseVoiceNames();
+    public static ComboBoxItem[]? InstalledVoices { get; } = GetInstalledVoiceNames();
 
-    private static ComboBoxItem[]? GetInstalledJapaneseVoiceNames()
+    private static ComboBoxItem[]? GetInstalledVoiceNames()
     {
         Synthesizer.InjectOneCoreVoices();
 

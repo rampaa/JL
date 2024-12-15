@@ -194,7 +194,7 @@ internal sealed class ConfigManager
     #endregion
 
     private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
-    private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneJapaneseFontComboBoxItems(s_japaneseFonts);
+    private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneComboBoxItems(s_japaneseFonts);
     private SkinType Theme { get; set; } = SkinType.Dark;
 
     private ConfigManager()

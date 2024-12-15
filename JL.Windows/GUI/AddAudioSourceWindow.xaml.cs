@@ -5,6 +5,7 @@ using System.Windows.Media;
 using JL.Core.Audio;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
+using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
 
@@ -129,7 +130,10 @@ internal sealed partial class AddAudioSourceWindow
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         AudioSourceTypeComboBox.ItemsSource = s_audioSourceTypes;
-        TextToSpeechVoicesComboBox.ItemsSource = SpeechSynthesisUtils.InstalledVoices;
+        if (SpeechSynthesisUtils.InstalledVoices is not null)
+        {
+            TextToSpeechVoicesComboBox.ItemsSource = WindowsUtils.CloneComboBoxItems(SpeechSynthesisUtils.InstalledVoices);
+        }
     }
 
     private void InfoButton_Click(object sender, RoutedEventArgs e)
