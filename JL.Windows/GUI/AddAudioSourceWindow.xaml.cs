@@ -98,7 +98,7 @@ internal sealed partial class AddAudioSourceWindow
                 break;
 
             case AudioSourceType.TextToSpeech:
-                uri = TextToSpeechVoicesComboBox.SelectedItem?.ToString();
+                uri = ((ComboBoxItem?)TextToSpeechVoicesComboBox.SelectedItem)?.Content.ToString();
                 if (string.IsNullOrWhiteSpace(uri)
                     || AudioUtils.AudioSources.ContainsKey(uri))
                 {

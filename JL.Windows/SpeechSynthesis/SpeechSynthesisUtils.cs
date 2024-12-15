@@ -1,6 +1,8 @@
-using System.Globalization;
 using System.IO;
 using System.Speech.Synthesis;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using JL.Core.Audio;
 using JL.Windows.Utilities;
 using NAudio.Wave;
@@ -13,17 +15,43 @@ internal static class SpeechSynthesisUtils
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
     private static SpeechSynthesizer Synthesizer { get; } = new();
 
-    public static string[] InstalledVoices { get; } = GetInstalledJapaneseVoiceNames();
+    public static ComboBoxItem[]? InstalledVoices { get; } = GetInstalledJapaneseVoiceNames();
 
-    private static string[] GetInstalledJapaneseVoiceNames()
+    private static ComboBoxItem[]? GetInstalledJapaneseVoiceNames()
     {
         Synthesizer.InjectOneCoreVoices();
 
-        return Synthesizer.GetInstalledVoices(CultureInfo.GetCultureInfo("ja-JP"))
-            .Where(static iv => iv.Enabled)
-            .Select(static iv => iv.VoiceInfo.Name)
-            .OrderBy(static name => name, StringComparer.InvariantCulture)
-            .ToArray();
+#pragma warning disable CA1304
+        List<InstalledVoice> installedVoices = Synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled).ToList();
+#pragma warning restore CA1304
+
+        return installedVoices.Count is 0
+            ? null
+            : Application.Current.Dispatcher.Invoke(() =>
+            {
+                ComboBoxItem[] installedVoiceComboboxItems = new ComboBoxItem[installedVoices.Count];
+
+                for (int i = 0; i < installedVoices.Count; i++)
+                {
+                    InstalledVoice installedVoice = installedVoices[i];
+                    ComboBoxItem comboBoxItem = new()
+                    {
+                        Content = installedVoice.VoiceInfo.Name
+                    };
+
+                    if (installedVoice.VoiceInfo.Culture.TwoLetterISOLanguageName is not "ja")
+                    {
+                        comboBoxItem.Foreground = Brushes.LightSlateGray;
+                    }
+
+                    installedVoiceComboboxItems[i] = comboBoxItem;
+                }
+
+                return installedVoiceComboboxItems
+                    .OrderBy(static iv => iv.Foreground == Brushes.LightSlateGray)
+                    .ThenBy(static iv => (string)iv.Content, StringComparer.InvariantCulture)
+                    .ToArray();
+            });
     }
 
     public static async Task StopTextToSpeech()

@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using JL.Core.Audio;
 using JL.Core.Utilities;
@@ -45,7 +46,16 @@ internal sealed partial class EditAudioSourceWindow
             case AudioSourceType.TextToSpeech:
                 PathType.Text = "Text to Speech Voice";
                 TextToSpeechVoicesComboBox.ItemsSource = SpeechSynthesisUtils.InstalledVoices;
-                TextToSpeechVoicesComboBox.SelectedItem = _uri;
+
+                TextToSpeechVoicesComboBox.SelectedIndex = SpeechSynthesisUtils.InstalledVoices is not null
+                    ? Array.FindIndex(SpeechSynthesisUtils.InstalledVoices, iv => iv.Content.ToString() == _uri)
+                    : 0;
+
+                if (TextToSpeechVoicesComboBox.SelectedIndex < 0)
+                {
+                    TextToSpeechVoicesComboBox.SelectedIndex = 0;
+                }
+
                 TextBlockUri.Visibility = Visibility.Collapsed;
                 TextToSpeechVoicesComboBox.Visibility = Visibility.Visible;
                 break;
@@ -132,7 +142,7 @@ internal sealed partial class EditAudioSourceWindow
                 break;
 
             case AudioSourceType.TextToSpeech:
-                uri = TextToSpeechVoicesComboBox.SelectedItem?.ToString();
+                uri = ((ComboBoxItem?)TextToSpeechVoicesComboBox.SelectedItem)?.Content.ToString();
                 if (string.IsNullOrWhiteSpace(uri)
                     || (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri)))
                 {
