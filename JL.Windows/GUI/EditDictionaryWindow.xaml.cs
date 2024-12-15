@@ -239,31 +239,6 @@ internal sealed partial class EditDictionaryWindow
                 BrowseForDictionaryFolder();
                 break;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            case DictType.Kenkyuusha:
-            case DictType.Daijisen:
-            case DictType.Daijirin:
-            case DictType.Koujien:
-            case DictType.Meikyou:
-            case DictType.Gakken:
-            case DictType.Kotowaza:
-            case DictType.IwanamiYomichan:
-            case DictType.JitsuyouYomichan:
-            case DictType.ShinmeikaiYomichan:
-            case DictType.NikkokuYomichan:
-            case DictType.ShinjirinYomichan:
-            case DictType.OubunshaYomichan:
-            case DictType.ZokugoYomichan:
-            case DictType.WeblioKogoYomichan:
-            case DictType.GakkenYojijukugoYomichan:
-            case DictType.ShinmeikaiYojijukugoYomichan:
-            case DictType.KireiCakeYomichan:
-            case DictType.KanjigenYomichan:
-            case DictType.DaijirinNazeka:
-            case DictType.ShinmeikaiNazeka:
-            case DictType.KenkyuushaNazeka:
-#pragma warning restore CS0618 // Type or member is obsolete
-                throw new ArgumentOutOfRangeException(null, selectedDictType, "Obsolete DictType (Edit)");
             default:
                 throw new ArgumentOutOfRangeException(null, selectedDictType, "Invalid DictType (Edit)");
         }

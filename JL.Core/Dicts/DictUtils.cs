@@ -1253,32 +1253,6 @@ public static class DictUtils
 
                     break;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-                case DictType.Kenkyuusha:
-                case DictType.Daijisen:
-                case DictType.Daijirin:
-                case DictType.Koujien:
-                case DictType.Meikyou:
-                case DictType.Gakken:
-                case DictType.Kotowaza:
-                case DictType.IwanamiYomichan:
-                case DictType.JitsuyouYomichan:
-                case DictType.ShinmeikaiYomichan:
-                case DictType.NikkokuYomichan:
-                case DictType.ShinjirinYomichan:
-                case DictType.OubunshaYomichan:
-                case DictType.ZokugoYomichan:
-                case DictType.WeblioKogoYomichan:
-                case DictType.GakkenYojijukugoYomichan:
-                case DictType.ShinmeikaiYojijukugoYomichan:
-                case DictType.KireiCakeYomichan:
-                case DictType.KanjigenYomichan:
-                case DictType.DaijirinNazeka:
-                case DictType.ShinmeikaiNazeka:
-                case DictType.KenkyuushaNazeka:
-                    throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolete dict type");
-#pragma warning restore CS0618 // Type or member is obsolete
-
                 default:
                     throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid dict type");
             }
@@ -1441,10 +1415,6 @@ public static class DictUtils
                     {
                         SingleDictTypeDicts[dict.Type] = dict;
                     }
-                    else
-                    {
-                        MigrateDictType(dict);
-                    }
 
                     InitDictOptions(dict);
 
@@ -1457,67 +1427,6 @@ public static class DictUtils
                 Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
                 throw new SerializationException("Couldn't load Config/dicts.json");
             }
-        }
-    }
-
-    private static void MigrateDictType(Dict dict)
-    {
-        switch (dict.Type)
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            case DictType.Kenkyuusha:
-            case DictType.Daijisen:
-            case DictType.Daijirin:
-            case DictType.Koujien:
-            case DictType.Meikyou:
-            case DictType.Gakken:
-            case DictType.Kotowaza:
-            case DictType.IwanamiYomichan:
-            case DictType.JitsuyouYomichan:
-            case DictType.ShinmeikaiYomichan:
-            case DictType.NikkokuYomichan:
-            case DictType.ShinjirinYomichan:
-            case DictType.OubunshaYomichan:
-            case DictType.ZokugoYomichan:
-            case DictType.WeblioKogoYomichan:
-            case DictType.GakkenYojijukugoYomichan:
-            case DictType.ShinmeikaiYojijukugoYomichan:
-            case DictType.KireiCakeYomichan:
-                dict.Type = DictType.NonspecificWordYomichan;
-                break;
-
-            case DictType.KanjigenYomichan:
-                dict.Type = DictType.NonspecificKanjiWithWordSchemaYomichan;
-                break;
-
-            case DictType.KenkyuushaNazeka:
-            case DictType.DaijirinNazeka:
-            case DictType.ShinmeikaiNazeka:
-                dict.Type = DictType.NonspecificWordNazeka;
-                break;
-#pragma warning restore CS0618 // Type or member is obsolete
-
-            case DictType.JMdict:
-            case DictType.JMnedict:
-            case DictType.Kanjidic:
-            case DictType.CustomWordDictionary:
-            case DictType.CustomNameDictionary:
-            case DictType.ProfileCustomWordDictionary:
-            case DictType.ProfileCustomNameDictionary:
-            case DictType.NonspecificWordYomichan:
-            case DictType.NonspecificKanjiYomichan:
-            case DictType.NonspecificKanjiWithWordSchemaYomichan:
-            case DictType.NonspecificNameYomichan:
-            case DictType.PitchAccentYomichan:
-            case DictType.NonspecificYomichan:
-            case DictType.NonspecificWordNazeka:
-            case DictType.NonspecificKanjiNazeka:
-            case DictType.NonspecificNameNazeka:
-            case DictType.NonspecificNazeka:
-                break;
-
-            default:
-                break;
         }
     }
 

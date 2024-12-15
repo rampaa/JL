@@ -74,12 +74,6 @@ internal sealed partial class MainWindow
 
         ConfigDBManager.CreateDB();
 
-        SqliteConnection migrationConnection = ConfigDBManager.CreateReadWriteDBConnection();
-        await using (migrationConnection.ConfigureAwait(true))
-        {
-            await ConfigMigrationManager.MigrateConfig(migrationConnection).ConfigureAwait(true);
-        }
-
         SqliteConnection readOnlyConnection = ConfigDBManager.CreateReadOnlyDBConnection();
         await using (readOnlyConnection.ConfigureAwait(true))
         {

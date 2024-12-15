@@ -334,32 +334,6 @@ public static class LookupUtils
                 case DictType.PitchAccentYomichan:
                     break;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-                case DictType.Kenkyuusha:
-                case DictType.Daijisen:
-                case DictType.Daijirin:
-                case DictType.Koujien:
-                case DictType.Meikyou:
-                case DictType.Gakken:
-                case DictType.Kotowaza:
-                case DictType.IwanamiYomichan:
-                case DictType.JitsuyouYomichan:
-                case DictType.ShinmeikaiYomichan:
-                case DictType.NikkokuYomichan:
-                case DictType.ShinjirinYomichan:
-                case DictType.OubunshaYomichan:
-                case DictType.ZokugoYomichan:
-                case DictType.WeblioKogoYomichan:
-                case DictType.GakkenYojijukugoYomichan:
-                case DictType.ShinmeikaiYojijukugoYomichan:
-                case DictType.KireiCakeYomichan:
-                case DictType.KanjigenYomichan:
-                case DictType.DaijirinNazeka:
-                case DictType.ShinmeikaiNazeka:
-                case DictType.KenkyuushaNazeka:
-#pragma warning restore CS0618 // Type or member is obsolete
-                    throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolete DictType");
-
                 default:
                     throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType");
             }
@@ -674,32 +648,6 @@ public static class LookupUtils
             case DictType.CustomNameDictionary:
             case DictType.ProfileCustomNameDictionary:
                 break;
-
-#pragma warning disable CS0618 // Type or member is obsolete
-            case DictType.Daijisen:
-            case DictType.Kenkyuusha:
-            case DictType.Daijirin:
-            case DictType.Koujien:
-            case DictType.Meikyou:
-            case DictType.Gakken:
-            case DictType.Kotowaza:
-            case DictType.IwanamiYomichan:
-            case DictType.JitsuyouYomichan:
-            case DictType.ShinmeikaiYomichan:
-            case DictType.NikkokuYomichan:
-            case DictType.ShinjirinYomichan:
-            case DictType.OubunshaYomichan:
-            case DictType.ZokugoYomichan:
-            case DictType.WeblioKogoYomichan:
-            case DictType.GakkenYojijukugoYomichan:
-            case DictType.ShinmeikaiYojijukugoYomichan:
-            case DictType.KireiCakeYomichan:
-            case DictType.KanjigenYomichan:
-            case DictType.DaijirinNazeka:
-            case DictType.ShinmeikaiNazeka:
-            case DictType.KenkyuushaNazeka:
-#pragma warning restore CS0618 // Type or member is obsolete
-                throw new ArgumentOutOfRangeException(null, dict.Type, "Obsolete DictType");
 
             default:
                 throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType");
