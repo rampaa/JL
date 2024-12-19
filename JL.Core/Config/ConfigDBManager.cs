@@ -27,17 +27,18 @@ public static class ConfigDBManager
 
     public static void CreateDB()
     {
-        if (File.Exists(s_configsPath))
+        bool dbExists = File.Exists(s_configsPath);
+        if (dbExists)
         {
             if (File.Exists($"{s_configsPath}-journal"))
             {
                 RestoreDatabase();
             }
-
-            return;
         }
-
-        _ = Directory.CreateDirectory(Utils.ConfigPath);
+        else
+        {
+            _ = Directory.CreateDirectory(Utils.ConfigPath);
+        }
 
         using SqliteConnection connection = DBUtils.CreateDBConnection(s_configsPath);
         using SqliteCommand command = connection.CreateCommand();
@@ -68,8 +69,25 @@ public static class ConfigDBManager
             """;
         _ = command.ExecuteNonQuery();
 
-        ProfileDBUtils.InsertDefaultProfile(connection);
-        StatsDBUtils.InsertStats(connection, Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
+        bool globalProfileExists = ProfileDBUtils.ProfileExists(ProfileUtils.GlobalProfileId);
+        bool defaultProfileExists = ProfileDBUtils.ProfileExists(ProfileUtils.DefaultProfileId);
+
+        if (!globalProfileExists)
+        {
+            if (defaultProfileExists)
+            {
+                ProfileUtils.CurrentProfileId = ProfileDBUtils.GetCurrentProfileIdFromDB(connection, ProfileUtils.DefaultProfileId);
+                Stats.LifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.DefaultProfileId)!;
+            }
+
+            ProfileDBUtils.InsertGlobalProfile(connection);
+            StatsDBUtils.InsertStats(connection, Stats.LifetimeStats, ProfileUtils.GlobalProfileId);
+        }
+
+        if (!defaultProfileExists)
+        {
+            ProfileDBUtils.InsertDefaultProfile(connection);
+        }
     }
 
     private static void RestoreDatabase()

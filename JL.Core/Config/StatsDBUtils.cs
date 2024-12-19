@@ -12,7 +12,7 @@ public static class StatsDBUtils
         InsertStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoNotIgnoringNullWithEnumConverterAndIndentation), profileId);
     }
 
-    public static void InsertStats(SqliteConnection connection, string stats, int profileId)
+    private static void InsertStats(SqliteConnection connection, string stats, int profileId)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
@@ -31,7 +31,7 @@ public static class StatsDBUtils
         UpdateStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoNotIgnoringNullWithEnumConverterAndIndentation), profileId);
     }
 
-    public static void UpdateStats(SqliteConnection connection, string stats, int profileId)
+    private static void UpdateStats(SqliteConnection connection, string stats, int profileId)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
@@ -73,7 +73,7 @@ public static class StatsDBUtils
 
     public static void UpdateLifetimeStats(SqliteConnection connection)
     {
-        UpdateStats(connection, Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
+        UpdateStats(connection, Stats.LifetimeStats, ProfileUtils.GlobalProfileId);
     }
 
     public static void UpdateProfileLifetimeStats()
@@ -89,7 +89,7 @@ public static class StatsDBUtils
 
     public static void SetStatsFromDB(SqliteConnection connection)
     {
-        Stats.LifetimeStats = GetStatsFromDB(connection, ProfileUtils.DefaultProfileId)!;
+        Stats.LifetimeStats = GetStatsFromDB(connection, ProfileUtils.GlobalProfileId)!;
         Stats.ProfileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
     }
 }
