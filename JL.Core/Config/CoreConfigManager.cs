@@ -91,6 +91,12 @@ public sealed class CoreConfigManager
             WebSocketUtils.HandleWebSocket();
         }
 
+        TrackTermLookupCounts = ConfigDBManager.GetValueFromConfig(connection, TrackTermLookupCounts, nameof(TrackTermLookupCounts), bool.TryParse);
+        if (!TrackTermLookupCounts)
+        {
+            Stats.SessionStats.TermLookupCountDict.Clear();
+        }
+
         AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);
         ForceSyncAnki = ConfigDBManager.GetValueFromConfig(connection, ForceSyncAnki, nameof(ForceSyncAnki), bool.TryParse);
         AllowDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, AllowDuplicateCards, nameof(AllowDuplicateCards), bool.TryParse);
@@ -98,7 +104,6 @@ public sealed class CoreConfigManager
         TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
         TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
         CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
-        TrackTermLookupCounts = ConfigDBManager.GetValueFromConfig(connection, TrackTermLookupCounts, nameof(TrackTermLookupCounts), bool.TryParse);
         CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
 
         if (!CaptureTextFromWebSocket && !CaptureTextFromClipboard)

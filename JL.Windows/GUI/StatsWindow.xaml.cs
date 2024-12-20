@@ -87,6 +87,7 @@ internal sealed partial class StatsWindow
         TextBlockTimesPlayedAudio.Text = stats.TimesPlayedAudio.ToString("N0", CultureInfo.InvariantCulture);
         TextBlockNumberOfLookups.Text = stats.NumberOfLookups.ToString(CultureInfo.InvariantCulture);
         TextBlockImoutos.Text = stats.Imoutos.ToString("N0", CultureInfo.InvariantCulture);
+        ShowTermLookupCountsButton.IsEnabled = CoreConfigManager.Instance.TrackTermLookupCounts;
     }
 
     private void ButtonSwapStats_OnClick(object sender, RoutedEventArgs e)
