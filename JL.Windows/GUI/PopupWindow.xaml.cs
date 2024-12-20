@@ -1407,7 +1407,7 @@ internal sealed partial class PopupWindow
             await PlayAudio().ConfigureAwait(false);
         }
 
-        else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
+        else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture) || keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
         {
             handled = true;
 

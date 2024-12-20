@@ -13,6 +13,8 @@ internal static class KeyGestureUtils
     public static readonly Dictionary<int, KeyGesture> GlobalKeyGestureDict = [];
     public static readonly Dictionary<string, int> GlobalKeyGestureNameToIntDict = [];
 
+    public static readonly KeyGesture AltF4KeyGesture = new(Key.F4, ModifierKeys.Alt);
+
     public static readonly FrozenSet<Key> ValidGlobalKeys = FrozenSet.ToFrozenSet(
     [
         #pragma warning disable format
