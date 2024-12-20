@@ -1685,6 +1685,13 @@
                         </DockPanel>
 
                         <DockPanel Margin="0,10,0,0">
+                            <TextBlock HorizontalAlignment="Left" Text="Track the lookup count of each term"
+                                       TextWrapping="Wrap"
+                                       Style="{StaticResource TextBlockDefault}" />
+                            <CheckBox x:Name="TrackTermLookupCountsCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Stop increasing time stat when minimized"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />

@@ -22,6 +22,7 @@ public sealed class CoreConfigManager
     public bool TextBoxRemoveNewlines { get; private set; } // = false;
     public Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
     public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
+    public bool TrackTermLookupCounts { get; private set; } // = false;
 
     private CoreConfigManager()
     {
@@ -97,6 +98,7 @@ public sealed class CoreConfigManager
         TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
         TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
         CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
+        TrackTermLookupCounts = ConfigDBManager.GetValueFromConfig(connection, TrackTermLookupCounts, nameof(TrackTermLookupCounts), bool.TryParse);
         CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
 
         if (!CaptureTextFromWebSocket && !CaptureTextFromClipboard)

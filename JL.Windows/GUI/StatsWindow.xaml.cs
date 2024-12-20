@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Interop;
 using JL.Core.Config;
 using JL.Core.Statistics;
@@ -17,6 +18,10 @@ internal sealed partial class StatsWindow
 {
     private static StatsWindow? s_instance;
     private nint _windowHandle;
+
+    private KeyValuePair<string, int>[]? _sessionLookupCountsForCurrentProfile;
+    private List<KeyValuePair<string, int>>? _termLookupCountsForCurrentProfile;
+    private List<KeyValuePair<string, int>>? _termLookupCountsForLifetime;
 
     public static StatsWindow Instance => s_instance ??= new StatsWindow();
 
@@ -54,9 +59,14 @@ internal sealed partial class StatsWindow
     {
         UpdateStatsDisplay(StatsMode.Session);
 
+        _sessionLookupCountsForCurrentProfile = Stats.SessionStats.TermLookupCountDict.ToArray();
+
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         StatsDBUtils.UpdateProfileLifetimeStats(connection);
         StatsDBUtils.UpdateLifetimeStats(connection);
+
+        _termLookupCountsForCurrentProfile = StatsDBUtils.GetTermLookupCountsFromDB(connection, ProfileUtils.CurrentProfileId);
+        _termLookupCountsForLifetime = StatsDBUtils.GetTermLookupCountsFromDB(connection, ProfileUtils.GlobalProfileId);
     }
 
     private void UpdateStatsDisplay(StatsMode mode)
@@ -81,22 +91,21 @@ internal sealed partial class StatsWindow
 
     private void ButtonSwapStats_OnClick(object sender, RoutedEventArgs e)
     {
-        Button button = (Button)sender;
-        if (Enum.TryParse(button.Content.ToString(), out StatsMode mode))
+        if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode mode))
         {
             switch (mode)
             {
                 case StatsMode.Session:
                     UpdateStatsDisplay(StatsMode.Profile);
-                    button.Content = StatsMode.Profile.ToString();
+                    ButtonSwapStats.Content = StatsMode.Profile.ToString();
                     break;
                 case StatsMode.Profile:
                     UpdateStatsDisplay(StatsMode.Lifetime);
-                    button.Content = StatsMode.Lifetime.ToString();
+                    ButtonSwapStats.Content = StatsMode.Lifetime.ToString();
                     break;
                 case StatsMode.Lifetime:
                     UpdateStatsDisplay(StatsMode.Session);
-                    button.Content = StatsMode.Session.ToString();
+                    ButtonSwapStats.Content = StatsMode.Session.ToString();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(null, mode, "StatsMode out of range");
@@ -146,7 +155,55 @@ internal sealed partial class StatsWindow
     private void Window_Closed(object sender, EventArgs e)
     {
         s_instance = null;
+        _sessionLookupCountsForCurrentProfile = null;
+        _termLookupCountsForCurrentProfile = null;
+        _termLookupCountsForLifetime = null;
+
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
+    }
+
+    private void ShowTermLookupCountsButton_Click(object sender, RoutedEventArgs e)
+    {
+        InfoDataGridWindow infoDataGridWindow = new()
+        {
+            ShowInTaskbar = false,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+
+        DataGridTextColumn termColumn = new()
+        {
+            Header = "Term",
+            Binding = new Binding("Key")
+        };
+
+        DataGridTextColumn frequencyColumn = new()
+        {
+            Header = "Count",
+            Binding = new Binding("Value")
+        };
+
+        infoDataGridWindow.InfoDataGrid.Columns.Add(termColumn);
+        infoDataGridWindow.InfoDataGrid.Columns.Add(frequencyColumn);
+
+        if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode mode))
+        {
+            IList<KeyValuePair<string, int>>? termLookupCounts = mode switch
+            {
+                StatsMode.Session => _sessionLookupCountsForCurrentProfile,
+                StatsMode.Profile => _termLookupCountsForCurrentProfile,
+                StatsMode.Lifetime => _termLookupCountsForLifetime,
+                _ => throw new ArgumentOutOfRangeException(null, mode, "StatsMode out of range")
+            };
+
+            infoDataGridWindow.InfoDataGrid.ItemsSource = termLookupCounts;
+
+            _ = infoDataGridWindow.ShowDialog();
+        }
+
+        else
+        {
+            Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+        }
     }
 }

@@ -66,6 +66,15 @@ public static class ConfigDBManager
                 value TEXT NOT NULL,
                 FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE CASCADE
             ) STRICT;
+
+            CREATE TABLE IF NOT EXISTS term_lookup_count
+            (
+                profile_id INTEGER NOT NULL,
+                term TEXT NOT NULL,
+                count INTEGER NOT NULL,
+                PRIMARY KEY (profile_id, term),
+                FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE CASCADE
+            ) STRICT;
             """;
         _ = command.ExecuteNonQuery();
 
@@ -87,6 +96,7 @@ public static class ConfigDBManager
         if (!defaultProfileExists)
         {
             ProfileDBUtils.InsertDefaultProfile(connection);
+            StatsDBUtils.InsertStats(connection, Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
         }
     }
 

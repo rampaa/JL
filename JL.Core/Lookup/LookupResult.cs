@@ -16,7 +16,7 @@ public sealed class LookupResult
     internal int EdictId { get; }
 
     // Word dictionaries
-    internal string DeconjugatedMatchedText { get; }
+    public string DeconjugatedMatchedText { get; }
     public string? DeconjugationProcess { get; }
     // JMdict, Nazeka EPWING
     public string[]? AlternativeSpellings { get; }

@@ -4,7 +4,7 @@ namespace JL.Core.Config;
 
 public static class ProfileUtils
 {
-    internal const int GlobalProfileId = 0;
+    public const int GlobalProfileId = 0;
     internal const string GlobalProfileName = "JLGlobal";
     internal const int DefaultProfileId = 1;
     public const string DefaultProfileName = "Default";

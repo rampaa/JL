@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using JL.Core.Config;
 
 namespace JL.Core.Statistics;
 
@@ -11,6 +12,8 @@ public sealed class Stats
     public ulong TimesPlayedAudio { get; set; }
     public ulong NumberOfLookups { get; set; }
     public ulong Imoutos { get; set; }
+
+    [JsonIgnore] public Dictionary<string, int> TermLookupCountDict { get; } = new(StringComparer.Ordinal);
 
     [JsonIgnore] public static Stats SessionStats { get; set; } = new();
     [JsonIgnore] public static Stats ProfileLifetimeStats { get; set; } = new();
@@ -136,5 +139,31 @@ public sealed class Stats
         stats.CardsMined = 0;
         stats.TimesPlayedAudio = 0;
         stats.Imoutos = 0;
+
+        stats.TermLookupCountDict.Clear();
+        if (statsMode is StatsMode.Profile or StatsMode.Lifetime)
+        {
+            StatsDBUtils.ResetAllTermLookupCounts(statsMode is StatsMode.Profile ? ProfileUtils.CurrentProfileId : ProfileUtils.GlobalProfileId);
+        }
+    }
+
+    public static void IncrementTermLookupCount(string primarySpelling)
+    {
+        IncrementLookupStat(SessionStats, primarySpelling);
+        IncrementLookupStat(ProfileLifetimeStats, primarySpelling);
+        IncrementLookupStat(LifetimeStats, primarySpelling);
+    }
+
+    private static void IncrementLookupStat(Stats stats, string primarySpelling)
+    {
+        Dictionary<string, int> lookupStatsDict = stats.TermLookupCountDict;
+        if (lookupStatsDict.TryGetValue(primarySpelling, out int count))
+        {
+            lookupStatsDict[primarySpelling] = count + 1;
+        }
+        else
+        {
+            lookupStatsDict[primarySpelling] = 1;
+        }
     }
 }

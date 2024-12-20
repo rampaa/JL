@@ -35,9 +35,9 @@ internal sealed partial class PopupWindow
 
     private int _firstVisibleListViewItemIndex; // 0
 
-    private int _currentCharPosition;
+    private int _currentSourceTextCharPosition;
 
-    private string _currentText = "";
+    private string _currentSourceText = "";
 
     private Button _buttonAll = new()
     {
@@ -58,7 +58,7 @@ internal sealed partial class PopupWindow
 
     public bool UnavoidableMouseEnter { get; private set; } // = false;
 
-    public string? LastText { get; set; }
+    private string? _lastLookedUpText;
 
     public bool MiningMode { get; private set; }
 
@@ -187,8 +187,8 @@ internal sealed partial class PopupWindow
     {
         string textBoxText = textBox.Text;
 
-        _currentText = textBoxText;
-        _currentCharPosition = charPosition;
+        _currentSourceText = textBoxText;
+        _currentSourceTextCharPosition = charPosition;
 
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
@@ -202,20 +202,20 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        string text = textBoxText.Length - charPosition > configManager.MaxSearchLength
+        string textToLookUp = textBoxText.Length - charPosition > configManager.MaxSearchLength
             ? textBoxText[..(charPosition + configManager.MaxSearchLength)]
             : textBoxText;
 
-        int endPosition = JapaneseUtils.FindExpressionBoundary(text, charPosition);
-        text = text[charPosition..endPosition];
+        int endPosition = JapaneseUtils.FindExpressionBoundary(textToLookUp, charPosition);
+        textToLookUp = textToLookUp[charPosition..endPosition];
 
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrEmpty(textToLookUp))
         {
             HidePopup();
             return Task.CompletedTask;
         }
 
-        if (text == LastText && IsVisible)
+        if (textToLookUp == _lastLookedUpText && IsVisible)
         {
             if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
@@ -230,15 +230,21 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        LastText = text;
+        _lastLookedUpText = textToLookUp;
 
-        LookupResult[]? lookupResults = LookupUtils.LookupText(text);
+        LookupResult[]? lookupResults = LookupUtils.LookupText(textToLookUp);
 
         if (lookupResults?.Length > 0)
         {
-            Stats.IncrementStat(StatType.NumberOfLookups);
             _previousTextBox = textBox;
-            LastSelectedText = lookupResults[0].MatchedText;
+            LookupResult firstLookupResult = lookupResults[0];
+            LastSelectedText = firstLookupResult.MatchedText;
+
+            Stats.IncrementStat(StatType.NumberOfLookups);
+            if (CoreConfigManager.Instance.TrackTermLookupCounts)
+            {
+                Stats.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText);
+            }
 
             if (configManager.HighlightLongestMatch)
             {
@@ -325,21 +331,19 @@ internal sealed partial class PopupWindow
 
     public Task LookupOnSelect(TextBox textBox)
     {
-        string text = textBox.SelectedText;
-        if (string.IsNullOrWhiteSpace(text))
+        _currentSourceText = textBox.Text;
+        _currentSourceTextCharPosition = textBox.SelectionStart;
+
+        string selectedText = textBox.SelectedText;
+        if (string.IsNullOrWhiteSpace(selectedText))
         {
             HidePopup();
             return Task.CompletedTask;
         }
 
-        int charPosition = textBox.SelectionStart;
-
-        _currentText = text;
-        _currentCharPosition = charPosition;
-
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        if (text == LastText && IsVisible)
+        if (selectedText == _lastLookedUpText && IsVisible)
         {
             if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
@@ -354,16 +358,22 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        LastText = text;
+        _lastLookedUpText = selectedText;
 
         LookupResult[]? lookupResults = LookupUtils.LookupText(textBox.SelectedText);
 
         if (lookupResults?.Length > 0)
         {
-            Stats.IncrementStat(StatType.NumberOfLookups);
             _previousTextBox = textBox;
-            LastSelectedText = lookupResults[0].MatchedText;
+            LookupResult firstLookupResult = lookupResults[0];
+            LastSelectedText = firstLookupResult.MatchedText;
             LastLookupResults = lookupResults;
+
+            Stats.IncrementStat(StatType.NumberOfLookups);
+            if (CoreConfigManager.Instance.TrackTermLookupCounts)
+            {
+                Stats.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText);
+            }
 
             EnableMiningMode();
             DisplayResults();
@@ -1092,7 +1102,7 @@ internal sealed partial class PopupWindow
 
     private async Task CheckResultForDuplicates(TextBlock[] duplicateIcons)
     {
-        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(LastLookupResults, _currentText, _currentCharPosition).ConfigureAwait(true);
+        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(LastLookupResults, _currentSourceText, _currentSourceTextCharPosition).ConfigureAwait(true);
         if (duplicateCard is not null)
         {
             for (int i = 0; i < duplicateCard.Length; i++)
@@ -1262,11 +1272,11 @@ internal sealed partial class PopupWindow
 
         if (configManager.MineToFileInsteadOfAnki)
         {
-            await MiningUtils.MineToFile(LastLookupResults[listViewItemIndex], _currentText, formattedDefinitions, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+            await MiningUtils.MineToFile(LastLookupResults[listViewItemIndex], _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition).ConfigureAwait(false);
         }
         else
         {
-            await MiningUtils.Mine(LastLookupResults[listViewItemIndex], _currentText, formattedDefinitions, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+            await MiningUtils.Mine(LastLookupResults[listViewItemIndex], _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition).ConfigureAwait(false);
         }
     }
 
@@ -1652,11 +1662,11 @@ internal sealed partial class PopupWindow
 
                 if (configManager.MineToFileInsteadOfAnki)
                 {
-                    await MiningUtils.MineToFile(LastLookupResults[index], _currentText, formattedDefinitions, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+                    await MiningUtils.MineToFile(LastLookupResults[index], _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition).ConfigureAwait(false);
                 }
                 else
                 {
-                    await MiningUtils.Mine(LastLookupResults[index], _currentText, formattedDefinitions, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+                    await MiningUtils.Mine(LastLookupResults[index], _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition).ConfigureAwait(false);
                 }
             }
         }
@@ -1997,7 +2007,7 @@ internal sealed partial class PopupWindow
         }
 
         PopupListView.ItemsSource = null;
-        LastText = "";
+        _lastLookedUpText = "";
         _listViewItemIndex = 0;
         _firstVisibleListViewItemIndex = 0;
         _lastInteractedTextBox = null;
@@ -2079,7 +2089,7 @@ internal sealed partial class PopupWindow
         _previousTextBox = null;
         _lastInteractedTextBox = null;
         LastSelectedText = null;
-        LastText = null;
+        _lastLookedUpText = null;
         _filteredDict = null;
         _popupListViewScrollViewer = null;
         ItemsControlButtons.ItemsSource = null;
@@ -2087,7 +2097,7 @@ internal sealed partial class PopupWindow
         _lastInteractedTextBox = null;
         LastLookupResults = null!;
         _dictsWithResults = null!;
-        _currentText = null!;
+        _currentSourceText = null!;
         _buttonAll.Click -= DictTypeButtonOnClick;
         _buttonAll = null!;
     }

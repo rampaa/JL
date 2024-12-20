@@ -838,6 +838,7 @@ internal sealed class ConfigManager
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = coreConfigManager.CheckForJLUpdatesOnStartUp;
+        preferenceWindow.TrackTermLookupCountsCheckBox.IsChecked = coreConfigManager.TrackTermLookupCounts;
         preferenceWindow.GlobalHotKeysCheckBox.IsChecked = GlobalHotKeys;
         preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked = StopIncreasingTimeStatWhenMinimized;
         preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked = StripPunctuationBeforeCalculatingCharacterCount;
@@ -1220,6 +1221,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckForJLUpdatesOnStartUp),
                 preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.TrackTermLookupCounts),
+                preferenceWindow.TrackTermLookupCountsCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(AlwaysOnTop), preferenceWindow.AlwaysOnTopCheckBox.IsChecked.ToString()!);
 
