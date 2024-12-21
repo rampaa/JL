@@ -91,6 +91,19 @@ public sealed class CoreConfigManager
             WebSocketUtils.HandleWebSocket();
         }
 
+        if (TrackTermLookupCounts)
+        {
+            if (Stats.ProfileLifetimeStats.TermLookupCountDict.Count > 0)
+            {
+                StatsDBUtils.UpdateProfileLifetimeStats(connection);
+            }
+
+            if (Stats.LifetimeStats.TermLookupCountDict.Count > 0)
+            {
+                StatsDBUtils.UpdateLifetimeStats(connection);
+            }
+        }
+
         TrackTermLookupCounts = ConfigDBManager.GetValueFromConfig(connection, TrackTermLookupCounts, nameof(TrackTermLookupCounts), bool.TryParse);
         if (!TrackTermLookupCounts)
         {
