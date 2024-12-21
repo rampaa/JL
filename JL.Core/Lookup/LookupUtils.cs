@@ -335,7 +335,9 @@ public static class LookupUtils
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType");
+                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(LookupUtils), nameof(LookupText), dict.Type);
+                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
+                    break;
             }
         });
 
@@ -650,7 +652,9 @@ public static class LookupUtils
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType");
+                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(LookupUtils), nameof(GetValidDeconjugatedResults), dict.Type);
+                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
+                break;
         }
 
         return resultsList;

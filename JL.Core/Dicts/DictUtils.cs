@@ -1254,7 +1254,7 @@ public static class DictUtils
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid dict type");
+                    throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid dictionary type");
             }
         }
 

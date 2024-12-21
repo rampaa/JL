@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Timers;
 using JL.Core.Config;
+using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 using Timer = System.Timers.Timer;
 
@@ -151,7 +152,9 @@ public static class StatsUtils
             }
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, "Invalid StatType");
+                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatType), nameof(StatsUtils), nameof(IncrementStat), type);
+                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid stat type: {type}");
+                break;
         }
     }
 

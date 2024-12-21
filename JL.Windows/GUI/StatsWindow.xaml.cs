@@ -100,16 +100,21 @@ internal sealed partial class StatsWindow
                     UpdateStatsDisplay(StatsMode.Profile);
                     ButtonSwapStats.Content = StatsMode.Profile.ToString();
                     break;
+
                 case StatsMode.Profile:
                     UpdateStatsDisplay(StatsMode.Lifetime);
                     ButtonSwapStats.Content = StatsMode.Lifetime.ToString();
                     break;
+
                 case StatsMode.Lifetime:
                     UpdateStatsDisplay(StatsMode.Session);
                     ButtonSwapStats.Content = StatsMode.Session.ToString();
                     break;
+
                 default:
-                    throw new ArgumentOutOfRangeException(null, mode, "StatsMode out of range");
+                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatsMode), nameof(StatsWindow), nameof(ButtonSwapStats_OnClick), mode);
+                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid stats mode: {mode}");
+                    break;
             }
         }
 

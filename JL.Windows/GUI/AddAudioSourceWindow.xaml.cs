@@ -190,8 +190,11 @@ internal sealed partial class AddAudioSourceWindow
                 TextBlockUri.Visibility = Visibility.Collapsed;
                 TextToSpeechVoicesComboBox.Visibility = Visibility.Visible;
                 break;
+
             default:
-                throw new ArgumentOutOfRangeException(null, audioSourceType, "Invalid AudioSourceType");
+                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AddAudioSourceWindow), nameof(AudioSourceTypeComboBox_SelectionChanged), audioSourceType);
+                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSourceType}");
+                break;
         }
     }
 }

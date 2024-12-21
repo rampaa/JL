@@ -167,7 +167,9 @@ public static class AudioUtils
                         return s_textToSpeechAudioResponse;
 
                     default:
-                        throw new ArgumentOutOfRangeException(null, audioSource.Type, "Invalid AudioSourceType");
+                        Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AudioUtils), nameof(GetPrioritizedAudio), audioSource.Type);
+                        Utils.Frontend.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSource.Type}");
+                        break;
                 }
 
                 if (audioResponse is not null)

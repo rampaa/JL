@@ -190,7 +190,9 @@ internal sealed partial class AddDictionaryWindow
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(null, selectedDictType, "Invalid DictType (Add)");
+                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(AddDictionaryWindow), nameof(BrowsePathButton_OnClick), selectedDictType);
+                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {selectedDictType}");
+                break;
         }
     }
 

@@ -224,12 +224,6 @@ internal sealed partial class EditDictionaryWindow
                 BrowseForDictionaryFile("Nazeka file|*.json");
                 break;
 
-            case DictType.CustomWordDictionary:
-            case DictType.CustomNameDictionary:
-            case DictType.ProfileCustomWordDictionary:
-            case DictType.ProfileCustomNameDictionary:
-                break;
-
             case DictType.NonspecificWordYomichan:
             case DictType.NonspecificKanjiYomichan:
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
@@ -239,8 +233,16 @@ internal sealed partial class EditDictionaryWindow
                 BrowseForDictionaryFolder();
                 break;
 
+            case DictType.CustomWordDictionary:
+            case DictType.CustomNameDictionary:
+            case DictType.ProfileCustomWordDictionary:
+            case DictType.ProfileCustomNameDictionary:
+                break;
+
             default:
-                throw new ArgumentOutOfRangeException(null, selectedDictType, "Invalid DictType (Edit)");
+                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(EditDictionaryWindow), nameof(BrowsePathButton_OnClick), selectedDictType);
+                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {selectedDictType}");
+                break;
         }
     }
 }

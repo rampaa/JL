@@ -363,7 +363,9 @@ public static class MiningUtils
                 return null;
 
             default:
-                throw new ArgumentOutOfRangeException(null, field, "Invalid JLField");
+                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(JLField), nameof(MiningUtils), nameof(GetMiningParameter), field);
+                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid JLField: {field}");
+                return null;
         }
     }
 

@@ -655,7 +655,9 @@ internal sealed class ConfigManager
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, popupPositionRelativeToCursorStr, "Invalid PopupPositionRelativeToCursor");
+                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupPositionRelativeToCursor", nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorStr);
+                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor option: {popupPositionRelativeToCursorStr}");
+                    break;
             }
         }
 
@@ -679,7 +681,9 @@ internal sealed class ConfigManager
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, popupFlipStr, "Invalid PopupFlip");
+                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupFlip", nameof(ConfigManager), nameof(ApplyPreferences), popupFlipStr);
+                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid PopupFlip: {popupFlipStr}");
+                    break;
             }
         }
 

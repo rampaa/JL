@@ -185,7 +185,9 @@ internal sealed partial class EditFrequencyWindow
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(null, selectedFreqType, "Invalid FreqType (Add)");
+                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(EditFrequencyWindow), nameof(BrowsePathButton_OnClick), selectedFreqType);
+                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid frequency type: {selectedFreqType}");
+                break;
         }
     }
 }
