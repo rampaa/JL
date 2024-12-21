@@ -291,7 +291,7 @@ internal sealed partial class MainWindow
         }
     }
 
-    public Task HandleMouseMove(MouseEventArgs? e)
+    private Task HandleMouseMove(MouseEventArgs? e)
     {
         ConfigManager configManager = ConfigManager.Instance;
         return configManager.InactiveLookupMode
@@ -436,7 +436,7 @@ internal sealed partial class MainWindow
         await using (connection.ConfigureAwait(false))
         {
             ConfigManager.Instance.SaveBeforeClosing(connection);
-            Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
+            StatsUtils.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
             StatsDBUtils.UpdateLifetimeStats(connection);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
         }

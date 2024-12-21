@@ -192,7 +192,7 @@ public static class AudioUtils
         {
             await Utils.Frontend.StopTextToSpeech().ConfigureAwait(false);
             Utils.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat);
-            Stats.IncrementStat(StatType.TimesPlayedAudio);
+            StatsUtils.IncrementStat(StatType.TimesPlayedAudio);
         }
     }
 

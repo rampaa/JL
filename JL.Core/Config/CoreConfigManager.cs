@@ -93,12 +93,12 @@ public sealed class CoreConfigManager
 
         if (TrackTermLookupCounts)
         {
-            if (Stats.ProfileLifetimeStats.TermLookupCountDict.Count > 0)
+            if (StatsUtils.ProfileLifetimeStats.TermLookupCountDict.Count > 0)
             {
                 StatsDBUtils.UpdateProfileLifetimeStats(connection);
             }
 
-            if (Stats.LifetimeStats.TermLookupCountDict.Count > 0)
+            if (StatsUtils.LifetimeStats.TermLookupCountDict.Count > 0)
             {
                 StatsDBUtils.UpdateLifetimeStats(connection);
             }
@@ -107,7 +107,7 @@ public sealed class CoreConfigManager
         TrackTermLookupCounts = ConfigDBManager.GetValueFromConfig(connection, TrackTermLookupCounts, nameof(TrackTermLookupCounts), bool.TryParse);
         if (!TrackTermLookupCounts)
         {
-            Stats.SessionStats.TermLookupCountDict.Clear();
+            StatsUtils.SessionStats.TermLookupCountDict.Clear();
         }
 
         AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);

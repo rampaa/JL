@@ -86,17 +86,17 @@ public static class ConfigDBManager
             if (defaultProfileExists)
             {
                 ProfileUtils.CurrentProfileId = ProfileDBUtils.GetCurrentProfileIdFromDB(connection, ProfileUtils.DefaultProfileId);
-                Stats.LifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.DefaultProfileId)!;
+                StatsUtils.LifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.DefaultProfileId)!;
             }
 
             ProfileDBUtils.InsertGlobalProfile(connection);
-            StatsDBUtils.InsertStats(connection, Stats.LifetimeStats, ProfileUtils.GlobalProfileId);
+            StatsDBUtils.InsertStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
         }
 
         if (!defaultProfileExists)
         {
             ProfileDBUtils.InsertDefaultProfile(connection);
-            StatsDBUtils.InsertStats(connection, Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
+            StatsDBUtils.InsertStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
         }
     }
 

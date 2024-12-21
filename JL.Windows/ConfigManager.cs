@@ -270,13 +270,13 @@ internal sealed class ConfigManager
 
             if (StripPunctuationBeforeCalculatingCharacterCount)
             {
-                Stats.IncrementStat(StatType.Characters, -(long)(Stats.SessionStats.Characters - characterCount));
-                Stats.IncrementStat(StatType.Lines, -(long)(Stats.SessionStats.Lines - lineCount));
+                StatsUtils.IncrementStat(StatType.Characters, -(long)(StatsUtils.SessionStats.Characters - characterCount));
+                StatsUtils.IncrementStat(StatType.Lines, -(long)(StatsUtils.SessionStats.Lines - lineCount));
             }
             else
             {
-                Stats.IncrementStat(StatType.Characters, (long)(characterCount - Stats.SessionStats.Characters));
-                Stats.IncrementStat(StatType.Lines, (long)(lineCount - Stats.SessionStats.Lines));
+                StatsUtils.IncrementStat(StatType.Characters, (long)(characterCount - StatsUtils.SessionStats.Characters));
+                StatsUtils.IncrementStat(StatType.Lines, (long)(lineCount - StatsUtils.SessionStats.Lines));
             }
         }
 
@@ -650,10 +650,12 @@ internal sealed class ConfigManager
                     break;
 
                 case "BottomRight":
-                default:
                     PositionPopupAboveCursor = false;
                     PositionPopupLeftOfCursor = false;
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(null, popupPositionRelativeToCursorStr, "Invalid PopupPositionRelativeToCursor");
             }
         }
 
@@ -672,10 +674,12 @@ internal sealed class ConfigManager
                     break;
 
                 case "Both":
-                default:
                     PopupFlipX = true;
                     PopupFlipY = true;
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(null, popupFlipStr, "Invalid PopupFlip");
             }
         }
 

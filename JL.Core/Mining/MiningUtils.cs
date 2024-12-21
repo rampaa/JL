@@ -360,8 +360,10 @@ public static class MiningUtils
             case JLField.Audio:
             case JLField.Image:
             case JLField.LocalTime:
-            default:
                 return null;
+
+            default:
+                throw new ArgumentOutOfRangeException(null, field, "Invalid JLField");
         }
     }
 
@@ -728,7 +730,7 @@ public static class MiningUtils
 
         await File.AppendAllTextAsync(filePath, lineToMine.ToString()).ConfigureAwait(false);
 
-        Stats.IncrementStat(StatType.CardsMined);
+        StatsUtils.IncrementStat(StatType.CardsMined);
 
         Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
         Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
@@ -954,7 +956,7 @@ public static class MiningUtils
             await AnkiConnect.Sync().ConfigureAwait(false);
         }
 
-        Stats.IncrementStat(StatType.CardsMined);
+        StatsUtils.IncrementStat(StatType.CardsMined);
     }
 
     /// <summary>

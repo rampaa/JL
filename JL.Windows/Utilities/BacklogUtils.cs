@@ -88,10 +88,10 @@ internal static class BacklogUtils
 
         if (text.Length > 0)
         {
-            Stats.IncrementStat(StatType.Lines, -1);
+            StatsUtils.IncrementStat(StatType.Lines, -1);
 
             int textLength = new StringInfo(text).LengthInTextElements;
-            Stats.IncrementStat(StatType.Characters, -textLength);
+            StatsUtils.IncrementStat(StatType.Characters, -textLength);
         }
 
         Backlog.RemoveAt(s_currentTextIndex);

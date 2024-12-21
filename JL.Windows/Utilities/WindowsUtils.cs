@@ -243,7 +243,7 @@ internal static class WindowsUtils
 
     public static void ShowStatsWindow()
     {
-        Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
+        StatsUtils.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
         StatsUtils.StatsStopWatch.Reset();
 
         StatsWindow statsWindow = StatsWindow.Instance;
@@ -425,7 +425,7 @@ internal static class WindowsUtils
 
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
             PlayAudio(audioData, "mp3");
-            Stats.IncrementStat(StatType.Imoutos);
+            StatsUtils.IncrementStat(StatType.Imoutos);
         }
         catch (Exception ex)
         {
@@ -691,11 +691,11 @@ internal static class WindowsUtils
 
         if (strippedText.Length > 0)
         {
-            Stats.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
+            StatsUtils.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
 
             if (newText)
             {
-                Stats.IncrementStat(StatType.Lines);
+                StatsUtils.IncrementStat(StatType.Lines);
             }
         }
     }

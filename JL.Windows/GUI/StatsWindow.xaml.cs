@@ -59,7 +59,7 @@ internal sealed partial class StatsWindow
     {
         UpdateStatsDisplay(StatsMode.Session);
 
-        _sessionLookupCountsForCurrentProfile = Stats.SessionStats.TermLookupCountDict.ToArray();
+        _sessionLookupCountsForCurrentProfile = StatsUtils.SessionStats.TermLookupCountDict.ToArray();
 
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         StatsDBUtils.UpdateProfileLifetimeStats(connection);
@@ -73,9 +73,9 @@ internal sealed partial class StatsWindow
     {
         Stats stats = mode switch
         {
-            StatsMode.Session => Stats.SessionStats,
-            StatsMode.Profile => Stats.ProfileLifetimeStats,
-            StatsMode.Lifetime => Stats.LifetimeStats,
+            StatsMode.Session => StatsUtils.SessionStats,
+            StatsMode.Profile => StatsUtils.ProfileLifetimeStats,
+            StatsMode.Lifetime => StatsUtils.LifetimeStats,
             _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "StatsMode out of range")
         };
 
@@ -132,7 +132,7 @@ internal sealed partial class StatsWindow
 
         if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode statsMode))
         {
-            Stats.ResetStats(statsMode);
+            StatsUtils.ResetStats(statsMode);
 
             if (statsMode is StatsMode.Lifetime)
             {

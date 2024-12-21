@@ -240,10 +240,10 @@ internal sealed partial class PopupWindow
             LookupResult firstLookupResult = lookupResults[0];
             LastSelectedText = firstLookupResult.MatchedText;
 
-            Stats.IncrementStat(StatType.NumberOfLookups);
+            StatsUtils.IncrementStat(StatType.NumberOfLookups);
             if (CoreConfigManager.Instance.TrackTermLookupCounts)
             {
-                Stats.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText);
+                StatsUtils.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText);
             }
 
             if (configManager.HighlightLongestMatch)
@@ -369,10 +369,10 @@ internal sealed partial class PopupWindow
             LastSelectedText = firstLookupResult.MatchedText;
             LastLookupResults = lookupResults;
 
-            Stats.IncrementStat(StatType.NumberOfLookups);
+            StatsUtils.IncrementStat(StatType.NumberOfLookups);
             if (CoreConfigManager.Instance.TrackTermLookupCounts)
             {
-                Stats.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText);
+                StatsUtils.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText);
             }
 
             EnableMiningMode();

@@ -134,11 +134,11 @@ public static class StatsDBUtils
 
     public static void UpdateLifetimeStats(SqliteConnection connection)
     {
-        UpdateStats(connection, Stats.LifetimeStats, ProfileUtils.GlobalProfileId);
+        UpdateStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
         if (CoreConfigManager.Instance.TrackTermLookupCounts)
         {
-            UpsertTermLookupCounts(connection, Stats.LifetimeStats.TermLookupCountDict, ProfileUtils.GlobalProfileId);
-            Stats.LifetimeStats.TermLookupCountDict.Clear();
+            UpsertTermLookupCounts(connection, StatsUtils.LifetimeStats.TermLookupCountDict, ProfileUtils.GlobalProfileId);
+            StatsUtils.LifetimeStats.TermLookupCountDict.Clear();
         }
     }
 
@@ -150,18 +150,18 @@ public static class StatsDBUtils
 
     public static void UpdateProfileLifetimeStats(SqliteConnection connection)
     {
-        UpdateStats(connection, Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
+        UpdateStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
         if (CoreConfigManager.Instance.TrackTermLookupCounts)
         {
-            UpsertTermLookupCounts(connection, Stats.ProfileLifetimeStats.TermLookupCountDict, ProfileUtils.CurrentProfileId);
-            Stats.ProfileLifetimeStats.TermLookupCountDict.Clear();
+            UpsertTermLookupCounts(connection, StatsUtils.ProfileLifetimeStats.TermLookupCountDict, ProfileUtils.CurrentProfileId);
+            StatsUtils.ProfileLifetimeStats.TermLookupCountDict.Clear();
         }
     }
 
     public static void SetStatsFromDB(SqliteConnection connection)
     {
-        Stats.LifetimeStats = GetStatsFromDB(connection, ProfileUtils.GlobalProfileId)!;
-        Stats.ProfileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
+        StatsUtils.LifetimeStats = GetStatsFromDB(connection, ProfileUtils.GlobalProfileId)!;
+        StatsUtils.ProfileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
     }
 
     internal static void ResetAllTermLookupCounts(int profileId)
