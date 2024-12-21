@@ -52,7 +52,11 @@
                                        Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                     <TextBlock Name="TextBlockNumberOfLookups" TextWrapping="Wrap"
                                        Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <Button Name="ShowTermLookupCountsButton" Padding="5" Margin="10,0,0,10" HorizontalAlignment="Left" Content="📜" FontSize="9" ToolTip="Show the lookup count of each term" Click="ShowTermLookupCountsButton_Click" ToolTipService.ShowOnDisabled="True" />
+                    <Button Name="ShowTermLookupCountsButton" Padding="5" Margin="10,0,0,10" HorizontalAlignment="Left" Content="📜" FontSize="9"
+                            ToolTip="Shows the lookup count for each term.
+                            &#10;Enable the &quot;Track the lookup count of each term&quot; option for this feature to work."
+                            Click="ShowTermLookupCountsButton_Click"
+                            ToolTipService.ShowOnDisabled="True" />
                 </DockPanel>
 
                 <DockPanel>
