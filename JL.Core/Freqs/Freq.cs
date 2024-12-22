@@ -17,12 +17,11 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
 
     // ReSharper disable once MemberCanBeInternal
     public int MaxValue { get; set; } = maxValue;
-
     [JsonIgnore] public bool Ready { get; set; } // = false;
+    public FreqOptions Options { get; set; } = options;
 
 #pragma warning disable CA2227
     [JsonIgnore] public IDictionary<string, IList<FrequencyRecord>> Contents { get; set; } = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
 #pragma warning restore CA2227
 
-    public FreqOptions Options { get; set; } = options;
 }

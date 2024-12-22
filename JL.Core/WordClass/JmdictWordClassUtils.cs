@@ -88,13 +88,13 @@ internal static class JmdictWordClassUtils
                                                && ((result.Readings is not null && jmdictRecord.Readings is not null && result.Readings.SequenceEqual(jmdictRecord.Readings))
                                                    || (result.Readings is null && jmdictRecord.Readings is null))))
                     {
-                        results.Add(new JmdictWordClass(jmdictRecord.PrimarySpelling, jmdictRecord.Readings, wordClasses));
+                        results.Add(new JmdictWordClass(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings));
                     }
                 }
 
                 else
                 {
-                    jmdictWordClassDictionary[key] = [new JmdictWordClass(jmdictRecord.PrimarySpelling, jmdictRecord.Readings, wordClasses)];
+                    jmdictWordClassDictionary[key] = [new JmdictWordClass(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings)];
                 }
             }
         }
