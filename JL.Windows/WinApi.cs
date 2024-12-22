@@ -315,7 +315,7 @@ internal sealed partial class WinApi
 
     public static void MoveWindowToPosition(nint windowHandle, double x, double y)
     {
-        _ = SetWindowPos(windowHandle, 0, (int)x, (int)y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+        _ = SetWindowPos(windowHandle, 0, double.ConvertToIntegerNative<int>(x), double.ConvertToIntegerNative<int>(y), 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)

@@ -584,7 +584,7 @@ public static class MiningUtils
             sumOfReciprocalOfFreqs += 1d / freq;
         }
 
-        return (int)Math.Round(lookupFrequencyResults.Count / sumOfReciprocalOfFreqs);
+        return double.ConvertToIntegerNative<int>(Math.Round(lookupFrequencyResults.Count / sumOfReciprocalOfFreqs));
     }
 
     private static List<KeyValuePair<string, byte>>? GetPitchAccents(IDictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)

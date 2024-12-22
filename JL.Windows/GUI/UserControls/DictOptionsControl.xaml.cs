@@ -141,7 +141,7 @@ internal sealed partial class DictOptionsControl
         AutoUpdateAfterNDaysOption? autoUpdateAfterNDaysOption = null;
         if (AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(type))
         {
-            autoUpdateAfterNDaysOption = new AutoUpdateAfterNDaysOption((int)AutoUpdateAfterNDaysNumericUpDown.Value);
+            autoUpdateAfterNDaysOption = new AutoUpdateAfterNDaysOption(double.ConvertToIntegerNative<int>(AutoUpdateAfterNDaysNumericUpDown.Value));
         }
 
         DictOptions options = new(
