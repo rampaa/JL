@@ -78,7 +78,7 @@ internal sealed partial class AddDictionaryWindow
             else
             {
                 bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-                    .Any(static s => Utils.ValidYomichanFileSuffixes.Contains(s));
+                    .Any(static s => MemoryExtensions.ContainsAny(s, Utils.ValidYomichanFileSuffixes));
 
                 if (!validPath)
                 {

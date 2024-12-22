@@ -176,8 +176,7 @@ internal static class KeyGestureUtils
         if (rawKeyGesture is not null)
         {
             KeyGestureConverter keyGestureConverter = new();
-
-            string keyGestureString = s_validModifiers.Contains(rawKeyGesture)
+            string keyGestureString = MemoryExtensions.ContainsAny(rawKeyGesture, s_validModifiers)
                 ? rawKeyGesture
                 : $"Win+{rawKeyGesture}";
 
