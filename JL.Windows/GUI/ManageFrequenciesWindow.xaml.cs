@@ -74,7 +74,8 @@ internal sealed partial class ManageFrequenciesWindow
     {
         List<DockPanel> resultDockPanels = [];
 
-        foreach (Freq freq in FreqUtils.FreqDicts.Values)
+        IOrderedEnumerable<Freq> sortedFreqs = FreqUtils.FreqDicts.Values.OrderBy(static freq => freq.Priority);
+        foreach (Freq freq in sortedFreqs)
         {
             DockPanel dockPanel = new();
 
@@ -190,8 +191,7 @@ internal sealed partial class ManageFrequenciesWindow
             resultDockPanels.Add(dockPanel);
         }
 
-        FrequenciesDisplay.ItemsSource = resultDockPanels
-            .OrderBy(static dockPanel => ((Freq)((CheckBox)dockPanel.Children[0]).Tag).Priority);
+        FrequenciesDisplay.ItemsSource = resultDockPanels;
     }
 
     private void PathTextBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

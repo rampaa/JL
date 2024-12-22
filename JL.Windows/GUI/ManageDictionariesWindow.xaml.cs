@@ -76,7 +76,8 @@ internal sealed partial class ManageDictionariesWindow
     {
         List<DockPanel> resultDockPanels = [];
 
-        foreach (Dict dict in DictUtils.Dicts.Values)
+        IOrderedEnumerable<Dict> sortedDicts = DictUtils.Dicts.Values.OrderBy(static d => d.Priority);
+        foreach (Dict dict in sortedDicts)
         {
             DockPanel dockPanel = new();
 
@@ -252,8 +253,7 @@ internal sealed partial class ManageDictionariesWindow
             resultDockPanels.Add(dockPanel);
         }
 
-        DictionariesDisplay.ItemsSource = resultDockPanels
-            .OrderBy(static dockPanel => ((Dict)((CheckBox)dockPanel.Children[0]).Tag).Priority);
+        DictionariesDisplay.ItemsSource = resultDockPanels;
     }
 
     private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

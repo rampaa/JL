@@ -68,7 +68,8 @@ internal sealed partial class ManageAudioSourcesWindow
     {
         List<DockPanel> resultDockPanels = [];
 
-        foreach ((string uri, AudioSource audioSource) in AudioUtils.AudioSources.OrderBy(static a => a.Value.Priority))
+        IOrderedEnumerable<KeyValuePair<string, AudioSource>> sortedAudioSources = AudioUtils.AudioSources.OrderBy(static a => a.Value.Priority);
+        foreach ((string uri, AudioSource audioSource) in sortedAudioSources)
         {
             DockPanel dockPanel = new();
 
@@ -167,8 +168,7 @@ internal sealed partial class ManageAudioSourcesWindow
             resultDockPanels.Add(dockPanel);
         }
 
-        AudioSourceListBox.ItemsSource = resultDockPanels
-            .OrderBy(static dockPanel => ((AudioSource)((CheckBox)dockPanel.Children[0]).Tag).Priority);
+        AudioSourceListBox.ItemsSource = resultDockPanels;
     }
 
     private static void CheckBox_Checked(object sender, RoutedEventArgs e)
