@@ -6,7 +6,7 @@ namespace JL.Core.Utilities;
 public static partial class RegexReplacerUtils
 {
     [GeneratedRegex(@"\|REGEX\|(?<regex>.+)\|BECOMES\|(?<replacement>.*)\|MODIFIER\|(?<modifiers>.*)\|END\|", RegexOptions.CultureInvariant)]
-    private static partial Regex ReplacementRegex();
+    private static partial Regex ReplacementRegex { get; }
 
     internal static List<KeyValuePair<Regex, string>>? s_regexReplacements;
 
@@ -49,7 +49,7 @@ public static partial class RegexReplacerUtils
         {
             foreach (string line in File.ReadLines(filePaths[i]))
             {
-                Match match = ReplacementRegex().Match(line);
+                Match match = ReplacementRegex.Match(line);
                 if (match.Success)
                 {
                     string regexPattern = match.Groups["regex"].Value;

@@ -340,7 +340,7 @@ internal sealed partial class PreferencesWindow
         List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
         if (fieldNames is not null)
         {
-            Dictionary<string, JLField> fields = new(fieldNames.Count, StringComparer.Ordinal);
+            OrderedDictionary<string, JLField> fields = new(fieldNames.Count, StringComparer.Ordinal);
             for (int i = 0; i < fieldNames.Count; i++)
             {
                 fields.Add(fieldNames[i], JLField.Nothing);
@@ -380,7 +380,7 @@ internal sealed partial class PreferencesWindow
         await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForWordDicts).ConfigureAwait(false);
     }
 
-    private static void CreateFieldElements(Dictionary<string, JLField> fields, JLField[] fieldList, Panel fieldPanel)
+    private static void CreateFieldElements(OrderedDictionary<string, JLField> fields, JLField[] fieldList, Panel fieldPanel)
     {
         fieldPanel.Children.Clear();
 
@@ -420,7 +420,7 @@ internal sealed partial class PreferencesWindow
         string deckName = deckNamesSelector.SelectedItem.ToString()!;
         string modelName = modelNamesSelector.SelectedItem.ToString()!;
 
-        Dictionary<string, JLField> dict = new(miningPanel.Children.Count, StringComparer.Ordinal);
+        OrderedDictionary<string, JLField> dict = new(miningPanel.Children.Count, StringComparer.Ordinal);
         foreach (StackPanel stackPanel in miningPanel.Children.Cast<StackPanel>())
         {
             TextBlock textBlock = (TextBlock)stackPanel.Children[0];

@@ -65,7 +65,7 @@ internal static class FrequencyYomichanLoader
                     case JsonValueKind.String:
                     {
                         string freqStr = thirdElement.GetString()!;
-                        Match match = Utils.NumberRegex().Match(freqStr);
+                        Match match = Utils.NumberRegex.Match(freqStr);
                         if (match.Success)
                         {
                             if (int.TryParse(match.ValueSpan, out int parsedFreq))

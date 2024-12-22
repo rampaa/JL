@@ -37,7 +37,7 @@ public sealed record class PitchAccentRecord : IDictRecord
             string? positionStr = jsonElements[5][0].GetString();
             if (positionStr is not null)
             {
-                Match match = Utils.NumberRegex().Match(positionStr);
+                Match match = Utils.NumberRegex.Match(positionStr);
                 Position = match.Success && byte.TryParse(match.ValueSpan, out byte position)
                     ? position
                     : byte.MaxValue;

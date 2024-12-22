@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <RollForward>LatestMajor</RollForward>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishReadyToRun>false</PublishReadyToRun>
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
-    <AnalysisLevel>8-all</AnalysisLevel>
+    <AnalysisLevel>9-all</AnalysisLevel>
   </PropertyGroup>
   
   <ItemGroup>

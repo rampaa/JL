@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
     <RollForward>LatestMajor</RollForward>
     <UseWPF>true</UseWPF>
@@ -14,8 +14,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <NoWin32Manifest>true</NoWin32Manifest>
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <AnalysisLevel>8-all</AnalysisLevel>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <AnalysisLevel>9-all</AnalysisLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 

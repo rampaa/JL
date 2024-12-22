@@ -10,13 +10,13 @@ public sealed class AnkiConfig
 
     [JsonPropertyName("modelName")] public string ModelName { get; }
 
-    [JsonPropertyName("fields")] public Dictionary<string, JLField> Fields { get; }
+    [JsonPropertyName("fields")] public OrderedDictionary<string, JLField> Fields { get; }
 
     [JsonPropertyName("tags")] public string[]? Tags { get; }
 
     [JsonIgnore] private static Dictionary<MineType, AnkiConfig>? s_ankiConfigDict;
 
-    public AnkiConfig(string deckName, string modelName, Dictionary<string, JLField> fields, string[]? tags)
+    public AnkiConfig(string deckName, string modelName, OrderedDictionary<string, JLField> fields, string[]? tags)
     {
         DeckName = deckName;
         ModelName = modelName;

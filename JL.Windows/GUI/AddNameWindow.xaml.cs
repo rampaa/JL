@@ -38,7 +38,7 @@ internal sealed partial class AddNameWindow
     {
         bool isValid = true;
 
-        if (!JapaneseUtils.JapaneseRegex().IsMatch(SpellingTextBox.Text))
+        if (!JapaneseUtils.JapaneseRegex.IsMatch(SpellingTextBox.Text))
         {
             SpellingTextBox.BorderBrush = Brushes.Red;
             isValid = false;

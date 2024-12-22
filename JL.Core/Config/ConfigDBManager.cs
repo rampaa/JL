@@ -147,7 +147,7 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void DeleteAllSettingsFromProfile(params string[] excludedSettings)
+    public static void DeleteAllSettingsFromProfile(params ReadOnlySpan<string> excludedSettings)
     {
         using SqliteConnection connection = CreateReadWriteDBConnection();
         using SqliteCommand command = connection.CreateCommand();

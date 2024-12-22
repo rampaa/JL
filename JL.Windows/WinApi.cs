@@ -222,20 +222,7 @@ internal sealed partial class WinApi
         }
     }
 
-    public static void UnregisterAllGlobalHotKeys(nint windowHandle, int keyGestureIdToIgnore)
-    {
-        foreach (int id in KeyGestureUtils.GlobalKeyGestureDict.Keys)
-        {
-            if (keyGestureIdToIgnore == id)
-            {
-                continue;
-            }
-
-            _ = UnregisterHotKey(windowHandle, id);
-        }
-    }
-
-    public static void UnregisterAllGlobalHotKeys(nint windowHandle, List<int> keyGestureIdsToIgnore)
+    public static void UnregisterAllGlobalHotKeys(nint windowHandle, params List<int> keyGestureIdsToIgnore)
     {
         foreach (int id in KeyGestureUtils.GlobalKeyGestureDict.Keys)
         {

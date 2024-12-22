@@ -194,9 +194,9 @@ internal sealed partial class PopupWindow
         MainWindow mainWindow = MainWindow.Instance;
         if (this != mainWindow.FirstPopupWindow
                 ? configManager.DisableLookupsForNonJapaneseCharsInPopups
-                  && !JapaneseUtils.JapaneseRegex().IsMatch(textBoxText[charPosition].ToString())
+                  && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString())
                 : configManager.DisableLookupsForNonJapaneseCharsInMainWindow
-                  && !JapaneseUtils.JapaneseRegex().IsMatch(textBoxText[charPosition].ToString()))
+                  && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString()))
         {
             HidePopup();
             return Task.CompletedTask;
@@ -1213,7 +1213,7 @@ internal sealed partial class PopupWindow
         if (MiningMode)
         {
             _lastInteractedTextBox = textBox;
-            if (JapaneseUtils.JapaneseRegex().IsMatch(textBox.Text))
+            if (JapaneseUtils.JapaneseRegex.IsMatch(textBox.Text))
             {
                 return ChildPopupWindow.LookupOnMouseMoveOrClick(textBox, false);
             }

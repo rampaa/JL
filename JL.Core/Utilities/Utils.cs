@@ -30,7 +30,7 @@ public static partial class Utils
     internal static StringPool StringPoolInstance => StringPool.Shared;
 
     [GeneratedRegex(@"\d+", RegexOptions.CultureInvariant)]
-    internal static partial Regex NumberRegex();
+    internal static partial Regex NumberRegex { get; }
 
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
 
@@ -217,7 +217,7 @@ public static partial class Utils
         return relativePath.StartsWith('.') ? fullPath : relativePath;
     }
 
-    internal static T[]? ConcatNullableArrays<T>(params T[]?[] arrays)
+    internal static T[]? ConcatNullableArrays<T>(params ReadOnlySpan<T[]?> arrays)
     {
         int position = 0;
         int length = 0;

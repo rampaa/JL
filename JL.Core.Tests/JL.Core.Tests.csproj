@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <RollForward>LatestMajor</RollForward>
     <IsPackable>false</IsPackable>
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AnalysisLevel>8-all</AnalysisLevel>
+    <AnalysisLevel>9-all</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>

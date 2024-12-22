@@ -778,8 +778,8 @@ public static class MiningUtils
                 continue;
             }
 
-            Dictionary<string, JLField> userFields = ankiConfig.Fields;
-            (string firstFieldName, JLField firstField) = userFields.First();
+            OrderedDictionary<string, JLField> userFields = ankiConfig.Fields;
+            (string firstFieldName, JLField firstField) = userFields.GetAt(0);
             string? firstFieldValue = GetMiningParameter(firstField, lookupResult, currentText, currentCharPosition);
             if (string.IsNullOrEmpty(firstFieldValue))
             {
@@ -855,7 +855,7 @@ public static class MiningUtils
             return;
         }
 
-        Dictionary<string, JLField> userFields = ankiConfig.Fields;
+        OrderedDictionary<string, JLField> userFields = ankiConfig.Fields;
         Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResult, currentText, formattedDefinitions, selectedDefinitions, currentCharPosition, true);
         Dictionary<string, string> fields = ConvertFields(userFields, miningParams);
 
@@ -967,7 +967,7 @@ public static class MiningUtils
     /// Value is the actual content of a mining field (e.g. if the field name is LocalTime, then it should contain the current time) <br/>
     /// UserField is the name of the user's field in Anki (e.g. Expression) <br/>
     /// </summary>
-    private static Dictionary<string, string> ConvertFields(Dictionary<string, JLField> userFields, Dictionary<JLField, string> miningParams)
+    private static Dictionary<string, string> ConvertFields(OrderedDictionary<string, JLField> userFields, Dictionary<JLField, string> miningParams)
     {
         Dictionary<string, string> dict = new(StringComparer.Ordinal);
         foreach ((string key, JLField value) in userFields)
@@ -981,7 +981,7 @@ public static class MiningUtils
         return dict;
     }
 
-    private static List<string> FindFields(JLField jlField, Dictionary<string, JLField> userFields)
+    private static List<string> FindFields(JLField jlField, OrderedDictionary<string, JLField> userFields)
     {
         return userFields.Keys.Where(key => userFields[key] == jlField).ToList();
     }
