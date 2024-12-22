@@ -20,19 +20,19 @@ public static class FreqUtils
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
-                true, 1, 57273, 35894, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                true, 1, 57273, 35894, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
         {
             "Narou (Nazeka)",
             new Freq(FreqType.Nazeka, "Narou (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_narou.json"),
-                false, 2, 75588, 48528, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 2, 75588, 48528, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_novels.json"),
-                false, 3, 114348, 74633, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 3, 114348, 74633, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         }
     };
 

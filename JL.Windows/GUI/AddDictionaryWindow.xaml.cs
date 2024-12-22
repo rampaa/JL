@@ -89,7 +89,7 @@ internal sealed partial class AddDictionaryWindow
         }
 
         DictOptions options = _dictOptionsControl.GetDictOptions(type);
-        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, false, options);
+        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
         DictUtils.Dicts.Add(name, dict);
 
         if (dict.Type is DictType.PitchAccentYomichan)

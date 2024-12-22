@@ -78,7 +78,7 @@ internal sealed partial class AddFrequencyWindow
         FreqOptions options = _freqOptionsControl.GetFreqOptions(type);
 
         FreqUtils.FreqDicts.Add(name,
-            new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0, 0, false, options));
+            new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0, 0, options));
 
         Close();
     }

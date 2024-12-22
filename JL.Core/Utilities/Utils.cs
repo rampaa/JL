@@ -51,13 +51,17 @@ public static partial class Utils
 
     internal static readonly JsonSerializerOptions s_jsoNotIgnoringNull = new()
     {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true
     };
 
     internal static readonly JsonSerializerOptions s_jsoIgnoringNull = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true
     };
 
     internal static readonly JsonSerializerOptions s_jsoNotIgnoringNullWithEnumConverter = new()
@@ -66,7 +70,9 @@ public static partial class Utils
         {
             new JsonStringEnumConverter()
         },
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true
     };
 
     internal static readonly JsonSerializerOptions s_jsoIgnoringNullWithEnumConverter = new()
@@ -76,7 +82,9 @@ public static partial class Utils
             new JsonStringEnumConverter()
         },
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true
     };
 
     internal static readonly JsonSerializerOptions s_jsoNotIgnoringNullWithEnumConverterAndIndentation = new()
@@ -86,7 +94,9 @@ public static partial class Utils
             new JsonStringEnumConverter()
         },
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        WriteIndented = true
+        WriteIndented = true,
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true
     };
 
     internal static readonly JsonSerializerOptions s_jsoIgnoringNullWithEnumConverterAndIndentation = new()
@@ -97,7 +107,9 @@ public static partial class Utils
         },
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = true
+        WriteIndented = true,
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true
     };
 
     internal static readonly FrozenDictionary<string, string> s_iso6392BTo2T = new Dictionary<string, string>(20, StringComparer.Ordinal)

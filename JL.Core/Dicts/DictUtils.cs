@@ -46,7 +46,7 @@ public static class DictUtils
             nameof(DictType.ProfileCustomWordDictionary), new Dict(DictType.ProfileCustomWordDictionary,
                 "Custom Word Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Words.txt"),
-                true, -1, 128, false,
+                true, -1, 128,
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
@@ -56,7 +56,7 @@ public static class DictUtils
             nameof(DictType.ProfileCustomNameDictionary), new Dict(DictType.ProfileCustomNameDictionary,
                 "Custom Name Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Names.txt"),
-                true, 0, 128, false,
+                true, 0, 128,
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false)))
@@ -65,7 +65,7 @@ public static class DictUtils
             nameof(DictType.CustomWordDictionary), new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_words.txt"),
-                true, 1, 128, false,
+                true, 1, 128,
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
@@ -75,7 +75,7 @@ public static class DictUtils
             nameof(DictType.CustomNameDictionary), new Dict(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_names.txt"),
-                true, 2, 128, false,
+                true, 2, 128,
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false)))
@@ -83,7 +83,7 @@ public static class DictUtils
         {
             nameof(DictType.JMdict), new Dict(DictType.JMdict, nameof(DictType.JMdict),
                 Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMdict)}.xml"),
-                true, 3, 500000, false,
+                true, 3, 500000,
                 new DictOptions(
                     new UseDBOption(true),
                     new NoAllOption(false),
@@ -108,7 +108,7 @@ public static class DictUtils
         {
             nameof(DictType.Kanjidic), new Dict(DictType.Kanjidic, nameof(DictType.Kanjidic),
                 Path.Join(Utils.ResourcesPath, "kanjidic2.xml"),
-                true, 4, 13108, false,
+                true, 4, 13108,
                 new DictOptions(
                     new UseDBOption(true),
                     new NoAllOption(false),
@@ -117,7 +117,7 @@ public static class DictUtils
         {
             nameof(DictType.JMnedict), new Dict(DictType.JMnedict, nameof(DictType.JMnedict),
                 Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMnedict)}.xml"),
-                true, 5, 700000, false,
+                true, 5, 700000,
                 new DictOptions(
                     new UseDBOption(true),
                     new NoAllOption(false),
