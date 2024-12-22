@@ -225,11 +225,8 @@ internal static class Deconjugator
             Rule virtualRule = new
             (
                 myRule.Type,
-                null,
                 [maybeDecEnd],
                 [maybeConEnd],
-                null,
-                null,
                 myRule.Detail
             );
             Form? ret = SubstitutionInner(myForm, virtualRule);
