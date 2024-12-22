@@ -10,8 +10,7 @@ namespace JL.Windows.Utilities;
 
 internal static class KeyGestureUtils
 {
-    public static readonly Dictionary<int, KeyGesture> GlobalKeyGestureDict = [];
-    public static readonly Dictionary<string, int> GlobalKeyGestureNameToIntDict = [];
+    public static readonly OrderedDictionary<string, KeyGesture> GlobalKeyGestureNameToKeyGestureDict = [];
 
     public static readonly KeyGesture AltF4KeyGesture = new(Key.F4, ModifierKeys.Alt);
 

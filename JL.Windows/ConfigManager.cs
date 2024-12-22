@@ -504,8 +504,7 @@ internal sealed class ConfigManager
             : mainWindow.OpacitySlider.Value / 100;
 
         WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
-        KeyGestureUtils.GlobalKeyGestureDict.Clear();
-        KeyGestureUtils.GlobalKeyGestureNameToIntDict.Clear();
+        KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Clear();
 
         DisableHotkeysKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MiningModeKeyGesture), MiningModeKeyGesture);
