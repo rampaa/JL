@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using JL.Core.Config;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
@@ -24,7 +23,6 @@ public static class LookupUtils
 
     public static LookupResult[]? LookupText(string text)
     {
-        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         bool useDBForPitchDict = false;
         if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
         {

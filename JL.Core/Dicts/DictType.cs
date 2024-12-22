@@ -25,5 +25,5 @@ public enum DictType
     [Description("Word Dictionary (Nazeka)")] NonspecificWordNazeka,
     [Description("Kanji Dictionary (Nazeka)")] NonspecificKanjiNazeka,
     [Description("Name Dictionary (Nazeka)")] NonspecificNameNazeka,
-    [Description("Nonspecific Dictionary (Nazeka)")] NonspecificNazeka,
+    [Description("Nonspecific Dictionary (Nazeka)")] NonspecificNazeka
 }
