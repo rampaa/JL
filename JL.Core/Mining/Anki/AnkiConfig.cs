@@ -16,7 +16,7 @@ public sealed class AnkiConfig
 
     [JsonIgnore] private static Dictionary<MineType, AnkiConfig>? s_ankiConfigDict;
 
-    public AnkiConfig(string deckName, string modelName, OrderedDictionary<string, JLField> fields, string[]? tags)
+    public AnkiConfig(string deckName, string modelName, OrderedDictionary<string, JLField> fields, string[]? tags = null)
     {
         DeckName = deckName;
         ModelName = modelName;
