@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Frozen;
 using System.Text;
 using System.Windows.Controls;
@@ -10,6 +11,8 @@ namespace JL.Windows.Utilities;
 
 internal static class KeyGestureUtils
 {
+    private static readonly SearchValues<string> s_validModifiers = SearchValues.Create(["Ctrl", "Alt", "Shift"], StringComparison.Ordinal);
+
     public static readonly OrderedDictionary<string, KeyGesture> GlobalKeyGestureNameToKeyGestureDict = [];
 
     public static readonly KeyGesture AltF4KeyGesture = new(Key.F4, ModifierKeys.Alt);
@@ -174,9 +177,7 @@ internal static class KeyGestureUtils
         {
             KeyGestureConverter keyGestureConverter = new();
 
-            string keyGestureString = rawKeyGesture.Contains("Ctrl", StringComparison.Ordinal)
-                                      || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
-                                      || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
+            string keyGestureString = s_validModifiers.Contains(rawKeyGesture)
                 ? rawKeyGesture
                 : $"Win+{rawKeyGesture}";
 

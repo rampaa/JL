@@ -79,7 +79,7 @@ internal sealed partial class EditDictionaryWindow
                 else
                 {
                     bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-                        .Any(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal));
+                        .Any(static s => Utils.ValidYomichanFileSuffixes.Contains(s));
 
                     if (!validPath)
                     {
