@@ -63,7 +63,6 @@ internal sealed partial class ManageAudioSourcesWindow
         SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
     }
 
-    // probably should be split into several methods
     private void UpdateAudioSourcesDisplay()
     {
         List<DockPanel> resultDockPanels = [];

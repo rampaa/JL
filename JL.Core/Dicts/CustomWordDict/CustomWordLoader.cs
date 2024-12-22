@@ -63,7 +63,7 @@ public static class CustomWordLoader
                 break;
             }
 
-            string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
+            string[] lParts = line.Split('\t', StringSplitOptions.TrimEntries);
             if (lParts.Length >= 4)
             {
                 string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);

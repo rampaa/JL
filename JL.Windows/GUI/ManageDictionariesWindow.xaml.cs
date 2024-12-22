@@ -71,7 +71,6 @@ internal sealed partial class ManageDictionariesWindow
         Utils.ClearStringPoolIfDictsAreReady();
     }
 
-    // probably should be split into several methods
     private void UpdateDictionariesDisplay()
     {
         List<DockPanel> resultDockPanels = [];

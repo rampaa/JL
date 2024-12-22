@@ -69,7 +69,6 @@ internal sealed partial class ManageFrequenciesWindow
         Utils.ClearStringPoolIfDictsAreReady();
     }
 
-    // probably should be split into several methods
     private void UpdateFreqsDisplay()
     {
         List<DockPanel> resultDockPanels = [];

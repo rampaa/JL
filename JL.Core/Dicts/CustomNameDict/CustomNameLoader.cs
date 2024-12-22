@@ -22,7 +22,7 @@ public static class CustomNameLoader
                 break;
             }
 
-            string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
+            string[] lParts = line.Split('\t', StringSplitOptions.TrimEntries);
 
             if (lParts.Length >= 3)
             {

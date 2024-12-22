@@ -1326,7 +1326,7 @@ public static class DictUtils
 
             for (int i = 0; i < lines.Length; i++)
             {
-                string[] lParts = lines[i].Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[] lParts = lines[i].Split('\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                 if (lParts.Length is 3)
                 {
