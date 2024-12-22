@@ -14,7 +14,7 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 </p>
 
 ## System requirements
-* .NET Desktop Runtime 8.0 or later
+* .NET Desktop Runtime 9.0 or later
 
 ## Features
 * Highly customizable (i.e. You can change the size/color/opacity/hotkey of pretty much everything)
