@@ -1810,6 +1810,10 @@ internal sealed partial class MainWindow
                 {
                     rightPosition = MagpieUtils.MagpieWindowRightEdgePosition;
                 }
+                else
+                {
+                    return Math.Max(activeScreen.Bounds.Left, rightPosition - currentWidth);
+                }
 
                 return Math.Max(MagpieUtils.MagpieWindowLeftEdgePosition, rightPosition - currentWidth);
             }
@@ -1848,6 +1852,10 @@ internal sealed partial class MainWindow
                 else if (bottomPosition is 0)
                 {
                     bottomPosition = (MagpieUtils.MagpieWindowTopEdgePosition + MagpieUtils.MagpieWindowBottomEdgePosition + currentHeight) / 2;
+                }
+                else
+                {
+                    return Math.Max(activeScreen.Bounds.Top, bottomPosition - currentHeight);
                 }
 
                 return Math.Max(MagpieUtils.MagpieWindowTopEdgePosition, bottomPosition - currentHeight);

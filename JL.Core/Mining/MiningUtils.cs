@@ -895,27 +895,29 @@ public static class MiningUtils
         byte[]? audioData = audioResponse?.AudioData;
         if (audioResponse?.AudioSource is AudioSourceType.TextToSpeech)
         {
-            await Utils.Frontend.StopTextToSpeech().ConfigureAwait(false);
-            audioData = Utils.Frontend.GetAudioResponseFromTextToSpeech(reading);
+            audioData = await Utils.Frontend.GetAudioResponseFromTextToSpeech(reading).ConfigureAwait(false);
         }
 
         if (audioData is not null)
         {
-            note.Audio = new Dictionary<string, object>(4, StringComparer.Ordinal)
-            {
-                {
-                    "data", audioData
-                },
-                {
-                    "filename", $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}"
-                },
-                {
-                    "skipHash", Networking.Jpod101NoAudioMd5Hash
-                },
-                {
-                    "fields", audioFields
-                }
-            };
+            note.Audio =
+                [
+                    new Dictionary<string, object>(4, StringComparer.Ordinal)
+                    {
+                        {
+                            "data", audioData
+                        },
+                        {
+                            "filename", $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}"
+                        },
+                        {
+                            "skipHash", Networking.Jpod101NoAudioMd5Hash
+                        },
+                        {
+                            "fields", audioFields
+                        }
+                    }
+                ];
         }
 
         List<string> imageFields = FindFields(JLField.Image, userFields);
@@ -926,18 +928,21 @@ public static class MiningUtils
 
         if (imageBytes is not null)
         {
-            note.Picture = new Dictionary<string, object>(3, StringComparer.Ordinal)
-            {
-                {
-                    "data", imageBytes
-                },
-                {
-                    "filename", $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png"
-                },
-                {
-                    "fields", imageFields
-                }
-            };
+            note.Picture =
+                [
+                    new Dictionary<string, object>(3, StringComparer.Ordinal)
+                    {
+                        {
+                            "data", imageBytes
+                        },
+                        {
+                            "filename", $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png"
+                        },
+                        {
+                            "fields", imageFields
+                        }
+                    }
+                ];
         }
 
         Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
@@ -949,8 +954,9 @@ public static class MiningUtils
         }
 
         bool showNoAudioMessage = needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash);
-        string message = $"Mined {lookupResult.PrimarySpelling}{(showNoAudioMessage ? " (No Audio)" : "")}{(!canAddNote.Value ? " (Duplicate)" : "")}";
-        Utils.Frontend.Alert(AlertLevel.Warning, message);
+        bool showDuplicateCardMessage = !canAddNote.Value;
+        string message = $"Mined {lookupResult.PrimarySpelling}{(showNoAudioMessage ? " (No Audio)" : "")}{(showDuplicateCardMessage ? " (Duplicate)" : "")}";
+        Utils.Frontend.Alert(showNoAudioMessage || showDuplicateCardMessage ? AlertLevel.Warning : AlertLevel.Success, message);
         Utils.Logger.Information(message);
 
         if (coreConfigManager.ForceSyncAnki)
