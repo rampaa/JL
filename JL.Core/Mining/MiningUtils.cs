@@ -773,13 +773,12 @@ public static class MiningUtils
                 ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
             }
 
-            if (ankiConfig is null)
+            if (ankiConfig is null || ankiConfig.Fields.Count is 0)
             {
                 continue;
             }
 
-            OrderedDictionary<string, JLField> userFields = ankiConfig.Fields;
-            (string firstFieldName, JLField firstField) = userFields.GetAt(0);
+            (string firstFieldName, JLField firstField) = ankiConfig.Fields.GetAt(0);
             string? firstFieldValue = GetMiningParameter(firstField, lookupResult, currentText, currentCharPosition);
             if (string.IsNullOrEmpty(firstFieldValue))
             {
@@ -791,7 +790,7 @@ public static class MiningUtils
                 { firstFieldName, firstFieldValue }
             };
 
-            Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, null, null, null, null, null);
+            Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields);
             notes.Add(note);
             positions.Add(i);
         }
@@ -861,7 +860,7 @@ public static class MiningUtils
 
         // Audio/Picture/Video shouldn't be set here
         // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
-        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, ankiConfig.Tags, null, null, null, null);
+        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields);
         bool? canAddNote = await AnkiUtils.CanAddNote(note).ConfigureAwait(false);
         if (canAddNote is null)
         {
@@ -876,6 +875,14 @@ public static class MiningUtils
             Utils.Logger.Information("Cannot mine {PrimarySpelling} because it is a duplicate card", lookupResult.PrimarySpelling);
             return;
         }
+
+        note.Tags = ankiConfig.Tags;
+        note.Options = new Dictionary<string, object>(1, StringComparer.Ordinal)
+        {
+            {
+                "allowDuplicate", coreConfigManager.AllowDuplicateCards
+            }
+        };
 
         List<string> audioFields = FindFields(JLField.Audio, userFields);
         bool needsAudio = audioFields.Count > 0;
@@ -932,13 +939,6 @@ public static class MiningUtils
                 }
             };
         }
-
-        note.Options = new Dictionary<string, object>(1, StringComparer.Ordinal)
-        {
-            {
-                "allowDuplicate", coreConfigManager.AllowDuplicateCards
-            }
-        };
 
         Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
         if (response is null)
