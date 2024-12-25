@@ -900,7 +900,7 @@ public static class MiningUtils
 
         if (audioData is not null)
         {
-            note.Audio =
+            note.Audios =
                 [
                     new Dictionary<string, object>(4, StringComparer.Ordinal)
                     {
@@ -928,7 +928,7 @@ public static class MiningUtils
 
         if (imageBytes is not null)
         {
-            note.Picture =
+            note.Pictures =
                 [
                     new Dictionary<string, object>(3, StringComparer.Ordinal)
                     {
