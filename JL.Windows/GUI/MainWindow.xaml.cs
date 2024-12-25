@@ -1430,20 +1430,12 @@ internal sealed partial class MainWindow
         if (e.ClickCount is 2
             && configManager is { MainWindowDynamicWidth: false, MainWindowDynamicHeight: true })
         {
-            if (MagpieUtils.IsMagpieScaling)
-            {
-                // If Magpie crashes or is killed during the process of scaling a window,
-                // JL will not receive the MagpieScalingChangedWindowMessage.
-                // Consequently, IsMagpieScaling may not be set to false.
-                // To ensure Magpie is still running, we must re-check whether it is scaling a window.
-                MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
-            }
-
             DpiScale dpi = WindowsUtils.Dpi;
             double xPosition;
             double yPosition;
             double width;
             double maxDynamicHeight = configManager.MainWindowMaxDynamicHeight * dpi.DpiScaleY;
+            MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieScaling && MagpieUtils.IsMagpieReallyScaling();
             if (!MagpieUtils.IsMagpieScaling)
             {
                 Rectangle workingArea = WindowsUtils.ActiveScreen.WorkingArea;
@@ -1468,7 +1460,8 @@ internal sealed partial class MainWindow
             {
                 xPosition = MagpieUtils.MagpieWindowLeftEdgePosition;
 
-                if (configManager.PositionPopupAboveCursor)
+                if (configManager.PositionPopupAboveCursor
+                    || configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true, MainWindowFixedBottomPosition: -2 or -1 })
                 {
                     yPosition = MagpieUtils.MagpieWindowBottomEdgePosition - maxDynamicHeight;
                     if (yPosition < MagpieUtils.MagpieWindowTopEdgePosition)
@@ -1802,8 +1795,26 @@ internal sealed partial class MainWindow
     private double GetDynamicXPosition(double rightPosition)
     {
         double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
-
         Screen activeScreen = WindowsUtils.ActiveScreen;
+
+        if (MagpieUtils.IsMagpieScaling)
+        {
+            MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
+            if (MagpieUtils.IsMagpieScaling)
+            {
+                if (rightPosition is 0)
+                {
+                    rightPosition = (MagpieUtils.MagpieWindowLeftEdgePosition + MagpieUtils.MagpieWindowRightEdgePosition + currentWidth) / 2;
+                }
+                else if (rightPosition is -1 or -2)
+                {
+                    rightPosition = MagpieUtils.MagpieWindowRightEdgePosition;
+                }
+
+                return Math.Max(MagpieUtils.MagpieWindowLeftEdgePosition, rightPosition - currentWidth);
+            }
+        }
+
         if (rightPosition is 0)
         {
             rightPosition = (activeScreen.Bounds.Left + activeScreen.Bounds.Right + currentWidth) / 2;
@@ -1817,14 +1828,32 @@ internal sealed partial class MainWindow
             rightPosition = activeScreen.Bounds.Right;
         }
 
-        return Math.Max(rightPosition is not -1 ? activeScreen.Bounds.Left : activeScreen.WorkingArea.Left, rightPosition - currentWidth);
+        return Math.Max(rightPosition is -1 ? activeScreen.WorkingArea.Left : activeScreen.Bounds.Left, rightPosition - currentWidth);
     }
 
     private double GetDynamicYPosition(double bottomPosition)
     {
         double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
-
         Screen activeScreen = WindowsUtils.ActiveScreen;
+
+        if (MagpieUtils.IsMagpieScaling)
+        {
+            MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
+            if (MagpieUtils.IsMagpieScaling)
+            {
+                if (bottomPosition is -2 or -1)
+                {
+                    bottomPosition = MagpieUtils.MagpieWindowBottomEdgePosition;
+                }
+                else if (bottomPosition is 0)
+                {
+                    bottomPosition = (MagpieUtils.MagpieWindowTopEdgePosition + MagpieUtils.MagpieWindowBottomEdgePosition + currentHeight) / 2;
+                }
+
+                return Math.Max(MagpieUtils.MagpieWindowTopEdgePosition, bottomPosition - currentHeight);
+            }
+        }
+
         if (bottomPosition is -2)
         {
             bottomPosition = activeScreen.Bounds.Bottom;
@@ -1838,6 +1867,6 @@ internal sealed partial class MainWindow
             bottomPosition = (activeScreen.Bounds.Top + activeScreen.Bounds.Bottom + currentHeight) / 2;
         }
 
-        return Math.Max(bottomPosition is not -1 ? activeScreen.Bounds.Top : activeScreen.WorkingArea.Top, bottomPosition - currentHeight);
+        return Math.Max(bottomPosition is -1 ? activeScreen.WorkingArea.Top : activeScreen.Bounds.Top, bottomPosition - currentHeight);
     }
 }
