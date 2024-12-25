@@ -91,12 +91,14 @@ internal static class SpeechSynthesisUtils
         _ = Synthesizer.SpeakAsync(text);
     }
 
-    public static byte[]? GetAudioResponseFromTextToSpeech(string text)
+    public static async Task<byte[]?> GetAudioResponseFromTextToSpeech(string text)
     {
         if (InstalledVoiceWithHighestPriority is null)
         {
             return null;
         }
+
+        await StopTextToSpeech().ConfigureAwait(false);
 
         Synthesizer.SelectVoice(InstalledVoiceWithHighestPriority);
         using MemoryStream audioDataStream = new();

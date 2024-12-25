@@ -9,6 +9,7 @@ internal static class MagpieUtils
     public static double MagpieWindowTopEdgePosition { get; set; }
     public static double MagpieWindowBottomEdgePosition { get; set; }
     public static double DpiAwareMagpieWindowWidth { get; set; }
+    // public static nint SourceWindowHandle { get; set; }
 
     public static void RegisterToMagpieScalingChangedMessage(nint windowHandle)
     {
@@ -45,6 +46,11 @@ internal static class MagpieUtils
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestBottom");
     }
+
+    //public static nint GetSourceWindowHande(nint windowHandle)
+    //{
+    //    return WinApi.GetProp(windowHandle, "Magpie.SrcHWND");
+    //}
 
     // If Magpie crashes or is killed during the process of scaling a window,
     // JL will not receive the MagpieScalingChangedWindowMessage.
