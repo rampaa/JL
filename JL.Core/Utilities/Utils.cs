@@ -45,7 +45,7 @@ public static partial class Utils
         .WriteTo.File(Path.Join(ApplicationPath, "Logs", "log.txt"),
             formatProvider: CultureInfo.InvariantCulture,
             rollingInterval: RollingInterval.Day,
-            retainedFileTimeLimit: TimeSpan.FromDays(90),
+            retainedFileTimeLimit: TimeSpan.FromDays(30),
             shared: true)
         .CreateLogger();
 
