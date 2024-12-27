@@ -52,10 +52,11 @@ internal static class MagpieUtils
     //    return WinApi.GetProp(windowHandle, "Magpie.SrcHWND");
     //}
 
-    // If Magpie crashes or is killed during the process of scaling a window,
-    // JL will not receive the MagpieScalingChangedWindowMessage.
-    // Consequently, IsMagpieScaling may not be set to false.
-    // To ensure Magpie is still running, we must re-check whether it is scaling a window through this method.
+    /// <summary>
+    /// If Magpie crashes or is killed during the process of scaling a window, the MagpieScalingChangedWindowMessage will not be received.
+    /// Consequently, IsMagpieScaling may not be set to false.
+    /// To ensure Magpie is still running, this method must be used to re-check whether any window is currently being scaled by Magpie.
+    /// </summary>
     public static bool IsMagpieReallyScaling()
     {
         return WinApi.FindWindow("Window_Magpie_967EB565-6F73-4E94-AE53-00CC42592A22") is not 0;
