@@ -720,13 +720,10 @@ public static class MiningUtils
 
             if (miningParameters.TryGetValue(jlField, out string? value))
             {
-                string jlFieldContent = value.ReplaceLineEndings("\\n").Replace("\t", "  ", StringComparison.Ordinal).Trim();
-                if (!string.IsNullOrEmpty(jlFieldContent))
-                {
-                    _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")
-                        .Append(jlFieldContent)
-                        .Append(i < jlFields.Length - 1 ? '\t' : '\n');
-                }
+                string jlFieldContent = value.ReplaceLineEndings("\\n").Replace("\t", "  ", StringComparison.Ordinal);
+                _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")
+                    .Append(jlFieldContent)
+                    .Append(i < jlFields.Length - 1 ? '\t' : '\n');
             }
         }
 
@@ -780,7 +777,7 @@ public static class MiningUtils
 
             (string firstFieldName, JLField firstField) = ankiConfig.Fields.GetAt(0);
             string? firstFieldValue = GetMiningParameter(firstField, lookupResult, currentText, currentCharPosition);
-            if (string.IsNullOrEmpty(firstFieldValue))
+            if (firstFieldValue is null)
             {
                 continue;
             }
@@ -978,7 +975,7 @@ public static class MiningUtils
         Dictionary<string, string> dict = new(StringComparer.Ordinal);
         foreach ((string key, JLField value) in userFields)
         {
-            if (miningParams.TryGetValue(value, out string? fieldValue) && !string.IsNullOrEmpty(fieldValue))
+            if (miningParams.TryGetValue(value, out string? fieldValue))
             {
                 dict.Add(key, fieldValue);
             }
