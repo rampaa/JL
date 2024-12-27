@@ -51,65 +51,65 @@ public static partial class Utils
 
     internal static readonly JsonSerializerOptions s_jsoNotIgnoringNull = new()
     {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true
+        RespectRequiredConstructorParameters = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
     internal static readonly JsonSerializerOptions s_jsoIgnoringNull = new()
     {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true
+        RespectRequiredConstructorParameters = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
     internal static readonly JsonSerializerOptions s_jsoNotIgnoringNullWithEnumConverter = new()
     {
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         Converters =
         {
             new JsonStringEnumConverter()
-        },
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true
+        }
     };
 
     internal static readonly JsonSerializerOptions s_jsoIgnoringNullWithEnumConverter = new()
     {
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         Converters =
         {
             new JsonStringEnumConverter()
-        },
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true
+        }
     };
 
     internal static readonly JsonSerializerOptions s_jsoNotIgnoringNullWithEnumConverterAndIndentation = new()
     {
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true,
         Converters =
         {
             new JsonStringEnumConverter()
-        },
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        WriteIndented = true,
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true
+        }
     };
 
     internal static readonly JsonSerializerOptions s_jsoIgnoringNullWithEnumConverterAndIndentation = new()
     {
-        Converters =
-        {
-            new JsonStringEnumConverter()
-        },
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         WriteIndented = true,
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        }
     };
 
     internal static readonly FrozenDictionary<string, string> s_iso6392BTo2T = new Dictionary<string, string>(20, StringComparer.Ordinal)
