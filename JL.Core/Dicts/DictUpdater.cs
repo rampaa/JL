@@ -22,10 +22,10 @@ public static class DictUpdater
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, dictDownloadUri);
 
-                string fullPath = Path.GetFullPath(dictPath, Utils.ApplicationPath);
-                if (File.Exists(fullPath))
+                string fullDictPath = Path.GetFullPath(dictPath, Utils.ApplicationPath);
+                if (File.Exists(fullDictPath))
                 {
-                    request.Headers.IfModifiedSince = File.GetLastWriteTime(fullPath);
+                    request.Headers.IfModifiedSince = File.GetLastWriteTime(fullDictPath);
                 }
 
                 if (!noPrompt)
@@ -37,10 +37,13 @@ public static class DictUpdater
                 if (response.IsSuccessStatusCode)
                 {
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    string tempDictPath = GetTempFilePath(fullDictPath);
                     await using (responseStream.ConfigureAwait(false))
                     {
-                        await DecompressGzipStream(responseStream, fullPath).ConfigureAwait(false);
+                        await DecompressGzipStream(responseStream, tempDictPath).ConfigureAwait(false);
                     }
+
+                    File.Move(tempDictPath, fullDictPath, true);
 
                     if (!noPrompt)
                     {
@@ -72,6 +75,12 @@ public static class DictUpdater
         {
             Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
             Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
+
+            string tempDictPath = GetTempFilePath(Path.GetFullPath(dictPath, Utils.ApplicationPath));
+            if (File.Exists(tempDictPath))
+            {
+                File.Delete(tempDictPath);
+            }
         }
 
         return false;
@@ -294,6 +303,11 @@ public static class DictUpdater
         }
 
         return Task.CompletedTask;
+    }
+
+    private static string GetTempFilePath(string filePath)
+    {
+        return $"{filePath}.tmp";
     }
 
 }
