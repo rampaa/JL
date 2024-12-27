@@ -13,7 +13,7 @@ internal static class JmdictWordClassUtils
         FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "PoS.json"));
         await using (fileStream.ConfigureAwait(false))
         {
-            DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, Utils.s_jsoIgnoringNull).ConfigureAwait(false))!;
+            DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, Utils.s_jso).ConfigureAwait(false))!;
         }
 
         foreach (IList<JmdictWordClass> jmdictWordClassList in DictUtils.WordClassDictionary.Values.ToArray())
@@ -100,7 +100,7 @@ internal static class JmdictWordClassUtils
         }
 
         return File.WriteAllTextAsync(Path.Join(Utils.ResourcesPath, "PoS.json"),
-            JsonSerializer.Serialize(jmdictWordClassDictionary, Utils.s_jsoIgnoringNull));
+            JsonSerializer.Serialize(jmdictWordClassDictionary, Utils.s_jsoIgnoringWhenWritingNull));
     }
 
     internal static async Task Initialize()

@@ -72,7 +72,7 @@ internal static class AnkiConnect
         try
         {
             // AnkiConnect doesn't like null values
-            using StringContent payload = new(JsonSerializer.Serialize(req, Utils.s_jsoIgnoringNull));
+            using StringContent payload = new(JsonSerializer.Serialize(req, Utils.s_jsoIgnoringWhenWritingNull));
             Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
 
             using HttpResponseMessage postResponse = await Networking.Client

@@ -1361,13 +1361,13 @@ public static class DictUtils
     {
         _ = Directory.CreateDirectory(Utils.ConfigPath);
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-            JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoIgnoringNullWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     public static Task SerializeDicts()
     {
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-            JsonSerializer.Serialize(Dicts, Utils.s_jsoIgnoringNullWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(Dicts, Utils.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeDicts()
@@ -1376,7 +1376,7 @@ public static class DictUtils
         await using (dictStream.ConfigureAwait(false))
         {
             Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsoIgnoringNullWithEnumConverter).ConfigureAwait(false);
+                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
 
             if (deserializedDicts is not null)
             {

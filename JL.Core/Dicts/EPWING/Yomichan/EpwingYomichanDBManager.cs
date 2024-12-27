@@ -98,9 +98,9 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.Parameters["@id"].Value = id;
             _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull);
-            _ = insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary_tags"].Value = record.DefinitionTags is not null ? JsonSerializer.Serialize(record.DefinitionTags, Utils.s_jsoNotIgnoringNull) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jso);
+            _ = insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jso) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary_tags"].Value = record.DefinitionTags is not null ? JsonSerializer.Serialize(record.DefinitionTags, Utils.s_jso) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
             _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
@@ -221,7 +221,7 @@ internal static class EpwingYomichanDBManager
         while (dataReader.Read())
         {
             EpwingYomichanRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(nameof(searchKeys)), Utils.s_jso)!;
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -255,18 +255,18 @@ internal static class EpwingYomichanDBManager
             reading = readingFromDB;
         }
 
-        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
+        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jso)!;
 
         string[]? wordClasses = null;
         if (dataReader[nameof(wordClasses)] is string wordClassesFromDB)
         {
-            wordClasses = JsonSerializer.Deserialize<string[]>(wordClassesFromDB, Utils.s_jsoNotIgnoringNull);
+            wordClasses = JsonSerializer.Deserialize<string[]>(wordClassesFromDB, Utils.s_jso);
         }
 
         string[]? definitionTags = null;
         if (dataReader[nameof(definitionTags)] is string definitionTagsFromDB)
         {
-            definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jsoNotIgnoringNull);
+            definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jso);
         }
 
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);

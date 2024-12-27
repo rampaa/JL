@@ -49,14 +49,14 @@ public static partial class Utils
             shared: true)
         .CreateLogger();
 
-    internal static readonly JsonSerializerOptions s_jsoNotIgnoringNull = new()
+    internal static readonly JsonSerializerOptions s_jso = new()
     {
         RespectNullableAnnotations = true,
         RespectRequiredConstructorParameters = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
-    internal static readonly JsonSerializerOptions s_jsoIgnoringNull = new()
+    internal static readonly JsonSerializerOptions s_jsoIgnoringWhenWritingNull = new()
     {
         RespectNullableAnnotations = true,
         RespectRequiredConstructorParameters = true,
@@ -64,7 +64,7 @@ public static partial class Utils
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    internal static readonly JsonSerializerOptions s_jsoNotIgnoringNullWithEnumConverter = new()
+    internal static readonly JsonSerializerOptions s_jsoWithEnumConverter = new()
     {
         RespectNullableAnnotations = true,
         RespectRequiredConstructorParameters = true,
@@ -75,19 +75,19 @@ public static partial class Utils
         }
     };
 
-    internal static readonly JsonSerializerOptions s_jsoIgnoringNullWithEnumConverter = new()
-    {
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Converters =
-        {
-            new JsonStringEnumConverter()
-        }
-    };
+    //internal static readonly JsonSerializerOptions s_jsoIgnoringWhenWritingNullWithEnumConverter = new()
+    //{
+    //    RespectNullableAnnotations = true,
+    //    RespectRequiredConstructorParameters = true,
+    //    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    //    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    //    Converters =
+    //    {
+    //        new JsonStringEnumConverter()
+    //    }
+    //};
 
-    internal static readonly JsonSerializerOptions s_jsoNotIgnoringNullWithEnumConverterAndIndentation = new()
+    internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndentation = new()
     {
         RespectNullableAnnotations = true,
         RespectRequiredConstructorParameters = true,
@@ -99,7 +99,7 @@ public static partial class Utils
         }
     };
 
-    internal static readonly JsonSerializerOptions s_jsoIgnoringNullWithEnumConverterAndIndentation = new()
+    internal static readonly JsonSerializerOptions s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation = new()
     {
         RespectNullableAnnotations = true,
         RespectRequiredConstructorParameters = true,
