@@ -85,7 +85,7 @@ public static class LookupUtils
                 int longVowelMarkCount = 0;
                 if (countLongVowelMark)
                 {
-                    foreach (char c in textInHiraganaList[i])
+                    foreach (char c in textInHiragana)
                     {
                         if (c is 'ー')
                         {
@@ -98,7 +98,7 @@ public static class LookupUtils
                 {
                     textWithoutLongVowelMarkList ??= new List<List<string>?>(text.Length);
                     textWithoutLongVowelMarkList.Add(longVowelMarkCount < 5
-                        ? JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i])
+                        ? JapaneseUtils.LongVowelMarkToKana(textInHiragana)
                         : null);
                 }
                 else
