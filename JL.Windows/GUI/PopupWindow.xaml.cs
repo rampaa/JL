@@ -112,6 +112,7 @@ internal sealed partial class PopupWindow
         {
             TextBlockMiningModeReminder.Text = string.Create(CultureInfo.InvariantCulture,
                 $"Click on an entry's main spelling to mine it,\nor press {configManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
+            TextBlockMiningModeReminder.ToolTip = "This message can be hidden by disabling Preferences->Popup->Show mining mode reminder";
         }
     }
 
