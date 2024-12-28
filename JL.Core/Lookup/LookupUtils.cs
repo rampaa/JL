@@ -427,6 +427,7 @@ public static class LookupUtils
                     ? index
                     : int.MaxValue;
             })
+            .ThenBy(static lookupResult => lookupResult.EntryId)
             .ToArray();
     }
 
@@ -963,7 +964,7 @@ public static class LookupUtils
                         readings: jmdictResult.Readings,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        edictId: jmdictResult.Id,
+                        entryId: jmdictResult.Id,
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
                         deconjugationProcess: LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(jmdictResult, wordFreqs, frequencyDicts),
@@ -1008,7 +1009,7 @@ public static class LookupUtils
 
                     LookupResult result = new
                     (
-                        edictId: jmnedictRecord.Id,
+                        entryId: jmnedictRecord.Id,
                         primarySpelling: jmnedictRecord.PrimarySpelling,
                         alternativeSpellings: jmnedictRecord.AlternativeSpellings,
                         readings: jmnedictRecord.Readings,

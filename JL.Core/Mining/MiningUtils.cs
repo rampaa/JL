@@ -196,8 +196,8 @@ public static class MiningUtils
                     : null;
 
             case JLField.EdictId:
-                return lookupResult.EdictId > 0
-                    ? lookupResult.EdictId.ToString(CultureInfo.InvariantCulture)
+                return lookupResult.EntryId > 0
+                    ? lookupResult.EntryId.ToString(CultureInfo.InvariantCulture)
                     : null;
 
             case JLField.DeconjugationProcess:
@@ -481,9 +481,9 @@ public static class MiningUtils
                 : selectedDefinitions;
         }
 
-        if (lookupResult.EdictId > 0)
+        if (lookupResult.EntryId > 0)
         {
-            miningParams[JLField.EdictId] = lookupResult.EdictId.ToString(CultureInfo.InvariantCulture);
+            miningParams[JLField.EdictId] = lookupResult.EntryId.ToString(CultureInfo.InvariantCulture);
         }
 
         if (lookupResult.DeconjugationProcess is not null)

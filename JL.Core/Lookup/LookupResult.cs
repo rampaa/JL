@@ -13,7 +13,7 @@ public sealed class LookupResult
     public List<LookupFrequencyResult>? Frequencies { get; }
 
     // JMdict, JMnedict, KANJIDIC2
-    internal int EdictId { get; }
+    internal int EntryId { get; }
 
     // Word dictionaries
     public string DeconjugatedMatchedText { get; }
@@ -57,7 +57,7 @@ public sealed class LookupResult
         string? deconjugationProcess = null,
         string? kanjiComposition = null,
         string? kanjiStats = null,
-        int edictId = 0,
+        int entryId = 0,
         byte strokeCount = 0,
         byte kanjiGrade = byte.MaxValue,
         IDictionary<string, IList<IDictRecord>>? pitchAccentDict = null
@@ -70,7 +70,7 @@ public sealed class LookupResult
         PrimarySpelling = primarySpelling;
         Readings = readings;
         FormattedDefinitions = formattedDefinitions;
-        EdictId = edictId;
+        EntryId = entryId;
         AlternativeSpellings = alternativeSpellings;
         DeconjugationProcess = deconjugationProcess;
         PrimarySpellingOrthographyInfoList = primarySpellingOrthographyInfoList;
