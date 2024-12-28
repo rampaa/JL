@@ -6,28 +6,40 @@ namespace JL.Core.Utilities;
 
 public static class TextUtils
 {
+    private const char HighSurrogateStart = '\uD800';
+    private const char Noncharacter = '\uFFFE';
+
+    // See https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Globalization/Normalization.Icu.cs
+    // Modified from private static bool HasInvalidUnicodeSequence(ReadOnlySpan<char> s)
     private static int FirstInvalidUnicodeSequenceIndex(ReadOnlySpan<char> text)
     {
-        for (int i = 0; i < text.Length; i++)
+        for (int i = text.IndexOfAnyInRange(HighSurrogateStart, Noncharacter); (uint)i < (uint)text.Length; i++)
         {
             char c = text[i];
 
-            if (c >= '\uD800')
+            if (c < HighSurrogateStart)
             {
-                if (c is '\uFFFD' or '\uFFFE' or '\uFFFF' || char.IsLowSurrogate(c))
+                continue;
+            }
+
+            if (c is Noncharacter)
+            {
+                return i;
+            }
+
+            if (char.IsLowSurrogate(c))
+            {
+                return i;
+            }
+
+            if (char.IsHighSurrogate(c))
+            {
+                if ((uint)(i + 1) >= (uint)text.Length || !char.IsLowSurrogate(text[i + 1]))
                 {
                     return i;
                 }
 
-                if (char.IsHighSurrogate(c))
-                {
-                    if (i + 1 >= text.Length || !char.IsLowSurrogate(text[i + 1]))
-                    {
-                        return i;
-                    }
-
-                    ++i;
-                }
+                ++i;
             }
         }
 
@@ -38,20 +50,20 @@ public static class TextUtils
     {
         StringBuilder sb = new(text[..index], text.Length - 1);
 
-        for (int i = index + 1; i < text.Length; i++)
+        for (int i = index + 1; (uint)i < (uint)text.Length; i++)
         {
             char c = text[i];
 
-            if (c < '\uD800')
+            if (c < HighSurrogateStart)
             {
                 _ = sb.Append(c);
             }
 
-            else if (c is not '\uFFFD' and not '\uFFFE' and not '\uFFFF' && !char.IsLowSurrogate(c))
+            else if (c is not Noncharacter && !char.IsLowSurrogate(c))
             {
                 if (char.IsHighSurrogate(c))
                 {
-                    if (i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
+                    if ((uint)(i + 1) < (uint)text.Length && char.IsLowSurrogate(text[i + 1]))
                     {
                         _ = sb.Append(c).Append(text[i + 1]);
                         ++i;
