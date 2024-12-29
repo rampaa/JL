@@ -94,7 +94,9 @@ internal sealed class ConfigManager
     public bool PopupDynamicHeight { get; private set; } = true;
     public bool PopupDynamicWidth { get; private set; } = true;
     public bool FixedPopupPositioning { get; private set; } // = false;
+    public bool FixedPopupRightPositioning { get; private set; } // = false;
     public double FixedPopupXPosition { get; set; } // = 0;
+    public bool FixedPopupBottomPositioning { get; private set; } // = false;
     public double FixedPopupYPosition { get; set; } // = 0;
     public bool PopupFocusOnLookup { get; private set; } // = false;
     public bool ShowMiningModeReminder { get; private set; } = true;
@@ -314,6 +316,8 @@ internal sealed class ConfigManager
         ShowMiningModeReminder = ConfigDBManager.GetValueFromConfig(connection, ShowMiningModeReminder, nameof(ShowMiningModeReminder), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInPopups = ConfigDBManager.GetValueFromConfig(connection, DisableLookupsForNonJapaneseCharsInPopups, nameof(DisableLookupsForNonJapaneseCharsInPopups), bool.TryParse);
         FixedPopupPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupPositioning, nameof(FixedPopupPositioning), bool.TryParse);
+        FixedPopupRightPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupRightPositioning, nameof(FixedPopupRightPositioning), bool.TryParse);
+        FixedPopupBottomPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupBottomPositioning, nameof(FixedPopupBottomPositioning), bool.TryParse);
         ChangeMainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetValueFromConfig(connection, ChangeMainWindowBackgroundOpacityOnUnhover, nameof(ChangeMainWindowBackgroundOpacityOnUnhover), bool.TryParse);
         TextOnlyVisibleOnHover = ConfigDBManager.GetValueFromConfig(connection, TextOnlyVisibleOnHover, nameof(TextOnlyVisibleOnHover), bool.TryParse);
         OnlyCaptureTextWithJapaneseChars = ConfigDBManager.GetValueFromConfig(connection, OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars), bool.TryParse);
@@ -929,6 +933,8 @@ internal sealed class ConfigManager
         preferenceWindow.PopupMinHeightNumericUpDown.Value = PopupMinHeight;
         preferenceWindow.PopupMinWidthNumericUpDown.Value = PopupMinWidth;
         preferenceWindow.FixedPopupPositioningCheckBox.IsChecked = FixedPopupPositioning;
+        preferenceWindow.FixedPopupRightPositioningCheckBox.IsChecked = FixedPopupRightPositioning;
+        preferenceWindow.FixedPopupBottomPositioningCheckBox.IsChecked = FixedPopupBottomPositioning;
         preferenceWindow.FixedPopupXPositionNumericUpDown.Value = FixedPopupXPosition;
         preferenceWindow.FixedPopupYPositionNumericUpDown.Value = FixedPopupYPosition;
         preferenceWindow.PopupDynamicHeightCheckBox.IsChecked = PopupDynamicHeight;
@@ -1265,6 +1271,12 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(FixedPopupPositioning),
                 preferenceWindow.FixedPopupPositioningCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(FixedPopupRightPositioning),
+                preferenceWindow.FixedPopupRightPositioningCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(FixedPopupBottomPositioning),
+                preferenceWindow.FixedPopupBottomPositioningCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(FixedPopupXPosition),
                 preferenceWindow.FixedPopupXPositionNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));

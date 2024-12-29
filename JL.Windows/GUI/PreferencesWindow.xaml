@@ -695,12 +695,40 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Fixed right edge positioning"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       Cursor="Help" ToolTip="&quot;Fixed positioning&quot; option must be enabled for this to take effect.
+                                       &#10;When enabled, the &quot;Fixed X position&quot; option will be used to specify the right edge position of the popup.
+                                       &#10;When this option is enabled and &quot;Fixed X position&quot; is set to:
+                                       &#10;-2, the popup will be positioned at the right edge of the screen.
+                                       &#10;-1, the popup will be positioned at the right edge of the working area.
+                                       &#10;0, the popup will be centered horizontally on the screen.
+                                       &#10;Any other value: Sets the popup's right edge at that specified number of pixels from the left edge of the active screen."
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="FixedPopupRightPositioningCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Fixed X position"
                                        Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" ToolTip="Only takes effect if fixed positioning is enabled."
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="FixedPopupXPositionNumericUpDown"
                                               HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Fixed bottom edge positioning"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       Cursor="Help" ToolTip="&quot;Fixed positioning&quot; option must be enabled for this to take effect.
+                                       &#10;When enabled, the &quot;Fixed Y position&quot; option will be used to specify the bottom edge position of the popup.
+                                       &#10;When this option is enabled and &quot;Fixed Y position&quot; is set to:
+                                       &#10;-2, the popup will be positioned at the bottom edge of the screen.
+                                       &#10;-1, the popup will be positioned at the bottom edge of the working area.
+                                       &#10;0, the popup will be centered vertically on the screen.
+                                       &#10;Any other value: Sets the popup's bottom edge at that specified number of pixels from the top edge of the active screen."
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="FixedPopupBottomPositioningCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>

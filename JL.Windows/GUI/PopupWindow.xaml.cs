@@ -13,6 +13,7 @@ using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Rectangle = System.Drawing.Rectangle;
+using Screen = System.Windows.Forms.Screen;
 
 namespace JL.Windows.GUI;
 
@@ -220,7 +221,7 @@ internal sealed partial class PopupWindow
         {
             if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
-                UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
+                UpdatePosition();
             }
 
             else
@@ -282,7 +283,7 @@ internal sealed partial class PopupWindow
 
             if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
-                UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
+                UpdatePosition();
             }
 
             else
@@ -348,7 +349,7 @@ internal sealed partial class PopupWindow
         {
             if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
-                UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
+                UpdatePosition();
             }
 
             else
@@ -391,7 +392,7 @@ internal sealed partial class PopupWindow
 
             if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
             {
-                UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
+                UpdatePosition();
             }
 
             else
@@ -480,8 +481,51 @@ internal sealed partial class PopupWindow
         WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
     }
 
-    private void UpdatePosition(double x, double y)
+    private void UpdatePosition()
     {
+        Screen activeScreen = WindowsUtils.ActiveScreen;
+        ConfigManager configManager = ConfigManager.Instance;
+
+        double x = configManager.FixedPopupXPosition;
+        if (configManager.FixedPopupRightPositioning)
+        {
+            double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
+            if (x is 0)
+            {
+                x = (activeScreen.Bounds.Left + activeScreen.Bounds.Right + currentWidth) / 2;
+            }
+            else if (x is -1)
+            {
+                x = activeScreen.WorkingArea.Right;
+            }
+            else if (x is -2)
+            {
+                x = activeScreen.Bounds.Right;
+            }
+
+            x = Math.Max(x is -1 ? activeScreen.WorkingArea.Left : activeScreen.Bounds.Left, x - currentWidth);
+        }
+
+        double y = configManager.FixedPopupYPosition;
+        if (configManager.FixedPopupBottomPositioning)
+        {
+            double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
+            if (y is -2)
+            {
+                y = activeScreen.Bounds.Bottom;
+            }
+            else if (y is -1)
+            {
+                y = activeScreen.WorkingArea.Bottom;
+            }
+            else if (y is 0)
+            {
+                y = (activeScreen.Bounds.Top + activeScreen.Bounds.Bottom + currentHeight) / 2;
+            }
+
+            y = Math.Max(y is -1 ? activeScreen.WorkingArea.Top : activeScreen.Bounds.Top, y - currentHeight);
+        }
+
         WinApi.MoveWindowToPosition(WindowHandle, x, y);
     }
 
@@ -1698,7 +1742,7 @@ internal sealed partial class PopupWindow
 
                 else if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
                 {
-                    UpdatePosition(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition);
+                    UpdatePosition();
                 }
 
                 else
