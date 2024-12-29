@@ -427,7 +427,7 @@ public static class LookupUtils
                     ? index
                     : int.MaxValue;
             })
-            .ThenBy(static lookupResult => lookupResult.EntryId)
+            // .ThenBy(static lookupResult => lookupResult.EntryId)
             .ToArray();
     }
 
