@@ -50,7 +50,7 @@ public static class TextUtils
     {
         StringBuilder sb = new(text[..index], text.Length - 1);
 
-        for (int i = index + 1; (uint)i < (uint)text.Length; i++)
+        for (int i = index + 1; i < text.Length; i++)
         {
             char c = text[i];
 
@@ -63,7 +63,7 @@ public static class TextUtils
             {
                 if (char.IsHighSurrogate(c))
                 {
-                    if ((uint)(i + 1) < (uint)text.Length && char.IsLowSurrogate(text[i + 1]))
+                    if (i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
                     {
                         _ = sb.Append(c).Append(text[i + 1]);
                         ++i;
