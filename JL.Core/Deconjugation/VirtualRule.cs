@@ -1,3 +1,10 @@
 namespace JL.Core.Deconjugation;
 
-internal readonly record struct VirtualRule(string DecEnd, string ConEnd, string DecTag, string ConTag, string Detail);
+internal readonly ref struct VirtualRule(string decEnd, string conEnd, string decTag, string conTag, string detail)
+{
+    public string DecEnd { get; } = decEnd;
+    public string ConEnd { get; } = conEnd;
+    public string DecTag { get; } = decTag;
+    public string ConTag { get; } = conTag;
+    public string Detail { get; } = detail;
+}
