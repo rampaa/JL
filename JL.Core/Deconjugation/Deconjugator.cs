@@ -99,9 +99,9 @@ internal static class Deconjugator
         }
 
         List<Form> collection = new(array.Length);
-        bool multiDecTag = myRule.DecTag!.Length == array.Length && array.Length > 1;
+        bool multiDecTag = myRule.DecTag!.Length > 1;
         string? singleDecTag = multiDecTag ? null : myRule.DecTag![0];
-        bool multiConTag = myRule.ConTag!.Length == array.Length && array.Length > 1;
+        bool multiConTag = myRule.ConTag!.Length > 1;
         string? singleConTag = multiConTag ? null : myRule.ConTag![0];
 
         for (int i = 0; i < array.Length; i++)
