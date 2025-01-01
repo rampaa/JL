@@ -6,12 +6,12 @@ internal static class JmnedictRecordBuilder
 {
     public static void AddToDictionary(JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
     {
-        Dictionary<string, JmnedictRecord> recordDictionary = new(StringComparer.Ordinal);
-
         int translationListCount = entry.TranslationList.Count;
         int kebListCount = entry.KebList.Count;
+        Dictionary<string, JmnedictRecord> recordDictionary;
         if (kebListCount > 0)
         {
+            recordDictionary = new(kebListCount, StringComparer.Ordinal);
             for (int i = 0; i < kebListCount; i++)
             {
                 string key = JapaneseUtils.KatakanaToHiragana(entry.KebList[i]).GetPooledString();
@@ -21,21 +21,21 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                List<string[]> definitionList = [];
-                List<string[]> nameTypeList = [];
-                // List<string[]?> relatedTermList = [];
+                string[][] definitionsArray = new string[translationListCount][];
+                string[][] nameTypesArray = new string[translationListCount][];
+                // string[]?[] relatedTermsArray = new string[translationListCount][];
 
                 for (int j = 0; j < translationListCount; j++)
                 {
                     Translation translation = entry.TranslationList[j];
 
-                    definitionList.Add(translation.TransDetList.ToArray());
-                    nameTypeList.Add(translation.NameTypeList.ToArray());
-                    //relatedTermList.Add(translation.XRefList.TrimListToArray());
+                    definitionsArray[j] = translation.TransDetList.ToArray();
+                    nameTypesArray[j] = translation.NameTypeList.ToArray();
+                    // relatedTermsArray[j] = translation.XRefList.TrimListToArray();
                 }
 
-                JmnedictRecord record = new(entry.Id, entry.KebList[i], entry.KebList.RemoveAtToArray(i), entry.RebList.TrimListToArray(), definitionList.ToArray(), nameTypeList.ToArray());
-                //record.RelatedTerms = relatedTermList.TrimListToArray();
+                JmnedictRecord record = new(entry.Id, entry.KebList[i], entry.KebList.RemoveAtToArray(i), entry.RebList.TrimListToArray(), definitionsArray, nameTypesArray);
+                // record.RelatedTerms = relatedTermsArray;
 
                 recordDictionary.Add(key, record);
             }
@@ -44,6 +44,7 @@ internal static class JmnedictRecordBuilder
         else
         {
             int rebListCount = entry.RebList.Count;
+            recordDictionary = new(rebListCount, StringComparer.Ordinal);
             for (int i = 0; i < rebListCount; i++)
             {
                 string key = JapaneseUtils.KatakanaToHiragana(entry.RebList[i]).GetPooledString();
@@ -53,21 +54,21 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                List<string[]> definitionList = [];
-                List<string[]> nameTypeList = [];
-                // List<string[]?> relatedTermList = [];
+                string[][] definitionsArray = new string[translationListCount][];
+                string[][] nameTypesArray = new string[translationListCount][];
+                // string[]?[] relatedTermsArray = new string[translationListCount][];
 
                 for (int j = 0; j < translationListCount; j++)
                 {
                     Translation translation = entry.TranslationList[j];
 
-                    definitionList.Add(translation.TransDetList.ToArray());
-                    nameTypeList.Add(translation.NameTypeList.ToArray());
-                    // relatedTermList.Add(translation.XRefList.TrimListToArray());
+                    definitionsArray[j] = translation.TransDetList.ToArray();
+                    nameTypesArray[j] = translation.NameTypeList.ToArray();
+                    // relatedTermsArray[j] = translation.XRefList.TrimListToArray();
                 }
 
-                JmnedictRecord record = new(entry.Id, entry.RebList[i], entry.RebList.RemoveAtToArray(i), null, definitionList.ToArray(), nameTypeList.ToArray());
-                // record.RelatedTerms = relatedTermList.TrimListToArray()
+                JmnedictRecord record = new(entry.Id, entry.RebList[i], entry.RebList.RemoveAtToArray(i), null, definitionsArray, nameTypesArray);
+                // record.RelatedTerms = relatedTermsArray;
 
                 recordDictionary.Add(key, record);
             }

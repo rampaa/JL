@@ -539,8 +539,8 @@ public static class LookupUtils
     {
         string lastTag = deconjugationResult.Tags[^1];
 
-        List<IDictRecord> resultsList = [];
         int dictResultCount = dictResults.Count;
+        List<IDictRecord> resultsList = new(dictResultCount);
         switch (dict.Type)
         {
             case DictType.JMdict:
@@ -670,8 +670,8 @@ public static class LookupUtils
             return null;
         }
 
-        Dictionary<string, IntermediaryResult> nameResults = new(StringComparer.Ordinal);
         int textListCount = textList.Count;
+        Dictionary<string, IntermediaryResult> nameResults = new(textListCount, StringComparer.Ordinal);
         for (int i = 0; i < textListCount; i++)
         {
             if (nameDict.TryGetValue(textInHiraganaList[i], out IList<IDictRecord>? result))
@@ -713,7 +713,7 @@ public static class LookupUtils
 
     private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(List<Freq> dbFreqs, string[] searchKeys)
     {
-        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(StringComparer.Ordinal);
+        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Count, StringComparer.Ordinal);
         _ = Parallel.For(0, dbFreqs.Count, i =>
         {
             Freq freq = dbFreqs[i];
@@ -729,7 +729,7 @@ public static class LookupUtils
 
     private static string[] GetSearchKeysFromJmdictRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
-        HashSet<string> searchKeys = [];
+        HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach ((string key, IntermediaryResult intermediaryResult) in dictResults)
         {
             _ = searchKeys.Add(key);
@@ -767,7 +767,7 @@ public static class LookupUtils
 
     private static string[] GetSearchKeysFromCustomWordRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
-        HashSet<string> searchKeys = [];
+        HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach ((string key, IntermediaryResult intermediaryResult) in dictResults)
         {
             _ = searchKeys.Add(key);
@@ -805,7 +805,7 @@ public static class LookupUtils
 
     private static string[] GetSearchKeysFromJmnedictRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
-        HashSet<string> searchKeys = [];
+        HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
@@ -841,7 +841,7 @@ public static class LookupUtils
 
     private static string[] GetSearchKeysFromCustomNameRecord(Dictionary<string, IntermediaryResult> dictResults)
     {
-        HashSet<string> searchKeys = [];
+        HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
@@ -867,7 +867,7 @@ public static class LookupUtils
 
     private static string[] GetSearchKeyForEpwingYomichanRecord(IDictionary<string, IntermediaryResult> dictResults)
     {
-        HashSet<string> searchKeys = [];
+        HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
@@ -893,7 +893,7 @@ public static class LookupUtils
 
     private static string[] GetSearchKeysFromEpwingNazekaRecord(IDictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
-        HashSet<string> searchKeys = [];
+        HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
@@ -1358,13 +1358,13 @@ public static class LookupUtils
 
     private static List<LookupFrequencyResult>? GetWordFrequencies<T>(T record, List<Freq> wordFreqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB) where T : IGetFrequency
     {
+        int freqCount = wordFreqs.Count;
         if (wordFreqs.Count is 0)
         {
             return null;
         }
 
-        List<LookupFrequencyResult> freqsList = [];
-        int freqCount = wordFreqs.Count;
+        List<LookupFrequencyResult> freqsList = new(freqCount);
         for (int i = 0; i < freqCount; i++)
         {
             Freq freq = wordFreqs[i];
@@ -1395,7 +1395,7 @@ public static class LookupUtils
             return null;
         }
 
-        List<LookupFrequencyResult> freqsList = [];
+        List<LookupFrequencyResult> freqsList = new(kanjiFreqCount);
         for (int i = 0; i < kanjiFreqCount; i++)
         {
             Freq kanjiFreq = kanjiFreqs[i];
@@ -1424,21 +1424,19 @@ public static class LookupUtils
         return freqsList;
     }
 
-    private static List<LookupFrequencyResult> GetKanjidicFrequencies(string kanji, int frequency, List<Freq> kanjiFreqs)
+    private static List<LookupFrequencyResult>? GetKanjidicFrequencies(string kanji, int frequency, List<Freq> kanjiFreqs)
     {
-        List<LookupFrequencyResult> freqsList = [];
-
-        if (frequency is not 0)
-        {
-            freqsList.Add(new LookupFrequencyResult("KANJIDIC2", frequency, false));
-        }
+        bool kanjidicFreqExists = frequency is not 0;
 
         List<LookupFrequencyResult>? frequencies = GetKanjiFrequencies(kanji, kanjiFreqs);
-        if (frequencies?.Count > 0)
-        {
-            freqsList.AddRange(frequencies);
-        }
+        bool freqsExist = frequencies?.Count > 0;
 
-        return freqsList;
+        return !kanjidicFreqExists && !freqsExist
+            ? null
+            : !kanjidicFreqExists && freqsExist
+                ? frequencies
+                : kanjidicFreqExists && !freqsExist
+                    ? ([new LookupFrequencyResult("KANJIDIC2", frequency, false)])
+                    : ([new LookupFrequencyResult("KANJIDIC2", frequency, false), .. frequencies]);
     }
 }

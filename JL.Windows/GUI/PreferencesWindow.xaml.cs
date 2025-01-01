@@ -449,7 +449,7 @@ internal sealed partial class PreferencesWindow
             return Task.CompletedTask;
         }
 
-        Dictionary<MineType, AnkiConfig> ankiConfigDict = [];
+        Dictionary<MineType, AnkiConfig> ankiConfigDict = new(4);
 
         AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, JLFieldUtils.JLFieldsForWordDicts, MineType.Word);
         if (ankiConfig is not null)

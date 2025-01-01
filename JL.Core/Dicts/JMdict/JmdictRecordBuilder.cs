@@ -6,8 +6,6 @@ internal static class JmdictRecordBuilder
 {
     public static void AddToDictionary(JmdictEntry entry, IDictionary<string, IList<IDictRecord>> jmdictDictionary)
     {
-        Dictionary<string, JmdictRecord> recordDictionary = new(StringComparer.Ordinal);
-
         List<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.Contains("sK")).ToList();
         string[] allSpellingsWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.Keb).ToArray();
         string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimListToArray()).ToArray();
@@ -16,6 +14,7 @@ internal static class JmdictRecordBuilder
         int kanjiElementCount = entry.KanjiElements.Count;
         int readingElementCount = entry.ReadingElements.Count;
         int senseListCount = entry.SenseList.Count;
+        Dictionary<string, JmdictRecord> recordDictionary = new(kanjiElementCount + readingElementCount, StringComparer.Ordinal);
         for (int i = 0; i < kanjiElementCount; i++)
         {
             KanjiElement kanjiElement = entry.KanjiElements[i];
@@ -41,8 +40,8 @@ internal static class JmdictRecordBuilder
                 continue;
             }
 
-            List<string> readingList = [];
-            List<string[]?> readingsOrthographyInfoList = [];
+            List<string> readingList = new(readingElementCount);
+            List<string[]?> readingsOrthographyInfoList = new(readingElementCount);
             for (int j = 0; j < readingElementCount; j++)
             {
                 ReadingElement readingElement = entry.ReadingElements[j];
@@ -55,17 +54,17 @@ internal static class JmdictRecordBuilder
                 }
             }
 
-            List<string[]> definitionList = [];
-            List<string[]> wordClassList = [];
-            List<string[]?> readingRestrictionList = [];
-            List<string[]?> spellingRestrictionList = [];
-            List<string[]?> fieldList = [];
-            List<string[]?> miscList = [];
-            List<string[]?> dialectList = [];
-            List<string?> definitionInfoList = [];
-            List<string[]?> relatedTermList = [];
-            List<string[]?> antonymList = [];
-            List<LoanwordSource[]?> loanwordSourceList = [];
+            List<string[]> definitionList = new(senseListCount);
+            List<string[]> wordClassList = new(senseListCount);
+            List<string[]?> readingRestrictionList = new(senseListCount);
+            List<string[]?> spellingRestrictionList = new(senseListCount);
+            List<string[]?> fieldList = new(senseListCount);
+            List<string[]?> miscList = new(senseListCount);
+            List<string[]?> dialectList = new(senseListCount);
+            List<string?> definitionInfoList = new(senseListCount);
+            List<string[]?> relatedTermList = new(senseListCount);
+            List<string[]?> antonymList = new(senseListCount);
+            List<LoanwordSource[]?> loanwordSourceList = new(senseListCount);
             for (int j = 0; j < senseListCount; j++)
             {
                 Sense sense = entry.SenseList[j];
@@ -182,17 +181,17 @@ internal static class JmdictRecordBuilder
                 alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAt(index);
             }
 
-            List<string[]> definitionList = [];
-            List<string[]> wordClassList = [];
-            List<string[]?> readingRestrictionList = [];
-            List<string[]?> spellingRestrictionList = [];
-            List<string[]?> fieldList = [];
-            List<string[]?> miscList = [];
-            List<string[]?> dialectList = [];
-            List<string?> definitionInfoList = [];
-            List<string[]?> relatedTermList = [];
-            List<string[]?> antonymList = [];
-            List<LoanwordSource[]?> loanwordSourceList = [];
+            List<string[]> definitionList = new(senseListCount);
+            List<string[]> wordClassList = new(senseListCount);
+            List<string[]?> readingRestrictionList = new(senseListCount);
+            List<string[]?> spellingRestrictionList = new(senseListCount);
+            List<string[]?> fieldList = new(senseListCount);
+            List<string[]?> miscList = new(senseListCount);
+            List<string[]?> dialectList = new(senseListCount);
+            List<string?> definitionInfoList = new(senseListCount);
+            List<string[]?> relatedTermList = new(senseListCount);
+            List<string[]?> antonymList = new(senseListCount);
+            List<LoanwordSource[]?> loanwordSourceList = new(senseListCount);
             for (int j = 0; j < senseListCount; j++)
             {
                 Sense sense = entry.SenseList[j];

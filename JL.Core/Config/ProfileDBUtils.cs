@@ -89,7 +89,6 @@ public static class ProfileDBUtils
 
     public static List<string> GetProfileNames(SqliteConnection connection)
     {
-        List<string> profiles = [];
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -100,6 +99,8 @@ public static class ProfileDBUtils
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
+
+        List<string> profiles = [];
         while (dataReader.Read())
         {
             profiles.Add(dataReader.GetString("name"));

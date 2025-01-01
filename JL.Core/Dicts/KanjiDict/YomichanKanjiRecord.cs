@@ -52,8 +52,8 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         //    Tags = null;
         //}
 
-        List<string> definitionList = [];
         JsonElement definitionsArray = jsonElement[4];
+        List<string> definitionList = new(definitionsArray.GetArrayLength());
         foreach (JsonElement definitionElement in definitionsArray.EnumerateArray())
         {
             string? definition = definitionElement.GetString();
@@ -65,14 +65,18 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
         Definitions = definitionList.TrimListToArray();
 
-        List<string> statList = [];
         JsonElement statsElement = jsonElement[5];
-        foreach (JsonProperty stat in statsElement.EnumerateObject())
+        int statsElementPropertyCount = statsElement.GetPropertyCount();
+        if (statsElementPropertyCount > 0)
         {
-            statList.Add(string.Create(CultureInfo.InvariantCulture, $"{stat.Name}: {stat.Value}"));
+            Stats = new string[statsElementPropertyCount];
+            int index = 0;
+            foreach (JsonProperty stat in statsElement.EnumerateObject())
+            {
+                Stats[index] = string.Create(CultureInfo.InvariantCulture, $"{stat.Name}: {stat.Value}");
+                ++index;
+            }
         }
-
-        Stats = statList.TrimListToArray();
     }
 
     public string? BuildFormattedDefinition(DictOptions options)

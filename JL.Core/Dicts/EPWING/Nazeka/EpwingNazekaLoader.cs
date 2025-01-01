@@ -32,11 +32,11 @@ internal static class EpwingNazekaLoader
         {
             string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
 
-            List<string>? spellingList = [];
-            foreach (JsonElement spellingJsonElement in jsonObj.GetProperty("s").EnumerateArray())
+            JsonElement spellingJsonArray = jsonObj.GetProperty("s");
+            List<string>? spellingList = new(spellingJsonArray.GetArrayLength());
+            foreach (JsonElement spellingJsonElement in spellingJsonArray.EnumerateArray())
             {
                 string? spelling = spellingJsonElement.GetString();
-
                 if (!string.IsNullOrWhiteSpace(spelling))
                 {
                     spellingList.Add(spelling.GetPooledString());
@@ -48,8 +48,9 @@ internal static class EpwingNazekaLoader
                 spellingList = null;
             }
 
-            List<string> definitionList = [];
-            foreach (JsonElement definitionJsonElement in jsonObj.GetProperty("l").EnumerateArray())
+            JsonElement definitionJsonArray = jsonObj.GetProperty("l");
+            List<string> definitionList = new(definitionJsonArray.GetArrayLength());
+            foreach (JsonElement definitionJsonElement in definitionJsonArray.EnumerateArray())
             {
                 string? definition = definitionJsonElement.GetString();
                 if (!string.IsNullOrWhiteSpace(definition))

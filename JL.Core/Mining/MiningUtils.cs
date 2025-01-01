@@ -743,8 +743,8 @@ public static class MiningUtils
             return null;
         }
 
-        List<Note> notes = [];
-        List<int> positions = [];
+        List<Note> notes = new(lookupResults.Length);
+        List<int> positions = new(lookupResults.Length);
         bool[] results = new bool[lookupResults.Length];
 
         for (int i = 0; i < lookupResults.Length; i++)
@@ -972,7 +972,7 @@ public static class MiningUtils
     /// </summary>
     private static Dictionary<string, string> ConvertFields(OrderedDictionary<string, JLField> userFields, Dictionary<JLField, string> miningParams)
     {
-        Dictionary<string, string> dict = new(StringComparer.Ordinal);
+        Dictionary<string, string> dict = new(userFields.Count, StringComparer.Ordinal);
         foreach ((string key, JLField value) in userFields)
         {
             if (miningParams.TryGetValue(value, out string? fieldValue))

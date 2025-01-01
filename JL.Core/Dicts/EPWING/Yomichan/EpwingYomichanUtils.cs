@@ -9,7 +9,7 @@ internal static class EpwingYomichanUtils
 {
     public static string[]? GetDefinitions(JsonElement jsonElement)
     {
-        List<string> definitions = [];
+        List<string> definitions = new(jsonElement.GetArrayLength());
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
         {
             string? definition = definitionElement.ValueKind switch
