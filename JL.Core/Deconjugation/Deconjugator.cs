@@ -25,28 +25,13 @@ internal static class Deconjugator
         }
 
         string newText = myForm.Text[..^myRule.ConEnd.Length] + myRule.DecEnd;
-        if (newText == myForm.OriginalText)
-        {
-            return null;
-        }
-
-        Form newForm = new(
-            newText,
-            myForm.OriginalText,
-            myForm.Tags.ToList(),
-            myForm.Process.ToList()
-        );
-
-        newForm.Process.Add(myRule.Detail);
-
-        if (newForm.Tags.Count is 0)
-        {
-            newForm.Tags.Add(myRule.ConTag);
-        }
-
-        newForm.Tags.Add(myRule.DecTag);
-
-        return newForm;
+        return newText == myForm.OriginalText
+            ? null
+            : new Form(newText, myForm.OriginalText,
+                myForm.Tags.Count is 0
+                    ? [myRule.ConTag, myRule.DecTag]
+                    : [.. myForm.Tags, myRule.DecTag],
+                [.. myForm.Process, myRule.Detail]);
     }
 
     private static List<Form>? StdruleDeconjugate(Form myForm, Rule myRule)
@@ -170,15 +155,7 @@ internal static class Deconjugator
         }
 
         string newText = myForm.Text.Replace(conEnd, myRule.DecEnd[0], StringComparison.Ordinal);
-        Form newForm = new(
-            newText,
-            myForm.OriginalText,
-            myForm.Tags.ToList(),
-            myForm.Process.ToList()
-        );
-
-        newForm.Process.Add(myRule.Detail);
-        return newForm;
+        return new Form(newText, myForm.OriginalText, myForm.Tags.ToList(), [.. myForm.Process, myRule.Detail]);
     }
 
     private static List<Form>? SubstitutionDeconjugate(Form myForm, Rule myRule)
@@ -255,16 +232,7 @@ internal static class Deconjugator
     public static List<Form> Deconjugate(string text)
     {
         List<Form> processed = [];
-        List<Form> novel = [];
-
-        Form startForm = new
-        (
-            text,
-            text,
-            [],
-            []
-        );
-        novel.Add(startForm);
+        List<Form> novel = [new Form(text, text, [], [])];
 
         int rulesLength = Rules.Length;
         bool addFormToProcess = false;
