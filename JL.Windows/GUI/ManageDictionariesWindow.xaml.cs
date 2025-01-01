@@ -73,11 +73,12 @@ internal sealed partial class ManageDictionariesWindow
 
     private void UpdateDictionariesDisplay()
     {
-        List<DockPanel> resultDockPanels = [];
-
-        IOrderedEnumerable<Dict> sortedDicts = DictUtils.Dicts.Values.OrderBy(static d => d.Priority);
-        foreach (Dict dict in sortedDicts)
+        Dict[] sortedDicts = DictUtils.Dicts.Values.OrderBy(static d => d.Priority).ToArray();
+        DockPanel[] resultDockPanels = new DockPanel[sortedDicts.Length];
+        for (int i = 0; i < sortedDicts.Length; i++)
         {
+            Dict dict = sortedDicts[i];
+
             DockPanel dockPanel = new();
 
             CheckBox checkBox = new()
@@ -249,7 +250,7 @@ internal sealed partial class ManageDictionariesWindow
             _ = dockPanel.Children.Add(removeButton);
             _ = dockPanel.Children.Add(infoButton);
 
-            resultDockPanels.Add(dockPanel);
+            resultDockPanels[i] = dockPanel;
         }
 
         DictionariesDisplay.ItemsSource = resultDockPanels;

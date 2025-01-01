@@ -65,11 +65,13 @@ internal sealed partial class ManageAudioSourcesWindow
 
     private void UpdateAudioSourcesDisplay()
     {
-        List<DockPanel> resultDockPanels = [];
+        KeyValuePair<string, AudioSource>[] sortedAudioSources = AudioUtils.AudioSources.OrderBy(static a => a.Value.Priority).ToArray();
 
-        IOrderedEnumerable<KeyValuePair<string, AudioSource>> sortedAudioSources = AudioUtils.AudioSources.OrderBy(static a => a.Value.Priority);
-        foreach ((string uri, AudioSource audioSource) in sortedAudioSources)
+        DockPanel[] resultDockPanels = new DockPanel[sortedAudioSources.Length];
+        for (int i = 0; i < sortedAudioSources.Length; i++)
         {
+            (string uri, AudioSource audioSource) = sortedAudioSources[i];
+
             DockPanel dockPanel = new();
 
             CheckBox checkBox = new()
@@ -164,7 +166,7 @@ internal sealed partial class ManageAudioSourcesWindow
             _ = dockPanel.Children.Add(editButton);
             _ = dockPanel.Children.Add(removeButton);
 
-            resultDockPanels.Add(dockPanel);
+            resultDockPanels[i] = dockPanel;
         }
 
         AudioSourceListBox.ItemsSource = resultDockPanels;

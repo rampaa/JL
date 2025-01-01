@@ -71,11 +71,11 @@ internal sealed partial class ManageFrequenciesWindow
 
     private void UpdateFreqsDisplay()
     {
-        List<DockPanel> resultDockPanels = [];
-
-        IOrderedEnumerable<Freq> sortedFreqs = FreqUtils.FreqDicts.Values.OrderBy(static freq => freq.Priority);
-        foreach (Freq freq in sortedFreqs)
+        Freq[] sortedFreqs = FreqUtils.FreqDicts.Values.OrderBy(static freq => freq.Priority).ToArray();
+        DockPanel[] resultDockPanels = new DockPanel[sortedFreqs.Length];
+        for (int i = 0; i < sortedFreqs.Length; i++)
         {
+            Freq freq = sortedFreqs[i];
             DockPanel dockPanel = new();
 
             CheckBox checkBox = new()
@@ -187,7 +187,7 @@ internal sealed partial class ManageFrequenciesWindow
             _ = dockPanel.Children.Add(editButton);
             _ = dockPanel.Children.Add(removeButton);
 
-            resultDockPanels.Add(dockPanel);
+            resultDockPanels[i] = dockPanel;
         }
 
         FrequenciesDisplay.ItemsSource = resultDockPanels;

@@ -45,11 +45,10 @@ internal sealed partial class ManageProfilesWindow
 
     private void UpdateProfilesDisplay()
     {
-        List<DockPanel> resultDockPanels = [];
-
         List<string> profileNames = ProfileDBUtils.GetProfileNames();
-        int profileCount = profileNames.Count;
 
+        int profileCount = profileNames.Count;
+        DockPanel[] resultDockPanels = new DockPanel[profileCount];
         for (int i = 0; i < profileCount; i++)
         {
             string profileName = profileNames[i];
@@ -86,7 +85,7 @@ internal sealed partial class ManageProfilesWindow
             };
             removeButton.Click += RemoveButton_Click;
 
-            resultDockPanels.Add(dockPanel);
+            resultDockPanels[i] = dockPanel;
 
             _ = dockPanel.Children.Add(profileNameTextBlock);
             _ = dockPanel.Children.Add(removeButton);
