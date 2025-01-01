@@ -14,8 +14,7 @@ internal static class EpwingYomichanLoader
             return;
         }
 
-        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-            .Where(static s => MemoryExtensions.ContainsAny(s, Utils.ValidYomichanFileSuffixes));
+        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term_bank_*.json", SearchOption.TopDirectoryOnly);
 
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiWithWordSchemaYomichan;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameYomichan;

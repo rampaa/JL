@@ -65,9 +65,7 @@ internal sealed partial class AddFrequencyWindow
         FreqType type = typeString.GetEnum<FreqType>();
         if (type is FreqType.Yomichan or FreqType.YomichanKanji)
         {
-            bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-                .Any(static s => MemoryExtensions.ContainsAny(s, Utils.ValidYomichanFileSuffixes));
-
+            bool validPath = Directory.EnumerateFiles(fullPath, type is FreqType.Yomichan ? "term_meta_bank_*.json" : "kanji_meta_bank_*.json", SearchOption.TopDirectoryOnly).Any();
             if (!validPath)
             {
                 TextBlockPath.BorderBrush = Brushes.Red;

@@ -66,25 +66,11 @@ internal sealed partial class AddDictionaryWindow
         DictType type = typeString.GetEnum<DictType>();
         if (DictUtils.YomichanDictTypes.Contains(type))
         {
-            if (type is DictType.NonspecificKanjiYomichan)
+            bool validPath = Directory.EnumerateFiles(fullPath, type is DictType.NonspecificKanjiYomichan ? "kanji_bank_*.json" : "term_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+            if (!validPath)
             {
-                bool validPath = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly).Any();
-                if (!validPath)
-                {
-                    TextBlockPath.BorderBrush = Brushes.Red;
-                    return;
-                }
-            }
-            else
-            {
-                bool validPath = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-                    .Any(static s => MemoryExtensions.ContainsAny(s, Utils.ValidYomichanFileSuffixes));
-
-                if (!validPath)
-                {
-                    TextBlockPath.BorderBrush = Brushes.Red;
-                    return;
-                }
+                TextBlockPath.BorderBrush = Brushes.Red;
+                return;
             }
         }
 

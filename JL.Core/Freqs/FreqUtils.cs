@@ -138,8 +138,9 @@ public static class FreqUtils
 
                             catch (Exception ex)
                             {
+                                string fullFreqPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                                Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
 
@@ -231,8 +232,9 @@ public static class FreqUtils
 
                             catch (Exception ex)
                             {
+                                string fullFreqPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                                Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
 

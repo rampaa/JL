@@ -262,6 +262,4 @@ public static partial class Utils
 
         return concatArray;
     }
-
-    public static readonly SearchValues<string> ValidYomichanFileSuffixes = SearchValues.Create(["term", "kanji"], StringComparison.Ordinal);
 }

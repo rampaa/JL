@@ -65,9 +65,7 @@ internal sealed partial class EditFrequencyWindow
         {
             if (_freq.Type is FreqType.Yomichan or FreqType.YomichanKanji)
             {
-                bool hasValidFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-                    .Any(static s => MemoryExtensions.ContainsAny(s, Utils.ValidYomichanFileSuffixes));
-
+                bool hasValidFiles = Directory.EnumerateFiles(fullPath, _freq.Type is FreqType.Yomichan ? "term_meta_bank_*.json" : "kanji_meta_bank_*.json", SearchOption.TopDirectoryOnly).Any();
                 if (!hasValidFiles)
                 {
                     TextBlockPath.BorderBrush = Brushes.Red;

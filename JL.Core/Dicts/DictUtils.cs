@@ -602,8 +602,10 @@ public static class DictUtils
                             }
                             catch (Exception ex)
                             {
-                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
-                                File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                File.Delete(fullDictPath);
                                 await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(false);
                             }
                         }));
@@ -682,8 +684,10 @@ public static class DictUtils
                             }
                             catch (Exception ex)
                             {
-                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
-                                File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                File.Delete(fullDictPath);
                                 await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(false);
                             }
                         }));
@@ -769,8 +773,10 @@ public static class DictUtils
                             }
                             catch (Exception ex)
                             {
-                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
-                                File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                File.Delete(fullDictPath);
                                 await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(false);
                             }
                         }));
@@ -860,8 +866,9 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
+                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
 
@@ -945,8 +952,9 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
+                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
 
@@ -1126,8 +1134,9 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
+                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
 
@@ -1211,8 +1220,9 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
+                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 _ = SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
                                 dictRemoved = true;
