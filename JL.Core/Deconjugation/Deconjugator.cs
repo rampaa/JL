@@ -232,7 +232,7 @@ internal static class Deconjugator
     public static List<Form> Deconjugate(string text)
     {
         List<Form> processed = [];
-        List<Form> novel = [new Form(text, text, [], [])];
+        List<Form> novel = [new(text, text, [], [])];
 
         int rulesLength = Rules.Length;
         bool addFormToProcess = false;

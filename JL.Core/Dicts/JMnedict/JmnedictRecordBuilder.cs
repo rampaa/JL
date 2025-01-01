@@ -11,7 +11,7 @@ internal static class JmnedictRecordBuilder
         Dictionary<string, JmnedictRecord> recordDictionary;
         if (kebListCount > 0)
         {
-            recordDictionary = new(kebListCount, StringComparer.Ordinal);
+            recordDictionary = new Dictionary<string, JmnedictRecord>(kebListCount, StringComparer.Ordinal);
             for (int i = 0; i < kebListCount; i++)
             {
                 string key = JapaneseUtils.KatakanaToHiragana(entry.KebList[i]).GetPooledString();
@@ -44,7 +44,7 @@ internal static class JmnedictRecordBuilder
         else
         {
             int rebListCount = entry.RebList.Count;
-            recordDictionary = new(rebListCount, StringComparer.Ordinal);
+            recordDictionary = new Dictionary<string, JmnedictRecord>(rebListCount, StringComparer.Ordinal);
             for (int i = 0; i < rebListCount; i++)
             {
                 string key = JapaneseUtils.KatakanaToHiragana(entry.RebList[i]).GetPooledString();

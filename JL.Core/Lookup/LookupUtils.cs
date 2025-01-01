@@ -1436,7 +1436,7 @@ public static class LookupUtils
             : !kanjidicFreqExists && freqsExist
                 ? frequencies
                 : kanjidicFreqExists && !freqsExist
-                    ? ([new LookupFrequencyResult("KANJIDIC2", frequency, false)])
-                    : ([new LookupFrequencyResult("KANJIDIC2", frequency, false), .. frequencies]);
+                    ? [new LookupFrequencyResult("KANJIDIC2", frequency, false)]
+                    : [new LookupFrequencyResult("KANJIDIC2", frequency, false), .. frequencies!];
     }
 }
