@@ -232,7 +232,7 @@ public static class LookupUtils
 
                     if (kanjidicResults?.Count > 0)
                     {
-                        lookupResults.AddRange(BuildKanjidicResult(kanjidicResults, useDBForPitchDict, pitchDict, kanjiFreqs!));
+                        lookupResults.Add(BuildKanjidicResult(kanjidicResults, useDBForPitchDict, pitchDict, kanjiFreqs!));
                     }
 
                     break;
@@ -1028,7 +1028,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static LookupResult[] BuildKanjidicResult(IDictionary<string, IntermediaryResult> kanjiResults, bool useDBForPitchDict, Dict? pitchDict, List<Freq> kanjiFreqs)
+    private static LookupResult BuildKanjidicResult(IDictionary<string, IntermediaryResult> kanjiResults, bool useDBForPitchDict, Dict? pitchDict, List<Freq> kanjiFreqs)
     {
         (string kanji, IntermediaryResult intermediaryResult) = kanjiResults.First();
 
@@ -1061,7 +1061,7 @@ public static class LookupUtils
             pitchAccentDict: pitchAccentDict
         );
 
-        return [result];
+        return result;
     }
 
     private static ConcurrentBag<LookupResult> BuildYomichanKanjiResult(
