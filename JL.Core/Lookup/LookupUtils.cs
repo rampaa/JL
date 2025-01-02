@@ -572,9 +572,6 @@ public static class LookupUtils
             }
 
             case DictType.NonspecificWordYomichan:
-            case DictType.NonspecificKanjiYomichan:
-            case DictType.NonspecificKanjiWithWordSchemaYomichan:
-            case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
             {
                 for (int i = 0; i < dictResultCount; i++)
@@ -611,8 +608,6 @@ public static class LookupUtils
             }
 
             case DictType.NonspecificWordNazeka:
-            case DictType.NonspecificKanjiNazeka:
-            case DictType.NonspecificNameNazeka:
             case DictType.NonspecificNazeka:
             {
                 for (int i = 0; i < dictResultCount; i++)
@@ -647,6 +642,11 @@ public static class LookupUtils
             case DictType.Kanjidic:
             case DictType.CustomNameDictionary:
             case DictType.ProfileCustomNameDictionary:
+            case DictType.NonspecificKanjiYomichan:
+            case DictType.NonspecificKanjiWithWordSchemaYomichan:
+            case DictType.NonspecificNameYomichan:
+            case DictType.NonspecificKanjiNazeka:
+            case DictType.NonspecificNameNazeka:
                 break;
 
             default:
@@ -1028,7 +1028,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static List<LookupResult> BuildKanjidicResult(IDictionary<string, IntermediaryResult> kanjiResults, bool useDBForPitchDict, Dict? pitchDict, List<Freq> kanjiFreqs)
+    private static LookupResult[] BuildKanjidicResult(IDictionary<string, IntermediaryResult> kanjiResults, bool useDBForPitchDict, Dict? pitchDict, List<Freq> kanjiFreqs)
     {
         (string kanji, IntermediaryResult intermediaryResult) = kanjiResults.First();
 
