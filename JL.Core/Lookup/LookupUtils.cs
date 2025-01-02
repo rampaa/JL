@@ -1167,9 +1167,7 @@ public static class LookupUtils
                         deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i]) : null,
                         frequencies: frequencies,
                         dict: wordResult.Dict,
-                        readings: epwingResult.Reading is not null
-                            ? [epwingResult.Reading]
-                            : null,
+                        readings: epwingResult.Reading is not null ? [epwingResult.Reading] : null,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchAccentDict: pitchAccentDict
                     );
@@ -1418,7 +1416,7 @@ public static class LookupUtils
 
             if (freqResultList is not null)
             {
-                int frequency = freqResultList.FirstOrDefault().Frequency;
+                int frequency = freqResultList[0].Frequency;
                 if (frequency is not 0)
                 {
                     freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency, false));
