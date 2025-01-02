@@ -466,13 +466,12 @@ public static class LookupUtils
                                 int index = r.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
                                 if (index >= 0)
                                 {
-                                    //if (!r.Processes?[index].Any(p => p.SequenceEqual(deconjugationResult.Process)) ?? false)
-                                    r.Processes?[index].Add(deconjugationResult.Process);
+                                    r.Processes![index].Add(deconjugationResult.Process);
                                 }
                                 else
                                 {
                                     r.Results.Add(resultsList);
-                                    r.Processes?.Add([deconjugationResult.Process]);
+                                    r.Processes!.Add([deconjugationResult.Process]);
                                 }
                             }
                         }
@@ -950,6 +949,7 @@ public static class LookupUtils
         List<LookupResult> results = [];
         foreach (IntermediaryResult wordResult in jmdictResults.Values)
         {
+            bool deconjugatedWord = wordResult.Processes is not null;
             int resultCount = wordResult.Results.Count;
             for (int i = 0; i < resultCount; i++)
             {
@@ -966,7 +966,7 @@ public static class LookupUtils
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         entryId: jmdictResult.Id,
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
-                        deconjugationProcess: LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i]),
+                        deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i]) : null,
                         frequencies: GetWordFrequencies(jmdictResult, wordFreqs, frequencyDicts),
                         primarySpellingOrthographyInfoList: jmdictResult.PrimarySpellingOrthographyInfo,
                         readingsOrthographyInfoList: jmdictResult.ReadingsOrthographyInfo,
@@ -1136,6 +1136,7 @@ public static class LookupUtils
         List<LookupResult> results = [];
         foreach (IntermediaryResult wordResult in epwingResults.Values)
         {
+            bool deconjugatedWord = wordResult.Processes is not null;
             int resultCount = wordResult.Results.Count;
             for (int i = 0; i < resultCount; i++)
             {
@@ -1163,7 +1164,7 @@ public static class LookupUtils
                         primarySpelling: epwingResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i]),
+                        deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i]) : null,
                         frequencies: frequencies,
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null
@@ -1207,6 +1208,7 @@ public static class LookupUtils
         ConcurrentBag<LookupResult> results = [];
         _ = Parallel.ForEach(epwingNazekaResults.Values, wordResult =>
         {
+            bool deconjugatedWord = wordResult.Processes is not null;
             int resultCount = wordResult.Results.Count;
             for (int i = 0; i < resultCount; i++)
             {
@@ -1235,7 +1237,7 @@ public static class LookupUtils
                         alternativeSpellings: epwingResult.AlternativeSpellings,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i]),
+                        deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i]) : null,
                         frequencies: frequencies,
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null
@@ -1279,6 +1281,7 @@ public static class LookupUtils
         ConcurrentBag<LookupResult> results = [];
         _ = Parallel.ForEach(customWordResults.Values, wordResult =>
         {
+            bool deconjugatedWord = wordResult.Processes is not null;
             int resultCount = wordResult.Results.Count;
             for (int i = 0; i < resultCount; i++)
             {
@@ -1293,7 +1296,9 @@ public static class LookupUtils
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: customWordDictResult.HasUserDefinedWordClass
-                            ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i])
+                            ? deconjugatedWord
+                                ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i])
+                                : null
                             : null,
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
