@@ -969,9 +969,9 @@ public static class LookupUtils
                         primarySpelling: jmdictResult.PrimarySpelling,
                         readings: jmdictResult.Readings,
                         matchedText: wordResult.MatchedText,
-                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         entryId: jmdictResult.Id,
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
+                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i]) : null,
                         frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
                         primarySpellingOrthographyInfoList: jmdictResult.PrimarySpellingOrthographyInfo,
@@ -1020,7 +1020,6 @@ public static class LookupUtils
                         alternativeSpellings: jmnedictRecord.AlternativeSpellings,
                         readings: jmnedictRecord.Readings,
                         matchedText: nameResult.MatchedText,
-                        deconjugatedMatchedText: nameResult.DeconjugatedMatchedText,
                         dict: nameResult.Dict,
                         formattedDefinitions: jmnedictRecord.BuildFormattedDefinition(nameResult.Dict.Options),
                         pitchAccentDict: pitchAccentDict
@@ -1059,7 +1058,6 @@ public static class LookupUtils
             kanjiComposition: kanjiComposition,
             frequencies: GetKanjidicFrequencies(kanji, kanjiRecord.Frequency, kanjiFreqs),
             matchedText: intermediaryResult.MatchedText,
-            deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
             dict: intermediaryResult.Dict,
             formattedDefinitions: kanjiRecord.BuildFormattedDefinition(),
             pitchAccentDict: pitchAccentDict
@@ -1100,7 +1098,6 @@ public static class LookupUtils
                     kanjiStats: yomichanKanjiDictResult.BuildFormattedStats(),
                     frequencies: kanjiFreqsExist ? GetKanjiFrequencies(kanji, kanjiFreqs!) : null,
                     matchedText: intermediaryResult.MatchedText,
-                    deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
                     dict: intermediaryResult.Dict,
                     formattedDefinitions: yomichanKanjiDictResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
                     pitchAccentDict: pitchAccentDict
@@ -1189,7 +1186,6 @@ public static class LookupUtils
                 (
                     primarySpelling: epwingResult.PrimarySpelling,
                     matchedText: intermediaryResult.MatchedText,
-                    deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
                     frequencies: kanjiFreqsExist ? GetKanjiFrequencies(epwingResult.PrimarySpelling, kanjiFreqs!) : null,
                     dict: intermediaryResult.Dict,
                     readings: epwingResult.Reading is not null ? [epwingResult.Reading] : null,
@@ -1288,7 +1284,6 @@ public static class LookupUtils
                     primarySpelling: epwingResult.PrimarySpelling,
                     alternativeSpellings: epwingResult.AlternativeSpellings,
                     matchedText: intermediaryResult.MatchedText,
-                    deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
                     frequencies: kanjiFreqsExist ? GetKanjiFrequencies(epwingResult.PrimarySpelling, kanjiFreqs!) : null,
                     dict: intermediaryResult.Dict,
                     readings: epwingResult.Reading is not null
@@ -1393,7 +1388,6 @@ public static class LookupUtils
                     (
                         primarySpelling: customNameDictResult.PrimarySpelling,
                         matchedText: customNameResult.MatchedText,
-                        deconjugatedMatchedText: customNameResult.DeconjugatedMatchedText,
                         frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
                         dict: customNameResult.Dict,
                         readings: customNameDictResult.Reading is not null

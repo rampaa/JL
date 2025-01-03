@@ -58,7 +58,7 @@ internal sealed class LookupTests
                 dict: DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
                 frequencies: [new LookupFrequencyResult("VN (Nazeka)", 759, false)],
                 primarySpelling: "始まる",
-                deconjugatedMatchedText: "始まる",
+                deconjugatedMatchedText: null,
                 readings: ["はじまる"],
                 formattedDefinitions: "(v5r, vi) (1) to begin; to start; to commence；(v5r, vi) (2) to happen (again); to begin (anew)；(v5r, vi) (3) to date (from); to originate (in)",
                 entryId: 1307500

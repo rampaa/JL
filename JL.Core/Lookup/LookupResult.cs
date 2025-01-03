@@ -40,7 +40,6 @@ public sealed class LookupResult
     internal LookupResult(
         string primarySpelling,
         string matchedText,
-        string? deconjugatedMatchedText,
         Dict dict,
         string[]? readings,
         List<LookupFrequencyResult>? frequencies = null,
@@ -54,6 +53,7 @@ public sealed class LookupResult
         string[]? nanoriReadings = null,
         string[]? radicalNames = null,
         string? formattedDefinitions = null,
+        string? deconjugatedMatchedText = null,
         string? deconjugationProcess = null,
         string? kanjiComposition = null,
         string? kanjiStats = null,
