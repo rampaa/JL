@@ -1440,7 +1440,9 @@ public static class LookupUtils
             }
         }
 
-        return freqsList;
+        return freqsList.Count > 0
+            ? freqsList
+            : null;
     }
 
     private static List<LookupFrequencyResult>? GetKanjiFrequencies(string kanji, List<Freq> kanjiFreqs)
@@ -1472,7 +1474,9 @@ public static class LookupUtils
             }
         }
 
-        return freqsList;
+        return freqsList.Count > 0
+            ? freqsList
+            : null;
     }
 
     private static List<LookupFrequencyResult>? GetKanjidicFrequencies(string kanji, int frequency, List<Freq>? kanjiFreqs)
