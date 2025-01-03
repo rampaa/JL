@@ -395,7 +395,7 @@ public static partial class JapaneseUtils
                 }
             }
 
-            else if (s_rightToLeftBracketDict.TryGetValue(sentence[0], out char leftBracket))
+            else if (s_rightToLeftBracketDict.TryGetValue(sentence[^1], out char leftBracket))
             {
                 if (!sentence.Contains(leftBracket, StringComparison.Ordinal))
                 {
