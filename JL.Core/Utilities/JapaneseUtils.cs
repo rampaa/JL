@@ -371,42 +371,45 @@ public static partial class JapaneseUtils
             sentence = sentence[..^1];
         }
 
-        if (s_leftToRightBracketDict.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
+        if (sentence.Length > 0)
         {
-            if (sentence[^1] == rightBracket)
+            if (s_leftToRightBracketDict.TryGetValue(sentence[0], out char rightBracket))
             {
-                sentence = sentence[1..^1];
-            }
-            else if (!sentence.Contains(rightBracket, StringComparison.Ordinal))
-            {
-                sentence = sentence[1..];
-            }
-            else
-            {
-                int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
-                int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
-
-                if (numberOfLeftBrackets == numberOfRightBrackets + 1)
+                if (sentence[^1] == rightBracket)
+                {
+                    sentence = sentence[1..^1];
+                }
+                else if (!sentence.Contains(rightBracket, StringComparison.Ordinal))
                 {
                     sentence = sentence[1..];
                 }
-            }
-        }
+                else
+                {
+                    int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
+                    int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
 
-        else if (s_rightToLeftBracketDict.TryGetValue(sentence.LastOrDefault(), out char leftBracket))
-        {
-            if (!sentence.Contains(leftBracket, StringComparison.Ordinal))
-            {
-                sentence = sentence[..^1];
+                    if (numberOfLeftBrackets == numberOfRightBrackets + 1)
+                    {
+                        sentence = sentence[1..];
+                    }
+                }
             }
-            else
-            {
-                int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
-                int numberOfRightBrackets = sentence.Count(p => p == sentence[^1]);
 
-                if (numberOfRightBrackets == numberOfLeftBrackets + 1)
+            else if (s_rightToLeftBracketDict.TryGetValue(sentence[0], out char leftBracket))
+            {
+                if (!sentence.Contains(leftBracket, StringComparison.Ordinal))
                 {
                     sentence = sentence[..^1];
+                }
+                else
+                {
+                    int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
+                    int numberOfRightBrackets = sentence.Count(p => p == sentence[^1]);
+
+                    if (numberOfRightBrackets == numberOfLeftBrackets + 1)
+                    {
+                        sentence = sentence[..^1];
+                    }
                 }
             }
         }
