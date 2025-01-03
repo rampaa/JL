@@ -1176,7 +1176,6 @@ public static class LookupUtils
             : null;
 
         List<LookupResult> results = [];
-        bool deconjugatedWord = intermediaryResult.Processes is not null;
         bool kanjiFreqsExist = kanjiFreqs is not null;
         int resultCount = intermediaryResult.Results.Count;
         for (int i = 0; i < resultCount; i++)
@@ -1191,7 +1190,6 @@ public static class LookupUtils
                     primarySpelling: epwingResult.PrimarySpelling,
                     matchedText: intermediaryResult.MatchedText,
                     deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
-                    deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(intermediaryResult.Processes![i]) : null,
                     frequencies: kanjiFreqsExist ? GetKanjiFrequencies(epwingResult.PrimarySpelling, kanjiFreqs!) : null,
                     dict: intermediaryResult.Dict,
                     readings: epwingResult.Reading is not null ? [epwingResult.Reading] : null,
@@ -1275,7 +1273,6 @@ public static class LookupUtils
             : null;
 
         List<LookupResult> results = [];
-        bool deconjugatedWord = intermediaryResult.Processes is not null;
         bool kanjiFreqsExist = kanjiFreqs is not null;
         int resultCount = intermediaryResult.Results.Count;
         for (int i = 0; i < resultCount; i++)
@@ -1292,7 +1289,6 @@ public static class LookupUtils
                     alternativeSpellings: epwingResult.AlternativeSpellings,
                     matchedText: intermediaryResult.MatchedText,
                     deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
-                    deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(intermediaryResult.Processes![i]) : null,
                     frequencies: kanjiFreqsExist ? GetKanjiFrequencies(epwingResult.PrimarySpelling, kanjiFreqs!) : null,
                     dict: intermediaryResult.Dict,
                     readings: epwingResult.Reading is not null
