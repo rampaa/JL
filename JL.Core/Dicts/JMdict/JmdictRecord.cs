@@ -77,15 +77,16 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
         bool multipleDefinitions = Definitions.Length > 1;
         bool showWordClassInfo = options.WordClassInfo!.Value;
-        bool showDialectInfo = options.DialectInfo!.Value;
-        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo!.Value;
-        bool definitionInfoExists = DefinitionInfo?.Length > 0;
-        bool showMiscInfo = options.MiscInfo!.Value;
-        bool showWordTypeInfo = options.WordTypeInfo!.Value;
+        bool showDialectInfo = options.DialectInfo!.Value && Dialects is not null;
+        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo!.Value && DefinitionInfo is not null;
+        bool showMiscInfo = options.MiscInfo!.Value && Misc is not null;
+        bool showWordTypeInfo = options.WordTypeInfo!.Value && Fields is not null;
         bool showSpellingRestrictionInfo = options.SpellingRestrictionInfo!.Value;
-        bool showLoanwordEtymology = options.LoanwordEtymology!.Value;
-        bool showRelatedTerms = options.RelatedTerm!.Value;
-        bool showAntonyms = options.Antonym!.Value;
+        bool showSpellingRestrictions = showSpellingRestrictionInfo && SpellingRestrictions is not null;
+        bool showReadingRestrictionss = showSpellingRestrictionInfo && ReadingRestrictions is not null;
+        bool showLoanwordEtymology = options.LoanwordEtymology!.Value && LoanwordEtymology is not null;
+        bool showRelatedTerms = options.RelatedTerm!.Value && RelatedTerms is not null;
+        bool showAntonyms = options.Antonym!.Value && Antonyms is not null;
 
         for (int i = 0; i < Definitions.Length; i++)
         {
@@ -96,11 +97,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (showWordClassInfo)
             {
-                string[]? wordClasses = WordClasses?[i];
-                if (wordClasses?.Length > 0)
-                {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", wordClasses)}) ");
-                }
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", WordClasses[i])}) ");
             }
 
             if (!newlines && multipleDefinitions)
@@ -110,8 +107,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (showMiscInfo)
             {
-                string[]? misc = Misc?[i];
-                if (misc?.Length > 0)
+                string[]? misc = Misc![i];
+                if (misc is not null)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", misc)}) ");
                 }
@@ -119,8 +116,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (showDialectInfo)
             {
-                string[]? dialects = Dialects?[i];
-                if (dialects?.Length > 0)
+                string[]? dialects = Dialects![i];
+                if (dialects is not null)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", dialects)}) ");
                 }
@@ -128,8 +125,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (showWordTypeInfo)
             {
-                string[]? fields = Fields?[i];
-                if (fields?.Length > 0)
+                string[]? fields = Fields![i];
+                if (fields is not null)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", fields)}) ");
                 }
@@ -137,7 +134,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])} ");
 
-            if (showExtraDefinitionInfo && definitionInfoExists)
+            if (showExtraDefinitionInfo)
             {
                 string? definitionInfo = DefinitionInfo![i];
                 if (definitionInfo is not null)
@@ -148,26 +145,28 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (showSpellingRestrictionInfo)
             {
-                string[]? spellingRestrictions = SpellingRestrictions?[i];
-                string[]? readingRestrictions = ReadingRestrictions?[i];
+                string[]? spellingRestrictions = showSpellingRestrictions ? SpellingRestrictions![i] : null;
+                string[]? readingRestrictions = showReadingRestrictionss ? ReadingRestrictions![i] : null;
 
-                if (spellingRestrictions?.Length > 0 || readingRestrictions?.Length > 0)
+                bool spellingRestrictionsExist = spellingRestrictions is not null;
+                bool readingRestrictionsExist = readingRestrictions is not null;
+                if (spellingRestrictionsExist || readingRestrictionsExist)
                 {
                     _ = defResult.Append("(only applies to ");
 
-                    if (spellingRestrictions?.Length > 0)
+                    if (spellingRestrictionsExist)
                     {
-                        _ = defResult.Append(string.Join("; ", spellingRestrictions));
+                        _ = defResult.Append(string.Join("; ", spellingRestrictions!));
                     }
 
-                    if (readingRestrictions?.Length > 0)
+                    if (readingRestrictionsExist)
                     {
-                        if (spellingRestrictions?.Length > 0)
+                        if (spellingRestrictionsExist)
                         {
                             _ = defResult.Append("; ");
                         }
 
-                        _ = defResult.Append(string.Join("; ", readingRestrictions));
+                        _ = defResult.Append(string.Join("; ", readingRestrictions!));
                     }
 
                     _ = defResult.Append(") ");
@@ -176,8 +175,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (showLoanwordEtymology)
             {
-                LoanwordSource[]? lSources = LoanwordEtymology?[i];
-                if (lSources?.Length > 0)
+                LoanwordSource[]? lSources = LoanwordEtymology![i];
+                if (lSources is not null)
                 {
                     _ = defResult.Append('(');
 
@@ -212,8 +211,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (showRelatedTerms)
             {
-                string[]? relatedTerms = RelatedTerms?[i];
-                if (relatedTerms?.Length > 0)
+                string[]? relatedTerms = RelatedTerms![i];
+                if (relatedTerms is not null)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"(related terms: {string.Join(", ", relatedTerms)}) ");
                 }
@@ -221,8 +220,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
 
             if (showAntonyms)
             {
-                string[]? antonyms = Antonyms?[i];
-                if (antonyms?.Length > 0)
+                string[]? antonyms = Antonyms![i];
+                if (antonyms is not null)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonyms: {string.Join(", ", antonyms)}) ");
                 }

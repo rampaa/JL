@@ -511,13 +511,14 @@ public static class LookupUtils
                 });
         }
 
+        bool textWithoutLongVowelMarkListExist = textWithoutLongVowelMarkList is not null;
         Dictionary<string, IntermediaryResult> results = new(StringComparer.Ordinal);
         int textListCount = textList.Count;
         for (int i = 0; i < textListCount; i++)
         {
             GetWordResultsHelper(dict, results, deconjugationResultsList[i], textList[i], textInHiraganaList[i], dbWordDict, dbVerbDict);
 
-            List<string>? textWithoutLongVowelMark = textWithoutLongVowelMarkList?[i];
+            List<string>? textWithoutLongVowelMark = textWithoutLongVowelMarkListExist ? textWithoutLongVowelMarkList![i] : null;
             if (textWithoutLongVowelMark is not null)
             {
                 Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = useDB
