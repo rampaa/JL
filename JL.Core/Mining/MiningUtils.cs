@@ -175,7 +175,7 @@ public static class MiningUtils
                 return lookupResult.PrimarySpelling;
 
             case JLField.DeconjugatedMatchedText:
-                return lookupResult.DeconjugatedMatchedText;
+                return lookupResult.DeconjugatedMatchedText ?? lookupResult.MatchedText;
 
             case JLField.KanjiStats:
                 return lookupResult.KanjiStats;
@@ -376,7 +376,7 @@ public static class MiningUtils
             [JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture),
             [JLField.DictionaryName] = lookupResult.Dict.Name,
             [JLField.MatchedText] = lookupResult.MatchedText,
-            [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
+            [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText ?? lookupResult.MatchedText,
             [JLField.PrimarySpelling] = lookupResult.PrimarySpelling,
             [JLField.PrimarySpellingWithOrthographyInfo] = lookupResult.PrimarySpellingOrthographyInfoList is not null
                 ? $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})"

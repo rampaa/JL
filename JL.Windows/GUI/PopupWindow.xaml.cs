@@ -245,7 +245,7 @@ internal sealed partial class PopupWindow
             StatsUtils.IncrementStat(StatType.NumberOfLookups);
             if (CoreConfigManager.Instance.TrackTermLookupCounts)
             {
-                StatsUtils.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText);
+                StatsUtils.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText ?? firstLookupResult.MatchedText);
             }
 
             if (configManager.HighlightLongestMatch)
@@ -374,7 +374,7 @@ internal sealed partial class PopupWindow
             StatsUtils.IncrementStat(StatType.NumberOfLookups);
             if (CoreConfigManager.Instance.TrackTermLookupCounts)
             {
-                StatsUtils.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText);
+                StatsUtils.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText ?? firstLookupResult.MatchedText);
             }
 
             EnableMiningMode();

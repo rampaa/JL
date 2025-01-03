@@ -16,7 +16,7 @@ public sealed class LookupResult
     internal int EntryId { get; }
 
     // Word dictionaries
-    public string DeconjugatedMatchedText { get; }
+    public string? DeconjugatedMatchedText { get; }
     public string? DeconjugationProcess { get; }
     // JMdict, Nazeka EPWING
     public string[]? AlternativeSpellings { get; }
@@ -40,7 +40,7 @@ public sealed class LookupResult
     internal LookupResult(
         string primarySpelling,
         string matchedText,
-        string deconjugatedMatchedText,
+        string? deconjugatedMatchedText,
         Dict dict,
         string[]? readings,
         List<LookupFrequencyResult>? frequencies = null,
