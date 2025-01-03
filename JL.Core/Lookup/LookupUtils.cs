@@ -458,7 +458,7 @@ public static class LookupUtils
         if (wordDict.TryGetValue(textInHiragana, out IList<IDictRecord>? tempResult))
         {
             _ = results.TryAdd(textInHiragana,
-                new IntermediaryResult([tempResult], null, matchedText, null, dict));
+                new IntermediaryResult(matchedText, dict, [tempResult]));
         }
 
         if (deconjugationResults is not null)
@@ -490,11 +490,11 @@ public static class LookupUtils
                         else
                         {
                             results.Add(deconjugationResult.Text,
-                                new IntermediaryResult([resultsList],
-                                    [[deconjugationResult.Process]],
-                                    matchedText,
+                                new IntermediaryResult(matchedText,
+                                    dict,
+                                    [resultsList],
                                     deconjugationResult.Text,
-                                    dict)
+                                    [[deconjugationResult.Process]])
                             );
                         }
                     }
@@ -690,7 +690,7 @@ public static class LookupUtils
             if (nameDict.TryGetValue(textInHiragana, out IList<IDictRecord>? result))
             {
                 nameResults.Add(textInHiragana,
-                    new IntermediaryResult([result], null, textList[i], null, dict));
+                    new IntermediaryResult(textList[i], dict, [result]));
             }
         }
 
@@ -702,7 +702,7 @@ public static class LookupUtils
     private static IntermediaryResult? GetKanjiResults(string kanji, Dict dict)
     {
         return dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result)
-            ? new IntermediaryResult([result], null, kanji, null, dict)
+            ? new IntermediaryResult(kanji, dict, [result])
             : null;
     }
 
@@ -711,7 +711,7 @@ public static class LookupUtils
         List<IDictRecord>? results = getKanjiRecordsFromDB(dict.Name, kanji);
 
         return results?.Count > 0
-            ? new IntermediaryResult([results], null, kanji, null, dict)
+            ? new IntermediaryResult(kanji, dict, [results])
             : null;
     }
 
