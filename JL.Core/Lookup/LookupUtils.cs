@@ -240,13 +240,13 @@ public static class LookupUtils
                     break;
 
                 case DictType.Kanjidic:
-                    KeyValuePair<string, IntermediaryResult>? kanjidicResult = useDB
+                    IntermediaryResult? kanjidicResult = useDB
                         ? GetKanjiResultsFromDB(kanji, dict, KanjidicDBManager.GetRecordsFromDB)
                         : GetKanjiResults(kanji, dict);
 
                     if (kanjidicResult is not null)
                     {
-                        lookupResults.Add(BuildKanjidicResult(kanjidicResult.Value.Key, kanjidicResult.Value.Value, useDBForPitchDict, pitchDict, kanjiFreqs));
+                        lookupResults.Add(BuildKanjidicResult(kanji, kanjidicResult, useDBForPitchDict, pitchDict, kanjiFreqs));
                     }
 
                     break;
@@ -254,13 +254,13 @@ public static class LookupUtils
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
                     // Template-wise, it is a word dictionary that's why its results are put into Yomichan Word Results
                     // Content-wise though it's a kanji dictionary, that's why GetKanjiResults is being used for the lookup
-                    KeyValuePair<string, IntermediaryResult>? epwingYomichanKanjiWithWordSchemaResults = useDB
+                    IntermediaryResult? epwingYomichanKanjiWithWordSchemaResults = useDB
                         ? GetKanjiResultsFromDB(kanji, dict, EpwingYomichanDBManager.GetRecordsFromDB)
                         : GetKanjiResults(kanji, dict);
 
                     if (epwingYomichanKanjiWithWordSchemaResults is not null)
                     {
-                        lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanKanjiWithWordSchemaResults.Value.Key, epwingYomichanKanjiWithWordSchemaResults.Value.Value, useDBForPitchDict, pitchDict, kanjiFreqs));
+                        lookupResults.AddRange(BuildEpwingYomichanResult(kanji, epwingYomichanKanjiWithWordSchemaResults, useDBForPitchDict, pitchDict, kanjiFreqs));
                     }
                     break;
 
@@ -283,13 +283,13 @@ public static class LookupUtils
                     break;
 
                 case DictType.NonspecificKanjiYomichan:
-                    KeyValuePair<string, IntermediaryResult>? epwingYomichanKanjiResults = useDB
+                    IntermediaryResult? epwingYomichanKanjiResults = useDB
                         ? GetKanjiResultsFromDB(kanji, dict, YomichanKanjiDBManager.GetRecordsFromDB)
                         : GetKanjiResults(kanji, dict);
 
                     if (epwingYomichanKanjiResults is not null)
                     {
-                        lookupResults.AddRange(BuildYomichanKanjiResult(epwingYomichanKanjiResults.Value.Key, epwingYomichanKanjiResults.Value.Value, useDBForPitchDict, pitchDict, kanjiFreqs));
+                        lookupResults.AddRange(BuildYomichanKanjiResult(kanji, epwingYomichanKanjiResults, useDBForPitchDict, pitchDict, kanjiFreqs));
                     }
                     break;
 
@@ -313,13 +313,13 @@ public static class LookupUtils
                     break;
 
                 case DictType.NonspecificKanjiNazeka:
-                    KeyValuePair<string, IntermediaryResult>? epwingNazekaKanjiResults = useDB
+                    IntermediaryResult? epwingNazekaKanjiResults = useDB
                         ? GetKanjiResultsFromDB(kanji, dict, EpwingNazekaDBManager.GetRecordsFromDB)
                         : GetKanjiResults(kanji, dict);
 
                     if (epwingNazekaKanjiResults is not null)
                     {
-                        lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaKanjiResults.Value.Key, epwingNazekaKanjiResults.Value.Value, useDBForPitchDict, pitchDict, kanjiFreqs));
+                        lookupResults.AddRange(BuildEpwingNazekaResult(kanji, epwingNazekaKanjiResults, useDBForPitchDict, pitchDict, kanjiFreqs));
                     }
 
                     break;
@@ -699,19 +699,19 @@ public static class LookupUtils
             : null;
     }
 
-    private static KeyValuePair<string, IntermediaryResult>? GetKanjiResults(string kanji, Dict dict)
+    private static IntermediaryResult? GetKanjiResults(string kanji, Dict dict)
     {
         return dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result)
-            ? KeyValuePair.Create(kanji, new IntermediaryResult([result], null, kanji, kanji, dict))
+            ? new IntermediaryResult([result], null, kanji, kanji, dict)
             : null;
     }
 
-    private static KeyValuePair<string, IntermediaryResult>? GetKanjiResultsFromDB(string kanji, Dict dict, GetKanjiRecordsFromDB getKanjiRecordsFromDB)
+    private static IntermediaryResult? GetKanjiResultsFromDB(string kanji, Dict dict, GetKanjiRecordsFromDB getKanjiRecordsFromDB)
     {
         List<IDictRecord>? results = getKanjiRecordsFromDB(dict.Name, kanji);
 
         return results?.Count > 0
-            ? KeyValuePair.Create(kanji, new IntermediaryResult([results], null, kanji, kanji, dict))
+            ? new IntermediaryResult([results], null, kanji, kanji, dict)
             : null;
     }
 
