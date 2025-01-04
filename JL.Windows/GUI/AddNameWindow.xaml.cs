@@ -36,23 +36,6 @@ internal sealed partial class AddNameWindow
     // ReSharper disable once AsyncVoidMethod
     private async void SaveButton_Click(object? sender, RoutedEventArgs? e)
     {
-        bool isValid = true;
-
-        if (!JapaneseUtils.JapaneseRegex.IsMatch(SpellingTextBox.Text))
-        {
-            SpellingTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (SpellingTextBox.BorderBrush == Brushes.Red)
-        {
-            SpellingTextBox.ClearValue(BorderBrushProperty);
-        }
-
-        if (!isValid)
-        {
-            return;
-        }
-
 #pragma warning disable CA1308 // Normalize strings to uppercase
         string nameType =
             NameTypeStackPanel.Children.OfType<RadioButton>()
