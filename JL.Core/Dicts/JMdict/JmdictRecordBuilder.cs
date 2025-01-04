@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMdict;
@@ -117,16 +118,16 @@ internal static class JmdictRecordBuilder
                     allSpellingsWithoutSearchOnlyForms.RemoveAt(index),
                     allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAt(index),
                     readingList.TrimListToArray(),
-                    readingsOrthographyInfoList.TrimListOfNullableArraysToArrayOfArrays(),
-                    spellingRestrictionList.TrimListOfNullableArraysToArrayOfArrays(),
-                    readingRestrictionList.TrimListOfNullableArraysToArrayOfArrays(),
-                    fieldList.TrimListOfNullableArraysToArrayOfArrays(),
-                    miscList.TrimListOfNullableArraysToArrayOfArrays(),
+                    readingsOrthographyInfoList.TrimListWithNullableElementsToArray(),
+                    spellingRestrictionList.TrimListWithNullableElementsToArray(),
+                    readingRestrictionList.TrimListWithNullableElementsToArray(),
+                    fieldList.TrimListWithNullableElementsToArray(),
+                    miscList.TrimListWithNullableElementsToArray(),
                     definitionInfoList.TrimListWithNullableElementsToArray(),
-                    dialectList.TrimListOfNullableArraysToArrayOfArrays(),
-                    loanwordSourceList.TrimListOfNullableArraysToArrayOfArrays(),
-                    relatedTermList.TrimListOfNullableArraysToArrayOfArrays(),
-                    antonymList.TrimListOfNullableArraysToArrayOfArrays());
+                    dialectList.TrimListWithNullableElementsToArray(),
+                    loanwordSourceList.TrimListWithNullableElementsToArray(),
+                    relatedTermList.TrimListWithNullableElementsToArray(),
+                    antonymList.TrimListWithNullableElementsToArray());
 
                 recordDictionary.Add(key, record);
 
@@ -223,10 +224,19 @@ internal static class JmdictRecordBuilder
                 {
                     Sense sense = entry.SenseList[j];
 
+                    if (sense.StagKList.Count is not 0 && sense.StagRList.Count is not 0
+                            && !sense.StagRList.Contains(readingElement.Reb)
+                            && !sense.StagKList.Contains(primarySpelling)
+                            && alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any())
+                    {
+                        Debug.WriteLine("This should not happen.");
+                    }
+
                     if ((sense.StagKList.Count is 0 && sense.StagRList.Count is 0)
                         || sense.StagRList.Contains(readingElement.Reb)
                         || sense.StagKList.Contains(primarySpelling)
-                        || (alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any()))
+                        // || (alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any())
+                        )
                     {
                         definitionList.Add(sense.GlossList.ToArray());
                         wordClassList.Add(sense.PosList.ToArray());
@@ -251,15 +261,15 @@ internal static class JmdictRecordBuilder
                     alternativeSpellingsOrthographyInfo,
                     readings,
                     readingsOrthographyInfo,
-                    spellingRestrictionList.TrimListOfNullableArraysToArrayOfArrays(),
-                    readingRestrictionList.TrimListOfNullableArraysToArrayOfArrays(),
-                    fieldList.TrimListOfNullableArraysToArrayOfArrays(),
-                    miscList.TrimListOfNullableArraysToArrayOfArrays(),
+                    spellingRestrictionList.TrimListWithNullableElementsToArray(),
+                    readingRestrictionList.TrimListWithNullableElementsToArray(),
+                    fieldList.TrimListWithNullableElementsToArray(),
+                    miscList.TrimListWithNullableElementsToArray(),
                     definitionInfoList.TrimListWithNullableElementsToArray(),
-                    dialectList.TrimListOfNullableArraysToArrayOfArrays(),
-                    loanwordSourceList.TrimListOfNullableArraysToArrayOfArrays(),
-                    relatedTermList.TrimListOfNullableArraysToArrayOfArrays(),
-                    antonymList.TrimListOfNullableArraysToArrayOfArrays());
+                    dialectList.TrimListWithNullableElementsToArray(),
+                    loanwordSourceList.TrimListWithNullableElementsToArray(),
+                    relatedTermList.TrimListWithNullableElementsToArray(),
+                    antonymList.TrimListWithNullableElementsToArray());
 
                 // record.Priorities = kanjiElement.KePriList
 
