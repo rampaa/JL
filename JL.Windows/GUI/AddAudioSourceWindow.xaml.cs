@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core.Audio;
 using JL.Core.Utilities;
@@ -28,6 +29,14 @@ internal sealed partial class AddAudioSourceWindow
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
+        AudioSourceTypeComboBox.ClearValue(BorderBrushProperty);
+        UriTextBox.ClearValue(BorderBrushProperty);
+        UriTextBox.ClearValue(CursorProperty);
+        UriTextBox.ClearValue(ToolTipProperty);
+        TextToSpeechVoicesComboBox.ClearValue(BorderBrushProperty);
+        TextToSpeechVoicesComboBox.ClearValue(CursorProperty);
+        TextToSpeechVoicesComboBox.ClearValue(ToolTipProperty);
+
         string? typeString = AudioSourceTypeComboBox.SelectionBoxItem.ToString();
         if (string.IsNullOrEmpty(typeString))
         {
@@ -35,94 +44,90 @@ internal sealed partial class AddAudioSourceWindow
             return;
         }
 
-        if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
-        {
-            AudioSourceTypeComboBox.ClearValue(BorderBrushProperty);
-        }
+        AudioSourceType type = typeString.GetEnum<AudioSourceType>();
 
-        AudioSourceType? type = null;
-        if (!string.IsNullOrEmpty(typeString))
-        {
-            type = typeString.GetEnum<AudioSourceType>();
-        }
-
-        bool isValid = true;
         string? uri;
-
         switch (type)
         {
             case AudioSourceType.LocalPath:
-                uri = TextBlockUri.Text;
+                uri = UriTextBox.Text;
                 string fullPath = Path.GetFullPath(uri, Utils.ApplicationPath);
 
-                if (!string.IsNullOrWhiteSpace(uri)
-                    && Path.IsPathFullyQualified(fullPath)
-                    && Directory.Exists(Path.GetDirectoryName(fullPath))
-                    && !string.IsNullOrWhiteSpace(Path.GetFileName(fullPath)))
+                if (string.IsNullOrWhiteSpace(uri)
+                    || !Path.IsPathFullyQualified(fullPath)
+                    || !Directory.Exists(Path.GetDirectoryName(fullPath))
+                    || string.IsNullOrWhiteSpace(Path.GetFileName(fullPath)))
                 {
-                    string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
-                    uri = relativePath.StartsWith('.') ? fullPath : relativePath;
-
-                    if (AudioUtils.AudioSources.ContainsKey(uri))
-                    {
-                        TextBlockUri.BorderBrush = Brushes.Red;
-                        isValid = false;
-                    }
-                    else if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
-                    {
-                        TextBlockUri.BorderBrush.ClearValue(BorderBrushProperty);
-                    }
+                    UriTextBox.BorderBrush = Brushes.Red;
+                    UriTextBox.Cursor = Cursors.Help;
+                    UriTextBox.ToolTip = "Invalid URI!";
+                    return;
                 }
-                else
+
+                string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
+                uri = relativePath.StartsWith('.')
+                    ? fullPath
+                    : relativePath;
+
+                if (AudioUtils.AudioSources.ContainsKey(uri))
                 {
-                    TextBlockUri.BorderBrush = Brushes.Red;
-                    isValid = false;
+                    UriTextBox.BorderBrush = Brushes.Red;
+                    UriTextBox.Cursor = Cursors.Help;
+                    UriTextBox.ToolTip = "URI must be unique!";
+                    return;
                 }
                 break;
 
             case AudioSourceType.Url:
             case AudioSourceType.UrlJson:
-                uri = TextBlockUri.Text
+                uri = UriTextBox.Text
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
                     .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase);
-                if (string.IsNullOrEmpty(uri)
-                    || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.OrdinalIgnoreCase).Replace("{Reading}", "", StringComparison.OrdinalIgnoreCase), UriKind.Absolute)
-                    || AudioUtils.AudioSources.ContainsKey(uri))
+
+                if (string.IsNullOrEmpty(uri) || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.OrdinalIgnoreCase).Replace("{Reading}", "", StringComparison.OrdinalIgnoreCase), UriKind.Absolute))
                 {
-                    TextBlockUri.BorderBrush = Brushes.Red;
-                    isValid = false;
+                    UriTextBox.BorderBrush = Brushes.Red;
+                    UriTextBox.Cursor = Cursors.Help;
+                    UriTextBox.ToolTip = "Invalid URI!";
+                    return;
                 }
-                else if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
+
+                if (AudioUtils.AudioSources.ContainsKey(uri))
                 {
-                    TextBlockUri.BorderBrush.ClearValue(BorderBrushProperty);
+                    UriTextBox.BorderBrush = Brushes.Red;
+                    UriTextBox.Cursor = Cursors.Help;
+                    UriTextBox.ToolTip = "URI must be unique!";
+                    return;
                 }
                 break;
 
             case AudioSourceType.TextToSpeech:
                 uri = ((ComboBoxItem?)TextToSpeechVoicesComboBox.SelectedItem)?.Content.ToString();
-                if (string.IsNullOrWhiteSpace(uri)
-                    || AudioUtils.AudioSources.ContainsKey(uri))
+                if (string.IsNullOrWhiteSpace(uri))
                 {
                     TextToSpeechVoicesComboBox.BorderBrush = Brushes.Red;
-                    isValid = false;
+                    TextToSpeechVoicesComboBox.Cursor = Cursors.Help;
+                    TextToSpeechVoicesComboBox.ToolTip = "Invalid URI!";
+                    return;
                 }
-                else if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
+
+                if (AudioUtils.AudioSources.ContainsKey(uri))
                 {
-                    TextToSpeechVoicesComboBox.BorderBrush.ClearValue(BorderBrushProperty);
+                    TextToSpeechVoicesComboBox.BorderBrush = Brushes.Red;
+                    TextToSpeechVoicesComboBox.Cursor = Cursors.Help;
+                    TextToSpeechVoicesComboBox.ToolTip = "URI must be unique!";
+                    return;
                 }
                 break;
 
             default:
-                isValid = false;
                 uri = null;
                 break;
         }
 
-        if (isValid && !string.IsNullOrEmpty(uri))
+        if (!string.IsNullOrEmpty(uri))
         {
-            AudioUtils.AudioSources.Add(uri,
-                new AudioSource(type!.Value, true, AudioUtils.AudioSources.Count + 1));
-
+            AudioUtils.AudioSources.Add(uri, new AudioSource(type, true, AudioUtils.AudioSources.Count + 1));
             Close();
         }
     }
@@ -175,19 +180,19 @@ internal sealed partial class AddAudioSourceWindow
             case AudioSourceType.Url:
             case AudioSourceType.UrlJson:
                 PathType.Text = "URL";
-                TextBlockUri.Visibility = Visibility.Visible;
+                UriTextBox.Visibility = Visibility.Visible;
                 TextToSpeechVoicesComboBox.Visibility = Visibility.Collapsed;
                 break;
 
             case AudioSourceType.LocalPath:
                 PathType.Text = "Path";
-                TextBlockUri.Visibility = Visibility.Visible;
+                UriTextBox.Visibility = Visibility.Visible;
                 TextToSpeechVoicesComboBox.Visibility = Visibility.Collapsed;
                 break;
 
             case AudioSourceType.TextToSpeech:
                 PathType.Text = "Text to Speech Voice";
-                TextBlockUri.Visibility = Visibility.Collapsed;
+                UriTextBox.Visibility = Visibility.Collapsed;
                 TextToSpeechVoicesComboBox.Visibility = Visibility.Visible;
                 break;
 

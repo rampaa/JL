@@ -14,7 +14,7 @@
 
             <TextBlock x:Name="PathType" Text="URI" TextWrapping="Wrap" Margin="0,10,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
             <DockPanel>
-                <TextBox Name="TextBlockUri" Width="400"
+                <TextBox Name="UriTextBox" Width="400"
                          Text=""
                          MaxHeight="300"
                          TextWrapping="Wrap"
