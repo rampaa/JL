@@ -9,7 +9,7 @@ namespace JL.Core.Dicts.KanjiDict;
 
 internal static class YomichanKanjiDBManager
 {
-    public const int Version = 0;
+    public const int Version = 1;
 
     private const string SingleTermQuery =
         """

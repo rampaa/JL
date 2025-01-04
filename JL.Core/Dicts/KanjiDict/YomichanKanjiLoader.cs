@@ -39,7 +39,10 @@ internal static class YomichanKanjiLoader
 
                 if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
                 {
-                    kanjiResult.Add(yomichanKanjiRecord);
+                    if (!kanjiResult.Contains(yomichanKanjiRecord))
+                    {
+                        kanjiResult.Add(yomichanKanjiRecord);
+                    }
                 }
                 else
                 {

@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.KanjiDict;
 
-internal sealed class YomichanKanjiRecord : IDictRecord
+internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanjiRecord>
 {
     public string[]? OnReadings { get; }
     public string[]? KunReadings { get; }
@@ -131,5 +131,72 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         }
 
         return statResult.ToString();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is YomichanKanjiRecord yomichanKanjiRecord
+               && ((OnReadings is null && yomichanKanjiRecord.OnReadings is null)
+                || (OnReadings is not null && yomichanKanjiRecord.OnReadings is not null && OnReadings.SequenceEqual(yomichanKanjiRecord.OnReadings)))
+               && ((KunReadings is null && yomichanKanjiRecord.KunReadings is null)
+                || (KunReadings is not null && yomichanKanjiRecord.KunReadings is not null && KunReadings.SequenceEqual(yomichanKanjiRecord.KunReadings)))
+               && ((Definitions is null && yomichanKanjiRecord.Definitions is null)
+                || (Definitions is not null && yomichanKanjiRecord.Definitions is not null && Definitions.SequenceEqual(yomichanKanjiRecord.Definitions)));
+    }
+
+    public bool Equals(YomichanKanjiRecord? other)
+    {
+        return other is not null
+               && ((OnReadings is null && other.OnReadings is null)
+                || (OnReadings is not null && other.OnReadings is not null && OnReadings.SequenceEqual(other.OnReadings)))
+               && ((KunReadings is null && other.KunReadings is null)
+                || (KunReadings is not null && other.KunReadings is not null && KunReadings.SequenceEqual(other.KunReadings)))
+               && ((Definitions is null && other.Definitions is null)
+                || (Definitions is not null && other.Definitions is not null && Definitions.SequenceEqual(other.Definitions)));
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 17 * 37;
+            if (OnReadings is not null)
+            {
+                foreach (string onReading in OnReadings)
+                {
+                    hash = (hash * 37) + onReading.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            if (KunReadings is not null)
+            {
+                foreach (string kunReading in KunReadings)
+                {
+                    hash = (hash * 37) + kunReading.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            if (Definitions is not null)
+            {
+                foreach (string definition in Definitions)
+                {
+                    hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            return hash;
+        }
     }
 }
