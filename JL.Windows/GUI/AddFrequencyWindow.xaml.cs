@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
@@ -31,8 +32,11 @@ internal sealed partial class AddFrequencyWindow
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         FreqTypeComboBox.ClearValue(BorderBrushProperty);
-        TextBlockPath.ClearValue(BorderBrushProperty);
+        PathTextBlock.ClearValue(BorderBrushProperty);
+        PathTextBlock.ClearValue(CursorProperty);
+        PathTextBlock.ClearValue(ToolTipProperty);
         NameTextBox.ClearValue(BorderBrushProperty);
+        NameTextBox.ToolTip = "Name of the frequency dictionary must be unique";
 
         string? typeString = FreqTypeComboBox.SelectionBoxItem.ToString();
         if (string.IsNullOrEmpty(typeString))
@@ -41,34 +45,50 @@ internal sealed partial class AddFrequencyWindow
             return;
         }
 
-        string path = TextBlockPath.Text;
+        string path = PathTextBlock.Text;
         string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
 
-        if (string.IsNullOrWhiteSpace(path)
-            || !Path.Exists(fullPath)
-            || FreqUtils.FreqDicts.Values.Any(freq => freq.Path == path))
+        if (string.IsNullOrWhiteSpace(path) || !Path.Exists(fullPath))
         {
-            TextBlockPath.BorderBrush = Brushes.Red;
+            PathTextBlock.BorderBrush = Brushes.Red;
+            PathTextBlock.Cursor = Cursors.Help;
+            PathTextBlock.ToolTip = "Invalid path!";
+            return;
+        }
+
+        if (FreqUtils.FreqDicts.Values.Any(freq => freq.Path == path))
+        {
+            PathTextBlock.BorderBrush = Brushes.Red;
+            PathTextBlock.Cursor = Cursors.Help;
+            PathTextBlock.ToolTip = "Path of the frequency dictionary must be unique!";
             return;
         }
 
         string name = NameTextBox.Text;
         if (string.IsNullOrWhiteSpace(name)
             || name.Length > 128
-            || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
-            || FreqUtils.FreqDicts.ContainsKey(name))
+            || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
             NameTextBox.BorderBrush = Brushes.Red;
+            NameTextBox.ToolTip = "Invalid frequency dictionary name!";
+            return;
+        }
+
+        if (FreqUtils.FreqDicts.ContainsKey(name))
+        {
+            NameTextBox.BorderBrush = Brushes.Red;
+            NameTextBox.ToolTip = "Name of the frequency dictionary must be unique!";
             return;
         }
 
         FreqType type = typeString.GetEnum<FreqType>();
         if (type is FreqType.Yomichan or FreqType.YomichanKanji)
         {
-            bool validPath = Directory.EnumerateFiles(fullPath, type is FreqType.Yomichan ? "term_meta_bank_*.json" : "kanji_meta_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+            bool validPath = Directory.EnumerateFiles(fullPath, "*_meta_bank_*.json", SearchOption.TopDirectoryOnly).Any();
             if (!validPath)
             {
-                TextBlockPath.BorderBrush = Brushes.Red;
+                PathTextBlock.BorderBrush = Brushes.Red;
+                PathTextBlock.ToolTip = "No valid file was found at the specified path!";
                 return;
             }
         }
@@ -91,7 +111,7 @@ internal sealed partial class AddFrequencyWindow
 
         if (openFileDialog.ShowDialog() is true)
         {
-            TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
+            PathTextBlock.Text = Utils.GetPath(openFileDialog.FileName);
         }
     }
 
@@ -104,7 +124,7 @@ internal sealed partial class AddFrequencyWindow
 
         if (openFolderDialog.ShowDialog() is true)
         {
-            TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);
+            PathTextBlock.Text = Utils.GetPath(openFolderDialog.FolderName);
         }
     }
 
