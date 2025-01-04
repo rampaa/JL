@@ -88,6 +88,7 @@ internal sealed partial class AddFrequencyWindow
             if (!validPath)
             {
                 PathTextBlock.BorderBrush = Brushes.Red;
+                PathTextBlock.Cursor = Cursors.Help;
                 PathTextBlock.ToolTip = "No valid file was found at the specified path!";
                 return;
             }
