@@ -268,9 +268,10 @@ public static partial class JapaneseUtils
             else
             {
                 int stringBuilderCount = stringBuilders.Count;
+                string unicodeText = unicodeTextList[i];
                 for (int j = 0; j < stringBuilderCount; j++)
                 {
-                    _ = stringBuilders[j].Append(unicodeTextList[i]);
+                    _ = stringBuilders[j].Append(unicodeText);
                 }
             }
         }
@@ -366,7 +367,7 @@ public static partial class JapaneseUtils
             sentence = sentence[1..];
         }
 
-        if (s_leftToRightBracketDict.ContainsKey(sentence.LastOrDefault()))
+        if (sentence.Length > 0 && s_leftToRightBracketDict.ContainsKey(sentence[^1]))
         {
             sentence = sentence[..^1];
         }
@@ -385,7 +386,8 @@ public static partial class JapaneseUtils
                 }
                 else
                 {
-                    int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
+                    char sentenceFirstChar = sentence[0];
+                    int numberOfLeftBrackets = sentence.Count(p => p == sentenceFirstChar);
                     int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
 
                     if (numberOfLeftBrackets == numberOfRightBrackets + 1)

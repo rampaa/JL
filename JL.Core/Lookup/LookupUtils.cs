@@ -537,9 +537,10 @@ public static class LookupUtils
                     ? getRecordsFromDB!(dict.Name, textWithoutLongVowelMark, longVowelQueryOrParameters![i]!)
                     : null;
 
+                string text = textList[i];
                 for (int j = 0; j < textWithoutLongVowelMark.Count; j++)
                 {
-                    GetWordResultsHelper(dict, results, null, textList[i], textWithoutLongVowelMark[j], dbWordDictForLongVowelConversion, null);
+                    GetWordResultsHelper(dict, results, null, text, textWithoutLongVowelMark[j], dbWordDictForLongVowelConversion, null);
                 }
             }
         }
@@ -959,6 +960,10 @@ public static class LookupUtils
             int resultCount = wordResult.Results.Count;
             for (int i = 0; i < resultCount; i++)
             {
+                string? deconjugationProcess = deconjugatedWord
+                    ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i])
+                    : null;
+
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
                 int dictRecordCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordCount; j++)
@@ -972,7 +977,7 @@ public static class LookupUtils
                         entryId: jmdictResult.Id,
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i]) : null,
+                        deconjugationProcess: deconjugationProcess,
                         frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
                         primarySpellingOrthographyInfoList: jmdictResult.PrimarySpellingOrthographyInfo,
                         readingsOrthographyInfoList: jmdictResult.ReadingsOrthographyInfo,
@@ -1140,6 +1145,10 @@ public static class LookupUtils
             int resultCount = wordResult.Results.Count;
             for (int i = 0; i < resultCount; i++)
             {
+                string? deconjugationProcess = deconjugatedWord
+                    ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i])
+                    : null;
+
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
                 int dictRecordCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordCount; j++)
@@ -1150,7 +1159,7 @@ public static class LookupUtils
                         primarySpelling: epwingResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i]) : null,
+                        deconjugationProcess: deconjugationProcess,
                         frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null ? [epwingResult.Reading] : null,
@@ -1231,6 +1240,10 @@ public static class LookupUtils
             int resultCount = wordResult.Results.Count;
             for (int i = 0; i < resultCount; i++)
             {
+                string? deconjugationProcess = deconjugatedWord
+                    ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i])
+                    : null;
+
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
                 int dictRecordCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordCount; j++)
@@ -1242,12 +1255,10 @@ public static class LookupUtils
                         alternativeSpellings: epwingResult.AlternativeSpellings,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: deconjugatedWord ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i]) : null,
+                        deconjugationProcess: deconjugationProcess,
                         frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         dict: wordResult.Dict,
-                        readings: epwingResult.Reading is not null
-                            ? [epwingResult.Reading]
-                            : null,
+                        readings: epwingResult.Reading is not null ? [epwingResult.Reading] : null,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchAccentDict: pitchAccentDict
                     );
@@ -1331,6 +1342,10 @@ public static class LookupUtils
             int resultCount = wordResult.Results.Count;
             for (int i = 0; i < resultCount; i++)
             {
+                string? deconjugationProcess = deconjugatedWord
+                    ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i])
+                    : null;
+
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
                 int dictRecordCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordCount; j++)
@@ -1341,11 +1356,7 @@ public static class LookupUtils
                         primarySpelling: customWordDictResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: customWordDictResult.HasUserDefinedWordClass
-                            ? deconjugatedWord
-                                ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes![i])
-                                : null
-                            : null,
+                        deconjugationProcess: customWordDictResult.HasUserDefinedWordClass ? deconjugationProcess : null,
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
                         alternativeSpellings: customWordDictResult.AlternativeSpellings,
