@@ -193,12 +193,12 @@ internal sealed partial class EditFrequencyWindow
 
         switch (selectedFreqType)
         {
-            // not providing a description for the filter causes the filename returned to be empty
             case FreqType.Yomichan:
             case FreqType.YomichanKanji:
                 BrowseForFrequencyFolder();
                 break;
 
+            // Not providing a description for the filter causes the filename returned to be empty
             case FreqType.Nazeka:
                 BrowseForFrequencyFile("Nazeka file|*.json");
                 break;

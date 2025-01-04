@@ -221,7 +221,7 @@ internal sealed partial class EditDictionaryWindow
 
         switch (selectedDictType)
         {
-            // not providing a description for the filter causes the filename returned to be empty
+            // Not providing a description for the filter causes the filename returned to be empty
             case DictType.JMdict:
                 BrowseForDictionaryFile("JMdict file|JMdict.xml");
                 break;
