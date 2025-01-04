@@ -37,32 +37,17 @@ internal sealed partial class AddWordWindow
     // ReSharper disable once AsyncVoidMethod
     private async void SaveButton_Click(object? sender, RoutedEventArgs? e)
     {
-        bool isValid = true;
-
-        if (!JapaneseUtils.JapaneseRegex.IsMatch(SpellingsTextBox.Text))
-        {
-            SpellingsTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (SpellingsTextBox.BorderBrush == Brushes.Red)
-        {
-            SpellingsTextBox.ClearValue(BorderBrushProperty);
-        }
+        DefinitionsTextBox.ClearValue(BorderBrushProperty);
+        DefinitionsTextBox.ClearValue(CursorProperty);
+        DefinitionsTextBox.ClearValue(ToolTipProperty);
 
         string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
         string[] definitions = rawDefinitions.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (definitions.Length is 0)
         {
             DefinitionsTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (DefinitionsTextBox.BorderBrush == Brushes.Red)
-        {
-            DefinitionsTextBox.ClearValue(BorderBrushProperty);
-        }
-
-        if (!isValid)
-        {
+            DefinitionsTextBox.Cursor = Cursors.Help;
+            DefinitionsTextBox.ToolTip = "Definitions cannot be left empty!";
             return;
         }
 
