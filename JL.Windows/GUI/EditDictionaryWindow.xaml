@@ -14,7 +14,7 @@
 
             <TextBlock Text="Path" TextWrapping="Wrap" Margin="0,10,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
             <WrapPanel>
-                <TextBox Name="TextBlockPath" Width="400"
+                <TextBox Name="PathTextBlock" Width="400"
                          Text=""
                          Margin="10"
                          IsReadOnly="True" />

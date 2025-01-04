@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
@@ -32,8 +33,11 @@ internal sealed partial class AddDictionaryWindow
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         ComboBoxDictType.ClearValue(BorderBrushProperty);
-        TextBlockPath.ClearValue(BorderBrushProperty);
+        PathTextBlock.ClearValue(BorderBrushProperty);
+        PathTextBlock.ClearValue(CursorProperty);
+        PathTextBlock.ClearValue(ToolTipProperty);
         NameTextBox.ClearValue(BorderBrushProperty);
+        NameTextBox.ToolTip = "Dictionary name must be unique";
 
         string? typeString = ComboBoxDictType.SelectionBoxItem.ToString();
         if (string.IsNullOrEmpty(typeString))
@@ -42,34 +46,59 @@ internal sealed partial class AddDictionaryWindow
             return;
         }
 
-        string path = TextBlockPath.Text;
+        string path = PathTextBlock.Text;
         string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
 
         if (string.IsNullOrWhiteSpace(path)
-            || !Path.Exists(fullPath)
-            || DictUtils.Dicts.Values.Any(dict => dict.Path == path))
+            || !Path.Exists(fullPath))
         {
-            TextBlockPath.BorderBrush = Brushes.Red;
+            PathTextBlock.BorderBrush = Brushes.Red;
+            PathTextBlock.Cursor = Cursors.Help;
+            PathTextBlock.ToolTip = "Invalid path!";
+            return;
+        }
+
+        if (DictUtils.Dicts.Values.Any(dict => dict.Path == path))
+        {
+            PathTextBlock.BorderBrush = Brushes.Red;
+            PathTextBlock.Cursor = Cursors.Help;
+            PathTextBlock.ToolTip = "Dictionary path must be unique!";
             return;
         }
 
         string name = NameTextBox.Text;
         if (string.IsNullOrWhiteSpace(name)
             || name.Length > 128
-            || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
-            || DictUtils.Dicts.ContainsKey(name))
+            || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
             NameTextBox.BorderBrush = Brushes.Red;
+            NameTextBox.ToolTip = "Invalid dictionary name!";
+            return;
+        }
+
+        if (DictUtils.Dicts.ContainsKey(name))
+        {
+            NameTextBox.BorderBrush = Brushes.Red;
+            NameTextBox.ToolTip = "Dictionary name must be unique!";
             return;
         }
 
         DictType type = typeString.GetEnum<DictType>();
         if (DictUtils.YomichanDictTypes.Contains(type))
         {
-            bool validPath = Directory.EnumerateFiles(fullPath, type is DictType.NonspecificKanjiYomichan ? "kanji_bank_*.json" : "term_bank_*.json", SearchOption.TopDirectoryOnly).Any();
+            bool validPath = Directory.EnumerateFiles(fullPath,
+                type is DictType.NonspecificKanjiYomichan
+                    ? "kanji_bank_*.json"
+                    : type is DictType.PitchAccentYomichan
+                        ? "term*bank_*.json"
+                        : "term_bank_*.json",
+            SearchOption.TopDirectoryOnly).Any();
+
             if (!validPath)
             {
-                TextBlockPath.BorderBrush = Brushes.Red;
+                PathTextBlock.BorderBrush = Brushes.Red;
+                PathTextBlock.Cursor = Cursors.Help;
+                PathTextBlock.ToolTip = "No valid file was found at the specified path!";
                 return;
             }
         }
@@ -96,7 +125,7 @@ internal sealed partial class AddDictionaryWindow
 
         if (openFileDialog.ShowDialog() is true)
         {
-            TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
+            PathTextBlock.Text = Utils.GetPath(openFileDialog.FileName);
         }
     }
 
@@ -109,7 +138,7 @@ internal sealed partial class AddDictionaryWindow
 
         if (openFolderDialog.ShowDialog() is true)
         {
-            TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);
+            PathTextBlock.Text = Utils.GetPath(openFolderDialog.FolderName);
         }
     }
 
