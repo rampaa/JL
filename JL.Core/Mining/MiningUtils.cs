@@ -755,19 +755,19 @@ public static class MiningUtils
             AnkiConfig? ankiConfig;
             if (DictUtils.s_wordDictTypes.Contains(dictType))
             {
-                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
+                _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
             }
             else if (DictUtils.s_kanjiDictTypes.Contains(dictType))
             {
-                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
+                _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
             }
             else if (DictUtils.s_nameDictTypes.Contains(dictType))
             {
-                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
+                _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
             }
             else
             {
-                ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
+                _ = ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
             }
 
             if (ankiConfig is null || ankiConfig.Fields.Count is 0)
@@ -830,19 +830,19 @@ public static class MiningUtils
         AnkiConfig? ankiConfig;
         if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {
-            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
+            _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
         }
         else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
-            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
+            _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
         }
         else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
         {
-            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
+            _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
         }
         else
         {
-            ankiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
+            _ = ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
         }
 
         if (ankiConfig is null)
