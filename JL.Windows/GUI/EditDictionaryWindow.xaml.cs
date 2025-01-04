@@ -47,7 +47,7 @@ internal sealed partial class EditDictionaryWindow
         string path = PathTextBlock.Text;
         string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
 
-        if (string.IsNullOrWhiteSpace(path))
+        if (string.IsNullOrWhiteSpace(path) || (_dict.Path != path && !Path.Exists(fullPath)))
         {
             PathTextBlock.BorderBrush = Brushes.Red;
             PathTextBlock.Cursor = Cursors.Help;
@@ -55,7 +55,7 @@ internal sealed partial class EditDictionaryWindow
             return;
         }
 
-        if (_dict.Path != path && (!Path.Exists(fullPath) || DictUtils.Dicts.Values.Any(dict => dict.Path == path)))
+        if (_dict.Path != path && DictUtils.Dicts.Values.Any(dict => dict.Path == path))
         {
             PathTextBlock.BorderBrush = Brushes.Red;
             PathTextBlock.Cursor = Cursors.Help;
