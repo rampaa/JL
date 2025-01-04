@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMdict;
@@ -223,19 +222,10 @@ internal static class JmdictRecordBuilder
                 for (int j = 0; j < senseListCount; j++)
                 {
                     Sense sense = entry.SenseList[j];
-
-                    if (sense.StagKList.Count is not 0 && sense.StagRList.Count is not 0
-                            && !sense.StagRList.Contains(readingElement.Reb)
-                            && !sense.StagKList.Contains(primarySpelling)
-                            && alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any())
-                    {
-                        Debug.WriteLine("This should not happen.");
-                    }
-
                     if ((sense.StagKList.Count is 0 && sense.StagRList.Count is 0)
                         || sense.StagRList.Contains(readingElement.Reb)
                         || sense.StagKList.Contains(primarySpelling)
-                        // || (alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any())
+                        || (alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any())
                         )
                     {
                         definitionList.Add(sense.GlossList.ToArray());
