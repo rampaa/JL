@@ -10,7 +10,7 @@ namespace JL.Core.Dicts.PitchAccent;
 
 internal static class YomichanPitchAccentDBManager
 {
-    public const int Version = 2;
+    public const int Version = 3;
 
     private const string SingleTermQuery =
         """

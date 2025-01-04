@@ -44,10 +44,12 @@ internal static class YomichanPitchAccentLoader
                 }
 
                 string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Spelling).GetPooledString();
-
                 if (pitchDict.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
                 {
-                    result.Add(newEntry);
+                    if (!result.Contains(newEntry))
+                    {
+                        result.Add(newEntry);
+                    }
                 }
 
                 else
