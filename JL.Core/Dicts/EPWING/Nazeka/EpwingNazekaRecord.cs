@@ -47,63 +47,35 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
     public int GetFrequency(Freq freq)
     {
+        bool readingExists = Reading is not null;
         int frequency = int.MaxValue;
-
-        if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
-                out IList<FrequencyRecord>? freqResults))
+        if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
             int freqResultCount = freqResults.Count;
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
+                if ((!readingExists && PrimarySpelling == freqResult.Spelling)
+                    || (readingExists && Reading == freqResult.Spelling))
                 {
-                    if (frequency > freqResult.Frequency)
-                    {
-                        frequency = freqResult.Frequency;
-                    }
-                }
-            }
-
-            if (frequency is not int.MaxValue || AlternativeSpellings is null)
-            {
-                return frequency;
-            }
-
-            for (int i = 0; i < AlternativeSpellings.Length; i++)
-            {
-                if (freq.Contents.TryGetValue(
-                        JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
-                        out IList<FrequencyRecord>? alternativeSpellingFreqResults))
-                {
-                    int alternativeSpellingFreqResultCount = alternativeSpellingFreqResults.Count;
-                    for (int j = 0; j < alternativeSpellingFreqResultCount; j++)
-                    {
-                        FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
-                        if (Reading == alternativeSpellingFreqResult.Spelling)
-                        {
-                            if (frequency > alternativeSpellingFreqResult.Frequency)
-                            {
-                                frequency = alternativeSpellingFreqResult.Frequency;
-                            }
-                        }
-                    }
+                    return freqResult.Frequency;
                 }
             }
         }
-        else if (Reading is not null
-            && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out IList<FrequencyRecord>? readingFreqResults))
+
+        if (readingExists)
         {
-            int readingFreqResultCount = readingFreqResults.Count;
-            for (int i = 0; i < readingFreqResultCount; i++)
+            bool alternativeSpellingsExist = AlternativeSpellings is not null;
+            if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out IList<FrequencyRecord>? readingFreqResults))
             {
-                FrequencyRecord readingFreqResult = readingFreqResults[i];
-                if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading[0]))
-                    || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
+                int readingFreqResultCount = readingFreqResults.Count;
+                for (int j = 0; j < readingFreqResultCount; j++)
                 {
-                    if (frequency > readingFreqResult.Frequency)
+                    FrequencyRecord readingFreqResult = readingFreqResults[j];
+                    if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading[0]))
+                        || (alternativeSpellingsExist && AlternativeSpellings!.Contains(readingFreqResult.Spelling)))
                     {
-                        frequency = readingFreqResult.Frequency;
+                        return readingFreqResult.Frequency;
                     }
                 }
             }
@@ -114,6 +86,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
     public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
+        bool readingExists = Reading is not null;
         int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
@@ -121,54 +94,27 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-
-                if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
+                if ((!readingExists && PrimarySpelling == freqResult.Spelling)
+                    || (readingExists && Reading == freqResult.Spelling))
                 {
-                    if (frequency > freqResult.Frequency)
-                    {
-                        frequency = freqResult.Frequency;
-                    }
-                }
-            }
-
-            if (frequency is not int.MaxValue || AlternativeSpellings is null)
-            {
-                return frequency;
-            }
-
-            for (int i = 0; i < AlternativeSpellings.Length; i++)
-            {
-                if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]), out List<FrequencyRecord>? alternativeSpellingFreqResults))
-                {
-                    int alternativeSpellingFreqResultCount = alternativeSpellingFreqResults.Count;
-                    for (int j = 0; j < alternativeSpellingFreqResultCount; j++)
-                    {
-                        FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
-                        if (Reading == alternativeSpellingFreqResult.Spelling)
-                        {
-                            if (frequency > alternativeSpellingFreqResult.Frequency)
-                            {
-                                frequency = alternativeSpellingFreqResult.Frequency;
-                            }
-                        }
-                    }
+                    return freqResult.Frequency;
                 }
             }
         }
 
-        else if (Reading is not null
-                 && freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out List<FrequencyRecord>? readingFreqResults))
+        if (readingExists)
         {
-            int readingFreqResultCount = readingFreqResults.Count;
-            for (int i = 0; i < readingFreqResultCount; i++)
+            bool alternativeSpellingsExist = AlternativeSpellings is not null;
+            if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out List<FrequencyRecord>? readingFreqResults))
             {
-                FrequencyRecord readingFreqResult = readingFreqResults[i];
-                if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading[0]))
-                    || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
+                int readingFreqResultCount = readingFreqResults.Count;
+                for (int j = 0; j < readingFreqResultCount; j++)
                 {
-                    if (frequency > readingFreqResult.Frequency)
+                    FrequencyRecord readingFreqResult = readingFreqResults[j];
+                    if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading[0]))
+                        || (alternativeSpellingsExist && AlternativeSpellings!.Contains(readingFreqResult.Spelling)))
                     {
-                        frequency = readingFreqResult.Frequency;
+                        return readingFreqResult.Frequency;
                     }
                 }
             }
