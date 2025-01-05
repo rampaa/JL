@@ -258,4 +258,42 @@ internal sealed class LookupTests
         // Assert
         Assert.That(expected == actual);
     }
+
+    [Test]
+    public void Freq_Ｈ_エッチ()
+    {
+        // Arrange
+        const int expected = 510;
+
+        const string text = "Ｈ";
+
+        // Act
+        LookupResult[]? result = LookupUtils.LookupText(text);
+
+        int actual = result is not null
+            ? result.First(static x => x.Readings?.Contains("エッチ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            : int.MaxValue;
+
+        // Assert
+        Assert.That(expected == actual);
+    }
+
+    [Test]
+    public void Freq_咫_た()
+    {
+        // Arrange
+        const int expected = int.MaxValue;
+
+        const string text = "咫";
+
+        // Act
+        LookupResult[]? result = LookupUtils.LookupText(text);
+
+        int actual = result is not null
+            ? result.First(static x => x.Readings?.Contains("た") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            : int.MaxValue;
+
+        // Assert
+        Assert.That(expected == actual);
+    }
 }

@@ -348,6 +348,7 @@ various information fields.
   <!ENTITY dei "deity">
   <!ENTITY derog "derogatory">
   <!ENTITY doc "document">
+  <!ENTITY euph "euphemistic">
   <!ENTITY ev "event">
   <!ENTITY fam "familiar language">
   <!ENTITY fem "female term or language">
@@ -523,6 +524,73 @@ various information fields.
       <gloss>beloved</gloss>
       <gloss>missed</gloss>
       <gloss>nostalgic</gloss>
+    </sense>
+  </entry>
+  <entry>
+    <ent_seq>1029150</ent_seq>
+    <k_ele>
+      <keb>Ｈ</keb>
+    </k_ele>
+    <k_ele>
+      <keb>ｈ</keb>
+    </k_ele>
+    <r_ele>
+      <reb>エッチ</reb>
+      <re_pri>gai1</re_pri>
+    </r_ele>
+    <r_ele>
+      <reb>エイチ</reb>
+    </r_ele>
+    <sense>
+      <pos>&n;</pos>
+      <gloss>H</gloss>
+      <gloss>h</gloss>
+    </sense>
+    <sense>
+      <stagk>Ｈ</stagk>
+      <stagr>エッチ</stagr>
+      <pos>&adj-na;</pos>
+      <pos>&n;</pos>
+      <xref>変態・へんたい・3</xref>
+      <misc>&uk;</misc>
+      <s_inf>from 変態</s_inf>
+      <gloss>indecent</gloss>
+      <gloss>lewd</gloss>
+      <gloss>sexy</gloss>
+      <gloss>dirty</gloss>
+      <gloss>obscene</gloss>
+    </sense>
+    <sense>
+      <stagk>Ｈ</stagk>
+      <stagr>エッチ</stagr>
+      <pos>&n;</pos>
+      <pos>&vs;</pos>
+      <pos>&vi;</pos>
+      <misc>&uk;</misc>
+      <misc>&col;</misc>
+      <misc>&euph;</misc>
+      <gloss>(having) sex</gloss>
+    </sense>
+    <sense>
+      <pos>&pref;</pos>
+      <xref>平成</xref>
+      <misc>&abbr;</misc>
+      <gloss>nth year in the Heisei era (1989.1.8-2019.4.30)</gloss>
+    </sense>
+    <sense>
+      <pos>&n;</pos>
+      <gloss>hour</gloss>
+    </sense>
+    <sense>
+      <stagk>Ｈ</stagk>
+      <pos>&n;</pos>
+      <gloss>hydrogen (H)</gloss>
+    </sense>
+    <sense>
+      <pos>&n;</pos>
+      <xref>ホール・2</xref>
+      <field>&golf;</field>
+      <gloss>hole</gloss>
     </sense>
   </entry>
   <entry>
@@ -835,6 +903,29 @@ various information fields.
       <pos>&n-suf;</pos>
       <gloss>more than</gloss>
       <gloss>over</gloss>
+    </sense>
+  </entry>
+  <entry>
+    <ent_seq>2243700</ent_seq>
+    <k_ele>
+      <keb>咫</keb>
+    </k_ele>
+    <k_ele>
+      <keb>尺</keb>
+    </k_ele>
+    <r_ele>
+      <reb>あた</reb>
+    </r_ele>
+    <r_ele>
+      <reb>た</reb>
+      <re_restr>咫</re_restr>
+    </r_ele>
+    <sense>
+      <pos>&n;</pos>
+      <pos>&n-suf;</pos>
+      <pos>&ctr;</pos>
+      <misc>&arch;</misc>
+      <gloss>distance between outstretched thumb and middle finger (approx. 18 cm)</gloss>
     </sense>
   </entry>
   <entry>
