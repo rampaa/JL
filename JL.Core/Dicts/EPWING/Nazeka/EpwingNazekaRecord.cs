@@ -47,7 +47,6 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
     public int GetFrequency(Freq freq)
     {
-        bool readingExists = Reading is not null;
         int frequency = int.MaxValue;
         if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
@@ -55,18 +54,17 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if ((!readingExists && PrimarySpelling == freqResult.Spelling)
-                    || (readingExists && Reading == freqResult.Spelling))
+                if (PrimarySpelling == freqResult.Spelling || Reading == freqResult.Spelling)
                 {
                     return freqResult.Frequency;
                 }
             }
         }
 
-        if (readingExists)
+        else if (Reading is not null)
         {
             bool alternativeSpellingsExist = AlternativeSpellings is not null;
-            if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out IList<FrequencyRecord>? readingFreqResults))
+            if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out IList<FrequencyRecord>? readingFreqResults))
             {
                 int readingFreqResultCount = readingFreqResults.Count;
                 for (int j = 0; j < readingFreqResultCount; j++)
@@ -86,7 +84,6 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
     public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
-        bool readingExists = Reading is not null;
         int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
@@ -94,18 +91,17 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if ((!readingExists && PrimarySpelling == freqResult.Spelling)
-                    || (readingExists && Reading == freqResult.Spelling))
+                if (PrimarySpelling == freqResult.Spelling || Reading == freqResult.Spelling)
                 {
                     return freqResult.Frequency;
                 }
             }
         }
 
-        if (readingExists)
+        else if (Reading is not null)
         {
             bool alternativeSpellingsExist = AlternativeSpellings is not null;
-            if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out List<FrequencyRecord>? readingFreqResults))
+            if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out List<FrequencyRecord>? readingFreqResults))
             {
                 int readingFreqResultCount = readingFreqResults.Count;
                 for (int j = 0; j < readingFreqResultCount; j++)

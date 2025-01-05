@@ -71,7 +71,6 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
 
     public int GetFrequency(Freq freq)
     {
-        bool readingExists = Reading is not null;
         int frequency = int.MaxValue;
         if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
@@ -79,15 +78,14 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if ((!readingExists && PrimarySpelling == freqResult.Spelling)
-                    || (readingExists && Reading == freqResult.Spelling))
+                if (PrimarySpelling == freqResult.Spelling || Reading == freqResult.Spelling)
                 {
                     return freqResult.Frequency;
                 }
             }
         }
 
-        if (readingExists && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out IList<FrequencyRecord>? readingFreqResults))
+        else if (Reading is not null && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out IList<FrequencyRecord>? readingFreqResults))
         {
             int readingFreqResultCount = readingFreqResults.Count;
             for (int j = 0; j < readingFreqResultCount; j++)
@@ -113,15 +111,14 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if ((!readingExists && PrimarySpelling == freqResult.Spelling)
-                    || (readingExists && Reading == freqResult.Spelling))
+                if (PrimarySpelling == freqResult.Spelling || Reading == freqResult.Spelling)
                 {
                     return freqResult.Frequency;
                 }
             }
         }
 
-        if (readingExists && freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out List<FrequencyRecord>? readingFreqResults))
+        else if (readingExists && freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out List<FrequencyRecord>? readingFreqResults))
         {
             int readingFreqResultCount = readingFreqResults.Count;
             for (int j = 0; j < readingFreqResultCount; j++)

@@ -246,7 +246,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if ((!readingsExist && PrimarySpelling == freqResult.Spelling)
+                if (PrimarySpelling == freqResult.Spelling
                     || (readingsExist && Readings!.Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
@@ -254,7 +254,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
             }
         }
 
-        if (readingsExist)
+        else if (readingsExist)
         {
             bool alternativeSpellingsExist = AlternativeSpellings is not null;
             for (int i = 0; i < Readings!.Length; i++)
@@ -289,7 +289,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if ((!readingsExist && PrimarySpelling == freqResult.Spelling)
+                if (PrimarySpelling == freqResult.Spelling
                     || (readingsExist && Readings!.Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
@@ -297,7 +297,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
             }
         }
 
-        if (readingsExist)
+        else if (readingsExist)
         {
             bool alternativeSpellingsExist = AlternativeSpellings is not null;
             for (int i = 0; i < Readings!.Length; i++)
