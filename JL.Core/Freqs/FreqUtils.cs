@@ -20,7 +20,7 @@ public static class FreqUtils
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
-                true, 1, 57273, 35894, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                true, 1, 57273, 35893, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
         {
             "Narou (Nazeka)",
