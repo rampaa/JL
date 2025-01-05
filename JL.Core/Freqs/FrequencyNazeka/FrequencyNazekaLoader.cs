@@ -39,26 +39,51 @@ internal static class FrequencyNazekaLoader
                     freq.MaxValue = frequencyRank;
                 }
 
+                FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
                 if (freq.Contents.TryGetValue(reading, out IList<FrequencyRecord>? readingFreqResult))
                 {
-                    readingFreqResult.Add(new FrequencyRecord(exactSpelling, frequencyRank));
+                    int index = readingFreqResult.IndexOf(frequencyRecordWithExactSpelling);
+                    if (index < 0)
+                    {
+                        readingFreqResult.Add(frequencyRecordWithExactSpelling);
+                    }
+                    else
+                    {
+                        FrequencyRecord record = readingFreqResult[index];
+                        if (record.Frequency > frequencyRank)
+                        {
+                            readingFreqResult[index] = frequencyRecordWithExactSpelling;
+                        }
+                    }
                 }
                 else
                 {
-                    freq.Contents[reading.GetPooledString()] = [new FrequencyRecord(exactSpelling, frequencyRank)];
+                    freq.Contents[reading.GetPooledString()] = [frequencyRecordWithExactSpelling];
                 }
 
                 string exactSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(exactSpelling).GetPooledString();
                 if (exactSpellingInHiragana != reading)
                 {
+                    FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
                     if (freq.Contents.TryGetValue(exactSpellingInHiragana, out IList<FrequencyRecord>? exactSpellingFreqResult))
                     {
-                        exactSpellingFreqResult.Add(new FrequencyRecord(reading, frequencyRank));
+                        int index = exactSpellingFreqResult.IndexOf(frequencyRecordWithReading);
+                        if (index < 0)
+                        {
+                            exactSpellingFreqResult.Add(frequencyRecordWithReading);
+                        }
+                        else
+                        {
+                            FrequencyRecord record = exactSpellingFreqResult[index];
+                            if (record.Frequency > frequencyRank)
+                            {
+                                exactSpellingFreqResult[index] = frequencyRecordWithReading;
+                            }
+                        }
                     }
-
                     else
                     {
-                        freq.Contents[exactSpellingInHiragana] = [new FrequencyRecord(reading, frequencyRank)];
+                        freq.Contents[exactSpellingInHiragana] = [frequencyRecordWithReading];
                     }
                 }
             }
