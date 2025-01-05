@@ -64,7 +64,10 @@ internal static class YomichanPitchAccentLoader
                     {
                         if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))
                         {
-                            readingResult.Add(newEntry);
+                            if (!readingResult.Contains(newEntry))
+                            {
+                                readingResult.Add(newEntry);
+                            }
                         }
                         else
                         {

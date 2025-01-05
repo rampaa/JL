@@ -4,7 +4,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.PitchAccent;
 
-public sealed record class PitchAccentRecord : IDictRecord
+public sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRecord>
 {
     public string Spelling { get; }
     public string? Reading { get; }
@@ -51,5 +51,24 @@ public sealed record class PitchAccentRecord : IDictRecord
         Reading = Spelling == Reading
             ? null
             : Reading!.GetPooledString();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is PitchAccentRecord pitchAccentRecord
+            && Spelling == pitchAccentRecord.Spelling
+            && Reading == pitchAccentRecord.Reading;
+    }
+
+    public bool Equals(PitchAccentRecord? other)
+    {
+        return other is not null
+            && Spelling == other.Spelling
+            && Reading == other.Reading;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Spelling, Reading);
     }
 }
