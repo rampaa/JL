@@ -1437,7 +1437,7 @@ public static class LookupUtils
 
             else
             {
-                freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq), freq.Options.HigherValueMeansHigherFrequency.Value));
+                freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq.Contents), freq.Options.HigherValueMeansHigherFrequency.Value));
             }
         }
 

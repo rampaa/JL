@@ -70,10 +70,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
     public string BuildFormattedDefinition(DictOptions options)
     {
         bool newlines = options.NewlineBetweenDefinitions!.Value;
-
         char separator = newlines ? '\n' : '；';
-
-        StringBuilder defResult = new();
 
         bool multipleDefinitions = Definitions.Length > 1;
         bool showWordClassInfo = options.WordClassInfo!.Value;
@@ -88,6 +85,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
         bool showRelatedTerms = options.RelatedTerm!.Value && RelatedTerms is not null;
         bool showAntonyms = options.Antonym!.Value && Antonyms is not null;
 
+        StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)
         {
             if (newlines && multipleDefinitions)
@@ -236,11 +234,11 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
         return defResult.ToString(0, defResult.Length - 1);
     }
 
-    public int GetFrequency(Freq freq)
+    public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)
     {
         bool readingsExist = Readings is not null;
         int frequency = int.MaxValue;
-        if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
+        if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
             int freqResultCount = freqResults.Count;
             for (int i = 0; i < freqResultCount; i++)
@@ -260,7 +258,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
             for (int i = 0; i < Readings!.Length; i++)
             {
                 string reading = Readings[i];
-                if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out IList<FrequencyRecord>? readingFreqResults))
+                if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out IList<FrequencyRecord>? readingFreqResults))
                 {
                     int readingFreqResultCount = readingFreqResults.Count;
                     for (int j = 0; j < readingFreqResultCount; j++)

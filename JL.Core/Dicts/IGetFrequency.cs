@@ -4,7 +4,7 @@ namespace JL.Core.Dicts;
 
 internal interface IGetFrequency
 {
-    public int GetFrequency(Freq freq);
+    public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict);
 
     public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict);
 }

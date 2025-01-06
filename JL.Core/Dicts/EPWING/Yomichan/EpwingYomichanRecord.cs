@@ -69,10 +69,10 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         return defResult.ToString();
     }
 
-    public int GetFrequency(Freq freq)
+    public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)
     {
         int frequency = int.MaxValue;
-        if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
+        if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
             int freqResultCount = freqResults.Count;
             for (int i = 0; i < freqResultCount; i++)
@@ -85,7 +85,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             }
         }
 
-        else if (Reading is not null && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out IList<FrequencyRecord>? readingFreqResults))
+        else if (Reading is not null && freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out IList<FrequencyRecord>? readingFreqResults))
         {
             int readingFreqResultCount = readingFreqResults.Count;
             for (int j = 0; j < readingFreqResultCount; j++)

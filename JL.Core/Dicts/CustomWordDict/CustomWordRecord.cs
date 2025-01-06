@@ -84,11 +84,11 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
         return defResult.ToString();
     }
 
-    public int GetFrequency(Freq freq)
+    public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)
     {
         bool readingsExist = Readings is not null;
         int frequency = int.MaxValue;
-        if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
+        if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
             int freqResultCount = freqResults.Count;
             for (int i = 0; i < freqResultCount; i++)
@@ -108,7 +108,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
             for (int i = 0; i < Readings!.Length; i++)
             {
                 string reading = Readings[i];
-                if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out IList<FrequencyRecord>? readingFreqResults))
+                if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out IList<FrequencyRecord>? readingFreqResults))
                 {
                     int readingFreqResultCount = readingFreqResults.Count;
                     for (int j = 0; j < readingFreqResultCount; j++)
