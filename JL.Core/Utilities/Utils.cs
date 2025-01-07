@@ -25,8 +25,8 @@ public static partial class Utils
 {
     public static readonly Version JLVersion = new(3, 0, 0);
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
-    public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
-    public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
+    public static readonly string ResourcesPath = Path.Join(ApplicationPath, "Resources");
+    public static readonly string ConfigPath = Path.Join(ApplicationPath, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
 
     [GeneratedRegex(@"\d+", RegexOptions.CultureInvariant)]

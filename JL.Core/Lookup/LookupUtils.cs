@@ -1209,7 +1209,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static ConcurrentBag<LookupResult> BuildEpwingNazekaResult(
+    private static List<LookupResult> BuildEpwingNazekaResult(
         IDictionary<string, IntermediaryResult> epwingNazekaResults, List<Freq>? freqs, List<Freq>? dbFreqs, bool useDBForPitchDict, Dict? pitchDict)
     {
         IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
@@ -1233,8 +1233,8 @@ public static class LookupUtils
             });
 
         bool freqsExist = freqs is not null;
-        ConcurrentBag<LookupResult> results = [];
-        _ = Parallel.ForEach(epwingNazekaResults.Values, wordResult =>
+        List<LookupResult> results = [];
+        foreach (IntermediaryResult wordResult in epwingNazekaResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
             int resultCount = wordResult.Results.Count;
@@ -1266,7 +1266,7 @@ public static class LookupUtils
                     results.Add(result);
                 }
             }
-        });
+        }
 
         return results;
     }
@@ -1311,7 +1311,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static ConcurrentBag<LookupResult> BuildCustomWordResult(
+    private static List<LookupResult> BuildCustomWordResult(
         Dictionary<string, IntermediaryResult> customWordResults, List<Freq>? wordFreqs, List<Freq>? dbWordFreqs, bool useDBForPitchDict, Dict? pitchDict)
     {
         IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
@@ -1335,8 +1335,8 @@ public static class LookupUtils
             });
 
         bool freqsExist = wordFreqs is not null;
-        ConcurrentBag<LookupResult> results = [];
-        _ = Parallel.ForEach(customWordResults.Values, wordResult =>
+        List<LookupResult> results = [];
+        foreach (IntermediaryResult wordResult in customWordResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
             int resultCount = wordResult.Results.Count;
@@ -1368,12 +1368,12 @@ public static class LookupUtils
                     results.Add(result);
                 }
             }
-        });
+        }
 
         return results;
     }
 
-    private static ConcurrentBag<LookupResult> BuildCustomNameResult(
+    private static List<LookupResult> BuildCustomNameResult(
         Dictionary<string, IntermediaryResult> customNameResults, bool useDBForPitchDict, Dict? pitchDict)
     {
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
@@ -1383,8 +1383,8 @@ public static class LookupUtils
             pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
         }
 
-        ConcurrentBag<LookupResult> results = [];
-        _ = Parallel.ForEach(customNameResults.Values, customNameResult =>
+        List<LookupResult> results = [];
+        foreach (IntermediaryResult customNameResult in customNameResults.Values)
         {
             int freq = 0;
             int resultCount = customNameResult.Results.Count;
@@ -1412,7 +1412,7 @@ public static class LookupUtils
                     results.Add(result);
                 }
             }
-        });
+        }
 
         return results;
     }
