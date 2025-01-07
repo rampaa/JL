@@ -6,5 +6,5 @@ internal interface IGetFrequency
 {
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict);
 
-    public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict);
+    public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict);
 }

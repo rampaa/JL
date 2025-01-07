@@ -82,7 +82,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         return frequency;
     }
 
-    public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict)
+    public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))

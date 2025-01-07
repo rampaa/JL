@@ -101,7 +101,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         return frequency;
     }
 
-    public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict)
+    public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         bool readingExists = Reading is not null;
         int frequency = int.MaxValue;

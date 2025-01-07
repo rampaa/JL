@@ -277,7 +277,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
         return frequency;
     }
 
-    public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict)
+    public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         bool readingsExist = Readings is not null;
         int frequency = int.MaxValue;

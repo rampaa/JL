@@ -127,7 +127,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
         return frequency;
     }
 
-    public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict)
+    public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         bool readingsExist = Readings is not null;
         int frequency = int.MaxValue;

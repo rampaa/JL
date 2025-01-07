@@ -1431,7 +1431,7 @@ public static class LookupUtils
             {
                 if (freqDictsForDBExist && freqDictsFromDB!.TryGetValue(freq.Name, out Dictionary<string, List<FrequencyRecord>>? freqDict))
                 {
-                    freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequencyFromDB(freqDict), freq.Options.HigherValueMeansHigherFrequency.Value));
+                    freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freqDict), freq.Options.HigherValueMeansHigherFrequency.Value));
                 }
             }
 
