@@ -1497,7 +1497,7 @@ public static class DictUtils
         }
     }
 
-    private static void CheckIfDBIsUsedForAtLeastOneDict(IReadOnlyList<Dict> dicts)
+    private static void CheckIfDBIsUsedForAtLeastOneDict(Dict[] dicts)
     {
         DBIsUsedForAtLeastOneDict = dicts.Any(static dict => dict.Options.UseDB.Value);
         DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
@@ -1505,7 +1505,7 @@ public static class DictUtils
         DBIsUsedForJmdict = SingleDictTypeDicts[DictType.JMdict] is { Active: true, Options.UseDB.Value: true };
     }
 
-    private static bool CheckIfAnyKanjiDictIsUsed(IReadOnlyList<Dict> dicts)
+    private static bool CheckIfAnyKanjiDictIsUsed(Dict[] dicts)
     {
         return dicts.Any(static d => d is { Type: DictType.Kanjidic or DictType.NonspecificKanjiYomichan or DictType.NonspecificKanjiNazeka or DictType.NonspecificKanjiWithWordSchemaYomichan, Active: true });
     }

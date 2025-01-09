@@ -134,8 +134,6 @@ public static class LookupUtils
         List<string?>? yomichanTextWithoutLongVowelMarkQueries = null;
         List<string?>? jmdictTextWithoutLongVowelMarkParameters = null;
 
-        Dict[] dicts = DictUtils.Dicts.Values.ToArray();
-
         if (DictUtils.DBIsUsedForAtLeastOneDict)
         {
             parameter = DBUtils.GetParameter(textInHiraganaList.Count);
@@ -212,13 +210,9 @@ public static class LookupUtils
             }
         }
 
+        List<Dict> dicts = DictUtils.Dicts.Values.Where(static dict => dict is { Active: true, Type: not DictType.PitchAccentYomichan }).ToList();
         _ = Parallel.ForEach(dicts, dict =>
         {
-            if (!dict.Active)
-            {
-                return;
-            }
-
             bool useDB = dict.Options.UseDB.Value && dict.Ready;
             switch (dict.Type)
             {
@@ -1195,7 +1189,7 @@ public static class LookupUtils
                 (
                     primarySpelling: epwingResult.PrimarySpelling,
                     matchedText: intermediaryResult.MatchedText,
-                    frequencies: kanjiFreqsExist ? GetKanjiFrequencies(epwingResult.PrimarySpelling, kanjiFreqs!) : null,
+                    frequencies: kanjiFreqsExist ? GetKanjiFrequencies(kanji, kanjiFreqs!) : null,
                     dict: intermediaryResult.Dict,
                     readings: epwingResult.Reading is not null ? [epwingResult.Reading] : null,
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
@@ -1295,7 +1289,7 @@ public static class LookupUtils
                     primarySpelling: epwingResult.PrimarySpelling,
                     alternativeSpellings: epwingResult.AlternativeSpellings,
                     matchedText: intermediaryResult.MatchedText,
-                    frequencies: kanjiFreqsExist ? GetKanjiFrequencies(epwingResult.PrimarySpelling, kanjiFreqs!) : null,
+                    frequencies: kanjiFreqsExist ? GetKanjiFrequencies(kanji, kanjiFreqs!) : null,
                     dict: intermediaryResult.Dict,
                     readings: epwingResult.Reading is not null
                         ? [epwingResult.Reading]

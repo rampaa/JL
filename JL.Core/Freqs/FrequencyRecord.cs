@@ -1,15 +1,9 @@
 namespace JL.Core.Freqs;
 
-public readonly struct FrequencyRecord : IEquatable<FrequencyRecord>
+public readonly struct FrequencyRecord(string spelling, int frequency) : IEquatable<FrequencyRecord>
 {
-    internal string Spelling { get; }
-    internal int Frequency { get; }
-
-    internal FrequencyRecord(string spelling, int frequency)
-    {
-        Spelling = spelling;
-        Frequency = frequency;
-    }
+    internal string Spelling { get; } = spelling;
+    internal int Frequency { get; } = frequency;
 
     public override bool Equals(object? obj)
     {
