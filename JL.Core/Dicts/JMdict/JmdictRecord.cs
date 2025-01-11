@@ -243,7 +243,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if (PrimarySpelling == freqResult.Spelling
+                if (freqResult.Spelling == PrimarySpelling
                     || (readingsExist && Readings!.Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
@@ -262,7 +262,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
                     for (int j = 0; j < readingFreqResultCount; j++)
                     {
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
-                        if (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0]))
+                        if (readingFreqResult.Spelling == PrimarySpelling
+                            || (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0])))
                         {
                             return readingFreqResult.Frequency;
                         }
@@ -283,7 +284,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
             for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-                if (PrimarySpelling == freqResult.Spelling
+                if (freqResult.Spelling == PrimarySpelling
                     || (readingsExist && Readings!.Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
@@ -302,7 +303,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency, IEquatable<Jmdi
                     for (int j = 0; j < readingFreqResultCount; j++)
                     {
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
-                        if (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0]))
+                        if (readingFreqResult.Spelling == PrimarySpelling
+                            || (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0])))
                         {
                             return readingFreqResult.Frequency;
                         }
