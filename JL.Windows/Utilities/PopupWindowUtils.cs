@@ -76,7 +76,7 @@ internal static class PopupWindowUtils
     {
         Grid pitchAccentGrid = new();
 
-        bool hasReading = readings?.Length > 0;
+        bool hasReading = readings is not null;
 
         ConfigManager configManager = ConfigManager.Instance;
         double fontSize = hasReading

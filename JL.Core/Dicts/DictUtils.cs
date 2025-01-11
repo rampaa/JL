@@ -35,8 +35,8 @@ public static class DictUtils
     internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; }
     internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; }
     internal static bool DBIsUsedForJmdict { get; private set; }
-    internal static bool AtLeastOneKanjiDictIsActive { get; private set; }
     internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; }
+    internal static bool AtLeastOneKanjiDictIsActive { get; private set; }
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
@@ -1311,7 +1311,7 @@ public static class DictUtils
                 }
             }
 
-            CheckDBUsageForDicts(dicts);
+            CheckDBUsageForDicts(Dicts.Values.ToArray());
 
             if (!UpdatingJmdict
                 && !UpdatingJmnedict

@@ -28,35 +28,21 @@ public static class LookupUtils
 
         ConcurrentBag<LookupResult> lookupResults = [];
 
-        List<Freq>? kanjiFreqs = null;
+        List<LookupFrequencyResult>? kanjiFrequencyResults = null;
+        List<Freq>? kanjiFreqs = FreqUtils.KanjiFreqs;
         string kanji = "";
         if (DictUtils.AtLeastOneKanjiDictIsActive)
         {
-            kanjiFreqs = FreqUtils.FreqDicts.Values
-                .Where(static f => f is { Type: FreqType.YomichanKanji, Active: true })
-                .OrderBy(static f => f.Priority)
-                .ToList();
-
-            if (kanjiFreqs.Count is 0)
-            {
-                kanjiFreqs = null;
-            }
-
             kanji = text.EnumerateRunes().First().ToString();
+
+            kanjiFrequencyResults = kanjiFreqs is not null
+                ? GetKanjiFrequencies(kanji, kanjiFreqs)
+                : null;
         }
 
-        List<Freq>? wordFreqs = FreqUtils.FreqDicts.Values
-            .Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji })
-            .OrderBy(static f => f.Priority)
-            .ToList();
-
-        List<Freq>? dbWordFreqs;
-        if (wordFreqs.Count is 0)
-        {
-            wordFreqs = null;
-            dbWordFreqs = null;
-        }
-        else
+        List<Freq>? wordFreqs = FreqUtils.WordFreqs;
+        List<Freq>? dbWordFreqs = null;
+        if (wordFreqs is not null)
         {
             dbWordFreqs = wordFreqs
                 .Where(static f => f is { Options.UseDB.Value: true, Ready: true })
@@ -130,8 +116,8 @@ public static class LookupUtils
         List<string?>? yomichanTextWithoutLongVowelMarkQueries = null;
         List<string?>? jmdictTextWithoutLongVowelMarkParameters = null;
 
-
-        List<string>? deconjugatedTexts = DictUtils.DBIsUsedForAtLeastOneWordDict || dbIsUsedForPitchDict || FreqUtils.DBIsUsedForAtLeastOneWordFreqDict
+        bool dbIsUsedForAtLeastOneWordFreqDict = wordFreqs is not null;
+        List<string>? deconjugatedTexts = DictUtils.DBIsUsedForAtLeastOneWordDict || dbIsUsedForPitchDict || dbIsUsedForAtLeastOneWordFreqDict
             ? deconjugationResultsList.SelectMany(static lf => lf.Select(static f => f.Text)).Distinct().ToList()
             : null;
 
@@ -207,7 +193,7 @@ public static class LookupUtils
             }
         }
 
-        HashSet<string>? allSearchKeys = dbIsUsedForPitchDict || FreqUtils.DBIsUsedForAtLeastOneWordFreqDict
+        HashSet<string>? allSearchKeys = dbIsUsedForPitchDict || dbIsUsedForAtLeastOneWordFreqDict
             ? textWithoutLongVowelMarkList is not null
                 ? new HashSet<string>([.. textInHiraganaList, .. deconjugatedTexts!, .. textWithoutLongVowelMarkList.Where(static tl => tl is not null).SelectMany(static textList => textList!)])
                 : new HashSet<string>([.. textInHiraganaList, .. deconjugatedTexts!])
@@ -233,10 +219,6 @@ public static class LookupUtils
         {
             pitchAccentDict = pitchDict?.Contents;
         }
-
-        List<LookupFrequencyResult>? kanjiFrequencyResults = kanjiFreqs is not null
-            ? GetKanjiFrequencies(kanji, kanjiFreqs)
-            : null;
 
         List<Dict> dicts = DictUtils.Dicts.Values.Where(static dict => dict is { Active: true, Type: not DictType.PitchAccentYomichan }).ToList();
         _ = Parallel.ForEach(dicts, dict =>
