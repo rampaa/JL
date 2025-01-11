@@ -6,7 +6,6 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using JL.Core.Audio;
 using JL.Core.Dicts;
-using JL.Core.Dicts.PitchAccent;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.GUI.UserControls;
@@ -73,8 +72,7 @@ internal static class PopupWindowUtils
         return textBox;
     }
 
-    public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? alternativeSpellings,
-        string[]? readings, string[]? splitReadingsWithRInfo, double leftMargin, Dict dict, IDictionary<string, IList<IDictRecord>>? pitchRecordDict)
+    public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? readings, string[]? splitReadingsWithRInfo, double leftMargin, byte[] pitchPositions)
     {
         Grid pitchAccentGrid = new();
 
@@ -89,12 +87,10 @@ internal static class PopupWindowUtils
 
         double horizontalOffsetForReading = leftMargin;
 
-        IDictionary<string, IList<IDictRecord>> lookupDict = pitchRecordDict ?? dict.Contents;
-
         for (int i = 0; i < expressions.Length; i++)
         {
-            string normalizedExpression = JapaneseUtils.KatakanaToHiragana(expressions[i]);
-            if (!lookupDict.TryGetValue(normalizedExpression, out IList<IDictRecord>? pitchAccentDictResultList))
+            byte pitchPosition = pitchPositions[i];
+            if (pitchPosition is byte.MaxValue)
             {
                 continue;
             }
@@ -107,74 +103,47 @@ internal static class PopupWindowUtils
                     WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo![i - 1]}、", fontSize).Width;
             }
 
-            PitchAccentRecord? chosenPitchAccentDictResult = null;
-
-            int pitchAccentDictResultListCount = pitchAccentDictResultList.Count;
-            for (int j = 0; j < pitchAccentDictResultListCount; j++)
+            Polyline polyline = new()
             {
-                PitchAccentRecord pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
+                StrokeThickness = 2,
+                Stroke = DictOptionManager.PitchAccentMarkerColor,
+                StrokeDashArray = StrokeDashArray
+            };
 
-                if ((!hasReading && pitchAccentDictResult.Reading is null)
-                    || (pitchAccentDictResult.Reading is not null
-                        && normalizedExpression == JapaneseUtils.KatakanaToHiragana(pitchAccentDictResult.Reading)))
-                {
-                    if (primarySpelling == pitchAccentDictResult.Spelling)
-                    {
-                        chosenPitchAccentDictResult = pitchAccentDictResult;
-                        break;
-                    }
-
-                    if (alternativeSpellings?.Contains(pitchAccentDictResult.Spelling) ?? false)
-                    {
-                        chosenPitchAccentDictResult ??= pitchAccentDictResult;
-                    }
-                }
-            }
-
-            if (chosenPitchAccentDictResult is not null)
+            bool lowPitch = false;
+            double horizontalOffsetForChar = horizontalOffsetForReading;
+            int combinedFormListCount = combinedFormList.Count;
+            for (int j = 0; j < combinedFormListCount; j++)
             {
-                Polyline polyline = new()
+                Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
+
+                if (pitchPosition - 1 == j)
                 {
-                    StrokeThickness = 2,
-                    Stroke = DictOptionManager.PitchAccentMarkerColor,
-                    StrokeDashArray = StrokeDashArray
-                };
+                    polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
+                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
+                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
 
-                bool lowPitch = false;
-                double horizontalOffsetForChar = horizontalOffsetForReading;
-                int combinedFormListCount = combinedFormList.Count;
-                for (int j = 0; j < combinedFormListCount; j++)
-                {
-                    Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
-
-                    if (chosenPitchAccentDictResult.Position - 1 == j)
-                    {
-                        polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
-                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
-
-                        lowPitch = true;
-                    }
-
-                    else if (j is 0)
-                    {
-                        polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
-                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
-                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                    }
-
-                    else
-                    {
-                        double charHeight = lowPitch ? charSize.Height : 0;
-                        polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
-                        polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charHeight));
-                    }
-
-                    horizontalOffsetForChar += charSize.Width;
+                    lowPitch = true;
                 }
 
-                _ = pitchAccentGrid.Children.Add(polyline);
+                else if (j is 0)
+                {
+                    polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
+                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
+                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
+                }
+
+                else
+                {
+                    double charHeight = lowPitch ? charSize.Height : 0;
+                    polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
+                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charHeight));
+                }
+
+                horizontalOffsetForChar += charSize.Width;
             }
+
+            _ = pitchAccentGrid.Children.Add(polyline);
         }
 
         pitchAccentGrid.VerticalAlignment = VerticalAlignment.Center;

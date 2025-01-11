@@ -537,12 +537,6 @@ internal sealed partial class PopupWindow
 
         PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
 
-        bool pitchDictIsActive = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
-        {
-            pitchDictIsActive = pitchDict.Active;
-        }
-
         Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         bool showPOrthographyInfo = jmdict.Options.POrthographyInfo!.Value;
         bool showROrthographyInfo = jmdict.Options.ROrthographyInfo!.Value;
@@ -578,7 +572,7 @@ internal sealed partial class PopupWindow
                 _dictsWithResults.Add(lookupResult.Dict);
             }
 
-            popupItemSource[i] = PrepareResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo, pOrthographyInfoFontSize, duplicateIcons);
+            popupItemSource[i] = PrepareResultStackPanel(lookupResult, i, resultCount, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo, pOrthographyInfoFontSize, duplicateIcons);
         }
 
         PopupListView.ItemsSource = popupItemSource;
@@ -612,7 +606,7 @@ internal sealed partial class PopupWindow
         textBox.PreviewMouseLeftButtonDown += DefinitionsTextBox_PreviewMouseLeftButtonDown;
     }
 
-    private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize, TextBlock[]? duplicateIcons)
+    private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultCount, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize, TextBlock[]? duplicateIcons)
     {
         // top
         WrapPanel top = new()
@@ -630,16 +624,15 @@ internal sealed partial class PopupWindow
             new Thickness(2, 0, 0, 0));
 
         primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
+        bool pitchPositionsExist = result.PitchPositions is not null;
 
-        if (result.Readings is null && pitchDictIsActive)
+        if (result.Readings is null && pitchPositionsExist)
         {
             Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                result.AlternativeSpellings,
                 null,
                 null,
                 primarySpellingTextBlock.Margin.Left,
-                pitchDict!,
-                result.PitchAccentDict);
+                result.PitchPositions!);
 
             if (pitchAccentGrid.Children.Count is 0)
             {
@@ -670,7 +663,7 @@ internal sealed partial class PopupWindow
         }
 
         if (result.Readings is not null && configManager.ReadingsFontSize > 0
-                                        && (pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)))
+                                        && (pitchPositionsExist || (result.KunReadings is null && result.OnReadings is null)))
         {
             string readingsText = showROrthographyInfo && result.ReadingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, result.ReadingsOrthographyInfoList)
@@ -684,15 +677,13 @@ internal sealed partial class PopupWindow
                     VerticalAlignment.Center,
                     new Thickness(5, 0, 0, 0));
 
-                if (pitchDictIsActive)
+                if (pitchPositionsExist)
                 {
                     Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                        result.AlternativeSpellings,
                         result.Readings,
                         readingTextBox.Text.Split('、'),
                         readingTextBox.Margin.Left,
-                        pitchDict!,
-                        result.PitchAccentDict);
+                        result.PitchPositions!);
 
                     if (pitchAccentGrid.Children.Count is 0)
                     {
@@ -722,15 +713,13 @@ internal sealed partial class PopupWindow
                     VerticalAlignment.Center,
                     new Thickness(7, 0, 0, 0));
 
-                if (pitchDictIsActive)
+                if (pitchPositionsExist)
                 {
                     Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                        result.AlternativeSpellings,
                         result.Readings,
                         readingTextBlock.Text.Split('、'),
                         readingTextBlock.Margin.Left,
-                        pitchDict!,
-                        result.PitchAccentDict);
+                        result.PitchPositions!);
 
                     if (pitchAccentGrid.Children.Count is 0)
                     {

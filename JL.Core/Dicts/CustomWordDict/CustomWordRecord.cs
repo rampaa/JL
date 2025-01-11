@@ -87,7 +87,6 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)
     {
         bool readingsExist = Readings is not null;
-        int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
             int freqResultCount = freqResults.Count;
@@ -104,7 +103,6 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
 
         else if (readingsExist)
         {
-            bool alternativeSpellingsExist = AlternativeSpellings is not null;
             for (int i = 0; i < Readings!.Length; i++)
             {
                 string reading = Readings[i];
@@ -114,8 +112,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
                     for (int j = 0; j < readingFreqResultCount; j++)
                     {
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
-                        if ((reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0]))
-                            || (alternativeSpellingsExist && AlternativeSpellings!.Contains(readingFreqResult.Spelling)))
+                        if (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0]))
                         {
                             return readingFreqResult.Frequency;
                         }
@@ -124,13 +121,12 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
             }
         }
 
-        return frequency;
+        return int.MaxValue;
     }
 
     public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         bool readingsExist = Readings is not null;
-        int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
             int freqResultCount = freqResults.Count;
@@ -147,7 +143,6 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
 
         else if (readingsExist)
         {
-            bool alternativeSpellingsExist = AlternativeSpellings is not null;
             for (int i = 0; i < Readings!.Length; i++)
             {
                 string reading = Readings[i];
@@ -157,8 +152,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
                     for (int j = 0; j < readingFreqResultCount; j++)
                     {
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
-                        if ((reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0]))
-                            || (alternativeSpellingsExist && AlternativeSpellings!.Contains(readingFreqResult.Spelling)))
+                        if (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0]))
                         {
                             return readingFreqResult.Frequency;
                         }
@@ -167,7 +161,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency, IEquatable<
             }
         }
 
-        return frequency;
+        return int.MaxValue;
     }
 
     public override bool Equals(object? obj)

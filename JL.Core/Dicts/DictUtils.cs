@@ -36,6 +36,7 @@ public static class DictUtils
     internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; }
     internal static bool DBIsUsedForJmdict { get; private set; }
     internal static bool AtLeastOneKanjiDictIsActive { get; private set; }
+    internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; }
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
@@ -504,8 +505,7 @@ public static class DictUtils
 
         Dict[] dicts = Dicts.Values.ToArray();
 
-        CheckIfDBIsUsedForAtLeastOneDict(dicts);
-        AtLeastOneKanjiDictIsActive = CheckIfAnyKanjiDictIsUsed(dicts);
+        CheckDBUsageForDicts(dicts);
 
         int customDictionaryTaskCount = 0;
         bool anyCustomDictionaryTaskIsActuallyUsed = false;
@@ -1311,8 +1311,7 @@ public static class DictUtils
                 }
             }
 
-            CheckIfDBIsUsedForAtLeastOneDict(dicts);
-            AtLeastOneKanjiDictIsActive = CheckIfAnyKanjiDictIsUsed(dicts);
+            CheckDBUsageForDicts(dicts);
 
             if (!UpdatingJmdict
                 && !UpdatingJmnedict
@@ -1497,16 +1496,13 @@ public static class DictUtils
         }
     }
 
-    private static void CheckIfDBIsUsedForAtLeastOneDict(Dict[] dicts)
+    private static void CheckDBUsageForDicts(Dict[] dicts)
     {
-        DBIsUsedForAtLeastOneDict = dicts.Any(static dict => dict.Options.UseDB.Value);
-        DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
-        DBIsUsedForAtLeastOneNazekaDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
+        DBIsUsedForAtLeastOneDict = dicts.Any(static dict => dict is { Active: true, Options.UseDB.Value: true });
+        DBIsUsedForAtLeastOneWordDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict is { Active: true, Options.UseDB.Value: true, Type: DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificWordNazeka });
+        DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict.Active && s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
+        DBIsUsedForAtLeastOneNazekaDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict.Active && s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
+        AtLeastOneKanjiDictIsActive = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict is { Type: DictType.Kanjidic or DictType.NonspecificKanjiYomichan or DictType.NonspecificKanjiNazeka or DictType.NonspecificKanjiWithWordSchemaYomichan, Active: true });
         DBIsUsedForJmdict = SingleDictTypeDicts[DictType.JMdict] is { Active: true, Options.UseDB.Value: true };
-    }
-
-    private static bool CheckIfAnyKanjiDictIsUsed(Dict[] dicts)
-    {
-        return dicts.Any(static d => d is { Type: DictType.Kanjidic or DictType.NonspecificKanjiYomichan or DictType.NonspecificKanjiNazeka or DictType.NonspecificKanjiWithWordSchemaYomichan, Active: true });
     }
 }

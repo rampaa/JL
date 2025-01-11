@@ -12,6 +12,8 @@ namespace JL.Core.Freqs;
 public static class FreqUtils
 {
     public static bool FreqsReady { get; private set; } // = false;
+    internal static bool DBIsUsedForAtLeastOneWordFreqDict { get; private set; } // = false;
+
     public static Dictionary<string, Freq> FreqDicts { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3, StringComparer.OrdinalIgnoreCase)
@@ -54,8 +56,11 @@ public static class FreqUtils
         Dictionary<string, string> freqDBPathDict = new(StringComparer.Ordinal);
 
         List<Task> tasks = [];
+        Freq[] freqs = FreqDicts.Values.ToArray();
 
-        foreach (Freq freq in FreqDicts.Values.ToArray())
+        DBIsUsedForAtLeastOneWordFreqDict = CheckIfDBIsUsedForAtLeastOneFreqDict(freqs);
+
+        foreach (Freq freq in freqs)
         {
             bool useDB = freq.Options.UseDB.Value;
             string dbPath = DBUtils.GetFreqDBPath(freq.Name);
@@ -325,6 +330,8 @@ public static class FreqUtils
                 }
             }
 
+            DBIsUsedForAtLeastOneWordFreqDict = CheckIfDBIsUsedForAtLeastOneFreqDict(freqs);
+
             Utils.Frontend.Alert(AlertLevel.Success, "Finished loading frequency dictionaries");
         }
 
@@ -373,5 +380,10 @@ public static class FreqUtils
                 throw new SerializationException("Couldn't load Config/freqs.json");
             }
         }
+    }
+
+    private static bool CheckIfDBIsUsedForAtLeastOneFreqDict(Freq[] freqs)
+    {
+        return DBIsUsedForAtLeastOneWordFreqDict = freqs.Any(static freq => freq.Options.UseDB.Value && freq.Type is not FreqType.YomichanKanji);
     }
 }

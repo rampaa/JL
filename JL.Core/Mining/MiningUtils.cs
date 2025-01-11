@@ -3,7 +3,6 @@ using System.Text;
 using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
-using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Mining.Anki;
@@ -268,71 +267,65 @@ public static class MiningUtils
 
             case JLField.PitchAccents:
             {
-                if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict) && pitchDict.Active)
+                if (lookupResult.PitchPositions is not null)
                 {
-                    List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
-                    if (pitchAccents is not null)
+                    string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
+
+                    StringBuilder expressionsWithPitchAccentBuilder = new();
+                    _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
+
+                    int expressionsLength = expressions.Length;
+                    for (int i = 0; i < expressionsLength; i++)
                     {
-                        StringBuilder expressionsWithPitchAccentBuilder = new();
-                        _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
-
-                        int pitchAccentCount = pitchAccents.Count;
-                        for (int i = 0; i < pitchAccentCount; i++)
+                        byte pitchPosition = lookupResult.PitchPositions[i];
+                        if (pitchPosition is not byte.MaxValue)
                         {
-                            (string expression, byte position) = pitchAccents[i];
-                            _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, position));
-
-                            if (i + 1 != pitchAccentCount)
-                            {
-                                _ = expressionsWithPitchAccentBuilder.Append('、');
-                            }
+                            _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expressions[i], pitchPosition));
+                            _ = expressionsWithPitchAccentBuilder.Append('、');
                         }
-
-                        return expressionsWithPitchAccentBuilder.ToString();
                     }
+
+                    return expressionsWithPitchAccentBuilder.ToString(0, expressionsWithPitchAccentBuilder.Length - 1);
                 }
+
                 return null;
             }
 
             case JLField.NumericPitchAccents:
             {
-                if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict) && pitchDict.Active)
+                if (lookupResult.PitchPositions is not null)
                 {
-                    List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
-                    if (pitchAccents is not null)
+                    string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
+
+                    StringBuilder numericPitchAccentBuilder = new();
+                    int expressionsLength = expressions.Length;
+                    for (int i = 0; i < expressionsLength; i++)
                     {
-                        StringBuilder numericPitchAccentBuilder = new();
-                        int pitchAccentCount = pitchAccents.Count;
-                        for (int i = 0; i < pitchAccentCount; i++)
+                        byte pitchPosition = lookupResult.PitchPositions[i];
+                        if (pitchPosition is not byte.MaxValue)
                         {
-                            (string expression, byte position) = pitchAccents[i];
-                            _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {position}");
-
-                            if (i + 1 != pitchAccentCount)
-                            {
-                                _ = numericPitchAccentBuilder.Append(", ");
-                            }
+                            _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expressions[i]}: {pitchPosition}, ");
                         }
-
-                        return numericPitchAccentBuilder.ToString();
                     }
+
+                    return numericPitchAccentBuilder.ToString(0, numericPitchAccentBuilder.Length - 2);
                 }
+
                 return null;
             }
 
             case JLField.PitchAccentForFirstReading:
             {
-                if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict) && pitchDict.Active)
+                if (lookupResult.PitchPositions is not null)
                 {
-                    List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
-                    if (pitchAccents is not null)
+                    byte firstPitchPosition = lookupResult.PitchPositions[0];
+                    if (firstPitchPosition is not byte.MaxValue)
                     {
-                        (string expression, byte position) = pitchAccents[0];
-                        if ((lookupResult.Readings is not null && expression == lookupResult.Readings[0])
-                            || (lookupResult.Readings is null && expression == lookupResult.PrimarySpelling))
-                        {
-                            return string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(expression, position)}");
-                        }
+                        string expression = lookupResult.Readings is not null
+                            ? lookupResult.Readings[0]
+                            : lookupResult.PrimarySpelling;
+
+                        return string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(expression, firstPitchPosition)}");
                     }
                 }
                 return null;
@@ -340,17 +333,16 @@ public static class MiningUtils
 
             case JLField.NumericPitchAccentForFirstReading:
             {
-                if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict) && pitchDict.Active)
+                if (lookupResult.PitchPositions is not null)
                 {
-                    List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
-                    if (pitchAccents is not null)
+                    byte firstPitchPosition = lookupResult.PitchPositions[0];
+                    if (firstPitchPosition is not byte.MaxValue)
                     {
-                        (string expression, byte position) = pitchAccents[0];
-                        if ((lookupResult.Readings is not null && expression == lookupResult.Readings[0])
-                            || (lookupResult.Readings is null && expression == lookupResult.PrimarySpelling))
-                        {
-                            return string.Create(CultureInfo.InvariantCulture, $"{expression}: {position}");
-                        }
+                        string expression = lookupResult.Readings is not null
+                            ? lookupResult.Readings[0]
+                            : lookupResult.PrimarySpelling;
+
+                        return string.Create(CultureInfo.InvariantCulture, $"{expression}: {firstPitchPosition}");
                     }
                 }
                 return null;
@@ -531,39 +523,35 @@ public static class MiningUtils
             miningParams[JLField.RadicalNames] = string.Join('、', lookupResult.RadicalNames);
         }
 
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict) && pitchDict.Active)
+        if (lookupResult.PitchPositions is not null)
         {
-            List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
-            if (pitchAccents is not null)
+            string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
+            StringBuilder expressionsWithPitchAccentBuilder = new();
+            _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
+
+            StringBuilder numericPitchAccentBuilder = new();
+            int expressionsLength = expressions.Length;
+            for (int i = 0; i < expressionsLength; i++)
             {
-                StringBuilder expressionsWithPitchAccentBuilder = new();
-                _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
-
-                StringBuilder numericPitchAccentBuilder = new();
-                int pitchAccentCount = pitchAccents.Count;
-                for (int i = 0; i < pitchAccentCount; i++)
+                byte pitchPosition = lookupResult.PitchPositions[i];
+                if (pitchPosition is not byte.MaxValue)
                 {
-                    (string expression, byte position) = pitchAccents[i];
-                    _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {position}");
-                    _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, position));
-
-                    if (i + 1 != pitchAccentCount)
-                    {
-                        _ = numericPitchAccentBuilder.Append(", ");
-                        _ = expressionsWithPitchAccentBuilder.Append('、');
-                    }
+                    string expression = expressions[i];
+                    _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {pitchPosition}, ");
+                    _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, pitchPosition));
+                    _ = expressionsWithPitchAccentBuilder.Append('、');
                 }
+            }
 
-                miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString();
-                miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString();
+            miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString(0, numericPitchAccentBuilder.Length - 2);
+            miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString(0, expressionsWithPitchAccentBuilder.Length - 1);
 
-                (string firstExpression, byte firstPosition) = pitchAccents[0];
-                if ((lookupResult.Readings is not null && firstExpression == lookupResult.Readings[0])
-                    || (lookupResult.Readings is null && firstExpression == lookupResult.PrimarySpelling))
-                {
-                    miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstExpression, firstPosition)}");
-                    miningParams[JLField.NumericPitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{firstExpression}: {firstPosition}");
-                }
+            byte firstPitchPosition = lookupResult.PitchPositions[0];
+            if (firstPitchPosition is not byte.MaxValue)
+            {
+                string firstExpression = expressions[0];
+                miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstExpression, firstPitchPosition)}");
+                miningParams[JLField.NumericPitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{firstExpression}: {firstPitchPosition}");
             }
         }
 
@@ -585,76 +573,6 @@ public static class MiningUtils
         }
 
         return double.ConvertToIntegerNative<int>(Math.Round(lookupFrequencyResults.Count / sumOfReciprocalOfFreqs));
-    }
-
-    private static List<KeyValuePair<string, byte>>? GetPitchAccents(IDictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)
-    {
-        List<KeyValuePair<string, byte>> pitchAccents = [];
-
-        if (lookupResult.Readings is not null)
-        {
-            for (int i = 0; i < lookupResult.Readings.Length; i++)
-            {
-                string reading = lookupResult.Readings[i];
-                string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading);
-
-                if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? pitchResult))
-                {
-                    int pitchResultCount = pitchResult.Count;
-                    for (int j = 0; j < pitchResultCount; j++)
-                    {
-                        PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)pitchResult[j];
-                        if (lookupResult.PrimarySpelling == pitchAccentRecord.Spelling
-                            || (lookupResult.AlternativeSpellings?.Contains(pitchAccentRecord.Spelling) ?? false))
-                        {
-                            pitchAccents.Add(KeyValuePair.Create(reading, pitchAccentRecord.Position));
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        else
-        {
-            string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(lookupResult.PrimarySpelling);
-            if (pitchDict.TryGetValue(primarySpellingInHiragana, out IList<IDictRecord>? pitchResult))
-            {
-                int pitchResultCount = pitchResult.Count;
-                for (int i = 0; i < pitchResultCount; i++)
-                {
-                    PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)pitchResult[i];
-                    if (pitchAccentRecord.Reading is null)
-                    {
-                        pitchAccents.Add(KeyValuePair.Create(lookupResult.PrimarySpelling, pitchAccentRecord.Position));
-                        break;
-                    }
-                }
-            }
-
-            else if (lookupResult.AlternativeSpellings is not null)
-            {
-                for (int i = 0; i < lookupResult.AlternativeSpellings.Length; i++)
-                {
-                    string alternativeSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(lookupResult.AlternativeSpellings[i]);
-                    if (pitchDict.TryGetValue(alternativeSpellingInHiragana, out pitchResult))
-                    {
-                        int pitchResultCount = pitchResult.Count;
-                        for (int j = 0; j < pitchResultCount; j++)
-                        {
-                            PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)pitchResult[j];
-                            if (pitchAccentRecord.Reading is null)
-                            {
-                                pitchAccents.Add(KeyValuePair.Create(lookupResult.PrimarySpelling, pitchAccentRecord.Position));
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return pitchAccents.Count > 0 ? pitchAccents : null;
     }
 
     private static StringBuilder GetExpressionWithPitchAccent(ReadOnlySpan<char> expression, byte position)

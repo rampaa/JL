@@ -12,17 +12,6 @@ internal static class YomichanPitchAccentDBManager
 {
     public const int Version = 3;
 
-    private const string SingleTermQuery =
-        """
-        SELECT rsk.search_key AS searchKey,
-               r.spelling AS spelling,
-               r.reading AS reading,
-               r.position AS position
-        FROM record r
-        JOIN record_search_key rsk ON r.id = rsk.record_id
-        WHERE rsk.search_key = @term;
-        """;
-
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
@@ -129,7 +118,7 @@ internal static class YomichanPitchAccentDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, string[] terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -145,8 +134,7 @@ internal static class YomichanPitchAccentDBManager
             WHERE rsk.search_key IN (@1
             """);
 
-        int termCount = terms.Length;
-        for (int i = 1; i < termCount; i++)
+        for (int i = 1; i < terms.Count; i++)
         {
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
@@ -157,44 +145,12 @@ internal static class YomichanPitchAccentDBManager
         command.CommandText = queryBuilder.ToString();
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        for (int i = 0; i < termCount; i++)
+        int index = 1;
+        foreach (string term in terms)
         {
-            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
+            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{index}"), term);
+            ++index;
         }
-
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
-        {
-            return null;
-        }
-
-        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-        while (dataReader.Read())
-        {
-            PitchAccentRecord record = GetRecord(dataReader);
-
-            string searchKey = dataReader.GetString(nameof(searchKey));
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
-            {
-                result.Add(record);
-            }
-            else
-            {
-                results[searchKey] = [record];
-            }
-        }
-
-        return results;
-    }
-
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, string term)
-    {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText = SingleTermQuery;
-
-        _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)

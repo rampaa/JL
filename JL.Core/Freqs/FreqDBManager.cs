@@ -107,7 +107,7 @@ internal static class FreqDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, string[] terms)
+    public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -122,8 +122,7 @@ internal static class FreqDBManager
             WHERE rsk.search_key IN (@1
             """);
 
-        int termCount = terms.Length;
-        for (int i = 1; i < termCount; i++)
+        for (int i = 1; i < terms.Count; i++)
         {
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
@@ -134,9 +133,11 @@ internal static class FreqDBManager
         command.CommandText = queryBuilder.ToString();
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        for (int i = 0; i < termCount; i++)
+        int index = 1;
+        foreach (string term in terms)
         {
-            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
+            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{index}"), term);
+            ++index;
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();

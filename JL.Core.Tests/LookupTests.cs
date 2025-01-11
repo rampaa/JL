@@ -244,7 +244,7 @@ internal sealed class LookupTests
     public void Freq_廃墟_はいきょ()
     {
         // Arrange
-        const int expected = 8560;
+        const int expected = int.MaxValue;
 
         const string text = "廃墟";
 
