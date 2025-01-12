@@ -50,9 +50,11 @@ You need to be in mining mode in order to interact with the popup window. "Left 
 ### How do I disable pass-through mode?
 Press the opacity slider button located top-left of the main window. You can also disable it with the same hotkey you've enabled it if you have the global hotkeys enabled and if its hotkey is a valid global hotkey. (Only hotkeys with modifiers (e.g. Alt+T), function keys (except for F12) and numpad keys can be used as global hotkeys.)
 ### How can I use JL with Magpie?
-Enable the "Preferences>General>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
+Enable the "Preferences>Main Window>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
 
 Optional: Give UI Access to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [UI Access](https://github.com/rampaa/JL/blob/master/Docs/UI%20Access.md) page for more details.
+
+If you use JL v2.0.0+ and Magpie v0.11.0+ then you don't necessarily need to change the following settings.
 
 Disable the "Preferences>Main Window>Focus on hover" option.
 
