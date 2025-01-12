@@ -37,6 +37,11 @@ internal sealed partial class AddWordWindow
     // ReSharper disable once AsyncVoidMethod
     private async void SaveButton_Click(object? sender, RoutedEventArgs? e)
     {
+        await HandleSaveButtonClick().ConfigureAwait(false);
+    }
+
+    private Task HandleSaveButtonClick()
+    {
         DefinitionsTextBox.ClearValue(BorderBrushProperty);
         DefinitionsTextBox.ClearValue(CursorProperty);
         DefinitionsTextBox.ClearValue(ToolTipProperty);
@@ -48,7 +53,7 @@ internal sealed partial class AddWordWindow
             DefinitionsTextBox.BorderBrush = Brushes.Red;
             DefinitionsTextBox.Cursor = Cursors.Help;
             DefinitionsTextBox.ToolTip = "Definitions cannot be left empty!";
-            return;
+            return Task.CompletedTask;
         }
 
         string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
@@ -90,7 +95,7 @@ internal sealed partial class AddWordWindow
             : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
 
         string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-        await File.AppendAllTextAsync(path, line).ConfigureAwait(false);
+        return File.AppendAllTextAsync(path, line);
     }
 
     private void Window_Closed(object sender, EventArgs e)
@@ -164,12 +169,13 @@ internal sealed partial class AddWordWindow
         }
     }
 
-    private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+    // ReSharper disable once AsyncVoidMethod
+    private async void Window_PreviewKeyUp(object sender, KeyEventArgs e)
     {
         if (e.Key is Key.Enter && InputMethod.Current?.ImeState is not InputMethodState.On)
         {
             e.Handled = true;
-            SaveButton_Click(null, null);
+            await HandleSaveButtonClick().ConfigureAwait(false);
         }
     }
 }

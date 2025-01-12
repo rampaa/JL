@@ -1220,13 +1220,13 @@ internal sealed partial class PopupWindow
         }
     }
 
-    private Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs? e)
+    private Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.InactiveLookupMode
             || configManager.LookupOnSelectOnly
             || configManager.LookupOnMouseClickOnly
-            || e?.LeftButton is MouseButtonState.Pressed
+            || e.LeftButton is MouseButtonState.Pressed
             || PopupContextMenu.IsVisible
             || ReadingSelectionWindow.IsItVisible()
             || (configManager.RequireLookupKeyPress
@@ -1263,7 +1263,7 @@ internal sealed partial class PopupWindow
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void TextBox_MouseMove(object sender, MouseEventArgs? e)
+    private async void TextBox_MouseMove(object sender, MouseEventArgs e)
     {
         await HandleTextBoxMouseMove((TextBox)sender, e).ConfigureAwait(false);
     }

@@ -2,7 +2,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Utilities;
@@ -34,7 +33,12 @@ internal sealed partial class AddNameWindow
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void SaveButton_Click(object? sender, RoutedEventArgs? e)
+    private async void SaveButton_Click(object sender, RoutedEventArgs e)
+    {
+        await HandleSaveButtonClick().ConfigureAwait(false);
+    }
+
+    private Task HandleSaveButtonClick()
     {
 #pragma warning disable CA1308 // Normalize strings to uppercase
         string nameType =
@@ -71,7 +75,7 @@ internal sealed partial class AddNameWindow
 
         string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         string line = $"{spelling}\t{reading}\t{nameType}\t{extraInfo}\n";
-        await File.AppendAllTextAsync(path, line).ConfigureAwait(false);
+        return File.AppendAllTextAsync(path, line);
     }
 
     private void Window_Closed(object sender, EventArgs e)
@@ -98,12 +102,13 @@ internal sealed partial class AddNameWindow
         }
     }
 
-    private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+    // ReSharper disable once AsyncVoidMethod
+    private async void Window_PreviewKeyUp(object sender, KeyEventArgs e)
     {
         if (e.Key is Key.Enter && InputMethod.Current?.ImeState is not InputMethodState.On)
         {
             e.Handled = true;
-            SaveButton_Click(null, null);
+            await HandleSaveButtonClick().ConfigureAwait(false);
         }
     }
 }

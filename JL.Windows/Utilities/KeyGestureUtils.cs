@@ -118,19 +118,20 @@ internal static class KeyGestureUtils
 
     public static bool IsPressed(this KeyGesture keyGesture)
     {
+        ModifierKeys modifierKeys = Keyboard.Modifiers;
+
         return keyGesture.Modifiers is ModifierKeys.Windows
-            ? Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers is ModifierKeys.None
-            : Keyboard.IsKeyDown(keyGesture.Key)
-              && (ModifierAsKeyPress(keyGesture.Key)
-                  ? keyGesture.Modifiers is ModifierKeys.None
-                  : Keyboard.Modifiers == keyGesture.Modifiers);
+            ? Keyboard.IsKeyDown(keyGesture.Key) && modifierKeys is ModifierKeys.None
+            : Keyboard.IsKeyDown(keyGesture.Key) && (ModifierAsKeyPress(keyGesture.Key, modifierKeys)
+                ? keyGesture.Modifiers is ModifierKeys.None
+                : modifierKeys == keyGesture.Modifiers);
     }
 
-    private static bool ModifierAsKeyPress(Key key)
+    private static bool ModifierAsKeyPress(Key key, ModifierKeys currentlyPressedModifierKeys)
     {
-        return (key is Key.LeftCtrl or Key.RightCtrl && Keyboard.Modifiers is ModifierKeys.Control)
-               || (key is Key.LeftAlt or Key.RightAlt && Keyboard.Modifiers is ModifierKeys.Alt)
-               || (key is Key.LeftShift or Key.RightShift && Keyboard.Modifiers is ModifierKeys.Shift);
+        return (key is Key.LeftCtrl or Key.RightCtrl && currentlyPressedModifierKeys is ModifierKeys.Control)
+               || (key is Key.LeftAlt or Key.RightAlt && currentlyPressedModifierKeys is ModifierKeys.Alt)
+               || (key is Key.LeftShift or Key.RightShift && currentlyPressedModifierKeys is ModifierKeys.Shift);
     }
 
     public static string ToFormattedString(this KeyGesture keyGesture)

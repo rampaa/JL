@@ -45,6 +45,7 @@ internal sealed partial class MainWindow
     public bool ContextMenuIsOpening { get; private set; } // = false;
 
     private Point _swipeStartPoint;
+    private InputMethod? _input;
 
     private static DateTime s_lastTextCopyTime;
 
@@ -62,6 +63,8 @@ internal sealed partial class MainWindow
     protected override async void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
+
+        _input = InputMethod.Current;
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
@@ -291,26 +294,26 @@ internal sealed partial class MainWindow
         }
     }
 
-    private Task HandleMouseMove(MouseEventArgs? e)
+    private Task HandleMouseMove(MouseEventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
         return configManager.InactiveLookupMode
                || configManager.LookupOnSelectOnly
                || configManager.LookupOnMouseClickOnly
-               || e?.LeftButton is MouseButtonState.Pressed
+               || e.LeftButton is MouseButtonState.Pressed
                || MainTextBoxContextMenu.IsVisible
                || TitleBarContextMenu.IsVisible
                || FontSizeSlider.IsVisible
                || OpacitySlider.IsVisible
                || FirstPopupWindow.MiningMode
-               || (!configManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
+               || (!configManager.TextBoxIsReadOnly && _input?.ImeState is InputMethodState.On)
                || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
             ? Task.CompletedTask
             : FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, false);
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
+    private async void MainTextBox_MouseMove(object? sender, MouseEventArgs e)
     {
         await HandleMouseMove(e).ConfigureAwait(false);
     }
@@ -1253,7 +1256,7 @@ internal sealed partial class MainWindow
         }
     }
 
-    private void DisplaySettingsChanged(object? sender, EventArgs? e)
+    private void DisplaySettingsChanged(object? sender, EventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
 
@@ -1562,7 +1565,7 @@ internal sealed partial class MainWindow
             || MainTextBoxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || Mouse.LeftButton is MouseButtonState.Pressed
-            || (!configManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On))
+            || (!configManager.TextBoxIsReadOnly && _input?.ImeState is InputMethodState.On))
         {
             return;
         }
