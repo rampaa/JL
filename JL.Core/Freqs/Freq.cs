@@ -13,10 +13,10 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
     public int Priority { get; set; } = priority;
 
     // ReSharper disable once MemberCanBeInternal
-    public int Size { get; set; } = size;
+    public int Size { get; internal set; } = size;
 
     // ReSharper disable once MemberCanBeInternal
-    public int MaxValue { get; set; } = maxValue;
+    public int MaxValue { get; internal set; } = maxValue;
     [JsonIgnore] public bool Ready { get; set; } // = false;
     public FreqOptions Options { get; set; } = options;
 
