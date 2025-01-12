@@ -71,7 +71,6 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
 
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)
     {
-        int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
             int freqResultCount = freqResults.Count;
@@ -99,13 +98,12 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             }
         }
 
-        return frequency;
+        return int.MaxValue;
     }
 
     public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         bool readingExists = Reading is not null;
-        int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
             int freqResultCount = freqResults.Count;
@@ -133,7 +131,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             }
         }
 
-        return frequency;
+        return int.MaxValue;
     }
 
     public override bool Equals(object? obj)
