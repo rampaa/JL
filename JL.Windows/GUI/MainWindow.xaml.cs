@@ -1612,6 +1612,7 @@ internal sealed partial class MainWindow
             && configManager is { Focusable: true, MainWindowFocusOnHover: true })
         {
             _ = Activate();
+            _ = Focus();
         }
     }
 
