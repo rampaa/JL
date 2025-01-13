@@ -1337,7 +1337,7 @@ public static class LookupUtils
                         for (int j = 0; j < records.Count; j++)
                         {
                             PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)records[j];
-                            if ((pitchAccentRecord.Spelling == primarySpelling)
+                            if (pitchAccentRecord.Spelling == primarySpelling
                                 || (pitchAccentRecord.Reading is null && pitchAccentRecord.Spelling == reading && JapaneseUtils.IsKatakana(reading[0])))
                             {
                                 if (positions is null)
