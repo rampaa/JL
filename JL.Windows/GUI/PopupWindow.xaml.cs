@@ -220,16 +220,7 @@ internal sealed partial class PopupWindow
 
         if (textToLookUp == _lastLookedUpText && IsVisible)
         {
-            if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
-            {
-                UpdatePosition();
-            }
-
-            else
-            {
-                UpdatePosition(WinApi.GetMousePosition());
-            }
-
+            UpdatePosition();
             return Task.CompletedTask;
         }
 
@@ -282,15 +273,7 @@ internal sealed partial class PopupWindow
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
-            if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
-            {
-                UpdatePosition();
-            }
-
-            else
-            {
-                UpdatePosition(WinApi.GetMousePosition());
-            }
+            UpdatePosition();
 
             if (configManager.Focusable
                 && (enableMiningMode || configManager.PopupFocusOnLookup))
@@ -345,19 +328,9 @@ internal sealed partial class PopupWindow
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
         if (selectedText == _lastLookedUpText && IsVisible)
         {
-            if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
-            {
-                UpdatePosition();
-            }
-
-            else
-            {
-                UpdatePosition(WinApi.GetMousePosition());
-            }
-
+            UpdatePosition();
             return Task.CompletedTask;
         }
 
@@ -391,15 +364,7 @@ internal sealed partial class PopupWindow
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
-            if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
-            {
-                UpdatePosition();
-            }
-
-            else
-            {
-                UpdatePosition(WinApi.GetMousePosition());
-            }
+            UpdatePosition();
 
             _ = textBox.Focus();
 
@@ -482,7 +447,7 @@ internal sealed partial class PopupWindow
         WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
     }
 
-    private void UpdatePosition()
+    private void UpdatePositionToFixedPosition()
     {
         Screen activeScreen = WindowsUtils.ActiveScreen;
         ConfigManager configManager = ConfigManager.Instance;
@@ -528,6 +493,19 @@ internal sealed partial class PopupWindow
         }
 
         WinApi.MoveWindowToPosition(WindowHandle, x, y);
+    }
+
+    public void UpdatePosition()
+    {
+        if (ConfigManager.Instance.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+        {
+            UpdatePositionToFixedPosition();
+        }
+
+        else
+        {
+            UpdatePosition(WinApi.GetMousePosition());
+        }
     }
 
     public void DisplayResults()
@@ -1729,15 +1707,9 @@ internal sealed partial class PopupWindow
 
                     await ChildPopupWindow.LookupOnSelect(_lastInteractedTextBox).ConfigureAwait(false);
                 }
-
-                else if (configManager.FixedPopupPositioning && this == mainWindow.FirstPopupWindow)
-                {
-                    UpdatePosition();
-                }
-
                 else
                 {
-                    UpdatePosition(WinApi.GetMousePosition());
+                    UpdatePosition();
                 }
             }
 

@@ -203,8 +203,10 @@ internal static class PopupWindowUtils
     {
         popupWindow.EnableMiningMode();
         popupWindow.DisplayResults();
+        popupWindow.UpdatePosition();
 
         ConfigManager configManager = ConfigManager.Instance;
+
         if (configManager.Focusable)
         {
             _ = popupWindow.Activate();
