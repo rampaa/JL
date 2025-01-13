@@ -1300,10 +1300,11 @@ public static class LookupUtils
                 {
                     byte position = byte.MaxValue;
                     string reading = readings[i];
+                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading);
                     for (int j = 0; j < records.Count; j++)
                     {
                         PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)records[j];
-                        if (pitchAccentRecord.Reading == reading && pitchAccentRecord.Spelling == primarySpelling)
+                        if (pitchAccentRecord.Reading is not null && readingInHiragana == JapaneseUtils.KatakanaToHiragana(pitchAccentRecord.Reading))
                         {
                             if (positions is null)
                             {
@@ -1336,7 +1337,7 @@ public static class LookupUtils
                         for (int j = 0; j < records.Count; j++)
                         {
                             PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)records[j];
-                            if ((pitchAccentRecord.Spelling == primarySpelling && pitchAccentRecord.Reading == reading)
+                            if ((pitchAccentRecord.Spelling == primarySpelling)
                                 || (pitchAccentRecord.Reading is null && pitchAccentRecord.Spelling == reading && JapaneseUtils.IsKatakana(reading[0])))
                             {
                                 if (positions is null)
