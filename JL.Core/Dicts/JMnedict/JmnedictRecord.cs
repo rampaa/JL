@@ -4,7 +4,7 @@ using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.JMnedict;
 
-internal sealed class JmnedictRecord : IDictRecord, IEquatable<JmnedictRecord>
+internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatable<JmnedictRecord>
 {
     public int Id { get; }
     public string PrimarySpelling { get; }
