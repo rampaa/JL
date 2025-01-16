@@ -30,7 +30,7 @@ internal sealed partial class AddProfileWindow
 
         string profileName = ProfileNameTextBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(profileName)
-            || profileName.Length < 128
+            || profileName.Length > 128
             || profileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
             ProfileNameTextBox.BorderBrush = Brushes.Red;
