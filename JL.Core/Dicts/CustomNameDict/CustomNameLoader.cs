@@ -44,6 +44,10 @@ public static class CustomNameLoader
                     {
                         extraInfo = null;
                     }
+                    else
+                    {
+                        extraInfo = extraInfo.Replace("\\n", "\n", StringComparison.Ordinal);
+                    }
                 }
 
                 AddToDictionary(spelling, reading, nameType, extraInfo, customNameDictionary);

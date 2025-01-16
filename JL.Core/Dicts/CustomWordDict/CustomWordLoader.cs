@@ -75,7 +75,7 @@ public static class CustomWordLoader
                     readings = null;
                 }
 
-                string[] definitions = lParts[2].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[] definitions = lParts[2].Replace("\\n", "\n", StringComparison.Ordinal).Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                 string partOfSpeech = lParts[3];
 
                 string[]? wordClasses = null;

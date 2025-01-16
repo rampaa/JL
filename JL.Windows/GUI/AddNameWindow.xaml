@@ -24,7 +24,7 @@
                 <TextBlock Text="Reading" HorizontalAlignment="Left" Margin="0,0,0,10" Style="{StaticResource TextBlockDefault}" />
                 <TextBox x:Name="ReadingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="300" Margin="0,0,0,20" />
                 <TextBlock Text="Extra Info" HorizontalAlignment="Left" Margin="0,0,0,10" Style="{StaticResource TextBlockDefault}" />
-                <TextBox x:Name="ExtraInfoTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="300" />
+                <TextBox x:Name="ExtraInfoTextBox" AcceptsReturn="True" AcceptsTab="False" TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="300" />
             </StackPanel>
             <StackPanel x:Name="NameTypeStackPanel" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Margin="0,20,20,70">

@@ -91,8 +91,8 @@ internal sealed partial class AddWordWindow
         Close();
 
         string line = string.IsNullOrWhiteSpace(rawWordClasses)
-            ? $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\n"
-            : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
+            ? $"{rawSpellings}\t{rawReadings}\t{rawDefinitions.ReplaceLineEndings("\\n")}\t{rawPartOfSpeech}\n"
+            : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions.ReplaceLineEndings("\\n")}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
 
         string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         return File.AppendAllTextAsync(path, line);
@@ -172,7 +172,7 @@ internal sealed partial class AddWordWindow
     // ReSharper disable once AsyncVoidMethod
     private async void Window_PreviewKeyUp(object sender, KeyEventArgs e)
     {
-        if (e.Key is Key.Enter && InputMethod.Current?.ImeState is not InputMethodState.On)
+        if (e.Key is Key.Enter && InputMethod.Current?.ImeState is not InputMethodState.On && !DefinitionsTextBox.IsFocused)
         {
             e.Handled = true;
             await HandleSaveButtonClick().ConfigureAwait(false);

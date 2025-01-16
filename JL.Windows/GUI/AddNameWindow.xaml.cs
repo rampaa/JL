@@ -74,7 +74,7 @@ internal sealed partial class AddNameWindow
         Close();
 
         string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-        string line = $"{spelling}\t{reading}\t{nameType}\t{extraInfo}\n";
+        string line = $"{spelling}\t{reading}\t{nameType}\t{extraInfo?.ReplaceLineEndings("\\n")}\n";
         return File.AppendAllTextAsync(path, line);
     }
 
@@ -105,7 +105,7 @@ internal sealed partial class AddNameWindow
     // ReSharper disable once AsyncVoidMethod
     private async void Window_PreviewKeyUp(object sender, KeyEventArgs e)
     {
-        if (e.Key is Key.Enter && InputMethod.Current?.ImeState is not InputMethodState.On)
+        if (e.Key is Key.Enter && InputMethod.Current?.ImeState is not InputMethodState.On && !ExtraInfoTextBox.IsFocused)
         {
             e.Handled = true;
             await HandleSaveButtonClick().ConfigureAwait(false);
