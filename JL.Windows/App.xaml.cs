@@ -71,4 +71,10 @@ internal sealed partial class App
     {
         Utils.Logger.Fatal(args.Exception, "Unobserved task exception");
     }
+
+    // ReSharper disable once AsyncVoidMethod
+    private async void Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)
+    {
+        await GUI.MainWindow.Instance.HandleAppClosing().ConfigureAwait(false);
+    }
 }
