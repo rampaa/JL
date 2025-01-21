@@ -24,7 +24,7 @@ public interface IFrontend
 
     public Task StopTextToSpeech();
 
-    public Task<byte[]?> GetAudioResponseFromTextToSpeech(string text);
+    public ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text);
 
     public void SetInstalledVoiceWithHighestPriority();
 }

@@ -33,7 +33,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public Task StopTextToSpeech() => SpeechSynthesisUtils.StopTextToSpeech();
 
-    public Task<byte[]?> GetAudioResponseFromTextToSpeech(string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(text);
+    public ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(text);
 
     public void SetInstalledVoiceWithHighestPriority() => SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
 }

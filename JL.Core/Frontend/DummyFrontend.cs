@@ -32,7 +32,7 @@ internal sealed class DummyFrontend : IFrontend
 
     public Task StopTextToSpeech() => Task.CompletedTask;
 
-    public Task<byte[]?> GetAudioResponseFromTextToSpeech(string text) => new(static () => null);
+    public ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text) => new();
 
     public void SetInstalledVoiceWithHighestPriority()
     {

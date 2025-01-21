@@ -91,7 +91,7 @@ internal static class SpeechSynthesisUtils
         _ = Synthesizer.SpeakAsync(text);
     }
 
-    public static async Task<byte[]?> GetAudioResponseFromTextToSpeech(string text)
+    public static async ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text)
     {
         if (InstalledVoiceWithHighestPriority is null)
         {
