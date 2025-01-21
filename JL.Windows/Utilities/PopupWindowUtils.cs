@@ -72,7 +72,7 @@ internal static class PopupWindowUtils
         return textBox;
     }
 
-    public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? readings, string[]? splitReadingsWithRInfo, double leftMargin, byte[] pitchPositions)
+    public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? readings, string[]? splitReadingsWithRInfo, double leftMargin, ReadOnlySpan<byte> pitchPositions)
     {
         Grid pitchAccentGrid = new();
 

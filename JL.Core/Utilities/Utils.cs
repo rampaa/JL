@@ -124,7 +124,7 @@ public static partial class Utils
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
 #pragma warning disable CA5351
-    internal static string GetMd5String(byte[] bytes)
+    internal static string GetMd5String(ReadOnlySpan<byte> bytes)
     {
         byte[] hash = MD5.HashData(bytes);
         return Convert.ToHexString(hash);
