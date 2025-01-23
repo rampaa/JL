@@ -199,29 +199,6 @@ internal static class PopupWindowUtils
         }
     }
 
-    public static void ShowMiningModeResults(PopupWindow popupWindow)
-    {
-        popupWindow.EnableMiningMode();
-        popupWindow.DisplayResults();
-        popupWindow.UpdatePosition();
-
-        ConfigManager configManager = ConfigManager.Instance;
-
-        if (configManager.Focusable)
-        {
-            _ = popupWindow.Activate();
-        }
-
-        _ = popupWindow.Focus();
-
-        WinApi.BringToFront(popupWindow.WindowHandle);
-
-        if (configManager.AutoHidePopupIfMouseIsNotOverIt)
-        {
-            SetPopupAutoHideTimer();
-        }
-    }
-
     public static Task PlayAudio(string primarySpelling, string? reading)
     {
         if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing

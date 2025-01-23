@@ -236,7 +236,7 @@ internal sealed partial class MainWindow
             if (!mergeTexts && SizeToContent is SizeToContent.Manual && WindowState is not WindowState.Minimized
                             && (configManager.MainWindowDynamicHeight || configManager.MainWindowDynamicWidth))
             {
-                WindowsUtils.SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight, this);
+                SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight);
             }
 
             TitleBarContextMenu.IsOpen = false;
@@ -1134,7 +1134,7 @@ internal sealed partial class MainWindow
         if (e.ChangedButton == ConfigManager.Instance.MiningModeMouseButton && FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             e.Handled = true;
-            PopupWindowUtils.ShowMiningModeResults(FirstPopupWindow);
+            FirstPopupWindow.ShowMiningModeResults();
         }
         else if (e.ChangedButton is not MouseButton.Right)
         {
@@ -1234,7 +1234,7 @@ internal sealed partial class MainWindow
         PopupWindow? currentPopupWindow = FirstPopupWindow;
         while (currentPopupWindow is not null)
         {
-            WindowsUtils.SetSizeToContent(configManager.PopupDynamicWidth, configManager.PopupDynamicHeight, configManager.PopupMaxWidth, configManager.PopupMaxHeight, configManager.PopupMinWidth, configManager.PopupMinHeight, currentPopupWindow);
+            currentPopupWindow.SetSizeToContent(configManager.PopupDynamicWidth, configManager.PopupDynamicHeight, configManager.PopupMaxWidth, configManager.PopupMaxHeight, configManager.PopupMinWidth, configManager.PopupMinHeight);
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
 
@@ -1668,7 +1668,7 @@ internal sealed partial class MainWindow
 
             if (SizeToContent is SizeToContent.Manual && (configManager.MainWindowDynamicHeight || configManager.MainWindowDynamicWidth))
             {
-                WindowsUtils.SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight, this);
+                SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight);
             }
 
             if (configManager.AlwaysOnTop)
@@ -1880,5 +1880,48 @@ internal sealed partial class MainWindow
         }
 
         return Math.Max(bottomPosition is -1 ? activeScreen.WorkingArea.Top : activeScreen.Bounds.Top, bottomPosition - currentHeight);
+    }
+
+    public void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double minWidth, double minHeight, double width, double height)
+    {
+        if (dynamicWidth && dynamicHeight)
+        {
+            MaxHeight = maxHeight;
+            MaxWidth = maxWidth;
+            MinHeight = minHeight;
+            MinWidth = minWidth;
+            SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
+        else if (dynamicHeight)
+        {
+            MaxHeight = maxHeight;
+            MinHeight = minHeight;
+            MaxWidth = double.PositiveInfinity;
+            MinWidth = 100;
+            SizeToContent = SizeToContent.Height;
+            Width = width;
+        }
+
+        else if (dynamicWidth)
+        {
+            MaxHeight = double.PositiveInfinity;
+            MinHeight = 50;
+            MaxWidth = maxWidth;
+            MinWidth = minWidth;
+            SizeToContent = SizeToContent.Width;
+            Height = height;
+        }
+
+        else
+        {
+            SizeToContent = SizeToContent.Manual;
+            MaxHeight = double.PositiveInfinity;
+            MaxWidth = double.PositiveInfinity;
+            MinHeight = 50;
+            MinWidth = 100;
+            Width = width;
+            Height = height;
+        }
     }
 }

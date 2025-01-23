@@ -101,7 +101,7 @@ internal sealed partial class PopupWindow
         Foreground = configManager.DefinitionsColor;
         FontFamily = configManager.PopupFont;
 
-        WindowsUtils.SetSizeToContent(configManager.PopupDynamicWidth, configManager.PopupDynamicHeight, configManager.PopupMaxWidth, configManager.PopupMaxHeight, configManager.PopupMinWidth, configManager.PopupMinHeight, this);
+        SetSizeToContent(configManager.PopupDynamicWidth, configManager.PopupDynamicHeight, configManager.PopupMaxWidth, configManager.PopupMaxHeight, configManager.PopupMinWidth, configManager.PopupMinHeight);
 
         AddNameMenuItem.SetInputGestureText(configManager.ShowAddNameWindowKeyGesture);
         AddWordMenuItem.SetInputGestureText(configManager.ShowAddWordWindowKeyGesture);
@@ -495,7 +495,7 @@ internal sealed partial class PopupWindow
         WinApi.MoveWindowToPosition(WindowHandle, x, y);
     }
 
-    public void UpdatePosition()
+    private void UpdatePosition()
     {
         if (ConfigManager.Instance.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
         {
@@ -508,7 +508,7 @@ internal sealed partial class PopupWindow
         }
     }
 
-    public void DisplayResults()
+    private void DisplayResults()
     {
         ConfigManager configManager = ConfigManager.Instance;
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
@@ -1740,7 +1740,7 @@ internal sealed partial class PopupWindow
         }
     }
 
-    public void EnableMiningMode()
+    private void EnableMiningMode()
     {
         MiningMode = true;
 
@@ -1970,12 +1970,12 @@ internal sealed partial class PopupWindow
         {
             if (!MiningMode)
             {
-                PopupWindowUtils.ShowMiningModeResults(this);
+                ShowMiningModeResults();
             }
 
             else if (ChildPopupWindow is { IsVisible: true, MiningMode: false })
             {
-                PopupWindowUtils.ShowMiningModeResults(ChildPopupWindow);
+                ChildPopupWindow.ShowMiningModeResults();
             }
         }
     }
@@ -2093,6 +2093,61 @@ internal sealed partial class PopupWindow
         if (e.LeftButton is MouseButtonState.Pressed)
         {
             DragMove();
+        }
+    }
+
+    public void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double minWidth, double minHeight)
+    {
+        MaxHeight = maxHeight;
+        MaxWidth = maxWidth;
+        MinHeight = minHeight;
+        MinWidth = minWidth;
+
+        if (dynamicWidth && dynamicHeight)
+        {
+            SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
+        else if (dynamicHeight)
+        {
+            SizeToContent = SizeToContent.Height;
+            Width = maxWidth;
+        }
+
+        else if (dynamicWidth)
+        {
+            SizeToContent = SizeToContent.Width;
+            Height = maxHeight;
+        }
+
+        else
+        {
+            SizeToContent = SizeToContent.Manual;
+            Height = maxHeight;
+            Width = maxWidth;
+        }
+    }
+
+    public void ShowMiningModeResults()
+    {
+        EnableMiningMode();
+        DisplayResults();
+        UpdatePosition();
+
+        ConfigManager configManager = ConfigManager.Instance;
+
+        if (configManager.Focusable)
+        {
+            _ = Activate();
+        }
+
+        _ = Focus();
+
+        WinApi.BringToFront(WindowHandle);
+
+        if (configManager.AutoHidePopupIfMouseIsNotOverIt)
+        {
+            PopupWindowUtils.SetPopupAutoHideTimer();
         }
     }
 
