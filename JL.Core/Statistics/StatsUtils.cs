@@ -168,14 +168,8 @@ public static class StatsUtils
             _ => throw new ArgumentOutOfRangeException(nameof(statsMode), statsMode, "Invalid StatsMode")
         };
 
-        stats.Characters = 0;
-        stats.Lines = 0;
-        stats.Time = TimeSpan.Zero;
-        stats.CardsMined = 0;
-        stats.TimesPlayedAudio = 0;
-        stats.Imoutos = 0;
+        stats.ResetStats();
 
-        stats.TermLookupCountDict.Clear();
         if (statsMode is StatsMode.Profile or StatsMode.Lifetime)
         {
             StatsDBUtils.ResetAllTermLookupCounts(statsMode is StatsMode.Profile ? ProfileUtils.CurrentProfileId : ProfileUtils.GlobalProfileId);
@@ -184,21 +178,8 @@ public static class StatsUtils
 
     public static void IncrementTermLookupCount(string primarySpelling)
     {
-        IncrementLookupStat(SessionStats, primarySpelling);
-        IncrementLookupStat(ProfileLifetimeStats, primarySpelling);
-        IncrementLookupStat(LifetimeStats, primarySpelling);
-    }
-
-    private static void IncrementLookupStat(Stats stats, string primarySpelling)
-    {
-        Dictionary<string, int> lookupStatsDict = stats.TermLookupCountDict;
-        if (lookupStatsDict.TryGetValue(primarySpelling, out int count))
-        {
-            lookupStatsDict[primarySpelling] = count + 1;
-        }
-        else
-        {
-            lookupStatsDict[primarySpelling] = 1;
-        }
+        SessionStats.IncrementLookupStat(primarySpelling);
+        ProfileLifetimeStats.IncrementLookupStat(primarySpelling);
+        LifetimeStats.IncrementLookupStat(primarySpelling);
     }
 }
