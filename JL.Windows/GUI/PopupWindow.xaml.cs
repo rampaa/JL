@@ -1420,7 +1420,7 @@ internal sealed partial class PopupWindow
             await PlayAudio().ConfigureAwait(false);
         }
 
-        else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture) || keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
+        else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
         {
             handled = true;
 
@@ -1725,6 +1725,13 @@ internal sealed partial class PopupWindow
             {
                 await mainWindow.FirstPopupWindow.LookupOnSelect(mainWindow.MainTextBox).ConfigureAwait(false);
             }
+        }
+
+        else if (keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
+        {
+            handled = true;
+
+            HidePopup();
         }
 
         if (handled && e is not null)
