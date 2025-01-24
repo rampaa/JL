@@ -176,10 +176,10 @@ public static class StatsUtils
         }
     }
 
-    public static void IncrementTermLookupCount(string primarySpelling)
+    public static void IncrementTermLookupCount(string deconjugatedMatchedText)
     {
-        SessionStats.IncrementLookupStat(primarySpelling);
-        ProfileLifetimeStats.IncrementLookupStat(primarySpelling);
-        LifetimeStats.IncrementLookupStat(primarySpelling);
+        SessionStats.IncrementLookupStat(deconjugatedMatchedText);
+        ProfileLifetimeStats.IncrementLookupStat(deconjugatedMatchedText);
+        LifetimeStats.IncrementLookupStat(deconjugatedMatchedText);
     }
 }

@@ -14,15 +14,15 @@ public sealed class Stats
 
     [JsonIgnore] public Dictionary<string, int> TermLookupCountDict { get; } = new(StringComparer.Ordinal);
 
-    internal void IncrementLookupStat(string primarySpelling)
+    internal void IncrementLookupStat(string deconjugatedMatchedText)
     {
-        if (TermLookupCountDict.TryGetValue(primarySpelling, out int count))
+        if (TermLookupCountDict.TryGetValue(deconjugatedMatchedText, out int count))
         {
-            TermLookupCountDict[primarySpelling] = count + 1;
+            TermLookupCountDict[deconjugatedMatchedText] = count + 1;
         }
         else
         {
-            TermLookupCountDict[primarySpelling] = 1;
+            TermLookupCountDict[deconjugatedMatchedText] = 1;
         }
     }
 
