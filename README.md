@@ -36,7 +36,7 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 * Touch screen support (i.e. Left Click/Touch lookup mode)
 * Can work without stealing the focus away from other windows
 * Can keep itself as the topmost window (i.e. JL can be used with programs like [Magpie](https://github.com/Blinue/Magpie))
-* Stats (read character/line count, spent time etc.)
+* Stats (read character/line count, read characters per minute, number of times a specific term was looked up etc.)
 
 ## FAQ
 ### How does it work?
