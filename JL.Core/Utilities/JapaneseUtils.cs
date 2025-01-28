@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Frozen;
 using System.Globalization;
 using System.Text;
@@ -172,7 +173,7 @@ public static partial class JapaneseUtils
 
     private static readonly FrozenDictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToFrozenDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
 
-    private static readonly FrozenSet<char> s_expressionTerminatingCharacters = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters).ToFrozenSet();
+    private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters)]);
 
     private static int FirstKatakanaIndex(ReadOnlySpan<char> text)
     {
@@ -188,12 +189,12 @@ public static partial class JapaneseUtils
         return -1;
     }
 
-    public static string KatakanaToHiragana(string text)
+    internal static string KatakanaToHiragana(string text)
     {
         string normalizedText = text;
         if (!normalizedText.IsNormalized(NormalizationForm.FormKC))
         {
-            // Normalizes ＯＬ to OL, ｶﾞ to が, ﾜ to わ, ㍿ to 株式会社 etc.
+            // Normalizes ＯＬ to OL, fullwidth space to halfwidth space, ｶﾞ to が, ﾜ to わ, ㍿ to 株式会社 etc.
             normalizedText = normalizedText.Normalize(NormalizationForm.FormKC);
         }
 
@@ -308,18 +309,8 @@ public static partial class JapaneseUtils
 
     public static int FindExpressionBoundary(ReadOnlySpan<char> text, int position)
     {
-        int endPosition = text.Length;
-        for (int i = position; i < text.Length; i++)
-        {
-            char c = text[i];
-            if (s_expressionTerminatingCharacters.Contains(c) || char.IsWhiteSpace(c))
-            {
-                endPosition = i + 1;
-                break;
-            }
-        }
-
-        return endPosition;
+        int endPosition = MemoryExtensions.IndexOfAny(text[position..], s_expressionTerminatingCharacters);
+        return endPosition < 0 ? text.Length : endPosition + position + 1;
     }
 
     internal static string FindSentence(ReadOnlySpan<char> text, int position)

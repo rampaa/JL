@@ -196,7 +196,7 @@ public static class ExtensionMethods
         }
     }
 
-    public static bool Contains(this string[] source, string item)
+    internal static bool Contains(this string[] source, string item)
     {
         for (int i = 0; i < source.Length; i++)
         {
@@ -209,7 +209,7 @@ public static class ExtensionMethods
         return false;
     }
 
-    public static int IndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
+    internal static int IndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
     {
         int index = text[startIndex..].IndexOf(value);
         return index < 0
@@ -217,7 +217,7 @@ public static class ExtensionMethods
             : index + startIndex;
     }
 
-    public static int IndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
+    internal static int IndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
     {
         int index = text[startIndex..].IndexOf(value);
         return index < 0
@@ -225,13 +225,13 @@ public static class ExtensionMethods
             : index + startIndex;
     }
 
-    public static int LastIndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
+    internal static int LastIndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
     {
         return text[..startIndex].LastIndexOf(value);
     }
 
-    public static int LastIndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
-    {
-        return text[..startIndex].LastIndexOf(value);
-    }
+    //public static int LastIndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
+    //{
+    //    return text[..startIndex].LastIndexOf(value);
+    //}
 }
