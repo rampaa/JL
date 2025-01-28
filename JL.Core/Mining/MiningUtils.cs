@@ -239,14 +239,18 @@ public static class MiningUtils
                     : null;
 
             case JLField.RawFrequencies:
-                if (lookupResult.Frequencies is not null)
+            {
+                if (lookupResult.Frequencies is null)
                 {
-                    List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
-                    return string.Join(", ", validFrequencies.Select(static f => f.Freq).ToList());
+                    return null;
                 }
-                return null;
+
+                List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
+                return string.Join(", ", validFrequencies.Select(static f => f.Freq).ToList());
+            }
 
             case JLField.PreferredFrequency:
+            {
                 if (lookupResult.Frequencies is not null)
                 {
                     int firstFrequency = lookupResult.Frequencies[0].Freq;
@@ -255,63 +259,66 @@ public static class MiningUtils
                         return firstFrequency.ToString(CultureInfo.InvariantCulture);
                     }
                 }
-                return null;
-
-            case JLField.FrequencyHarmonicMean:
-                if (lookupResult.Frequencies is not null)
-                {
-                    List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
-                    return CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
-                }
-                return null;
-
-            case JLField.PitchAccents:
-            {
-                if (lookupResult.PitchPositions is not null)
-                {
-                    string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
-
-                    StringBuilder expressionsWithPitchAccentBuilder = new();
-                    _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
-
-                    int expressionsLength = expressions.Length;
-                    for (int i = 0; i < expressionsLength; i++)
-                    {
-                        byte pitchPosition = lookupResult.PitchPositions[i];
-                        if (pitchPosition is not byte.MaxValue)
-                        {
-                            _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expressions[i], pitchPosition));
-                            _ = expressionsWithPitchAccentBuilder.Append('、');
-                        }
-                    }
-
-                    return expressionsWithPitchAccentBuilder.ToString(0, expressionsWithPitchAccentBuilder.Length - 1);
-                }
 
                 return null;
             }
 
-            case JLField.NumericPitchAccents:
+            case JLField.FrequencyHarmonicMean:
             {
-                if (lookupResult.PitchPositions is not null)
+                if (lookupResult.Frequencies is null)
                 {
-                    string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
-
-                    StringBuilder numericPitchAccentBuilder = new();
-                    int expressionsLength = expressions.Length;
-                    for (int i = 0; i < expressionsLength; i++)
-                    {
-                        byte pitchPosition = lookupResult.PitchPositions[i];
-                        if (pitchPosition is not byte.MaxValue)
-                        {
-                            _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expressions[i]}: {pitchPosition}, ");
-                        }
-                    }
-
-                    return numericPitchAccentBuilder.ToString(0, numericPitchAccentBuilder.Length - 2);
+                    return null;
                 }
 
-                return null;
+                List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
+                return CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
+            }
+
+            case JLField.PitchAccents:
+            {
+                if (lookupResult.PitchPositions is null)
+                {
+                    return null;
+                }
+
+                string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
+                StringBuilder expressionsWithPitchAccentBuilder = new();
+                _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
+
+                int expressionsLength = expressions.Length;
+                for (int i = 0; i < expressionsLength; i++)
+                {
+                    byte pitchPosition = lookupResult.PitchPositions[i];
+                    if (pitchPosition is not byte.MaxValue)
+                    {
+                        _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expressions[i], pitchPosition));
+                        _ = expressionsWithPitchAccentBuilder.Append('、');
+                    }
+                }
+
+                return expressionsWithPitchAccentBuilder.ToString(0, expressionsWithPitchAccentBuilder.Length - 1);
+            }
+
+            case JLField.NumericPitchAccents:
+            {
+                if (lookupResult.PitchPositions is null)
+                {
+                    return null;
+                }
+
+                string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
+                StringBuilder numericPitchAccentBuilder = new();
+                int expressionsLength = expressions.Length;
+                for (int i = 0; i < expressionsLength; i++)
+                {
+                    byte pitchPosition = lookupResult.PitchPositions[i];
+                    if (pitchPosition is not byte.MaxValue)
+                    {
+                        _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expressions[i]}: {pitchPosition}, ");
+                    }
+                }
+
+                return numericPitchAccentBuilder.ToString(0, numericPitchAccentBuilder.Length - 2);
             }
 
             case JLField.PitchAccentForFirstReading:
@@ -328,6 +335,7 @@ public static class MiningUtils
                         return string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(expression, firstPitchPosition)}");
                     }
                 }
+
                 return null;
             }
 
@@ -345,6 +353,47 @@ public static class MiningUtils
                         return string.Create(CultureInfo.InvariantCulture, $"{expression}: {firstPitchPosition}");
                     }
                 }
+
+                return null;
+            }
+
+            case JLField.PitchAccentCategories:
+            {
+                if (lookupResult.PitchPositions is null)
+                {
+                    return null;
+                }
+
+                string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
+                StringBuilder pitchAccentCategoriesBuilder = new();
+                for (int i = 0; i < expressions.Length; i++)
+                {
+                    byte pitchPosition = lookupResult.PitchPositions[i];
+                    if (pitchPosition is not byte.MaxValue)
+                    {
+                        string expression = expressions[i];
+                        _ = pitchAccentCategoriesBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {GetPitchAccentCategory(expression, pitchPosition)}, ");
+                    }
+                }
+
+                return pitchAccentCategoriesBuilder.ToString(0, pitchAccentCategoriesBuilder.Length - 2);
+            }
+
+            case JLField.PitchAccentCategoryForFirstReading:
+            {
+                if (lookupResult.PitchPositions is not null)
+                {
+                    byte firstPitchPosition = lookupResult.PitchPositions[0];
+                    if (firstPitchPosition is not byte.MaxValue)
+                    {
+                        string firstExpression = lookupResult.Readings is not null
+                                ? lookupResult.Readings[0]
+                                : lookupResult.PrimarySpelling;
+
+                        return $"{firstExpression}: {GetPitchAccentCategory(firstExpression, firstPitchPosition)}";
+                    }
+                }
+
                 return null;
             }
 
@@ -355,9 +404,11 @@ public static class MiningUtils
                 return null;
 
             default:
+            {
                 Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(JLField), nameof(MiningUtils), nameof(GetMiningParameter), field);
                 Utils.Frontend.Alert(AlertLevel.Error, $"Invalid JLField: {field}");
                 return null;
+            }
         }
     }
 
@@ -530,21 +581,25 @@ public static class MiningUtils
             _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
 
             StringBuilder numericPitchAccentBuilder = new();
-            int expressionsLength = expressions.Length;
-            for (int i = 0; i < expressionsLength; i++)
+            StringBuilder pitchAccentCategoriesBuilder = new();
+            for (int i = 0; i < expressions.Length; i++)
             {
                 byte pitchPosition = lookupResult.PitchPositions[i];
                 if (pitchPosition is not byte.MaxValue)
                 {
                     string expression = expressions[i];
                     _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {pitchPosition}, ");
+
                     _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, pitchPosition));
                     _ = expressionsWithPitchAccentBuilder.Append('、');
+
+                    _ = pitchAccentCategoriesBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {GetPitchAccentCategory(expression, pitchPosition)}, ");
                 }
             }
 
             miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString(0, numericPitchAccentBuilder.Length - 2);
             miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString(0, expressionsWithPitchAccentBuilder.Length - 1);
+            miningParams[JLField.PitchAccentCategories] = pitchAccentCategoriesBuilder.ToString(0, pitchAccentCategoriesBuilder.Length - 2);
 
             byte firstPitchPosition = lookupResult.PitchPositions[0];
             if (firstPitchPosition is not byte.MaxValue)
@@ -552,6 +607,7 @@ public static class MiningUtils
                 string firstExpression = expressions[0];
                 miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstExpression, firstPitchPosition)}");
                 miningParams[JLField.NumericPitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{firstExpression}: {firstPitchPosition}");
+                miningParams[JLField.PitchAccentCategoryForFirstReading] = $"{firstExpression}: {GetPitchAccentCategory(firstExpression, firstPitchPosition)}";
             }
         }
 
@@ -573,6 +629,17 @@ public static class MiningUtils
         }
 
         return double.ConvertToIntegerNative<int>(Math.Round(lookupFrequencyResults.Count / sumOfReciprocalOfFreqs));
+    }
+
+    private static string GetPitchAccentCategory(string expression, byte pitchPosition)
+    {
+        return pitchPosition is 0
+            ? "Heiban"
+            : pitchPosition is 1
+                ? "Atamadaka"
+                : JapaneseUtils.GetCombinedFormLength(expression) > pitchPosition
+                    ? "Nakadaka"
+                    : "Odaka";
     }
 
     private static StringBuilder GetExpressionWithPitchAccent(ReadOnlySpan<char> expression, byte position)

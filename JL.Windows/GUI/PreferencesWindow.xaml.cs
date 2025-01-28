@@ -73,6 +73,8 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: ３, おみな: 0, おうな: 1".
                                             • {JLField.PitchAccentForFirstReading.GetDescription()}: Pitch accent for the first reading of the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                             • {JLField.NumericPitchAccentForFirstReading.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3".
+                                            • {JLField.PitchAccentCategories.GetDescription()}: Pitch accent categories for the mined word, e.g., "にほんご: Heiban, にっぽんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
+                                            • {JLField.PitchAccentCategoryForFirstReading.GetDescription()}: Pitch accent category for the first reading of the mined word, e.g., "にほんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
                                             • {JLField.EdictId.GetDescription()}: JMDict entry ID.
                                             • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                             """;
@@ -105,6 +107,7 @@ internal sealed partial class PreferencesWindow
                                              • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., "666".
                                              • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                              • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3, おみな: 0, おうな: 1".
+                                             • {JLField.PitchAccentCategories.GetDescription()}: Pitch accent categories for the mined word, e.g., "にほんご: Heiban, にっぽんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
                                              • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                              """;
 
@@ -130,6 +133,8 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3, おみな: 0, おうな: 1".
                                             • {JLField.PitchAccentForFirstReading.GetDescription()}: Pitch accent for the first reading of the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                             • {JLField.NumericPitchAccentForFirstReading.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3".
+                                            • {JLField.PitchAccentCategories.GetDescription()}: Pitch accent categories for the mined word, e.g., "にほんご: Heiban, にっぽんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
+                                            • {JLField.PitchAccentCategoryForFirstReading.GetDescription()}: Pitch accent category for the first reading of the mined word, e.g., "にほんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
                                             • {JLField.EdictId.GetDescription()}: JMnedict entry ID.
                                             • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                             """;

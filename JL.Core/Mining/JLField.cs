@@ -30,8 +30,10 @@ public enum JLField
     [Description("Frequency (Harmonic Mean)")] FrequencyHarmonicMean,
     [Description("Pitch Accents")] PitchAccents,
     [Description("Pitch Accents (Numeric)")] NumericPitchAccents,
+    [Description("Pitch Accent Categories")] PitchAccentCategories,
     [Description("Pitch Accent for First Reading")] PitchAccentForFirstReading,
     [Description("Pitch Accent for First Reading (Numeric)")] NumericPitchAccentForFirstReading,
+    [Description("Pitch Accent Category for First Reading")] PitchAccentCategoryForFirstReading,
 
     // JMdict, JMnedict
     [Description("Entry ID")] EdictId,

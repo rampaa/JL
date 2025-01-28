@@ -302,6 +302,22 @@ public static partial class JapaneseUtils
         return combinedForm;
     }
 
+    internal static int GetCombinedFormLength(ReadOnlySpan<char> text)
+    {
+        int length = 0;
+        for (int i = 0; i < text.Length; i++)
+        {
+            ++length;
+            if (i + 1 < text.Length
+                && s_smallCombiningKanaSet.Contains(text[i + 1]))
+            {
+                ++i;
+            }
+        }
+
+        return length;
+    }
+
     internal static bool IsKatakana(char character)
     {
         return s_katakanaToHiraganaDict.ContainsKey(character);
