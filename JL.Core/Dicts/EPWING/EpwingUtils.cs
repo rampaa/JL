@@ -1,41 +1,16 @@
-using System.Collections.Frozen;
+using System.Buffers;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING;
 
 internal static class EpwingUtils
 {
-    //'×', '‐', '。', '、', '⻖', '/', '-', '・', '+', ':', '！', '！', '●',
-    //'？', '～', '〃', '､', '!', '−', '＆', '?', '&', '－', '／', '√', '$',
-    //'＄', '°', '＋', ',', '®', '＼', '─', '─', '．', '■', '’', '⻌', '◎',
-    //'Ⓒ', 'Ⓡ', '’', '＠', '〒', '@', '〜', '，', '㏄', '\'', '％', '#',
-    //'△', '~', '%', '℃', '：', '※', '㊙', '©', '—', '‘', '△', '*', '≒',
-    //'←', '↑', '↓', '☆', '.', '･'
-    private static readonly FrozenSet<char> s_invalidCharacters = FrozenSet.ToFrozenSet(
-    [
-        '�', '〓', '㋝', '㋜',
-        '（', '）', '(', ')',
-        '【', '】', '「', '」',
-        '［', '］', '[', ']',
-        '{', '}', '〈', '〉',
-        '＜', '＞', '〔', '〕',
-        '《', '》', '<', '>',
-        '○', '∘', '＝', '=',
-        '…', '‥', ';', '；',
-        '→', '━'
-    ]);
+    private static readonly SearchValues<char> s_invalidCharacters = SearchValues.Create(['�', '〓', '\n']);
 
     public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[] definitions, Dict dict)
     {
-        foreach (char c in primarySpelling)
-        {
-            if (s_invalidCharacters.Contains(c) || char.IsWhiteSpace(c))
-            {
-                return false;
-            }
-        }
-
-        return FilterDuplicateEntries(primarySpelling, reading, definitions, dict);
+        return !MemoryExtensions.ContainsAny(primarySpelling, s_invalidCharacters)
+            && FilterDuplicateEntries(primarySpelling, reading, definitions, dict);
     }
 
     private static bool FilterDuplicateEntries(string primarySpelling, string? reading, string[] definitions, Dict dict)
