@@ -322,7 +322,7 @@ public static partial class JapaneseUtils
         return endPosition;
     }
 
-    internal static string FindSentence(string text, int position)
+    internal static string FindSentence(ReadOnlySpan<char> text, int position)
     {
         int startPosition = -1;
         int endPosition = -1;
@@ -332,14 +332,12 @@ public static partial class JapaneseUtils
             char terminatingCharacter = s_sentenceTerminatingCharacters[i];
 
             int tempIndex = text.LastIndexOf(terminatingCharacter, position);
-
             if (tempIndex > startPosition)
             {
                 startPosition = tempIndex;
             }
 
             tempIndex = text.IndexOf(terminatingCharacter, position);
-
             if (tempIndex >= 0 && (endPosition < 0 || tempIndex < endPosition))
             {
                 endPosition = tempIndex;
@@ -353,13 +351,13 @@ public static partial class JapaneseUtils
             endPosition = text.Length - 1;
         }
 
-        string sentence = startPosition <= endPosition
+        ReadOnlySpan<char> sentence = startPosition <= endPosition
             ? text[startPosition..(endPosition + 1)].Trim()
             : "";
 
         if (sentence.Length <= 1)
         {
-            return sentence;
+            return sentence.ToString();
         }
 
         if (s_rightToLeftBracketDict.ContainsKey(sentence[0]))
@@ -380,15 +378,15 @@ public static partial class JapaneseUtils
                 {
                     sentence = sentence[1..^1];
                 }
-                else if (!sentence.Contains(rightBracket, StringComparison.Ordinal))
+                else if (!sentence.Contains(rightBracket))
                 {
                     sentence = sentence[1..];
                 }
                 else
                 {
                     char sentenceFirstChar = sentence[0];
-                    int numberOfLeftBrackets = sentence.Count(p => p == sentenceFirstChar);
-                    int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
+                    int numberOfLeftBrackets = sentence.Count(sentenceFirstChar);
+                    int numberOfRightBrackets = sentence.Count(rightBracket);
 
                     if (numberOfLeftBrackets == numberOfRightBrackets + 1)
                     {
@@ -399,14 +397,14 @@ public static partial class JapaneseUtils
 
             else if (s_rightToLeftBracketDict.TryGetValue(sentence[^1], out char leftBracket))
             {
-                if (!sentence.Contains(leftBracket, StringComparison.Ordinal))
+                if (!sentence.Contains(leftBracket))
                 {
                     sentence = sentence[..^1];
                 }
                 else
                 {
-                    int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
-                    int numberOfRightBrackets = sentence.Count(p => p == sentence[^1]);
+                    int numberOfLeftBrackets = sentence.Count(leftBracket);
+                    int numberOfRightBrackets = sentence.Count(sentence[^1]);
 
                     if (numberOfRightBrackets == numberOfLeftBrackets + 1)
                     {
@@ -416,7 +414,7 @@ public static partial class JapaneseUtils
             }
         }
 
-        return sentence;
+        return sentence.ToString();
     }
 
     private static int FirstPunctuationIndex(ReadOnlySpan<char> text)

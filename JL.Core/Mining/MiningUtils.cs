@@ -73,55 +73,55 @@ public static class MiningUtils
         </style>
         """;
 
-    private static string? GetMiningParameter(JLField field, LookupResult lookupResult, string currentText, int currentCharPosition)
+    private static string? GetMiningParameter(JLField field, LookupResult lookupResult, ReadOnlySpan<char> currentText, int currentCharPosition)
     {
         switch (field)
         {
             case JLField.LeadingSentencePart:
             {
-                string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+                ReadOnlySpan<char> sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
                 int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
                 if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
                 {
                     searchStartIndex = 0;
                 }
 
-                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
-                return currentText[sentenceStartIndex..currentCharPosition];
+                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex);
+                return currentText[sentenceStartIndex..currentCharPosition].ToString();
             }
 
             case JLField.TrailingSentencePart:
             {
-                string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+                ReadOnlySpan<char> sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
                 int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
                 if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
                 {
                     searchStartIndex = 0;
                 }
 
-                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
-                return currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
+                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex);
+                return currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)].ToString();
             }
 
             case JLField.Sentence:
             {
-                string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+                ReadOnlySpan<char> sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
                 int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
                 if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
                 {
                     searchStartIndex = 0;
                 }
 
-                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
-                string leadingSentencePart = currentText[sentenceStartIndex..currentCharPosition];
-                string trailingSentencePart = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
+                int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex);
+                ReadOnlySpan<char> leadingSentencePart = currentText[sentenceStartIndex..currentCharPosition];
+                ReadOnlySpan<char> trailingSentencePart = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
                 return $"{leadingSentencePart}<b>{lookupResult.MatchedText}</b>{trailingSentencePart}";
             }
 
             case JLField.SourceText:
             {
-                string leadingSourcePart = currentText[..currentCharPosition].ReplaceLineEndings("<br/>");
-                string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ReplaceLineEndings("<br/>");
+                string leadingSourcePart = currentText[..currentCharPosition].ToString().ReplaceLineEndings("<br/>");
+                string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString().ReplaceLineEndings("<br/>");
                 return $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}".ReplaceLineEndings("<br/>");
             }
 
@@ -225,10 +225,10 @@ public static class MiningUtils
                 return lookupResult.FormattedDefinitions?.ReplaceLineEndings("<br/>");
 
             case JLField.LeadingSourceTextPart:
-                return currentText[..currentCharPosition].ReplaceLineEndings("<br/>");
+                return currentText[..currentCharPosition].ToString().ReplaceLineEndings("<br/>");
 
             case JLField.TrailingSourceTextPart:
-                return currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ReplaceLineEndings("<br/>");
+                return currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString().ReplaceLineEndings("<br/>");
 
             case JLField.DictionaryName:
                 return lookupResult.Dict.Name;
@@ -361,7 +361,7 @@ public static class MiningUtils
         }
     }
 
-    private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, bool useHtmlTags)
+    private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, ReadOnlySpan<char> currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, bool useHtmlTags)
     {
         Dictionary<JLField, string> miningParams = new()
         {
@@ -375,8 +375,8 @@ public static class MiningUtils
                 : lookupResult.PrimarySpelling
         };
 
-        string leadingSourcePart = currentText[..currentCharPosition];
-        string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..];
+        string leadingSourcePart = currentText[..currentCharPosition].ToString();
+        string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString();
         if (useHtmlTags)
         {
             leadingSourcePart = leadingSourcePart.ReplaceLineEndings("<br/>");
@@ -388,7 +388,7 @@ public static class MiningUtils
 
         miningParams[JLField.SourceText] = useHtmlTags
                 ? $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}".ReplaceLineEndings("<br/>")
-                : currentText;
+                : currentText.ToString();
 
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
         int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
@@ -397,11 +397,11 @@ public static class MiningUtils
             searchStartIndex = 0;
         }
 
-        int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
-        string leadingSentencePart = currentText[sentenceStartIndex..currentCharPosition];
-        miningParams[JLField.LeadingSentencePart] = leadingSentencePart;
-        string trailingSentencePart = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
-        miningParams[JLField.TrailingSentencePart] = trailingSentencePart;
+        int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex);
+        ReadOnlySpan<char> leadingSentencePart = currentText[sentenceStartIndex..currentCharPosition];
+        miningParams[JLField.LeadingSentencePart] = leadingSentencePart.ToString();
+        ReadOnlySpan<char> trailingSentencePart = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
+        miningParams[JLField.TrailingSentencePart] = trailingSentencePart.ToString();
 
         miningParams[JLField.Sentence] = useHtmlTags
             ? $"{leadingSentencePart}<b>{lookupResult.MatchedText}</b>{trailingSentencePart}"

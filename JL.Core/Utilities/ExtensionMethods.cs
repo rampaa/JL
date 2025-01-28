@@ -208,4 +208,30 @@ public static class ExtensionMethods
 
         return false;
     }
+
+    public static int IndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
+    {
+        int index = text[startIndex..].IndexOf(value);
+        return index < 0
+            ? -1
+            : index + startIndex;
+    }
+
+    public static int IndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
+    {
+        int index = text[startIndex..].IndexOf(value);
+        return index < 0
+            ? -1
+            : index + startIndex;
+    }
+
+    public static int LastIndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
+    {
+        return text[..startIndex].LastIndexOf(value);
+    }
+
+    public static int LastIndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
+    {
+        return text[..startIndex].LastIndexOf(value);
+    }
 }
