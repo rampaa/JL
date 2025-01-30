@@ -6,6 +6,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using JL.Core.Config;
 using JL.Core.Dicts;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Mining;
 using JL.Core.Mining.Anki;
 using JL.Core.Network;
@@ -65,6 +66,7 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.MatchedText.GetDescription()}: Text the mined word found as, e.g., "わかりました".
                                             • {JLField.DeconjugatedMatchedText.GetDescription()}: Matched Text's deconjugated form, e.g., if the "Matched Text" is "わかりました", "Deconjugated Matched Text" will be "わかる".
                                             • {JLField.DeconjugationProcess.GetDescription()}: Deconjugation path from the "Matched Text" to "Deconjugated Matched Text".
+                                            • {JLField.WordClasses.GetDescription()}: Part-of-speech info for the mined word, e.g., if the mined word is 電話, "Word Classes" will be "n, vs, vt, vi".
                                             • {JLField.Frequencies.GetDescription()}: Frequency info for the mined word, e.g., "VN: 77, jpdb: 666".
                                             • {JLField.RawFrequencies.GetDescription()}: Raw frequency info for the mined word, e.g., "77, 666".
                                             • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., "666".

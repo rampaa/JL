@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.JMnedict;

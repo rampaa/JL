@@ -1,6 +1,7 @@
 using System.Text.Json;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;

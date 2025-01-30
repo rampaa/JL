@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Globalization;
 using System.Xml;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 

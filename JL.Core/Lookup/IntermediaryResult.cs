@@ -1,4 +1,5 @@
 using JL.Core.Dicts;
+using JL.Core.Dicts.Interfaces;
 
 namespace JL.Core.Lookup;
 

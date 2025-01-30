@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.IO.Compression;
 using System.Net;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.JMnedict;
 using JL.Core.Dicts.KANJIDIC;

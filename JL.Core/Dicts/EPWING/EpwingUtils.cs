@@ -1,4 +1,5 @@
 using System.Buffers;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING;

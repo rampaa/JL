@@ -5,6 +5,7 @@ using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EPWING.Nazeka;
 using JL.Core.Dicts.EPWING.Yomichan;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.JMnedict;
 using JL.Core.Dicts.KANJIDIC;
@@ -304,7 +305,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult>? epwingYomichanNameResults = GetNameResults(textList, textInHiraganaList, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery);
                     if (epwingYomichanNameResults is not null)
                     {
-                        lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanNameResults, null, null, pitchAccentDict));
+                        lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanNameResults, null, null, pitchAccentDict, false));
                     }
 
                     break;
@@ -314,7 +315,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarkList, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, yomichanTextWithoutLongVowelMarkQueries);
                     if (epwingYomichanWordResults.Count > 0)
                     {
-                        lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResults, wordFreqs, frequencyDicts, pitchAccentDict));
+                        lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResults, wordFreqs, frequencyDicts, pitchAccentDict, true));
                     }
 
                     break;
@@ -335,7 +336,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult>? epwingNazekaNameResults = GetNameResults(textList, textInHiraganaList, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery);
                     if (epwingNazekaNameResults is not null)
                     {
-                        lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaNameResults, null, null, pitchAccentDict));
+                        lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaNameResults, null, null, pitchAccentDict, false));
                     }
 
                     break;
@@ -345,7 +346,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarkList, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQueries);
                     if (epwingNazekaWordResults.Count > 0)
                     {
-                        lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResults, wordFreqs, frequencyDicts, pitchAccentDict));
+                        lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResults, wordFreqs, frequencyDicts, pitchAccentDict, true));
                     }
                     break;
 
@@ -598,11 +599,13 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     EpwingYomichanRecord dictResult = (EpwingYomichanRecord)dictResults[i];
-                    if (dictResult.WordClasses?.Contains(lastTag) ?? false)
+                    if (dictResult.WordClasses is not null)
                     {
-                        resultsList.Add(dictResult);
+                        if (dictResult.WordClasses.Contains(lastTag))
+                        {
+                            resultsList.Add(dictResult);
+                        }
                     }
-
                     else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
                                  out IList<JmdictWordClass>? jmdictWcResults))
                     {
@@ -781,10 +784,23 @@ public static class LookupUtils
                     : null;
 
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
-                int dictRecordCount = dictRecords.Count;
-                for (int j = 0; j < dictRecordCount; j++)
+                for (int j = 0; j < dictRecords.Count; j++)
                 {
                     JmdictRecord jmdictResult = (JmdictRecord)dictRecords[j];
+                    List<string> wordClassesList = new(jmdictResult.WordClasses[0].Length);
+                    for (int k = 0; k < jmdictResult.WordClasses.Length; k++)
+                    {
+                        string[] wordClasses = jmdictResult.WordClasses[k];
+                        for (int l = 0; l < wordClasses.Length; l++)
+                        {
+                            string pos = wordClasses[l];
+                            if (!wordClasses.Contains(pos))
+                            {
+                                wordClassesList.Add(pos);
+                            }
+                        }
+                    }
+
                     LookupResult result = new
                     (
                         primarySpelling: jmdictResult.PrimarySpelling,
@@ -801,7 +817,8 @@ public static class LookupUtils
                         miscList: jmdictResult.Misc,
                         dict: wordResult.Dict,
                         formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null
+                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null,
+                        wordClasses: wordClassesList
                     );
 
                     results.Add(result);
@@ -942,7 +959,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildEpwingYomichanResult(
-        IDictionary<string, IntermediaryResult> epwingResults, List<Freq>? freqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        IDictionary<string, IntermediaryResult> epwingResults, List<Freq>? freqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict, bool conjugatable)
     {
         bool freqsExist = freqs is not null;
         bool pitchAccentDictExists = pitchAccentDict is not null;
@@ -962,6 +979,13 @@ public static class LookupUtils
                 for (int j = 0; j < dictRecordCount; j++)
                 {
                     EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)dictRecords[j];
+
+                    string[]? wordClasses = conjugatable
+                        ? epwingResult.WordClasses is not null
+                            ? epwingResult.WordClasses
+                            : GetWordClassesFromWordClassDictionary(epwingResult)
+                        : null;
+
                     string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
                     LookupResult result = new
                     (
@@ -973,7 +997,8 @@ public static class LookupUtils
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
+                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                        wordClasses: wordClasses
                     );
 
                     results.Add(result);
@@ -1016,7 +1041,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildEpwingNazekaResult(
-        IDictionary<string, IntermediaryResult> epwingNazekaResults, List<Freq>? freqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        IDictionary<string, IntermediaryResult> epwingNazekaResults, List<Freq>? freqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict, bool conjugatable)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         bool freqsExist = freqs is not null;
@@ -1036,6 +1061,11 @@ public static class LookupUtils
                 for (int j = 0; j < dictRecordCount; j++)
                 {
                     EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)dictRecords[j];
+
+                    string[]? wordClasses = conjugatable
+                        ? GetWordClassesFromWordClassDictionary(epwingResult)
+                        : null;
+
                     string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
                     LookupResult result = new
                     (
@@ -1048,7 +1078,8 @@ public static class LookupUtils
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
+                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                        wordClasses: wordClasses
                     );
 
                     results.Add(result);
@@ -1057,6 +1088,25 @@ public static class LookupUtils
         }
 
         return results;
+    }
+
+    private static string[]? GetWordClassesFromWordClassDictionary(IDictRecordWithSingleReading record)
+    {
+        if (DictUtils.WordClassDictionary.TryGetValue(record.PrimarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
+        {
+            for (int i = 0; i < jmdictWcResults.Count; i++)
+            {
+                JmdictWordClass jmdictWordClassResult = jmdictWcResults[i];
+                if (record.PrimarySpelling == jmdictWordClassResult.Spelling
+                    && ((record.Reading is not null && jmdictWordClassResult.Readings is not null && jmdictWordClassResult.Readings.Contains(record.Reading))
+                        || (record.Reading is null && jmdictWordClassResult.Readings is null)))
+                {
+                    return jmdictWordClassResult.WordClasses;
+                }
+            }
+        }
+
+        return null;
     }
 
     private static List<LookupResult> BuildEpwingNazekaResultForKanji(IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
@@ -1137,6 +1187,17 @@ public static class LookupUtils
                 for (int j = 0; j < dictRecordCount; j++)
                 {
                     CustomWordRecord customWordDictResult = (CustomWordRecord)dictRecords[j];
+
+                    string[]? wordClasses = null;
+                    if (customWordDictResult.HasUserDefinedWordClass)
+                    {
+                        wordClasses = customWordDictResult.WordClasses;
+                    }
+                    else if (customWordDictResult.WordClasses.Length is 1 && customWordDictResult.WordClasses[0] is "n")
+                    {
+                        wordClasses = CustomWordLoader.s_noun;
+                    }
+
                     LookupResult result = new
                     (
                         primarySpelling: customWordDictResult.PrimarySpelling,
@@ -1148,7 +1209,8 @@ public static class LookupUtils
                         alternativeSpellings: customWordDictResult.AlternativeSpellings,
                         formattedDefinitions: customWordDictResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
-                        frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null
+                        frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
+                        wordClasses: wordClasses
                     );
 
                     results.Add(result);

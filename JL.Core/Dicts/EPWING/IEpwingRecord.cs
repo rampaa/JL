@@ -1,7 +1,8 @@
+using JL.Core.Dicts.Interfaces;
+
 namespace JL.Core.Dicts.EPWING;
 
-internal interface IEpwingRecord : IDictRecord
+internal interface IEpwingRecord : IDictRecordWithSingleReading
 {
-    public string? Reading { get; }
     public string[] Definitions { get; }
 }

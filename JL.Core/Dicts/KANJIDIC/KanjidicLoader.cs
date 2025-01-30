@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Xml;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.KANJIDIC;

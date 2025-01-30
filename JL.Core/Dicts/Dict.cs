@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Text.Json.Serialization;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts;

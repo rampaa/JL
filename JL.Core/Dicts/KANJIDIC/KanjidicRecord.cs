@@ -1,3 +1,5 @@
+using JL.Core.Dicts.Interfaces;
+
 namespace JL.Core.Dicts.KANJIDIC;
 
 internal sealed class KanjidicRecord(

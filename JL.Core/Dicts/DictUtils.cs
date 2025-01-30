@@ -6,6 +6,7 @@ using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EPWING.Nazeka;
 using JL.Core.Dicts.EPWING.Yomichan;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.JMnedict;
 using JL.Core.Dicts.KANJIDIC;

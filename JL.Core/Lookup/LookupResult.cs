@@ -37,6 +37,7 @@ public sealed class LookupResult
     public byte KanjiGrade { get; }
     // Pitch Dictionary
     public byte[]? PitchPositions { get; }
+    public IReadOnlyList<string>? WordClasses { get; }
 
     internal LookupResult(
         string primarySpelling,
@@ -61,7 +62,8 @@ public sealed class LookupResult
         int entryId = 0,
         byte strokeCount = 0,
         byte kanjiGrade = byte.MaxValue,
-        byte[]? pitchPositions = null
+        byte[]? pitchPositions = null,
+        IReadOnlyList<string>? wordClasses = null
     )
     {
         MatchedText = matchedText;
@@ -87,5 +89,6 @@ public sealed class LookupResult
         KanjiGrade = kanjiGrade;
         RadicalNames = radicalNames;
         PitchPositions = pitchPositions;
+        WordClasses = wordClasses;
     }
 }

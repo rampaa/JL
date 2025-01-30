@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Dicts;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 

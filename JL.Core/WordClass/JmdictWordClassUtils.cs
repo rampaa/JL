@@ -1,14 +1,21 @@
 using System.Collections.Frozen;
 using System.Text.Json;
 using JL.Core.Dicts;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Utilities;
 
 namespace JL.Core.WordClass;
 
-internal static class JmdictWordClassUtils
+public static class JmdictWordClassUtils
 {
-    public static async Task Load()
+    public static readonly FrozenSet<string> UsedWordClasses =
+        [
+            "adj-i", "adj-na", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
+            "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
+        ];
+
+    internal static async Task Load()
     {
         FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "PoS.json"));
         await using (fileStream.ConfigureAwait(false))
@@ -53,15 +60,9 @@ internal static class JmdictWordClassUtils
         DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    public static Task Serialize()
+    internal static Task Serialize()
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new(StringComparer.Ordinal);
-
-        HashSet<string> usedWordClasses =
-        [
-            "adj-i", "adj-na", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
-            "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
-        ];
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         foreach ((string key, IList<IDictRecord> jmdictRecordList) in dict.Contents)
@@ -70,7 +71,7 @@ internal static class JmdictWordClassUtils
             for (int i = 0; i < jmdictRecordListCount; i++)
             {
                 JmdictRecord jmdictRecord = (JmdictRecord)jmdictRecordList[i];
-                string[] wordClasses = usedWordClasses.Intersect(jmdictRecord.WordClasses.SelectMany(static wc => wc)).ToArray();
+                string[] wordClasses = UsedWordClasses.Intersect(jmdictRecord.WordClasses.SelectMany(static wc => wc)).ToArray();
 
                 if (wordClasses.Length is 0)
                 {

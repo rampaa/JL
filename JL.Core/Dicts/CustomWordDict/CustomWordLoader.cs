@@ -1,3 +1,4 @@
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.CustomWordDict;
@@ -35,9 +36,9 @@ public static class CustomWordLoader
         "adj-na"
     ];
 
-    private static readonly string[] s_noun =
+    internal static readonly string[] s_noun =
     [
-        "noun"
+        "n"
     ];
 
     private static readonly string[] s_other =
@@ -96,7 +97,7 @@ public static class CustomWordLoader
         string[] wordClassArray = rawPartOfSpeech switch
         {
             "Verb" => hasUserDefinedWordClasses ? wordClasses! : s_verbs,
-            "Adjective" => s_adjectives,
+            "Adjective" => hasUserDefinedWordClasses ? wordClasses! : s_adjectives,
             "Noun" => s_noun,
             _ => s_other
         };

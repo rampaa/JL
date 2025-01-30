@@ -1,6 +1,6 @@
 using JL.Core.Freqs;
 
-namespace JL.Core.Dicts;
+namespace JL.Core.Dicts.Interfaces;
 
 internal interface IGetFrequency
 {

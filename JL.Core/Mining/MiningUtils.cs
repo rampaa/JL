@@ -176,6 +176,9 @@ public static class MiningUtils
             case JLField.DeconjugatedMatchedText:
                 return lookupResult.DeconjugatedMatchedText ?? lookupResult.MatchedText;
 
+            case JLField.WordClasses:
+                return lookupResult.WordClasses is not null ? string.Join(", ", lookupResult.WordClasses) : null;
+
             case JLField.KanjiStats:
                 return lookupResult.KanjiStats;
 
@@ -532,6 +535,11 @@ public static class MiningUtils
         if (lookupResult.DeconjugationProcess is not null)
         {
             miningParams[JLField.DeconjugationProcess] = lookupResult.DeconjugationProcess;
+        }
+
+        if (lookupResult.WordClasses is not null)
+        {
+            miningParams[JLField.WordClasses] = string.Join(", ", lookupResult.WordClasses);
         }
 
         if (lookupResult.KanjiComposition is not null)
