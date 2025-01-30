@@ -1059,7 +1059,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static string[]? GetWordClassesFromWordClassDictionary(IDictRecordWithSingleReading record)
+    private static string[]? GetWordClassesFromWordClassDictionary<T>(T record) where T : IDictRecordWithSingleReading
     {
         if (DictUtils.WordClassDictionary.TryGetValue(record.PrimarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
         {
@@ -1088,7 +1088,7 @@ public static class LookupUtils
         return null;
     }
 
-    private static bool WordClassDictionaryContainsTag(IDictRecordWithSingleReading record, string tag)
+    private static bool WordClassDictionaryContainsTag<T>(T record, string tag) where T : IDictRecordWithSingleReading
     {
         if (DictUtils.WordClassDictionary.TryGetValue(record.PrimarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
         {
