@@ -83,19 +83,18 @@ public static class JmdictWordClassUtils
                     continue;
                 }
 
+                JmdictWordClass record = new(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings);
                 if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? results))
                 {
-                    if (!results.Any(result => result.Spelling == jmdictRecord.PrimarySpelling
-                                               && ((result.Readings is not null && jmdictRecord.Readings is not null && result.Readings.SequenceEqual(jmdictRecord.Readings))
-                                                   || (result.Readings is null && jmdictRecord.Readings is null))))
+                    if (!results.Contains(record))
                     {
-                        results.Add(new JmdictWordClass(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings));
+                        results.Add(record);
                     }
                 }
 
                 else
                 {
-                    jmdictWordClassDictionary[key] = [new JmdictWordClass(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings)];
+                    jmdictWordClassDictionary[key] = [record];
                 }
             }
         }

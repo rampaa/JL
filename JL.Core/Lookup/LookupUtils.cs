@@ -606,25 +606,9 @@ public static class LookupUtils
                             resultsList.Add(dictResult);
                         }
                     }
-                    else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
-                                 out IList<JmdictWordClass>? jmdictWcResults))
+                    else if (WordClassDictionaryContainsTag(dictResult, lastTag))
                     {
-                        int jmdictWcResultCount = jmdictWcResults.Count;
-                        for (int j = 0; j < jmdictWcResultCount; j++)
-                        {
-                            JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
-
-                            if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
-                                && ((dictResult.Reading is not null && jmdictWordClassResult.Readings is not null && jmdictWordClassResult.Readings.Contains(dictResult.Reading))
-                                    || (dictResult.Reading is null && jmdictWordClassResult.Readings is null)))
-                            {
-                                if (jmdictWordClassResult.WordClasses.Contains(lastTag))
-                                {
-                                    resultsList.Add(dictResult);
-                                    break;
-                                }
-                            }
-                        }
+                        resultsList.Add(dictResult);
                     }
                 }
 
@@ -637,24 +621,9 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     EpwingNazekaRecord dictResult = (EpwingNazekaRecord)dictResults[i];
-                    if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text, out IList<JmdictWordClass>? jmdictWcResults))
+                    if (WordClassDictionaryContainsTag(dictResult, lastTag))
                     {
-                        int jmdictWCResultCount = jmdictWcResults.Count;
-                        for (int j = 0; j < jmdictWCResultCount; j++)
-                        {
-                            JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
-
-                            if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
-                                && ((dictResult.Reading is not null && jmdictWordClassResult.Readings is not null && jmdictWordClassResult.Readings.Contains(dictResult.Reading))
-                                    || (dictResult.Reading is null && jmdictWordClassResult.Readings is null)))
-                            {
-                                if (jmdictWordClassResult.WordClasses.Contains(lastTag))
-                                {
-                                    resultsList.Add(dictResult);
-                                    break;
-                                }
-                            }
-                        }
+                        resultsList.Add(dictResult);
                     }
                 }
 
@@ -1094,19 +1063,49 @@ public static class LookupUtils
     {
         if (DictUtils.WordClassDictionary.TryGetValue(record.PrimarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
         {
+            JmdictWordClass? foundRecord = null;
             for (int i = 0; i < jmdictWcResults.Count; i++)
             {
-                JmdictWordClass jmdictWordClassResult = jmdictWcResults[i];
-                if (record.PrimarySpelling == jmdictWordClassResult.Spelling
-                    && ((record.Reading is not null && jmdictWordClassResult.Readings is not null && jmdictWordClassResult.Readings.Contains(record.Reading))
-                        || (record.Reading is null && jmdictWordClassResult.Readings is null)))
+                JmdictWordClass result = jmdictWcResults[i];
+                if (record.PrimarySpelling == result.Spelling
+                    && ((record.Reading is not null && result.Readings is not null && result.Readings.Contains(record.Reading))
+                        || (record.Reading is null && result.Readings is null)))
                 {
-                    return jmdictWordClassResult.WordClasses;
+                    // If there is more than one valid result, we can't be sure which one applies to the current record, so we return null.
+                    // See the entries for 駆ける and 振りかえる in JMdict as examples, where the spelling and reading are the same, but the word classes differ.
+                    if (foundRecord is not null)
+                    {
+                        return null;
+                    }
+
+                    foundRecord = result;
+                }
+            }
+
+            return foundRecord?.WordClasses;
+        }
+
+        return null;
+    }
+
+    private static bool WordClassDictionaryContainsTag(IDictRecordWithSingleReading record, string tag)
+    {
+        if (DictUtils.WordClassDictionary.TryGetValue(record.PrimarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
+        {
+            for (int i = 0; i < jmdictWcResults.Count; i++)
+            {
+                JmdictWordClass result = jmdictWcResults[i];
+                if (record.PrimarySpelling == result.Spelling
+                    && ((record.Reading is not null && result.Readings is not null && result.Readings.Contains(record.Reading))
+                        || (record.Reading is null && result.Readings is null))
+                    && result.WordClasses.Contains(tag))
+                {
+                    return true;
                 }
             }
         }
 
-        return null;
+        return false;
     }
 
     private static List<LookupResult> BuildEpwingNazekaResultForKanji(IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
