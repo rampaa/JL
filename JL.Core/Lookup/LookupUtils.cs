@@ -794,7 +794,7 @@ public static class LookupUtils
                         for (int l = 0; l < wordClasses.Length; l++)
                         {
                             string pos = wordClasses[l];
-                            if (!wordClasses.Contains(pos))
+                            if (!wordClassesList.Contains(pos))
                             {
                                 wordClassesList.Add(pos);
                             }
