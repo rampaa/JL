@@ -6,6 +6,7 @@ using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Utilities;
+using JL.Core.WordClass;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -15,6 +16,37 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class AddWordWindow
 {
+    private const string SupportedAdjectiveWordClasses =
+        """
+        adj-i: Adjective (keiyoushi)
+        adj-na: Adjectival nouns or quasi-adjectives (keiyodoshi)
+        """;
+
+    private const string SupportedVerbWordClasses =
+        """
+        v1: Ichidan verb
+        v1-s: Ichidan verb - kureru special class
+        v4r: Yodan verb with `ru' ending (archaic)
+        v5aru: Godan verb - -aru special class
+        v5b: Godan verb with 'bu' ending
+        v5g: Godan verb with 'gu' ending
+        v5k: Godan verb with 'ku' ending
+        v5k-s: Godan verb - Iku/Yuku special class
+        v5m: Godan verb with 'mu' ending
+        v5n: Godan verb with 'nu' ending
+        v5r: Godan verb with 'ru' ending
+        v5r-i: Godan verb with 'ru' ending (irregular verb)
+        v5s: Godan verb with 'su' ending
+        v5t: Godan verb with 'tsu' ending
+        v5u: Godan verb with 'u' ending
+        v5u-s: Godan verb with 'u' ending (special class)
+        vk: Kuru verb - special class
+        vs-c: su verb - precursor to the modern suru (limited support)
+        vs-i: suru verb - included
+        vs-s: suru verb - special class
+        vz: Ichidan verb - zuru verb (alternative form of -jiru verbs)
+        """;
+
     private static AddWordWindow? s_instance;
 
     public static AddWordWindow Instance => s_instance ??= new AddWordWindow();
@@ -46,35 +78,54 @@ internal sealed partial class AddWordWindow
         DefinitionsTextBox.ClearValue(CursorProperty);
         DefinitionsTextBox.ClearValue(ToolTipProperty);
 
+        string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+        string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (spellings.Length is 0)
+        {
+            SpellingsTextBox.BorderBrush = Brushes.Red;
+            SpellingsTextBox.Cursor = Cursors.Help;
+            SpellingsTextBox.ToolTip = "Spellings field cannot be left empty!";
+            return Task.CompletedTask;
+        }
+
         string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
         string[] definitions = rawDefinitions.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (definitions.Length is 0)
         {
             DefinitionsTextBox.BorderBrush = Brushes.Red;
             DefinitionsTextBox.Cursor = Cursors.Help;
-            DefinitionsTextBox.ToolTip = "Definitions cannot be left empty!";
+            DefinitionsTextBox.ToolTip = "Definitions field cannot be left empty!";
             return Task.CompletedTask;
         }
 
-        string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+        string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+        string[]? wordClasses = rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        bool noWordClass = wordClasses.Length is 0;
+
+        if (WordClassStackPanel.Visibility is Visibility.Visible
+            && (noWordClass
+                || !wordClasses.All(JmdictWordClassUtils.UsedWordClasses.Contains)))
+        {
+            WordClassTextBox.BorderBrush = Brushes.Red;
+            WordClassTextBox.Cursor = Cursors.Help;
+            WordClassTextBox.ToolTip = noWordClass ? "Word Classes field cannot be left empty!" : "Invalid word class!";
+            return Task.CompletedTask;
+        }
+
+        if (noWordClass)
+        {
+            wordClasses = null;
+        }
+
         string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
         string rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
             .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString()!;
-        string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
-
-        string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
         string[]? readings = rawReadings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (readings.Length is 0
             || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
         {
             readings = null;
-        }
-
-        string[]? wordClasses = rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (wordClasses.Length is 0)
-        {
-            wordClasses = null;
         }
 
         DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
@@ -105,7 +156,7 @@ internal sealed partial class AddWordWindow
         _ = MainWindow.Instance.Focus();
     }
 
-    private void VerbRadioButton_Checked(object sender, RoutedEventArgs e)
+    private void VerbOrAdjectiveRadioButton_Checked(object sender, RoutedEventArgs e)
     {
         WordClassStackPanel.Visibility = Visibility.Visible;
     }
@@ -118,29 +169,8 @@ internal sealed partial class AddWordWindow
 
     private void InfoButton_Click(object sender, RoutedEventArgs e)
     {
-        const string supportedWordClasses = """
-                                            v1: Ichidan verb
-                                            v1-s: Ichidan verb - kureru special class
-                                            v4r: Yodan verb with `ru' ending (archaic)
-                                            v5aru: Godan verb - -aru special class
-                                            v5b: Godan verb with 'bu' ending
-                                            v5g: Godan verb with 'gu' ending
-                                            v5k: Godan verb with 'ku' ending
-                                            v5k-s: Godan verb - Iku/Yuku special class
-                                            v5m: Godan verb with 'mu' ending
-                                            v5n: Godan verb with 'nu' ending
-                                            v5r: Godan verb with 'ru' ending
-                                            v5r-i: Godan verb with 'ru' ending (irregular verb)
-                                            v5s: Godan verb with 'su' ending
-                                            v5t: Godan verb with 'tsu' ending
-                                            v5u: Godan verb with 'u' ending
-                                            v5u-s: Godan verb with 'u' ending (special class)
-                                            vk: Kuru verb - special class
-                                            vs-c: su verb - precursor to the modern suru (limited support)
-                                            vs-i: suru verb - included
-                                            vs-s: suru verb - special class
-                                            vz: Ichidan verb - zuru verb (alternative form of -jiru verbs)
-                                            """;
+        bool verbSelected = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
+            .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString() is "Verb";
 
         InfoWindow infoWindow = new()
         {
@@ -148,7 +178,7 @@ internal sealed partial class AddWordWindow
             Title = "Supported Word Classes",
             InfoTextBox =
             {
-                Text = supportedWordClasses
+                Text = verbSelected ? SupportedVerbWordClasses : SupportedAdjectiveWordClasses
             },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };

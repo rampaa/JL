@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Utilities;
@@ -47,6 +48,13 @@ internal sealed partial class AddNameWindow
 #pragma warning restore CA1308 // Normalize strings to uppercase
 
         string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+        if (spelling.Length is 0)
+        {
+            SpellingTextBox.BorderBrush = Brushes.Red;
+            SpellingTextBox.Cursor = Cursors.Help;
+            SpellingTextBox.ToolTip = "Spelling field cannot be left empty!";
+            return Task.CompletedTask;
+        }
 
         string? reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
         if (reading.Length is 0 || reading == spelling)

@@ -44,8 +44,8 @@
                         Margin="0,20,20,70">
                 <TextBlock Text="Part of Speech" HorizontalAlignment="Stretch" Margin="0,0,0,10" Style="{StaticResource TextBlockDefault}" />
                 <RadioButton Content="Noun" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="OtherRadioButtons_Checked" />
-                <RadioButton Content="Verb" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="VerbRadioButton_Checked" />
-                <RadioButton Content="Adjective" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="OtherRadioButtons_Checked" />
+                <RadioButton Content="Verb" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="VerbOrAdjectiveRadioButton_Checked" />
+                <RadioButton Content="Adjective" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="VerbOrAdjectiveRadioButton_Checked" />
                 <RadioButton Content="Other" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="OtherRadioButtons_Checked" IsChecked="True" />
             </StackPanel>
         </Grid>
