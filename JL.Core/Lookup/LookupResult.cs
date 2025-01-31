@@ -37,7 +37,7 @@ public sealed class LookupResult
     public byte KanjiGrade { get; }
     // Pitch Dictionary
     public byte[]? PitchPositions { get; }
-    public IReadOnlyList<string>? WordClasses { get; }
+    internal IReadOnlyList<string>? WordClasses { get; }
 
     internal LookupResult(
         string primarySpelling,

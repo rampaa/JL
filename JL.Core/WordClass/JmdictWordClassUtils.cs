@@ -7,7 +7,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.WordClass;
 
-public static class JmdictWordClassUtils
+internal static class JmdictWordClassUtils
 {
     private static readonly FrozenSet<string> s_usedWordClasses =
         [

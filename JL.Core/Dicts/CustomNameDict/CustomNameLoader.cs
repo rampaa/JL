@@ -41,14 +41,9 @@ public static class CustomNameLoader
                 if (lParts.Length is 4)
                 {
                     extraInfo = lParts[3];
-                    if (extraInfo.Length is 0)
-                    {
-                        extraInfo = null;
-                    }
-                    else
-                    {
-                        extraInfo = extraInfo.Replace("\\n", "\n", StringComparison.Ordinal);
-                    }
+                    extraInfo = extraInfo.Length is 0
+                        ? null
+                        : extraInfo.Replace("\\n", "\n", StringComparison.Ordinal);
                 }
 
                 AddToDictionary(spelling, reading, nameType, extraInfo, customNameDictionary);

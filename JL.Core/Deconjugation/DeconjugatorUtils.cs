@@ -17,10 +17,6 @@ internal static class DeconjugatorUtils
         for (int i = 0; i < rulesLength; i++)
         {
             Rule rule = Deconjugator.Rules[i];
-
-            rule.Type = rule.Type.GetPooledString();
-            rule.Detail = rule.Detail.GetPooledString();
-            rule.ContextRule = rule.ContextRule?.GetPooledString();
             rule.DecEnd.DeduplicateStringsInArray();
             rule.ConEnd.DeduplicateStringsInArray();
             rule.DecTag?.DeduplicateStringsInArray();
