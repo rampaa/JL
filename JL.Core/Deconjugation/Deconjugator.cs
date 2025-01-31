@@ -5,7 +5,7 @@ internal static class Deconjugator
 {
     public static Rule[] Rules { get; set; } = [];
 
-    private static Form? StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
+    private static Form? StdruleDeconjugateInner(Form myForm, in VirtualRule myRule)
     {
         // tag doesn't match
         if (myForm.Tags.Count > 0 && myForm.Tags[^1] != myRule.ConTag)

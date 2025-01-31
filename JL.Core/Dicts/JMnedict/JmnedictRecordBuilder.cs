@@ -5,7 +5,7 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictRecordBuilder
 {
-    public static void AddToDictionary(JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
+    public static void AddToDictionary(in JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
     {
         int translationListCount = entry.TranslationList.Count;
         int kebListCount = entry.KebList.Count;
