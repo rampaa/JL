@@ -9,7 +9,7 @@ namespace JL.Core.WordClass;
 
 public static class JmdictWordClassUtils
 {
-    public static readonly FrozenSet<string> UsedWordClasses =
+    private static readonly FrozenSet<string> s_usedWordClasses =
         [
             "adj-i", "adj-na", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
@@ -71,7 +71,7 @@ public static class JmdictWordClassUtils
             for (int i = 0; i < jmdictRecordListCount; i++)
             {
                 JmdictRecord jmdictRecord = (JmdictRecord)jmdictRecordList[i];
-                string[] wordClasses = UsedWordClasses.Intersect(jmdictRecord.WordClasses.SelectMany(static wc => wc)).ToArray();
+                string[] wordClasses = s_usedWordClasses.Intersect(jmdictRecord.WordClasses.SelectMany(static wc => wc)).ToArray();
 
                 if (wordClasses.Length is 0)
                 {

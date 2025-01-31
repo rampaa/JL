@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -6,7 +8,6 @@ using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Utilities;
-using JL.Core.WordClass;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -16,36 +17,83 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class AddWordWindow
 {
-    private const string SupportedAdjectiveWordClasses =
-        """
-        adj-i: Adjective (keiyoushi)
-        adj-na: Adjectival nouns or quasi-adjectives (keiyodoshi)
-        """;
+    private static readonly string[] s_allVerbTypes =
+        [
+            "v-unspec",
+            "v1",
+            "v1-s",
+            "v2a-s",
+            "v2b-k",
+            "v2b-s",
+            "v2d-k",
+            "v2d-s",
+            "v2g-k",
+            "v2g-s",
+            "v2h-k",
+            "v2h-s",
+            "v2k-k",
+            "v2k-s",
+            "v2m-k",
+            "v2m-s",
+            "v2n-s",
+            "v2r-k",
+            "v2r-s",
+            "v2s-s",
+            "v2t-k",
+            "v2t-s",
+            "v2w-s",
+            "v2y-k",
+            "v2y-s",
+            "v2z-s",
+            "v4b",
+            "v4g",
+            "v4h",
+            "v4k",
+            "v4m",
+            "v4n",
+            "v4r",
+            "v4s",
+            "v4t",
+            "v5aru",
+            "v5b",
+            "v5g",
+            "v5k",
+            "v5k-s",
+            "v5m",
+            "v5n",
+            "v5r",
+            "v5r-i",
+            "v5s",
+            "v5t",
+            "v5u",
+            "v5u-s",
+            "v5uru",
+            "vi",
+            "vk",
+            "vn",
+            "vr",
+            "vs",
+            "vs-c",
+            "vs-i",
+            "vs-s",
+            "vt",
+            "vz"
+        ];
 
-    private const string SupportedVerbWordClasses =
-        """
-        v1: Ichidan verb
-        v1-s: Ichidan verb - kureru special class
-        v4r: Yodan verb with `ru' ending (archaic)
-        v5aru: Godan verb - -aru special class
-        v5b: Godan verb with 'bu' ending
-        v5g: Godan verb with 'gu' ending
-        v5k: Godan verb with 'ku' ending
-        v5k-s: Godan verb - Iku/Yuku special class
-        v5m: Godan verb with 'mu' ending
-        v5n: Godan verb with 'nu' ending
-        v5r: Godan verb with 'ru' ending
-        v5r-i: Godan verb with 'ru' ending (irregular verb)
-        v5s: Godan verb with 'su' ending
-        v5t: Godan verb with 'tsu' ending
-        v5u: Godan verb with 'u' ending
-        v5u-s: Godan verb with 'u' ending (special class)
-        vk: Kuru verb - special class
-        vs-c: su verb - precursor to the modern suru (limited support)
-        vs-i: suru verb - included
-        vs-s: suru verb - special class
-        vz: Ichidan verb - zuru verb (alternative form of -jiru verbs)
-        """;
+    private static readonly string[] s_allAdjectiveTypes =
+        [
+            "adj-f",
+            "adj-i",
+            "adj-ix",
+            "adj-kari",
+            "adj-ku",
+            "adj-na",
+            "adj-nari",
+            "adj-no",
+            "adj-pn",
+            "adj-shiku",
+            "adj-t"
+        ];
 
     private static AddWordWindow? s_instance;
 
@@ -77,6 +125,9 @@ internal sealed partial class AddWordWindow
         DefinitionsTextBox.ClearValue(BorderBrushProperty);
         DefinitionsTextBox.ClearValue(CursorProperty);
         DefinitionsTextBox.ClearValue(ToolTipProperty);
+        WordClassTextBox.ClearValue(BorderBrushProperty);
+        WordClassTextBox.ClearValue(CursorProperty);
+        WordClassTextBox.ClearValue(ToolTipProperty);
 
         string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
         string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -102,14 +153,33 @@ internal sealed partial class AddWordWindow
         string[]? wordClasses = rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         bool noWordClass = wordClasses.Length is 0;
 
-        if (WordClassStackPanel.Visibility is Visibility.Visible
-            && (noWordClass
-                || !wordClasses.All(JmdictWordClassUtils.UsedWordClasses.Contains)))
+        string rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
+            .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString()!;
+
+        if (WordClassStackPanel.Visibility is Visibility.Visible)
         {
-            WordClassTextBox.BorderBrush = Brushes.Red;
-            WordClassTextBox.Cursor = Cursors.Help;
-            WordClassTextBox.ToolTip = noWordClass ? "Word Classes field cannot be left empty!" : "Invalid word class!";
-            return Task.CompletedTask;
+            if (noWordClass)
+            {
+                WordClassTextBox.BorderBrush = Brushes.Red;
+                WordClassTextBox.Cursor = Cursors.Help;
+                WordClassTextBox.ToolTip = "Word Classes field cannot be left empty!";
+                return Task.CompletedTask;
+            }
+
+            string[] validWordClasses = rawPartOfSpeech is "Verb"
+                ? s_allVerbTypes
+                : s_allAdjectiveTypes;
+
+            for (int i = 0; i < wordClasses.Length; i++)
+            {
+                if (!validWordClasses.Contains(wordClasses[i]))
+                {
+                    WordClassTextBox.BorderBrush = Brushes.Red;
+                    WordClassTextBox.Cursor = Cursors.Help;
+                    WordClassTextBox.ToolTip = "Invalid word class! Press the info button to see the list of valid word classes.";
+                    return Task.CompletedTask;
+                }
+            }
         }
 
         if (noWordClass)
@@ -118,9 +188,6 @@ internal sealed partial class AddWordWindow
         }
 
         string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
-        string rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
-            .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString()!;
-
         string[]? readings = rawReadings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (readings.Length is 0
             || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
@@ -169,8 +236,19 @@ internal sealed partial class AddWordWindow
 
     private void InfoButton_Click(object sender, RoutedEventArgs e)
     {
-        bool verbSelected = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
+        bool showAllowedVerbTypeInfo = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
             .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString() is "Verb";
+
+        string[] keys = showAllowedVerbTypeInfo ? s_allVerbTypes : s_allAdjectiveTypes;
+        StringBuilder sb = new(keys.Length);
+        for (int i = 0; i < keys.Length; i++)
+        {
+            string key = keys[i];
+            if (DictUtils.JmdictEntities.TryGetValue(key, out string? value))
+            {
+                _ = sb.Append(CultureInfo.InvariantCulture, $"{key}: {value}\n");
+            }
+        }
 
         InfoWindow infoWindow = new()
         {
@@ -178,7 +256,7 @@ internal sealed partial class AddWordWindow
             Title = "Supported Word Classes",
             InfoTextBox =
             {
-                Text = verbSelected ? SupportedVerbWordClasses : SupportedAdjectiveWordClasses
+                Text = sb.ToString(0, sb.Length - 1)
             },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };

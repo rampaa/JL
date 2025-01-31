@@ -41,6 +41,10 @@ internal sealed partial class AddNameWindow
 
     private Task HandleSaveButtonClick()
     {
+        SpellingTextBox.ClearValue(BorderBrushProperty);
+        SpellingTextBox.ClearValue(CursorProperty);
+        SpellingTextBox.ClearValue(ToolTipProperty);
+
 #pragma warning disable CA1308 // Normalize strings to uppercase
         string nameType =
             NameTypeStackPanel.Children.OfType<RadioButton>()
