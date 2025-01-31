@@ -1,6 +1,6 @@
 namespace JL.Core.Lookup;
 
-public sealed class LookupFrequencyResult
+public readonly record struct LookupFrequencyResult
 {
     internal string Name { get; }
     public int Freq { get; }
