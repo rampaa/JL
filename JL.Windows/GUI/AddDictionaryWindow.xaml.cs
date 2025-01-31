@@ -181,9 +181,6 @@ internal sealed partial class AddDictionaryWindow
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
             case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
-                BrowseForDictionaryFolder();
-                break;
-
             case DictType.PitchAccentYomichan:
                 BrowseForDictionaryFolder();
                 break;

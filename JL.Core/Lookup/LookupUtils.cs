@@ -950,9 +950,7 @@ public static class LookupUtils
                     EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)dictRecords[j];
 
                     string[]? wordClasses = conjugatable
-                        ? epwingResult.WordClasses is not null
-                            ? epwingResult.WordClasses
-                            : GetWordClassesFromWordClassDictionary(epwingResult)
+                        ? epwingResult.WordClasses ?? GetWordClassesFromWordClassDictionary(epwingResult)
                         : null;
 
                     string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;

@@ -30,7 +30,6 @@ public static class JmdictWordClassUtils
             {
                 JmdictWordClass jmdictWordClass = jmdictWordClassList[i];
 
-                jmdictWordClass.Spelling = jmdictWordClass.Spelling.GetPooledString();
                 jmdictWordClass.Readings?.DeduplicateStringsInArray();
                 jmdictWordClass.WordClasses.DeduplicateStringsInArray();
 

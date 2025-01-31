@@ -6,7 +6,7 @@ namespace JL.Core.Dicts.EPWING;
 
 internal static class EpwingUtils
 {
-    private static readonly SearchValues<char> s_invalidCharacters = SearchValues.Create(['�', '〓', '\n']);
+    private static readonly SearchValues<char> s_invalidCharacters = SearchValues.Create('�', '〓', '\n');
 
     public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[] definitions, Dict dict)
     {

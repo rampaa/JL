@@ -325,7 +325,7 @@ public static partial class JapaneseUtils
 
     public static int FindExpressionBoundary(ReadOnlySpan<char> text, int position)
     {
-        int endPosition = MemoryExtensions.IndexOfAny(text[position..], s_expressionTerminatingCharacters);
+        int endPosition = text[position..].IndexOfAny(s_expressionTerminatingCharacters);
         return endPosition < 0 ? text.Length : endPosition + position + 1;
     }
 
