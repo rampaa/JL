@@ -34,7 +34,7 @@ internal static class Deconjugator
                 [.. myForm.Process, myRule.Detail]);
     }
 
-    private static List<Form>? StdruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? StdruleDeconjugate(Form myForm, in Rule myRule)
     {
         // can't deconjugate nothingness
         if (myForm.Text.Length is 0)
@@ -111,28 +111,28 @@ internal static class Deconjugator
             : null;
     }
 
-    private static List<Form>? RewriteruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? RewriteruleDeconjugate(Form myForm, in Rule myRule)
     {
         return myForm.Text != myRule.ConEnd[0]
             ? null
             : StdruleDeconjugate(myForm, myRule);
     }
 
-    private static List<Form>? OnlyfinalruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? OnlyfinalruleDeconjugate(Form myForm, in Rule myRule)
     {
         return myForm.Tags.Count is not 0
             ? null
             : StdruleDeconjugate(myForm, myRule);
     }
 
-    private static List<Form>? NeverfinalruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? NeverfinalruleDeconjugate(Form myForm, in Rule myRule)
     {
         return myForm.Tags.Count is 0
             ? null
             : StdruleDeconjugate(myForm, myRule);
     }
 
-    private static List<Form>? ContextruleDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? ContextruleDeconjugate(Form myForm, in Rule myRule)
     {
         bool result = myRule.ContextRule switch
         {
@@ -146,7 +146,7 @@ internal static class Deconjugator
             : null;
     }
 
-    private static Form? SubstitutionInner(Form myForm, Rule myRule)
+    private static Form? SubstitutionInner(Form myForm, in Rule myRule)
     {
         string conEnd = myRule.ConEnd[0];
         if (!myForm.Text.Contains(conEnd, StringComparison.Ordinal))
@@ -158,7 +158,7 @@ internal static class Deconjugator
         return new Form(newText, myForm.OriginalText, myForm.Tags.ToList(), [.. myForm.Process, myRule.Detail]);
     }
 
-    private static List<Form>? SubstitutionDeconjugate(Form myForm, Rule myRule)
+    private static List<Form>? SubstitutionDeconjugate(Form myForm, in Rule myRule)
     {
         if (myForm.Process.Count is not 0)
         {
@@ -212,7 +212,7 @@ internal static class Deconjugator
         return myForm.Tags.Count is not 1 || myForm.Tags[0] is not "stem-ren";
     }
 
-    private static bool SaspecialCheck(Form myForm, Rule myRule)
+    private static bool SaspecialCheck(Form myForm, in Rule myRule)
     {
         if (myForm.Text.Length is 0)
         {
@@ -243,8 +243,7 @@ internal static class Deconjugator
             {
                 for (int j = 0; j < rulesLength; j++)
                 {
-                    Rule rule = Rules[j];
-
+                    ref Rule rule = ref Rules[j];
                     List<Form>? newForm = rule.Type switch
                     {
                         "stdrule" => StdruleDeconjugate(form, rule),

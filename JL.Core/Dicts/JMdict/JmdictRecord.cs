@@ -181,7 +181,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
                     for (int j = 0; j < lSources.Length; j++)
                     {
-                        LoanwordSource lSource = lSources[j];
+                        ref LoanwordSource lSource = ref lSources[j];
                         if (lSource.IsWasei)
                         {
                             _ = defResult.Append("wasei ");

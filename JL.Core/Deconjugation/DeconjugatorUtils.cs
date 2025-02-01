@@ -16,7 +16,7 @@ internal static class DeconjugatorUtils
         int rulesLength = Deconjugator.Rules.Length;
         for (int i = 0; i < rulesLength; i++)
         {
-            Rule rule = Deconjugator.Rules[i];
+            ref Rule rule = ref Deconjugator.Rules[i];
             rule.DecEnd.DeduplicateStringsInArray();
             rule.ConEnd.DeduplicateStringsInArray();
             rule.DecTag?.DeduplicateStringsInArray();
