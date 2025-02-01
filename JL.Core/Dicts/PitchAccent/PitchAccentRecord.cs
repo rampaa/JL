@@ -72,4 +72,7 @@ public sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRecor
     {
         return HashCode.Combine(Spelling, Reading);
     }
+
+    public static bool operator ==(PitchAccentRecord left, PitchAccentRecord right) => left.Equals(right);
+    public static bool operator !=(PitchAccentRecord left, PitchAccentRecord right) => !left.Equals(right);
 }

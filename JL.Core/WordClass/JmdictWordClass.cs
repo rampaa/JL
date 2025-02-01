@@ -53,4 +53,7 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
             return hash;
         }
     }
+
+    public static bool operator ==(JmdictWordClass? left, JmdictWordClass? right) => left is not null ? left.Equals(right) : right is null;
+    public static bool operator !=(JmdictWordClass? left, JmdictWordClass? right) => left is not null ? !left.Equals(right) : right is not null;
 }

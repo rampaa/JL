@@ -200,4 +200,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
             return hash;
         }
     }
+
+    public static bool operator ==(YomichanKanjiRecord left, YomichanKanjiRecord right) => left.Equals(right);
+    public static bool operator !=(YomichanKanjiRecord left, YomichanKanjiRecord right) => !left.Equals(right);
 }

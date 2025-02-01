@@ -107,4 +107,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             return Id * PrimarySpelling.GetHashCode(StringComparison.Ordinal);
         }
     }
+
+    public static bool operator ==(JmnedictRecord? left, JmnedictRecord? right) => left is not null ? left.Equals(right) : right is null;
+    public static bool operator !=(JmnedictRecord? left, JmnedictRecord? right) => left is not null ? !left.Equals(right) : right is not null;
 }

@@ -338,4 +338,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             return Id * PrimarySpelling.GetHashCode(StringComparison.Ordinal);
         }
     }
+
+    public static bool operator ==(JmdictRecord? left, JmdictRecord? right) => left is not null ? left.Equals(right) : right is null;
+    public static bool operator !=(JmdictRecord? left, JmdictRecord? right) => left is not null ? !left.Equals(right) : right is not null;
 }
