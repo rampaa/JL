@@ -756,20 +756,6 @@ public static class LookupUtils
                 for (int j = 0; j < dictRecords.Count; j++)
                 {
                     JmdictRecord jmdictResult = (JmdictRecord)dictRecords[j];
-                    List<string> wordClassesList = new(jmdictResult.WordClasses[0].Length);
-                    for (int k = 0; k < jmdictResult.WordClasses.Length; k++)
-                    {
-                        string[] wordClasses = jmdictResult.WordClasses[k];
-                        for (int l = 0; l < wordClasses.Length; l++)
-                        {
-                            string pos = wordClasses[l];
-                            if (!wordClassesList.Contains(pos))
-                            {
-                                wordClassesList.Add(pos);
-                            }
-                        }
-                    }
-
                     LookupResult result = new
                     (
                         primarySpelling: jmdictResult.PrimarySpelling,
