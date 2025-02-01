@@ -28,7 +28,6 @@ public static class JLFieldUtils
         JLField.MatchedText,
         JLField.DeconjugatedMatchedText,
         JLField.DeconjugationProcess,
-        JLField.WordClasses,
         JLField.Frequencies,
         JLField.RawFrequencies,
         JLField.PreferredFrequency,

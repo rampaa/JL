@@ -26,8 +26,7 @@ public sealed class LookupResult
         int entryId = 0,
         byte strokeCount = 0,
         byte kanjiGrade = byte.MaxValue,
-        byte[]? pitchPositions = null,
-        IReadOnlyList<string>? wordClasses = null
+        byte[]? pitchPositions = null
     ) : IEquatable<LookupResult>
 {
     // common (required for sorting)
@@ -63,7 +62,6 @@ public sealed class LookupResult
     public byte KanjiGrade { get; } = kanjiGrade;
     // Pitch Dictionary
     public byte[]? PitchPositions { get; } = pitchPositions;
-    internal IReadOnlyList<string>? WordClasses { get; } = wordClasses;
 
     public override int GetHashCode()
     {

@@ -41,7 +41,6 @@ public enum JLField
     // Word dictionaries
     [Description("Deconjugated Matched Text")] DeconjugatedMatchedText,
     [Description("Deconjugation Process")] DeconjugationProcess,
-    [Description("Word Classes")] WordClasses,
     // JMdict, Nazeka EPWING
     [Description("Alternative Spellings")] AlternativeSpellings,
     // JMdict
