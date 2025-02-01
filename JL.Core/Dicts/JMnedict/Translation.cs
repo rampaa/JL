@@ -39,4 +39,7 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
     {
         return NameTypeList.SequenceEqual(other.NameTypeList) && TransDetList.SequenceEqual(other.TransDetList);
     }
+
+    public static bool operator ==(Translation left, Translation right) => left.Equals(right);
+    public static bool operator !=(Translation left, Translation right) => !left.Equals(right);
 }

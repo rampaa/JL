@@ -44,4 +44,7 @@ internal readonly struct ReadingElement(string reb, List<string> reRestrList, Li
             && ReRestrList.SequenceEqual(other.ReRestrList)
             && ReInfList.SequenceEqual(other.ReInfList);
     }
+
+    public static bool operator ==(in ReadingElement left, in ReadingElement right) => left.Equals(right);
+    public static bool operator !=(in ReadingElement left, in ReadingElement right) => !left.Equals(right);
 }

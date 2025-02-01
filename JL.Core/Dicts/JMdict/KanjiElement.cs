@@ -34,4 +34,7 @@ internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEqu
     {
         return Keb == other.Keb && KeInfList.SequenceEqual(other.KeInfList);
     }
+
+    public static bool operator ==(KanjiElement left, KanjiElement right) => left.Equals(right);
+    public static bool operator !=(KanjiElement left, KanjiElement right) => !left.Equals(right);
 }
