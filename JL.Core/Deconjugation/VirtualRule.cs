@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace JL.Core.Deconjugation;
 
+[method: JsonConstructor]
 internal readonly ref struct VirtualRule(string decEnd, string conEnd, string decTag, string conTag, string detail)
 {
     public string DecEnd { get; } = decEnd;

@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace JL.Core.Dicts.JMdict;
 
+[method: JsonConstructor]
 internal readonly struct ReadingElement(string reb, List<string> reRestrList, List<string> reInfList) : IEquatable<ReadingElement>
 {
     public string Reb { get; } = reb; // Reading in kana. e.g. むすめ

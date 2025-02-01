@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace JL.Core.Dicts.JMdict;
 
+[method: JsonConstructor]
 internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEquatable<KanjiElement>
 {
     public string Keb { get; } = keb; // e.g. 娘

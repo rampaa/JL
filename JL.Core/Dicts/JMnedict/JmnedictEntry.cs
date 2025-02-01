@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace JL.Core.Dicts.JMnedict;
 
+[method: JsonConstructor]
 internal readonly ref struct JmnedictEntry(int id, List<string> kebList, List<string> rebList, List<Translation> translationList)
 {
     public int Id { get; } = id;

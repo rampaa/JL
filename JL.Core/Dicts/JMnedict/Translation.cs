@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace JL.Core.Dicts.JMnedict;
 
+[method: JsonConstructor]
 internal readonly struct Translation(List<string> nameTypeList, List<string> transDetList) : IEquatable<Translation>
 {
     public List<string> NameTypeList { get; } = nameTypeList;

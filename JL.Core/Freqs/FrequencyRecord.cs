@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace JL.Core.Freqs;
 
+[method: JsonConstructor]
 public readonly struct FrequencyRecord(string spelling, int frequency) : IEquatable<FrequencyRecord>
 {
     internal string Spelling { get; } = spelling;

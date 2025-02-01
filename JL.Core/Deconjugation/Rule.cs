@@ -3,6 +3,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
 
+[method: JsonConstructor]
 internal readonly struct Rule(string type, string[] decEnd, string[] conEnd, string detail, string? contextRule = null, string[]? decTag = null, string[]? conTag = null)
 {
     [JsonPropertyName("type")] public string Type { get; } = type.GetPooledString();
