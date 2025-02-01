@@ -58,7 +58,7 @@ internal sealed class LookupTests
                 primarySpelling: "始まる",
                 deconjugatedMatchedText: null,
                 readings: ["はじまる"],
-                formattedDefinitions: "(v5r, vi) (1) to begin; to start; to commence；(v5r, vi) (2) to happen (again); to begin (anew)；(v5r, vi) (3) to date (from); to originate (in)",
+                formattedDefinitions: "[v5r, vi] (1) to begin; to start; to commence；(2) to happen (again); to begin (anew)；(3) to date (from); to originate (in)",
                 entryId: 1307500,
                 wordClasses: ["v5r", "vi"]
             );
