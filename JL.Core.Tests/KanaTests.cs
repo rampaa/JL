@@ -17,24 +17,24 @@ internal sealed class KanaTests
         const string text = "ア";
 
         // Act
-        string result = JapaneseUtils.KatakanaToHiragana(text);
+        string actual = JapaneseUtils.KatakanaToHiragana(text);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
     public void KatakanaToHiraganaConverter_NormalizesText1()
     {
         // Arrange
-        const string expected1 = "か";
-        const string text1 = "㋕";
+        const string expected = "か";
+        const string text = "㋕";
 
         // Act
-        string result1 = JapaneseUtils.KatakanaToHiragana(text1);
+        string actual = JapaneseUtils.KatakanaToHiragana(text);
 
         // Assert
-        Assert.That(expected1 == result1);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -45,10 +45,10 @@ internal sealed class KanaTests
         const string text = "㌀";
 
         // Act
-        string result = JapaneseUtils.KatakanaToHiragana(text);
+        string actual = JapaneseUtils.KatakanaToHiragana(text);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     // this one seems to be inconsistent between platforms
@@ -61,10 +61,10 @@ internal sealed class KanaTests
         const string text = "㋿";
 
         // Act
-        string result3 = JapaneseUtils.KatakanaToHiragana(text);
+        string actual = JapaneseUtils.KatakanaToHiragana(text);
 
         // Assert
-        Assert.That(expected == result3);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -76,9 +76,9 @@ internal sealed class KanaTests
         const string text = "オー";
 
         // Act
-        List<string> result = JapaneseUtils.LongVowelMarkToKana(JapaneseUtils.KatakanaToHiragana(text));
+        List<string> actual = JapaneseUtils.LongVowelMarkToKana(JapaneseUtils.KatakanaToHiragana(text));
 
         // Assert
-        Assert.That(expected.SequenceEqual(result));
+        Assert.That(actual, Is.EqualTo(expected));
     }
 }

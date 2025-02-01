@@ -18,12 +18,10 @@ internal sealed class UtilsTests
         const int position = 0;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -36,12 +34,10 @@ internal sealed class UtilsTests
         const int position = 97;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -54,12 +50,10 @@ internal sealed class UtilsTests
         const int position = 0;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -72,12 +66,10 @@ internal sealed class UtilsTests
         const int position = 0;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -90,12 +82,10 @@ internal sealed class UtilsTests
         const int position = 15;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -108,12 +98,10 @@ internal sealed class UtilsTests
         const int position = 0;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -126,12 +114,10 @@ internal sealed class UtilsTests
         const int position = 0;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -144,12 +130,10 @@ internal sealed class UtilsTests
         const int position = 0;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -162,12 +146,10 @@ internal sealed class UtilsTests
         const int position = 0;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -180,12 +162,10 @@ internal sealed class UtilsTests
         const int position = 8;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -198,12 +178,10 @@ internal sealed class UtilsTests
         const int position = 72;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -216,11 +194,9 @@ internal sealed class UtilsTests
         const int position = 10;
 
         // Act
-        string result = JapaneseUtils.FindSentence(
-            text,
-            position);
+        string actual = JapaneseUtils.FindSentence(text, position);
 
         // Assert
-        Assert.That(expected == result);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 }

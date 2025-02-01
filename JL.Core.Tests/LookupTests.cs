@@ -1,4 +1,3 @@
-using System.Text.Json;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
@@ -51,9 +50,7 @@ internal sealed class LookupTests
     public void LookupText_始まる()
     {
         // Arrange
-        List<LookupResult> expected =
-        [
-            new
+        LookupResult expected = new
             (
                 matchedText: "始まる",
                 dict: DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
@@ -64,16 +61,25 @@ internal sealed class LookupTests
                 formattedDefinitions: "(v5r, vi) (1) to begin; to start; to commence；(v5r, vi) (2) to happen (again); to begin (anew)；(v5r, vi) (3) to date (from); to originate (in)",
                 entryId: 1307500,
                 wordClasses: ["v5r", "vi"]
-            )
-        ];
+            );
 
         const string text = "始まる";
 
         // Act
-        LookupResult[]? result = LookupUtils.LookupText(text);
+        LookupResult? actual = LookupUtils.LookupText(text)?.FirstOrDefault();
 
         // Assert
-        Assert.That(JsonSerializer.Serialize(expected) == JsonSerializer.Serialize(result));
+        Assert.That(actual, Is.EqualTo(expected)
+            .Using<LookupResult, LookupResult>((a, e) =>
+                a.MatchedText == e.MatchedText
+                && a.Dict == e.Dict
+                && (e.Frequencies is not null ? (a.Frequencies?.SequenceEqual(e.Frequencies) ?? false) : a.Frequencies is null)
+                && a.PrimarySpelling == e.PrimarySpelling
+                && a.DeconjugatedMatchedText == e.DeconjugatedMatchedText
+                && (e.Readings is not null ? (a.Readings?.SequenceEqual(e.Readings) ?? false) : a.Readings is null)
+                && a.FormattedDefinitions == e.FormattedDefinitions
+                && a.EntryId == e.EntryId
+                && (e.WordClasses is not null ? (a.WordClasses?.SequenceEqual(e.WordClasses) ?? false) : a.WordClasses is null)));
     }
 
     [Test]
@@ -91,7 +97,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -109,7 +115,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -127,7 +133,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -145,7 +151,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -163,7 +169,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -182,7 +188,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -201,7 +207,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -220,7 +226,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -239,7 +245,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -258,7 +264,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -277,7 +283,7 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -296,6 +302,6 @@ internal sealed class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.That(expected == actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 }

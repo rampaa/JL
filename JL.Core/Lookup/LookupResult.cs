@@ -3,43 +3,7 @@ using JL.Core.Dicts;
 namespace JL.Core.Lookup;
 
 public sealed class LookupResult
-{
-    // common (required for sorting)
-    public string PrimarySpelling { get; }
-    public string[]? Readings { get; }
-    public string? FormattedDefinitions { get; }
-    public Dict Dict { get; }
-    public string MatchedText { get; }
-    public List<LookupFrequencyResult>? Frequencies { get; }
-
-    // JMdict, JMnedict, KANJIDIC2
-    internal int EntryId { get; }
-
-    // Word dictionaries
-    public string? DeconjugatedMatchedText { get; }
-    public string? DeconjugationProcess { get; }
-    // JMdict, Nazeka EPWING
-    public string[]? AlternativeSpellings { get; }
-    public string[]? PrimarySpellingOrthographyInfoList { get; }
-    public string[]?[]? ReadingsOrthographyInfoList { get; }
-    public string[]?[]? AlternativeSpellingsOrthographyInfoList { get; }
-    internal string[]?[]? MiscList { get; }
-
-    // Kanji
-    public string[]? OnReadings { get; }
-    public string[]? KunReadings { get; }
-    public string? KanjiComposition { get; }
-    public string? KanjiStats { get; }
-    // KANJIDIC2
-    public string[]? NanoriReadings { get; }
-    public string[]? RadicalNames { get; }
-    public byte StrokeCount { get; }
-    public byte KanjiGrade { get; }
-    // Pitch Dictionary
-    public byte[]? PitchPositions { get; }
-    internal IReadOnlyList<string>? WordClasses { get; }
-
-    internal LookupResult(
+    (
         string primarySpelling,
         string matchedText,
         Dict dict,
@@ -64,31 +28,70 @@ public sealed class LookupResult
         byte kanjiGrade = byte.MaxValue,
         byte[]? pitchPositions = null,
         IReadOnlyList<string>? wordClasses = null
-    )
+    ) : IEquatable<LookupResult>
+{
+    // common (required for sorting)
+    public string PrimarySpelling { get; } = primarySpelling;
+    public string[]? Readings { get; } = readings;
+    public string? FormattedDefinitions { get; } = formattedDefinitions;
+    public Dict Dict { get; } = dict;
+    public string MatchedText { get; } = matchedText;
+    public List<LookupFrequencyResult>? Frequencies { get; } = frequencies;
+
+    // JMdict, JMnedict, KANJIDIC2
+    internal int EntryId { get; } = entryId;
+
+    // Word dictionaries
+    public string? DeconjugatedMatchedText { get; } = deconjugatedMatchedText;
+    public string? DeconjugationProcess { get; } = deconjugationProcess;
+    // JMdict, Nazeka EPWING
+    public string[]? AlternativeSpellings { get; } = alternativeSpellings;
+    public string[]? PrimarySpellingOrthographyInfoList { get; } = primarySpellingOrthographyInfoList;
+    public string[]?[]? ReadingsOrthographyInfoList { get; } = readingsOrthographyInfoList;
+    public string[]?[]? AlternativeSpellingsOrthographyInfoList { get; } = alternativeSpellingsOrthographyInfoList;
+    internal string[]?[]? MiscList { get; } = miscList;
+
+    // Kanji
+    public string[]? OnReadings { get; } = onReadings;
+    public string[]? KunReadings { get; } = kunReadings;
+    public string? KanjiComposition { get; } = kanjiComposition;
+    public string? KanjiStats { get; } = kanjiStats;
+    // KANJIDIC2
+    public string[]? NanoriReadings { get; } = nanoriReadings;
+    public string[]? RadicalNames { get; } = radicalNames;
+    public byte StrokeCount { get; } = strokeCount;
+    public byte KanjiGrade { get; } = kanjiGrade;
+    // Pitch Dictionary
+    public byte[]? PitchPositions { get; } = pitchPositions;
+    internal IReadOnlyList<string>? WordClasses { get; } = wordClasses;
+
+    public override int GetHashCode()
     {
-        MatchedText = matchedText;
-        DeconjugatedMatchedText = deconjugatedMatchedText;
-        Frequencies = frequencies;
-        Dict = dict;
-        PrimarySpelling = primarySpelling;
-        Readings = readings;
-        FormattedDefinitions = formattedDefinitions;
-        EntryId = entryId;
-        AlternativeSpellings = alternativeSpellings;
-        DeconjugationProcess = deconjugationProcess;
-        PrimarySpellingOrthographyInfoList = primarySpellingOrthographyInfoList;
-        ReadingsOrthographyInfoList = readingsOrthographyInfoList;
-        AlternativeSpellingsOrthographyInfoList = alternativeSpellingsOrthographyInfoList;
-        MiscList = miscList;
-        OnReadings = onReadings;
-        KunReadings = kunReadings;
-        NanoriReadings = nanoriReadings;
-        StrokeCount = strokeCount;
-        KanjiComposition = kanjiComposition;
-        KanjiStats = kanjiStats;
-        KanjiGrade = kanjiGrade;
-        RadicalNames = radicalNames;
-        PitchPositions = pitchPositions;
-        WordClasses = wordClasses;
+        unchecked
+        {
+            int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + MatchedText.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + Dict.GetHashCode();
+            hash = (hash * 37) + FormattedDefinitions?.GetHashCode(StringComparison.Ordinal) ?? 37;
+            return hash;
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is LookupResult other
+            && PrimarySpelling == other.PrimarySpelling
+            && MatchedText == other.MatchedText
+            && Dict == other.Dict
+            && FormattedDefinitions == other.FormattedDefinitions;
+    }
+
+    public bool Equals(LookupResult? other)
+    {
+        return other is not null
+            && PrimarySpelling == other.PrimarySpelling
+            && MatchedText == other.MatchedText
+            && Dict == other.Dict
+            && FormattedDefinitions == other.FormattedDefinitions;
     }
 }
