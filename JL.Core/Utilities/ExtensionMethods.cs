@@ -154,14 +154,14 @@ public static class ExtensionMethods
         return array;
     }
 
-    internal static T[]? TrimListToArray<T>(this List<T> list) where T : notnull
+    internal static T[]? TrimToArray<T>(this List<T> list) where T : notnull
     {
         return list.Count is 0
             ? null
             : list.ToArray();
     }
 
-    internal static T?[]? TrimListWithNullableElementsToArray<T>(this List<T?> list) where T : class
+    internal static T?[]? TrimListOfNullableElementsToArray<T>(this List<T?> list) where T : class
     {
         if (list.Count is 0)
         {
@@ -181,6 +181,71 @@ public static class ExtensionMethods
         return allElementsAreNull
             ? null
             : list.ToArray();
+    }
+
+    internal static T[][] ToSingleElementArrayIfIdentical<T>(this List<T[]> list) where T : class
+    {
+        if (list.Count is 1)
+        {
+            return list.ToArray();
+        }
+
+        T[] firstElemenmt = list[0];
+        for (int i = 1; i < list.Count; i++)
+        {
+            if (!list[i].SequenceEqual(firstElemenmt))
+            {
+                return list.ToArray();
+            }
+        }
+
+        return [firstElemenmt];
+    }
+
+    internal static T[]?[]? TrimListOfNullableElementsToSingleElementArrayIfIdentical<T>(this List<T[]?> list) where T : class
+    {
+        if (list.Count is 0)
+        {
+            return null;
+        }
+
+        T[]? firstElement = list[0];
+        if (list.Count is 1)
+        {
+            return firstElement is not null
+                ? [firstElement]
+                : null;
+        }
+
+        bool allElementsAreNull = true;
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i] is not null)
+            {
+                allElementsAreNull = false;
+                break;
+            }
+        }
+
+        bool allElementsAreIdentical = firstElement is not null;
+        if (!allElementsAreNull && allElementsAreIdentical)
+        {
+            for (int i = 1; i < list.Count; i++)
+            {
+                T[]? currentItem = list[i];
+                if (currentItem is null || !currentItem.SequenceEqual(firstElement!))
+                {
+                    allElementsAreIdentical = false;
+                    break;
+                }
+            }
+        }
+
+        return allElementsAreNull
+            ? null
+            : allElementsAreIdentical
+                ? [firstElement]
+                : list.ToArray();
     }
 
     internal static string GetPooledString(this string str)

@@ -31,7 +31,7 @@ internal static class EpwingYomichanUtils
             }
         }
 
-        return definitions.TrimListToArray();
+        return definitions.TrimToArray();
     }
 
     private static string? GetDefinitionsFromJsonArray(JsonElement jsonElement, string? parentTag = null)

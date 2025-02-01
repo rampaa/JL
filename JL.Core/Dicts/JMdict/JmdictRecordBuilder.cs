@@ -9,7 +9,7 @@ internal static class JmdictRecordBuilder
     {
         List<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.Contains("sK")).ToList();
         string[] allSpellingsWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.Keb).ToArray();
-        string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimListToArray()).ToArray();
+        string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimToArray()).ToArray();
 
         string? firstPrimarySpelling;
         string[]? alternativeSpellingsForFirstPrimarySpelling;
@@ -73,7 +73,7 @@ internal static class JmdictRecordBuilder
                         && (readingElement.ReRestrList.Count is 0 || readingElement.ReRestrList.Contains(kanjiElement.Keb)))
                     {
                         readingList.Add(readingElement.Reb);
-                        readingsOrthographyInfoList.Add(readingElement.ReInfList.TrimListToArray());
+                        readingsOrthographyInfoList.Add(readingElement.ReInfList.TrimToArray());
                     }
                 }
 
@@ -98,36 +98,36 @@ internal static class JmdictRecordBuilder
                     {
                         definitionList.Add(sense.GlossList.ToArray());
                         wordClassList.Add(sense.PosList.ToArray());
-                        readingRestrictionList.Add(sense.StagRList.TrimListToArray());
-                        spellingRestrictionList.Add(sense.StagKList.TrimListToArray());
-                        fieldList.Add(sense.FieldList.TrimListToArray());
-                        miscList.Add(sense.MiscList.TrimListToArray());
-                        dialectList.Add(sense.DialList.TrimListToArray());
+                        readingRestrictionList.Add(sense.StagRList.TrimToArray());
+                        spellingRestrictionList.Add(sense.StagKList.TrimToArray());
+                        fieldList.Add(sense.FieldList.TrimToArray());
+                        miscList.Add(sense.MiscList.TrimToArray());
+                        dialectList.Add(sense.DialList.TrimToArray());
                         definitionInfoList.Add(sense.SInf);
-                        relatedTermList.Add(sense.XRefList.TrimListToArray());
-                        antonymList.Add(sense.AntList.TrimListToArray());
-                        loanwordSourceList.Add(sense.LSourceList.TrimListToArray());
+                        relatedTermList.Add(sense.XRefList.TrimToArray());
+                        antonymList.Add(sense.AntList.TrimToArray());
+                        loanwordSourceList.Add(sense.LSourceList.TrimToArray());
                     }
                 }
 
                 JmdictRecord record = new(entry.Id,
                     kanjiElement.Keb,
                     definitionList.ToArray(),
-                    wordClassList.ToArray(),
+                    wordClassList.ToSingleElementArrayIfIdentical(),
                     allKanjiOrthographyInfoWithoutSearchOnlyForms[index],
                     allSpellingsWithoutSearchOnlyForms.RemoveAt(index),
                     allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAt(index),
-                    readingList.TrimListToArray(),
-                    readingsOrthographyInfoList.TrimListWithNullableElementsToArray(),
-                    spellingRestrictionList.TrimListWithNullableElementsToArray(),
-                    readingRestrictionList.TrimListWithNullableElementsToArray(),
-                    fieldList.TrimListWithNullableElementsToArray(),
-                    miscList.TrimListWithNullableElementsToArray(),
-                    definitionInfoList.TrimListWithNullableElementsToArray(),
-                    dialectList.TrimListWithNullableElementsToArray(),
-                    loanwordSourceList.TrimListWithNullableElementsToArray(),
-                    relatedTermList.TrimListWithNullableElementsToArray(),
-                    antonymList.TrimListWithNullableElementsToArray());
+                    readingList.TrimToArray(),
+                    readingsOrthographyInfoList.TrimListOfNullableElementsToArray(),
+                    spellingRestrictionList.TrimListOfNullableElementsToArray(),
+                    readingRestrictionList.TrimListOfNullableElementsToArray(),
+                    fieldList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    miscList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    definitionInfoList.TrimListOfNullableElementsToArray(),
+                    dialectList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    loanwordSourceList.TrimListOfNullableElementsToArray(),
+                    relatedTermList.TrimListOfNullableElementsToArray(),
+                    antonymList.TrimListOfNullableElementsToArray());
 
                 recordDictionary.Add(key, record);
 
@@ -140,7 +140,7 @@ internal static class JmdictRecordBuilder
         if (readingElementsWithoutSearchOnlyFormsExist)
         {
             string[] allReadingsWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.Reb).ToArray();
-            string[]?[] allROrthographyInfoWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.ReInfList.TrimListToArray()).ToArray();
+            string[]?[] allROrthographyInfoWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.ReInfList.TrimToArray()).ToArray();
             string firstReadingInHiragana = JapaneseUtils.KatakanaToHiragana(allReadingsWithoutSearchOnlyForms[0]);
 
             index = 0;
@@ -231,36 +231,36 @@ internal static class JmdictRecordBuilder
                     {
                         definitionList.Add(sense.GlossList.ToArray());
                         wordClassList.Add(sense.PosList.ToArray());
-                        readingRestrictionList.Add(sense.StagRList.TrimListToArray());
-                        spellingRestrictionList.Add(sense.StagKList.TrimListToArray());
-                        fieldList.Add(sense.FieldList.TrimListToArray());
-                        miscList.Add(sense.MiscList.TrimListToArray());
-                        dialectList.Add(sense.DialList.TrimListToArray());
+                        readingRestrictionList.Add(sense.StagRList.TrimToArray());
+                        spellingRestrictionList.Add(sense.StagKList.TrimToArray());
+                        fieldList.Add(sense.FieldList.TrimToArray());
+                        miscList.Add(sense.MiscList.TrimToArray());
+                        dialectList.Add(sense.DialList.TrimToArray());
                         definitionInfoList.Add(sense.SInf);
-                        relatedTermList.Add(sense.XRefList.TrimListToArray());
-                        antonymList.Add(sense.AntList.TrimListToArray());
-                        loanwordSourceList.Add(sense.LSourceList.TrimListToArray());
+                        relatedTermList.Add(sense.XRefList.TrimToArray());
+                        antonymList.Add(sense.AntList.TrimToArray());
+                        loanwordSourceList.Add(sense.LSourceList.TrimToArray());
                     }
                 }
 
                 JmdictRecord record = new(entry.Id,
                     primarySpelling,
                     definitionList.ToArray(),
-                    wordClassList.ToArray(),
+                    wordClassList.ToSingleElementArrayIfIdentical(),
                     primarySpellingOrthographyInfo,
                     alternativeSpellings,
                     alternativeSpellingsOrthographyInfo,
                     readings,
                     readingsOrthographyInfo,
-                    spellingRestrictionList.TrimListWithNullableElementsToArray(),
-                    readingRestrictionList.TrimListWithNullableElementsToArray(),
-                    fieldList.TrimListWithNullableElementsToArray(),
-                    miscList.TrimListWithNullableElementsToArray(),
-                    definitionInfoList.TrimListWithNullableElementsToArray(),
-                    dialectList.TrimListWithNullableElementsToArray(),
-                    loanwordSourceList.TrimListWithNullableElementsToArray(),
-                    relatedTermList.TrimListWithNullableElementsToArray(),
-                    antonymList.TrimListWithNullableElementsToArray());
+                    spellingRestrictionList.TrimListOfNullableElementsToArray(),
+                    readingRestrictionList.TrimListOfNullableElementsToArray(),
+                    fieldList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    miscList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    definitionInfoList.TrimListOfNullableElementsToArray(),
+                    dialectList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    loanwordSourceList.TrimListOfNullableElementsToArray(),
+                    relatedTermList.TrimListOfNullableElementsToArray(),
+                    antonymList.TrimListOfNullableElementsToArray());
 
                 // record.Priorities = kanjiElement.KePriList
 

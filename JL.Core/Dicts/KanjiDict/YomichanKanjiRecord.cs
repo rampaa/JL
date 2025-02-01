@@ -64,7 +64,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
             }
         }
 
-        Definitions = definitionList.TrimListToArray();
+        Definitions = definitionList.TrimToArray();
 
         JsonElement statsElement = jsonElement[5];
         int statsElementPropertyCount = statsElement.GetPropertyCount();

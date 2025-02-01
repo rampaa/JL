@@ -74,11 +74,24 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         char separator = newlines ? '\n' : '；';
 
         bool multipleDefinitions = Definitions.Length > 1;
+
         bool showWordClassInfo = options.WordClassInfo!.Value;
-        bool showDialectInfo = options.DialectInfo!.Value && Dialects is not null;
-        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo!.Value && DefinitionInfo is not null;
+        bool showFirstWordClassInfo = showWordClassInfo && Definitions.Length > WordClasses.Length;
+        string[]? firstWordClass = showFirstWordClassInfo ? WordClasses[0] : null;
+
         bool showMiscInfo = options.MiscInfo!.Value && Misc is not null;
+        bool showFirstMiscInfo = showMiscInfo && Definitions.Length > Misc!.Length;
+        string[]? firstMiscInfo = showFirstMiscInfo ? Misc![0] : null;
+
+        bool showDialectInfo = options.DialectInfo!.Value && Dialects is not null;
+        bool showFirstDialectInfo = showDialectInfo && Definitions.Length > Dialects!.Length;
+        string[]? firstDialect = showFirstDialectInfo ? Dialects![0] : null;
+
         bool showWordTypeInfo = options.WordTypeInfo!.Value && Fields is not null;
+        bool showFirstWordTypeInfo = showWordTypeInfo && Definitions.Length > Fields!.Length;
+        string[]? firstWordTypeInfo = showFirstWordTypeInfo ? Fields![0] : null;
+
+        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo!.Value && DefinitionInfo is not null;
         bool showSpellingRestrictionInfo = options.SpellingRestrictionInfo!.Value;
         bool showSpellingRestrictions = showSpellingRestrictionInfo && SpellingRestrictions is not null;
         bool showReadingRestrictionss = showSpellingRestrictionInfo && ReadingRestrictions is not null;
@@ -87,6 +100,34 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         bool showAntonyms = options.Antonym!.Value && Antonyms is not null;
 
         StringBuilder defResult = new();
+        if (showFirstWordClassInfo || showFirstMiscInfo || showFirstDialectInfo || showFirstWordTypeInfo)
+        {
+            if (showFirstWordClassInfo)
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", firstWordClass!)}] ");
+            }
+
+            if (showFirstMiscInfo)
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", firstMiscInfo!)}] ");
+            }
+
+            if (showFirstDialectInfo)
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", firstDialect!)}] ");
+            }
+
+            if (showFirstWordTypeInfo)
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", firstWordTypeInfo!)}] ");
+            }
+
+            if (newlines)
+            {
+                _ = defResult.Replace(" ", "\n", defResult.Length - 1, 1);
+            }
+        }
+
         for (int i = 0; i < Definitions.Length; i++)
         {
             if (newlines && multipleDefinitions)
@@ -94,7 +135,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if (showWordClassInfo)
+            if (!showFirstWordClassInfo && showWordClassInfo)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", WordClasses[i])}) ");
             }
@@ -104,7 +145,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if (showMiscInfo)
+            if (!showFirstMiscInfo && showMiscInfo)
             {
                 string[]? misc = Misc![i];
                 if (misc is not null)
@@ -113,7 +154,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 }
             }
 
-            if (showDialectInfo)
+            if (!showFirstDialectInfo && showDialectInfo)
             {
                 string[]? dialects = Dialects![i];
                 if (dialects is not null)
@@ -122,7 +163,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 }
             }
 
-            if (showWordTypeInfo)
+            if (!showFirstWordTypeInfo && showWordTypeInfo)
             {
                 string[]? fields = Fields![i];
                 if (fields is not null)
