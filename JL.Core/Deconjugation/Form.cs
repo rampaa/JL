@@ -49,4 +49,7 @@ internal sealed class Form(
             return hash;
         }
     }
+
+    public static bool operator ==(Form? left, Form? right) => left is not null ? left.Equals(right) : right is null;
+    public static bool operator !=(Form? left, Form? right) => left is not null ? !left.Equals(right) : right is not null;
 }
