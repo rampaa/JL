@@ -13,6 +13,7 @@ public sealed class CoreConfigManager
     public Uri AnkiConnectUri { get; set; } = new("http://127.0.0.1:8765");
     public bool AnkiIntegration { get; set; } // = false;
     public bool ForceSyncAnki { get; private set; } // = false;
+    public bool NotifyWhenMiningSucceeds { get; private set; } = true;
     public bool AllowDuplicateCards { get; private set; } // = false;
     public bool CheckForDuplicateCards { get; private set; } // = false;
     public bool CaptureTextFromClipboard { get; set; } = true;
@@ -112,6 +113,7 @@ public sealed class CoreConfigManager
 
         AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);
         ForceSyncAnki = ConfigDBManager.GetValueFromConfig(connection, ForceSyncAnki, nameof(ForceSyncAnki), bool.TryParse);
+        NotifyWhenMiningSucceeds = ConfigDBManager.GetValueFromConfig(connection, NotifyWhenMiningSucceeds, nameof(NotifyWhenMiningSucceeds), bool.TryParse);
         AllowDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, AllowDuplicateCards, nameof(AllowDuplicateCards), bool.TryParse);
         CheckForDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, CheckForDuplicateCards, nameof(CheckForDuplicateCards), bool.TryParse);
         TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);

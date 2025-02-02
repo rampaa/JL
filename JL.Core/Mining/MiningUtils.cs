@@ -716,8 +716,11 @@ public static class MiningUtils
 
         StatsUtils.IncrementStat(StatType.CardsMined);
 
-        Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
         Utils.Logger.Information("Mined {PrimarySpelling}", lookupResult.PrimarySpelling);
+        if (CoreConfigManager.Instance.NotifyWhenMiningSucceeds)
+        {
+            Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
+        }
     }
 
     public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, string currentText, int currentCharPosition)
@@ -938,8 +941,12 @@ public static class MiningUtils
         bool showNoAudioMessage = needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash);
         bool showDuplicateCardMessage = !canAddNote.Value;
         string message = $"Mined {lookupResult.PrimarySpelling}{(showNoAudioMessage ? " (No Audio)" : "")}{(showDuplicateCardMessage ? " (Duplicate)" : "")}";
-        Utils.Frontend.Alert(showNoAudioMessage || showDuplicateCardMessage ? AlertLevel.Warning : AlertLevel.Success, message);
+
         Utils.Logger.Information(message);
+        if (coreConfigManager.NotifyWhenMiningSucceeds)
+        {
+            Utils.Frontend.Alert(showNoAudioMessage || showDuplicateCardMessage ? AlertLevel.Warning : AlertLevel.Success, message);
+        }
 
         if (coreConfigManager.ForceSyncAnki)
         {
