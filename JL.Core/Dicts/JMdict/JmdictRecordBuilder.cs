@@ -110,10 +110,16 @@ internal static class JmdictRecordBuilder
                     }
                 }
 
+                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetWordClasses(wordClassList);
+                (string[]?[]? exclusiveMiscValues, string[]? miscValuesSharedByAllSenses) = GetSenseFields(miscList);
+                (string[]?[]? exclusiveFieldValues, string[]? fieldValuesSharedByAllSenses) = GetSenseFields(fieldList);
+                (string[]?[]? exclusiveDialectValues, string[]? dialectValuesSharedByAllSenses) = GetSenseFields(dialectList);
+
                 JmdictRecord record = new(entry.Id,
                     kanjiElement.Keb,
                     definitionList.ToArray(),
-                    wordClassList.ToSingleElementArrayIfIdentical(),
+                    exclusiveWordClasses,
+                    wordClassesSharedByAllSenses,
                     allKanjiOrthographyInfoWithoutSearchOnlyForms[index],
                     allSpellingsWithoutSearchOnlyForms.RemoveAt(index),
                     allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAt(index),
@@ -121,10 +127,13 @@ internal static class JmdictRecordBuilder
                     readingsOrthographyInfoList.TrimListOfNullableElementsToArray(),
                     spellingRestrictionList.TrimListOfNullableElementsToArray(),
                     readingRestrictionList.TrimListOfNullableElementsToArray(),
-                    fieldList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
-                    miscList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    exclusiveFieldValues,
+                    fieldValuesSharedByAllSenses,
+                    exclusiveMiscValues,
+                    miscValuesSharedByAllSenses,
                     definitionInfoList.TrimListOfNullableElementsToArray(),
-                    dialectList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    exclusiveDialectValues,
+                    dialectValuesSharedByAllSenses,
                     loanwordSourceList.TrimListOfNullableElementsToArray(),
                     relatedTermList.TrimListOfNullableElementsToArray(),
                     antonymList.TrimListOfNullableElementsToArray());
@@ -243,10 +252,16 @@ internal static class JmdictRecordBuilder
                     }
                 }
 
+                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetWordClasses(wordClassList);
+                (string[]?[]? exclusiveMiscValues, string[]? miscValuesSharedByAllSenses) = GetSenseFields(miscList);
+                (string[]?[]? exclusiveFieldValues, string[]? fieldValuesSharedByAllSenses) = GetSenseFields(fieldList);
+                (string[]?[]? exclusiveDialectValues, string[]? dialectValuesSharedByAllSenses) = GetSenseFields(dialectList);
+
                 JmdictRecord record = new(entry.Id,
                     primarySpelling,
                     definitionList.ToArray(),
-                    wordClassList.ToSingleElementArrayIfIdentical(),
+                    exclusiveWordClasses,
+                    wordClassesSharedByAllSenses,
                     primarySpellingOrthographyInfo,
                     alternativeSpellings,
                     alternativeSpellingsOrthographyInfo,
@@ -254,10 +269,13 @@ internal static class JmdictRecordBuilder
                     readingsOrthographyInfo,
                     spellingRestrictionList.TrimListOfNullableElementsToArray(),
                     readingRestrictionList.TrimListOfNullableElementsToArray(),
-                    fieldList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
-                    miscList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    exclusiveFieldValues,
+                    fieldValuesSharedByAllSenses,
+                    exclusiveMiscValues,
+                    miscValuesSharedByAllSenses,
                     definitionInfoList.TrimListOfNullableElementsToArray(),
-                    dialectList.TrimListOfNullableElementsToSingleElementArrayIfIdentical(),
+                    exclusiveDialectValues,
+                    dialectValuesSharedByAllSenses,
                     loanwordSourceList.TrimListOfNullableElementsToArray(),
                     relatedTermList.TrimListOfNullableElementsToArray(),
                     antonymList.TrimListOfNullableElementsToArray());
@@ -289,5 +307,85 @@ internal static class JmdictRecordBuilder
                 jmdictDictionary[key] = [jmdictRecord];
             }
         }
+    }
+
+    private static (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) GetWordClasses(List<string[]> wordClasses)
+    {
+        if (wordClasses.Count is 1)
+        {
+            return (wordClasses.TrimToArray(), null);
+        }
+
+        List<string>?[] exclusiveWordClassesList = new List<string>?[wordClasses.Count];
+        List<string> wordClassesSharedByAllSensesList = [];
+
+        for (int i = 0; i < wordClasses.Count; i++)
+        {
+            string[] wordClassInfo = wordClasses[i];
+            for (int j = 0; j < wordClassInfo.Length; j++)
+            {
+                string wordClass = wordClassInfo[j];
+                if (wordClasses.All(wc => wc.Contains(wordClass)))
+                {
+                    if (!wordClassesSharedByAllSensesList.Contains(wordClass))
+                    {
+                        wordClassesSharedByAllSensesList.Add(wordClass);
+                    }
+                }
+                else
+                {
+                    exclusiveWordClassesList[i] ??= [];
+                    exclusiveWordClassesList[i]!.Add(wordClass);
+                }
+            }
+        }
+
+        return wordClassesSharedByAllSensesList.Count is 0
+            ? (wordClasses.TrimToArray(), null)
+            : exclusiveWordClassesList.All(ewc => ewc is null)
+                ? (null, wordClassesSharedByAllSensesList.TrimToArray())
+                : (exclusiveWordClassesList.Select(ewc => ewc?.TrimToArray()).ToArray(), wordClassesSharedByAllSensesList.TrimToArray());
+    }
+
+    private static (string[]?[]? exclusiveSenseFieldValues, string[]? fieldValuesSharedByAllSenses) GetSenseFields(List<string[]?> senseField)
+    {
+        if (senseField.Count is 1)
+        {
+            return (senseField.TrimListOfNullableElementsToArray(), null);
+        }
+
+        List<string>?[] exclusiveSenseFieldValues = new List<string>?[senseField.Count];
+        List<string> fieldValuesSharedByAllSenses = [];
+
+
+        for (int i = 0; i < senseField.Count; i++)
+        {
+            string[]? wordClassInfo = senseField[i];
+            if (wordClassInfo is not null)
+            {
+                for (int j = 0; j < wordClassInfo.Length; j++)
+                {
+                    string wordClass = wordClassInfo[j];
+                    if (senseField.All(wc => wc?.Contains(wordClass) ?? false))
+                    {
+                        if (!fieldValuesSharedByAllSenses.Contains(wordClass))
+                        {
+                            fieldValuesSharedByAllSenses.Add(wordClass);
+                        }
+                    }
+                    else
+                    {
+                        exclusiveSenseFieldValues[i] ??= [];
+                        exclusiveSenseFieldValues[i]!.Add(wordClass);
+                    }
+                }
+            }
+        }
+
+        return fieldValuesSharedByAllSenses.Count is 0
+            ? (senseField.TrimListOfNullableElementsToArray(), null)
+            : exclusiveSenseFieldValues.All(ewc => ewc is null)
+                ? (null, fieldValuesSharedByAllSenses.TrimToArray())
+                : (exclusiveSenseFieldValues.Select(ewc => ewc?.TrimToArray()).ToArray(), fieldValuesSharedByAllSenses.TrimToArray());
     }
 }

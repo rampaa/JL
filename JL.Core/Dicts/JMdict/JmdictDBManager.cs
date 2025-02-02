@@ -10,7 +10,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 4;
+    public const int Version = 5;
 
     public static void CreateDB(string dbName)
     {
@@ -32,11 +32,15 @@ internal static class JmdictDBManager
                 reading_restrictions TEXT,
                 glossary TEXT NOT NULL,
                 glossary_info TEXT,
-                part_of_speech TEXT NOT NULL,
+                part_of_speech TEXT,
+                part_of_speech_shared_by_all_senses TEXT,
                 spelling_restrictions TEXT,
                 fields TEXT,
+                fields_shared_by_all_senses TEXT,
                 misc TEXT,
+                misc_shared_by_all_senses TEXT,
                 dialects TEXT,
+                dialects_shared_by_all_senses TEXT,
                 loanword_etymology TEXT,
                 cross_references TEXT,
                 antonyms TEXT
@@ -87,8 +91,8 @@ internal static class JmdictDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (id, edict_id, primary_spelling, primary_spelling_orthography_info, alternative_spellings, alternative_spellings_orthography_info, readings, readings_orthography_info, reading_restrictions, glossary, glossary_info, part_of_speech, spelling_restrictions, fields, misc, dialects, loanword_etymology, cross_references, antonyms)
-            VALUES (@id, @edict_id, @primary_spelling, @primary_spelling_orthography_info, @alternative_spellings, @alternative_spellings_orthography_info, @readings, @readings_orthography_info, @reading_restrictions, @glossary, @glossary_info, @part_of_speech, @spelling_restrictions, @fields, @misc, @dialects, @loanword_etymology, @cross_references, @antonyms);
+            INSERT INTO record (id, edict_id, primary_spelling, primary_spelling_orthography_info, alternative_spellings, alternative_spellings_orthography_info, readings, readings_orthography_info, reading_restrictions, glossary, glossary_info, part_of_speech, part_of_speech_shared_by_all_senses, spelling_restrictions, fields, fields_shared_by_all_senses, misc, misc_shared_by_all_senses, dialects, dialects_shared_by_all_senses, loanword_etymology, cross_references, antonyms)
+            VALUES (@id, @edict_id, @primary_spelling, @primary_spelling_orthography_info, @alternative_spellings, @alternative_spellings_orthography_info, @readings, @readings_orthography_info, @reading_restrictions, @glossary, @glossary_info, @part_of_speech, @part_of_speech_shared_by_all_senses, @spelling_restrictions, @fields, @fields_shared_by_all_senses, @misc, @misc_shared_by_all_senses, @dialects, @dialects_shared_by_all_senses, @loanword_etymology, @cross_references, @antonyms);
             """;
 
         _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
@@ -103,10 +107,14 @@ internal static class JmdictDBManager
         _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@glossary_info", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@part_of_speech", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@part_of_speech_shared_by_all_senses", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@spelling_restrictions", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@fields", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@fields_shared_by_all_senses", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@misc", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@misc_shared_by_all_senses", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@dialects", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@dialects_shared_by_all_senses", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@loanword_etymology", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@cross_references", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@antonyms", SqliteType.Text);
@@ -136,11 +144,15 @@ internal static class JmdictDBManager
             insertRecordCommand.Parameters["@reading_restrictions"].Value = record.ReadingRestrictions is not null ? JsonSerializer.Serialize(record.ReadingRestrictions, Utils.s_jso) : DBNull.Value;
             insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jso);
             insertRecordCommand.Parameters["@glossary_info"].Value = record.DefinitionInfo is not null ? JsonSerializer.Serialize(record.DefinitionInfo, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@part_of_speech"].Value = JsonSerializer.Serialize(record.WordClasses, Utils.s_jso);
+            insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jso) : DBNull.Value;
+            insertRecordCommand.Parameters["@part_of_speech_shared_by_all_senses"].Value = record.WordClassesSharedByAllSenses is not null ? JsonSerializer.Serialize(record.WordClassesSharedByAllSenses, Utils.s_jso) : DBNull.Value;
             insertRecordCommand.Parameters["@spelling_restrictions"].Value = record.SpellingRestrictions is not null ? JsonSerializer.Serialize(record.SpellingRestrictions, Utils.s_jso) : DBNull.Value;
             insertRecordCommand.Parameters["@fields"].Value = record.Fields is not null ? JsonSerializer.Serialize(record.Fields, Utils.s_jso) : DBNull.Value;
+            insertRecordCommand.Parameters["@fields_shared_by_all_senses"].Value = record.FieldsSharedByAllSenses is not null ? JsonSerializer.Serialize(record.FieldsSharedByAllSenses, Utils.s_jso) : DBNull.Value;
             insertRecordCommand.Parameters["@misc"].Value = record.Misc is not null ? JsonSerializer.Serialize(record.Misc, Utils.s_jso) : DBNull.Value;
+            insertRecordCommand.Parameters["@misc_shared_by_all_senses"].Value = record.MiscSharedByAllSenses is not null ? JsonSerializer.Serialize(record.MiscSharedByAllSenses, Utils.s_jso) : DBNull.Value;
             insertRecordCommand.Parameters["@dialects"].Value = record.Dialects is not null ? JsonSerializer.Serialize(record.Dialects, Utils.s_jso) : DBNull.Value;
+            insertRecordCommand.Parameters["@dialects_shared_by_all_senses"].Value = record.DialectsSharedByAllSenses is not null ? JsonSerializer.Serialize(record.DialectsSharedByAllSenses, Utils.s_jso) : DBNull.Value;
             insertRecordCommand.Parameters["@loanword_etymology"].Value = record.LoanwordEtymology is not null ? JsonSerializer.Serialize(record.LoanwordEtymology, Utils.s_jso) : DBNull.Value;
             insertRecordCommand.Parameters["@cross_references"].Value = record.RelatedTerms is not null ? JsonSerializer.Serialize(record.RelatedTerms, Utils.s_jso) : DBNull.Value;
             insertRecordCommand.Parameters["@antonyms"].Value = record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jso) : DBNull.Value;
@@ -193,9 +205,13 @@ internal static class JmdictDBManager
                    r.glossary AS definitions,
                    r.glossary_info AS definitionInfo,
                    r.part_of_speech AS wordClasses,
+                   r.part_of_speech_shared_by_all_senses AS wordClassesSharedByAllSenses,
                    r.fields AS fields,
+                   r.fields_shared_by_all_senses AS fieldsSharedByAllSenses,
                    r.misc AS misc,
+                   r.misc_shared_by_all_senses AS miscSharedByAllSenses,
                    r.dialects AS dialects,
+                   r.dialects_shared_by_all_senses AS dialectsSharedByAllSenses,
                    r.loanword_etymology AS loanwordEtymology,
                    r.cross_references AS relatedTerms,
                    r.antonyms AS antonyms
@@ -257,9 +273,13 @@ internal static class JmdictDBManager
                    r.glossary AS definitions,
                    r.glossary_info AS definitionInfo,
                    r.part_of_speech AS wordClasses,
+                   r.part_of_speech_shared_by_all_senses AS wordClassesSharedByAllSenses,
                    r.fields AS fields,
+                   r.fields_shared_by_all_senses AS fieldsSharedByAllSenses,
                    r.misc AS misc,
+                   r.misc_shared_by_all_senses AS miscSharedByAllSenses,
                    r.dialects AS dialects,
+                   r.dialects_shared_by_all_senses AS dialectsSharedByAllSenses,
                    r.loanword_etymology AS loanwordEtymology,
                    r.cross_references AS relatedTerms,
                    r.antonyms AS antonyms
@@ -344,7 +364,18 @@ internal static class JmdictDBManager
         }
 
         string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(definitions)), Utils.s_jso)!;
-        string[][] wordClasses = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(wordClasses)), Utils.s_jso)!;
+
+        string[]?[]? wordClasses = null;
+        if (dataReader[nameof(wordClasses)] is string wordClassesFromDB)
+        {
+            wordClasses = JsonSerializer.Deserialize<string[]?[]>(wordClassesFromDB, Utils.s_jso);
+        }
+
+        string[]? wordClassesSharedByAllSenses = null;
+        if (dataReader[nameof(wordClassesSharedByAllSenses)] is string wordClassesSharedByAllSensesFromDB)
+        {
+            wordClassesSharedByAllSenses = JsonSerializer.Deserialize<string[]>(wordClassesSharedByAllSensesFromDB, Utils.s_jso);
+        }
 
         string[]?[]? fields = null;
         if (dataReader[nameof(fields)] is string fieldsFromDB)
@@ -352,10 +383,22 @@ internal static class JmdictDBManager
             fields = JsonSerializer.Deserialize<string[]?[]>(fieldsFromDB, Utils.s_jso);
         }
 
+        string[]? fieldsSharedByAllSenses = null;
+        if (dataReader[nameof(fieldsSharedByAllSenses)] is string fieldsSharedByAllSensesFromDB)
+        {
+            fieldsSharedByAllSenses = JsonSerializer.Deserialize<string[]>(fieldsSharedByAllSensesFromDB, Utils.s_jso);
+        }
+
         string[]?[]? misc = null;
         if (dataReader[nameof(misc)] is string miscFromDB)
         {
             misc = JsonSerializer.Deserialize<string[]?[]>(miscFromDB, Utils.s_jso);
+        }
+
+        string[]? miscSharedByAllSenses = null;
+        if (dataReader[nameof(miscSharedByAllSenses)] is string miscSharedByAllSensesFromDB)
+        {
+            miscSharedByAllSenses = JsonSerializer.Deserialize<string[]>(miscSharedByAllSensesFromDB, Utils.s_jso);
         }
 
         string?[]? definitionInfo = null;
@@ -368,6 +411,12 @@ internal static class JmdictDBManager
         if (dataReader[nameof(dialects)] is string dialectsFromDB)
         {
             dialects = JsonSerializer.Deserialize<string[]?[]>(dialectsFromDB, Utils.s_jso);
+        }
+
+        string[]? dialectsSharedByAllSenses = null;
+        if (dataReader[nameof(dialectsSharedByAllSenses)] is string dialectsSharedByAllSensesFromDB)
+        {
+            dialectsSharedByAllSenses = JsonSerializer.Deserialize<string[]>(dialectsSharedByAllSensesFromDB, Utils.s_jso);
         }
 
         LoanwordSource[]?[]? loanwordEtymology = null;
@@ -388,6 +437,6 @@ internal static class JmdictDBManager
             antonyms = JsonSerializer.Deserialize<string[]?[]>(antonymsFromDB, Utils.s_jso);
         }
 
-        return new JmdictRecord(id, primarySpelling, definitions, wordClasses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, misc, definitionInfo, dialects, loanwordEtymology, relatedTerms, antonyms);
+        return new JmdictRecord(id, primarySpelling, definitions, wordClasses, wordClassesSharedByAllSenses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, fieldsSharedByAllSenses, misc, miscSharedByAllSenses, definitionInfo, dialects, dialectsSharedByAllSenses, loanwordEtymology, relatedTerms, antonyms);
     }
 }

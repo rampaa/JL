@@ -399,6 +399,11 @@ public static class LookupUtils
                     return 2;
                 }
 
+                if (lookupResult.MiscSharedByAllSenses?.Contains("uk") ?? false)
+                {
+                    return 0;
+                }
+
                 if (lookupResult.MiscList is not null)
                 {
                     for (int i = 0; i < lookupResult.MiscList.Length; i++)
@@ -476,7 +481,6 @@ public static class LookupUtils
                 if (verbDict.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
                     List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
-
                     if (resultsList.Count > 0)
                     {
                         if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
@@ -569,7 +573,8 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     JmdictRecord dictResult = (JmdictRecord)dictResults[i];
-                    if (dictResult.WordClasses.Any(wordClasses => wordClasses.Contains(lastTag)))
+                    if ((dictResult.WordClassesSharedByAllSenses?.Contains(lastTag) ?? false)
+                        || (dictResult.WordClasses?.Any(wordClasses => wordClasses?.Contains(lastTag) ?? false) ?? false))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -770,6 +775,7 @@ public static class LookupUtils
                         readingsOrthographyInfoList: jmdictResult.ReadingsOrthographyInfo,
                         alternativeSpellingsOrthographyInfoList: jmdictResult.AlternativeSpellingsOrthographyInfo,
                         miscList: jmdictResult.Misc,
+                        miscSharedByAllSensesList: jmdictResult.MiscSharedByAllSenses,
                         dict: wordResult.Dict,
                         formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null

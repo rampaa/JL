@@ -17,13 +17,17 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
     public string[]? Readings { get; }
     public string[]?[]? ReadingsOrthographyInfo { get; }
     public string[][] Definitions { get; }
-    public string[][] WordClasses { get; } //e.g. noun +
+    public string[]?[]? WordClasses { get; } //e.g. noun +
+    public string[]? WordClassesSharedByAllSenses { get; }
     public string[]?[]? SpellingRestrictions { get; }
     public string[]?[]? ReadingRestrictions { get; }
     public string[]?[]? Fields { get; } // e.g. "martial arts"
+    public string[]? FieldsSharedByAllSenses { get; }
     public string[]?[]? Misc { get; } // e.g. "abbr" +
+    public string[]? MiscSharedByAllSenses { get; }
     public string?[]? DefinitionInfo { get; } // e.g. "often derog" +
     public string[]?[]? Dialects { get; } // e.g. ksb
+    public string[]? DialectsSharedByAllSenses { get; }
     public LoanwordSource[]?[]? LoanwordEtymology { get; }
     public string[]?[]? RelatedTerms { get; }
     public string[]?[]? Antonyms { get; }
@@ -32,7 +36,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
     public JmdictRecord(int id,
         string primarySpelling,
         string[][] definitions,
-        string[][] wordClasses,
+        string[]?[]? wordClasses,
+        string[]? wordClassesSharedByAllSenses,
         string[]? primarySpellingOrthographyInfo,
         string[]? alternativeSpellings,
         string[]?[]? alternativeSpellingsOrthographyInfo,
@@ -41,9 +46,12 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         string[]?[]? spellingRestrictions,
         string[]?[]? readingRestrictions,
         string[]?[]? fields,
+        string[]? fieldsSharedByAllSenses,
         string[]?[]? misc,
+        string[]? miscSharedByAllSenses,
         string?[]? definitionInfo,
         string[]?[]? dialects,
+        string[]? dialectsSharedByAllSenses,
         LoanwordSource[]?[]? loanwordEtymology,
         string[]?[]? relatedTerms,
         string[]?[]? antonyms)
@@ -57,12 +65,16 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         ReadingsOrthographyInfo = readingsOrthographyInfo;
         Definitions = definitions;
         WordClasses = wordClasses;
+        WordClassesSharedByAllSenses = wordClassesSharedByAllSenses;
         SpellingRestrictions = spellingRestrictions;
         ReadingRestrictions = readingRestrictions;
         Fields = fields;
+        FieldsSharedByAllSenses = fieldsSharedByAllSenses;
         Misc = misc;
+        MiscSharedByAllSenses = miscSharedByAllSenses;
         DefinitionInfo = definitionInfo;
         Dialects = dialects;
+        DialectsSharedByAllSenses = dialectsSharedByAllSenses;
         LoanwordEtymology = loanwordEtymology;
         RelatedTerms = relatedTerms;
         Antonyms = antonyms;
@@ -75,51 +87,53 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
         bool multipleDefinitions = Definitions.Length > 1;
 
-        bool showWordClassInfo = options.WordClassInfo!.Value;
-        bool showFirstWordClassInfo = showWordClassInfo && Definitions.Length > WordClasses.Length;
-        string[]? firstWordClass = showFirstWordClassInfo ? WordClasses[0] : null;
+        bool showWordClassInfoOptionValue = options.WordClassInfo!.Value;
+        bool showWordClassInfo = showWordClassInfoOptionValue && WordClasses is not null;
+        bool showWordClassesSharedByAllSenses = showWordClassInfoOptionValue && WordClassesSharedByAllSenses is not null;
 
-        bool showMiscInfo = options.MiscInfo!.Value && Misc is not null;
-        bool showFirstMiscInfo = showMiscInfo && Definitions.Length > Misc!.Length;
-        string[]? firstMiscInfo = showFirstMiscInfo ? Misc![0] : null;
+        bool showMiscInfoOptionValue = options.MiscInfo!.Value;
+        bool showMiscInfo = showMiscInfoOptionValue && Misc is not null;
+        bool showMiscSharedByAllSenses = showMiscInfoOptionValue && MiscSharedByAllSenses is not null;
 
-        bool showDialectInfo = options.DialectInfo!.Value && Dialects is not null;
-        bool showFirstDialectInfo = showDialectInfo && Definitions.Length > Dialects!.Length;
-        string[]? firstDialect = showFirstDialectInfo ? Dialects![0] : null;
+        bool showDialectInfoOptionValue = options.DialectInfo!.Value;
+        bool showDialectInfo = showDialectInfoOptionValue && Dialects is not null;
+        bool showDialectsSharedByAllSenses = showDialectInfoOptionValue && DialectsSharedByAllSenses is not null;
 
-        bool showWordTypeInfo = options.WordTypeInfo!.Value && Fields is not null;
-        bool showFirstWordTypeInfo = showWordTypeInfo && Definitions.Length > Fields!.Length;
-        string[]? firstWordTypeInfo = showFirstWordTypeInfo ? Fields![0] : null;
+        bool showFieldInfoOptionValue = options.WordTypeInfo!.Value;
+        bool showFieldsInfo = showFieldInfoOptionValue && Fields is not null;
+        bool showFieldsSharedByAllSenses = showFieldInfoOptionValue && FieldsSharedByAllSenses is not null;
 
         bool showExtraDefinitionInfo = options.ExtraDefinitionInfo!.Value && DefinitionInfo is not null;
+
         bool showSpellingRestrictionInfo = options.SpellingRestrictionInfo!.Value;
         bool showSpellingRestrictions = showSpellingRestrictionInfo && SpellingRestrictions is not null;
         bool showReadingRestrictionss = showSpellingRestrictionInfo && ReadingRestrictions is not null;
+
         bool showLoanwordEtymology = options.LoanwordEtymology!.Value && LoanwordEtymology is not null;
         bool showRelatedTerms = options.RelatedTerm!.Value && RelatedTerms is not null;
         bool showAntonyms = options.Antonym!.Value && Antonyms is not null;
 
         StringBuilder defResult = new();
-        if (showFirstWordClassInfo || showFirstMiscInfo || showFirstDialectInfo || showFirstWordTypeInfo)
+        if (showWordClassesSharedByAllSenses || showMiscSharedByAllSenses || showDialectsSharedByAllSenses || showFieldsSharedByAllSenses)
         {
-            if (showFirstWordClassInfo)
+            if (showWordClassesSharedByAllSenses)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", firstWordClass!)}] ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", WordClassesSharedByAllSenses!)}] ");
             }
 
-            if (showFirstMiscInfo)
+            if (showMiscSharedByAllSenses)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", firstMiscInfo!)}] ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", MiscSharedByAllSenses!)}] ");
             }
 
-            if (showFirstDialectInfo)
+            if (showDialectsSharedByAllSenses)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", firstDialect!)}] ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", DialectsSharedByAllSenses!)}] ");
             }
 
-            if (showFirstWordTypeInfo)
+            if (showFieldsSharedByAllSenses)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", firstWordTypeInfo!)}] ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", FieldsSharedByAllSenses!)}] ");
             }
 
             if (newlines)
@@ -135,9 +149,13 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if (!showFirstWordClassInfo && showWordClassInfo)
+            if (showWordClassInfo)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", WordClasses[i])}) ");
+                string[]? wordClasses = WordClasses![i];
+                if (wordClasses is not null)
+                {
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", wordClasses)}) ");
+                }
             }
 
             if (!newlines && multipleDefinitions)
@@ -145,7 +163,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if (!showFirstMiscInfo && showMiscInfo)
+            if (showMiscInfo)
             {
                 string[]? misc = Misc![i];
                 if (misc is not null)
@@ -154,7 +172,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 }
             }
 
-            if (!showFirstDialectInfo && showDialectInfo)
+            if (showDialectInfo)
             {
                 string[]? dialects = Dialects![i];
                 if (dialects is not null)
@@ -163,7 +181,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 }
             }
 
-            if (!showFirstWordTypeInfo && showWordTypeInfo)
+            if (showFieldsInfo)
             {
                 string[]? fields = Fields![i];
                 if (fields is not null)
