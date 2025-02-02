@@ -69,13 +69,13 @@ internal sealed class LookupTests
 
         // Assert
         Assert.That(actual, Is.EqualTo(expected)
-            .Using<LookupResult, LookupResult>((a, e) =>
+            .Using<LookupResult, LookupResult>(static (a, e) =>
                 a.MatchedText == e.MatchedText
                 && a.Dict == e.Dict
-                && (e.Frequencies is not null ? (a.Frequencies?.SequenceEqual(e.Frequencies) ?? false) : a.Frequencies is null)
+                && (e.Frequencies is not null ? a.Frequencies?.SequenceEqual(e.Frequencies) ?? false : a.Frequencies is null)
                 && a.PrimarySpelling == e.PrimarySpelling
                 && a.DeconjugatedMatchedText == e.DeconjugatedMatchedText
-                && (e.Readings is not null ? (a.Readings?.SequenceEqual(e.Readings) ?? false) : a.Readings is null)
+                && (e.Readings is not null ? a.Readings?.SequenceEqual(e.Readings) ?? false : a.Readings is null)
                 && a.FormattedDefinitions == e.FormattedDefinitions
                 && a.EntryId == e.EntryId));
     }

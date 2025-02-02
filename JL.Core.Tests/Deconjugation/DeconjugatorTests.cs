@@ -27,7 +27,7 @@ internal sealed class DeconjugatorTests
         bool success = false;
         foreach (Form form in result)
         {
-            if (form.Text is expectedText && form.Process.Count > 0 && form.Process[0] is expectedProcess)
+            if (form is { Text: expectedText, Process.Count: > 0 } && form.Process[0] is expectedProcess)
             {
                 success = true;
                 break;

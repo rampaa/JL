@@ -94,6 +94,6 @@ public sealed class LookupResult
             && FormattedDefinitions == other.FormattedDefinitions;
     }
 
-    public static bool operator ==(LookupResult? left, LookupResult? right) => left is not null ? left.Equals(right) : right is null;
-    public static bool operator !=(LookupResult? left, LookupResult? right) => left is not null ? !left.Equals(right) : right is not null;
+    public static bool operator ==(LookupResult? left, LookupResult? right) => left?.Equals(right) ?? right is null;
+    public static bool operator !=(LookupResult? left, LookupResult? right) => !left?.Equals(right) ?? right is not null;
 }

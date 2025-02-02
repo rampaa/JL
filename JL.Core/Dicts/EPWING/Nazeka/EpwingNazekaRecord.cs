@@ -148,6 +148,6 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         }
     }
 
-    public static bool operator ==(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => left is not null ? left.Equals(right) : right is null;
-    public static bool operator !=(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => left is not null ? !left.Equals(right) : right is not null;
+    public static bool operator ==(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => left?.Equals(right) ?? right is null;
+    public static bool operator !=(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => !left?.Equals(right) ?? right is not null;
 }

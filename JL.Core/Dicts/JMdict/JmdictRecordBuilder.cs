@@ -342,9 +342,9 @@ internal static class JmdictRecordBuilder
 
         return wordClassesSharedByAllSensesList.Count is 0
             ? (wordClasses.TrimToArray(), null)
-            : exclusiveWordClassesList.All(ewc => ewc is null)
+            : exclusiveWordClassesList.All(static ewc => ewc is null)
                 ? (null, wordClassesSharedByAllSensesList.TrimToArray())
-                : (exclusiveWordClassesList.Select(ewc => ewc?.TrimToArray()).ToArray(), wordClassesSharedByAllSensesList.TrimToArray());
+                : (exclusiveWordClassesList.Select(static ewc => ewc?.TrimToArray()).ToArray(), wordClassesSharedByAllSensesList.TrimToArray());
     }
 
     private static (string[]?[]? exclusiveSenseFieldValues, string[]? fieldValuesSharedByAllSenses) GetSenseFields(List<string[]?> senseField)
@@ -384,8 +384,8 @@ internal static class JmdictRecordBuilder
 
         return fieldValuesSharedByAllSenses.Count is 0
             ? (senseField.TrimListOfNullableElementsToArray(), null)
-            : exclusiveSenseFieldValues.All(ewc => ewc is null)
+            : exclusiveSenseFieldValues.All(static ewc => ewc is null)
                 ? (null, fieldValuesSharedByAllSenses.TrimToArray())
-                : (exclusiveSenseFieldValues.Select(ewc => ewc?.TrimToArray()).ToArray(), fieldValuesSharedByAllSenses.TrimToArray());
+                : (exclusiveSenseFieldValues.Select(static ewc => ewc?.TrimToArray()).ToArray(), fieldValuesSharedByAllSenses.TrimToArray());
     }
 }

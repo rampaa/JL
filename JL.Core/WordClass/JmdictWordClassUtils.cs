@@ -71,7 +71,7 @@ internal static class JmdictWordClassUtils
             {
                 JmdictRecord jmdictRecord = (JmdictRecord)jmdictRecordList[i];
                 string[] wordClasses = s_usedWordClasses
-                    .Intersect((jmdictRecord.WordClasses?.Where(wc => wc is not null).SelectMany(static wc => wc!) ?? [])
+                    .Intersect((jmdictRecord.WordClasses?.Where(static wc => wc is not null).SelectMany(static wc => wc!) ?? [])
                         .Union(jmdictRecord.WordClassesSharedByAllSenses ?? [])).ToArray();
 
                 if (wordClasses.Length is 0)

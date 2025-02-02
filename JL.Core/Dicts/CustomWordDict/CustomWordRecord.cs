@@ -236,6 +236,6 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
         }
     }
 
-    public static bool operator ==(CustomWordRecord? left, CustomWordRecord? right) => left is not null ? left.Equals(right) : right is null;
-    public static bool operator !=(CustomWordRecord? left, CustomWordRecord? right) => left is not null ? !left.Equals(right) : right is not null;
+    public static bool operator ==(CustomWordRecord? left, CustomWordRecord? right) => left?.Equals(right) ?? right is null;
+    public static bool operator !=(CustomWordRecord? left, CustomWordRecord? right) => !left?.Equals(right) ?? right is not null;
 }

@@ -167,6 +167,6 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         }
     }
 
-    public static bool operator ==(EpwingYomichanRecord? left, EpwingYomichanRecord? right) => left is not null ? left.Equals(right) : right is null;
-    public static bool operator !=(EpwingYomichanRecord? left, EpwingYomichanRecord? right) => left is not null ? !left.Equals(right) : right is not null;
+    public static bool operator ==(EpwingYomichanRecord? left, EpwingYomichanRecord? right) => left?.Equals(right) ?? right is null;
+    public static bool operator !=(EpwingYomichanRecord? left, EpwingYomichanRecord? right) => !left?.Equals(right) ?? right is not null;
 }
