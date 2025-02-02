@@ -1067,12 +1067,6 @@
                                 <CheckBox x:Name="CheckForDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
-                            <DockPanel Margin="0,10,0,0">
-                                <TextBlock HorizontalAlignment="Left" Text="Notify when mining succeeds"
-                                           Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
-                                <CheckBox x:Name="NotifyWhenMiningSucceedsCheckBox"  HorizontalAlignment="Right" />
-                            </DockPanel>
-
                             <TabControl Margin="0,10,0,0">
                                 <TabControl.Resources>
                                     <Style TargetType="{x:Type TabPanel}">
@@ -1737,6 +1731,12 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />
                             <CheckBox x:Name="StripPunctuationBeforeCalculatingCharacterCountCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel Margin="0,10,0,0">
+                            <TextBlock HorizontalAlignment="Left" Text="Notify when mining succeeds"
+                                           Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                            <CheckBox x:Name="NotifyWhenMiningSucceedsCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel Margin="0,10,0,0">
