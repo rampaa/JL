@@ -36,35 +36,26 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
                 : string.Join("; ", Definitions[0]);
         }
 
-        bool newlines = options.NewlineBetweenDefinitions!.Value;
-
-        char separator = newlines
+        char separator = options.NewlineBetweenDefinitions!.Value
             ? '\n'
             : '；';
 
         StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)
         {
-            string[] definitions = Definitions[i];
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
 
-            if (newlines)
-            {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
-            }
-
+            // TODO: Check if it can evaluate to false
             if (NameTypes.Length >= i)
             {
                 string[] nameTypes = NameTypes[i];
                 if (nameTypes.Length > 1 || !nameTypes.Contains("unclass"))
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", nameTypes)}) ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", nameTypes)}] ");
                 }
             }
 
-            if (!newlines)
-            {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
-            }
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])}");
 
             // if (showRelatedTerms)
             // {
@@ -74,8 +65,6 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             //         _ = defResult.Append("(related terms: {string.Join(", ", relatedTerms)}) ");
             //     }
             // }
-
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)}");
 
             if (i + 1 != Definitions.Length)
             {

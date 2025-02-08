@@ -33,31 +33,23 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         if (Definitions.Length is 1)
         {
             return definitionTagsExist
-                ? $"({DefinitionTags![0]}) {Definitions[0]}"
+                ? $"[{DefinitionTags![0]}] {Definitions[0]}"
                 : Definitions[0];
         }
 
-        bool newlines = options.NewlineBetweenDefinitions!.Value;
-        char separator = newlines
+        char separator = options.NewlineBetweenDefinitions!.Value
             ? '\n'
             : '；';
 
         StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)
         {
-            if (newlines)
-            {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
-            }
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
 
+            // TODO: Check if DefinitionTags!.Length > i can be false when definitionTagsExist is true
             if (definitionTagsExist && DefinitionTags!.Length > i)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({DefinitionTags[i]}) ");
-            }
-
-            if (!newlines)
-            {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{DefinitionTags[i]}] ");
             }
 
             _ = defResult.Append(Definitions[i]);

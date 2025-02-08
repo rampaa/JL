@@ -25,6 +25,6 @@ internal sealed class KanjidicRecord(
     {
         return Definitions is null
             ? null
-            : string.Join(", ", Definitions);
+            : string.Join('；', Definitions);
     }
 }

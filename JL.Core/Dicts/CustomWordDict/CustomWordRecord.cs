@@ -49,33 +49,17 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
 
         if (Definitions.Length is 1)
         {
-            return $"({tempWordClass}) {Definitions[0]}";
+            return $"[{tempWordClass}] {Definitions[0]}";
         }
 
-        bool newlines = options.NewlineBetweenDefinitions!.Value;
-
-        StringBuilder defResult = new();
-
-        char separator = newlines
+        char separator = options.NewlineBetweenDefinitions!.Value
             ? '\n'
             : '；';
 
+        StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)
         {
-            if (newlines)
-            {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
-            }
-
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"({tempWordClass}) ");
-
-            if (!newlines)
-            {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
-            }
-
-            _ = defResult.Append(Definitions[i]);
-
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. [{tempWordClass}] {Definitions[i]}");
             if (i + 1 != Definitions.Length)
             {
                 _ = defResult.Append(separator);
