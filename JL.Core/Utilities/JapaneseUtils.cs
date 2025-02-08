@@ -595,19 +595,21 @@ public static partial class JapaneseUtils
 
             if (hasKatakana)
             {
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{segment} [{reading[index..(index + segment.Length)]}]");
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{segment}[{reading[index..(index + segment.Length)]}]");
             }
             else
             {
                 _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{segment} ");
             }
 
-            currentReadingPosition = index + segment.Length + 1;
+            currentReadingPosition = index + segment.Length;
 
             if (i + 2 == primarySpellingSegments.Count)
             {
                 _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{primarySpellingSegments[i + 1]}[{reading[currentReadingPosition..]}]");
             }
+
+            ++currentReadingPosition;
         }
 
         return stringBuilder.ToString();
