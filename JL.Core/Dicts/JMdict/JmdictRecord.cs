@@ -136,7 +136,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", FieldsSharedByAllSenses!)}] ");
             }
 
-            if (newlines)
+            if (multipleDefinitions && newlines)
             {
                 _ = defResult.Replace(" ", "\n", defResult.Length - 1, 1);
             }
@@ -144,49 +144,44 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
         for (int i = 0; i < Definitions.Length; i++)
         {
-            if (newlines && multipleDefinitions)
+            if (multipleDefinitions)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
-            }
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
 
-            if (showWordClassInfo)
-            {
-                string[]? wordClasses = WordClasses![i];
-                if (wordClasses is not null)
+                if (showWordClassInfo)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", wordClasses)}) ");
+                    string[]? wordClasses = WordClasses![i];
+                    if (wordClasses is not null)
+                    {
+                        _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", wordClasses)}] ");
+                    }
                 }
-            }
 
-            if (!newlines && multipleDefinitions)
-            {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
-            }
-
-            if (showMiscInfo)
-            {
-                string[]? misc = Misc![i];
-                if (misc is not null)
+                if (showMiscInfo)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", misc)}) ");
+                    string[]? misc = Misc![i];
+                    if (misc is not null)
+                    {
+                        _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", misc)}] ");
+                    }
                 }
-            }
 
-            if (showDialectInfo)
-            {
-                string[]? dialects = Dialects![i];
-                if (dialects is not null)
+                if (showDialectInfo)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", dialects)}) ");
+                    string[]? dialects = Dialects![i];
+                    if (dialects is not null)
+                    {
+                        _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", dialects)}] ");
+                    }
                 }
-            }
 
-            if (showFieldsInfo)
-            {
-                string[]? fields = Fields![i];
-                if (fields is not null)
+                if (showFieldsInfo)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", fields)}) ");
+                    string[]? fields = Fields![i];
+                    if (fields is not null)
+                    {
+                        _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", fields)}] ");
+                    }
                 }
             }
 

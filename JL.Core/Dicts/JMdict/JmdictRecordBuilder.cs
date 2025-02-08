@@ -94,7 +94,7 @@ internal static class JmdictRecordBuilder
 
                     if ((sense.StagKList.Count is 0 && sense.StagRList.Count is 0)
                         || sense.StagKList.Contains(kanjiElement.Keb)
-                        || sense.StagRList.Intersect(readingList).Any())
+                        || sense.StagRList.Any(readingList.Contains))
                     {
                         definitionList.Add(sense.GlossList.ToArray());
                         wordClassList.Add(sense.PosList.ToArray());
@@ -110,10 +110,10 @@ internal static class JmdictRecordBuilder
                     }
                 }
 
-                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetWordClasses(wordClassList);
-                (string[]?[]? exclusiveMiscValues, string[]? miscValuesSharedByAllSenses) = GetSenseFields(miscList);
-                (string[]?[]? exclusiveFieldValues, string[]? fieldValuesSharedByAllSenses) = GetSenseFields(fieldList);
-                (string[]?[]? exclusiveDialectValues, string[]? dialectValuesSharedByAllSenses) = GetSenseFields(dialectList);
+                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetExclusiveAndSharedValuesForNonNullableSenseField(wordClassList);
+                (string[]?[]? exclusiveMiscValues, string[]? miscValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(miscList);
+                (string[]?[]? exclusiveFieldValues, string[]? fieldValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(fieldList);
+                (string[]?[]? exclusiveDialectValues, string[]? dialectValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(dialectList);
 
                 JmdictRecord record = new(entry.Id,
                     kanjiElement.Keb,
@@ -235,8 +235,7 @@ internal static class JmdictRecordBuilder
                     if ((sense.StagKList.Count is 0 && sense.StagRList.Count is 0)
                         || sense.StagRList.Contains(readingElement.Reb)
                         || sense.StagKList.Contains(primarySpelling)
-                        || (alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any())
-                        )
+                        || (alternativeSpellings is not null && sense.StagKList.Any(alternativeSpellings.Contains)))
                     {
                         definitionList.Add(sense.GlossList.ToArray());
                         wordClassList.Add(sense.PosList.ToArray());
@@ -252,10 +251,10 @@ internal static class JmdictRecordBuilder
                     }
                 }
 
-                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetWordClasses(wordClassList);
-                (string[]?[]? exclusiveMiscValues, string[]? miscValuesSharedByAllSenses) = GetSenseFields(miscList);
-                (string[]?[]? exclusiveFieldValues, string[]? fieldValuesSharedByAllSenses) = GetSenseFields(fieldList);
-                (string[]?[]? exclusiveDialectValues, string[]? dialectValuesSharedByAllSenses) = GetSenseFields(dialectList);
+                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetExclusiveAndSharedValuesForNonNullableSenseField(wordClassList);
+                (string[]?[]? exclusiveMiscValues, string[]? miscValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(miscList);
+                (string[]?[]? exclusiveFieldValues, string[]? fieldValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(fieldList);
+                (string[]?[]? exclusiveDialectValues, string[]? dialectValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(dialectList);
 
                 JmdictRecord record = new(entry.Id,
                     primarySpelling,
@@ -309,83 +308,92 @@ internal static class JmdictRecordBuilder
         }
     }
 
-    private static (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) GetWordClasses(List<string[]> wordClasses)
+    private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNonNullableSenseField(List<string[]> senseField)
     {
-        if (wordClasses.Count is 1)
+        if (senseField.Count is 0)
         {
-            return (wordClasses.TrimToArray(), null);
+            return (null, null);
         }
 
-        List<string>?[] exclusiveWordClassesList = new List<string>?[wordClasses.Count];
-        List<string> wordClassesSharedByAllSensesList = [];
-
-        for (int i = 0; i < wordClasses.Count; i++)
+        if (senseField.Count is 1)
         {
-            string[] wordClassInfo = wordClasses[i];
-            for (int j = 0; j < wordClassInfo.Length; j++)
+            return (null, senseField[0]);
+        }
+
+        List<string>?[] exclusiveSenseFieldValues = new List<string>?[senseField.Count];
+        List<string> senseFieldValuesSharedByAllSenses = [];
+
+        for (int i = 0; i < senseField.Count; i++)
+        {
+            string[] senseFieldValue = senseField[i];
+            for (int j = 0; j < senseFieldValue.Length; j++)
             {
-                string wordClass = wordClassInfo[j];
-                if (wordClasses.All(wc => wc.Contains(wordClass)))
+                string value = senseFieldValue[j];
+                if (senseField.All(wc => wc.Contains(value)))
                 {
-                    if (!wordClassesSharedByAllSensesList.Contains(wordClass))
+                    if (!senseFieldValuesSharedByAllSenses.Contains(value))
                     {
-                        wordClassesSharedByAllSensesList.Add(wordClass);
+                        senseFieldValuesSharedByAllSenses.Add(value);
                     }
                 }
                 else
                 {
-                    exclusiveWordClassesList[i] ??= [];
-                    exclusiveWordClassesList[i]!.Add(wordClass);
+                    exclusiveSenseFieldValues[i] ??= [];
+                    exclusiveSenseFieldValues[i]!.Add(value);
                 }
             }
         }
 
-        return wordClassesSharedByAllSensesList.Count is 0
-            ? (wordClasses.TrimToArray(), null)
-            : exclusiveWordClassesList.All(static ewc => ewc is null)
-                ? (null, wordClassesSharedByAllSensesList.TrimToArray())
-                : (exclusiveWordClassesList.Select(static ewc => ewc?.TrimToArray()).ToArray(), wordClassesSharedByAllSensesList.TrimToArray());
+        return senseFieldValuesSharedByAllSenses.Count is 0
+            ? (senseField.TrimToArray(), null)
+            : exclusiveSenseFieldValues.All(static ewc => ewc is null)
+                ? (null, senseFieldValuesSharedByAllSenses.TrimToArray())
+                : (exclusiveSenseFieldValues.Select(static ewc => ewc?.TrimToArray()).ToArray(), senseFieldValuesSharedByAllSenses.TrimToArray());
     }
 
-    private static (string[]?[]? exclusiveSenseFieldValues, string[]? fieldValuesSharedByAllSenses) GetSenseFields(List<string[]?> senseField)
+    private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNullableSenseField(List<string[]?> senseField)
     {
+        if (senseField.Count is 0)
+        {
+            return (null, null);
+        }
+
         if (senseField.Count is 1)
         {
-            return (senseField.TrimListOfNullableElementsToArray(), null);
+            return (null, senseField[0]);
         }
 
         List<string>?[] exclusiveSenseFieldValues = new List<string>?[senseField.Count];
-        List<string> fieldValuesSharedByAllSenses = [];
-
+        List<string> senseFieldValuesSharedByAllSenses = [];
 
         for (int i = 0; i < senseField.Count; i++)
         {
-            string[]? wordClassInfo = senseField[i];
-            if (wordClassInfo is not null)
+            string[]? senseFieldValue = senseField[i];
+            if (senseFieldValue is not null)
             {
-                for (int j = 0; j < wordClassInfo.Length; j++)
+                for (int j = 0; j < senseFieldValue.Length; j++)
                 {
-                    string wordClass = wordClassInfo[j];
-                    if (senseField.All(wc => wc?.Contains(wordClass) ?? false))
+                    string value = senseFieldValue[j];
+                    if (senseField.All(wc => wc?.Contains(value) ?? false))
                     {
-                        if (!fieldValuesSharedByAllSenses.Contains(wordClass))
+                        if (!senseFieldValuesSharedByAllSenses.Contains(value))
                         {
-                            fieldValuesSharedByAllSenses.Add(wordClass);
+                            senseFieldValuesSharedByAllSenses.Add(value);
                         }
                     }
                     else
                     {
                         exclusiveSenseFieldValues[i] ??= [];
-                        exclusiveSenseFieldValues[i]!.Add(wordClass);
+                        exclusiveSenseFieldValues[i]!.Add(value);
                     }
                 }
             }
         }
 
-        return fieldValuesSharedByAllSenses.Count is 0
+        return senseFieldValuesSharedByAllSenses.Count is 0
             ? (senseField.TrimListOfNullableElementsToArray(), null)
             : exclusiveSenseFieldValues.All(static ewc => ewc is null)
-                ? (null, fieldValuesSharedByAllSenses.TrimToArray())
-                : (exclusiveSenseFieldValues.Select(static ewc => ewc?.TrimToArray()).ToArray(), fieldValuesSharedByAllSenses.TrimToArray());
+                ? (null, senseFieldValuesSharedByAllSenses.TrimToArray())
+                : (exclusiveSenseFieldValues.Select(static ewc => ewc?.TrimToArray()).ToArray(), senseFieldValuesSharedByAllSenses.TrimToArray());
     }
 }
