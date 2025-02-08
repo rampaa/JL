@@ -39,7 +39,7 @@ internal static class PopupWindowUtils
         };
     }
 
-    public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin)
+    public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin, ContextMenu contextMenu)
     {
         TouchScreenTextBox textBox = new()
         {
@@ -50,6 +50,7 @@ internal static class PopupWindowUtils
             FontSize = fontSize,
             VerticalAlignment = verticalAlignment,
             Margin = margin,
+            ContextMenu = contextMenu,
             HorizontalAlignment = HorizontalAlignment.Left,
             Background = Brushes.Transparent,
             Cursor = Cursors.Arrow,

@@ -868,32 +868,6 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Mine button"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
-                            <ComboBox x:Name="MineMouseButtonComboBox" HorizontalAlignment="Right"
-                                      SelectedValuePath="Tag" Width="250">
-                                <ComboBoxItem Content="Left button" Tag="Left" />
-                                <ComboBoxItem Content="Middle button" Tag="Middle" />
-                                <ComboBoxItem Content="Back button" Tag="XButton1" />
-                                <ComboBoxItem Content="Forward button" Tag="XButton2" />
-                            </ComboBox>
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Copy primary spelling button"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
-                            <ComboBox x:Name="CopyPrimarySpellingToClipboardMouseButtonComboBox" HorizontalAlignment="Right"
-                                      SelectedValuePath="Tag" Width="250">
-                                <ComboBoxItem Content="Left button" Tag="Left" />
-                                <ComboBoxItem Content="Middle button" Tag="Middle" />
-                                <ComboBoxItem Content="Back button" Tag="XButton1" />
-                                <ComboBoxItem Content="Forward button" Tag="XButton2" />
-                            </ComboBox>
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Primary spelling color"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />

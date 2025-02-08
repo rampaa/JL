@@ -46,6 +46,13 @@ public static partial class JapaneseUtils
     [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD82C[\uDC00-\uDD6F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD868][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]|\uD869[\uDF00-\uDFFF]|[\uD86A-\uD87A][\uDC00-\uDFFF]|\uD87B[\uDC00-\uDE5F]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]", RegexOptions.CultureInvariant)]
     public static partial Regex JapaneseRegex { get; }
 
+    // Hiragana (3040–309F)
+    // Katakana (30A0–30FF)
+    // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included in the regex.
+    [GeneratedRegex(@"[\u3040-\u31FF]", RegexOptions.CultureInvariant)]
+    public static partial Regex KanaRegex { get; }
+
+
     private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new Dictionary<char, string>(87)
     {
         #pragma warning disable format
@@ -463,5 +470,231 @@ public static partial class JapaneseUtils
         }
 
         return sb.ToString();
+    }
+
+    public static string GetPrimarySpellingAndReadingMapping(string primarySpelling, string reading)
+    {
+        if (!KanaRegex.IsMatch(primarySpelling))
+        {
+            return $"{primarySpelling}[{reading}]";
+        }
+
+        List<string> primarySpellingSegments = new(primarySpelling.Length);
+        bool wasKana = true;
+        foreach (Rune rune in primarySpelling.EnumerateRunes())
+        {
+            string runeAsString = rune.ToString();
+            bool isKana = KanaRegex.IsMatch(runeAsString);
+            if (primarySpellingSegments.Count is 0 || wasKana != isKana)
+            {
+                wasKana = isKana;
+                primarySpellingSegments.Add(runeAsString);
+            }
+            else
+            {
+                primarySpellingSegments[^1] += runeAsString;
+            }
+        }
+
+        string? result = GetPrimarySpellingAndReadingMapping(primarySpellingSegments, reading);
+        return result ?? $"{primarySpelling}[{reading}]";
+    }
+
+    private static string? GetPrimarySpellingAndReadingMapping(List<string> primarySpellingSegments, string reading)
+    {
+        StringBuilder stringBuilder = new();
+
+        bool firstSegmentIsKana = KanaRegex.IsMatch(primarySpellingSegments[0]);
+        int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
+        for (int i = currentReadingPosition; i < primarySpellingSegments.Count; i += 2)
+        {
+            string segment = primarySpellingSegments[i];
+            int searchLength = reading.Length - currentReadingPosition - primarySpellingSegments.Count + i + 1;
+            if (searchLength < 0)
+            {
+                searchLength = reading.Length - currentReadingPosition;
+            }
+
+            List<int> indexes = reading.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segment);
+            bool hasKatakana = false;
+            int index = -1;
+            if (indexes.Count is 0)
+            {
+                string readingInHiragana = KatakanaToHiragana(reading);
+                if (readingInHiragana.Length != reading.Length)
+                {
+                    return null;
+                }
+                string segmentInHiragana = KatakanaToHiragana(segment);
+                if (segmentInHiragana.Length != segment.Length)
+                {
+                    return null;
+                }
+
+                indexes = readingInHiragana.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segmentInHiragana);
+                hasKatakana = true;
+            }
+
+            if (indexes.Count is 0)
+            {
+                return null;
+            }
+
+            if (indexes.Count == 1)
+            {
+                index = indexes[0];
+            }
+            else
+            {
+                for (int j = 0; j < indexes.Count; j++)
+                {
+                    int currentIndex = indexes[j];
+                    if (currentIndex is 0 && i is 0)
+                    {
+                        index = 0;
+                        break;
+                    }
+
+                    if (i + 1 == primarySpellingSegments.Count)
+                    {
+                        if (currentIndex + segment.Length == reading.Length)
+                        {
+                            index = currentIndex;
+                            break;
+                        }
+                    }
+                    else if (i + 2 < primarySpellingSegments.Count)
+                    {
+                        bool unambiguous = IsPrimarySpellingAndReadingMappingUnambiguous(primarySpellingSegments[(i + 2)..], reading[(currentIndex + segment.Length + 1)..]);
+                        if (unambiguous)
+                        {
+                            if (index >= 0)
+                            {
+                                return null;
+                            }
+
+                            index = currentIndex;
+                        }
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            if (index < 0)
+            {
+                return null;
+            }
+
+            if (i > 0)
+            {
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{primarySpellingSegments[i - 1]}[{reading[(currentReadingPosition - 1)..index]}]");
+            }
+
+            if (hasKatakana)
+            {
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{segment} [{reading[index..(index + segment.Length)]}]");
+            }
+            else
+            {
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{segment} ");
+            }
+
+            currentReadingPosition = index + segment.Length + 1;
+
+            if (i + 2 == primarySpellingSegments.Count)
+            {
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{primarySpellingSegments[i + 1]}[{reading[currentReadingPosition..]}]");
+            }
+        }
+
+        return stringBuilder.ToString();
+    }
+
+    private static bool IsPrimarySpellingAndReadingMappingUnambiguous(List<string> primarySpellingSegments, string reading)
+    {
+        bool firstSegmentIsKana = KanaRegex.IsMatch(primarySpellingSegments[0]);
+        int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
+        for (int i = currentReadingPosition; i < primarySpellingSegments.Count; i += 2)
+        {
+            string segment = primarySpellingSegments[i];
+            int searchLength = reading.Length - currentReadingPosition - primarySpellingSegments.Count + i + 1;
+            if (searchLength < 0)
+            {
+                searchLength = reading.Length - currentReadingPosition;
+            }
+
+            List<int> indexes = reading.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segment);
+            int index = -1;
+            if (indexes.Count is 0)
+            {
+                string readingInHiragana = KatakanaToHiragana(reading);
+                if (readingInHiragana.Length != reading.Length)
+                {
+                    return false;
+                }
+                string segmentInHiragana = KatakanaToHiragana(segment);
+                if (segmentInHiragana.Length != segment.Length)
+                {
+                    return false;
+                }
+
+                indexes = readingInHiragana.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segmentInHiragana);
+            }
+
+            if (indexes.Count is 0)
+            {
+                return false;
+            }
+
+            if (indexes.Count == 1)
+            {
+                index = indexes[0];
+            }
+            else
+            {
+                for (int j = 0; j < indexes.Count; j++)
+                {
+                    int currentIndex = indexes[j];
+                    if (currentIndex is 0 && i is 0)
+                    {
+                        index = 0;
+                        break;
+                    }
+
+                    if (i + 1 == primarySpellingSegments.Count)
+                    {
+                        if (currentIndex + segment.Length == reading.Length)
+                        {
+                            index = currentIndex;
+                            break;
+                        }
+                    }
+                    else if (i + 2 < primarySpellingSegments.Count)
+                    {
+                        bool unambiguous = IsPrimarySpellingAndReadingMappingUnambiguous(primarySpellingSegments[(i + 2)..], reading[(currentIndex + segment.Length + 1)..]);
+                        if (unambiguous)
+                        {
+                            if (index >= 0)
+                            {
+                                return false;
+                            }
+
+                            index = currentIndex;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            currentReadingPosition = index + segment.Length + 1;
+        }
+
+        return true;
     }
 }

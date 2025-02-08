@@ -55,7 +55,7 @@
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
                   HorizontalContentAlignment="Stretch" MouseLeave="PopupListView_MouseLeave" ScrollViewer.PanningMode="VerticalFirst"
-                  Background="Transparent"
+                  Background="Transparent" PreviewMouseWheel="PopupListView_PreviewMouseWheel"
                   x:Name="PopupListView">
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">

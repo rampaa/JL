@@ -112,7 +112,7 @@ internal sealed partial class PopupWindow
         if (configManager.ShowMiningModeReminder)
         {
             TextBlockMiningModeReminder.Text = string.Create(CultureInfo.InvariantCulture,
-                $"Click on an entry's main spelling to mine it,\nor press {configManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
+                $"Click on the ➕ button to mine,\nor press {configManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
             TextBlockMiningModeReminder.ToolTip = "This message can be hidden by disabling Preferences->Popup->Show mining mode reminder";
             TextBlockMiningModeReminder.Cursor = Cursors.Help;
         }
@@ -522,7 +522,7 @@ internal sealed partial class PopupWindow
         bool showAOrthographyInfo = jmdict.Options.AOrthographyInfo!.Value;
         double pOrthographyInfoFontSize = jmdict.Options.POrthographyInfoFontSize!.Value;
 
-        TextBlock[]? duplicateIcons;
+        Button[]? duplicateIcons;
         int resultCount;
         bool checkForDuplicateCards;
         if (MiningMode)
@@ -530,7 +530,7 @@ internal sealed partial class PopupWindow
             resultCount = LastLookupResults.Length;
             checkForDuplicateCards = coreConfigManager is { CheckForDuplicateCards: true, AnkiIntegration: true } && !configManager.MineToFileInsteadOfAnki;
             duplicateIcons = checkForDuplicateCards
-                ? new TextBlock[LastLookupResults.Length]
+                ? new Button[LastLookupResults.Length]
                 : null;
         }
         else
@@ -565,7 +565,7 @@ internal sealed partial class PopupWindow
         UpdateLayout();
     }
 
-    private void AddEventHandlersToTextBox(TextBox textBox)
+    private void AddEventHandlersToTextBox(FrameworkElement textBox)
     {
         textBox.PreviewMouseUp += TextBox_PreviewMouseUp;
         textBox.MouseMove += TextBox_MouseMove;
@@ -585,7 +585,7 @@ internal sealed partial class PopupWindow
         textBox.PreviewMouseLeftButtonDown += DefinitionsTextBox_PreviewMouseLeftButtonDown;
     }
 
-    private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultCount, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize, TextBlock[]? duplicateIcons)
+    private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultCount, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize, Button[]? miningButtons)
     {
         // top
         WrapPanel top = new()
@@ -595,14 +595,29 @@ internal sealed partial class PopupWindow
 
         ConfigManager configManager = ConfigManager.Instance;
 
-        TextBlock primarySpellingTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpelling),
+        FrameworkElement primarySpellingFrameworkElement;
+        if (MiningMode)
+        {
+            primarySpellingFrameworkElement = PopupWindowUtils.CreateTextBox(nameof(result.PrimarySpelling),
+            result.PrimarySpelling,
+            configManager.PrimarySpellingColor,
+            configManager.PrimarySpellingFontSize,
+            VerticalAlignment.Center,
+            new Thickness(2, 0, 0, 0),
+            PopupContextMenu);
+
+            AddEventHandlersToTextBox(primarySpellingFrameworkElement);
+        }
+        else
+        {
+            primarySpellingFrameworkElement = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpelling),
             result.PrimarySpelling,
             configManager.PrimarySpellingColor,
             configManager.PrimarySpellingFontSize,
             VerticalAlignment.Center,
             new Thickness(2, 0, 0, 0));
+        }
 
-        primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
         bool pitchPositionsExist = result.PitchPositions is not null;
 
         if (result.Readings is null && pitchPositionsExist)
@@ -610,29 +625,30 @@ internal sealed partial class PopupWindow
             Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                 null,
                 null,
-                primarySpellingTextBlock.Margin.Left,
+                primarySpellingFrameworkElement.Margin.Left,
                 result.PitchPositions!);
 
             if (pitchAccentGrid.Children.Count is 0)
             {
-                _ = top.Children.Add(primarySpellingTextBlock);
+                _ = top.Children.Add(primarySpellingFrameworkElement);
             }
 
             else
             {
-                _ = pitchAccentGrid.Children.Add(primarySpellingTextBlock);
+                _ = pitchAccentGrid.Children.Add(primarySpellingFrameworkElement);
                 _ = top.Children.Add(pitchAccentGrid);
             }
         }
         else
         {
-            _ = top.Children.Add(primarySpellingTextBlock);
+            _ = top.Children.Add(primarySpellingFrameworkElement);
         }
 
-        if (showPOrthographyInfo && result.PrimarySpellingOrthographyInfoList is not null)
+        JmdictLookupResult? jmdictLookupResult = result.JmdictLookupResult;
+        if (showPOrthographyInfo && jmdictLookupResult?.PrimarySpellingOrthographyInfoList is not null)
         {
-            TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpellingOrthographyInfoList),
-                $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})",
+            TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(jmdictLookupResult.PrimarySpellingOrthographyInfoList),
+                $"({string.Join(", ", jmdictLookupResult.PrimarySpellingOrthographyInfoList)})",
                 DictOptionManager.POrthographyInfoColor,
                 pOrthographyInfoFontSize,
                 VerticalAlignment.Center,
@@ -642,10 +658,10 @@ internal sealed partial class PopupWindow
         }
 
         if (result.Readings is not null && configManager.ReadingsFontSize > 0
-                                        && (pitchPositionsExist || (result.KunReadings is null && result.OnReadings is null)))
+                                        && (pitchPositionsExist || result.KanjiLookupResult is null || (result.KanjiLookupResult.KunReadings is null && result.KanjiLookupResult.OnReadings is null)))
         {
-            string readingsText = showROrthographyInfo && result.ReadingsOrthographyInfoList is not null
-                ? LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, result.ReadingsOrthographyInfoList)
+            string readingsText = showROrthographyInfo && jmdictLookupResult?.ReadingsOrthographyInfoList is not null
+                ? LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, jmdictLookupResult.ReadingsOrthographyInfoList)
                 : string.Join('、', result.Readings);
 
             if (MiningMode)
@@ -654,7 +670,8 @@ internal sealed partial class PopupWindow
                     readingsText, configManager.ReadingsColor,
                     configManager.ReadingsFontSize,
                     VerticalAlignment.Center,
-                    new Thickness(5, 0, 0, 0));
+                    new Thickness(5, 0, 0, 0),
+                    PopupContextMenu);
 
                 if (pitchPositionsExist)
                 {
@@ -727,8 +744,10 @@ internal sealed partial class PopupWindow
                 Content = "🔊",
                 Foreground = configManager.DefinitionsColor,
                 VerticalAlignment = VerticalAlignment.Top,
+                // VerticalContentAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(3, 0, 0, 0),
                 HorizontalAlignment = HorizontalAlignment.Left,
+                // HorizontalContentAlignment = HorizontalAlignment.Left,
                 Background = Brushes.Transparent,
                 Cursor = Cursors.Arrow,
                 BorderThickness = new Thickness(0),
@@ -743,8 +762,8 @@ internal sealed partial class PopupWindow
 
         if (result.AlternativeSpellings is not null && configManager.AlternativeSpellingsFontSize > 0)
         {
-            string alternativeSpellingsText = showAOrthographyInfo && result.AlternativeSpellingsOrthographyInfoList is not null
-                ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
+            string alternativeSpellingsText = showAOrthographyInfo && result.JmdictLookupResult?.AlternativeSpellingsOrthographyInfoList is not null
+                ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, result.JmdictLookupResult.AlternativeSpellingsOrthographyInfoList)
                 : $"({string.Join('、', result.AlternativeSpellings)})";
 
             if (MiningMode)
@@ -754,7 +773,8 @@ internal sealed partial class PopupWindow
                     configManager.AlternativeSpellingsColor,
                     configManager.AlternativeSpellingsFontSize,
                     VerticalAlignment.Center,
-                    new Thickness(5, 0, 0, 0));
+                    new Thickness(5, 0, 0, 0),
+                    PopupContextMenu);
 
                 AddEventHandlersToTextBox(alternativeSpellingsTexBox);
 
@@ -782,7 +802,8 @@ internal sealed partial class PopupWindow
                     configManager.DeconjugationInfoColor,
                     configManager.DeconjugationInfoFontSize,
                     VerticalAlignment.Top,
-                    new Thickness(5, 0, 0, 0));
+                    new Thickness(5, 0, 0, 0),
+                    PopupContextMenu);
 
                 AddEventHandlersToTextBox(deconjugationProcessTextBox);
 
@@ -831,28 +852,33 @@ internal sealed partial class PopupWindow
             _ = top.Children.Add(dictTypeTextBlock);
         }
 
-        // Keep this at the bottom
-        if (duplicateIcons is not null)
+        if (MiningMode)
         {
-            TextBlock duplicateIconTextBlock = new()
+            Button miningButton = new()
             {
-                Name = nameof(duplicateIconTextBlock),
-                Text = "⚠",
+                Name = nameof(miningButton),
+                Content = '➕',
+                ToolTip = "Mine",
                 Foreground = configManager.DefinitionsColor,
-                FontSize = 14,
                 VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(7, 0, 0, 0),
+                VerticalContentAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(3, 0, 0, 0),
                 HorizontalAlignment = HorizontalAlignment.Left,
+                HorizontalContentAlignment = HorizontalAlignment.Left,
                 Background = Brushes.Transparent,
                 Cursor = Cursors.Arrow,
-                TextWrapping = TextWrapping.NoWrap,
+                BorderThickness = new Thickness(0),
                 Padding = new Thickness(0),
-                ToolTip = $"{result.PrimarySpelling} is already in the Anki deck",
-                Visibility = Visibility.Hidden
+                FontSize = 12
             };
 
-            _ = top.Children.Add(duplicateIconTextBlock);
-            duplicateIcons[index] = duplicateIconTextBlock;
+            miningButton.PreviewMouseUp += MiningButton_PreviewMouseUp;
+            _ = top.Children.Add(miningButton);
+
+            if (miningButtons is not null)
+            {
+                miningButtons[index] = miningButton;
+            }
         }
 
         // bottom
@@ -867,7 +893,8 @@ internal sealed partial class PopupWindow
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
                     VerticalAlignment.Center,
-                    new Thickness(0, 2, 2, 2));
+                    new Thickness(0, 2, 2, 2),
+                    PopupContextMenu);
 
                 AddEventHandlersToDefinitionsTextBox(definitionsTextBox);
                 _ = bottom.Children.Add(definitionsTextBox);
@@ -886,202 +913,211 @@ internal sealed partial class PopupWindow
             }
         }
 
-        // KANJIDIC
-        if (result.OnReadings is not null)
+        KanjiLookupResult? kanjiLookupResult = result.KanjiLookupResult;
+        if (kanjiLookupResult is not null)
         {
-            if (MiningMode)
+            if (kanjiLookupResult.OnReadings is not null)
             {
-                TextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.OnReadings),
-                    $"On: {string.Join('、', result.OnReadings)}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(0, 2, 2, 2));
+                if (MiningMode)
+                {
+                    TextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.OnReadings),
+                        $"On: {string.Join('、', kanjiLookupResult.OnReadings)}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(0, 2, 2, 2),
+                        PopupContextMenu);
 
-                AddEventHandlersToTextBox(onReadingsTextBox);
+                    AddEventHandlersToTextBox(onReadingsTextBox);
 
-                _ = bottom.Children.Add(onReadingsTextBox);
+                    _ = bottom.Children.Add(onReadingsTextBox);
+                }
+
+                else
+                {
+                    TextBlock onReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.OnReadings),
+                        $"On: {string.Join('、', kanjiLookupResult.OnReadings)}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(2));
+
+                    _ = bottom.Children.Add(onReadingsTextBlock);
+                }
             }
 
-            else
+            if (kanjiLookupResult.KunReadings is not null)
             {
-                TextBlock onReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.OnReadings),
-                    $"On: {string.Join('、', result.OnReadings)}",
+                if (MiningMode)
+                {
+                    TextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.KunReadings),
+                        $"Kun: {string.Join('、', kanjiLookupResult.KunReadings)}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(0, 2, 2, 2),
+                        PopupContextMenu);
+
+                    AddEventHandlersToTextBox(kunReadingsTextBox);
+
+                    _ = bottom.Children.Add(kunReadingsTextBox);
+                }
+
+                else
+                {
+                    TextBlock kunReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KunReadings),
+                        $"Kun: {string.Join('、', kanjiLookupResult.KunReadings)}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(2));
+
+                    _ = bottom.Children.Add(kunReadingsTextBlock);
+                }
+            }
+
+            if (kanjiLookupResult.NanoriReadings is not null)
+            {
+                if (MiningMode)
+                {
+                    TextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.NanoriReadings),
+                        $"Nanori: {string.Join('、', kanjiLookupResult.NanoriReadings)}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(0, 2, 2, 2),
+                        PopupContextMenu);
+
+                    AddEventHandlersToTextBox(nanoriReadingsTextBox);
+
+                    _ = bottom.Children.Add(nanoriReadingsTextBox);
+                }
+
+                else
+                {
+                    TextBlock nanoriReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.NanoriReadings),
+                        $"Nanori: {string.Join('、', kanjiLookupResult.NanoriReadings)}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(2));
+
+                    _ = bottom.Children.Add(nanoriReadingsTextBlock);
+                }
+            }
+
+            if (kanjiLookupResult.RadicalNames is not null)
+            {
+                if (MiningMode)
+                {
+                    TextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.RadicalNames),
+                        $"Radical names: {string.Join('、', kanjiLookupResult.RadicalNames)}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(0, 2, 2, 2),
+                        PopupContextMenu);
+
+                    AddEventHandlersToTextBox(radicalNameTextBox);
+
+                    _ = bottom.Children.Add(radicalNameTextBox);
+                }
+
+                else
+                {
+                    TextBlock radicalNameTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.RadicalNames),
+                        $"Radical names: {string.Join('、', kanjiLookupResult.RadicalNames)}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(2));
+
+                    _ = bottom.Children.Add(radicalNameTextBlock);
+                }
+            }
+
+            if (kanjiLookupResult.KanjiGrade is not byte.MaxValue)
+            {
+                TextBlock gradeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KanjiGrade),
+                    $"Grade: {LookupResultUtils.GradeToText(kanjiLookupResult.KanjiGrade)}",
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
                     VerticalAlignment.Center,
                     new Thickness(2));
 
-                _ = bottom.Children.Add(onReadingsTextBlock);
-            }
-        }
-
-        if (result.KunReadings is not null)
-        {
-            if (MiningMode)
-            {
-                TextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KunReadings),
-                    $"Kun: {string.Join('、', result.KunReadings)}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(0, 2, 2, 2));
-
-                AddEventHandlersToTextBox(kunReadingsTextBox);
-
-                _ = bottom.Children.Add(kunReadingsTextBox);
+                _ = bottom.Children.Add(gradeTextBlock);
             }
 
-            else
+            if (kanjiLookupResult.StrokeCount > 0)
             {
-                TextBlock kunReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KunReadings),
-                    $"Kun: {string.Join('、', result.KunReadings)}",
+                TextBlock strokeCountTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.StrokeCount),
+                    string.Create(CultureInfo.InvariantCulture, $"Stroke count: {kanjiLookupResult.StrokeCount}"),
                     configManager.DefinitionsColor,
                     configManager.DefinitionsFontSize,
                     VerticalAlignment.Center,
                     new Thickness(2));
 
-                _ = bottom.Children.Add(kunReadingsTextBlock);
-            }
-        }
-
-        if (result.NanoriReadings is not null)
-        {
-            if (MiningMode)
-            {
-                TextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.NanoriReadings),
-                    $"Nanori: {string.Join('、', result.NanoriReadings)}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(0, 2, 2, 2));
-
-                AddEventHandlersToTextBox(nanoriReadingsTextBox);
-
-                _ = bottom.Children.Add(nanoriReadingsTextBox);
+                _ = bottom.Children.Add(strokeCountTextBlock);
             }
 
-            else
+            if (kanjiLookupResult.KanjiComposition is not null)
             {
-                TextBlock nanoriReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.NanoriReadings),
-                    $"Nanori: {string.Join('、', result.NanoriReadings)}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(2));
+                if (MiningMode)
+                {
+                    TextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.KanjiComposition),
+                        $"Composition: {kanjiLookupResult.KanjiComposition}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(0, 2, 2, 2),
+                        PopupContextMenu);
 
-                _ = bottom.Children.Add(nanoriReadingsTextBlock);
-            }
-        }
+                    AddEventHandlersToTextBox(compositionTextBox);
 
-        if (result.RadicalNames is not null)
-        {
-            if (MiningMode)
-            {
-                TextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(result.RadicalNames),
-                    $"Radical names: {string.Join('、', result.RadicalNames)}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(0, 2, 2, 2));
+                    _ = bottom.Children.Add(compositionTextBox);
+                }
 
-                AddEventHandlersToTextBox(radicalNameTextBox);
+                else
+                {
+                    TextBlock compositionTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KanjiComposition),
+                        $"Composition: {kanjiLookupResult.KanjiComposition}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(2));
 
-                _ = bottom.Children.Add(radicalNameTextBox);
-            }
-
-            else
-            {
-                TextBlock radicalNameTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.RadicalNames),
-                    $"Radical names: {string.Join('、', result.RadicalNames)}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(2));
-
-                _ = bottom.Children.Add(radicalNameTextBlock);
-            }
-        }
-
-        if (result.KanjiGrade is not byte.MaxValue)
-        {
-            TextBlock gradeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiGrade),
-                $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
-
-            _ = bottom.Children.Add(gradeTextBlock);
-        }
-
-        if (result.StrokeCount > 0)
-        {
-            TextBlock strokeCountTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.StrokeCount),
-                string.Create(CultureInfo.InvariantCulture, $"Stroke count: {result.StrokeCount}"),
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
-
-            _ = bottom.Children.Add(strokeCountTextBlock);
-        }
-
-        if (result.KanjiComposition is not null)
-        {
-            if (MiningMode)
-            {
-                TextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KanjiComposition),
-                    $"Composition: {result.KanjiComposition}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(0, 2, 2, 2));
-
-                AddEventHandlersToTextBox(compositionTextBox);
-
-                _ = bottom.Children.Add(compositionTextBox);
+                    _ = bottom.Children.Add(compositionTextBlock);
+                }
             }
 
-            else
+            if (kanjiLookupResult.KanjiStats is not null)
             {
-                TextBlock compositionTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiComposition),
-                    $"Composition: {result.KanjiComposition}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(2));
+                if (MiningMode)
+                {
+                    TextBox kanjiStatsTextBlock = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.KanjiStats),
+                        $"Statistics:\n{kanjiLookupResult.KanjiStats}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(0, 2, 2, 2),
+                        PopupContextMenu);
 
-                _ = bottom.Children.Add(compositionTextBlock);
-            }
-        }
+                    AddEventHandlersToTextBox(kanjiStatsTextBlock);
 
-        if (result.KanjiStats is not null)
-        {
-            if (MiningMode)
-            {
-                TextBox kanjiStatsTextBlock = PopupWindowUtils.CreateTextBox(nameof(result.KanjiStats),
-                    $"Statistics:\n{result.KanjiStats}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(0, 2, 2, 2));
+                    _ = bottom.Children.Add(kanjiStatsTextBlock);
+                }
 
-                AddEventHandlersToTextBox(kanjiStatsTextBlock);
+                else
+                {
+                    TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KanjiStats),
+                        $"Statistics:\n{kanjiLookupResult.KanjiStats}",
+                        configManager.DefinitionsColor,
+                        configManager.DefinitionsFontSize,
+                        VerticalAlignment.Center,
+                        new Thickness(2));
 
-                _ = bottom.Children.Add(kanjiStatsTextBlock);
-            }
-
-            else
-            {
-                TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiStats),
-                    $"Statistics:\n{result.KanjiStats}",
-                    configManager.DefinitionsColor,
-                    configManager.DefinitionsFontSize,
-                    VerticalAlignment.Center,
-                    new Thickness(2));
-
-                _ = bottom.Children.Add(kanjiStatsTextBlock);
+                    _ = bottom.Children.Add(kanjiStatsTextBlock);
+                }
             }
         }
 
@@ -1113,7 +1149,7 @@ internal sealed partial class PopupWindow
         return stackPanel;
     }
 
-    private async Task CheckResultForDuplicates(TextBlock[] duplicateIcons)
+    private async Task CheckResultForDuplicates(Button[] miningButtons)
     {
         bool[]? duplicateCard = await MiningUtils.CheckDuplicates(LastLookupResults, _currentSourceText, _currentSourceTextCharPosition).ConfigureAwait(true);
         if (duplicateCard is not null)
@@ -1122,7 +1158,9 @@ internal sealed partial class PopupWindow
             {
                 if (duplicateCard[i])
                 {
-                    duplicateIcons[i].Visibility = Visibility.Visible;
+                    Button miningButton = miningButtons[i];
+                    miningButton.Foreground = Brushes.OrangeRed;
+                    miningButton.ToolTip = "Duplicate note";
                 }
             }
         }
@@ -1207,6 +1245,7 @@ internal sealed partial class PopupWindow
             || e.LeftButton is MouseButtonState.Pressed
             || PopupContextMenu.IsVisible
             || ReadingSelectionWindow.IsItVisible()
+            || MiningSelectionWindow.IsItVisible()
             || (configManager.RequireLookupKeyPress
                 && !configManager.LookupKeyKeyGesture.IsPressed()))
         {
@@ -1261,17 +1300,9 @@ internal sealed partial class PopupWindow
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    private async void MiningButton_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        ConfigManager configManager = ConfigManager.Instance;
-        if (e.ChangedButton == configManager.CopyPrimarySpellingToClipboardMouseButton)
-        {
-            WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
-            HidePopup();
-            return;
-        }
-
-        if (!MiningMode || e.ChangedButton != configManager.MineMouseButton)
+        if (!MiningMode || e.ChangedButton is MouseButton.Right)
         {
             return;
         }
@@ -1280,16 +1311,28 @@ internal sealed partial class PopupWindow
         TextBox? definitionsTextBox = GetDefinitionTextBox(listViewItemIndex);
         string? formattedDefinitions = definitionsTextBox?.Text;
         string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
+        string currentSourceText = _currentSourceText;
+        int currentSourceTextCharPosition = _currentSourceTextCharPosition;
+        LookupResult[] lookupResults = LastLookupResults;
 
-        HidePopup();
-
-        if (configManager.MineToFileInsteadOfAnki)
+        LookupResult lookupResult = lookupResults[listViewItemIndex];
+        if (lookupResult.Readings is null)
         {
-            await MiningUtils.MineToFile(LastLookupResults[listViewItemIndex], _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition).ConfigureAwait(false);
+            HidePopup();
+
+            ConfigManager configManager = ConfigManager.Instance;
+            if (configManager.MineToFileInsteadOfAnki)
+            {
+                await MiningUtils.MineToFile(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling).ConfigureAwait(false);
+            }
+            else
+            {
+                await MiningUtils.Mine(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling).ConfigureAwait(false);
+            }
         }
         else
         {
-            await MiningUtils.Mine(LastLookupResults[listViewItemIndex], _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition).ConfigureAwait(false);
+            MiningSelectionWindow.Show(this, lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition);
         }
     }
 
@@ -1673,13 +1716,14 @@ internal sealed partial class PopupWindow
 
                 HidePopup();
 
+                LookupResult lookupResult = LastLookupResults[index];
                 if (configManager.MineToFileInsteadOfAnki)
                 {
-                    await MiningUtils.MineToFile(LastLookupResults[index], _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition).ConfigureAwait(false);
+                    await MiningUtils.MineToFile(LastLookupResults, index, _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition, lookupResult.PrimarySpelling).ConfigureAwait(false);
                 }
                 else
                 {
-                    await MiningUtils.Mine(LastLookupResults[index], _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition).ConfigureAwait(false);
+                    await MiningUtils.Mine(LastLookupResults, index, _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition, lookupResult.PrimarySpelling).ConfigureAwait(false);
                 }
             }
         }
@@ -1844,6 +1888,7 @@ internal sealed partial class PopupWindow
             {
                 if (PopupContextMenu.IsVisible
                     || ReadingSelectionWindow.IsItVisible()
+                    || MiningSelectionWindow.IsItVisible()
                     || AddWordWindow.IsItVisible()
                     || AddNameWindow.IsItVisible())
                 {
@@ -1958,6 +2003,7 @@ internal sealed partial class PopupWindow
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         ReadingSelectionWindow.HideWindow();
+        MiningSelectionWindow.CloseWindow();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (ChildPopupWindow is not null
@@ -2000,6 +2046,7 @@ internal sealed partial class PopupWindow
         }
 
         ReadingSelectionWindow.HideWindow();
+        MiningSelectionWindow.CloseWindow();
 
         if (isFirstPopup && ChildPopupWindow is not null)
         {
@@ -2148,6 +2195,16 @@ internal sealed partial class PopupWindow
         if (configManager.AutoHidePopupIfMouseIsNotOverIt)
         {
             PopupWindowUtils.SetPopupAutoHideTimer();
+        }
+    }
+
+    private void PopupListView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if ((ChildPopupWindow?.IsVisible ?? false)
+            || ReadingSelectionWindow.IsItVisible()
+            || MiningSelectionWindow.IsItVisible())
+        {
+            e.Handled = true;
         }
     }
 

@@ -234,4 +234,17 @@ public static class ExtensionMethods
     //{
     //    return text[..startIndex].LastIndexOf(value);
     //}
+
+    internal static List<int> FindAllIndexes(this ReadOnlySpan<char> text, int startIndex, int length, ReadOnlySpan<char> value)
+    {
+        ReadOnlySpan<char> textToSearch = text.Slice(startIndex, length);
+
+        List<int> indexes = new(textToSearch.Length);
+        for (int i = textToSearch.IndexOf(value); i > -1; i = textToSearch.IndexOf(value, i + 1))
+        {
+            indexes.Add(i + startIndex);
+        }
+
+        return indexes;
+    }
 }

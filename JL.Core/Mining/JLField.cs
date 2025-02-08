@@ -6,11 +6,13 @@ public enum JLField
 {
     // Shared
     Nothing,
+    [Description("Selected Spelling")] SelectedSpelling,
     [Description("Primary Spelling")] PrimarySpelling,
     Readings,
-    [Description("First Reading")] FirstReading,
+    [Description("Selected Reading")] FirstReading,
     Definitions,
-    [Description("Primary Spelling and First Reading")] PrimarySpellingAndFirstReading,
+    [Description("Definitions from Multiple Dictionaries")] DefinitionsFromMultipleDictionaries,
+    [Description("Primary Spelling and Selected Reading")] PrimarySpellingAndFirstReading,
     [Description("Primary Spelling and Readings")] PrimarySpellingAndReadings,
     [Description("Selected Definitions")] SelectedDefinitions,
     [Description("Dictionary Name")] DictionaryName,
@@ -31,9 +33,9 @@ public enum JLField
     [Description("Pitch Accents")] PitchAccents,
     [Description("Pitch Accents (Numeric)")] NumericPitchAccents,
     [Description("Pitch Accent Categories")] PitchAccentCategories,
-    [Description("Pitch Accent for First Reading")] PitchAccentForFirstReading,
-    [Description("Pitch Accent for First Reading (Numeric)")] NumericPitchAccentForFirstReading,
-    [Description("Pitch Accent Category for First Reading")] PitchAccentCategoryForFirstReading,
+    [Description("Pitch Accent for Selected Reading")] PitchAccentForFirstReading,
+    [Description("Pitch Accent for Selected Reading (Numeric)")] NumericPitchAccentForFirstReading,
+    [Description("Pitch Accent Category for Selected Reading")] PitchAccentCategoryForFirstReading,
 
     // JMdict, JMnedict
     [Description("Entry ID")] EdictId,
@@ -41,6 +43,7 @@ public enum JLField
     // Word dictionaries
     [Description("Deconjugated Matched Text")] DeconjugatedMatchedText,
     [Description("Deconjugation Process")] DeconjugationProcess,
+    [Description("Word Classes")] WordClasses,
     // JMdict, Nazeka EPWING
     [Description("Alternative Spellings")] AlternativeSpellings,
     // JMdict

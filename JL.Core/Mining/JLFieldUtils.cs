@@ -5,6 +5,7 @@ public static class JLFieldUtils
     public static readonly JLField[] JLFieldsForWordDicts =
     [
         JLField.Nothing,
+        JLField.SelectedSpelling,
         JLField.PrimarySpelling,
         JLField.PrimarySpellingWithOrthographyInfo,
         JLField.AlternativeSpellings,
@@ -13,6 +14,7 @@ public static class JLFieldUtils
         JLField.ReadingsWithOrthographyInfo,
         JLField.FirstReading,
         JLField.Definitions,
+        JLField.DefinitionsFromMultipleDictionaries,
         JLField.SelectedDefinitions,
         JLField.PrimarySpellingAndFirstReading,
         JLField.PrimarySpellingAndReadings,
@@ -28,6 +30,7 @@ public static class JLFieldUtils
         JLField.MatchedText,
         JLField.DeconjugatedMatchedText,
         JLField.DeconjugationProcess,
+        JLField.WordClasses,
         JLField.Frequencies,
         JLField.RawFrequencies,
         JLField.PreferredFrequency,
@@ -45,6 +48,7 @@ public static class JLFieldUtils
     public static readonly JLField[] JLFieldsForKanjiDicts =
     [
         JLField.Nothing,
+        JLField.SelectedSpelling,
         JLField.PrimarySpelling,
         JLField.Readings,
         JLField.KunReadings,
@@ -56,6 +60,7 @@ public static class JLFieldUtils
         JLField.KanjiComposition,
         JLField.KanjiStats,
         JLField.Definitions,
+        JLField.DefinitionsFromMultipleDictionaries,
         JLField.SelectedDefinitions,
         JLField.DictionaryName,
         JLField.Audio,
@@ -79,11 +84,13 @@ public static class JLFieldUtils
     public static readonly JLField[] JLFieldsForNameDicts =
     [
         JLField.Nothing,
+        JLField.SelectedSpelling,
         JLField.PrimarySpelling,
         JLField.Readings,
         JLField.FirstReading,
         JLField.AlternativeSpellings,
         JLField.Definitions,
+        JLField.DefinitionsFromMultipleDictionaries,
         JLField.SelectedDefinitions,
         JLField.PrimarySpellingAndFirstReading,
         JLField.PrimarySpellingAndReadings,

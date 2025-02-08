@@ -42,6 +42,12 @@ internal sealed partial class ReadingSelectionWindow
         currentInstance.Owner = owner;
         currentInstance.Show();
         currentInstance.UpdatePosition(WinApi.GetMousePosition());
+
+        if (configManager.Focusable)
+        {
+            _ = currentInstance.Activate();
+        }
+        _ = currentInstance.Focus();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -65,7 +71,7 @@ internal sealed partial class ReadingSelectionWindow
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void ReadingsListView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private async void ReadingsListView_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         string selectedReading = (string)((ListViewItem)sender).Content;
         Hide();

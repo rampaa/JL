@@ -10,24 +10,14 @@ public sealed class LookupResult
         string[]? readings,
         List<LookupFrequencyResult>? frequencies = null,
         string[]? alternativeSpellings = null,
-        string[]? primarySpellingOrthographyInfoList = null,
-        string[]?[]? readingsOrthographyInfoList = null,
-        string[]?[]? alternativeSpellingsOrthographyInfoList = null,
-        string[]?[]? miscList = null,
-        string[]? miscSharedByAllSensesList = null,
-        string[]? onReadings = null,
-        string[]? kunReadings = null,
-        string[]? nanoriReadings = null,
-        string[]? radicalNames = null,
         string? formattedDefinitions = null,
         string? deconjugatedMatchedText = null,
         string? deconjugationProcess = null,
-        string? kanjiComposition = null,
-        string? kanjiStats = null,
         int entryId = 0,
-        byte strokeCount = 0,
-        byte kanjiGrade = byte.MaxValue,
-        byte[]? pitchPositions = null
+        byte[]? pitchPositions = null,
+        string[]? wordClasses = null,
+        JmdictLookupResult? jmdictLookupResult = null,
+        KanjiLookupResult? kanjiLookupResult = null
     ) : IEquatable<LookupResult>
 {
     // common (required for sorting)
@@ -38,29 +28,23 @@ public sealed class LookupResult
     public string MatchedText { get; } = matchedText;
     public List<LookupFrequencyResult>? Frequencies { get; } = frequencies;
 
-    // JMdict, JMnedict, KANJIDIC2
+    // JMdict, JMnedict
     internal int EntryId { get; } = entryId;
 
     // Word dictionaries
     public string? DeconjugatedMatchedText { get; } = deconjugatedMatchedText;
     public string? DeconjugationProcess { get; } = deconjugationProcess;
+    internal string[]? WordClasses { get; } = wordClasses;
+
     // JMdict, Nazeka EPWING
     public string[]? AlternativeSpellings { get; } = alternativeSpellings;
-    public string[]? PrimarySpellingOrthographyInfoList { get; } = primarySpellingOrthographyInfoList;
-    public string[]?[]? ReadingsOrthographyInfoList { get; } = readingsOrthographyInfoList;
-    public string[]?[]? AlternativeSpellingsOrthographyInfoList { get; } = alternativeSpellingsOrthographyInfoList;
-    internal string[]?[]? MiscList { get; } = miscList;
-    internal string[]? MiscSharedByAllSenses { get; } = miscSharedByAllSensesList;
+
+    // JMdict
+    public JmdictLookupResult? JmdictLookupResult { get; } = jmdictLookupResult;
+
     // Kanji
-    public string[]? OnReadings { get; } = onReadings;
-    public string[]? KunReadings { get; } = kunReadings;
-    public string? KanjiComposition { get; } = kanjiComposition;
-    public string? KanjiStats { get; } = kanjiStats;
-    // KANJIDIC2
-    public string[]? NanoriReadings { get; } = nanoriReadings;
-    public string[]? RadicalNames { get; } = radicalNames;
-    public byte StrokeCount { get; } = strokeCount;
-    public byte KanjiGrade { get; } = kanjiGrade;
+    public KanjiLookupResult? KanjiLookupResult { get; } = kanjiLookupResult;
+
     // Pitch Dictionary
     public byte[]? PitchPositions { get; } = pitchPositions;
 
@@ -72,6 +56,19 @@ public sealed class LookupResult
             hash = (hash * 37) + MatchedText.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Dict.GetHashCode();
             hash = (hash * 37) + FormattedDefinitions?.GetHashCode(StringComparison.Ordinal) ?? 37;
+
+            if (Readings is not null)
+            {
+                foreach (string reading in Readings)
+                {
+                    hash = (hash * 37) + reading.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash = (hash * 37) + 37;
+            }
+
             return hash;
         }
     }
@@ -82,7 +79,10 @@ public sealed class LookupResult
             && PrimarySpelling == other.PrimarySpelling
             && MatchedText == other.MatchedText
             && Dict == other.Dict
-            && FormattedDefinitions == other.FormattedDefinitions;
+            && FormattedDefinitions == other.FormattedDefinitions
+            && other.Readings is not null
+                ? Readings?.SequenceEqual(other.Readings) ?? false
+                : Readings is null;
     }
 
     public bool Equals(LookupResult? other)
@@ -91,7 +91,10 @@ public sealed class LookupResult
             && PrimarySpelling == other.PrimarySpelling
             && MatchedText == other.MatchedText
             && Dict == other.Dict
-            && FormattedDefinitions == other.FormattedDefinitions;
+            && FormattedDefinitions == other.FormattedDefinitions
+            && other.Readings is not null
+                ? Readings?.SequenceEqual(other.Readings) ?? false
+                : Readings is null;
     }
 
     public static bool operator ==(LookupResult? left, LookupResult? right) => left?.Equals(right) ?? right is null;

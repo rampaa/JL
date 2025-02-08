@@ -132,8 +132,6 @@ internal sealed class ConfigManager
     public bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } // = false;
     public bool AutoLookupFirstTermWhenTextIsCopiedFromWebSocket { get; private set; } // = false;
     public bool AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized { get; private set; } = true;
-    public MouseButton MineMouseButton { get; private set; } = MouseButton.Left;
-    public MouseButton CopyPrimarySpellingToClipboardMouseButton { get; private set; } = MouseButton.Middle;
 
     #endregion
 
@@ -284,9 +282,6 @@ internal sealed class ConfigManager
 
         LookupOnClickMouseButton = ConfigDBManager.GetValueFromConfig(connection, LookupOnClickMouseButton, nameof(LookupOnClickMouseButton), Enum.TryParse);
         MiningModeMouseButton = ConfigDBManager.GetValueFromConfig(connection, MiningModeMouseButton, nameof(MiningModeMouseButton), Enum.TryParse);
-        MineMouseButton = ConfigDBManager.GetValueFromConfig(connection, MineMouseButton, nameof(MineMouseButton), Enum.TryParse);
-        CopyPrimarySpellingToClipboardMouseButton = ConfigDBManager.GetValueFromConfig(connection, CopyPrimarySpellingToClipboardMouseButton, nameof(CopyPrimarySpellingToClipboardMouseButton), Enum.TryParse);
-
         MainWindowTextVerticalAlignment = ConfigDBManager.GetValueFromConfig(connection, MainWindowTextVerticalAlignment, nameof(MainWindowTextVerticalAlignment), Enum.TryParse);
         mainWindow.MainTextBox.VerticalContentAlignment = MainWindowTextVerticalAlignment;
 
@@ -967,8 +962,6 @@ internal sealed class ConfigManager
 
         preferenceWindow.LookupOnClickMouseButtonComboBox.SelectedValue = LookupOnClickMouseButton.ToString();
         preferenceWindow.MiningModeMouseButtonComboBox.SelectedValue = MiningModeMouseButton.ToString();
-        preferenceWindow.MineMouseButtonComboBox.SelectedValue = MineMouseButton.ToString();
-        preferenceWindow.CopyPrimarySpellingToClipboardMouseButtonComboBox.SelectedValue = CopyPrimarySpellingToClipboardMouseButton.ToString();
 
         preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
@@ -1401,12 +1394,6 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(MiningModeMouseButton),
                 preferenceWindow.MiningModeMouseButtonComboBox.SelectedValue.ToString()!);
-
-            ConfigDBManager.UpdateSetting(connection, nameof(MineMouseButton),
-                preferenceWindow.MineMouseButtonComboBox.SelectedValue.ToString()!);
-
-            ConfigDBManager.UpdateSetting(connection, nameof(CopyPrimarySpellingToClipboardMouseButton),
-                preferenceWindow.CopyPrimarySpellingToClipboardMouseButtonComboBox.SelectedValue.ToString()!);
 
             MainWindow mainWindow = MainWindow.Instance;
             DpiScale dpi = WindowsUtils.Dpi;

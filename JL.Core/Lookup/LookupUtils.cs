@@ -375,11 +375,12 @@ public static class LookupUtils
             .ThenBy(static lookupResult => lookupResult.Dict.Priority)
             .ThenBy(static lookupResult =>
             {
-                if (lookupResult.PrimarySpellingOrthographyInfoList is not null && lookupResult.PrimarySpelling == lookupResult.MatchedText)
+                JmdictLookupResult? jmdictResult = lookupResult.JmdictLookupResult;
+                if (jmdictResult?.PrimarySpellingOrthographyInfoList is not null && lookupResult.PrimarySpelling == lookupResult.MatchedText)
                 {
-                    for (int i = 0; i < lookupResult.PrimarySpellingOrthographyInfoList.Length; i++)
+                    for (int i = 0; i < jmdictResult.PrimarySpellingOrthographyInfoList.Length; i++)
                     {
-                        if (lookupResult.PrimarySpellingOrthographyInfoList[i] is "oK" or "iK" or "rK")
+                        if (jmdictResult.PrimarySpellingOrthographyInfoList[i] is "oK" or "iK" or "rK")
                         {
                             return 1;
                         }
@@ -399,30 +400,34 @@ public static class LookupUtils
                     return 2;
                 }
 
-                if (lookupResult.MiscSharedByAllSenses?.Contains("uk") ?? false)
+                JmdictLookupResult? jmdictLookupResult = lookupResult.JmdictLookupResult;
+                if (jmdictLookupResult is not null)
                 {
-                    return 0;
-                }
-
-                if (lookupResult.MiscList is not null)
-                {
-                    for (int i = 0; i < lookupResult.MiscList.Length; i++)
+                    if (jmdictLookupResult.MiscSharedByAllSenses?.Contains("uk") ?? false)
                     {
-                        if (lookupResult.MiscList[i]?.Contains("uk") ?? false)
+                        return 0;
+                    }
+
+                    if (jmdictLookupResult.MiscList is not null)
+                    {
+                        for (int i = 0; i < jmdictLookupResult.MiscList.Length; i++)
                         {
-                            return 0;
+                            if (jmdictLookupResult.MiscList[i]?.Contains("uk") ?? false)
+                            {
+                                return 0;
+                            }
                         }
                     }
-                }
 
-                string[]? readingsOrthographyInfo = lookupResult.ReadingsOrthographyInfoList?[index];
-                if (readingsOrthographyInfo is not null)
-                {
-                    for (int i = 0; i < readingsOrthographyInfo.Length; i++)
+                    string[]? readingsOrthographyInfo = jmdictLookupResult.ReadingsOrthographyInfoList?[index];
+                    if (readingsOrthographyInfo is not null)
                     {
-                        if (readingsOrthographyInfo[i] is "ok" or "ik" or "rk")
+                        for (int i = 0; i < readingsOrthographyInfo.Length; i++)
                         {
-                            return 3;
+                            if (readingsOrthographyInfo[i] is "ok" or "ik" or "rk")
+                            {
+                                return 3;
+                            }
                         }
                     }
                 }
@@ -771,14 +776,11 @@ public static class LookupUtils
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
                         frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
-                        primarySpellingOrthographyInfoList: jmdictResult.PrimarySpellingOrthographyInfo,
-                        readingsOrthographyInfoList: jmdictResult.ReadingsOrthographyInfo,
-                        alternativeSpellingsOrthographyInfoList: jmdictResult.AlternativeSpellingsOrthographyInfo,
-                        miscList: jmdictResult.Misc,
-                        miscSharedByAllSensesList: jmdictResult.MiscSharedByAllSenses,
+                        jmdictLookupResult: new JmdictLookupResult(jmdictResult.PrimarySpellingOrthographyInfo, jmdictResult.ReadingsOrthographyInfo, jmdictResult.AlternativeSpellingsOrthographyInfo, jmdictResult.MiscSharedByAllSenses, jmdictResult.Misc, jmdictResult.WordClasses),
                         dict: wordResult.Dict,
                         formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null
+                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null,
+                        wordClasses: jmdictResult.WordClassesSharedByAllSenses
                     );
 
                     results.Add(result);
@@ -862,13 +864,7 @@ public static class LookupUtils
         (
             primarySpelling: kanji,
             readings: allReadings,
-            onReadings: kanjiRecord.OnReadings,
-            kunReadings: kanjiRecord.KunReadings,
-            nanoriReadings: kanjiRecord.NanoriReadings,
-            radicalNames: kanjiRecord.RadicalNames,
-            strokeCount: kanjiRecord.StrokeCount,
-            kanjiGrade: kanjiRecord.Grade,
-            kanjiComposition: kanjiComposition,
+            kanjiLookupResult: new KanjiLookupResult(kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiComposition, kanjiRecord.NanoriReadings, kanjiRecord.RadicalNames, kanjiRecord.StrokeCount, kanjiRecord.Grade),
             frequencies: GetKanjidicFrequencies(kanjiRecord.Frequency, kanjiFrequencyResults),
             matchedText: intermediaryResult.MatchedText,
             dict: intermediaryResult.Dict,
@@ -896,15 +892,11 @@ public static class LookupUtils
                 string[]? allReadings = Utils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
 
                 _ = DictUtils.KanjiCompositionDict.TryGetValue(kanji, out string? kanjiComposition);
-
                 LookupResult result = new
                 (
                     primarySpelling: kanji,
                     readings: allReadings,
-                    onReadings: yomichanKanjiDictResult.OnReadings,
-                    kunReadings: yomichanKanjiDictResult.KunReadings,
-                    kanjiComposition: kanjiComposition,
-                    kanjiStats: yomichanKanjiDictResult.BuildFormattedStats(),
+                    kanjiLookupResult: new KanjiLookupResult(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiComposition, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats()),
                     frequencies: kanjiFrequencyResults,
                     matchedText: intermediaryResult.MatchedText,
                     dict: intermediaryResult.Dict,
@@ -951,7 +943,8 @@ public static class LookupUtils
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
+                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                        wordClasses: epwingResult.WordClasses
                     );
 
                     results.Add(result);
@@ -1149,7 +1142,8 @@ public static class LookupUtils
                         alternativeSpellings: customWordDictResult.AlternativeSpellings,
                         formattedDefinitions: customWordDictResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
-                        frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null
+                        frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
+                        wordClasses: customWordDictResult.WordClasses
                     );
 
                     results.Add(result);

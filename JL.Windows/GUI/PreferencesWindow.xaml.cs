@@ -43,17 +43,19 @@ internal sealed partial class PreferencesWindow
     }
 
     private static readonly string s_wordJLFieldsInfo = $"""
+                                            • {JLField.SelectedSpelling.GetDescription()}: The primary spelling or the selected reading you click to mine the word.
                                             • {JLField.PrimarySpelling.GetDescription()}: It's the spelling you click to mine the word, e.g., if you look up "わかりました", its primary spelling will be "分かる".
                                             • {JLField.PrimarySpellingWithOrthographyInfo.GetDescription()}: It's the spelling you click to mine the word with its orthography Info, e.g., if you look up "珈琲", its "Primary Spelling with Orthography Info" will be "珈琲 (ateji)".
                                             • {JLField.Readings.GetDescription()}: Readings of the mined word, e.g., if you look up "従妹", its "Readings" will be "じゅうまい、いとこ".
-                                            • {JLField.FirstReading.GetDescription()}: First reading of the mined word, e.g., if you look up "従妹", its "First Reading" will be "じゅうまい".
+                                            • {JLField.FirstReading.GetDescription()}: If you selected a reading to mine the word, it will be that reading, otherwise it will be the first reading of the mined word
                                             • {JLField.ReadingsWithOrthographyInfo.GetDescription()}: Readings of the mined word with their orthography info, e.g. if you look up "従妹", its "Readings with Orthography Info" will be "じゅうまい、いとこ (gikun)".
                                             • {JLField.AlternativeSpellings.GetDescription()}: Alternative spellings of the mined word, e.g., if you look up "わかりました", its alternative spellings will be "解る、判る、分る".
                                             • {JLField.AlternativeSpellingsWithOrthographyInfo.GetDescription()}: Alternative spellings of the mined word with their orthography info, e.g., if you look up "嫁" its "Alternative Spellings with Orthography Info" will be "娵 (rK)、婦 (rK)、媳 (rK)".
                                             • {JLField.Definitions.GetDescription()}: Definitions of the mined word. You can edit the definitions in the popup window by pressing Insert key and clicking on the definitions text box with the left mouse button.
+                                            • {JLField.DefinitionsFromMultipleDictionaries.GetDescription()}: Definitions for the mined word from word dictionaries.
                                             • {JLField.SelectedDefinitions.GetDescription()}: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
-                                            • {JLField.PrimarySpellingAndReadings.GetDescription()}: Primary spelling and its readings in the format "Primary Spelling[Reading 1、Reading 2、...、Reading N]" format, e.g., 俺[おれ、オレ、おらあ、おり].
-                                            • {JLField.PrimarySpellingAndFirstReading.GetDescription()}: Primary spelling and its first reading in the format "Primary Spelling[Reading 1]" format, e.g., 俺[おれ].
+                                            • {JLField.PrimarySpellingAndReadings.GetDescription()}: Primary spelling and its readings in the format "Primary Spelling[Reading 1]、Spelling[Reading 2]、...、Spelling[Reading N]" format, e.g., 俺[おれ]、俺[オレ]、俺[おらあ]、俺[おり].
+                                            • {JLField.PrimarySpellingAndFirstReading.GetDescription()}: Primary spelling and its first reading in the format "Primary Spelling[Selected Reading]" format, e.g., 俺[おれ].
                                             • {JLField.DictionaryName.GetDescription()}: Name of the dictionary, e.g., JMDict.
                                             • {JLField.Audio.GetDescription()}: Audio for the first reading of the mined word.
                                             • {JLField.Image.GetDescription()}: Image found in clipboard at the time of mining.
@@ -66,21 +68,23 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.MatchedText.GetDescription()}: Text the mined word found as, e.g., "わかりました".
                                             • {JLField.DeconjugatedMatchedText.GetDescription()}: Matched Text's deconjugated form, e.g., if the "Matched Text" is "わかりました", "Deconjugated Matched Text" will be "わかる".
                                             • {JLField.DeconjugationProcess.GetDescription()}: Deconjugation path from the "Matched Text" to "Deconjugated Matched Text".
+                                            • {JLField.WordClasses.GetDescription()}: Part-of-speech info for the mined word, e.g., if the mined word is 電話, "Word Classes" will be "n, vs, vt, vi".
                                             • {JLField.Frequencies.GetDescription()}: Frequency info for the mined word, e.g., "VN: 77, jpdb: 666".
                                             • {JLField.RawFrequencies.GetDescription()}: Raw frequency info for the mined word, e.g., "77, 666".
                                             • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., "666".
                                             • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., "666".
                                             • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: ３, おみな: 0, おうな: 1".
-                                            • {JLField.PitchAccentForFirstReading.GetDescription()}: Pitch accent for the first reading of the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                            • {JLField.NumericPitchAccentForFirstReading.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3".
+                                            • {JLField.PitchAccentForFirstReading.GetDescription()}: Pitch accent for the 'Selected Reading' of the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
+                                            • {JLField.NumericPitchAccentForFirstReading.GetDescription()}: Pitch accent for the 'Selected Reading' of the mined word in numeric form, e.g., "おんな: 3".
                                             • {JLField.PitchAccentCategories.GetDescription()}: Pitch accent categories for the mined word, e.g., "にほんご: Heiban, にっぽんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
-                                            • {JLField.PitchAccentCategoryForFirstReading.GetDescription()}: Pitch accent category for the first reading of the mined word, e.g., "にほんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
+                                            • {JLField.PitchAccentCategoryForFirstReading.GetDescription()}: Pitch accent category for the 'Selected Reading' of the mined word, e.g., "にほんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
                                             • {JLField.EdictId.GetDescription()}: JMDict entry ID.
                                             • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                             """;
 
     private static readonly string s_kanjiJLFieldsInfo = $"""
+                                             • {JLField.SelectedSpelling.GetDescription()}: The primary spelling or the selected reading you click to mine the kanji.
                                              • {JLField.PrimarySpelling.GetDescription()}: It's the spelling you click to mine the kanji, e.g., "妹".
                                              • {JLField.Readings.GetDescription()}: Kun+On+Nanori readings of the kanji.
                                              • {JLField.KunReadings.GetDescription()}: Kun readings of the mined kanji.
@@ -92,6 +96,7 @@ internal sealed partial class PreferencesWindow
                                              • {JLField.KanjiComposition.GetDescription()}: Kanji composition info, e.g., "⿰女未" for "妹".
                                              • {JLField.KanjiStats.GetDescription()}: Kanji stats.
                                              • {JLField.Definitions.GetDescription()}: Definitions of the mined kanji. You can edit the definitions in the popup window by pressing Insert key and clicking on the definitions text box with the left mouse button.
+                                             • {JLField.DefinitionsFromMultipleDictionaries.GetDescription()}: Definitions for the mined kanji from kanji dictionaries.
                                              • {JLField.SelectedDefinitions.GetDescription()}: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                              • {JLField.DictionaryName.GetDescription()}: Name of the dictionary, e.g., "Kanjidic".
                                              • {JLField.Audio.GetDescription()}: Audio for the first reading of the mined word.
@@ -113,14 +118,16 @@ internal sealed partial class PreferencesWindow
                                              """;
 
     private static readonly string s_nameJLFieldsInfo = $"""
+                                            • {JLField.SelectedSpelling.GetDescription()}: The primary spelling or the selected reading you click to mine the name.
                                             • {JLField.PrimarySpelling.GetDescription()}: It's the spelling you click to mine the name.
                                             • {JLField.Readings.GetDescription()}: Readings of the name.
-                                            • {JLField.FirstReading.GetDescription()}: First reading of the name.
+                                            • {JLField.FirstReading.GetDescription()}: If you selected a reading to mine the name, it will be that reading, otherwise it will be the first reading of the mined name
                                             • {JLField.AlternativeSpellings.GetDescription()}: Alternative spellings of the mined name.
                                             • {JLField.Definitions.GetDescription()}: Translations of the name. You can edit the definitions in the popup window by pressing Insert key and clicking on the definitions text box with the left mouse button.
+                                            • {JLField.DefinitionsFromMultipleDictionaries.GetDescription()}: Definitions for the mined name from name dictionaries.
                                             • {JLField.SelectedDefinitions.GetDescription()}: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                             • {JLField.PrimarySpellingAndReadings.GetDescription()}: Primary spelling and its readings in the format "Primary Spelling[Reading 1、Reading 2、...、Reading N]" format, e.g., 俺[おれ、オレ、おらあ、おり].
-                                            • {JLField.PrimarySpellingAndFirstReading.GetDescription()}: Primary spelling and its first reading in the format "Primary Spelling[Reading 1]" format, e.g., 俺[おれ].
+                                            • {JLField.PrimarySpellingAndFirstReading.GetDescription()}: Primary spelling and its 'Selected Reading' in the format "Primary Spelling[Selected Reading]" format, e.g., 俺[おれ].
                                             • {JLField.DictionaryName.GetDescription()}: Name of the dictionary, e.g., "JMnedict".
                                             • {JLField.Audio.GetDescription()}: Audio for the first reading of the mined word.
                                             • {JLField.Image.GetDescription()}: Image found in clipboard at the time of mining.
@@ -132,10 +139,10 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.TrailingSentencePart.GetDescription()}: Part of the sentence that appears after the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Trailing Sentence Part" will be "のことが大好き".
                                             • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3, おみな: 0, おうな: 1".
-                                            • {JLField.PitchAccentForFirstReading.GetDescription()}: Pitch accent for the first reading of the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                            • {JLField.NumericPitchAccentForFirstReading.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3".
+                                            • {JLField.PitchAccentForFirstReading.GetDescription()}: Pitch accent for the 'Selected Reading' of the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
+                                            • {JLField.NumericPitchAccentForFirstReading.GetDescription()}: Pitch accent for the 'Selected Reading' of the mined word in numeric form, e.g., "おんな: 3".
                                             • {JLField.PitchAccentCategories.GetDescription()}: Pitch accent categories for the mined word, e.g., "にほんご: Heiban, にっぽんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
-                                            • {JLField.PitchAccentCategoryForFirstReading.GetDescription()}: Pitch accent category for the first reading of the mined word, e.g., "にほんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
+                                            • {JLField.PitchAccentCategoryForFirstReading.GetDescription()}: Pitch accent category for the 'Selected Reading' of the mined word, e.g., "にほんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
                                             • {JLField.EdictId.GetDescription()}: JMnedict entry ID.
                                             • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                             """;

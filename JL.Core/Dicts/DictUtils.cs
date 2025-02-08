@@ -480,6 +480,12 @@ public static class DictUtils
         DictType.NonspecificWordNazeka
     ];
 
+    internal static readonly DictType[] s_otherDictTypes =
+    [
+        DictType.NonspecificYomichan,
+        DictType.NonspecificNazeka
+    ];
+
     private static readonly FrozenSet<DictType> s_yomichanWordAndNameDictTypeSet = YomichanDictTypes
         .Where(static dictType => dictType is not DictType.PitchAccentYomichan and not DictType.NonspecificKanjiYomichan and not DictType.NonspecificKanjiWithWordSchemaYomichan)
         .ToFrozenSet();

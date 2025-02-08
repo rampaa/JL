@@ -3,7 +3,6 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Web;
 using System.Windows;
@@ -549,42 +548,6 @@ internal static class WindowsUtils
         double verticalOffset = textBox.VerticalOffset;
         textBox.Select(0, 0);
         textBox.ScrollToVerticalOffset(verticalOffset);
-    }
-
-    public static void CopyTextToClipboard(string? text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return;
-        }
-
-        MainWindow mainWindow = MainWindow.Instance;
-        bool captureTextFromClipboard = CoreConfigManager.Instance.CaptureTextFromClipboard;
-        if (captureTextFromClipboard)
-        {
-            WinApi.UnsubscribeFromClipboardChanged(mainWindow.WindowHandle);
-        }
-
-        bool retry = true;
-        do
-        {
-            try
-            {
-                // Using Clipboard.SetText or setting the "copy" parameter of SetDataObject to true
-                // Results in "System.Runtime.InteropServices.COMException (0x800401D0): OpenClipboard Failed (0x800401D0 (CLIPBRD_E_CANT_OPEN))"
-                Clipboard.SetDataObject(text, false);
-                retry = false;
-            }
-            catch (ExternalException ex)
-            {
-                Utils.Logger.Warning(ex, "CopyTextToClipboard failed");
-            }
-        } while (retry);
-
-        if (captureTextFromClipboard)
-        {
-            WinApi.SubscribeToClipboardChanged(mainWindow.WindowHandle);
-        }
     }
 
     public static void HandlePostCopy(string text, string? subsequentText, string? mergedText)
