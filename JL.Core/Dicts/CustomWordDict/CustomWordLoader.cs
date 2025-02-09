@@ -36,7 +36,7 @@ public static class CustomWordLoader
         "adj-na"
     ];
 
-    internal static readonly string[] s_noun =
+    private static readonly string[] s_noun =
     [
         "n"
     ];
