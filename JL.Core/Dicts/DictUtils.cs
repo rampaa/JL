@@ -1278,19 +1278,21 @@ public static class DictUtils
 
         if (dictDBPaths.Count > 0)
         {
-            Dictionary<string, string> tempDictDBPathDict = new(DBUtils.DictDBPaths.Count + dictDBPaths.Count, StringComparer.Ordinal);
-
+            KeyValuePair<string, string>[] tempDictDBPathKeyValuePairs = new KeyValuePair<string, string>[DBUtils.DictDBPaths.Count + dictDBPaths.Count];
+            int index = 0;
             foreach ((string key, string value) in DBUtils.DictDBPaths)
             {
-                tempDictDBPathDict[key] = value;
+                tempDictDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
+                ++index;
             }
 
             foreach ((string key, string value) in dictDBPaths)
             {
-                tempDictDBPathDict[key] = value;
+                tempDictDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
+                ++index;
             }
 
-            DBUtils.DictDBPaths = tempDictDBPathDict.ToFrozenDictionary(StringComparer.Ordinal);
+            DBUtils.DictDBPaths = tempDictDBPathKeyValuePairs.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
         if (tasks.Count > 0 || dictCleared)
