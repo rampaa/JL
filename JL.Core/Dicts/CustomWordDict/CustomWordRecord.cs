@@ -40,9 +40,9 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             tempWordClass = wordClass switch
             {
                 "adj-i" => "adjective",
-                "noun" => "noun",
-                "other" => "other",
                 "v1" => "verb",
+                "n" => "noun",
+                "other" => "other",
                 _ => "other"
             };
         }

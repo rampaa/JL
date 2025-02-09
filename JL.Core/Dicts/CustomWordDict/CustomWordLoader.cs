@@ -94,13 +94,15 @@ public static class CustomWordLoader
         ReadOnlySpan<char> rawPartOfSpeech, string[]? wordClasses, IDictionary<string, IList<IDictRecord>> customWordDictionary)
     {
         bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
-        string[] wordClassArray = rawPartOfSpeech switch
-        {
-            "Verb" => hasUserDefinedWordClasses ? wordClasses! : s_verbs,
-            "Adjective" => hasUserDefinedWordClasses ? wordClasses! : s_adjectives,
-            "Noun" => s_noun,
-            _ => s_other
-        };
+        string[] wordClassArray = hasUserDefinedWordClasses
+            ? wordClasses!
+            : rawPartOfSpeech switch
+            {
+                "Verb" => s_verbs,
+                "Adjective" => s_adjectives,
+                "Noun" => s_noun,
+                _ => s_other
+            };
 
         for (int i = 0; i < spellings.Length; i++)
         {
