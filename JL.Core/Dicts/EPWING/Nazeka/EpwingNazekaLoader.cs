@@ -15,7 +15,6 @@ internal static class EpwingNazekaLoader
             return;
         }
 
-        // TODO: Utf8JsonReader?
         List<JsonElement>? jsonObjects;
 
         FileStream fileStream = File.OpenRead(fullPath);

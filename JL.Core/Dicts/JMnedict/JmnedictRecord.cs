@@ -31,7 +31,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
         if (Definitions.Length is 1)
         {
             string[] nameTypes = NameTypes[0];
-            return nameTypes.Length > 1 || !nameTypes.Contains("unclass")
+            return nameTypes.Length > 1 || nameTypes[0] is not "unclass"
                 ? $"({string.Join(", ", nameTypes)}) {string.Join("; ", Definitions[0])}"
                 : string.Join("; ", Definitions[0]);
         }
@@ -45,14 +45,10 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
         {
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
 
-            // TODO: Check if it can evaluate to false
-            if (NameTypes.Length >= i)
+            string[] nameTypes = NameTypes[i];
+            if (nameTypes.Length > 1 || nameTypes[0] is not "unclass")
             {
-                string[] nameTypes = NameTypes[i];
-                if (nameTypes.Length > 1 || !nameTypes.Contains("unclass"))
-                {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", nameTypes)}] ");
-                }
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", nameTypes)}] ");
             }
 
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])}");
