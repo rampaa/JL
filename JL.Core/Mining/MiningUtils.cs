@@ -667,7 +667,7 @@ public static class MiningUtils
             }
         }
 
-        if (userFields is null || userFields.ContainsKey(JLField.DefinitionsFromMultipleDictionaries.GetDescription()!))
+        if (userFields is null || userFields.ContainsValue(JLField.DefinitionsFromMultipleDictionaries))
         {
             string? definitionsFromAllDictionaries = GetDefinitionsFromAllDictionaries(lookupResults, currentLookupResultIndex, selectedSpelling, formattedDefinitions, useHtmlTags);
             if (definitionsFromAllDictionaries is not null)
