@@ -16,7 +16,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
     public string[]? DefinitionTags { get; }
     //public int Score { get; }
     //public int Sequence { get; }
-    //public string TermTags { get; }
+    //public string[]? TermTags { get; }
 
     public EpwingYomichanRecord(string primarySpelling, string? reading, string[] definitions, string[]? wordClasses, string[]? definitionTags)
     {
@@ -37,22 +37,20 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
                 : Definitions[0];
         }
 
-        char separator = options.NewlineBetweenDefinitions!.Value
+        bool newline = options.NewlineBetweenDefinitions!.Value;
+        char separator = newline
             ? '\n'
             : '；';
 
         StringBuilder defResult = new();
+        if (definitionTagsExist)
+        {
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", DefinitionTags!)}]{(newline ? '\n' : ' ')}");
+        }
+
         for (int i = 0; i < Definitions.Length; i++)
         {
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
-
-            // DefinitionTags!.Length > i can be false even when definitionTagsExist is true
-            if (definitionTagsExist && DefinitionTags!.Length > i)
-            {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{DefinitionTags[i]}] ");
-            }
-
-            _ = defResult.Append(Definitions[i]);
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. {Definitions[i]}");
             if (i + 1 != Definitions.Length)
             {
                 _ = defResult.Append(separator);
