@@ -32,7 +32,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
         {
             string[] nameTypes = NameTypes[0];
             return nameTypes.Length > 1 || nameTypes[0] is not "unclass"
-                ? $"({string.Join(", ", nameTypes)}) {string.Join("; ", Definitions[0])}"
+                ? $"[{string.Join(", ", nameTypes)}] {string.Join("; ", Definitions[0])}"
                 : string.Join("; ", Definitions[0]);
         }
 

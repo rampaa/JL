@@ -648,7 +648,7 @@ internal sealed partial class PopupWindow
         if (showPOrthographyInfo && jmdictLookupResult?.PrimarySpellingOrthographyInfoList is not null)
         {
             TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(jmdictLookupResult.PrimarySpellingOrthographyInfoList),
-                $"({string.Join(", ", jmdictLookupResult.PrimarySpellingOrthographyInfoList)})",
+                $"[{string.Join(", ", jmdictLookupResult.PrimarySpellingOrthographyInfoList)}]",
                 DictOptionManager.POrthographyInfoColor,
                 pOrthographyInfoFontSize,
                 VerticalAlignment.Center,

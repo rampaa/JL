@@ -46,7 +46,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         {
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
 
-            // TODO: Check if DefinitionTags!.Length > i can be false when definitionTagsExist is true
+            // DefinitionTags!.Length > i can be false even when definitionTagsExist is true
             if (definitionTagsExist && DefinitionTags!.Length > i)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"[{DefinitionTags[i]}] ");
