@@ -112,7 +112,7 @@ internal sealed partial class PopupWindow
         if (configManager.ShowMiningModeReminder)
         {
             TextBlockMiningModeReminder.Text = string.Create(CultureInfo.InvariantCulture,
-                $"Click on the ➕ button to mine,\nor press {configManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
+                $"Click the ➕ button to mine,\nor press {configManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
             TextBlockMiningModeReminder.ToolTip = "This message can be hidden by disabling Preferences->Popup->Show mining mode reminder";
             TextBlockMiningModeReminder.Cursor = Cursors.Help;
         }
@@ -764,7 +764,7 @@ internal sealed partial class PopupWindow
         {
             string alternativeSpellingsText = showAOrthographyInfo && result.JmdictLookupResult?.AlternativeSpellingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, result.JmdictLookupResult.AlternativeSpellingsOrthographyInfoList)
-                : $"({string.Join('、', result.AlternativeSpellings)})";
+                : $"[{string.Join('、', result.AlternativeSpellings)}]";
 
             if (MiningMode)
             {
