@@ -11,6 +11,18 @@ internal static class JmdictLoader
 {
     private static bool s_canHandleCulture = true;
 
+    private static readonly FrozenDictionary<string, string> s_iso6392BTo2T = new KeyValuePair<string, string>[]
+    {
+        #pragma warning disable format
+        // ReSharper disable BadExpressionBracesLineBreaks
+        new("tib", "bod"), new("cze", "ces"), new("wel", "cym"), new("ger", "deu"), new("gre", "ell"),
+        new("baq", "eus"), new("per", "fas"), new("fre", "fra"), new("arm", "hye"), new("ice", "isl"),
+        new("geo", "kat"), new("mac", "mkd"), new("mao", "mri"), new("may", "msa"), new("bur", "mya"),
+        new("dut", "nld"), new("rum", "ron"), new("slo", "slk"), new("alb", "sqi"), new("chi", "zho")
+        // ReSharper restore BadExpressionBracesLineBreaks
+        #pragma warning restore format
+    }.ToFrozenDictionary(StringComparer.Ordinal);
+
     public static async Task Load(Dict dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
@@ -309,7 +321,7 @@ internal static class JmdictLoader
                         {
                             if (s_canHandleCulture)
                             {
-                                if (Utils.s_iso6392BTo2T.TryGetValue(lang, out string? langCode))
+                                if (s_iso6392BTo2T.TryGetValue(lang, out string? langCode))
                                 {
                                     lang = langCode;
                                 }

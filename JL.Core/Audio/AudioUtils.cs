@@ -21,16 +21,14 @@ public static class AudioUtils
         }
     };
 
-    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new Dictionary<string, string>(6, StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new KeyValuePair<string, string>[6]
     {
-        // ReSharper disable BadExpressionBracesLineBreaks
-        { "mpeg", "mp3" },
-        { "3gpp", "3gp" },
-        { "3gpp2", "3g2" },
-        { "vorbis", "ogg" },
-        { "vorbis-config", "ogg" },
-        { "x-midi", "midi" }
-        // ReSharper restore BadExpressionBracesLineBreaks
+        new("mpeg", "mp3"),
+        new("3gpp", "3gp"),
+        new("3gpp2", "3g2"),
+        new("vorbis", "ogg"),
+        new("vorbis-config", "ogg"),
+        new("x-midi", "midi")
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
     private static async ValueTask<AudioResponse?> GetAudioFromUrl(Uri url)

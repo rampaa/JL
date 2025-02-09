@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Encodings.Web;
@@ -110,18 +109,6 @@ public static partial class Utils
             new JsonStringEnumConverter()
         }
     };
-
-    internal static readonly FrozenDictionary<string, string> s_iso6392BTo2T = new Dictionary<string, string>(20, StringComparer.Ordinal)
-    {
-        #pragma warning disable format
-        // ReSharper disable BadExpressionBracesLineBreaks
-        { "tib", "bod" }, { "cze", "ces" }, { "wel", "cym" }, { "ger", "deu" }, { "gre", "ell" },
-        { "baq", "eus" }, { "per", "fas" }, { "fre", "fra" }, { "arm", "hye" }, { "ice", "isl" },
-        { "geo", "kat" }, { "mac", "mkd" }, { "mao", "mri" }, { "may", "msa" }, { "bur", "mya" },
-        { "dut", "nld" }, { "rum", "ron" }, { "slo", "slk" }, { "alb", "sqi" }, { "chi", "zho" }
-        // ReSharper restore BadExpressionBracesLineBreaks
-        #pragma warning restore format
-    }.ToFrozenDictionary(StringComparer.Ordinal);
 
 #pragma warning disable CA5351
     internal static string GetMd5String(ReadOnlySpan<byte> bytes)
