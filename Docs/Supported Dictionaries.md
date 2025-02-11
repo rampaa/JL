@@ -15,7 +15,7 @@
 
 * [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format
   * Word dictionaries (Daijirin, Shinmeikai, Kenkyuusha etc.) through `Word Dictionary (Nazeka)` type
-  * Name dictionaries through `Name Dictionary (Nazeka)` type
+  * Name dictionaries (e.g., [VndbCharacterNames](https://github.com/rampaa/VndbCharacterNames)) through `Name Dictionary (Nazeka)` type
   * Kanji dictionaries through `Kanji Dictionary (Nazeka)` type
   * Other dictionaries through `Nonspecific Dictionary (Nazeka)` type
 
