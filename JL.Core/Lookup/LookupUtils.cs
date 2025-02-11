@@ -488,19 +488,23 @@ public static class LookupUtils
                     List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
                     if (resultsList.Count > 0)
                     {
-                        if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
+                        if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? result))
                         {
-                            if (r.MatchedText == deconjugationResult.OriginalText)
+                            if (result.MatchedText == deconjugationResult.OriginalText)
                             {
-                                int index = r.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
+                                int index = result.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
                                 if (index >= 0)
                                 {
-                                    r.Processes![index].Add(deconjugationResult.Process);
+                                    List<List<string>> processes = result.Processes![index];
+                                    if (!processes.Any(p => p.SequenceEqual(deconjugationResult.Process)))
+                                    {
+                                        processes.Add(deconjugationResult.Process);
+                                    }
                                 }
                                 else
                                 {
-                                    r.Results.Add(resultsList);
-                                    r.Processes!.Add([deconjugationResult.Process]);
+                                    result.Results.Add(resultsList);
+                                    result.Processes!.Add([deconjugationResult.Process]);
                                 }
                             }
                         }
@@ -611,9 +615,15 @@ public static class LookupUtils
                     EpwingYomichanRecord dictResult = (EpwingYomichanRecord)dictResults[i];
                     if (dictResult.WordClasses is not null)
                     {
-                        if (dictResult.WordClasses.Contains(lastTag))
+                        // It seems like instead of storing precise tags like v5r
+                        // Yomichan dictionaries simply store the general v5 tag
+                        for (int j = 0; j < dictResult.WordClasses.Length; j++)
                         {
-                            resultsList.Add(dictResult);
+                            if (lastTag.StartsWith(dictResult.WordClasses[j], StringComparison.Ordinal))
+                            {
+                                resultsList.Add(dictResult);
+                                break;
+                            }
                         }
                     }
                     else if (WordClassDictionaryContainsTag(dictResult, lastTag))
