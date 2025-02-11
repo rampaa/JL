@@ -626,7 +626,7 @@ public static class LookupUtils
                             }
                         }
                     }
-                    else if (WordClassDictionaryContainsTag(dictResult, lastTag))
+                    else if (WordClassDictionaryContainsTag(dictResult.PrimarySpelling, dictResult.Reading, lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -641,7 +641,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     EpwingNazekaRecord dictResult = (EpwingNazekaRecord)dictResults[i];
-                    if (WordClassDictionaryContainsTag(dictResult, lastTag))
+                    if (WordClassDictionaryContainsTag(dictResult.PrimarySpelling, dictResult.Reading, lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -1042,16 +1042,16 @@ public static class LookupUtils
     }
 
 
-    private static bool WordClassDictionaryContainsTag<T>(T record, string tag) where T : IDictRecordWithSingleReading
+    private static bool WordClassDictionaryContainsTag(string primarySpelling, string? reading, string tag)
     {
-        if (DictUtils.WordClassDictionary.TryGetValue(record.PrimarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
+        if (DictUtils.WordClassDictionary.TryGetValue(primarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
         {
             for (int i = 0; i < jmdictWcResults.Count; i++)
             {
                 JmdictWordClass result = jmdictWcResults[i];
-                if (record.PrimarySpelling == result.Spelling
-                    && ((record.Reading is not null && result.Readings is not null && result.Readings.Contains(record.Reading))
-                        || (record.Reading is null && result.Readings is null))
+                if (primarySpelling == result.Spelling
+                    && ((reading is not null && result.Readings is not null && result.Readings.Contains(reading))
+                        || (reading is null && result.Readings is null))
                     && result.WordClasses.Contains(tag))
                 {
                     return true;
