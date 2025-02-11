@@ -1046,12 +1046,13 @@ public static class LookupUtils
     {
         if (DictUtils.WordClassDictionary.TryGetValue(primarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
         {
+            bool hasReading = reading is not null;
             for (int i = 0; i < jmdictWcResults.Count; i++)
             {
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
-                    && ((reading is not null && result.Readings is not null && result.Readings.Contains(reading))
-                        || (reading is null && result.Readings is null))
+                    && ((hasReading && result.Readings is not null && result.Readings.Contains(reading!))
+                        || (!hasReading && result.Readings is null))
                     && result.WordClasses.Contains(tag))
                 {
                     return true;
