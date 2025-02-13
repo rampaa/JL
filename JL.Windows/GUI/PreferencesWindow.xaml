@@ -872,8 +872,8 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
-                                       ToolTip="Specifies the mouse button to use with the ➕ button for selecting a spelling to set as the &quot;Selected Spelling&quot; field
-                                       &#10;If no reading is available, the &quot;Selected Spelling&quot; field will be set to the primary spelling"/>
+                                       ToolTip="Specifies the mouse button to use with the ➕ button, which will open a selection window to choose from the primary spelling and available readings.
+                                       &#10;If no reading is available, the &quot;Selected Spelling&quot; field will be set to the primary spelling and the term will be mined." /> 
                             <ComboBox x:Name="MineMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
                                 <ComboBoxItem Content="Left button" Tag="Left" />
@@ -888,7 +888,7 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
-                                       ToolTip="Sets the &quot;Selected Spelling&quot; field to the value of the primary spelling and mines the term."/>
+                                       ToolTip="Sets the value of the &quot;Selected Spelling&quot; field to the primary spelling and mines the term"/>
                             <ComboBox x:Name="MinePrimarySpellingMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
                                 <ComboBoxItem Content="Left button" Tag="Left" />
