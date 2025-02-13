@@ -2066,9 +2066,16 @@ internal sealed partial class PopupWindow
                 ShowMiningModeResults();
             }
 
-            else if (ChildPopupWindow is { IsVisible: true, MiningMode: false })
+            else if (ChildPopupWindow?.IsVisible ?? false)
             {
-                ChildPopupWindow.ShowMiningModeResults();
+                if (!ChildPopupWindow.MiningMode)
+                {
+                    ChildPopupWindow.ShowMiningModeResults();
+                }
+                else
+                {
+                    PopupWindowUtils.HidePopups(ChildPopupWindow);
+                }
             }
         }
     }
