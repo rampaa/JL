@@ -24,6 +24,7 @@ using JL.Windows.SpeechSynthesis;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using ColorPicker = HandyControl.Controls.ColorPicker;
+using Rectangle = System.Drawing.Rectangle;
 using Screen = System.Windows.Forms.Screen;
 
 namespace JL.Windows.Utilities;
@@ -667,5 +668,68 @@ internal static class WindowsUtils
     public static bool ShowYesNoDialog(string text, string caption)
     {
         return HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
+    }
+
+    public static void UpdatePositionForSelectionWindows(Window window, nint windowHandle, Point cursorPosition)
+    {
+        double mouseX = cursorPosition.X;
+        double mouseY = cursorPosition.Y;
+
+        DpiScale dpi = Dpi;
+        double currentWidth = window.ActualWidth * dpi.DpiScaleX;
+        double currentHeight = window.ActualHeight * dpi.DpiScaleY;
+
+        double dpiAwareXOffSet = 5 * dpi.DpiScaleX;
+        double dpiAwareYOffset = 15 * dpi.DpiScaleY;
+
+        Rectangle bounds = ActiveScreen.Bounds;
+        bool needsFlipX = mouseX + currentWidth > bounds.Right;
+        bool needsFlipY = mouseY + currentHeight > bounds.Bottom;
+
+        double newLeft;
+        double newTop;
+
+        if (needsFlipX)
+        {
+            // flip Leftwards while preventing -OOB
+            newLeft = mouseX - currentWidth - dpiAwareXOffSet;
+            if (newLeft < bounds.X)
+            {
+                newLeft = bounds.X;
+            }
+        }
+        else
+        {
+            // no flip
+            newLeft = mouseX - dpiAwareXOffSet;
+        }
+
+        if (needsFlipY)
+        {
+            // flip Upwards while preventing -OOB
+            newTop = mouseY - (currentHeight + dpiAwareYOffset);
+            if (newTop < bounds.Y)
+            {
+                newTop = bounds.Y;
+            }
+        }
+        else
+        {
+            // no flip
+            newTop = mouseY + dpiAwareYOffset;
+        }
+
+        // stick to edges if +OOB
+        if (newLeft + currentWidth > bounds.Right)
+        {
+            newLeft = bounds.Right - currentWidth;
+        }
+
+        if (newTop + currentHeight > bounds.Bottom)
+        {
+            newTop = bounds.Bottom - currentHeight;
+        }
+
+        WinApi.MoveWindowToPosition(windowHandle, newLeft, newTop);
     }
 }

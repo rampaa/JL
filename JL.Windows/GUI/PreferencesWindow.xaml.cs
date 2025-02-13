@@ -84,7 +84,6 @@ internal sealed partial class PreferencesWindow
                                             """;
 
     private static readonly string s_kanjiJLFieldsInfo = $"""
-                                             • {JLField.SelectedSpelling.GetDescription()}: The primary spelling or the selected reading you click to mine the kanji.
                                              • {JLField.PrimarySpelling.GetDescription()}: It's the spelling you click to mine the kanji, e.g., "妹".
                                              • {JLField.Readings.GetDescription()}: Kun+On+Nanori readings of the kanji.
                                              • {JLField.KunReadings.GetDescription()}: Kun readings of the mined kanji.

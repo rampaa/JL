@@ -48,7 +48,6 @@ public static class JLFieldUtils
     public static readonly JLField[] JLFieldsForKanjiDicts =
     [
         JLField.Nothing,
-        JLField.SelectedSpelling,
         JLField.PrimarySpelling,
         JLField.Readings,
         JLField.KunReadings,

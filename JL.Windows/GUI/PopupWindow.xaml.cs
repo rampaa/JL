@@ -1288,52 +1288,62 @@ internal sealed partial class PopupWindow
     // ReSharper disable once AsyncVoidMethod
     private async void AudioButton_Click(object sender, RoutedEventArgs e)
     {
+        await HandleAudioButtonClick().ConfigureAwait(false);
+    }
+
+    private Task HandleAudioButtonClick()
+    {
         LookupResult lookupResult = LastLookupResults[_listViewItemIndex];
         if (lookupResult.Readings is null || lookupResult.Readings.Length is 1)
         {
-            await PopupWindowUtils.PlayAudio(lookupResult.PrimarySpelling, lookupResult.Readings?[0]).ConfigureAwait(false);
+            return PopupWindowUtils.PlayAudio(lookupResult.PrimarySpelling, lookupResult.Readings?[0]);
         }
         else
         {
             ReadingSelectionWindow.Show(this, lookupResult.PrimarySpelling, lookupResult.Readings);
+            return Task.CompletedTask;
         }
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void MiningButton_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    private Task HandleMining(bool minePrimarySpelling)
     {
-        if (!MiningMode || e.ChangedButton is MouseButton.Right)
-        {
-            return;
-        }
-
         int listViewItemIndex = _listViewItemIndex;
-        TextBox? definitionsTextBox = GetDefinitionTextBox(listViewItemIndex);
-        string? formattedDefinitions = definitionsTextBox?.Text;
-        string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
         string currentSourceText = _currentSourceText;
         int currentSourceTextCharPosition = _currentSourceTextCharPosition;
         LookupResult[] lookupResults = LastLookupResults;
 
         LookupResult lookupResult = lookupResults[listViewItemIndex];
-        if (lookupResult.Readings is null)
+        if (minePrimarySpelling
+            || lookupResult.Readings is null
+            || DictUtils.KanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
+            TextBox? definitionsTextBox = GetDefinitionTextBox(listViewItemIndex);
+            string? formattedDefinitions = definitionsTextBox?.Text;
+            string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
+
             HidePopup();
 
-            ConfigManager configManager = ConfigManager.Instance;
-            if (configManager.MineToFileInsteadOfAnki)
-            {
-                await MiningUtils.MineToFile(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling).ConfigureAwait(false);
-            }
-            else
-            {
-                await MiningUtils.Mine(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling).ConfigureAwait(false);
-            }
+            return ConfigManager.Instance.MineToFileInsteadOfAnki
+                ? MiningUtils.MineToFile(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling)
+                : MiningUtils.Mine(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling);
         }
-        else
+
+        MiningSelectionWindow.Show(this, lookupResults, listViewItemIndex, currentSourceText, currentSourceTextCharPosition);
+        return Task.CompletedTask;
+    }
+
+    // ReSharper disable once AsyncVoidMethod
+    private async void MiningButton_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        bool minePrimarySpelling = e.ChangedButton == configManager.MinePrimarySpellingMouseButton;
+        if (!MiningMode
+            || (!minePrimarySpelling && e.ChangedButton != configManager.MineMouseButton))
         {
-            MiningSelectionWindow.Show(this, lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition);
+            return;
         }
+
+        await HandleMining(minePrimarySpelling).ConfigureAwait(false);
     }
 
     private void ShowAddNameWindow()
@@ -1842,7 +1852,8 @@ internal sealed partial class PopupWindow
     // ReSharper disable once AsyncVoidMethod
     private async void TextBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        _lastInteractedTextBox = (TextBox)sender;
+        TextBox textBox = (TextBox)sender;
+        _lastInteractedTextBox = textBox;
         LastSelectedText = _lastInteractedTextBox.SelectedText;
 
         ConfigManager configManager = ConfigManager.Instance;
@@ -1854,20 +1865,19 @@ internal sealed partial class PopupWindow
             return;
         }
 
+        await HandleTextBoxMouseUp(textBox).ConfigureAwait(false);
+    }
+
+    private Task HandleTextBoxMouseUp(TextBox textBox)
+    {
         ChildPopupWindow ??= new PopupWindow
         {
             Owner = this
         };
 
-        if (configManager.LookupOnSelectOnly)
-        {
-            await ChildPopupWindow.LookupOnSelect((TextBox)sender).ConfigureAwait(false);
-        }
-
-        else
-        {
-            await ChildPopupWindow.LookupOnMouseMoveOrClick((TextBox)sender, true).ConfigureAwait(false);
-        }
+        return ConfigManager.Instance.LookupOnSelectOnly
+            ? ChildPopupWindow.LookupOnSelect(textBox)
+            : ChildPopupWindow.LookupOnMouseMoveOrClick(textBox, true);
     }
 
     private void OnMouseLeave(object sender, MouseEventArgs e)
@@ -2124,7 +2134,7 @@ internal sealed partial class PopupWindow
         }
     }
 
-    private TextBox? GetDefinitionTextBox(int listViewIndex)
+    public TextBox? GetDefinitionTextBox(int listViewIndex)
     {
         PopupListView.Items.Filter = null;
         return ((StackPanel)((StackPanel)PopupListView.Items[listViewIndex]!).Children[1]).GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));

@@ -5,7 +5,6 @@ using System.Windows.Interop;
 using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Windows.Utilities;
-using Rectangle = System.Drawing.Rectangle;
 
 namespace JL.Windows.GUI;
 
@@ -18,15 +17,13 @@ internal sealed partial class MiningSelectionWindow
     private readonly LookupResult[] _lookupResults;
     private readonly int _currentLookupResultIndex;
     private readonly string _currentSourceText;
-    private readonly string? _formattedDefinitions;
-    private readonly string? _selectedDefinitions;
     private readonly int _currentSourceTextCharPosition;
 
     private nint _windowHandle;
 
     private static MiningSelectionWindow? s_instance;
 
-    private MiningSelectionWindow(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, string? formattedDefinitions, string? selectedDefinitions, int currentSourceTextCharPosition)
+    private MiningSelectionWindow(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition)
     {
         InitializeComponent();
         Owner = owner;
@@ -34,8 +31,6 @@ internal sealed partial class MiningSelectionWindow
         _lookupResults = lookupResults;
         _currentLookupResultIndex = currentLookupResultIndex;
         _currentSourceText = currentSourceText;
-        _formattedDefinitions = formattedDefinitions;
-        _selectedDefinitions = selectedDefinitions;
         _currentSourceTextCharPosition = currentSourceTextCharPosition;
     }
 
@@ -44,9 +39,9 @@ internal sealed partial class MiningSelectionWindow
         return s_instance?.IsVisible ?? false;
     }
 
-    internal static void Show(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, string? formattedDefinitions, string? selectedDefinitions, int currentSourceTextCharPosition)
+    internal static void Show(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition)
     {
-        MiningSelectionWindow currentInstance = s_instance ??= new MiningSelectionWindow(owner, lookupResults, currentLookupResultIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition);
+        MiningSelectionWindow currentInstance = s_instance ??= new MiningSelectionWindow(owner, lookupResults, currentLookupResultIndex, currentSourceText, currentSourceTextCharPosition);
         ConfigManager configManager = ConfigManager.Instance;
 
         ListViewItem[] listViewItem;
@@ -73,7 +68,7 @@ internal sealed partial class MiningSelectionWindow
         currentInstance.FontFamily = configManager.PopupFont;
         currentInstance.Owner = owner;
         currentInstance.Show();
-        currentInstance.UpdatePosition(WinApi.GetMousePosition());
+        WindowsUtils.UpdatePositionForSelectionWindows(currentInstance, currentInstance._windowHandle, WinApi.GetMousePosition());
 
         if (configManager.Focusable)
         {
@@ -105,81 +100,22 @@ internal sealed partial class MiningSelectionWindow
     // ReSharper disable once AsyncVoidMethod
     private async void MiningListView_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
+        TextBox? definitionsTextBox = _popupWindow.GetDefinitionTextBox(_currentLookupResultIndex);
+        string? formattedDefinitions = definitionsTextBox?.Text;
+        string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
+
         string selectedSpelling = (string)((ListViewItem)sender).Content;
         _popupWindow.HidePopup();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.MineToFileInsteadOfAnki)
         {
-            await MiningUtils.MineToFile(_lookupResults, _currentLookupResultIndex, _currentSourceText, _formattedDefinitions, _selectedDefinitions, _currentSourceTextCharPosition, selectedSpelling).ConfigureAwait(false);
+            await MiningUtils.MineToFile(_lookupResults, _currentLookupResultIndex, _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition, selectedSpelling).ConfigureAwait(false);
         }
         else
         {
-            await MiningUtils.Mine(_lookupResults, _currentLookupResultIndex, _currentSourceText, _formattedDefinitions, _selectedDefinitions, _currentSourceTextCharPosition, selectedSpelling).ConfigureAwait(false);
+            await MiningUtils.Mine(_lookupResults, _currentLookupResultIndex, _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition, selectedSpelling).ConfigureAwait(false);
         }
-    }
-
-    private void UpdatePosition(Point cursorPosition)
-    {
-        double mouseX = cursorPosition.X;
-        double mouseY = cursorPosition.Y;
-
-        DpiScale dpi = WindowsUtils.Dpi;
-        double currentWidth = ActualWidth * dpi.DpiScaleX;
-        double currentHeight = ActualHeight * dpi.DpiScaleY;
-
-        double dpiAwareXOffSet = 5 * dpi.DpiScaleX;
-        double dpiAwareYOffset = 15 * dpi.DpiScaleY;
-
-        Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
-        bool needsFlipX = mouseX + currentWidth > bounds.Right;
-        bool needsFlipY = mouseY + currentHeight > bounds.Bottom;
-
-        double newLeft;
-        double newTop;
-
-        if (needsFlipX)
-        {
-            // flip Leftwards while preventing -OOB
-            newLeft = mouseX - currentWidth - dpiAwareXOffSet;
-            if (newLeft < bounds.X)
-            {
-                newLeft = bounds.X;
-            }
-        }
-        else
-        {
-            // no flip
-            newLeft = mouseX - dpiAwareXOffSet;
-        }
-
-        if (needsFlipY)
-        {
-            // flip Upwards while preventing -OOB
-            newTop = mouseY - (currentHeight + dpiAwareYOffset);
-            if (newTop < bounds.Y)
-            {
-                newTop = bounds.Y;
-            }
-        }
-        else
-        {
-            // no flip
-            newTop = mouseY + dpiAwareYOffset;
-        }
-
-        // stick to edges if +OOB
-        if (newLeft + currentWidth > bounds.Right)
-        {
-            newLeft = bounds.Right - currentWidth;
-        }
-
-        if (newTop + currentHeight > bounds.Bottom)
-        {
-            newTop = bounds.Bottom - currentHeight;
-        }
-
-        WinApi.MoveWindowToPosition(_windowHandle, newLeft, newTop);
     }
 
     public static void CloseWindow()

@@ -3,7 +3,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using JL.Windows.Utilities;
-using Rectangle = System.Drawing.Rectangle;
 
 namespace JL.Windows.GUI;
 
@@ -41,7 +40,7 @@ internal sealed partial class ReadingSelectionWindow
         currentInstance.FontFamily = configManager.PopupFont;
         currentInstance.Owner = owner;
         currentInstance.Show();
-        currentInstance.UpdatePosition(WinApi.GetMousePosition());
+        WindowsUtils.UpdatePositionForSelectionWindows(currentInstance, currentInstance._windowHandle, WinApi.GetMousePosition());
 
         if (configManager.Focusable)
         {
@@ -76,69 +75,6 @@ internal sealed partial class ReadingSelectionWindow
         string selectedReading = (string)((ListViewItem)sender).Content;
         Hide();
         await PopupWindowUtils.PlayAudio(_primarySpelling!, selectedReading).ConfigureAwait(false);
-    }
-
-    private void UpdatePosition(Point cursorPosition)
-    {
-        double mouseX = cursorPosition.X;
-        double mouseY = cursorPosition.Y;
-
-        DpiScale dpi = WindowsUtils.Dpi;
-        double currentWidth = ActualWidth * dpi.DpiScaleX;
-        double currentHeight = ActualHeight * dpi.DpiScaleY;
-
-        double dpiAwareXOffSet = 5 * dpi.DpiScaleX;
-        double dpiAwareYOffset = 15 * dpi.DpiScaleY;
-
-        Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
-        bool needsFlipX = mouseX + currentWidth > bounds.Right;
-        bool needsFlipY = mouseY + currentHeight > bounds.Bottom;
-
-        double newLeft;
-        double newTop;
-
-        if (needsFlipX)
-        {
-            // flip Leftwards while preventing -OOB
-            newLeft = mouseX - currentWidth - dpiAwareXOffSet;
-            if (newLeft < bounds.X)
-            {
-                newLeft = bounds.X;
-            }
-        }
-        else
-        {
-            // no flip
-            newLeft = mouseX - dpiAwareXOffSet;
-        }
-
-        if (needsFlipY)
-        {
-            // flip Upwards while preventing -OOB
-            newTop = mouseY - (currentHeight + dpiAwareYOffset);
-            if (newTop < bounds.Y)
-            {
-                newTop = bounds.Y;
-            }
-        }
-        else
-        {
-            // no flip
-            newTop = mouseY + dpiAwareYOffset;
-        }
-
-        // stick to edges if +OOB
-        if (newLeft + currentWidth > bounds.Right)
-        {
-            newLeft = bounds.Right - currentWidth;
-        }
-
-        if (newTop + currentHeight > bounds.Bottom)
-        {
-            newTop = bounds.Bottom - currentHeight;
-        }
-
-        WinApi.MoveWindowToPosition(_windowHandle, newLeft, newTop);
     }
 
     public static void HideWindow()

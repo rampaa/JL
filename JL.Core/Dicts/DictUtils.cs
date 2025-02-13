@@ -454,7 +454,7 @@ public static class DictUtils
         DictType.NonspecificNazeka
     ];
 
-    internal static readonly DictType[] s_kanjiDictTypes =
+    public static readonly DictType[] KanjiDictTypes =
     [
         DictType.Kanjidic,
         DictType.NonspecificKanjiYomichan,

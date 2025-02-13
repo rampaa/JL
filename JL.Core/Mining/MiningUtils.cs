@@ -688,9 +688,9 @@ public static class MiningUtils
         {
             dictTypes = DictUtils.s_wordDictTypes;
         }
-        else if (DictUtils.s_kanjiDictTypes.Contains(selectedLookupResult.Dict.Type))
+        else if (DictUtils.KanjiDictTypes.Contains(selectedLookupResult.Dict.Type))
         {
-            dictTypes = DictUtils.s_kanjiDictTypes;
+            dictTypes = DictUtils.KanjiDictTypes;
         }
         else if (DictUtils.s_nameDictTypes.Contains(selectedLookupResult.Dict.Type))
         {
@@ -1055,7 +1055,7 @@ public static class MiningUtils
             filePath = Path.Join(Utils.ResourcesPath, "mined_names.txt");
             jlFields = JLFieldUtils.JLFieldsForNameDicts;
         }
-        else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
+        else if (DictUtils.KanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
             filePath = Path.Join(Utils.ResourcesPath, "mined_kanjis.txt");
             jlFields = JLFieldUtils.JLFieldsForKanjiDicts;
@@ -1118,7 +1118,7 @@ public static class MiningUtils
             {
                 _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
             }
-            else if (DictUtils.s_kanjiDictTypes.Contains(dictType))
+            else if (DictUtils.KanjiDictTypes.Contains(dictType))
             {
                 _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
             }
@@ -1194,7 +1194,7 @@ public static class MiningUtils
         {
             _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
         }
-        else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
+        else if (DictUtils.KanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
         }
