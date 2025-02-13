@@ -58,7 +58,7 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Mining mode button"
+                            <TextBlock HorizontalAlignment="Left" Text="&quot;Enable mining mode&quot; button"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
@@ -870,7 +870,10 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Mine button"
                                        Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="Specifies the mouse button to use with the ➕ button for selecting a spelling to set as the &quot;Selected Spelling&quot; field
+                                       &#10;If no reading is available, the &quot;Selected Spelling&quot; field will be set to the primary spelling"/>
                             <ComboBox x:Name="MineMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
                                 <ComboBoxItem Content="Left button" Tag="Left" />
@@ -881,9 +884,11 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Mine primary spelling button"
+                            <TextBlock HorizontalAlignment="Left" Text="&quot;Mine primary spelling&quot; button"
                                        Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="Sets the &quot;Selected Spelling&quot; field to the value of the primary spelling and mines the term."/>
                             <ComboBox x:Name="MinePrimarySpellingMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
                                 <ComboBoxItem Content="Left button" Tag="Left" />
