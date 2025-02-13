@@ -565,7 +565,7 @@ internal sealed partial class PopupWindow
         UpdateLayout();
     }
 
-    private void AddEventHandlersToTextBox(FrameworkElement textBox)
+    private void AddEventHandlersToTextBox(TextBox textBox)
     {
         textBox.PreviewMouseUp += TextBox_PreviewMouseUp;
         textBox.MouseMove += TextBox_MouseMove;
@@ -583,6 +583,16 @@ internal sealed partial class PopupWindow
         textBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
         textBox.MouseLeave += OnMouseLeave;
         textBox.PreviewMouseLeftButtonDown += DefinitionsTextBox_PreviewMouseLeftButtonDown;
+    }
+
+    private void AddEventHandlersToPrimarySpellingTextBox(FrameworkElement textBox)
+    {
+        textBox.PreviewMouseUp += PrimarySpellingTextBox_PreviewMouseUp;
+        textBox.MouseMove += TextBox_MouseMove;
+        textBox.LostFocus += Unselect;
+        textBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
+        textBox.MouseLeave += OnMouseLeave;
+        textBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
     }
 
     private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultCount, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize, Button[]? miningButtons)
@@ -606,7 +616,7 @@ internal sealed partial class PopupWindow
             new Thickness(2, 0, 0, 0),
             PopupContextMenu);
 
-            AddEventHandlersToTextBox(primarySpellingFrameworkElement);
+            AddEventHandlersToPrimarySpellingTextBox(primarySpellingFrameworkElement);
         }
         else
         {
@@ -1866,6 +1876,33 @@ internal sealed partial class PopupWindow
         }
 
         await HandleTextBoxMouseUp(textBox).ConfigureAwait(false);
+    }
+
+    // ReSharper disable once AsyncVoidMethod
+    private async void PrimarySpellingTextBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        TextBox textBox = (TextBox)sender;
+        _lastInteractedTextBox = textBox;
+        LastSelectedText = _lastInteractedTextBox.SelectedText;
+
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.InactiveLookupMode
+            || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
+            || ((!configManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
+                && (!configManager.LookupOnMouseClickOnly || e.ChangedButton != configManager.LookupOnClickMouseButton)))
+        {
+            if ((configManager.LookupOnMouseClickOnly
+                || configManager.LookupOnSelectOnly
+                || e.ChangedButton != configManager.MiningModeMouseButton)
+                    && (e.ChangedButton == configManager.MinePrimarySpellingMouseButton))
+            {
+                await HandleMining(true).ConfigureAwait(false);
+            }
+        }
+        else
+        {
+            await HandleTextBoxMouseUp(textBox).ConfigureAwait(false);
+        }
     }
 
     private Task HandleTextBoxMouseUp(TextBox textBox)

@@ -888,7 +888,9 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
-                                       ToolTip="Sets the value of the &quot;Selected Spelling&quot; field to the primary spelling and mines the term"/>
+                                       ToolTip="Sets the value of the &quot;Selected Spelling&quot; field to the primary spelling and mines the term.
+                                       &#10;Can be used to mine the term by clicking either the ➕ button or the Primary Spelling text box.
+                                       &#10;When clicking the Primary Spelling text box, the &quot;Lookup button&quot; and &quot;'Enable mining mode' button&quot; will take precedence over this action."/>
                             <ComboBox x:Name="MinePrimarySpellingMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
                                 <ComboBoxItem Content="Left button" Tag="Left" />
