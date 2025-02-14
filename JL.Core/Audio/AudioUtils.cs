@@ -21,7 +21,7 @@ public static class AudioUtils
         }
     };
 
-    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new KeyValuePair<string, string>[6]
+    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new KeyValuePair<string, string>[]
     {
         new("mpeg", "mp3"),
         new("3gpp", "3gp"),

@@ -472,7 +472,7 @@ public static partial class JapaneseUtils
         return sb.ToString();
     }
 
-    public static string GetPrimarySpellingAndReadingMapping(string primarySpelling, string reading)
+    internal static string GetPrimarySpellingAndReadingMapping(string primarySpelling, string reading)
     {
         if (!KanaRegex.IsMatch(primarySpelling))
         {

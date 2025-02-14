@@ -1308,11 +1308,9 @@ internal sealed partial class PopupWindow
         {
             return PopupWindowUtils.PlayAudio(lookupResult.PrimarySpelling, lookupResult.Readings?[0]);
         }
-        else
-        {
-            ReadingSelectionWindow.Show(this, lookupResult.PrimarySpelling, lookupResult.Readings);
-            return Task.CompletedTask;
-        }
+
+        ReadingSelectionWindow.Show(this, lookupResult.PrimarySpelling, lookupResult.Readings);
+        return Task.CompletedTask;
     }
 
     private Task HandleMining(bool minePrimarySpelling)
@@ -1894,7 +1892,7 @@ internal sealed partial class PopupWindow
             if ((configManager.LookupOnMouseClickOnly
                 || configManager.LookupOnSelectOnly
                 || e.ChangedButton != configManager.MiningModeMouseButton)
-                    && (e.ChangedButton == configManager.MinePrimarySpellingMouseButton))
+                    && e.ChangedButton == configManager.MinePrimarySpellingMouseButton)
             {
                 await HandleMining(true).ConfigureAwait(false);
             }

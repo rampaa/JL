@@ -5,20 +5,20 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.PitchAccent;
 
-public sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRecord>
+internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRecord>
 {
     public string Spelling { get; }
     public string? Reading { get; }
     public byte Position { get; }
 
-    internal PitchAccentRecord(string spelling, string? reading, byte position)
+    public PitchAccentRecord(string spelling, string? reading, byte position)
     {
         Spelling = spelling;
         Reading = reading;
         Position = position;
     }
 
-    internal PitchAccentRecord(List<JsonElement> jsonElements)
+    public PitchAccentRecord(List<JsonElement> jsonElements)
     {
         Spelling = jsonElements[0].GetString()!.GetPooledString();
 
