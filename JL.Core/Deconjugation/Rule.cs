@@ -72,8 +72,8 @@ internal readonly struct Rule(string type, string[] decEnd, string[] conEnd, str
                && ContextRule == other.ContextRule
                && DecEnd.SequenceEqual(other.DecEnd)
                && ConEnd.SequenceEqual(other.ConEnd)
-               && (other.DecTag is not null ? (DecTag?.SequenceEqual(other.DecTag) ?? false) : DecTag is null)
-               && (other.ConTag is not null ? (ConTag?.SequenceEqual(other.ConTag) ?? false) : ConTag is null);
+               && (other.DecTag is not null ? DecTag?.SequenceEqual(other.DecTag) ?? false : DecTag is null)
+               && (other.ConTag is not null ? ConTag?.SequenceEqual(other.ConTag) ?? false : ConTag is null);
     }
 
     public static bool operator ==(Rule left, Rule right) => left.Equals(right);

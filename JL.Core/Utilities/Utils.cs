@@ -38,7 +38,7 @@ public static partial class Utils
         MinimumLevel = LogEventLevel.Error
     };
 
-    public static readonly ILogger Logger = new LoggerConfiguration()
+    public static readonly Logger Logger = new LoggerConfiguration()
         .MinimumLevel.ControlledBy(s_loggingLevelSwitch)
         .WriteTo.File(Path.Join(ApplicationPath, "Logs", "log.txt"),
             formatProvider: CultureInfo.InvariantCulture,
