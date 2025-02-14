@@ -371,6 +371,11 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         return int.MaxValue;
     }
 
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, PrimarySpelling.GetHashCode(StringComparison.Ordinal));
+    }
+
     public override bool Equals(object? obj)
     {
         return obj is JmdictRecord jmdictRecord
@@ -383,14 +388,6 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         return other is not null
             && Id == other.Id
             && PrimarySpelling == other.PrimarySpelling;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            return Id * PrimarySpelling.GetHashCode(StringComparison.Ordinal);
-        }
     }
 
     public static bool operator ==(JmdictRecord? left, JmdictRecord? right) => left?.Equals(right) ?? right is null;

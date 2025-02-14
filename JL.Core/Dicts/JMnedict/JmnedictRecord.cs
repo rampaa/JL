@@ -71,6 +71,11 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
         return defResult.ToString();
     }
 
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, PrimarySpelling.GetHashCode(StringComparison.Ordinal));
+    }
+
     public override bool Equals(object? obj)
     {
         return obj is JmnedictRecord jmnedictObj
@@ -83,14 +88,6 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
         return other is not null
                && Id == other.Id
                && PrimarySpelling == other.PrimarySpelling;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            return Id * PrimarySpelling.GetHashCode(StringComparison.Ordinal);
-        }
     }
 
     public static bool operator ==(JmnedictRecord? left, JmnedictRecord? right) => left?.Equals(right) ?? right is null;

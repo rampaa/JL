@@ -54,6 +54,11 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
             : Reading!.GetPooledString();
     }
 
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Spelling.GetHashCode(StringComparison.Ordinal), Reading?.GetHashCode(StringComparison.Ordinal) ?? 0);
+    }
+
     public override bool Equals(object? obj)
     {
         return obj is PitchAccentRecord pitchAccentRecord
@@ -66,11 +71,6 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
         return other is not null
             && Spelling == other.Spelling
             && Reading == other.Reading;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Spelling, Reading);
     }
 
     public static bool operator ==(PitchAccentRecord? left, PitchAccentRecord? right) => left?.Equals(right) ?? right is null;
