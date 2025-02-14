@@ -489,31 +489,45 @@ internal static class WindowsUtils
 
     public static void ShowColorPicker(Button button)
     {
-        using ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
+        ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
         HandyControl.Controls.PopupWindow window = new()
         {
             PopupElement = picker,
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
+
         picker.SelectedBrush = (SolidColorBrush)button.Tag;
-
-        picker.Canceled += delegate
-        {
-            window.Close();
-        };
-
-        picker.Confirmed += delegate
-        {
-            ConfirmColor(button, picker.SelectedBrush, window);
-        };
+        picker.Tag = (window, button);
+        picker.Canceled += ColorPicker_Cancelled;
+        picker.Confirmed += ColorPicker_Confirmed;
 
         window.ShowDialog(picker, false);
     }
 
-    private static void ConfirmColor(Button button, Brush selectedBrush, Window window)
+    private static void ColorPicker_Cancelled(object? sender, EventArgs e)
     {
-        SetButtonColor(button, selectedBrush);
+        if (sender is not ColorPicker colorPicker)
+        {
+            return;
+        }
+
+        (HandyControl.Controls.PopupWindow window, _) = ((HandyControl.Controls.PopupWindow, Button))colorPicker.Tag;
+
         window.Close();
+        colorPicker.Dispose();
+    }
+
+    private static void ColorPicker_Confirmed(object? sender, FunctionEventArgs<Color> e)
+    {
+        if (sender is not ColorPicker colorPicker)
+        {
+            return;
+        }
+
+        (HandyControl.Controls.PopupWindow window, Button button) = ((HandyControl.Controls.PopupWindow, Button))colorPicker.Tag;
+        SetButtonColor(button, colorPicker.SelectedBrush);
+        window.Close();
+        colorPicker.Dispose();
     }
 
     public static void SetButtonColor(Button button, Brush selectedBrush)
