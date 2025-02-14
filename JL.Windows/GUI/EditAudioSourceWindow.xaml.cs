@@ -18,7 +18,9 @@ internal sealed partial class EditAudioSourceWindow
     private readonly string _uri;
     private readonly AudioSource _audioSource;
 
+#pragma warning disable CA1054 // URI-like parameters should not be strings
     public EditAudioSourceWindow(string uri, AudioSource audioSource)
+#pragma warning restore CA1054 // URI-like parameters should not be strings
     {
         _uri = uri;
         _audioSource = audioSource;

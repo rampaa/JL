@@ -177,14 +177,17 @@ internal sealed class ConfigManager
     public KeyGesture SelectNextLookupResultKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Alt);
     public KeyGesture SelectPreviousLookupResultKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Alt);
     public KeyGesture MineSelectedLookupResultKeyGesture { get; private set; } = new(Key.D5, ModifierKeys.Alt);
-
     #endregion
 
     #region Advanced
 
     public int MaxSearchLength { get; private set; } = 37;
     public int MaxNumResultsNotInMiningMode { get; private set; } = 7;
+
+#pragma warning disable CA1056 // URI-like properties should not be strings
     public string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
+#pragma warning restore CA1056 // URI-like properties should not be strings
+
     public string BrowserPath { get; private set; } = "";
     public bool DisableHotkeys { get; set; } // = false;
     public bool GlobalHotKeys { get; private set; } = true;
