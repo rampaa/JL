@@ -30,9 +30,7 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
 
     public override bool Equals(object? obj)
     {
-        return obj is Translation other
-            && NameTypeList.SequenceEqual(other.NameTypeList)
-            && TransDetList.SequenceEqual(other.TransDetList);
+        return obj is Translation translation && Equals(translation);
     }
 
     public bool Equals(Translation other)

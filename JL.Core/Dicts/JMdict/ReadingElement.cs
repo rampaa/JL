@@ -32,10 +32,7 @@ internal readonly struct ReadingElement(string reb, List<string> reRestrList, Li
 
     public override bool Equals(object? obj)
     {
-        return obj is ReadingElement other
-            && Reb == other.Reb
-            && ReRestrList.SequenceEqual(other.ReRestrList)
-            && ReInfList.SequenceEqual(other.ReInfList);
+        return obj is ReadingElement readingElement && Equals(readingElement);
     }
 
     public bool Equals(ReadingElement other)

@@ -8,14 +8,14 @@ public readonly struct FrequencyRecord(string spelling, int frequency) : IEquata
     internal string Spelling { get; } = spelling;
     internal int Frequency { get; } = frequency;
 
-    public override bool Equals(object? obj)
-    {
-        return obj is FrequencyRecord record && Spelling == record.Spelling;
-    }
-
     public override int GetHashCode()
     {
         return Spelling.GetHashCode(StringComparison.InvariantCulture);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is FrequencyRecord frequencyRecord && Equals(frequencyRecord);
     }
 
     public bool Equals(FrequencyRecord other)

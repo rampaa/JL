@@ -25,9 +25,7 @@ internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEqu
 
     public override bool Equals(object? obj)
     {
-        return obj is KanjiElement other
-            && Keb == other.Keb
-            && KeInfList.SequenceEqual(other.KeInfList);
+        return obj is KanjiElement kanjiElement && Equals(kanjiElement);
     }
 
     public bool Equals(KanjiElement other)

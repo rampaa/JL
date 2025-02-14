@@ -62,14 +62,7 @@ internal readonly struct Rule(string type, string[] decEnd, string[] conEnd, str
 
     public override bool Equals(object? obj)
     {
-        return obj is Rule rule
-               && Type == rule.Type
-               && Detail == rule.Detail
-               && ContextRule == rule.ContextRule
-               && DecEnd.SequenceEqual(rule.DecEnd)
-               && ConEnd.SequenceEqual(rule.ConEnd)
-               && (rule.DecTag is not null ? (DecTag?.SequenceEqual(rule.DecTag) ?? false) : DecTag is null)
-               && (rule.ConTag is not null ? (ConTag?.SequenceEqual(rule.ConTag) ?? false) : ConTag is null);
+        return obj is Rule rule && Equals(rule);
     }
 
     public bool Equals(Rule other)
