@@ -27,22 +27,22 @@ internal static class MagpieUtils
         WinApi.RemoveProp(windowHandle, "Magpie.ToolWindow");
     }
 
-    public static double GetMagpieWindowLeftEdgePosition(nint windowHandle)
+    public static double GetMagpieWindowLeftEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestLeft");
     }
 
-    public static double GetMagpieWindowRightEdgePosition(nint windowHandle)
+    public static double GetMagpieWindowRightEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestRight");
     }
 
-    public static double GetMagpieWindowTopEdgePosition(nint windowHandle)
+    public static double GetMagpieWindowTopEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestTop");
     }
 
-    public static double GetMagpieWindowBottomEdgePosition(nint windowHandle)
+    public static double GetMagpieWindowBottomEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestBottom");
     }

@@ -1892,7 +1892,7 @@ internal sealed partial class PopupWindow
             if ((configManager.LookupOnMouseClickOnly
                 || configManager.LookupOnSelectOnly
                 || e.ChangedButton != configManager.MiningModeMouseButton)
-                    && e.ChangedButton == configManager.MinePrimarySpellingMouseButton)
+                    && (e.ChangedButton == configManager.MinePrimarySpellingMouseButton))
             {
                 await HandleMining(true).ConfigureAwait(false);
             }
