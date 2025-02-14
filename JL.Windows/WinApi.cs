@@ -35,19 +35,44 @@ internal sealed partial class WinApi
         internal const int MOD_NOREPEAT = 0x4000;
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct LPPOINT
+        internal struct LPPOINT : IEquatable<LPPOINT>
         {
             public int X;
             public int Y;
+
+            public override readonly int GetHashCode()
+            {
+                unchecked
+                {
+                    int hash = (17 * 37) + X;
+                    hash = (hash * 37) + Y;
+                    return hash;
+                }
+            }
+
+            public override readonly bool Equals(object? obj)
+            {
+                return obj is LPPOINT lpPoint && Equals(lpPoint);
+            }
+
+            public readonly bool Equals(LPPOINT other)
+            {
+                return X == other.X && Y == other.Y;
+            }
+
+            public static bool operator ==(LPPOINT left, LPPOINT right) => left.Equals(right);
+            public static bool operator !=(LPPOINT left, LPPOINT right) => !left.Equals(right);
         }
 
         // ReSharper disable UnusedMember.Global
+#pragma warning disable CA1028
         internal enum ChangeWindowMessageFilterExAction : uint
         {
             Reset = 0,
             Allow = 1,
             Disallow = 2
         }
+#pragma warning restore CA1028
         // ReSharper restore UnusedMember.Global
 
         [LibraryImport("user32.dll", EntryPoint = "AddClipboardFormatListener", SetLastError = true)]
