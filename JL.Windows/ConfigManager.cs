@@ -125,6 +125,10 @@ internal sealed class ConfigManager
     public double DeconjugationInfoFontSize { get; set; } = 17;
     public Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public double DictTypeFontSize { get; set; } = 15;
+    public Brush AudioButtonColor { get; private set; } = Brushes.White;
+    public double AudioButtonFontSize { get; set; } = 12;
+    public Brush MiningButtonColor { get; private set; } = Brushes.White;
+    public double MiningButtonFontSize { get; set; } = 12;
     public Brush SeparatorColor { get; private set; } = Brushes.White;
     public bool HideDictTabsWithNoResults { get; private set; } = true;
     public bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } // = false;
@@ -427,6 +431,8 @@ internal sealed class ConfigManager
         FrequencyFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FrequencyFontSize, nameof(FrequencyFontSize), double.TryParse);
         DeconjugationInfoFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize), double.TryParse);
         DictTypeFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DictTypeFontSize, nameof(DictTypeFontSize), double.TryParse);
+        AudioButtonFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AudioButtonFontSize, nameof(AudioButtonFontSize), double.TryParse);
+        MiningButtonFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MiningButtonFontSize, nameof(MiningButtonFontSize), double.TryParse);
         MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds), double.TryParse);
         MaxNumResultsNotInMiningMode = ConfigDBManager.GetValueFromConfig(connection, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
 
@@ -509,10 +515,10 @@ internal sealed class ConfigManager
         DefinitionsColor = ConfigUtils.GetFrozenBrushFromConfig(connection, DefinitionsColor, nameof(DefinitionsColor));
         FrequencyColor = ConfigUtils.GetFrozenBrushFromConfig(connection, FrequencyColor, nameof(FrequencyColor));
         DeconjugationInfoColor = ConfigUtils.GetFrozenBrushFromConfig(connection, DeconjugationInfoColor, nameof(DeconjugationInfoColor));
-
         SeparatorColor = ConfigUtils.GetFrozenBrushFromConfig(connection, SeparatorColor, nameof(SeparatorColor));
-
         DictTypeColor = ConfigUtils.GetFrozenBrushFromConfig(connection, DictTypeColor, nameof(DictTypeColor));
+        AudioButtonColor = ConfigUtils.GetFrozenBrushFromConfig(connection, AudioButtonColor, nameof(AudioButtonColor));
+        MiningButtonColor = ConfigUtils.GetFrozenBrushFromConfig(connection, MiningButtonColor, nameof(MiningButtonColor));
 
         HighlightColor = ConfigUtils.GetFrozenBrushFromConfig(connection, HighlightColor, nameof(HighlightColor));
         mainWindow.MainTextBox.SelectionBrush = HighlightColor;
@@ -859,7 +865,8 @@ internal sealed class ConfigManager
         WindowsUtils.SetButtonColor(preferenceWindow.PopupBackgroundColorButton, PopupBackgroundColor);
         WindowsUtils.SetButtonColor(preferenceWindow.SeparatorColorButton, SeparatorColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DictTypeColorButton, DictTypeColor);
-
+        WindowsUtils.SetButtonColor(preferenceWindow.AudioButtonColorButton, AudioButtonColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.MiningButtonColorButton, MiningButtonColor);
 
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         preferenceWindow.SearchUrlTextBox.Text = SearchUrl;
@@ -971,6 +978,8 @@ internal sealed class ConfigManager
         preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value = AlternativeSpellingsFontSize;
         preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value = DeconjugationInfoFontSize;
         preferenceWindow.DictTypeFontSizeNumericUpDown.Value = DictTypeFontSize;
+        preferenceWindow.AudioButtonFontSizeNumericUpDown.Value = AudioButtonFontSize;
+        preferenceWindow.MiningButtonFontSizeNumericUpDown.Value = MiningButtonFontSize;
         preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value = MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds;
         preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value = TextBoxCustomLineHeight;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
@@ -1363,6 +1372,12 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(DictTypeFontSize),
                 preferenceWindow.DictTypeFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
+            ConfigDBManager.UpdateSetting(connection, nameof(AudioButtonFontSize),
+                preferenceWindow.AudioButtonFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(MiningButtonFontSize),
+                preferenceWindow.MiningButtonFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
             ConfigDBManager.UpdateSetting(connection, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds),
                 preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
@@ -1372,6 +1387,10 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(SeparatorColor), preferenceWindow.SeparatorColorButton.Tag.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(DictTypeColor), preferenceWindow.DictTypeColorButton.Tag.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(AudioButtonColor), preferenceWindow.AudioButtonColorButton.Tag.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(MiningButtonColor), preferenceWindow.MiningButtonColorButton.Tag.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupFocusOnLookup),
                 preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked.ToString()!);

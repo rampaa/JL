@@ -767,13 +767,13 @@ internal sealed partial class PopupWindow
             }
         }
 
-        if (MiningMode)
+        if (MiningMode && configManager.AudioButtonFontSize > 0)
         {
             Button audioButton = new()
             {
                 Name = "AudioButton",
                 Content = "🔊",
-                Foreground = configManager.DefinitionsColor,
+                Foreground = configManager.AudioButtonColor,
                 VerticalAlignment = VerticalAlignment.Top,
                 // VerticalContentAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(3, 0, 0, 0),
@@ -783,7 +783,7 @@ internal sealed partial class PopupWindow
                 Cursor = Cursors.Arrow,
                 BorderThickness = new Thickness(0),
                 Padding = new Thickness(0),
-                FontSize = 12
+                FontSize = configManager.AudioButtonFontSize
             };
 
             audioButton.PreviewMouseUp += AudioButton_Click;
@@ -883,14 +883,14 @@ internal sealed partial class PopupWindow
             _ = top.Children.Add(dictTypeTextBlock);
         }
 
-        if (MiningMode)
+        if (MiningMode && configManager.MiningButtonFontSize > 0)
         {
             Button miningButton = new()
             {
                 Name = "MiningButton",
                 Content = '➕',
                 ToolTip = "Mine",
-                Foreground = configManager.DefinitionsColor,
+                Foreground = configManager.MiningButtonColor,
                 VerticalAlignment = VerticalAlignment.Top,
                 VerticalContentAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(3, 0, 0, 0),
@@ -900,7 +900,7 @@ internal sealed partial class PopupWindow
                 Cursor = Cursors.Arrow,
                 BorderThickness = new Thickness(0),
                 Padding = new Thickness(0),
-                FontSize = 12
+                FontSize = configManager.MiningButtonFontSize
             };
 
             miningButton.PreviewMouseUp += MiningButton_PreviewMouseUp;

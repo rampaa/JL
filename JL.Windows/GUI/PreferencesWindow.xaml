@@ -1020,6 +1020,38 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Audio button color"
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <Button x:Name="AudioButtonColorButton"  HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Audio button font size"
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="AudioButtonFontSizeNumericUpDown" Maximum="100"
+                                              Minimum="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Mining button color"
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <Button x:Name="MiningButtonColorButton"  HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Mining button font size"
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MiningButtonFontSizeNumericUpDown" Maximum="100"
+                                              Minimum="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Separator Color"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="SeparatorColorButton"  HorizontalAlignment="Right"
