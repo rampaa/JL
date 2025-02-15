@@ -771,12 +771,9 @@ internal sealed partial class MainWindow
         {
             if (MainTextBox.Text.Length > 0)
             {
-                if (configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
-                {
-                    return FirstPopupWindow.LookupOnSelect(MainTextBox);
-                }
-
-                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true);
+                return configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex
+                    ? FirstPopupWindow.LookupOnSelect(MainTextBox)
+                    : FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true);
             }
         }
 
@@ -1175,6 +1172,8 @@ internal sealed partial class MainWindow
             configManager.FrequencyFontSize = Math.Round(configManager.FrequencyFontSize / fontScale);
             configManager.PrimarySpellingFontSize = Math.Round(configManager.PrimarySpellingFontSize / fontScale);
             configManager.ReadingsFontSize = Math.Round(configManager.ReadingsFontSize / fontScale);
+            configManager.AudioButtonFontSize = Math.Round(configManager.AudioButtonFontSize / fontScale);
+            configManager.MiningButtonFontSize = Math.Round(configManager.MiningButtonFontSize / fontScale);
         }
     }
 
