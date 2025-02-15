@@ -53,7 +53,7 @@ internal sealed class ConfigManager
     public bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } // = false;
     public bool MainWindowFocusOnHover { get; private set; } // = false;
     public bool SteppedBacklogWithMouseWheel { get; private set; } = true;
-    public bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } // = false;
+    public bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } = true;
     public bool EnableBacklog { get; private set; } = true;
     public bool AutoSaveBacklogBeforeClosing { get; private set; } // = false;
     public bool TextToSpeechOnTextChange { get; private set; } // = false;
@@ -99,7 +99,6 @@ internal sealed class ConfigManager
     public bool FixedPopupBottomPositioning { get; private set; } // = false;
     public double FixedPopupYPosition { get; set; } // = 0;
     public bool PopupFocusOnLookup { get; private set; } // = false;
-    public bool ShowMiningModeReminder { get; private set; } = true;
     public bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
     public Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0))
     {
@@ -337,7 +336,6 @@ internal sealed class ConfigManager
         }
 
         PopupFocusOnLookup = ConfigDBManager.GetValueFromConfig(connection, PopupFocusOnLookup, nameof(PopupFocusOnLookup), bool.TryParse);
-        ShowMiningModeReminder = ConfigDBManager.GetValueFromConfig(connection, ShowMiningModeReminder, nameof(ShowMiningModeReminder), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInPopups = ConfigDBManager.GetValueFromConfig(connection, DisableLookupsForNonJapaneseCharsInPopups, nameof(DisableLookupsForNonJapaneseCharsInPopups), bool.TryParse);
         FixedPopupPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupPositioning, nameof(FixedPopupPositioning), bool.TryParse);
         FixedPopupRightPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupRightPositioning, nameof(FixedPopupRightPositioning), bool.TryParse);
@@ -1004,7 +1002,6 @@ internal sealed class ConfigManager
         preferenceWindow.MineMouseButtonComboBox.SelectedValue = MineMouseButton.ToString();
         preferenceWindow.MinePrimarySpellingMouseButtonComboBox.SelectedValue = MinePrimarySpellingMouseButton.ToString();
 
-        preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
         preferenceWindow.HideDictTabsWithNoResultsCheckBox.IsChecked = HideDictTabsWithNoResults;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked = AutoHidePopupIfMouseIsNotOverIt;
@@ -1416,9 +1413,6 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursor", preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, "PopupFlip", preferenceWindow.PopupFlipComboBox.SelectedValue.ToString()!);
-
-            ConfigDBManager.UpdateSetting(connection, nameof(ShowMiningModeReminder),
-                preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(DisableLookupsForNonJapaneseCharsInPopups),
                 preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked.ToString()!);

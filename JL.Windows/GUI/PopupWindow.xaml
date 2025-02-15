@@ -33,13 +33,6 @@
             </Button>
         </Grid>
 
-        <TextBlock Grid.Row="1" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,0,0,0"
-                       Visibility="Collapsed" TextWrapping="Wrap"
-                       Background="Transparent"
-                       Foreground="{Binding Path=Foreground,
-                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
-        </TextBlock>
-
         <ItemsControl Grid.Row="2" Name="ItemsControlButtons" Visibility="Collapsed"
                           Background="Transparent">
             <ItemsControl.ItemsPanel>

@@ -108,14 +108,6 @@ internal sealed partial class PopupWindow
         SearchMenuItem.SetInputGestureText(configManager.SearchWithBrowserKeyGesture);
 
         AddMenuItemsToEditableTextBoxContextMenu();
-
-        if (configManager.ShowMiningModeReminder)
-        {
-            TextBlockMiningModeReminder.Text = string.Create(CultureInfo.InvariantCulture,
-                $"Click the ➕ button to mine,\nor press {configManager.ClosePopupKeyGesture.ToFormattedString()} or click on the main window to exit.");
-            TextBlockMiningModeReminder.ToolTip = "This message can be hidden by disabling Preferences->Popup->Show mining mode reminder";
-            TextBlockMiningModeReminder.Cursor = Cursors.Help;
-        }
     }
 
     private void AddMenuItemsToEditableTextBoxContextMenu()
@@ -1848,11 +1840,6 @@ internal sealed partial class PopupWindow
         MiningMode = true;
 
         TitleBarGrid.Visibility = Visibility.Visible;
-        if (ConfigManager.Instance.ShowMiningModeReminder && this == MainWindow.Instance.FirstPopupWindow)
-        {
-            TextBlockMiningModeReminder.Visibility = Visibility.Visible;
-        }
-
         ItemsControlButtons.Visibility = Visibility.Visible;
     }
 
@@ -2153,7 +2140,6 @@ internal sealed partial class PopupWindow
 
         MiningMode = false;
         TitleBarGrid.Visibility = Visibility.Collapsed;
-        TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         ItemsControlButtons.ItemsSource = null;
         _buttonAll.Click -= DictTypeButtonOnClick;
