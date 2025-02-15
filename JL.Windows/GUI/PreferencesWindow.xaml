@@ -1307,7 +1307,29 @@
                             <TextBox x:Name="PlayAudioKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Play audio" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Play audio for the first reading" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ClickAudioButtonKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Click audio button hotkey" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ClickMiningButtonKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Click mining button hotkey" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1558,10 +1580,16 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="SelectNextLookupResultKeyGestureTextBox"
+                            <TextBox x:Name="SelectNextItemKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Select the next lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Select next item"
+                                       Cursor="Help"
+                                       ToolTip="Selects the next item based on the active window.
+                                       &#10;If the reading selection window for audio is open, it selects the next reading.
+                                       &#10;If the spelling selection window for mining is open, it selects the next spelling.
+                                       &#10;If neither of those windows are open, but a popup is open in mining mode, it selects the next lookup result"
+                                       TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1569,10 +1597,16 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="SelectPreviousLookupResultKeyGestureTextBox"
+                            <TextBox x:Name="SelectPreviousItemKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Select the previous lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Select previous item"
+                                       Cursor="Help"
+                                       ToolTip="Selects the previous item based on the active window.
+                                       &#10;If the reading selection window for audio is open, it selects the previous reading.
+                                       &#10;If the spelling selection window for mining is open, it selects the previous spelling.
+                                       &#10;If neither of those windows are open, but a popup is open in mining mode, it selects the previous lookup result"
+                                       TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1580,10 +1614,16 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="MineSelectedLookupResultKeyGestureTextBox"
+                            <TextBox x:Name="ConfirmItemSelectionKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Mine selected lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Confirm selected item"
+                                       Cursor="Help"
+                                       ToolTip="Interacts with the selected item based on the active window.
+                                       &#10;If the reading selection window for audio is open, it plays the selected reading.
+                                       &#10;If the spelling selection window for mining is open, it mines the selected spelling.
+                                       &#10;If neither of those windows are open, but a popup is open in mining mode, it mines the selected entry using its primary spelling."
+                                       TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>

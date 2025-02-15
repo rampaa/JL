@@ -155,33 +155,54 @@ internal sealed partial class PopupWindow
 
     private void AddName(object sender, RoutedEventArgs e)
     {
-        ShowAddNameWindow();
+        ShowAddNameWindow(false);
     }
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
-        ShowAddWordWindow();
+        ShowAddWordWindow(false);
     }
 
-    private void ShowAddWordWindow()
+    private void ShowAddWordWindow(bool useSelectedListViewItemIfItExists)
     {
-        string text = _lastInteractedTextBox?.SelectionLength > 0
-            ? _lastInteractedTextBox.SelectedText
-            : LastLookupResults[_listViewItemIndex].PrimarySpelling;
+        string text;
+        if (PopupListView.SelectedItem is not null && useSelectedListViewItemIfItExists)
+        {
+            int index = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+            text = LastLookupResults[index].PrimarySpelling;
+        }
+        else
+        {
+            text = _lastInteractedTextBox?.SelectionLength > 0
+                ? _lastInteractedTextBox.SelectedText
+                : LastLookupResults[_listViewItemIndex].PrimarySpelling;
+        }
 
         WindowsUtils.ShowAddWordWindow(this, text);
     }
 
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
-        SearchWithBrowser();
+        SearchWithBrowser(false);
     }
 
-    private void SearchWithBrowser()
+    private void SearchWithBrowser(bool useSelectedListViewItemIfItExists)
     {
-        string text = _lastInteractedTextBox?.SelectionLength > 0
-            ? _lastInteractedTextBox.SelectedText
-            : LastLookupResults[_listViewItemIndex].PrimarySpelling;
+        string text;
+        if (useSelectedListViewItemIfItExists)
+        {
+            int listViewItemIndex = PopupListView.SelectedItem is not null
+                ? PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem)
+                : _listViewItemIndex;
+
+            text = LastLookupResults[listViewItemIndex].PrimarySpelling;
+        }
+        else
+        {
+            text = _lastInteractedTextBox?.SelectionLength > 0
+                ? _lastInteractedTextBox.SelectedText
+                : LastLookupResults[_listViewItemIndex].PrimarySpelling;
+        }
 
         WindowsUtils.SearchWithBrowser(text);
     }
@@ -287,7 +308,7 @@ internal sealed partial class PopupWindow
 
             if (configManager.AutoPlayAudio)
             {
-                return PlayAudio();
+                return PlayAudio(false);
             }
         }
         else
@@ -379,7 +400,7 @@ internal sealed partial class PopupWindow
 
             if (configManager.AutoPlayAudio)
             {
-                return PlayAudio();
+                return PlayAudio(false);
             }
         }
         else
@@ -750,7 +771,7 @@ internal sealed partial class PopupWindow
         {
             Button audioButton = new()
             {
-                Name = nameof(audioButton),
+                Name = "AudioButton",
                 Content = "🔊",
                 Foreground = configManager.DefinitionsColor,
                 VerticalAlignment = VerticalAlignment.Top,
@@ -765,7 +786,7 @@ internal sealed partial class PopupWindow
                 FontSize = 12
             };
 
-            audioButton.Click += AudioButton_Click;
+            audioButton.PreviewMouseUp += AudioButton_Click;
 
             _ = top.Children.Add(audioButton);
         }
@@ -866,7 +887,7 @@ internal sealed partial class PopupWindow
         {
             Button miningButton = new()
             {
-                Name = nameof(miningButton),
+                Name = "MiningButton",
                 Content = '➕',
                 ToolTip = "Mine",
                 Foreground = configManager.DefinitionsColor,
@@ -1296,31 +1317,89 @@ internal sealed partial class PopupWindow
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void AudioButton_Click(object sender, RoutedEventArgs e)
+    private async void AudioButton_Click(object sender, MouseButtonEventArgs e)
     {
-        await HandleAudioButtonClick().ConfigureAwait(false);
+        if (e.ChangedButton is not MouseButton.Right)
+        {
+            await HandleAudioButtonClick(false).ConfigureAwait(false);
+        }
     }
 
-    private Task HandleAudioButtonClick()
+    private Task HandleAudioButtonClick(bool useSelectedListViewItemIfItExists)
     {
-        LookupResult lookupResult = LastLookupResults[_listViewItemIndex];
+        if (LastLookupResults.Length is 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        StackPanel? popupListViewItem;
+        int listViewItemIndex;
+        if (useSelectedListViewItemIfItExists && PopupListView.SelectedItem is not null)
+        {
+            popupListViewItem = (StackPanel)PopupListView.SelectedItem!;
+            listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(popupListViewItem);
+        }
+        else
+        {
+            listViewItemIndex = _listViewItemIndex;
+            popupListViewItem = (StackPanel)PopupListView.Items[listViewItemIndex]!;
+        }
+
+        LookupResult lookupResult = LastLookupResults[listViewItemIndex];
         if (lookupResult.Readings is null || lookupResult.Readings.Length is 1)
         {
             return PopupWindowUtils.PlayAudio(lookupResult.PrimarySpelling, lookupResult.Readings?[0]);
         }
 
-        ReadingSelectionWindow.Show(this, lookupResult.PrimarySpelling, lookupResult.Readings);
+        Point position;
+        if (useSelectedListViewItemIfItExists)
+        {
+            Button? audioButton = popupListViewItem.GetChildByName<Button>("AudioButton");
+            if (audioButton is not null)
+            {
+                position = audioButton.PointToScreen(default);
+                position.Y += 7;
+                position.X += 7;
+            }
+            else
+            {
+                position = WinApi.GetMousePosition();
+            }
+        }
+        else
+        {
+            position = WinApi.GetMousePosition();
+        }
+
+        ReadingSelectionWindow.Show(this, lookupResult.PrimarySpelling, lookupResult.Readings, position);
         return Task.CompletedTask;
     }
 
-    private Task HandleMining(bool minePrimarySpelling)
+    private Task HandleMining(bool minePrimarySpelling, bool useSelectedListViewItemIfItExists)
     {
-        int listViewItemIndex = _listViewItemIndex;
+        if (LastLookupResults.Length is 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        StackPanel popupListViewItem;
+        int listViewItemIndex;
+        if (useSelectedListViewItemIfItExists && PopupListView.SelectedItem is not null)
+        {
+            popupListViewItem = (StackPanel)PopupListView.SelectedItem!;
+            listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(popupListViewItem);
+        }
+        else
+        {
+            listViewItemIndex = _listViewItemIndex;
+            popupListViewItem = (StackPanel)PopupListView.Items[listViewItemIndex]!;
+        }
+
+        LookupResult[] lookupResults = LastLookupResults;
+        LookupResult lookupResult = lookupResults[listViewItemIndex];
         string currentSourceText = _currentSourceText;
         int currentSourceTextCharPosition = _currentSourceTextCharPosition;
-        LookupResult[] lookupResults = LastLookupResults;
 
-        LookupResult lookupResult = lookupResults[listViewItemIndex];
         if (minePrimarySpelling
             || lookupResult.Readings is null
             || DictUtils.KanjiDictTypes.Contains(lookupResult.Dict.Type))
@@ -1336,7 +1415,27 @@ internal sealed partial class PopupWindow
                 : MiningUtils.Mine(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling);
         }
 
-        MiningSelectionWindow.Show(this, lookupResults, listViewItemIndex, currentSourceText, currentSourceTextCharPosition);
+        Point position;
+        if (useSelectedListViewItemIfItExists)
+        {
+            Button? audioButton = popupListViewItem.GetChildByName<Button>("MiningButton");
+            if (audioButton is not null)
+            {
+                position = audioButton.PointToScreen(default);
+                position.Y += 5;
+                position.X += 7;
+            }
+            else
+            {
+                position = WinApi.GetMousePosition();
+            }
+        }
+        else
+        {
+            position = WinApi.GetMousePosition();
+        }
+
+        MiningSelectionWindow.Show(this, lookupResults, listViewItemIndex, currentSourceText, currentSourceTextCharPosition, position);
         return Task.CompletedTask;
     }
 
@@ -1351,14 +1450,32 @@ internal sealed partial class PopupWindow
             return;
         }
 
-        await HandleMining(minePrimarySpelling).ConfigureAwait(false);
+        await HandleMining(minePrimarySpelling, false).ConfigureAwait(false);
     }
 
-    private void ShowAddNameWindow()
+    private void ShowAddNameWindow(bool useSelectedListViewItemIfItExists)
     {
         string text;
         string reading = "";
-        if (_lastInteractedTextBox?.SelectionLength > 0)
+
+        bool useSelectedItem = useSelectedListViewItemIfItExists && PopupListView.SelectedItem is not null;
+        if (useSelectedItem
+            || _lastInteractedTextBox is null
+            || _lastInteractedTextBox.SelectionLength is 0)
+        {
+            int listViewItemIndex = useSelectedItem
+                ? PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem!)
+                : _listViewItemIndex;
+
+            LookupResult lookupResult = LastLookupResults[listViewItemIndex];
+
+            text = lookupResult.PrimarySpelling;
+            string[]? readings = lookupResult.Readings;
+            reading = readings?.Length is 1
+                ? readings[0]
+                : "";
+        }
+        else
         {
             text = _lastInteractedTextBox.SelectedText;
             if (text == ChildPopupWindow?.LastSelectedText)
@@ -1368,15 +1485,6 @@ internal sealed partial class PopupWindow
                     ? readings[0]
                     : "";
             }
-        }
-        else
-        {
-            text = LastLookupResults[_listViewItemIndex].PrimarySpelling;
-
-            string[]? readings = LastLookupResults[_listViewItemIndex].Readings;
-            reading = readings?.Length is 1
-                ? readings[0]
-                : "";
         }
 
         if (reading == text)
@@ -1390,47 +1498,17 @@ internal sealed partial class PopupWindow
     // ReSharper disable once AsyncVoidMethod
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        e.Handled = true;
         await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
     }
 
-    private void SelectNextLookupResult()
-    {
-        int nextItemIndex = PopupListView.SelectedIndex + 1 < PopupListView.Items.Count
-            ? PopupListView.SelectedIndex + 1
-            : 0;
-
-        PopupListView.SelectedIndex = nextItemIndex;
-
-        PopupListView.ScrollIntoView(PopupListView.Items.GetItemAt(nextItemIndex));
-    }
-
-    private void SelectPreviousLookupResult()
-    {
-        int nextItemIndex = PopupListView.SelectedIndex - 1 >= 0
-            ? PopupListView.SelectedIndex - 1
-            : PopupListView.Items.Count - 1;
-
-        PopupListView.SelectedIndex = nextItemIndex;
-
-        PopupListView.ScrollIntoView(PopupListView.Items.GetItemAt(nextItemIndex));
-    }
-
-    public async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e)
+    public Task HandleHotKey(KeyGesture keyGesture)
     {
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        bool handled = false;
         if (keyGesture.IsEqual(configManager.DisableHotkeysKeyGesture))
         {
-            if (e is not null)
-            {
-                e.Handled = true;
-            }
-
-            handled = true;
-
             configManager.DisableHotkeys = !configManager.DisableHotkeys;
-
             if (configManager.GlobalHotKeys)
             {
                 if (configManager.DisableHotkeys)
@@ -1444,18 +1522,11 @@ internal sealed partial class PopupWindow
             }
         }
 
-        if (configManager.DisableHotkeys || handled)
+        else if (keyGesture.IsEqual(configManager.MiningModeKeyGesture))
         {
-            return;
-        }
-
-        if (keyGesture.IsEqual(configManager.MiningModeKeyGesture))
-        {
-            handled = true;
-
             if (MiningMode)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             EnableMiningMode();
@@ -1476,29 +1547,31 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.PlayAudioKeyGesture))
         {
-            handled = true;
+            return PlayAudio(true);
+        }
 
-            await PlayAudio().ConfigureAwait(false);
+        else if (keyGesture.IsEqual(configManager.ClickAudioButtonKeyGesture))
+        {
+            if (MiningMode)
+            {
+                return HandleAudioButtonClick(true);
+            }
         }
 
         else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
         {
-            handled = true;
-
             HidePopup();
         }
 
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
-            handled = true;
-
             if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
             {
                 if (!MiningMode)
                 {
                     if (Owner is PopupWindow previousPopupWindow)
                     {
-                        previousPopupWindow.ShowAddNameWindow();
+                        previousPopupWindow.ShowAddNameWindow(true);
                     }
 
                     else
@@ -1511,7 +1584,7 @@ internal sealed partial class PopupWindow
 
                 else
                 {
-                    ShowAddNameWindow();
+                    ShowAddNameWindow(false);
                 }
 
                 PopupWindowUtils.PopupAutoHideTimer.Start();
@@ -1520,15 +1593,13 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.ShowAddWordWindowKeyGesture))
         {
-            handled = true;
-
             if (DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready)
             {
                 if (!MiningMode)
                 {
                     if (Owner is PopupWindow previousPopupWindow)
                     {
-                        previousPopupWindow.ShowAddWordWindow();
+                        previousPopupWindow.ShowAddWordWindow(true);
                     }
 
                     else
@@ -1541,7 +1612,7 @@ internal sealed partial class PopupWindow
 
                 else
                 {
-                    ShowAddWordWindow();
+                    ShowAddWordWindow(false);
                 }
 
                 PopupWindowUtils.PopupAutoHideTimer.Start();
@@ -1550,13 +1621,11 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.SearchWithBrowserKeyGesture))
         {
-            handled = true;
-
             if (!MiningMode)
             {
                 if (Owner is PopupWindow previousPopupWindow)
                 {
-                    previousPopupWindow.SearchWithBrowser();
+                    previousPopupWindow.SearchWithBrowser(true);
                 }
 
                 else
@@ -1569,28 +1638,22 @@ internal sealed partial class PopupWindow
 
             else
             {
-                SearchWithBrowser();
+                SearchWithBrowser(false);
             }
         }
 
         else if (keyGesture.IsEqual(configManager.InactiveLookupModeKeyGesture))
         {
-            handled = true;
-
             configManager.InactiveLookupMode = !configManager.InactiveLookupMode;
         }
 
         else if (keyGesture.IsEqual(configManager.MotivationKeyGesture))
         {
-            handled = true;
-
-            await WindowsUtils.Motivate().ConfigureAwait(false);
+            return WindowsUtils.Motivate();
         }
 
         else if (keyGesture.IsEqual(configManager.NextDictKeyGesture))
         {
-            handled = true;
-
             bool foundSelectedButton = false;
 
             Button? nextButton = null;
@@ -1617,8 +1680,6 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.PreviousDictKeyGesture))
         {
-            handled = true;
-
             bool foundSelectedButton = false;
             Button? previousButton = null;
 
@@ -1661,8 +1722,6 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
-            handled = true;
-
             PopupWindowUtils.HidePopups(mainWindow.FirstPopupWindow);
 
             if (configManager.Focusable)
@@ -1688,76 +1747,65 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.SelectedTextToSpeechKeyGesture))
         {
-            handled = true;
-
-            if (MiningMode
-                && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
+            if (MiningMode && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
             {
-                string text = _lastInteractedTextBox?.SelectionLength > 0
-                    ? _lastInteractedTextBox.SelectedText
-                    : LastLookupResults[_listViewItemIndex].PrimarySpelling;
-
-                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text).ConfigureAwait(false);
-            }
-        }
-
-        else if (keyGesture.IsEqual(configManager.SelectNextLookupResultKeyGesture))
-        {
-            handled = true;
-
-            if (MiningMode)
-            {
-                SelectNextLookupResult();
-            }
-        }
-
-        else if (keyGesture.IsEqual(configManager.SelectPreviousLookupResultKeyGesture))
-        {
-            handled = true;
-
-            if (MiningMode)
-            {
-                SelectPreviousLookupResult();
-            }
-        }
-
-        else if (keyGesture.IsEqual(configManager.MineSelectedLookupResultKeyGesture))
-        {
-            handled = true;
-
-            if (MiningMode && PopupListView.SelectedItem is not null)
-            {
-                int index = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
-                TextBox? definitionsTextBox = GetDefinitionTextBox(index);
-                string? formattedDefinitions = definitionsTextBox?.Text;
-                string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
-
-                HidePopup();
-
-                LookupResult lookupResult = LastLookupResults[index];
-                if (configManager.MineToFileInsteadOfAnki)
+                string text;
+                if (PopupListView.SelectedItem is not null)
                 {
-                    await MiningUtils.MineToFile(LastLookupResults, index, _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition, lookupResult.PrimarySpelling).ConfigureAwait(false);
+                    int listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+                    text = LastLookupResults[listViewItemIndex].PrimarySpelling;
                 }
                 else
                 {
-                    await MiningUtils.Mine(LastLookupResults, index, _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition, lookupResult.PrimarySpelling).ConfigureAwait(false);
+                    text = _lastInteractedTextBox?.SelectionLength > 0
+                        ? _lastInteractedTextBox.SelectedText
+                        : LastLookupResults[_listViewItemIndex].PrimarySpelling;
                 }
+
+                return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text);
+            }
+        }
+
+        else if (keyGesture.IsEqual(configManager.SelectNextItemKeyGesture))
+        {
+            if (MiningMode)
+            {
+                WindowsUtils.SelectNextListViewItem(PopupListView);
+            }
+        }
+
+        else if (keyGesture.IsEqual(configManager.SelectPreviousItemKeyGesture))
+        {
+            if (MiningMode)
+            {
+                WindowsUtils.SelectPreviousListViewItem(PopupListView);
+            }
+        }
+
+        else if (keyGesture.IsEqual(configManager.ConfirmItemSelectionKeyGesture))
+        {
+            if (MiningMode && PopupListView.SelectedItem is not null)
+            {
+                return HandleMining(true, true);
+            }
+        }
+
+        else if (keyGesture.IsEqual(configManager.ClickMiningButtonKeyGesture))
+        {
+            if (MiningMode)
+            {
+                return HandleMining(false, true);
             }
         }
 
         else if (keyGesture.IsEqual(configManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
         {
-            handled = true;
-
             configManager.AlwaysShowMainTextBoxCaret = !configManager.AlwaysShowMainTextBoxCaret;
             mainWindow.MainTextBox.IsReadOnlyCaretVisible = configManager.AlwaysShowMainTextBoxCaret;
         }
 
         else if (keyGesture.IsEqual(configManager.LookupSelectedTextKeyGesture))
         {
-            handled = true;
-
             if (MiningMode)
             {
                 if (_lastInteractedTextBox?.SelectionLength > 0)
@@ -1767,39 +1815,32 @@ internal sealed partial class PopupWindow
                         Owner = this
                     };
 
-                    await ChildPopupWindow.LookupOnSelect(_lastInteractedTextBox).ConfigureAwait(false);
+                    return ChildPopupWindow.LookupOnSelect(_lastInteractedTextBox);
                 }
-                else
-                {
-                    UpdatePosition();
-                }
+
+                UpdatePosition();
             }
 
             else if (Owner is PopupWindow previousPopupWindow)
             {
                 if (previousPopupWindow._lastInteractedTextBox?.SelectionLength > 0)
                 {
-                    await LookupOnSelect(previousPopupWindow._lastInteractedTextBox).ConfigureAwait(false);
+                    return LookupOnSelect(previousPopupWindow._lastInteractedTextBox);
                 }
             }
 
             else
             {
-                await mainWindow.FirstPopupWindow.LookupOnSelect(mainWindow.MainTextBox).ConfigureAwait(false);
+                return mainWindow.FirstPopupWindow.LookupOnSelect(mainWindow.MainTextBox);
             }
         }
 
         else if (keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
         {
-            handled = true;
-
             HidePopup();
         }
 
-        if (handled && e is not null)
-        {
-            e.Handled = true;
-        }
+        return Task.CompletedTask;
     }
 
     private void EnableMiningMode()
@@ -1815,14 +1856,18 @@ internal sealed partial class PopupWindow
         ItemsControlButtons.Visibility = Visibility.Visible;
     }
 
-    private Task PlayAudio()
+    private Task PlayAudio(bool useSelectedListViewItemIfItExists)
     {
         if (LastLookupResults.Length is 0)
         {
             return Task.CompletedTask;
         }
 
-        LookupResult lastLookupResult = LastLookupResults[_listViewItemIndex];
+        int listViewItemIndex = PopupListView.SelectedItem is not null && useSelectedListViewItemIfItExists
+            ? PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem)
+            : _listViewItemIndex;
+
+        LookupResult lastLookupResult = LastLookupResults[listViewItemIndex];
         string primarySpelling = lastLookupResult.PrimarySpelling;
         string? reading = lastLookupResult.Readings?[0];
 
@@ -1892,9 +1937,9 @@ internal sealed partial class PopupWindow
             if ((configManager.LookupOnMouseClickOnly
                 || configManager.LookupOnSelectOnly
                 || e.ChangedButton != configManager.MiningModeMouseButton)
-                    && (e.ChangedButton == configManager.MinePrimarySpellingMouseButton))
+                    && e.ChangedButton == configManager.MinePrimarySpellingMouseButton)
             {
-                await HandleMining(true).ConfigureAwait(false);
+                await HandleMining(true, false).ConfigureAwait(false);
             }
         }
         else

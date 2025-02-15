@@ -141,7 +141,8 @@ internal sealed class ConfigManager
 
     public KeyGesture DisableHotkeysKeyGesture { get; private set; } = new(Key.Pause, ModifierKeys.Alt);
     public KeyGesture MiningModeKeyGesture { get; private set; } = new(Key.M, ModifierKeys.Alt);
-    public KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Alt);
+    public KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.NumPad1, ModifierKeys.Alt);
+    public KeyGesture ClickAudioButtonKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Alt);
     public KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
     public KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
     public KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Alt);
@@ -174,9 +175,10 @@ internal sealed class ConfigManager
     public KeyGesture LookupTermAtCaretIndexKeyGesture { get; private set; } = new(Key.NumPad5, ModifierKeys.Alt);
     public KeyGesture LookupFirstTermKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
     public KeyGesture LookupSelectedTextKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
-    public KeyGesture SelectNextLookupResultKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Alt);
-    public KeyGesture SelectPreviousLookupResultKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Alt);
-    public KeyGesture MineSelectedLookupResultKeyGesture { get; private set; } = new(Key.D5, ModifierKeys.Alt);
+    public KeyGesture SelectNextItemKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Alt);
+    public KeyGesture SelectPreviousItemKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Alt);
+    public KeyGesture ConfirmItemSelectionKeyGesture { get; private set; } = new(Key.D5, ModifierKeys.Alt);
+    public KeyGesture ClickMiningButtonKeyGesture { get; private set; } = new(Key.D3, ModifierKeys.Alt);
     #endregion
 
     #region Advanced
@@ -531,6 +533,7 @@ internal sealed class ConfigManager
         DisableHotkeysKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MiningModeKeyGesture), MiningModeKeyGesture);
         PlayAudioKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(PlayAudioKeyGesture), PlayAudioKeyGesture);
+        ClickAudioButtonKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ClickAudioButtonKeyGesture), ClickAudioButtonKeyGesture);
         LookupKeyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupKeyKeyGesture), LookupKeyKeyGesture);
         ClosePopupKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ClosePopupKeyGesture), ClosePopupKeyGesture);
         ShowStatsKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowStatsKeyGesture), ShowStatsKeyGesture);
@@ -546,9 +549,10 @@ internal sealed class ConfigManager
         LookupTermAtCaretIndexKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupTermAtCaretIndexKeyGesture), LookupTermAtCaretIndexKeyGesture);
         LookupFirstTermKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupFirstTermKeyGesture), LookupFirstTermKeyGesture);
         LookupSelectedTextKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupSelectedTextKeyGesture), LookupSelectedTextKeyGesture);
-        SelectNextLookupResultKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SelectNextLookupResultKeyGesture), SelectNextLookupResultKeyGesture);
-        SelectPreviousLookupResultKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SelectPreviousLookupResultKeyGesture), SelectPreviousLookupResultKeyGesture);
-        MineSelectedLookupResultKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MineSelectedLookupResultKeyGesture), MineSelectedLookupResultKeyGesture);
+        SelectNextItemKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SelectNextItemKeyGesture), SelectNextItemKeyGesture);
+        SelectPreviousItemKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(SelectPreviousItemKeyGesture), SelectPreviousItemKeyGesture);
+        ConfirmItemSelectionKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ConfirmItemSelectionKeyGesture), ConfirmItemSelectionKeyGesture);
+        ClickMiningButtonKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ClickMiningButtonKeyGesture), ClickMiningButtonKeyGesture);
         CaptureTextFromClipboardKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
         CaptureTextFromWebSocketKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
         ReconnectToWebSocketServerKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
@@ -763,6 +767,7 @@ internal sealed class ConfigManager
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = DisableHotkeysKeyGesture.ToFormattedString();
         preferenceWindow.MiningModeKeyGestureTextBox.Text = MiningModeKeyGesture.ToFormattedString();
         preferenceWindow.PlayAudioKeyGestureTextBox.Text = PlayAudioKeyGesture.ToFormattedString();
+        preferenceWindow.ClickAudioButtonKeyGestureTextBox.Text = ClickAudioButtonKeyGesture.ToFormattedString();
         preferenceWindow.LookupKeyKeyGestureTextBox.Text = LookupKeyKeyGesture.ToFormattedString();
 
         preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text =
@@ -817,12 +822,14 @@ internal sealed class ConfigManager
             LookupFirstTermKeyGesture.ToFormattedString();
         preferenceWindow.LookupSelectedTextKeyGestureTextBox.Text =
             LookupSelectedTextKeyGesture.ToFormattedString();
-        preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text =
-            SelectNextLookupResultKeyGesture.ToFormattedString();
-        preferenceWindow.SelectPreviousLookupResultKeyGestureTextBox.Text =
-            SelectPreviousLookupResultKeyGesture.ToFormattedString();
-        preferenceWindow.MineSelectedLookupResultKeyGestureTextBox.Text =
-            MineSelectedLookupResultKeyGesture.ToFormattedString();
+        preferenceWindow.SelectNextItemKeyGestureTextBox.Text =
+            SelectNextItemKeyGesture.ToFormattedString();
+        preferenceWindow.SelectPreviousItemKeyGestureTextBox.Text =
+            SelectPreviousItemKeyGesture.ToFormattedString();
+        preferenceWindow.ConfirmItemSelectionKeyGestureTextBox.Text =
+            ConfirmItemSelectionKeyGesture.ToFormattedString();
+        preferenceWindow.ClickMiningButtonKeyGestureTextBox.Text =
+            ClickMiningButtonKeyGesture.ToFormattedString();
         preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text =
             CaptureTextFromClipboardKeyGesture.ToFormattedString();
         preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text =
@@ -1017,6 +1024,7 @@ internal sealed class ConfigManager
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(MiningModeKeyGesture), preferenceWindow.MiningModeKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(PlayAudioKeyGesture), preferenceWindow.PlayAudioKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ClickAudioButtonKeyGesture), preferenceWindow.ClickAudioButtonKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(LookupKeyKeyGesture), preferenceWindow.LookupKeyKeyGestureTextBox.Text);
 
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(ShowManageDictionariesWindowKeyGesture),
@@ -1071,12 +1079,14 @@ internal sealed class ConfigManager
                 preferenceWindow.LookupFirstTermKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(LookupSelectedTextKeyGesture),
                 preferenceWindow.LookupSelectedTextKeyGestureTextBox.Text);
-            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SelectNextLookupResultKeyGesture),
-                preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text);
-            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SelectPreviousLookupResultKeyGesture),
-                preferenceWindow.SelectPreviousLookupResultKeyGestureTextBox.Text);
-            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MineSelectedLookupResultKeyGesture),
-                preferenceWindow.MineSelectedLookupResultKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SelectNextItemKeyGesture),
+                preferenceWindow.SelectNextItemKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SelectPreviousItemKeyGesture),
+                preferenceWindow.SelectPreviousItemKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ConfirmItemSelectionKeyGesture),
+                preferenceWindow.ConfirmItemSelectionKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ClickMiningButtonKeyGesture),
+                preferenceWindow.ClickMiningButtonKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(CaptureTextFromClipboardKeyGesture),
                 preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(CaptureTextFromWebSocketKeyGesture),

@@ -45,16 +45,18 @@ internal static class KeyGestureUtils
         nameof(ConfigManager.ClosePopupKeyGesture),
         nameof(ConfigManager.DisableHotkeysKeyGesture),
         nameof(ConfigManager.PlayAudioKeyGesture),
+        nameof(ConfigManager.ClickAudioButtonKeyGesture),
+        nameof(ConfigManager.ClickMiningButtonKeyGesture),
         nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
         nameof(ConfigManager.SearchWithBrowserKeyGesture),
         nameof(ConfigManager.LookupFirstTermKeyGesture),
-        nameof(ConfigManager.MineSelectedLookupResultKeyGesture),
+        nameof(ConfigManager.ConfirmItemSelectionKeyGesture),
         nameof(ConfigManager.MotivationKeyGesture),
         nameof(ConfigManager.NextDictKeyGesture),
         nameof(ConfigManager.PreviousDictKeyGesture),
         nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
-        nameof(ConfigManager.SelectNextLookupResultKeyGesture),
-        nameof(ConfigManager.SelectPreviousLookupResultKeyGesture),
+        nameof(ConfigManager.SelectNextItemKeyGesture),
+        nameof(ConfigManager.SelectPreviousItemKeyGesture),
         nameof(ConfigManager.CaptureTextFromClipboardKeyGesture),
         nameof(ConfigManager.CaptureTextFromWebSocketKeyGesture),
         nameof(ConfigManager.ReconnectToWebSocketServerKeyGesture),
@@ -83,17 +85,12 @@ internal static class KeyGestureUtils
             modifierKeys = ModifierKeys.None;
         }
 
-        if (modifierKeys is ModifierKeys.Shift)
-        {
-            return Task.CompletedTask;
-        }
-
-        KeyGesture pressedKeyGesture = new(key, modifierKeys);
-
-        return HandleHotKey(pressedKeyGesture, e);
+        return modifierKeys is ModifierKeys.Shift
+            ? Task.CompletedTask
+            : HandleHotKey(new KeyGesture(key, modifierKeys));
     }
 
-    public static Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e = null)
+    public static Task HandleHotKey(KeyGesture keyGesture)
     {
         PopupWindow? lastPopup = null;
         MainWindow mainWindow = MainWindow.Instance;
@@ -105,8 +102,12 @@ internal static class KeyGestureUtils
         }
 
         return lastPopup is not null
-            ? lastPopup.HandleHotKey(keyGesture, e)
-            : mainWindow.HandleHotKey(keyGesture, e);
+            ? ReadingSelectionWindow.IsItVisible()
+                ? ReadingSelectionWindow.HandleHotKey(keyGesture)
+                : MiningSelectionWindow.IsItVisible()
+                    ? MiningSelectionWindow.HandleHotKey(keyGesture)
+                    : lastPopup.HandleHotKey(keyGesture)
+            : mainWindow.HandleHotKey(keyGesture);
     }
 
     public static bool IsEqual(this KeyGesture sourceKeyGesture, KeyGesture targetKeyGesture)

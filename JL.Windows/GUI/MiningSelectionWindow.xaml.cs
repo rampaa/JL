@@ -39,7 +39,7 @@ internal sealed partial class MiningSelectionWindow
         return s_instance?.IsVisible ?? false;
     }
 
-    internal static void Show(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition)
+    internal static void Show(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition, Point position)
     {
         MiningSelectionWindow currentInstance = s_instance ??= new MiningSelectionWindow(owner, lookupResults, currentLookupResultIndex, currentSourceText, currentSourceTextCharPosition);
         ConfigManager configManager = ConfigManager.Instance;
@@ -68,7 +68,7 @@ internal sealed partial class MiningSelectionWindow
         currentInstance.FontFamily = configManager.PopupFont;
         currentInstance.Owner = owner;
         currentInstance.Show();
-        WindowsUtils.UpdatePositionForSelectionWindows(currentInstance, currentInstance._windowHandle, WinApi.GetMousePosition());
+        WindowsUtils.UpdatePositionForSelectionWindows(currentInstance, currentInstance._windowHandle, position);
 
         if (configManager.Focusable)
         {
@@ -100,28 +100,42 @@ internal sealed partial class MiningSelectionWindow
     // ReSharper disable once AsyncVoidMethod
     private async void MiningListView_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        TextBox? definitionsTextBox = _popupWindow.GetDefinitionTextBox(_currentLookupResultIndex);
+        string selectedSpelling = (string)((ListViewItem)sender).Content;
+        await MineSelectedSpelling(_popupWindow, _lookupResults, _currentLookupResultIndex, _currentSourceText, _currentSourceTextCharPosition, selectedSpelling).ConfigureAwait(false);
+    }
+
+    private static Task MineSelectedSpelling()
+    {
+        if (s_instance is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        string selectedSpelling = (string)((ListViewItem)s_instance.MiningListView.SelectedItem).Content;
+        return MineSelectedSpelling(s_instance._popupWindow, s_instance._lookupResults, s_instance._currentLookupResultIndex, s_instance._currentSourceText, s_instance._currentSourceTextCharPosition, selectedSpelling);
+    }
+
+    private static Task MineSelectedSpelling(PopupWindow popupWindow, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition, string selectedSpelling)
+    {
+        TextBox? definitionsTextBox = popupWindow.GetDefinitionTextBox(currentLookupResultIndex);
         string? formattedDefinitions = definitionsTextBox?.Text;
         string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
 
-        string selectedSpelling = (string)((ListViewItem)sender).Content;
-        _popupWindow.HidePopup();
+        popupWindow.HidePopup();
 
-        ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.MineToFileInsteadOfAnki)
-        {
-            await MiningUtils.MineToFile(_lookupResults, _currentLookupResultIndex, _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition, selectedSpelling).ConfigureAwait(false);
-        }
-        else
-        {
-            await MiningUtils.Mine(_lookupResults, _currentLookupResultIndex, _currentSourceText, formattedDefinitions, selectedDefinitions, _currentSourceTextCharPosition, selectedSpelling).ConfigureAwait(false);
-        }
+        return ConfigManager.Instance.MineToFileInsteadOfAnki
+            ? MiningUtils.MineToFile(lookupResults, currentLookupResultIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, selectedSpelling)
+            : MiningUtils.Mine(lookupResults, currentLookupResultIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, selectedSpelling);
     }
 
     public static void CloseWindow()
     {
-        s_instance?.Close();
-        s_instance = null;
+        if (s_instance is not null)
+        {
+            s_instance.Close();
+            s_instance.MiningListView.SelectedItem = null;
+            s_instance = null;
+        }
     }
 
     private void Window_LostFocus(object sender, RoutedEventArgs e)
@@ -129,8 +143,47 @@ internal sealed partial class MiningSelectionWindow
         CloseWindow();
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    // ReSharper disable once AsyncVoidMethod
+    private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        s_instance = null;
+        e.Handled = true;
+        await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
+    }
+
+    public static Task HandleHotKey(KeyGesture keyGesture)
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
+        {
+            CloseWindow();
+        }
+
+        else if (keyGesture.IsEqual(configManager.SelectNextItemKeyGesture))
+        {
+            if (s_instance is not null)
+            {
+                WindowsUtils.SelectNextListViewItem(s_instance.MiningListView);
+            }
+        }
+
+        else if (keyGesture.IsEqual(configManager.SelectPreviousItemKeyGesture))
+        {
+            if (s_instance is not null)
+            {
+                WindowsUtils.SelectPreviousListViewItem(s_instance.MiningListView);
+            }
+        }
+
+        else if (keyGesture.IsEqual(configManager.ConfirmItemSelectionKeyGesture))
+        {
+            return MineSelectedSpelling();
+        }
+
+        else if (keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
+        {
+            CloseWindow();
+        }
+
+        return Task.CompletedTask;
     }
 }

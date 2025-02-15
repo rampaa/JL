@@ -462,23 +462,16 @@ internal sealed partial class MainWindow
     // ReSharper disable once AsyncVoidMethod
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        e.Handled = true;
         await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
     }
 
-    public async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e)
+    public Task HandleHotKey(KeyGesture keyGesture)
     {
         ConfigManager configManager = ConfigManager.Instance;
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-        bool handled = false;
         if (keyGesture.IsEqual(configManager.DisableHotkeysKeyGesture))
         {
-            if (e is not null)
-            {
-                e.Handled = true;
-            }
-
-            handled = true;
-
             configManager.DisableHotkeys = !configManager.DisableHotkeys;
 
             if (configManager.GlobalHotKeys)
@@ -502,29 +495,18 @@ internal sealed partial class MainWindow
             }
         }
 
-        if (configManager.DisableHotkeys || handled)
+        else if (keyGesture.IsEqual(configManager.SteppedBacklogBackwardsKeyGesture))
         {
-            return;
-        }
-
-        if (keyGesture.IsEqual(configManager.SteppedBacklogBackwardsKeyGesture))
-        {
-            handled = true;
-
             BacklogUtils.ShowPreviousBacklogItem();
         }
 
         else if (keyGesture.IsEqual(configManager.SteppedBacklogForwardsKeyGesture))
         {
-            handled = true;
-
             BacklogUtils.ShowNextBacklogItem();
         }
 
         else if (keyGesture.IsEqual(configManager.ShowPreferencesWindowKeyGesture))
         {
-            handled = true;
-
             if (PreferencesMenuItem.IsEnabled)
             {
                 WindowsUtils.ShowPreferencesWindow();
@@ -533,8 +515,6 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.MousePassThroughModeKeyGesture))
         {
-            handled = true;
-
             if (Background.Opacity is not 0)
             {
                 Background.Opacity = 0;
@@ -558,8 +538,6 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
-            handled = true;
-
             bool customNameDictReady = false;
             if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict))
             {
@@ -580,8 +558,6 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.ShowAddWordWindowKeyGesture))
         {
-            handled = true;
-
             bool customWordDictReady = false;
             if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict))
             {
@@ -602,74 +578,56 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.ShowManageDictionariesWindowKeyGesture))
         {
-            handled = true;
-
             if (DictUtils.DictsReady
                 && !DictUtils.UpdatingJmdict
                 && !DictUtils.UpdatingJmnedict
                 && !DictUtils.UpdatingKanjidic)
             {
-                await WindowsUtils.ShowManageDictionariesWindow().ConfigureAwait(false);
+                return WindowsUtils.ShowManageDictionariesWindow();
             }
         }
 
         else if (keyGesture.IsEqual(configManager.ShowManageFrequenciesWindowKeyGesture))
         {
-            handled = true;
-
             if (FreqUtils.FreqsReady)
             {
-                await WindowsUtils.ShowManageFrequenciesWindow().ConfigureAwait(false);
+                return WindowsUtils.ShowManageFrequenciesWindow();
             }
         }
 
         else if (keyGesture.IsEqual(configManager.SearchWithBrowserKeyGesture))
         {
-            handled = true;
-
             WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
             WindowsUtils.UpdateMainWindowVisibility();
         }
 
         else if (keyGesture.IsEqual(configManager.InactiveLookupModeKeyGesture))
         {
-            handled = true;
-
             configManager.InactiveLookupMode = !configManager.InactiveLookupMode;
         }
 
         else if (keyGesture.IsEqual(configManager.MotivationKeyGesture))
         {
-            handled = true;
-
-            await WindowsUtils.Motivate().ConfigureAwait(false);
+            return WindowsUtils.Motivate();
         }
 
         else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
         {
-            handled = true;
-
             FirstPopupWindow.HidePopup();
         }
 
         else if (keyGesture.IsEqual(configManager.ShowStatsKeyGesture))
         {
-            handled = true;
-
             WindowsUtils.ShowStatsWindow();
         }
 
         else if (keyGesture.IsEqual(configManager.ShowManageAudioSourcesWindowKeyGesture))
         {
-            handled = true;
-
-            await WindowsUtils.ShowManageAudioSourcesWindow().ConfigureAwait(false);
+            return WindowsUtils.ShowManageAudioSourcesWindow();
         }
 
         else if (keyGesture.IsEqual(configManager.AlwaysOnTopKeyGesture))
         {
-            handled = true;
-
             configManager.AlwaysOnTop = !configManager.AlwaysOnTop;
 
             Topmost = configManager.AlwaysOnTop;
@@ -677,8 +635,6 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.CaptureTextFromClipboardKeyGesture))
         {
-            handled = true;
-
             coreConfigManager.CaptureTextFromClipboard = !coreConfigManager.CaptureTextFromClipboard;
             if (coreConfigManager.CaptureTextFromClipboard)
             {
@@ -703,8 +659,6 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.CaptureTextFromWebSocketKeyGesture))
         {
-            handled = true;
-
             coreConfigManager.CaptureTextFromWebSocket = !coreConfigManager.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();
 
@@ -722,8 +676,6 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.ReconnectToWebSocketServerKeyGesture))
         {
-            handled = true;
-
             if (!WebSocketUtils.Connected)
             {
                 coreConfigManager.CaptureTextFromWebSocket = true;
@@ -740,8 +692,6 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.TextBoxIsReadOnlyKeyGesture))
         {
-            handled = true;
-
             configManager.TextBoxIsReadOnly = !configManager.TextBoxIsReadOnly;
             MainTextBox.IsReadOnly = configManager.TextBoxIsReadOnly;
             MainTextBox.IsUndoEnabled = !configManager.TextBoxIsReadOnly;
@@ -750,15 +700,11 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.DeleteCurrentLineKeyGesture))
         {
-            handled = true;
-
             BacklogUtils.DeleteCurrentLine();
         }
 
         else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
-            handled = true;
-
             PopupWindowUtils.HidePopups(FirstPopupWindow);
 
             if (configManager.Focusable)
@@ -788,8 +734,6 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.SelectedTextToSpeechKeyGesture))
         {
-            handled = true;
-
             if (SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
             {
                 string selectedText = MainTextBox.SelectionLength > 0
@@ -798,86 +742,64 @@ internal sealed partial class MainWindow
 
                 if (selectedText.Length > 0)
                 {
-                    await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText).ConfigureAwait(false);
+                    return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText);
                 }
             }
         }
 
         else if (keyGesture.IsEqual(configManager.MoveCaretLeftKeyGesture))
         {
-            handled = true;
-
             MoveCaret(Key.Left);
         }
 
         else if (keyGesture.IsEqual(configManager.MoveCaretRightKeyGesture))
         {
-            handled = true;
-
             MoveCaret(Key.Right);
         }
 
         else if (keyGesture.IsEqual(configManager.MoveCaretUpKeyGesture))
         {
-            handled = true;
-
             MoveCaret(Key.Up);
         }
 
         else if (keyGesture.IsEqual(configManager.MoveCaretDownKeyGesture))
         {
-            handled = true;
-
             MoveCaret(Key.Down);
         }
 
         else if (keyGesture.IsEqual(configManager.LookupTermAtCaretIndexKeyGesture))
         {
-            handled = true;
-
             if (MainTextBox.Text.Length > 0)
             {
                 if (configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
                 {
-                    await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
+                    return FirstPopupWindow.LookupOnSelect(MainTextBox);
                 }
 
-                else
-                {
-                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true).ConfigureAwait(false);
-                }
+                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true);
             }
         }
 
         else if (keyGesture.IsEqual(configManager.LookupFirstTermKeyGesture))
         {
-            handled = true;
-
             if (MainTextBox.Text.Length > 0)
             {
-                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
+                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true);
             }
         }
 
         else if (keyGesture.IsEqual(configManager.LookupSelectedTextKeyGesture))
         {
-            handled = true;
-
-            await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
+            return FirstPopupWindow.LookupOnSelect(MainTextBox);
         }
 
         else if (keyGesture.IsEqual(configManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
         {
-            handled = true;
-
             configManager.AlwaysShowMainTextBoxCaret = !configManager.AlwaysShowMainTextBoxCaret;
             MainTextBox.IsReadOnlyCaretVisible = configManager.AlwaysShowMainTextBoxCaret;
         }
 
-        if (handled && e is not null)
-        {
-            e.Handled = true;
-        }
+        return Task.CompletedTask;
     }
 
     private void ShowTitleBarButtons()

@@ -746,4 +746,26 @@ internal static class WindowsUtils
 
         WinApi.MoveWindowToPosition(windowHandle, newLeft, newTop);
     }
+
+    public static void SelectPreviousListViewItem(ListView listView)
+    {
+        int nextItemIndex = listView.SelectedIndex - 1 >= 0
+            ? listView.SelectedIndex - 1
+            : listView.Items.Count - 1;
+
+        listView.SelectedIndex = nextItemIndex;
+
+        listView.ScrollIntoView(listView.Items.GetItemAt(nextItemIndex));
+    }
+
+    public static void SelectNextListViewItem(ListView listView)
+    {
+        int nextItemIndex = listView.SelectedIndex + 1 < listView.Items.Count
+            ? listView.SelectedIndex + 1
+            : 0;
+
+        listView.SelectedIndex = nextItemIndex;
+
+        listView.ScrollIntoView(listView.Items.GetItemAt(nextItemIndex));
+    }
 }
