@@ -63,10 +63,10 @@ internal sealed partial class AddProfileWindow
         Close();
 
         _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
-        string custonNamePath = ProfileUtils.GetProfileCustomNameDictPath(profileName);
-        if (!File.Exists(custonNamePath))
+        string customNamePath = ProfileUtils.GetProfileCustomNameDictPath(profileName);
+        if (!File.Exists(customNamePath))
         {
-            await File.Create(custonNamePath).DisposeAsync().ConfigureAwait(false);
+            await File.Create(customNamePath).DisposeAsync().ConfigureAwait(false);
         }
 
         string customWordPath = ProfileUtils.GetProfileCustomWordDictPath(profileName);
