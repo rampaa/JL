@@ -104,15 +104,12 @@ public static class Networking
         s_updatingJL = false;
     }
 
-    internal static void StartUpdaterTimer()
+    internal static void InitializeUpdaterTimer()
     {
-        if (!s_updaterTimer.Enabled)
-        {
-            s_updaterTimer.Interval = TimeSpan.FromHours(12).TotalMilliseconds;
-            s_updaterTimer.Elapsed += CheckForUpdates;
-            s_updaterTimer.AutoReset = true;
-            s_updaterTimer.Enabled = true;
-        }
+        s_updaterTimer.Interval = TimeSpan.FromHours(12).TotalMilliseconds;
+        s_updaterTimer.Elapsed += CheckForUpdates;
+        s_updaterTimer.AutoReset = true;
+        s_updaterTimer.Enabled = true;
     }
 
     // ReSharper disable once AsyncVoidMethod

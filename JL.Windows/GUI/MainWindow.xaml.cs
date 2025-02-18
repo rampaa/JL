@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -137,13 +138,12 @@ internal sealed partial class MainWindow
     public Task CopyFromWebSocket(string text)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        return CopyText(text)
-            ? Dispatcher.Invoke(() => configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
-                                      && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
-                                          || WindowState is WindowState.Minimized)
-                ? FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true)
-                : Task.CompletedTask)
-            : Task.CompletedTask;
+        return Dispatcher.Invoke(() => CopyText(text)
+                                       && configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
+                                       && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+                                           || WindowState is WindowState.Minimized)
+            ? FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true)
+            : Task.CompletedTask, DispatcherPriority.Send);
     }
 
     private bool CopyText(string text)
@@ -164,101 +164,130 @@ internal sealed partial class MainWindow
         string? subsequentText = null;
         string? mergedText = null;
 
-        bool result = Dispatcher.Invoke(() =>
+        string previousText = MainTextBox.Text;
+        if (configManager.DiscardIdenticalText && sanitizedNewText == previousText)
         {
-            string previousText = MainTextBox.Text;
-            if (configManager.DiscardIdenticalText && sanitizedNewText == previousText)
-            {
-                if (configManager.MergeSequentialTextsWhenTheyMatch)
-                {
-                    s_lastTextCopyTime = new DateTime(Stopwatch.GetTimestamp());
-                }
-
-                return false;
-            }
-
             if (configManager.MergeSequentialTextsWhenTheyMatch)
             {
-                DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-                mergeTexts = (configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
-                              || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                              && previousText.Length > 0;
+                s_lastTextCopyTime = new DateTime(Stopwatch.GetTimestamp());
+            }
 
-                s_lastTextCopyTime = preciseTimeNow;
+            return false;
+        }
 
-                if (mergeTexts)
+        if (configManager.MergeSequentialTextsWhenTheyMatch)
+        {
+            DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
+            mergeTexts = (configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
+                          || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
+                          && previousText.Length > 0;
+
+            s_lastTextCopyTime = preciseTimeNow;
+
+            if (mergeTexts)
+            {
+                if (!configManager.DiscardIdenticalText && previousText == sanitizedNewText)
                 {
-                    if (!configManager.DiscardIdenticalText && previousText == sanitizedNewText)
-                    {
-                        return false;
-                    }
+                    return false;
+                }
 
-                    if (!configManager.AllowPartialMatchingForTextMerge)
+                if (!configManager.AllowPartialMatchingForTextMerge)
+                {
+                    if (sanitizedNewText.StartsWith(previousText, StringComparison.Ordinal))
                     {
-                        if (sanitizedNewText.StartsWith(previousText, StringComparison.Ordinal))
-                        {
-                            subsequentText = sanitizedNewText[previousText.Length..];
-                        }
+                        subsequentText = sanitizedNewText[previousText.Length..];
                     }
-                    else
+                }
+                else
+                {
+                    int startIndex = Math.Max(previousText.Length - sanitizedNewText.Length, 0);
+                    for (int i = startIndex; i < previousText.Length; i++)
                     {
-                        int startIndex = Math.Max(previousText.Length - sanitizedNewText.Length, 0);
-                        for (int i = startIndex; i < previousText.Length; i++)
+                        if (sanitizedNewText.StartsWith(previousText[i..], StringComparison.Ordinal))
                         {
-                            if (sanitizedNewText.StartsWith(previousText[i..], StringComparison.Ordinal))
+                            subsequentText = sanitizedNewText[(previousText.Length - i)..];
+                            if (subsequentText.Length is 0 && sanitizedNewText != previousText)
                             {
-                                subsequentText = sanitizedNewText[(previousText.Length - i)..];
-                                if (subsequentText.Length is 0 && sanitizedNewText != previousText)
-                                {
-                                    subsequentText = null;
-                                }
-
-                                break;
+                                subsequentText = null;
                             }
+
+                            break;
                         }
                     }
                 }
             }
+        }
 
-            mergeTexts = mergeTexts && subsequentText is not null;
+        mergeTexts = mergeTexts && subsequentText is not null;
+        if (mergeTexts)
+        {
+            MainTextBox.AppendText(subsequentText);
+            mergedText = MainTextBox.Text;
+        }
+        else
+        {
+            MainTextBox.Text = sanitizedNewText;
+        }
+
+        MainTextBox.Foreground = configManager.MainWindowTextColor;
+
+        bool notMinimized = WindowState is not WindowState.Minimized;
+        if (!mergeTexts && SizeToContent is SizeToContent.Manual && notMinimized
+                        && (configManager.MainWindowDynamicHeight || configManager.MainWindowDynamicWidth))
+        {
+            SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight);
+        }
+
+        TitleBarContextMenu.IsOpen = false;
+        MainTextBoxContextMenu.IsOpen = false;
+
+        if (configManager.HidePopupsOnTextChange)
+        {
+            PopupWindowUtils.HidePopups(FirstPopupWindow);
+        }
+
+        UpdatePosition();
+        BringToFront();
+
+        if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || notMinimized)
+        {
+            StatsUtils.StartTimeStatStopWatch();
+            StatsUtils.SetIdleTimeTimerInterval(mergedText?.Length ?? sanitizedNewText.Length);
+
+            string strippedText = configManager.StripPunctuationBeforeCalculatingCharacterCount
+                ? JapaneseUtils.RemovePunctuation(subsequentText ?? sanitizedNewText)
+                : subsequentText ?? sanitizedNewText;
+
+            if (strippedText.Length > 0)
+            {
+                StatsUtils.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
+
+                if (!mergeTexts)
+                {
+                    StatsUtils.IncrementStat(StatType.Lines);
+                }
+            }
+        }
+
+        if (configManager.EnableBacklog)
+        {
             if (mergeTexts)
             {
-                MainTextBox.AppendText(subsequentText);
-                mergedText = MainTextBox.Text;
+                BacklogUtils.ReplaceLastBacklogText(mergedText!);
             }
             else
             {
-                MainTextBox.Text = sanitizedNewText;
+                BacklogUtils.AddToBacklog(sanitizedNewText);
             }
-
-            MainTextBox.Foreground = configManager.MainWindowTextColor;
-
-            if (!mergeTexts && SizeToContent is SizeToContent.Manual && WindowState is not WindowState.Minimized
-                            && (configManager.MainWindowDynamicHeight || configManager.MainWindowDynamicWidth))
-            {
-                SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight);
-            }
-
-            TitleBarContextMenu.IsOpen = false;
-            MainTextBoxContextMenu.IsOpen = false;
-
-            if (configManager.HidePopupsOnTextChange)
-            {
-                PopupWindowUtils.HidePopups(FirstPopupWindow);
-            }
-
-            UpdatePosition();
-            BringToFront();
-
-            return true;
-        }, DispatcherPriority.Send);
-
-        if (result)
-        {
-            WindowsUtils.HandlePostCopy(sanitizedNewText, subsequentText, mergedText);
         }
 
-        return result;
+        if (configManager.TextToSpeechOnTextChange
+            && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
+        {
+            _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, sanitizedNewText).ConfigureAwait(false);
+        }
+
+        return true;
     }
 
     public void BringToFront()
@@ -439,7 +468,7 @@ internal sealed partial class MainWindow
         await using (connection.ConfigureAwait(false))
         {
             ConfigManager.Instance.SaveBeforeClosing(connection);
-            StatsUtils.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
+            StatsUtils.IncrementStat(StatType.Time, StatsUtils.TimeStatStopWatch.ElapsedTicks);
             StatsDBUtils.UpdateLifetimeStats(connection);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
         }
@@ -647,13 +676,11 @@ internal sealed partial class MainWindow
 
             if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
             {
-                StatsUtils.StatsStopWatch.Stop();
-                StatsUtils.StopStatsTimer();
+                StatsUtils.StopTimeStatStopWatch();
             }
-            else if (!configManager.StopIncreasingTimeStatWhenMinimized || WindowState is not WindowState.Minimized)
+            else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
             {
-                StatsUtils.StatsStopWatch.Start();
-                StatsUtils.StartStatsTimer();
+                StatsUtils.StartTimeStatStopWatch();
             }
         }
 
@@ -664,13 +691,11 @@ internal sealed partial class MainWindow
 
             if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
             {
-                StatsUtils.StatsStopWatch.Stop();
-                StatsUtils.StopStatsTimer();
+                StatsUtils.StopTimeStatStopWatch();
             }
-            else if (!configManager.StopIncreasingTimeStatWhenMinimized || WindowState is not WindowState.Minimized)
+            else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
             {
-                StatsUtils.StatsStopWatch.Start();
-                StatsUtils.StartStatsTimer();
+                StatsUtils.StartTimeStatStopWatch();
             }
         }
 
@@ -679,13 +704,10 @@ internal sealed partial class MainWindow
             if (!WebSocketUtils.Connected)
             {
                 coreConfigManager.CaptureTextFromWebSocket = true;
-
-                if (!StatsUtils.StatsStopWatch.IsRunning)
+                if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
                 {
-                    StatsUtils.StatsStopWatch.Start();
-                    StatsUtils.StartStatsTimer();
+                    StatsUtils.StartTimeStatStopWatch();
                 }
-
                 WebSocketUtils.HandleWebSocket();
             }
         }
@@ -1546,9 +1568,9 @@ internal sealed partial class MainWindow
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (WindowState is WindowState.Minimized)
         {
-            if (configManager.StopIncreasingTimeStatWhenMinimized)
+            if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized)
             {
-                StatsUtils.StatsStopWatch.Stop();
+                StatsUtils.StopTimeStatStopWatch();
             }
 
             if (configManager.GlobalHotKeys)
@@ -1576,10 +1598,10 @@ internal sealed partial class MainWindow
 
         else
         {
-            if (configManager.StopIncreasingTimeStatWhenMinimized
-                && (coreConfigManager.CaptureTextFromClipboard || (coreConfigManager.CaptureTextFromWebSocket && WebSocketUtils.Connected)))
+            if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized
+                && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket))
             {
-                StatsUtils.StatsStopWatch.Start();
+                StatsUtils.StartTimeStatStopWatch();
             }
 
             if (configManager.GlobalHotKeys)

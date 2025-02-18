@@ -61,7 +61,8 @@ internal static class KeyGestureUtils
         nameof(ConfigManager.CaptureTextFromWebSocketKeyGesture),
         nameof(ConfigManager.ReconnectToWebSocketServerKeyGesture),
         nameof(ConfigManager.ShowAddNameWindowKeyGesture),
-        nameof(ConfigManager.ShowAddWordWindowKeyGesture)
+        nameof(ConfigManager.ShowAddWordWindowKeyGesture),
+        nameof(ConfigManager.ShowStatsKeyGesture)
     ];
 
     public static Task HandleKeyDown(KeyEventArgs e)

@@ -13,7 +13,6 @@ namespace JL.Core.Utilities;
 public static class DBUtils
 {
     private static readonly Timer s_optimizePragmaTimer = new();
-
     internal static FrozenDictionary<string, string> DictDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
     internal static FrozenDictionary<string, string> FreqDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
 
@@ -51,15 +50,12 @@ public static class DBUtils
             : $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite";
     }
 
-    internal static void StartOptimizePragmaTimer()
+    internal static void InitializeOptimizePragmaTimer()
     {
-        if (!s_optimizePragmaTimer.Enabled)
-        {
-            s_optimizePragmaTimer.Interval = TimeSpan.FromHours(1).TotalMilliseconds;
-            s_optimizePragmaTimer.Elapsed += SendOptimizePragmaToAllDBs;
-            s_optimizePragmaTimer.AutoReset = true;
-            s_optimizePragmaTimer.Enabled = true;
-        }
+        s_optimizePragmaTimer.Interval = TimeSpan.FromHours(1).TotalMilliseconds;
+        s_optimizePragmaTimer.Elapsed += SendOptimizePragmaToAllDBs;
+        s_optimizePragmaTimer.AutoReset = true;
+        s_optimizePragmaTimer.Enabled = true;
     }
 
     private static void SendOptimizePragmaToAllDBs(object? sender, ElapsedEventArgs e)

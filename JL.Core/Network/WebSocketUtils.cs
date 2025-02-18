@@ -78,8 +78,7 @@ public static class WebSocketUtils
                         {
                             if (coreConfigManager is { AutoReconnectToWebSocket: false, CaptureTextFromClipboard: false })
                             {
-                                StatsUtils.StatsStopWatch.Stop();
-                                StatsUtils.StopStatsTimer();
+                                StatsUtils.StopTimeStatStopWatch();
                             }
 
                             if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
@@ -99,8 +98,7 @@ public static class WebSocketUtils
                     {
                         if (!coreConfigManager.CaptureTextFromClipboard)
                         {
-                            StatsUtils.StatsStopWatch.Stop();
-                            StatsUtils.StopStatsTimer();
+                            StatsUtils.StopTimeStatStopWatch();
                         }
 
                         if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)

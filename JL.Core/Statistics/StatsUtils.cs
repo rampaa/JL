@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Text.Json.Serialization;
 using System.Timers;
 using JL.Core.Config;
 using JL.Core.Utilities;
@@ -10,41 +9,94 @@ namespace JL.Core.Statistics;
 
 public static class StatsUtils
 {
-    [JsonIgnore] public static Stats SessionStats { get; } = new();
-    [JsonIgnore] public static Stats ProfileLifetimeStats { get; set; } = new();
-    [JsonIgnore] public static Stats LifetimeStats { get; internal set; } = new();
+    public static Stats SessionStats { get; } = new();
+    public static Stats ProfileLifetimeStats { get; set; } = new();
+    public static Stats LifetimeStats { get; internal set; } = new();
 
-    public static Stopwatch StatsStopWatch { get; } = new();
+    public static Stopwatch TimeStatStopWatch { get; } = new();
     private static Timer StatsTimer { get; } = new();
-
-    public static void StartStatsTimer()
+    private static Timer IdleTimeTimer { get; } = new()
     {
-        if (!StatsTimer.Enabled)
+        AutoReset = false
+    };
+
+    private static int s_textLength; // = 0
+
+    static StatsUtils()
+    {
+        IdleTimeTimer.Elapsed += IdleTimeTimer_OnTimedEvent;
+        StatsTimer.Elapsed += StatsTimer_OnTimedEvent;
+    }
+
+    public static void InitializeStatsTimer()
+    {
+        StatsTimer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
+        StatsTimer.AutoReset = true;
+        StatsTimer.Enabled = true;
+    }
+
+    public static void InitializeIdleTimeTimer()
+    {
+        SetIdleTimeTimerInterval(s_textLength);
+    }
+
+    public static void SetIdleTimeTimerInterval(int textLength)
+    {
+        s_textLength = textLength;
+        double minReadingSpeedThreshold = CoreConfigManager.Instance.MinCharactersPerMinuteBeforeStoppingTimeTracking;
+        if (minReadingSpeedThreshold > 0 && textLength > 0 && TimeStatStopWatch.IsRunning)
         {
-            StatsTimer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
-            StatsTimer.Elapsed += OnTimedEvent;
-            StatsTimer.AutoReset = true;
-            StatsTimer.Enabled = true;
+            IdleTimeTimer.Interval = TimeSpan.FromMinutes(textLength / minReadingSpeedThreshold).TotalMilliseconds;
+            IdleTimeTimer.Enabled = true;
+        }
+        else
+        {
+            IdleTimeTimer.Enabled = false;
         }
     }
 
-    public static void StopStatsTimer()
+    public static void StartTimeStatStopWatch()
     {
-        StatsTimer.Enabled = false;
+        TimeStatStopWatch.Start();
+
+        // Restarts the timer
+        // This is faster than setting the Enabled property to false and then true
+        IdleTimeTimer.Interval = IdleTimeTimer.Interval;
+        IdleTimeTimer.Enabled = true;
     }
 
-    private static void OnTimedEvent(object? sender, ElapsedEventArgs e)
+    public static void StopTimeStatStopWatch()
     {
-        IncrementStat(StatType.Time, StatsStopWatch.ElapsedTicks);
+        TimeStatStopWatch.Stop();
+        IdleTimeTimer.Enabled = false;
+    }
 
-        if (StatsStopWatch.IsRunning)
+    public static void StopIdleItemTimer()
+    {
+        IdleTimeTimer.Enabled = false;
+    }
+
+    private static void IdleTimeTimer_OnTimedEvent(object? sender, ElapsedEventArgs e)
+    {
+        if (TimeStatStopWatch.IsRunning)
         {
-            StatsStopWatch.Restart();
+            IncrementStat(StatType.Time, TimeStatStopWatch.ElapsedTicks);
+            TimeStatStopWatch.Reset();
+        }
+    }
+
+    private static void StatsTimer_OnTimedEvent(object? sender, ElapsedEventArgs e)
+    {
+        IncrementStat(StatType.Time, TimeStatStopWatch.ElapsedTicks);
+
+        if (TimeStatStopWatch.IsRunning)
+        {
+            TimeStatStopWatch.Restart();
         }
 
         else
         {
-            StatsStopWatch.Reset();
+            TimeStatStopWatch.Reset();
         }
 
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();

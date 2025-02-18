@@ -107,6 +107,8 @@ internal sealed partial class PopupWindow
         AddWordMenuItem.SetInputGestureText(configManager.ShowAddWordWindowKeyGesture);
         SearchMenuItem.SetInputGestureText(configManager.SearchWithBrowserKeyGesture);
 
+        _buttonAll.Click += DictTypeButtonOnClick;
+
         AddMenuItemsToEditableTextBoxContextMenu();
     }
 
@@ -1990,7 +1992,6 @@ internal sealed partial class PopupWindow
     {
         List<Button> buttons = new(DictUtils.Dicts.Values.Count + 1);
         _buttonAll.Background = Brushes.DodgerBlue;
-        _buttonAll.Click += DictTypeButtonOnClick;
         buttons.Add(_buttonAll);
 
         foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToArray())
@@ -2142,7 +2143,6 @@ internal sealed partial class PopupWindow
         TitleBarGrid.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         ItemsControlButtons.ItemsSource = null;
-        _buttonAll.Click -= DictTypeButtonOnClick;
 
         if (_popupListViewScrollViewer is not null)
         {

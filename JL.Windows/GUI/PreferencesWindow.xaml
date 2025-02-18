@@ -1791,11 +1791,25 @@
                             <CheckBox x:Name="TrackTermLookupCountsCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Minimum reading speed to keep time stat increasing (in Characters Per Minute)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Cursor="Help"
+                                       ToolTip="This option sets the minimum reading speed (in characters per minute) required to continue increasing the time stat.
+                                       &#10;If the reading speed for the last captured text drops below this value, JL will consider the user idle
+                                       &#10;and stop increasing the time stat until a new text is captured.
+                                       &#10;The lower this value, the more time you have to read before being considered idle.
+                                       &#10;Set it to your slowest possible reading speed, NOT to your average speed." />
+                            <hc:NumericUpDown x:Name="MinCharactersPerMinuteBeforeStoppingTimeTrackingNumericUpDown" Maximum="5000" Minimum="0" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
                         <DockPanel Margin="0,10,0,0">
-                            <TextBlock HorizontalAlignment="Left" Text="Stop increasing time stat when minimized"
+                            <TextBlock HorizontalAlignment="Left" Text="Stop increasing time and read character stats when minimized"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />
-                            <CheckBox x:Name="StopIncreasingTimeStatWhenMinimizedCheckBox"  HorizontalAlignment="Right" />
+                             <CheckBox x:Name="StopIncreasingTimeAndCharStatsWhenMinimizedCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel Margin="0,10,0,0">
@@ -1816,7 +1830,7 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap"
                                        Cursor="Help"
-                                       ToolTip="Instead of mining the term as an Anki card it will be mined to
+                                       ToolTip="If set to true, instead of mining the term as an Anki card it will be mined to
                                        &#10;Resources/mined_words.txt or Resources/names.txt or Resources/kanjis.txt or Resources/others.txt
                                        &#10;depending on the dictionary type"/>
                             <CheckBox x:Name="MineToFileInsteadOfAnkiCheckBox"  HorizontalAlignment="Right" />

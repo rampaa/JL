@@ -139,7 +139,7 @@ internal static class WindowsUtils
         addNameWindowInstance.ReadingTextBox.Text = reading;
         addNameWindowInstance.Owner = owner;
         addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        StatsUtils.StatsStopWatch.Stop();
+        StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
@@ -156,7 +156,7 @@ internal static class WindowsUtils
         addWordWindowInstance.SpellingsTextBox.Text = selectedText ?? "";
         addWordWindowInstance.Owner = owner;
         addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        StatsUtils.StatsStopWatch.Stop();
+        StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
@@ -175,7 +175,7 @@ internal static class WindowsUtils
         MainWindow mainWindow = MainWindow.Instance;
         preferencesWindow.Owner = mainWindow;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        StatsUtils.StatsStopWatch.Stop();
+        StatsUtils.StopTimeStatStopWatch();
 
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
@@ -208,7 +208,7 @@ internal static class WindowsUtils
         MainWindow mainWindow = MainWindow.Instance;
         manageDictionariesWindow.Owner = mainWindow;
         manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        StatsUtils.StatsStopWatch.Stop();
+        StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
@@ -230,7 +230,7 @@ internal static class WindowsUtils
         MainWindow mainWindow = MainWindow.Instance;
         manageFrequenciesWindow.Owner = mainWindow;
         manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        StatsUtils.StatsStopWatch.Stop();
+        StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
@@ -243,8 +243,9 @@ internal static class WindowsUtils
 
     public static void ShowStatsWindow()
     {
-        StatsUtils.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
-        StatsUtils.StatsStopWatch.Reset();
+        StatsUtils.IncrementStat(StatType.Time, StatsUtils.TimeStatStopWatch.ElapsedTicks);
+        StatsUtils.TimeStatStopWatch.Reset();
+        StatsUtils.StopIdleItemTimer();
 
         StatsWindow statsWindow = StatsWindow.Instance;
         MainWindow mainWindow = MainWindow.Instance;
@@ -271,7 +272,7 @@ internal static class WindowsUtils
         MainWindow mainWindow = MainWindow.Instance;
         manageAudioSourcesWindow.Owner = mainWindow;
         manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        StatsUtils.StatsStopWatch.Stop();
+        StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
@@ -514,6 +515,8 @@ internal static class WindowsUtils
         (HandyControl.Controls.PopupWindow window, _) = ((HandyControl.Controls.PopupWindow, Button))colorPicker.Tag;
 
         window.Close();
+        colorPicker.Canceled -= ColorPicker_Cancelled;
+        colorPicker.Confirmed -= ColorPicker_Confirmed;
         colorPicker.Dispose();
     }
 
@@ -527,6 +530,8 @@ internal static class WindowsUtils
         (HandyControl.Controls.PopupWindow window, Button button) = ((HandyControl.Controls.PopupWindow, Button))colorPicker.Tag;
         SetButtonColor(button, colorPicker.SelectedBrush);
         window.Close();
+        colorPicker.Canceled -= ColorPicker_Cancelled;
+        colorPicker.Confirmed -= ColorPicker_Confirmed;
         colorPicker.Dispose();
     }
 
@@ -565,69 +570,47 @@ internal static class WindowsUtils
         textBox.ScrollToVerticalOffset(verticalOffset);
     }
 
-    public static void HandlePostCopy(string text, string? subsequentText, string? mergedText)
-    {
-        bool newText = mergedText is null;
-
-        ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.EnableBacklog)
-        {
-            if (newText)
-            {
-                BacklogUtils.AddToBacklog(text);
-            }
-            else
-            {
-                BacklogUtils.ReplaceLastBacklogText(mergedText!);
-            }
-        }
-
-        if (configManager.TextToSpeechOnTextChange
-            && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
-        {
-            _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text).ConfigureAwait(false);
-        }
-
-        string strippedText = configManager.StripPunctuationBeforeCalculatingCharacterCount
-            ? JapaneseUtils.RemovePunctuation(subsequentText ?? text)
-            : subsequentText ?? text;
-
-        if (strippedText.Length > 0)
-        {
-            StatsUtils.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
-
-            if (newText)
-            {
-                StatsUtils.IncrementStat(StatType.Lines);
-            }
-        }
-    }
-
     public static void UpdateMainWindowVisibility()
     {
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        if (!mainWindow.FirstPopupWindow.IsVisible)
+        bool mainWindowIsNotMinimized = mainWindow.WindowState is not WindowState.Minimized;
+        if (mainWindowIsNotMinimized)
         {
-            if (!mainWindow.IsMouseOver)
+            if (!mainWindow.FirstPopupWindow.IsVisible)
             {
-                if (configManager.TextOnlyVisibleOnHover)
+                if (!mainWindow.IsMouseOver)
                 {
-                    mainWindow.MainGrid.Opacity = 0;
-                }
+                    if (configManager.TextOnlyVisibleOnHover)
+                    {
+                        mainWindow.MainGrid.Opacity = 0;
+                    }
 
-                if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
-                {
-                    mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                    if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+                    {
+                        mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                    }
                 }
             }
+
+            CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+            if (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
+            {
+                StatsUtils.StartTimeStatStopWatch();
+            }
+
+            if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
+            {
+                WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
+            }
         }
-
-        StatsUtils.StatsStopWatch.Start();
-
-        if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
+        else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized)
         {
-            WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
+            CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+            if (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
+            {
+                StatsUtils.StartTimeStatStopWatch();
+            }
         }
     }
 

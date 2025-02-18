@@ -24,6 +24,7 @@ public sealed class CoreConfigManager
     public Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
     public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public bool TrackTermLookupCounts { get; private set; } // = false;
+    public int MinCharactersPerMinuteBeforeStoppingTimeTracking { get; private set; } = 60;
 
     private CoreConfigManager()
     {
@@ -120,16 +121,6 @@ public sealed class CoreConfigManager
         TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
         CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
         CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
-
-        if (!CaptureTextFromWebSocket && !CaptureTextFromClipboard)
-        {
-            StatsUtils.StatsStopWatch.Stop();
-            StatsUtils.StopStatsTimer();
-        }
-        else
-        {
-            StatsUtils.StatsStopWatch.Start();
-            StatsUtils.StartStatsTimer();
-        }
+        MinCharactersPerMinuteBeforeStoppingTimeTracking = ConfigDBManager.GetValueFromConfig(connection, MinCharactersPerMinuteBeforeStoppingTimeTracking, nameof(MinCharactersPerMinuteBeforeStoppingTimeTracking), int.TryParse);
     }
 }

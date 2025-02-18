@@ -120,12 +120,9 @@ public static partial class Utils
 
     public static async Task CoreInitialize()
     {
-        Networking.StartUpdaterTimer();
-
-        StatsUtils.StartStatsTimer();
-        StatsUtils.StatsStopWatch.Start();
-
-        DBUtils.StartOptimizePragmaTimer();
+        Networking.InitializeUpdaterTimer();
+        StatsUtils.InitializeStatsTimer();
+        DBUtils.InitializeOptimizePragmaTimer();
 
         _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
         _ = Directory.CreateDirectory(DBUtils.s_dictDBFolderPath);

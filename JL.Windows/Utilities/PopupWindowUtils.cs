@@ -19,7 +19,15 @@ internal static class PopupWindowUtils
     private static string? s_primarySpellingOfLastPlayedAudio;
     private static string? s_readingOfLastPlayedAudio;
     private static DoubleCollection StrokeDashArray { get; set; } = [1, 1];
-    public static readonly Timer PopupAutoHideTimer = new();
+    public static readonly Timer PopupAutoHideTimer = new()
+    {
+        AutoReset = false
+    };
+
+    static PopupWindowUtils()
+    {
+        PopupAutoHideTimer.Elapsed += PopupAutoHideTimerEvent;
+    }
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin)
     {
@@ -156,8 +164,6 @@ internal static class PopupWindowUtils
     public static void SetPopupAutoHideTimer()
     {
         PopupAutoHideTimer.Interval = ConfigManager.Instance.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
-        PopupAutoHideTimer.Elapsed += PopupAutoHideTimerEvent;
-        PopupAutoHideTimer.AutoReset = false;
         PopupAutoHideTimer.Enabled = true;
     }
 

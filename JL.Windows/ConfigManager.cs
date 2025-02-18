@@ -196,7 +196,7 @@ internal sealed class ConfigManager
     public string BrowserPath { get; private set; } = "";
     public bool DisableHotkeys { get; set; } // = false;
     public bool GlobalHotKeys { get; private set; } = true;
-    public bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
+    public bool StopIncreasingTimeAndCharStatsWhenMinimized { get; private set; } // = false;
     public bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
     public bool MineToFileInsteadOfAnki { get; private set; } // = false;
     public bool AutoAdjustFontSizesOnResolutionChange { get; private set; } // = false;
@@ -317,7 +317,7 @@ internal sealed class ConfigManager
         HighlightLongestMatch = ConfigDBManager.GetValueFromConfig(connection, HighlightLongestMatch, nameof(HighlightLongestMatch), bool.TryParse);
         AutoPlayAudio = ConfigDBManager.GetValueFromConfig(connection, AutoPlayAudio, nameof(AutoPlayAudio), bool.TryParse);
         GlobalHotKeys = ConfigDBManager.GetValueFromConfig(connection, GlobalHotKeys, nameof(GlobalHotKeys), bool.TryParse);
-        StopIncreasingTimeStatWhenMinimized = ConfigDBManager.GetValueFromConfig(connection, StopIncreasingTimeStatWhenMinimized, nameof(StopIncreasingTimeStatWhenMinimized), bool.TryParse);
+        StopIncreasingTimeAndCharStatsWhenMinimized = ConfigDBManager.GetValueFromConfig(connection, StopIncreasingTimeAndCharStatsWhenMinimized, nameof(StopIncreasingTimeAndCharStatsWhenMinimized), bool.TryParse);
         MineToFileInsteadOfAnki = ConfigDBManager.GetValueFromConfig(connection, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki), bool.TryParse);
         AlwaysOnTop = ConfigDBManager.GetValueFromConfig(connection, AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
         mainWindow.Topmost = AlwaysOnTop;
@@ -533,6 +533,17 @@ internal sealed class ConfigManager
 
         WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
         KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Clear();
+
+        if ((!StopIncreasingTimeAndCharStatsWhenMinimized || mainWindow.WindowState is not WindowState.Minimized)
+            && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket))
+        {
+            StatsUtils.StartTimeStatStopWatch();
+            StatsUtils.InitializeIdleTimeTimer();
+        }
+        else
+        {
+            StatsUtils.StopTimeStatStopWatch();
+        }
 
         DisableHotkeysKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MiningModeKeyGesture), MiningModeKeyGesture);
@@ -882,7 +893,7 @@ internal sealed class ConfigManager
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = coreConfigManager.CheckForJLUpdatesOnStartUp;
         preferenceWindow.TrackTermLookupCountsCheckBox.IsChecked = coreConfigManager.TrackTermLookupCounts;
         preferenceWindow.GlobalHotKeysCheckBox.IsChecked = GlobalHotKeys;
-        preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked = StopIncreasingTimeStatWhenMinimized;
+        preferenceWindow.StopIncreasingTimeAndCharStatsWhenMinimizedCheckBox.IsChecked = StopIncreasingTimeAndCharStatsWhenMinimized;
         preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked = StripPunctuationBeforeCalculatingCharacterCount;
         preferenceWindow.MineToFileInsteadOfAnkiCheckBox.IsChecked = MineToFileInsteadOfAnki;
         preferenceWindow.AlwaysOnTopCheckBox.IsChecked = AlwaysOnTop;
@@ -981,6 +992,7 @@ internal sealed class ConfigManager
         preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value = MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds;
         preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value = TextBoxCustomLineHeight;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
+        preferenceWindow.MinCharactersPerMinuteBeforeStoppingTimeTrackingNumericUpDown.Value = coreConfigManager.MinCharactersPerMinuteBeforeStoppingTimeTracking;
         preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
         preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
         preferenceWindow.PrimarySpellingFontSizeNumericUpDown.Value = PrimarySpellingFontSize;
@@ -1261,8 +1273,8 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(GlobalHotKeys), preferenceWindow.GlobalHotKeysCheckBox.IsChecked.ToString()!);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(StopIncreasingTimeStatWhenMinimized),
-                preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked.ToString()!);
+            ConfigDBManager.UpdateSetting(connection, nameof(StopIncreasingTimeAndCharStatsWhenMinimized),
+                preferenceWindow.StopIncreasingTimeAndCharStatsWhenMinimizedCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(StripPunctuationBeforeCalculatingCharacterCount),
                 preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked.ToString()!);
@@ -1425,6 +1437,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds),
                 preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.MinCharactersPerMinuteBeforeStoppingTimeTracking),
+                preferenceWindow.MinCharactersPerMinuteBeforeStoppingTimeTrackingNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoLookupFirstTermWhenTextIsCopiedFromClipboard),
                 preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromClipboardCheckBox.IsChecked.ToString()!);
