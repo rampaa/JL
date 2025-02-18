@@ -24,7 +24,7 @@ public sealed class CoreConfigManager
     public Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
     public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public bool TrackTermLookupCounts { get; private set; } // = false;
-    public int MinCharactersPerMinuteBeforeStoppingTimeTracking { get; private set; } = 60;
+    public int MinCharactersPerMinuteBeforeStoppingTimeTracking { get; private set; } = 10;
 
     private CoreConfigManager()
     {
