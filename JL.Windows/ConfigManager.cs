@@ -535,7 +535,8 @@ internal sealed class ConfigManager
         KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Clear();
 
         if ((!StopIncreasingTimeAndCharStatsWhenMinimized || mainWindow.WindowState is not WindowState.Minimized)
-            && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket))
+            && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
+            && mainWindow.MainTextBox.Text.Length > 0)
         {
             StatsUtils.StartTimeStatStopWatch();
             StatsUtils.InitializeIdleTimeTimer();
