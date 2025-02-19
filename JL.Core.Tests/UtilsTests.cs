@@ -4,9 +4,9 @@ using NUnit.Framework;
 namespace JL.Core.Tests;
 
 [TestFixture]
-#pragma warning disable CA1812
+#pragma warning disable CA1812 // Avoid uninstantiated internal classes
 internal sealed class UtilsTests
-#pragma warning restore CA1812
+#pragma warning restore CA1812 // Avoid uninstantiated internal classes
 {
     [Test]
     public void FindSentence_FromTheStart()

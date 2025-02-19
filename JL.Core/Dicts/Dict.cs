@@ -18,7 +18,7 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
     public DictOptions Options { get; set; } = options;
     [JsonIgnore] public bool Ready { get; set; } // = false;
 
-#pragma warning disable CA2227
+#pragma warning disable CA2227 // Collection properties should be read only
     [JsonIgnore] public IDictionary<string, IList<IDictRecord>> Contents { get; set; } = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-#pragma warning restore CA2227
+#pragma warning restore CA2227 // Collection properties should be read only
 }

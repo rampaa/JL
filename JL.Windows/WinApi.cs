@@ -10,7 +10,7 @@ namespace JL.Windows;
 
 internal sealed partial class WinApi
 {
-#pragma warning disable IDE1006
+#pragma warning disable IDE1006 // Naming rule violation
     internal static partial class NativeMethods
     {
         // ReSharper disable InconsistentNaming
@@ -60,14 +60,14 @@ internal sealed partial class WinApi
         }
 
         // ReSharper disable UnusedMember.Global
-#pragma warning disable CA1028
+#pragma warning disable CA1028 // Enum storage should be Int32
         internal enum ChangeWindowMessageFilterExAction : uint
         {
             Reset = 0,
             Allow = 1,
             Disallow = 2
         }
-#pragma warning restore CA1028
+#pragma warning restore CA1028 // Enum storage should be Int32
         // ReSharper restore UnusedMember.Global
 
         [LibraryImport("user32.dll", EntryPoint = "AddClipboardFormatListener", SetLastError = true)]
@@ -175,7 +175,7 @@ internal sealed partial class WinApi
 
         // ReSharper restore InconsistentNaming
     }
-#pragma warning restore IDE1006
+#pragma warning restore IDE1006 // Naming rule violation
 
     private static ulong s_clipboardSequenceNo;
 

@@ -35,7 +35,7 @@ internal static class FrequencyYomichanLoader
                 int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
 
-#pragma warning disable IDE0010
+#pragma warning disable IDE0010 // Add missing cases to switch statement
                 // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
                 switch (thirdElement.ValueKind)
                 {
@@ -81,7 +81,7 @@ internal static class FrequencyYomichanLoader
                         frequency = thirdElement[1].GetInt32();
                         break;
                 }
-#pragma warning restore IDE0010
+#pragma warning restore IDE0010 // Add missing cases to switch statement
 
                 if (frequency is int.MaxValue)
                 {

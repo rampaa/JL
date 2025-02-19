@@ -110,13 +110,13 @@ public static partial class Utils
         }
     };
 
-#pragma warning disable CA5351
+#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms
     internal static string GetMd5String(ReadOnlySpan<byte> bytes)
     {
         byte[] hash = MD5.HashData(bytes);
         return Convert.ToHexString(hash);
     }
-#pragma warning restore CA5351
+#pragma warning restore CA5351 // Do Not Use Broken Cryptographic Algorithms
 
     public static async Task CoreInitialize()
     {

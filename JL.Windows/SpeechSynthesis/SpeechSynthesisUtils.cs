@@ -21,9 +21,9 @@ internal static class SpeechSynthesisUtils
     {
         Synthesizer.InjectOneCoreVoices();
 
-#pragma warning disable CA1304
+#pragma warning disable CA1304 // Specify CultureInfo
         List<InstalledVoice> installedVoices = Synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled).ToList();
-#pragma warning restore CA1304
+#pragma warning restore CA1304 // Specify CultureInfo
 
         return installedVoices.Count is 0
             ? null

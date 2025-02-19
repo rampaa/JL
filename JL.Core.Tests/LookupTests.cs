@@ -12,9 +12,9 @@ using NUnit.Framework;
 namespace JL.Core.Tests;
 
 [TestFixture]
-#pragma warning disable CA1812
+#pragma warning disable CA1812 // Avoid uninstantiated internal classes
 internal sealed class LookupTests
-#pragma warning restore CA1812
+#pragma warning restore CA1812 // Avoid uninstantiated internal classes
 {
     [OneTimeSetUp]
     public void ClassInit()

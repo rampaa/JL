@@ -19,7 +19,7 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
     [JsonIgnore] public bool Ready { get; set; } // = false;
     public FreqOptions Options { get; set; } = options;
 
-#pragma warning disable CA2227
+#pragma warning disable CA2227 // Collection properties should be read only
     [JsonIgnore] public IDictionary<string, IList<FrequencyRecord>> Contents { get; set; } = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-#pragma warning restore CA2227
+#pragma warning restore CA2227 // Collection properties should be read only
 }
