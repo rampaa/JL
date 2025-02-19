@@ -31,7 +31,6 @@ namespace JL.Windows.Utilities;
 
 internal static class WindowsUtils
 {
-    private static readonly Random s_random = new();
     public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
     private static DateTime s_lastAudioPlayTime;
     public static WaveOut? AudioPlayer { get; private set; }
@@ -421,7 +420,7 @@ internal static class WindowsUtils
             }
 
 #pragma warning disable CA5394 // Do not use insecure randomness
-            string randomFilePath = filePaths[s_random.Next(numFiles)];
+            string randomFilePath = filePaths[Random.Shared.Next(numFiles)];
 #pragma warning restore CA5394 // Do not use insecure randomness
 
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
