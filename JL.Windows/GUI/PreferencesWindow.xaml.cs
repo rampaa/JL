@@ -255,7 +255,7 @@ internal sealed partial class PreferencesWindow
 
     private async Task SetPreviousMiningConfig()
     {
-        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(true);
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig().ConfigureAwait(true);
 
         if (ankiConfigDict is null)
         {
@@ -489,7 +489,7 @@ internal sealed partial class PreferencesWindow
 
         if (ankiConfigDict.Count > 0)
         {
-            return AnkiConfig.WriteAnkiConfig(ankiConfigDict);
+            return AnkiConfigUtils.WriteAnkiConfig(ankiConfigDict);
         }
 
         WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");

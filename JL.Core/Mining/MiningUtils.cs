@@ -1098,7 +1098,7 @@ public static class MiningUtils
 
     public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, string currentText, int currentCharPosition)
     {
-        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig().ConfigureAwait(false);
         if (ankiConfigDict is null)
         {
             return null;
@@ -1181,7 +1181,7 @@ public static class MiningUtils
             return;
         }
 
-        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig().ConfigureAwait(false);
         if (ankiConfigDict is null)
         {
             Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
