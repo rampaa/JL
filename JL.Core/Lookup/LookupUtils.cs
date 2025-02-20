@@ -329,7 +329,7 @@ public static class LookupUtils
 
                     if (epwingNazekaKanjiResults is not null)
                     {
-                        lookupResults.AddRange(BuildEpwingNazekaResultForKanji(epwingNazekaKanjiResults, kanjiFrequencyResults, pitchAccentDict));
+                        lookupResults.AddRange(BuildEpwingNazekaResultForKanji(kanjiComposition, epwingNazekaKanjiResults, kanjiFrequencyResults, pitchAccentDict));
                     }
 
                     break;
@@ -1062,7 +1062,7 @@ public static class LookupUtils
         return false;
     }
 
-    private static List<LookupResult> BuildEpwingNazekaResultForKanji(IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+    private static List<LookupResult> BuildEpwingNazekaResultForKanji(string[]? kanjiComposition, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
@@ -1083,6 +1083,7 @@ public static class LookupUtils
                     frequencies: kanjiFrequencyResults,
                     dict: intermediaryResult.Dict,
                     readings: readings,
+                    kanjiLookupResult: new KanjiLookupResult(kanjiComposition),
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
                 );
