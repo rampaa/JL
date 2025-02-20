@@ -270,7 +270,7 @@ public static class LookupUtils
 
                     if (epwingYomichanKanjiWithWordSchemaResults is not null)
                     {
-                        lookupResults.AddRange(BuildEpwingYomichanResultForKanjiWithWordSchema(epwingYomichanKanjiWithWordSchemaResults, kanjiFrequencyResults, pitchAccentDict));
+                        lookupResults.AddRange(BuildEpwingYomichanResultForKanjiWithWordSchema(kanjiComposition, epwingYomichanKanjiWithWordSchemaResults, kanjiFrequencyResults, pitchAccentDict));
                     }
                     break;
 
@@ -874,7 +874,7 @@ public static class LookupUtils
         (
             primarySpelling: kanji,
             readings: allReadings,
-            kanjiLookupResult: new KanjiLookupResult(kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiComposition, kanjiRecord.NanoriReadings, kanjiRecord.RadicalNames, kanjiRecord.StrokeCount, kanjiRecord.Grade),
+            kanjiLookupResult: new KanjiLookupResult(kanjiComposition, kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings, kanjiRecord.RadicalNames, kanjiRecord.StrokeCount, kanjiRecord.Grade),
             frequencies: GetKanjidicFrequencies(kanjiRecord.Frequency, kanjiFrequencyResults),
             matchedText: intermediaryResult.MatchedText,
             dict: intermediaryResult.Dict,
@@ -904,7 +904,7 @@ public static class LookupUtils
                 (
                     primarySpelling: kanji,
                     readings: allReadings,
-                    kanjiLookupResult: new KanjiLookupResult(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiComposition, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats()),
+                    kanjiLookupResult: new KanjiLookupResult(kanjiComposition, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats()),
                     frequencies: kanjiFrequencyResults,
                     matchedText: intermediaryResult.MatchedText,
                     dict: intermediaryResult.Dict,
@@ -963,7 +963,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static List<LookupResult> BuildEpwingYomichanResultForKanjiWithWordSchema(IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+    private static List<LookupResult> BuildEpwingYomichanResultForKanjiWithWordSchema(string[]? kanjiComposition, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
@@ -983,6 +983,7 @@ public static class LookupUtils
                     frequencies: kanjiFrequencyResults,
                     dict: intermediaryResult.Dict,
                     readings: readings,
+                    kanjiLookupResult: new KanjiLookupResult(kanjiComposition),
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
                 );

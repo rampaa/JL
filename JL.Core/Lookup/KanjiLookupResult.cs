@@ -1,9 +1,9 @@
 namespace JL.Core.Lookup;
 
 public sealed class KanjiLookupResult(
-    string[]? onReadings,
-    string[]? kunReadings,
     string[]? kanjiComposition,
+    string[]? onReadings = null,
+    string[]? kunReadings = null,
     string[]? nanoriReadings = null,
     string[]? radicalNames = null,
     byte strokeCount = 0,

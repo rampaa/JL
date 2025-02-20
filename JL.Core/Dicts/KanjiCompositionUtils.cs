@@ -17,28 +17,29 @@ internal static class KanjiCompositionUtils
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] lParts = lines[i].Split('\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-                if (lParts.Length > 2)
+                if (lParts.Length < 3)
                 {
-                    List<string> components = new(lParts.Length - 2);
-                    for (int j = 2; j < lParts.Length; j++)
-                    {
-                        string currentPart = lParts[j];
-                        int endIndex = currentPart.IndexOf('[', StringComparison.Ordinal);
-                        if (endIndex < 0)
-                        {
-                            components.Add(currentPart);
-                        }
-                        else if (currentPart.Contains('J', StringComparison.Ordinal))
-                        {
-                            components.Add(currentPart[..endIndex]);
-                        }
-                    }
+                    continue;
+                }
 
-                    if (components.Count > 0)
+                List<string> components = new(lParts.Length - 2);
+                for (int j = 2; j < lParts.Length; j++)
+                {
+                    string currentPart = lParts[j];
+                    int endIndex = currentPart.IndexOf('[', StringComparison.Ordinal);
+                    if (endIndex < 0)
                     {
-                        KanjiCompositionDict[lParts[1].GetPooledString()] = components.ToArray();
+                        components.Add(currentPart);
                     }
+                    else if (currentPart.Contains('J', StringComparison.Ordinal))
+                    {
+                        components.Add(currentPart[..endIndex]);
+                    }
+                }
+
+                if (components.Count > 0)
+                {
+                    KanjiCompositionDict[lParts[1].GetPooledString()] = components.ToArray();
                 }
             }
 
