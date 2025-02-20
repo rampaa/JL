@@ -27,7 +27,6 @@ public static class DictUtils
     public static bool UpdatingKanjidic { get; internal set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
-    internal static IDictionary<string, string> KanjiCompositionDict { get; private set; } = new Dictionary<string, string>(86934, StringComparer.Ordinal);
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
@@ -1335,46 +1334,6 @@ public static class DictUtils
         DictsReady = true;
     }
 #pragma warning restore IDE0072 // Add missing cases to switch expression
-
-    internal static async Task InitializeKanjiCompositionDict()
-    {
-        string filePath = Path.Join(Utils.ResourcesPath, "ids.txt");
-        if (File.Exists(filePath))
-        {
-            string[] lines = await File.ReadAllLinesAsync(filePath).ConfigureAwait(false);
-
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string[] lParts = lines[i].Split('\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-                if (lParts.Length is 3)
-                {
-                    int endIndex = lParts[2].IndexOf('[', StringComparison.Ordinal);
-
-                    KanjiCompositionDict.Add(lParts[1].GetPooledString(),
-                        endIndex < 0 ? lParts[2] : lParts[2][..endIndex]);
-                }
-
-                else if (lParts.Length > 3)
-                {
-                    for (int j = 2; j < lParts.Length; j++)
-                    {
-                        if (lParts[j].Contains('J', StringComparison.Ordinal))
-                        {
-                            int endIndex = lParts[j].IndexOf('[', StringComparison.Ordinal);
-                            if (endIndex >= 0)
-                            {
-                                KanjiCompositionDict.Add(lParts[1].GetPooledString(), lParts[j][..endIndex]);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            KanjiCompositionDict = KanjiCompositionDict.ToFrozenDictionary(StringComparer.Ordinal);
-        }
-    }
 
     public static Task CreateDefaultDictsConfig()
     {

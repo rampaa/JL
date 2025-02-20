@@ -3,7 +3,7 @@ namespace JL.Core.Lookup;
 public sealed class KanjiLookupResult(
     string[]? onReadings,
     string[]? kunReadings,
-    string? kanjiComposition,
+    string[]? kanjiComposition,
     string[]? nanoriReadings = null,
     string[]? radicalNames = null,
     byte strokeCount = 0,
@@ -12,7 +12,7 @@ public sealed class KanjiLookupResult(
 {
     public string[]? OnReadings { get; } = onReadings;
     public string[]? KunReadings { get; } = kunReadings;
-    public string? KanjiComposition { get; } = kanjiComposition;
+    public string[]? KanjiComposition { get; } = kanjiComposition;
     public string? KanjiStats { get; } = kanjiStats;
 
     // KANJIDIC2

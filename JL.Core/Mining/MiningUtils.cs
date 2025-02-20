@@ -221,7 +221,7 @@ public static class MiningUtils
                 return lookupResult.DeconjugationProcess;
 
             case JLField.KanjiComposition:
-                return lookupResult.KanjiLookupResult?.KanjiComposition;
+                return lookupResult.KanjiLookupResult?.KanjiComposition is not null ? string.Join('、', lookupResult.KanjiLookupResult.KanjiComposition) : null;
 
             case JLField.StrokeCount:
                 return lookupResult.KanjiLookupResult?.StrokeCount > 0
@@ -591,7 +591,7 @@ public static class MiningUtils
         {
             if (kanjiLookupResult.KanjiComposition is not null)
             {
-                miningParams[JLField.KanjiComposition] = kanjiLookupResult.KanjiComposition;
+                miningParams[JLField.KanjiComposition] = string.Join('、', kanjiLookupResult.KanjiComposition);
             }
 
             if (kanjiLookupResult.KanjiStats is not null)

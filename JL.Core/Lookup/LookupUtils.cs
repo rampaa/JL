@@ -32,9 +32,11 @@ public static class LookupUtils
         List<LookupFrequencyResult>? kanjiFrequencyResults = null;
         List<Freq>? kanjiFreqs = FreqUtils.KanjiFreqs;
         string kanji = "";
+        string[]? kanjiComposition = null;
         if (DictUtils.AtLeastOneKanjiDictIsActive)
         {
             kanji = text.EnumerateRunes().First().ToString();
+            _ = KanjiCompositionUtils.KanjiCompositionDict.TryGetValue(kanji, out kanjiComposition);
 
             kanjiFrequencyResults = kanjiFreqs is not null
                 ? GetKanjiFrequencies(kanji, kanjiFreqs)
@@ -254,7 +256,7 @@ public static class LookupUtils
 
                     if (kanjidicResult is not null)
                     {
-                        lookupResults.Add(BuildKanjidicResult(kanji, kanjidicResult, kanjiFrequencyResults, pitchAccentDict));
+                        lookupResults.Add(BuildKanjidicResult(kanji, kanjiComposition, kanjidicResult, kanjiFrequencyResults, pitchAccentDict));
                     }
 
                     break;
@@ -297,7 +299,7 @@ public static class LookupUtils
 
                     if (epwingYomichanKanjiResults is not null)
                     {
-                        lookupResults.AddRange(BuildYomichanKanjiResult(kanji, epwingYomichanKanjiResults, kanjiFrequencyResults, pitchAccentDict));
+                        lookupResults.AddRange(BuildYomichanKanjiResult(kanji, kanjiComposition, epwingYomichanKanjiResults, kanjiFrequencyResults, pitchAccentDict));
                     }
                     break;
 
@@ -861,13 +863,11 @@ public static class LookupUtils
         return results;
     }
 
-    private static LookupResult BuildKanjidicResult(string kanji, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+    private static LookupResult BuildKanjidicResult(string kanji, string[]? kanjiComposition, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         KanjidicRecord kanjiRecord = (KanjidicRecord)intermediaryResult.Results[0][0];
 
         string[]? allReadings = Utils.ConcatNullableArrays(kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings);
-
-        _ = DictUtils.KanjiCompositionDict.TryGetValue(kanji, out string? kanjiComposition);
 
         bool pitchAccentDictExists = pitchAccentDict is not null;
         LookupResult result = new
@@ -886,7 +886,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildYomichanKanjiResult(
-        string kanji, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        string kanji, string[]? kanjiComposition, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
@@ -900,8 +900,6 @@ public static class LookupUtils
                 YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)dictRecords[j];
 
                 string[]? allReadings = Utils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
-
-                _ = DictUtils.KanjiCompositionDict.TryGetValue(kanji, out string? kanjiComposition);
                 LookupResult result = new
                 (
                     primarySpelling: kanji,

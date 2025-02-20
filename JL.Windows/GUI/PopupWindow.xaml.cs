@@ -1087,10 +1087,11 @@ internal sealed partial class PopupWindow
 
             if (kanjiLookupResult.KanjiComposition is not null)
             {
+                string composition = $"Composition: {string.Join('、', kanjiLookupResult.KanjiComposition)}";
                 if (MiningMode)
                 {
                     TextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.KanjiComposition),
-                        $"Composition: {kanjiLookupResult.KanjiComposition}",
+                        composition,
                         configManager.DefinitionsColor,
                         configManager.DefinitionsFontSize,
                         VerticalAlignment.Center,
@@ -1105,7 +1106,7 @@ internal sealed partial class PopupWindow
                 else
                 {
                     TextBlock compositionTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KanjiComposition),
-                        $"Composition: {kanjiLookupResult.KanjiComposition}",
+                        composition,
                         configManager.DefinitionsColor,
                         configManager.DefinitionsFontSize,
                         VerticalAlignment.Center,

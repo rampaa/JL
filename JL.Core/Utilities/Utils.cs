@@ -189,7 +189,7 @@ public static partial class Utils
                 Frontend.SetInstalledVoiceWithHighestPriority();
             }),
             Task.Run(static async () => await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false)),
-            Task.Run(static async () => await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false))).ConfigureAwait(false);
+            Task.Run(static async () => await KanjiCompositionUtils.InitializeKanjiCompositionDict().ConfigureAwait(false))).ConfigureAwait(false);
 
         StringPoolInstance.Reset();
     }
