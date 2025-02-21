@@ -1245,16 +1245,18 @@ public static class MiningUtils
 
         List<string> audioFields = FindFields(JLField.Audio, userFields);
         bool needsAudio = audioFields.Count > 0;
-        string reading = lookupResult.Readings?[0] ?? lookupResult.PrimarySpelling;
+        string selectedReading = selectedSpelling == lookupResult.PrimarySpelling && lookupResult.Readings is not null
+            ? lookupResult.Readings[0]
+            : selectedSpelling;
 
         AudioResponse? audioResponse = needsAudio
-            ? await AudioUtils.GetPrioritizedAudio(lookupResult.PrimarySpelling, reading).ConfigureAwait(false)
+            ? await AudioUtils.GetPrioritizedAudio(lookupResult.PrimarySpelling, selectedReading).ConfigureAwait(false)
             : null;
 
         byte[]? audioData = audioResponse?.AudioData;
         if (audioResponse?.AudioSource is AudioSourceType.TextToSpeech)
         {
-            audioData = await Utils.Frontend.GetAudioResponseFromTextToSpeech(reading).ConfigureAwait(false);
+            audioData = await Utils.Frontend.GetAudioResponseFromTextToSpeech(selectedReading).ConfigureAwait(false);
         }
 
         if (audioData is not null)
@@ -1267,7 +1269,7 @@ public static class MiningUtils
                             "data", audioData
                         },
                         {
-                            "filename", $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}"
+                            "filename", $"JL_audio_{selectedReading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}"
                         },
                         {
                             "skipHash", Networking.Jpod101NoAudioMd5Hash
@@ -1295,7 +1297,7 @@ public static class MiningUtils
                             "data", imageBytes
                         },
                         {
-                            "filename", $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png"
+                            "filename", $"JL_image_{selectedReading}_{lookupResult.PrimarySpelling}.png"
                         },
                         {
                             "fields", imageFields

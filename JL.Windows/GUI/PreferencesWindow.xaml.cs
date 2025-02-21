@@ -57,7 +57,7 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.PrimarySpellingAndReadings.GetDescription()}: Primary spelling and its readings in the format "Primary Spelling[Reading 1]、Spelling[Reading 2]、...、Spelling[Reading N]" format, e.g., 俺[おれ]、俺[オレ]、俺[おらあ]、俺[おり].
                                             • {JLField.PrimarySpellingAndFirstReading.GetDescription()}: Primary spelling and its first reading in the format "Primary Spelling[Selected Reading]" format, e.g., 俺[おれ].
                                             • {JLField.DictionaryName.GetDescription()}: Name of the dictionary, e.g., JMDict.
-                                            • {JLField.Audio.GetDescription()}: Audio for the first reading of the mined word.
+                                            • {JLField.Audio.GetDescription()}: Audio for the 'Selected Reading' of the mined word.
                                             • {JLField.Image.GetDescription()}: Image found in clipboard at the time of mining.
                                             • {JLField.SourceText.GetDescription()}: Whole text in which the mined word appears in.
                                             • {JLField.LeadingSourceTextPart.GetDescription()}: Part of the source text that appears before the matched text.
@@ -98,7 +98,6 @@ internal sealed partial class PreferencesWindow
                                              • {JLField.DefinitionsFromMultipleDictionaries.GetDescription()}: Definitions for the mined kanji from kanji dictionaries.
                                              • {JLField.SelectedDefinitions.GetDescription()}: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                              • {JLField.DictionaryName.GetDescription()}: Name of the dictionary, e.g., "Kanjidic".
-                                             • {JLField.Audio.GetDescription()}: Audio for the first reading of the mined word.
                                              • {JLField.Image.GetDescription()}: Image found in clipboard at the time of mining.
                                              • {JLField.SourceText.GetDescription()}: Whole text in which the mined kanji appears in.
                                              • {JLField.LeadingSourceTextPart.GetDescription()}: Part of the source text that appears before the mined kanji.
@@ -107,11 +106,11 @@ internal sealed partial class PreferencesWindow
                                              • {JLField.LeadingSentencePart.GetDescription()}: Part of the sentence that appears before the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Leading Sentence Part" will be "妹が".
                                              • {JLField.TrailingSentencePart.GetDescription()}: Part of the sentence that appears after the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Trailing Sentence Part" will be "好きです".
                                              • {JLField.Frequencies.GetDescription()}: Frequency info for the kanji, e.g., "KANJIDIC2: 77, jpdb: 666".
-                                             • {JLField.RawFrequencies.GetDescription()}: Raw frequency info for the mined word, e.g., "77, 666".
-                                             • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., "666".
+                                             • {JLField.RawFrequencies.GetDescription()}: Raw frequency info for the mined kanji, e.g., "77, 666".
+                                             • {JLField.PreferredFrequency.GetDescription()}: Frequency info for the mined kanji from the frequency dictionary with the highest priority, e.g., "666".
                                              • {JLField.FrequencyHarmonicMean.GetDescription()}: Harmonic mean of the raw frequencies, e.g., "666".
-                                             • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
-                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined word in numeric form, e.g., "おんな: 3, おみな: 0, おうな: 1".
+                                             • {JLField.PitchAccents.GetDescription()}: Pitch accents for the mined kanji, displayed in a similar fashion to how pitch accents are shown in a JL popup.
+                                             • {JLField.NumericPitchAccents.GetDescription()}: Pitch accents for the mined kanji in numeric form, e.g., "おんな: 3, おみな: 0, おうな: 1".
                                              • {JLField.PitchAccentCategories.GetDescription()}: Pitch accent categories for the mined word, e.g., "にほんご: Heiban, にっぽんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.
                                              • {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone.
                                              """;
@@ -128,7 +127,7 @@ internal sealed partial class PreferencesWindow
                                             • {JLField.PrimarySpellingAndReadings.GetDescription()}: Primary spelling and its readings in the format "Primary Spelling[Reading 1、Reading 2、...、Reading N]" format, e.g., 俺[おれ、オレ、おらあ、おり].
                                             • {JLField.PrimarySpellingAndFirstReading.GetDescription()}: Primary spelling and its 'Selected Reading' in the format "Primary Spelling[Selected Reading]" format, e.g., 俺[おれ].
                                             • {JLField.DictionaryName.GetDescription()}: Name of the dictionary, e.g., "JMnedict".
-                                            • {JLField.Audio.GetDescription()}: Audio for the first reading of the mined word.
+                                            • {JLField.Audio.GetDescription()}: Audio for the 'Selected Reading' of the mined name.
                                             • {JLField.Image.GetDescription()}: Image found in clipboard at the time of mining.
                                             • {JLField.SourceText.GetDescription()}: Whole text in which the mined name appears in.
                                             • {JLField.LeadingSourceTextPart.GetDescription()}: Part of the source text that appears before the mined name.

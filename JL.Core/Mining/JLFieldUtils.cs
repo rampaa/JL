@@ -62,7 +62,6 @@ public static class JLFieldUtils
         JLField.DefinitionsFromMultipleDictionaries,
         JLField.SelectedDefinitions,
         JLField.DictionaryName,
-        JLField.Audio,
         JLField.Image,
         JLField.SourceText,
         JLField.LeadingSourceTextPart,
