@@ -11,7 +11,7 @@ namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaDBManager
 {
-    public const int Version = 6;
+    public const int Version = 7;
 
     private const string SingleTermQuery =
         """

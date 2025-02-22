@@ -10,8 +10,7 @@ internal static class EpwingUtils
 
     public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[] definitions, Dict dict)
     {
-        return !string.IsNullOrWhiteSpace(primarySpelling)
-            && !MemoryExtensions.ContainsAny(primarySpelling, s_invalidCharacters)
+        return !MemoryExtensions.ContainsAny(primarySpelling, s_invalidCharacters)
             && FilterDuplicateEntries(primarySpelling, reading, definitions, dict);
     }
 
