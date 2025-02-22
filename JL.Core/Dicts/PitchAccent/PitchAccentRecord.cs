@@ -52,6 +52,12 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
         Reading = Spelling == Reading
             ? null
             : Reading!.GetPooledString();
+
+        if (string.IsNullOrWhiteSpace(Spelling) && !string.IsNullOrWhiteSpace(Reading))
+        {
+            Spelling = Reading;
+            Reading = null;
+        }
     }
 
     public override int GetHashCode()

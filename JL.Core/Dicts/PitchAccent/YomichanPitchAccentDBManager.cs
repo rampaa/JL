@@ -11,7 +11,7 @@ namespace JL.Core.Dicts.PitchAccent;
 
 internal static class YomichanPitchAccentDBManager
 {
-    public const int Version = 3;
+    public const int Version = 4;
 
     public static void CreateDB(string dbName)
     {

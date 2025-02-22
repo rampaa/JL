@@ -38,8 +38,7 @@ internal static class YomichanPitchAccentLoader
             foreach (List<JsonElement> jsonObject in jsonObjects)
             {
                 PitchAccentRecord newEntry = new(jsonObject);
-
-                if (newEntry.Position is byte.MaxValue)
+                if (newEntry.Position is byte.MaxValue || string.IsNullOrWhiteSpace(newEntry.Spelling))
                 {
                     continue;
                 }
