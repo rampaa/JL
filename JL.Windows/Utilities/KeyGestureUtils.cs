@@ -54,6 +54,7 @@ internal static class KeyGestureUtils
         nameof(ConfigManager.MotivationKeyGesture),
         nameof(ConfigManager.NextDictKeyGesture),
         nameof(ConfigManager.PreviousDictKeyGesture),
+        nameof(ConfigManager.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture),
         nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
         nameof(ConfigManager.SelectNextItemKeyGesture),
         nameof(ConfigManager.SelectPreviousItemKeyGesture),

@@ -130,6 +130,7 @@ internal sealed class ConfigManager
     public double MiningButtonFontSize { get; set; } = 12;
     public Brush SeparatorColor { get; private set; } = Brushes.White;
     public bool HideDictTabsWithNoResults { get; private set; } = true;
+    public bool ShowDictionaryTabsInMiningMode { get; private set; } = true;
     public bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } // = false;
     public double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
     public bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } // = false;
@@ -182,6 +183,7 @@ internal sealed class ConfigManager
     public KeyGesture SelectPreviousItemKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Alt);
     public KeyGesture ConfirmItemSelectionKeyGesture { get; private set; } = new(Key.D5, ModifierKeys.Alt);
     public KeyGesture ClickMiningButtonKeyGesture { get; private set; } = new(Key.D3, ModifierKeys.Alt);
+    public KeyGesture ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture { get; private set; } = new(Key.V, ModifierKeys.Alt);
     #endregion
 
     #region Advanced
@@ -355,6 +357,7 @@ internal sealed class ConfigManager
         AutoLookupFirstTermWhenTextIsCopiedFromClipboard = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermWhenTextIsCopiedFromClipboard, nameof(AutoLookupFirstTermWhenTextIsCopiedFromClipboard), bool.TryParse);
         AutoLookupFirstTermWhenTextIsCopiedFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermWhenTextIsCopiedFromWebSocket, nameof(AutoLookupFirstTermWhenTextIsCopiedFromWebSocket), bool.TryParse);
         AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized), bool.TryParse);
+        ShowDictionaryTabsInMiningMode = ConfigDBManager.GetValueFromConfig(connection, ShowDictionaryTabsInMiningMode, nameof(ShowDictionaryTabsInMiningMode), bool.TryParse);
 
         TextBoxIsReadOnly = ConfigDBManager.GetValueFromConfig(connection, TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         if (mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
@@ -555,6 +558,7 @@ internal sealed class ConfigManager
         ShowStatsKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ShowStatsKeyGesture), ShowStatsKeyGesture);
         NextDictKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(NextDictKeyGesture), NextDictKeyGesture);
         PreviousDictKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(PreviousDictKeyGesture), PreviousDictKeyGesture);
+        ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture), ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
         AlwaysOnTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
         TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
         ToggleAlwaysShowMainTextBoxCaretKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture), ToggleAlwaysShowMainTextBoxCaretKeyGesture);
@@ -818,6 +822,8 @@ internal sealed class ConfigManager
             NextDictKeyGesture.ToFormattedString();
         preferenceWindow.PreviousDictKeyGestureTextBox.Text =
             PreviousDictKeyGesture.ToFormattedString();
+        preferenceWindow.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGestureTextBox.Text =
+            ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture.ToFormattedString();
         preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
             AlwaysOnTopKeyGesture.ToFormattedString();
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
@@ -1022,6 +1028,7 @@ internal sealed class ConfigManager
         preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromClipboardCheckBox.IsChecked = AutoLookupFirstTermWhenTextIsCopiedFromClipboard;
         preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromWebSocketCheckBox.IsChecked = AutoLookupFirstTermWhenTextIsCopiedFromWebSocket;
         preferenceWindow.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimizedCheckBox.IsChecked = AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized;
+        preferenceWindow.ShowDictionaryTabsInMiningModeCheckBox.IsChecked = ShowDictionaryTabsInMiningMode;
 
         preferenceWindow.ThemeComboBox.SelectedValue = Theme;
         preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue = MainWindowTextVerticalAlignment;
@@ -1078,6 +1085,8 @@ internal sealed class ConfigManager
                 preferenceWindow.NextDictKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(PreviousDictKeyGesture),
                 preferenceWindow.PreviousDictKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture),
+                preferenceWindow.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(AlwaysOnTopKeyGesture),
                 preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(TextBoxIsReadOnlyKeyGesture),
@@ -1450,6 +1459,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized),
                 preferenceWindow.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimizedCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(ShowDictionaryTabsInMiningMode),
+                preferenceWindow.ShowDictionaryTabsInMiningModeCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, "LookupMode", preferenceWindow.LookupModeComboBox.SelectedValue.ToString()!);
 

@@ -577,7 +577,11 @@ internal sealed partial class PopupWindow
             _ = CheckResultForDuplicates(duplicateIcons!);
         }
 
-        GenerateDictTypeButtons();
+        if (configManager.ShowDictionaryTabsInMiningMode)
+        {
+            GenerateDictTypeButtons();
+        }
+
         UpdateLayout();
     }
 
@@ -1716,6 +1720,11 @@ internal sealed partial class PopupWindow
             }
         }
 
+        else if (keyGesture.IsEqual(configManager.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture))
+        {
+            ToggleVisibilityOfDictTypeButtons();
+        }
+
         else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
             PopupWindowUtils.HidePopups(mainWindow.FirstPopupWindow);
@@ -1844,7 +1853,31 @@ internal sealed partial class PopupWindow
         MiningMode = true;
 
         TitleBarGrid.Visibility = Visibility.Visible;
-        ItemsControlButtons.Visibility = Visibility.Visible;
+        if (ConfigManager.Instance.ShowDictionaryTabsInMiningMode)
+        {
+            ItemsControlButtons.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void ToggleVisibilityOfDictTypeButtons()
+    {
+        if (!MiningMode)
+        {
+            return;
+        }
+
+        if (ItemsControlButtons.Visibility is Visibility.Visible)
+        {
+            ItemsControlButtons.Visibility = Visibility.Collapsed;
+            ItemsControlButtons.ItemsSource = null;
+        }
+        else
+        {
+            GenerateDictTypeButtons();
+            ItemsControlButtons.Visibility = Visibility.Visible;
+        }
+
+        UpdatePosition();
     }
 
     private Task PlayAudio(bool useSelectedListViewItemIfItExists)
