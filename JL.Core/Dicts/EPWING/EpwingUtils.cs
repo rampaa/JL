@@ -10,7 +10,8 @@ internal static class EpwingUtils
 
     public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[] definitions, Dict dict)
     {
-        return !MemoryExtensions.ContainsAny(primarySpelling, s_invalidCharacters)
+        return primarySpelling.Trim().Length > 0
+            && !MemoryExtensions.ContainsAny(primarySpelling, s_invalidCharacters)
             && FilterDuplicateEntries(primarySpelling, reading, definitions, dict);
     }
 
@@ -28,8 +29,7 @@ internal static class EpwingUtils
                 if (previousResult.Definitions.SequenceEqual(definitions))
                 {
                     // If an entry has reading info while others don't, keep the one with the reading info.
-                    if (string.IsNullOrEmpty(previousResult.Reading) &&
-                        !string.IsNullOrEmpty(reading))
+                    if (string.IsNullOrEmpty(previousResult.Reading) && !string.IsNullOrEmpty(reading))
                     {
                         previousResults.RemoveAt(i);
                         break;

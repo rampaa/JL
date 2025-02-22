@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -227,7 +228,7 @@ internal sealed partial class PopupWindow
         int endPosition = JapaneseUtils.FindExpressionBoundary(textToLookUp, charPosition);
         textToLookUp = textToLookUp[charPosition..endPosition];
 
-        if (string.IsNullOrEmpty(textToLookUp))
+        if (string.IsNullOrEmpty(textToLookUp) || Rune.IsWhiteSpace(textToLookUp.EnumerateRunes().First()))
         {
             HidePopup();
             return Task.CompletedTask;
@@ -336,7 +337,7 @@ internal sealed partial class PopupWindow
         _currentSourceTextCharPosition = textBox.SelectionStart;
 
         string selectedText = textBox.SelectedText;
-        if (string.IsNullOrWhiteSpace(selectedText))
+        if (string.IsNullOrEmpty(selectedText) || Rune.IsWhiteSpace(selectedText.EnumerateRunes().First()))
         {
             HidePopup();
             return Task.CompletedTask;

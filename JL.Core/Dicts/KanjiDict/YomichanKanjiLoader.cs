@@ -37,6 +37,10 @@ internal static class YomichanKanjiLoader
             {
                 YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
                 string kanji = jsonObj[0].GetString()!.GetPooledString();
+                if (kanji.Trim().Length is 0)
+                {
+                    continue;
+                }
 
                 if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
                 {
