@@ -577,10 +577,7 @@ internal sealed partial class PopupWindow
             _ = CheckResultForDuplicates(duplicateIcons!);
         }
 
-        if (configManager.ShowDictionaryTabsInMiningMode)
-        {
-            GenerateDictTypeButtons();
-        }
+        GenerateDictTypeButtons();
 
         UpdateLayout();
     }
@@ -1869,11 +1866,9 @@ internal sealed partial class PopupWindow
         if (ItemsControlButtons.Visibility is Visibility.Visible)
         {
             ItemsControlButtons.Visibility = Visibility.Collapsed;
-            ItemsControlButtons.ItemsSource = null;
         }
         else
         {
-            GenerateDictTypeButtons();
             ItemsControlButtons.Visibility = Visibility.Visible;
         }
 
