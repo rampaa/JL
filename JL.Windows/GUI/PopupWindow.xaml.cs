@@ -1863,14 +1863,9 @@ internal sealed partial class PopupWindow
             return;
         }
 
-        if (ItemsControlButtons.Visibility is Visibility.Visible)
-        {
-            ItemsControlButtons.Visibility = Visibility.Collapsed;
-        }
-        else
-        {
-            ItemsControlButtons.Visibility = Visibility.Visible;
-        }
+        ItemsControlButtons.Visibility = ItemsControlButtons.Visibility is Visibility.Visible
+            ? Visibility.Collapsed
+            : Visibility.Visible;
 
         UpdatePosition();
     }

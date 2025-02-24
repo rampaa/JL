@@ -28,7 +28,7 @@ public static class StatsUtils
         StatsTimer.Elapsed += StatsTimer_OnTimedEvent;
     }
 
-    public static void InitializeStatsTimer()
+    internal static void InitializeStatsTimer()
     {
         StatsTimer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
         StatsTimer.AutoReset = true;
