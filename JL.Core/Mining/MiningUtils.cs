@@ -317,8 +317,7 @@ public static class MiningUtils
                     byte pitchPosition = lookupResult.PitchPositions[i];
                     if (pitchPosition is not byte.MaxValue)
                     {
-                        _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expressions[i], pitchPosition));
-                        _ = expressionsWithPitchAccentBuilder.Append('、');
+                        _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expressions[i], pitchPosition)).Append('、');
                     }
                 }
 
@@ -646,8 +645,7 @@ public static class MiningUtils
                     string expression = expressions[i];
                     _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {pitchPosition}, ");
 
-                    _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, pitchPosition));
-                    _ = expressionsWithPitchAccentBuilder.Append('、');
+                    _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, pitchPosition)).Append('、');
 
                     _ = pitchAccentCategoriesBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {GetPitchAccentCategory(expression, pitchPosition)}, ");
                 }
