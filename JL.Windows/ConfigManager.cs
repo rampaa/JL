@@ -777,6 +777,12 @@ internal sealed class ConfigManager
             currentPopupWindow.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);
             currentPopupWindow.SearchMenuItem.SetInputGestureText(SearchWithBrowserKeyGesture);
 
+            currentPopupWindow.TitleBarToggleVisibilityOfDictTabsMenuItem.SetInputGestureText(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
+            currentPopupWindow.TitleBarHidePopupMenuItem.SetInputGestureText(ClosePopupKeyGesture);
+
+            currentPopupWindow.DictTabButtonsItemsControlToggleVisibilityOfDictTabsMenuItem.SetInputGestureText(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
+            currentPopupWindow.DictTabButtonsItemsControlHidePopupMenuItem.SetInputGestureText(ClosePopupKeyGesture);
+
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
     }

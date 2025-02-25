@@ -20,8 +20,20 @@
 
         <Grid Grid.Row="0" Name="TitleBarGrid" Visibility="Collapsed">
             <Rectangle VerticalAlignment="Top" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
-                   HorizontalAlignment="Stretch" Height="20" Opacity="1" Margin="0"
-                   Fill="Transparent">
+                       HorizontalAlignment="Stretch" Height="20" Opacity="1" Margin="0"
+                       Fill="Transparent">
+                <Rectangle.ContextMenu>
+                    <ContextMenu Name="TitleBarContextMenu" IsVisibleChanged="ContextMenu_IsVisibleChanged">
+                        <MenuItem
+                        Name="TitleBarToggleVisibilityOfDictTabsMenuItem"
+                        Header="Show/Hide dict tabs"
+                        Click="ToggleVisibilityOfDictTabs" />
+                        <MenuItem
+                        Name="TitleBarHidePopupMenuItem"
+                        Header="Close"
+                        Click="HidePopup" />
+                    </ContextMenu>
+                </Rectangle.ContextMenu>
             </Rectangle>
 
             <Button HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click"
@@ -33,8 +45,21 @@
             </Button>
         </Grid>
 
-        <ItemsControl Grid.Row="2" Name="ItemsControlButtons" Visibility="Collapsed"
+        <ItemsControl Grid.Row="2" Name="DictTabButtonsItemsControl" Visibility="Collapsed"
                           Background="Transparent">
+            <ItemsControl.ContextMenu>
+                <ContextMenu Name="DictTabButtonsItemsControlContextMenu" IsVisibleChanged="ContextMenu_IsVisibleChanged">
+                    <MenuItem
+                        Name="DictTabButtonsItemsControlToggleVisibilityOfDictTabsMenuItem"
+                        Header="Show/Hide dict tabs"
+                        Click="ToggleVisibilityOfDictTabs" />
+                    <MenuItem
+                        Name="DictTabButtonsItemsControlHidePopupMenuItem"
+                        Header="Close"
+                        Click="HidePopup" />
+                </ContextMenu>
+            </ItemsControl.ContextMenu>
+
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal" />
@@ -59,7 +84,7 @@
     </Grid>
 
     <Window.ContextMenu>
-        <ContextMenu Name="PopupContextMenu" IsVisibleChanged="PopupContextMenu_IsVisibleChanged">
+        <ContextMenu Name="PopupContextMenu" IsVisibleChanged="ContextMenu_IsVisibleChanged">
             <MenuItem
                 Name="AddNameMenuItem"
                 Header="Add name"

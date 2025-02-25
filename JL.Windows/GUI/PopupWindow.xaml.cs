@@ -1206,7 +1206,9 @@ internal sealed partial class PopupWindow
 
     private void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (PopupContextMenu.IsVisible)
+        if (PopupContextMenu.IsVisible
+            || TitleBarContextMenu.IsVisible
+            || DictTabButtonsItemsControlContextMenu.IsVisible)
         {
             _listViewItemIndexAfterContextMenuIsClosed = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
         }
@@ -1272,6 +1274,8 @@ internal sealed partial class PopupWindow
             || configManager.LookupOnMouseClickOnly
             || e.LeftButton is MouseButtonState.Pressed
             || PopupContextMenu.IsVisible
+            || TitleBarContextMenu.IsVisible
+            || DictTabButtonsItemsControlContextMenu.IsVisible
             || ReadingSelectionWindow.IsItVisible()
             || MiningSelectionWindow.IsItVisible()
             || (configManager.RequireLookupKeyPress
@@ -1654,10 +1658,10 @@ internal sealed partial class PopupWindow
             bool foundSelectedButton = false;
 
             Button? nextButton = null;
-            int buttonCount = ItemsControlButtons.Items.Count;
+            int buttonCount = DictTabButtonsItemsControl.Items.Count;
             for (int i = 0; i < buttonCount; i++)
             {
-                Button button = (Button)ItemsControlButtons.Items[i]!;
+                Button button = (Button)DictTabButtonsItemsControl.Items[i]!;
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1680,10 +1684,10 @@ internal sealed partial class PopupWindow
             bool foundSelectedButton = false;
             Button? previousButton = null;
 
-            int dictCount = ItemsControlButtons.Items.Count;
+            int dictCount = DictTabButtonsItemsControl.Items.Count;
             for (int i = dictCount - 1; i >= 0; i--)
             {
-                Button button = (Button)ItemsControlButtons.Items[i]!;
+                Button button = (Button)DictTabButtonsItemsControl.Items[i]!;
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1707,10 +1711,10 @@ internal sealed partial class PopupWindow
             {
                 for (int i = dictCount - 1; i > 0; i--)
                 {
-                    Button btn = (Button)ItemsControlButtons.Items[i]!;
-                    if (btn.IsEnabled)
+                    Button button = (Button)DictTabButtonsItemsControl.Items[i]!;
+                    if (button.IsEnabled)
                     {
-                        ClickDictTypeButton(btn);
+                        ClickDictTypeButton(button);
                         break;
                     }
                 }
@@ -1719,7 +1723,7 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture))
         {
-            ToggleVisibilityOfDictTypeButtons();
+            ToggleVisibilityOfDictTabs();
         }
 
         else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
@@ -1852,18 +1856,18 @@ internal sealed partial class PopupWindow
         TitleBarGrid.Visibility = Visibility.Visible;
         if (ConfigManager.Instance.ShowDictionaryTabsInMiningMode)
         {
-            ItemsControlButtons.Visibility = Visibility.Visible;
+            DictTabButtonsItemsControl.Visibility = Visibility.Visible;
         }
     }
 
-    private void ToggleVisibilityOfDictTypeButtons()
+    private void ToggleVisibilityOfDictTabs()
     {
         if (!MiningMode)
         {
             return;
         }
 
-        ItemsControlButtons.Visibility = ItemsControlButtons.Visibility is Visibility.Visible
+        DictTabButtonsItemsControl.Visibility = DictTabButtonsItemsControl.Visibility is Visibility.Visible
             ? Visibility.Collapsed
             : Visibility.Visible;
 
@@ -1991,6 +1995,8 @@ internal sealed partial class PopupWindow
             if (ConfigManager.Instance.AutoHidePopupIfMouseIsNotOverIt)
             {
                 if (PopupContextMenu.IsVisible
+                    || TitleBarContextMenu.IsVisible
+                    || DictTabButtonsItemsControlContextMenu.IsVisible
                     || ReadingSelectionWindow.IsItVisible()
                     || MiningSelectionWindow.IsItVisible()
                     || AddWordWindow.IsItVisible()
@@ -2042,7 +2048,7 @@ internal sealed partial class PopupWindow
             buttons.Add(button);
         }
 
-        ItemsControlButtons.ItemsSource = buttons;
+        DictTabButtonsItemsControl.ItemsSource = buttons;
     }
 
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
@@ -2052,7 +2058,7 @@ internal sealed partial class PopupWindow
 
     private void ClickDictTypeButton(Button button)
     {
-        foreach (Button btn in ItemsControlButtons.Items.Cast<Button>())
+        foreach (Button btn in DictTabButtonsItemsControl.Items.Cast<Button>())
         {
             btn.ClearValue(BackgroundProperty);
         }
@@ -2086,7 +2092,7 @@ internal sealed partial class PopupWindow
         return (Dict)items.Tag == _filteredDict;
     }
 
-    private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    private void ContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         bool contextMenuBecameInvisible = !(bool)e.NewValue;
         if (contextMenuBecameInvisible)
@@ -2095,6 +2101,9 @@ internal sealed partial class PopupWindow
             LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
             if (!IsMouseOver
+                && !PopupContextMenu.IsVisible
+                && !TitleBarContextMenu.IsVisible
+                && !DictTabButtonsItemsControlContextMenu.IsVisible
                 && !AddWordWindow.IsItVisible()
                 && !AddNameWindow.IsItVisible())
             {
@@ -2136,6 +2145,16 @@ internal sealed partial class PopupWindow
         }
     }
 
+    private void ToggleVisibilityOfDictTabs(object sender, RoutedEventArgs e)
+    {
+        ToggleVisibilityOfDictTabs();
+    }
+
+    private void HidePopup(object sender, RoutedEventArgs e)
+    {
+        HidePopup();
+    }
+
     public void HidePopup()
     {
         MainWindow mainWindow = MainWindow.Instance;
@@ -2166,8 +2185,8 @@ internal sealed partial class PopupWindow
 
         MiningMode = false;
         TitleBarGrid.Visibility = Visibility.Collapsed;
-        ItemsControlButtons.Visibility = Visibility.Collapsed;
-        ItemsControlButtons.ItemsSource = null;
+        DictTabButtonsItemsControl.Visibility = Visibility.Collapsed;
+        DictTabButtonsItemsControl.ItemsSource = null;
 
         if (_popupListViewScrollViewer is not null)
         {
@@ -2225,7 +2244,9 @@ internal sealed partial class PopupWindow
 
     private void PopupListView_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (!PopupContextMenu.IsVisible)
+        if (!PopupContextMenu.IsVisible
+            && !TitleBarContextMenu.IsVisible
+            && !DictTabButtonsItemsControlContextMenu.IsVisible)
         {
             _listViewItemIndex = _firstVisibleListViewItemIndex;
             LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
@@ -2326,7 +2347,7 @@ internal sealed partial class PopupWindow
         _lastLookedUpText = null;
         _filteredDict = null;
         _popupListViewScrollViewer = null;
-        ItemsControlButtons.ItemsSource = null;
+        DictTabButtonsItemsControl.ItemsSource = null;
         PopupListView.ItemsSource = null;
         _lastInteractedTextBox = null;
         LastLookupResults = null!;
