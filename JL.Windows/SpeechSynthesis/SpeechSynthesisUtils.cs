@@ -22,22 +22,18 @@ internal static class SpeechSynthesisUtils
         Synthesizer.InjectOneCoreVoices();
 
 #pragma warning disable CA1304 // Specify CultureInfo
-        List<InstalledVoice> installedVoices = Synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled).ToList();
+        List<InstalledVoice> installedVoices = Synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled && iv.VoiceInfo.Name is not null && iv.VoiceInfo.Culture is not null).ToList();
 #pragma warning restore CA1304 // Specify CultureInfo
 
         return installedVoices.Count is 0
             ? null
             : Application.Current.Dispatcher.Invoke(() =>
             {
-                List<ComboBoxItem> installedVoiceComboboxItems = new(installedVoices.Count);
+                ComboBoxItem[] installedVoiceComboboxItems = new ComboBoxItem[installedVoices.Count];
 
                 for (int i = 0; i < installedVoices.Count; i++)
                 {
                     InstalledVoice installedVoice = installedVoices[i];
-                    if (installedVoice.VoiceInfo.Name is null || installedVoice.VoiceInfo.Culture is null)
-                    {
-                        continue;
-                    }
 
                     ComboBoxItem comboBoxItem = new()
                     {
@@ -49,15 +45,13 @@ internal static class SpeechSynthesisUtils
                         comboBoxItem.Foreground = Brushes.LightSlateGray;
                     }
 
-                    installedVoiceComboboxItems.Add(comboBoxItem);
+                    installedVoiceComboboxItems[i] = comboBoxItem;
                 }
 
-                return installedVoiceComboboxItems.Count is 0
-                    ? null
-                    : installedVoiceComboboxItems
-                        .OrderBy(static iv => iv.Foreground == Brushes.LightSlateGray)
-                        .ThenBy(static iv => (string)iv.Content, StringComparer.InvariantCulture)
-                        .ToArray();
+                return installedVoiceComboboxItems
+                    .OrderBy(static iv => iv.Foreground == Brushes.LightSlateGray)
+                    .ThenBy(static iv => (string)iv.Content, StringComparer.InvariantCulture)
+                    .ToArray();
             });
     }
 
