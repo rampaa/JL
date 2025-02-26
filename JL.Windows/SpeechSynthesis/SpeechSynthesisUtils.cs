@@ -34,6 +34,12 @@ internal static class SpeechSynthesisUtils
                 for (int i = 0; i < installedVoices.Count; i++)
                 {
                     InstalledVoice installedVoice = installedVoices[i];
+
+                    if (installedVoice.VoiceInfo.Name is null || installedVoice.VoiceInfo.Culture is null)
+                    {
+                        continue;
+                    }
+
                     ComboBoxItem comboBoxItem = new()
                     {
                         Content = installedVoice.VoiceInfo.Name
