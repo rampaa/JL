@@ -29,12 +29,11 @@ internal static class SpeechSynthesisUtils
             ? null
             : Application.Current.Dispatcher.Invoke(() =>
             {
-                ComboBoxItem[] installedVoiceComboboxItems = new ComboBoxItem[installedVoices.Count];
+                List<ComboBoxItem> installedVoiceComboboxItems = new(installedVoices.Count);
 
                 for (int i = 0; i < installedVoices.Count; i++)
                 {
                     InstalledVoice installedVoice = installedVoices[i];
-
                     if (installedVoice.VoiceInfo.Name is null || installedVoice.VoiceInfo.Culture is null)
                     {
                         continue;
@@ -50,13 +49,15 @@ internal static class SpeechSynthesisUtils
                         comboBoxItem.Foreground = Brushes.LightSlateGray;
                     }
 
-                    installedVoiceComboboxItems[i] = comboBoxItem;
+                    installedVoiceComboboxItems.Add(comboBoxItem);
                 }
 
-                return installedVoiceComboboxItems
-                    .OrderBy(static iv => iv.Foreground == Brushes.LightSlateGray)
-                    .ThenBy(static iv => (string)iv.Content, StringComparer.InvariantCulture)
-                    .ToArray();
+                return installedVoiceComboboxItems.Count is 0
+                    ? null
+                    : installedVoiceComboboxItems
+                        .OrderBy(static iv => iv.Foreground == Brushes.LightSlateGray)
+                        .ThenBy(static iv => (string)iv.Content, StringComparer.InvariantCulture)
+                        .ToArray();
             });
     }
 
