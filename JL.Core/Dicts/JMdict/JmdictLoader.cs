@@ -11,14 +11,35 @@ internal static class JmdictLoader
 {
     private static bool s_canHandleCulture = true;
 
-    private static readonly FrozenDictionary<string, string> s_iso6392BTo2T = new KeyValuePair<string, string>[]
+    private static readonly FrozenDictionary<string, string> s_iso6392BToEnglishNames = new KeyValuePair<string, string>[]
     {
         #pragma warning disable format
-        // ReSharper disable BadExpressionBracesLineBreaks
-        new("tib", "bod"), new("cze", "ces"), new("wel", "cym"), new("ger", "deu"), new("gre", "ell"),
-        new("baq", "eus"), new("per", "fas"), new("fre", "fra"), new("arm", "hye"), new("ice", "isl"),
-        new("geo", "kat"), new("mac", "mkd"), new("mao", "mri"), new("may", "msa"), new("bur", "mya"),
-        new("dut", "nld"), new("rum", "ron"), new("slo", "slk"), new("alb", "sqi"), new("chi", "zho")
+        // ReSharper disable BadExpressionBracesLineBreakssme
+        new("afr", "Afrikaans"), new("ain", "Ainu"), new("alb", "Albanian"),
+        new("alg", "Algonquian languages"), new("amh", "Amharic"), new("ara", "Arabic"),
+        new("arm", "Armenian"), new("arn", "Mapuche"), new("baq", "Basque"),
+        new("bnt", "Bantu languages"), new("bre", "Breton"), new("bul", "Bulgarian"),
+        new("bur", "Burmese"), new("chi", "Chinese"), new("chn", "Chinook Jargon"),
+        new("cze", "Czech"), new("dan", "Danish"), new("dut", "Dutch"),
+        new("eng", "English"), new("epo", "Esperanto"), new("est", "Estonian"),
+        new("fil", "Filipino"), new("fin", "Finnish"), new("fre", "French"),
+        new("geo", "Georgian"), new("ger", "German"), new("glg", "Galician"),
+        new("grc", "Ancient Greek"), new("gre", "Greek"), new("haw", "Hawaiian"),
+        new("heb", "Hebrew"), new("hin", "Hindi"), new("hun", "Hungarian"),
+        new("ice", "Icelandic"), new("ind", "Indonesian"), new("ita", "Italian"),
+        new("khm", "Khmer"), new("kor", "Korean"), new("kur", "Kurdish"),
+        new("lat", "Latin"), new("lit", "Lithuanian"), new("mac", "mkd"),
+        new("mal", "Malayalam"), new("mao", "Maori"), new("may", "Malay"),
+        new("mnc", "Manchu"), new("mol", "Moldovan"), new("mon", "Mongolian"),
+        new("nor", "Norwegian"), new("per", "Persian"), new("pol", "Polish"),
+        new("por", "Portuguese"), new("rum", "Romanian"), new("rus", "Russian"),
+        new("san", "Sanskrit"), new("scr", "Serbo-Croatian"), new("slo", "Slovak"),
+        new("slv", "Slovenian"), new("som", "Somali"), new("spa", "Spanish"),
+        new("swa", "Kiswahili"), new("swe", "Swedish"), new("tah", "Tahitian"),
+        new("tam", "Tamil"), new("tgl", "Tagalog"), new("tha", "Thai"),
+        new("tib", "Tibetan"), new("tur", "Turkish"), new("ukr", "Ukrainian"),
+        new("urd", "Urdu"), new("uzb", "Uzbek"), new("vie", "Vietnamese"),
+        new("wel", "Welsh"), new("yid", "Yiddish")
         // ReSharper restore BadExpressionBracesLineBreaks
         #pragma warning restore format
     }.ToFrozenDictionary(StringComparer.Ordinal);
@@ -319,12 +340,14 @@ internal static class JmdictLoader
 
                         if (lang is not null)
                         {
-                            if (s_canHandleCulture)
+                            if (s_iso6392BToEnglishNames.TryGetValue(lang, out string? englishName))
                             {
-                                if (s_iso6392BTo2T.TryGetValue(lang, out string? langCode))
-                                {
-                                    lang = langCode;
-                                }
+                                lang = englishName;
+                            }
+
+                            else if (s_canHandleCulture)
+                            {
+                                Utils.Logger.Error($"JMdict: English name of {lang} is missing!");
 
                                 try
                                 {
