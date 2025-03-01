@@ -219,9 +219,14 @@ public static partial class JapaneseUtils
         for (int i = firstKatakanaIndex; i < normalizedTextLength; i++)
         {
             char character = normalizedText[i];
-            _ = textInHiragana.Append(s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr)
-                ? hiraganaStr
-                : character);
+            if (s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr))
+            {
+                _ = textInHiragana.Append(hiraganaStr);
+            }
+            else
+            {
+                _ = textInHiragana.Append(character);
+            }
         }
 
         return textInHiragana.ToString();

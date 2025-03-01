@@ -48,9 +48,14 @@ public static class LookupResultUtils
 
             if (formText.Length is not 0)
             {
-                _ = first
-                    ? deconjugation.Append(CultureInfo.InvariantCulture, $"～{formText}")
-                    : deconjugation.Append(CultureInfo.InvariantCulture, $"; {formText}");
+                if (first)
+                {
+                    _ = deconjugation.Append(CultureInfo.InvariantCulture, $"～{formText}");
+                }
+                else
+                {
+                    _ = deconjugation.Append(CultureInfo.InvariantCulture, $"; {formText}");
+                }
             }
 
             first = false;
