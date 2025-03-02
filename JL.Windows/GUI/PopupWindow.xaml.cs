@@ -1870,8 +1870,6 @@ internal sealed partial class PopupWindow
         DictTabButtonsItemsControl.Visibility = DictTabButtonsItemsControl.Visibility is Visibility.Visible
             ? Visibility.Collapsed
             : Visibility.Visible;
-
-        UpdatePosition();
     }
 
     private Task PlayAudio(bool useSelectedListViewItemIfItExists)
