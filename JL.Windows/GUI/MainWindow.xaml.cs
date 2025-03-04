@@ -1578,7 +1578,11 @@ internal sealed partial class MainWindow
         {
             if (configManager.RestoreFocusToPreviouslyActiveWindow)
             {
-                WindowsUtils.LastActiveWindowHandle = WinApi.GetActiveWindowHandle();
+                nint lastActiveWindowHandle = WinApi.GetActiveWindowHandle();
+                if (lastActiveWindowHandle != WindowHandle)
+                {
+                    WindowsUtils.LastActiveWindowHandle = lastActiveWindowHandle;
+                }
             }
 
             _ = Activate();
