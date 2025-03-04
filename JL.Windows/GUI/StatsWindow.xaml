@@ -24,7 +24,7 @@
                     <TextBlock Name="TextBlockLines" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
-                <DockPanel>
+                <DockPanel ToolTip="Days.Hours:Minutes:Seconds" Cursor="Help">
                     <TextBlock Text="Time: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                     <TextBlock Name="TextBlockTime" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
