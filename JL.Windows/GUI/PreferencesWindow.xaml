@@ -480,7 +480,9 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
-                                       ToolTip="If Focusable is set to false, this option will have no effect."/>
+                                       ToolTip="Attempts to steal focus from the currently active window by attaching JL to its thread on mouse hover.
+                                       &#10;Note that attaching to another program's thread can be seen as an intrusive action, so keep that in mind before enabling this option.
+                                       &#10;If &quot;Focusable&quot; is set to false, this option will have no effect." />
                             <CheckBox x:Name="MainWindowFocusOnHoverCheckBox" HorizontalAlignment="Right" />
                         </DockPanel>
 

@@ -181,6 +181,19 @@ internal sealed partial class WinApi
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static partial bool SetForegroundWindow(nint hwnd);
+
+        [LibraryImport("Kernel32.dll", EntryPoint = "GetCurrentThreadId")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial uint GetCurrentThreadId();
+
+        [LibraryImport("user32.dll", EntryPoint = "GetWindowThreadProcessId")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId);
+
+        [LibraryImport("user32.dll", EntryPoint = "AttachThreadInput")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool AttachThreadInput(uint idAttach, uint idAttachTo, [MarshalAs(UnmanagedType.Bool)] bool fAttach);
     }
 #pragma warning restore IDE1006 // Naming rule violation
 
@@ -350,7 +363,20 @@ internal sealed partial class WinApi
 
     public static void GiveFocusToWindow(nint windowHandle)
     {
+        uint currentThreadId = GetCurrentThreadId();
+        uint foregroundThread = GetWindowThreadProcessId(windowHandle, out _);
+        _ = AttachThreadInput(currentThreadId, foregroundThread, true);
         _ = SetForegroundWindow(windowHandle);
+        _ = AttachThreadInput(currentThreadId, foregroundThread, true);
+    }
+
+    public static void StealFocus(nint windowHandle)
+    {
+        uint currentThreadId = GetCurrentThreadId();
+        uint foregroundThread = GetWindowThreadProcessId(GetForegroundWindow(), out _);
+        _ = AttachThreadInput(currentThreadId, foregroundThread, true);
+        _ = SetForegroundWindow(windowHandle);
+        _ = AttachThreadInput(currentThreadId, foregroundThread, true);
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
