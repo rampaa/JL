@@ -1529,16 +1529,35 @@ internal sealed partial class MainWindow
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
+        ConfigManager configManager = ConfigManager.Instance;
         if (IsMouseOver
             || FirstPopupWindow.MiningMode
             || (FirstPopupWindow.IsMouseOver
-                && (ConfigManager.Instance.FixedPopupPositioning
+                && (configManager.FixedPopupPositioning
                     || FirstPopupWindow.UnavoidableMouseEnter)))
         {
             return;
         }
 
         FirstPopupWindow.HidePopup();
+
+        nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
+        if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
+            && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
+            && lastActiveWindowHandle is not 0
+            && lastActiveWindowHandle != WindowHandle
+            && !MainTextBoxContextMenu.IsVisible
+            && !TitleBarContextMenu.IsVisible
+            && !ManageDictionariesWindow.IsItVisible()
+            && !ManageFrequenciesWindow.IsItVisible()
+            && !ManageAudioSourcesWindow.IsItVisible()
+            && !AddNameWindow.IsItVisible()
+            && !AddWordWindow.IsItVisible()
+            && !PreferencesWindow.IsItVisible()
+            && !StatsWindow.IsItVisible())
+        {
+            WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+        }
     }
 
     private void Window_MouseEnter(object sender, MouseEventArgs e)
@@ -1557,6 +1576,11 @@ internal sealed partial class MainWindow
         if (!FirstPopupWindow.IsVisible
             && configManager is { Focusable: true, MainWindowFocusOnHover: true })
         {
+            if (configManager.RestoreFocusToPreviouslyActiveWindow)
+            {
+                WindowsUtils.LastActiveWindowHandle = WinApi.GetActiveWindowHandle();
+            }
+
             _ = Activate();
             _ = Focus();
         }

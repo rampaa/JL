@@ -173,7 +173,14 @@ internal sealed partial class WinApi
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial nint FindWindowW(string? lpClassName, string? lpWindowName);
 
-        // ReSharper restore InconsistentNaming
+        [LibraryImport("user32.dll", EntryPoint = "GetForegroundWindow")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial nint GetForegroundWindow();
+
+        [LibraryImport("user32.dll", EntryPoint = "SetForegroundWindow")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool SetForegroundWindow(nint hwnd);
     }
 #pragma warning restore IDE1006 // Naming rule violation
 
@@ -334,6 +341,16 @@ internal sealed partial class WinApi
     public static void MoveWindowToPosition(nint windowHandle, double x, double y)
     {
         _ = SetWindowPos(windowHandle, 0, double.ConvertToIntegerNative<int>(x), double.ConvertToIntegerNative<int>(y), 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+    }
+
+    public static nint GetActiveWindowHandle()
+    {
+        return GetForegroundWindow();
+    }
+
+    public static void GiveFocusToWindow(nint windowHandle)
+    {
+        _ = SetForegroundWindow(windowHandle);
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)

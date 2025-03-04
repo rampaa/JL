@@ -31,6 +31,7 @@ internal sealed class ConfigManager
     public bool HighlightLongestMatch { get; private set; } // = false;
     public bool AutoPlayAudio { get; private set; } // = false;
     public bool Focusable { get; private set; } = true;
+    public bool RestoreFocusToPreviouslyActiveWindow { get; private set; } // = false;
     public MouseButton MiningModeMouseButton { get; private set; } = MouseButton.Middle;
     public MouseButton LookupOnClickMouseButton { get; private set; } = MouseButton.Left;
 
@@ -337,6 +338,7 @@ internal sealed class ConfigManager
             WinApi.PreventActivation(mainWindow.WindowHandle);
         }
 
+        RestoreFocusToPreviouslyActiveWindow = ConfigDBManager.GetValueFromConfig(connection, RestoreFocusToPreviouslyActiveWindow, nameof(RestoreFocusToPreviouslyActiveWindow), bool.TryParse);
         PopupFocusOnLookup = ConfigDBManager.GetValueFromConfig(connection, PopupFocusOnLookup, nameof(PopupFocusOnLookup), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInPopups = ConfigDBManager.GetValueFromConfig(connection, DisableLookupsForNonJapaneseCharsInPopups, nameof(DisableLookupsForNonJapaneseCharsInPopups), bool.TryParse);
         FixedPopupPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupPositioning, nameof(FixedPopupPositioning), bool.TryParse);
@@ -913,6 +915,7 @@ internal sealed class ConfigManager
         preferenceWindow.RequireLookupKeyPressCheckBox.IsChecked = RequireLookupKeyPress;
         preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
         preferenceWindow.FocusableCheckBox.IsChecked = Focusable;
+        preferenceWindow.RestoreFocusToPreviouslyActiveWindowCheckBox.IsChecked = RestoreFocusToPreviouslyActiveWindow;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = coreConfigManager.AnkiIntegration;
 
@@ -1312,6 +1315,8 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(DisableHotkeys), preferenceWindow.DisableHotkeysCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(Focusable), preferenceWindow.FocusableCheckBox.IsChecked.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(RestoreFocusToPreviouslyActiveWindow), preferenceWindow.RestoreFocusToPreviouslyActiveWindowCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(TextOnlyVisibleOnHover),
                 preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString()!);

@@ -41,6 +41,8 @@ internal static class WindowsUtils
     public static double DpiAwareXOffset { get; set; } = ConfigManager.Instance.PopupXOffset * Dpi.DpiScaleX;
     public static double DpiAwareYOffset { get; set; } = ConfigManager.Instance.PopupYOffset * Dpi.DpiScaleY;
 
+    public static nint LastActiveWindowHandle { get; set; }
+
     public static ComboBoxItem[] FindJapaneseFonts()
     {
         XmlLanguage japaneseXmlLanguage = XmlLanguage.GetLanguage("ja-JP");
@@ -589,6 +591,15 @@ internal static class WindowsUtils
                     {
                         mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
                     }
+
+                    nint lastActiveWindowHandle = LastActiveWindowHandle;
+                    if (configManager.RestoreFocusToPreviouslyActiveWindow
+                        && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
+                        && lastActiveWindowHandle is not 0
+                        && lastActiveWindowHandle != mainWindow.WindowHandle)
+                    {
+                        WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+                    }
                 }
             }
 
@@ -603,12 +614,24 @@ internal static class WindowsUtils
                 WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
             }
         }
-        else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized)
+        else
         {
-            CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-            if (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
+            nint lastActiveWindowHandle = LastActiveWindowHandle;
+            if (configManager.RestoreFocusToPreviouslyActiveWindow
+                && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
+                && lastActiveWindowHandle is not 0
+                && lastActiveWindowHandle != mainWindow.WindowHandle)
             {
-                StatsUtils.StartTimeStatStopWatch();
+                WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+            }
+
+            if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized)
+            {
+                CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+                if (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
+                {
+                    StatsUtils.StartTimeStatStopWatch();
+                }
             }
         }
     }

@@ -211,10 +211,11 @@ internal sealed partial class PopupWindow
 
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        if (this != mainWindow.FirstPopupWindow
-                ? configManager.DisableLookupsForNonJapaneseCharsInPopups
+        bool isFirstPopupWindow = this == mainWindow.FirstPopupWindow;
+        if (isFirstPopupWindow
+                ? configManager.DisableLookupsForNonJapaneseCharsInMainWindow
                   && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString())
-                : configManager.DisableLookupsForNonJapaneseCharsInMainWindow
+                : configManager.DisableLookupsForNonJapaneseCharsInPopups
                   && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString()))
         {
             HidePopup();
@@ -258,7 +259,7 @@ internal sealed partial class PopupWindow
 
             if (configManager.HighlightLongestMatch)
             {
-                WinApi.ActivateWindow(this == mainWindow.FirstPopupWindow
+                WinApi.ActivateWindow(isFirstPopupWindow
                     ? mainWindow.WindowHandle
                     : ((PopupWindow)Owner).WindowHandle);
 
@@ -294,6 +295,15 @@ internal sealed partial class PopupWindow
             if (configManager.Focusable
                 && (enableMiningMode || configManager.PopupFocusOnLookup))
             {
+                if (configManager.RestoreFocusToPreviouslyActiveWindow && isFirstPopupWindow)
+                {
+                    nint previousWindowHandle = WinApi.GetActiveWindowHandle();
+                    if (previousWindowHandle != mainWindow.WindowHandle)
+                    {
+                        WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
+                    }
+                }
+
                 _ = Activate();
             }
 
@@ -2215,6 +2225,16 @@ internal sealed partial class PopupWindow
             if (configManager.HighlightLongestMatch && !mainWindow.ContextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_previousTextBox);
+            }
+
+            nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
+            if (configManager.RestoreFocusToPreviouslyActiveWindow
+                && lastActiveWindowHandle is not 0
+                && lastActiveWindowHandle != mainWindow.WindowHandle
+                && ((configManager.PopupFocusOnLookup && mainWindow.WindowState is WindowState.Minimized)
+                    || (configManager.MainWindowFocusOnHover && !mainWindow.IsMouseOver)))
+            {
+                WinApi.GiveFocusToWindow(lastActiveWindowHandle);
             }
         }
 

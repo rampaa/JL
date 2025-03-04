@@ -127,6 +127,15 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Restore focus to previously active window"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
+                                       ToolTip="Restores focus to the non-JL window that was previously active if focus was automatically taken by the &quot;Focus on hover&quot; or &quot;Focus on lookup&quot; option,
+                                       &#10;when no popup is open and the mouse is no longer over the main window." />
+                            <CheckBox x:Name="RestoreFocusToPreviouslyActiveWindowCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
                                        Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
