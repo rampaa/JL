@@ -1,4 +1,4 @@
-### Grant UIAccess privilege to JL
+### Granting UIAccess privilege to JL
 
 By editing the manifest file (`JL.exe.manifest`), you can change `uiAccess="false"` to `uiAccess="true"`. This allows JL to stay on top of other applications that do not have UIAccess, even without clipboard changes (e.g., JL will stay on top of Magpie before any clipboard changes occur).. It also enables JL to keep itself on top of applications that have UIAccess on every clipboard change. 
 
