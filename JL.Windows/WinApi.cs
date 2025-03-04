@@ -182,7 +182,7 @@ internal sealed partial class WinApi
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static partial bool SetForegroundWindow(nint hwnd);
 
-        [LibraryImport("Kernel32.dll", EntryPoint = "GetCurrentThreadId")]
+        [LibraryImport("kernel32.dll", EntryPoint = "GetCurrentThreadId")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial uint GetCurrentThreadId();
 
