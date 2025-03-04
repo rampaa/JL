@@ -367,7 +367,7 @@ internal sealed partial class WinApi
         uint foregroundThread = GetWindowThreadProcessId(windowHandle, out _);
         _ = AttachThreadInput(currentThreadId, foregroundThread, true);
         _ = SetForegroundWindow(windowHandle);
-        _ = AttachThreadInput(currentThreadId, foregroundThread, true);
+        _ = AttachThreadInput(currentThreadId, foregroundThread, false);
     }
 
     public static void StealFocus(nint windowHandle)
@@ -376,7 +376,7 @@ internal sealed partial class WinApi
         uint foregroundThread = GetWindowThreadProcessId(GetForegroundWindow(), out _);
         _ = AttachThreadInput(currentThreadId, foregroundThread, true);
         _ = SetForegroundWindow(windowHandle);
-        _ = AttachThreadInput(currentThreadId, foregroundThread, true);
+        _ = AttachThreadInput(currentThreadId, foregroundThread, false);
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
