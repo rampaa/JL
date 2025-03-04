@@ -22,8 +22,9 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 * Supports lots of dictionaries (see the [Supported Dictionaries](https://github.com/rampaa/JL/blob/master/Docs/Supported%20Dictionaries.md) page for details)
 * Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
 * Allows customizing the displayed info per dictionary (not showing PoS info for JMdict, choosing whether to put newlines between definitions etc. through "Manage Dictionaries"->"Edit" button of the dictionary->"Options" section)
-* Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Docs/Deconjugation%20Support.md) page for the list of supported  adjective and verb types)
+* Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Docs/Deconjugation%20Support.md) page for the list of supported adjective and verb types)
 * Anki mining (allows different configurations for word/kanji/name mining)
+* Support for multiple audio sources (see the [Supported Audio Source Types](https://github.com/rampaa/JL/blob/master/Docs/Supported%20Audio%20Source%20Types.md) page for more details)
 * Allows different opacity level on un/hover
 * Pass-through mode (i.e. mouse clicks will pass through JL)
 * Recursive lookups (i.e. popup within popup)
@@ -52,7 +53,7 @@ Press the opacity slider button located top-left of the main window. You can als
 ### How can I use JL with Magpie?
 Enable the "Preferences>Main Window>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
 
-Optional: Give UI Access to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [UI Access](https://github.com/rampaa/JL/blob/master/Docs/UI%20Access.md) page for more details.
+Optional: Grant UIAccess privilege to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [Granting UIAccess privilege to JL](https://github.com/rampaa/JL/blob/master/Docs/UIAccess.md) page for more details.
 
 If you use JL v2.0.0+ and Magpie v0.11.0+ then you don't necessarily need to change the following settings.
 
