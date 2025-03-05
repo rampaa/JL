@@ -408,7 +408,7 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
-                                       ToolTip="If this option is enabled, JL will *continously* try connecting to the specified WebSocket"/>
+                                       ToolTip="If this option is enabled, JL will *continuously* try connecting to the specified WebSocket"/>
                             <CheckBox x:Name="AutoReconnectToWebSocketCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -889,7 +889,7 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="Specifies the mouse button to use with the ➕ button, which will open a selection window to choose from the primary spelling and available readings.
-                                       &#10;If no reading is available, the &quot;Selected Spelling&quot; field will be set to the primary spelling and the term will be mined." /> 
+                                       &#10;If no reading is available, the &quot;Selected Spelling&quot; field will be set to the primary spelling and the term will be mined." />
                             <ComboBox x:Name="MineMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
                                 <ComboBoxItem Content="Left button" Tag="Left" />
@@ -1915,7 +1915,7 @@
 
                         <Button x:Name="ResetPreferencesButton" Content="Reset preferences"
                                     HorizontalAlignment="Center" Click="ResetPreferencesButton_Click" />
-                        
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
