@@ -131,7 +131,9 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
                                        ToolTip="Restores focus to the non-JL window that was previously active if focus was automatically taken by the &quot;Focus on hover&quot; or &quot;Focus on lookup&quot; option,
-                                       &#10;when no popup is open and the mouse is no longer over the main window." />
+                                       &#10;when no popup is open and the mouse is no longer over the main window.
+                                       &#10;Note that JL may need to attach itself to another program's thread to do this, which could be seen as an intrusive action.
+                                       &#10;Keep this in mind before enabling this option." />
                             <CheckBox x:Name="RestoreFocusToPreviouslyActiveWindowCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -480,8 +482,9 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
-                                       ToolTip="Attempts to steal focus from the currently active window by attaching JL to its thread on mouse hover.
-                                       &#10;Note that attaching to another program's thread can be seen as an intrusive action, so keep that in mind before enabling this option.
+                                       ToolTip="Attempts to steal focus from the currently active window on mouse hover.
+                                       &#10;Note that JL may need to attach itself to another program's thread to do this, which could be seen as an intrusive action.
+                                       &#10;Keep that in mind before enabling this option.
                                        &#10;If &quot;Focusable&quot; is set to false, this option will have no effect." />
                             <CheckBox x:Name="MainWindowFocusOnHoverCheckBox" HorizontalAlignment="Right" />
                         </DockPanel>

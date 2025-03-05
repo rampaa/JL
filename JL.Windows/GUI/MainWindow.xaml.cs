@@ -1585,7 +1585,11 @@ internal sealed partial class MainWindow
                 }
             }
 
-            WinApi.StealFocus(WindowHandle);
+            if (!Activate())
+            {
+                WinApi.StealFocus(WindowHandle);
+            }
+
             _ = Focus();
         }
     }

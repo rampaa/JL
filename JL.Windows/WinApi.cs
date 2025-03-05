@@ -363,11 +363,14 @@ internal sealed partial class WinApi
 
     public static void GiveFocusToWindow(nint windowHandle)
     {
-        uint currentThreadId = GetCurrentThreadId();
-        uint foregroundThread = GetWindowThreadProcessId(windowHandle, out _);
-        _ = AttachThreadInput(currentThreadId, foregroundThread, true);
-        _ = SetForegroundWindow(windowHandle);
-        _ = AttachThreadInput(currentThreadId, foregroundThread, false);
+        if (!SetForegroundWindow(windowHandle))
+        {
+            uint currentThreadId = GetCurrentThreadId();
+            uint foregroundThread = GetWindowThreadProcessId(windowHandle, out _);
+            _ = AttachThreadInput(currentThreadId, foregroundThread, true);
+            _ = SetForegroundWindow(windowHandle);
+            _ = AttachThreadInput(currentThreadId, foregroundThread, false);
+        }
     }
 
     public static void StealFocus(nint windowHandle)
