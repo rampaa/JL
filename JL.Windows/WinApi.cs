@@ -367,9 +367,11 @@ internal sealed partial class WinApi
         {
             uint currentThreadId = GetCurrentThreadId();
             uint foregroundThread = GetWindowThreadProcessId(windowHandle, out _);
-            _ = AttachThreadInput(currentThreadId, foregroundThread, true);
-            _ = SetForegroundWindow(windowHandle);
-            _ = AttachThreadInput(currentThreadId, foregroundThread, false);
+            if (AttachThreadInput(currentThreadId, foregroundThread, true))
+            {
+                _ = SetForegroundWindow(windowHandle);
+                _ = AttachThreadInput(currentThreadId, foregroundThread, false);
+            }
         }
     }
 
@@ -377,9 +379,11 @@ internal sealed partial class WinApi
     {
         uint currentThreadId = GetCurrentThreadId();
         uint foregroundThread = GetWindowThreadProcessId(GetForegroundWindow(), out _);
-        _ = AttachThreadInput(currentThreadId, foregroundThread, true);
-        _ = SetForegroundWindow(windowHandle);
-        _ = AttachThreadInput(currentThreadId, foregroundThread, false);
+        if (AttachThreadInput(currentThreadId, foregroundThread, true))
+        {
+            _ = SetForegroundWindow(windowHandle);
+            _ = AttachThreadInput(currentThreadId, foregroundThread, false);
+        }
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)

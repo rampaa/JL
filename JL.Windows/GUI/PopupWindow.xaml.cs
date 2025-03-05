@@ -298,13 +298,16 @@ internal sealed partial class PopupWindow
                 if (configManager.RestoreFocusToPreviouslyActiveWindow && isFirstPopupWindow)
                 {
                     nint previousWindowHandle = WinApi.GetActiveWindowHandle();
-                    if (previousWindowHandle != mainWindow.WindowHandle)
+                    if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
                     {
                         WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
                     }
                 }
 
-                _ = Activate();
+                if (!Activate())
+                {
+                    WinApi.StealFocus(WindowHandle);
+                }
             }
 
             _ = Focus();
@@ -396,7 +399,20 @@ internal sealed partial class PopupWindow
 
             if (configManager.Focusable)
             {
-                _ = Activate();
+                MainWindow mainWindow = MainWindow.Instance;
+                if (configManager.RestoreFocusToPreviouslyActiveWindow && this == mainWindow.FirstPopupWindow)
+                {
+                    nint previousWindowHandle = WinApi.GetActiveWindowHandle();
+                    if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
+                    {
+                        WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
+                    }
+                }
+
+                if (!Activate())
+                {
+                    WinApi.StealFocus(WindowHandle);
+                }
             }
 
             _ = Focus();
@@ -1545,7 +1561,19 @@ internal sealed partial class PopupWindow
 
             if (configManager.Focusable)
             {
-                _ = Activate();
+                if (configManager.RestoreFocusToPreviouslyActiveWindow && this == mainWindow.FirstPopupWindow)
+                {
+                    nint previousWindowHandle = WinApi.GetActiveWindowHandle();
+                    if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
+                    {
+                        WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
+                    }
+                }
+
+                if (!Activate())
+                {
+                    WinApi.StealFocus(WindowHandle);
+                }
             }
 
             _ = Focus();
@@ -2332,7 +2360,20 @@ internal sealed partial class PopupWindow
 
         if (configManager.Focusable)
         {
-            _ = Activate();
+            MainWindow mainWindow = MainWindow.Instance;
+            if (configManager.RestoreFocusToPreviouslyActiveWindow && this == mainWindow.FirstPopupWindow)
+            {
+                nint previousWindowHandle = WinApi.GetActiveWindowHandle();
+                if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
+                {
+                    WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
+                }
+            }
+
+            if (!Activate())
+            {
+                WinApi.StealFocus(WindowHandle);
+            }
         }
 
         _ = Focus();

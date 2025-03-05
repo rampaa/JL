@@ -1562,6 +1562,11 @@ internal sealed partial class MainWindow
 
     private void Window_MouseEnter(object sender, MouseEventArgs e)
     {
+        if (FirstPopupWindow.IsVisible)
+        {
+            return;
+        }
+
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.TextOnlyVisibleOnHover)
         {
@@ -1573,8 +1578,7 @@ internal sealed partial class MainWindow
             Background.Opacity = OpacitySlider.Value / 100;
         }
 
-        if (!FirstPopupWindow.IsVisible
-            && configManager is { Focusable: true, MainWindowFocusOnHover: true })
+        if (configManager is { Focusable: true, MainWindowFocusOnHover: true })
         {
             if (configManager.RestoreFocusToPreviouslyActiveWindow)
             {
