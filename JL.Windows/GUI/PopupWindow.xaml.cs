@@ -805,7 +805,8 @@ internal sealed partial class PopupWindow
                 Cursor = Cursors.Arrow,
                 BorderThickness = new Thickness(0),
                 Padding = new Thickness(0),
-                FontSize = configManager.AudioButtonFontSize
+                FontSize = configManager.AudioButtonFontSize,
+                Focusable = false
             };
 
             audioButton.PreviewMouseUp += AudioButton_Click;
@@ -922,7 +923,8 @@ internal sealed partial class PopupWindow
                 Cursor = Cursors.Arrow,
                 BorderThickness = new Thickness(0),
                 Padding = new Thickness(0),
-                FontSize = configManager.MiningButtonFontSize
+                FontSize = configManager.MiningButtonFontSize,
+                Focusable = false
             };
 
             miningButton.PreviewMouseUp += MiningButton_PreviewMouseUp;
