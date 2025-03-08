@@ -1546,6 +1546,7 @@ internal sealed partial class MainWindow
             && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
             && lastActiveWindowHandle is not 0
             && lastActiveWindowHandle != WindowHandle
+            && e.LeftButton is not MouseButtonState.Pressed
             && !MainTextBoxContextMenu.IsVisible
             && !TitleBarContextMenu.IsVisible
             && !ManageDictionariesWindow.IsItVisible()
