@@ -50,7 +50,6 @@ public static partial class JapaneseUtils
     // Katakana (30A0–30FF)
     // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included in the regex.
     [GeneratedRegex(@"[\u3040-\u31FF]", RegexOptions.CultureInvariant)]
-
     private static partial Regex KanaRegex { get; }
 
     private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new KeyValuePair<char, string>[]
