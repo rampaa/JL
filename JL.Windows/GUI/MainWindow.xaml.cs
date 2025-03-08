@@ -1348,7 +1348,7 @@ internal sealed partial class MainWindow
             {
                 MaxWidth = double.PositiveInfinity;
                 MaxHeight = double.PositiveInfinity;
-                MinWidth = 100;
+                MinWidth = 125;
                 MinHeight = 50;
             }
 
@@ -1874,7 +1874,7 @@ internal sealed partial class MainWindow
             MaxHeight = maxHeight;
             MinHeight = minHeight;
             MaxWidth = double.PositiveInfinity;
-            MinWidth = 100;
+            MinWidth = 125;
             SizeToContent = SizeToContent.Height;
             Width = width;
         }
@@ -1895,7 +1895,7 @@ internal sealed partial class MainWindow
             MaxHeight = double.PositiveInfinity;
             MaxWidth = double.PositiveInfinity;
             MinHeight = 50;
-            MinWidth = 100;
+            MinWidth = 125;
             Width = width;
             Height = height;
         }

@@ -62,7 +62,7 @@ internal sealed class ConfigManager
     public bool AlwaysShowMainTextBoxCaret { get; set; } // = false;
     public double MainWindowMaxDynamicWidth { get; set; } = 800;
     public double MainWindowMaxDynamicHeight { get; set; } = 269;
-    public double MainWindowMinDynamicWidth { get; set; } = 100;
+    public double MainWindowMinDynamicWidth { get; set; } = 125;
     public double MainWindowMinDynamicHeight { get; set; } = 50;
     private bool TextBoxApplyDropShadowEffect { get; set; } = true;
     private bool HorizontallyCenterMainWindowText { get; set; } // = false;

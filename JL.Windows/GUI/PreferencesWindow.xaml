@@ -210,7 +210,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Min dynamic width"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="MainWindowMinDynamicWidthNumericUpDown" Minimum="100"
+                            <hc:NumericUpDown x:Name="MainWindowMinDynamicWidthNumericUpDown" Minimum="125"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
