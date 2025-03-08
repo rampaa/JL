@@ -3,14 +3,19 @@ JL is a program for looking up Japanese words and expressions. Inspired by [Naze
 
 Download from the [releases page](https://github.com/rampaa/JL/releases).
 
-
 ## Screenshots
-<img src="https://user-images.githubusercontent.com/25622653/169386347-c6c4d4ff-e071-4e5f-a08a-8bf480b22219.png">
+<img src="https://github.com/user-attachments/assets/8787b37f-1b9f-4f79-ba41-ea03dd1160cf">
 
 <p float="left">
-  <img src="https://user-images.githubusercontent.com/25622653/169386915-33e8441f-3c99-4479-afb0-a5d7f575a9bf.png" width="40%" height="40%" />
-  <img src="https://user-images.githubusercontent.com/25622653/169388031-d430e9d7-155b-4a55-8159-3b928a16c231.png" width="20%" height="20%" /> 
-  <img src="https://user-images.githubusercontent.com/25622653/169387074-674749ac-8908-4eed-a334-18ed5548d0d3.png" width="20%" height="20%" />
+  <img src="https://github.com/user-attachments/assets/d731bf68-084a-46de-886e-8c0a217b3e7f" width="42%" height="42%" />
+  <img src="https://github.com/user-attachments/assets/9a7c90d8-68ee-4b98-bc66-8e4b5c5581ad" width="29%" height="29%" /> 
+  <img src="https://github.com/user-attachments/assets/72abcc15-0187-4e27-a592-aa84b2249c44" width="19%" height="19%" />
+</p>
+
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/ee201845-ce83-4183-96cb-ed715ea78061" width="30%" height="30%" />
+  <img src="https://github.com/user-attachments/assets/cf37d4a2-d617-4274-b71a-1461f029306d" width="29%" height="29%" /> 
+  <img src="https://github.com/user-attachments/assets/7f70e11a-ebd9-46c4-a953-f041af2cde7c" width="34%" height="34%" />
 </p>
 
 ## System requirements
