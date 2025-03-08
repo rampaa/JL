@@ -13,7 +13,6 @@ public static class LookupResultUtils
         }
 
         StringBuilder deconjugation = new();
-        bool first = true;
 
         int processListCount = processList.Count;
         for (int i = 0; i < processListCount; i++)
@@ -21,7 +20,7 @@ public static class LookupResultUtils
             List<string> form = processList[i];
 
             StringBuilder formText = new();
-            int added = 0;
+            bool added = false;
 
             for (int j = form.Count - 1; j >= 0; j--)
             {
@@ -32,23 +31,29 @@ public static class LookupResultUtils
                     continue;
                 }
 
-                if (info.StartsWith('(') && info.EndsWith(')') && j is not 0)
+                bool startsWithParentheses = info.StartsWith('(');
+                if (startsWithParentheses)
                 {
-                    continue;
+                    if (j is not 0)
+                    {
+                        continue;
+                    }
+
+                    info = info[1..^1];
                 }
 
-                if (added > 0)
+                if (added)
                 {
                     _ = formText.Append('→');
                 }
 
-                ++added;
                 _ = formText.Append(info);
+                added = true;
             }
 
             if (formText.Length is not 0)
             {
-                if (first)
+                if (i is 0)
                 {
                     _ = deconjugation.Append(CultureInfo.InvariantCulture, $"～{formText}");
                 }
@@ -57,8 +62,6 @@ public static class LookupResultUtils
                     _ = deconjugation.Append(CultureInfo.InvariantCulture, $"; {formText}");
                 }
             }
-
-            first = false;
         }
 
         return deconjugation.Length is 0
