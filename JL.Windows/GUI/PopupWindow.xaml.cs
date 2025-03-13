@@ -847,34 +847,66 @@ internal sealed partial class PopupWindow
             }
         }
 
-        if (result.DeconjugationProcess is not null && configManager.DeconjugationInfoFontSize > 0)
+        if (configManager.DeconjugationInfoFontSize > 0)
         {
-            if (MiningMode)
+            if (result.DeconjugationProcess is not null)
             {
-                TextBox deconjugationProcessTextBox = PopupWindowUtils.CreateTextBox(nameof(result.DeconjugationProcess),
-                    $"{result.MatchedText} {result.DeconjugationProcess}",
-                    configManager.DeconjugationInfoColor,
-                    configManager.DeconjugationInfoFontSize,
-                    VerticalAlignment.Top,
-                    new Thickness(5, 0, 0, 0),
-                    PopupContextMenu);
+                if (MiningMode)
+                {
+                    TextBox deconjugationProcessTextBox = PopupWindowUtils.CreateTextBox(nameof(result.DeconjugationProcess),
+                        $"{result.MatchedText} {result.DeconjugationProcess}",
+                        configManager.DeconjugationInfoColor,
+                        configManager.DeconjugationInfoFontSize,
+                        VerticalAlignment.Top,
+                        new Thickness(5, 0, 0, 0),
+                        PopupContextMenu);
 
-                AddEventHandlersToTextBox(deconjugationProcessTextBox);
+                    AddEventHandlersToTextBox(deconjugationProcessTextBox);
 
-                _ = top.Children.Add(deconjugationProcessTextBox);
+                    _ = top.Children.Add(deconjugationProcessTextBox);
+                }
+                else
+                {
+                    TextBlock deconjugationProcessTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.DeconjugationProcess),
+                        $"{result.MatchedText} {result.DeconjugationProcess}",
+                        configManager.DeconjugationInfoColor,
+                        configManager.DeconjugationInfoFontSize,
+                        VerticalAlignment.Top,
+                        new Thickness(7, 0, 0, 0));
+
+                    _ = top.Children.Add(deconjugationProcessTextBlock);
+                }
             }
-            else
+            else if (result.PrimarySpelling != result.MatchedText && (!result.Readings?.Contains(result.MatchedText) ?? true))
             {
-                TextBlock deconjugationProcessTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.DeconjugationProcess),
-                    $"{result.MatchedText} {result.DeconjugationProcess}",
-                    configManager.DeconjugationInfoColor,
-                    configManager.DeconjugationInfoFontSize,
-                    VerticalAlignment.Top,
-                    new Thickness(7, 0, 0, 0));
+                if (MiningMode)
+                {
+                    TextBox matchedTextTextBox = PopupWindowUtils.CreateTextBox(nameof(result.MatchedText),
+                        result.MatchedText,
+                        configManager.DeconjugationInfoColor,
+                        configManager.DeconjugationInfoFontSize,
+                        VerticalAlignment.Top,
+                        new Thickness(5, 0, 0, 0),
+                        PopupContextMenu);
 
-                _ = top.Children.Add(deconjugationProcessTextBlock);
+                    AddEventHandlersToTextBox(matchedTextTextBox);
+
+                    _ = top.Children.Add(matchedTextTextBox);
+                }
+                else
+                {
+                    TextBlock matchedTextTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.MatchedText),
+                        result.MatchedText,
+                        configManager.DeconjugationInfoColor,
+                        configManager.DeconjugationInfoFontSize,
+                        VerticalAlignment.Top,
+                        new Thickness(7, 0, 0, 0));
+
+                    _ = top.Children.Add(matchedTextTextBlock);
+                }
             }
         }
+
 
         if (result.Frequencies is not null)
         {
