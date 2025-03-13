@@ -74,15 +74,6 @@ internal static class EpwingYomichanLoader
             reading = null;
         }
 
-        string[]? definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5]);
-        definitions?.DeduplicateStringsInArray();
-
-        if (definitions is null
-            || !EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
-        {
-            return null;
-        }
-
         string[]? definitionTags = null;
         JsonElement definitionTagsElement = jsonElements[2];
         if (definitionTagsElement.ValueKind is JsonValueKind.String)
@@ -96,6 +87,20 @@ internal static class EpwingYomichanLoader
             {
                 definitionTags.DeduplicateStringsInArray();
             }
+        }
+
+        if (definitionTags?.Length is 1 && definitionTags[0] is "子" or "句")
+        {
+            return null;
+        }
+
+        string[]? definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5]);
+        definitions?.DeduplicateStringsInArray();
+
+        if (definitions is null
+            || !EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
+        {
+            return null;
         }
 
         string[]? wordClasses = jsonElements[3].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
