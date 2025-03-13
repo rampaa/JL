@@ -41,7 +41,7 @@ internal sealed partial class PopupWindow
 
     private string _currentSourceText = "";
 
-    private Button _buttonAll = new()
+    private readonly Button _buttonAll = new()
     {
         Content = "All",
         Margin = new Thickness(1),
@@ -2234,8 +2234,10 @@ internal sealed partial class PopupWindow
 
         PopupListView.ItemsSource = null;
         _lastLookedUpText = "";
+        _currentSourceText = "";
         _listViewItemIndex = 0;
         _firstVisibleListViewItemIndex = 0;
+        _currentSourceTextCharPosition = 0;
         _lastInteractedTextBox = null;
 
         PopupWindowUtils.PopupAutoHideTimer.Stop();
@@ -2294,7 +2296,8 @@ internal sealed partial class PopupWindow
     {
         if (!PopupContextMenu.IsVisible
             && !TitleBarContextMenu.IsVisible
-            && !DictTabButtonsItemsControlContextMenu.IsVisible)
+            && !DictTabButtonsItemsControlContextMenu.IsVisible
+            && LastLookupResults.Length > 0)
         {
             _listViewItemIndex = _firstVisibleListViewItemIndex;
             LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
@@ -2411,10 +2414,8 @@ internal sealed partial class PopupWindow
         DictTabButtonsItemsControl.ItemsSource = null;
         PopupListView.ItemsSource = null;
         _lastInteractedTextBox = null;
-        LastLookupResults = null!;
-        _dictsWithResults = null!;
-        _currentSourceText = null!;
+        LastLookupResults = [];
+        _dictsWithResults = [];
         _buttonAll.Click -= DictTypeButtonOnClick;
-        _buttonAll = null!;
     }
 }
