@@ -1438,7 +1438,7 @@ internal sealed partial class PopupWindow
 
     private Task HandleMining(bool minePrimarySpelling, bool useSelectedListViewItemIfItExists)
     {
-        if (LastLookupResults.Length is 0)
+        if (LastLookupResults.Length is 0 || PopupListView.Items.Count is 0)
         {
             return Task.CompletedTask;
         }
