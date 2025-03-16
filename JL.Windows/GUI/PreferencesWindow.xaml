@@ -143,12 +143,13 @@
                                 </DockPanel>
                             </ListBoxItem>
 
-                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="If unchecked, JL will not steal the focus away from other windows, even in case of a mouse click.">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Focusable"
                                        Style="{StaticResource TextBlockDefault}"
-                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
-                                       ToolTip="If unchecked, JL will not steal the focus away from other windows, even in case of a mouse click."/>
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                                     <CheckBox x:Name="FocusableCheckBox"  HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -721,13 +722,13 @@
                                 </DockPanel>
                             </ListBoxItem>
 
-                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                       Cursor="Help"
+                                       ToolTip="Automatically saves the backlog to Backlogs folder before closing JL">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Auto save backlog before closing JL"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       Cursor="Help"
-                                       ToolTip="Automatically saves the backlog to Backlogs folder before closing JL"/>
+                                       Style="{StaticResource TextBlockDefault}" />
                                     <CheckBox x:Name="AutoSaveBacklogBeforeClosingCheckBox"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
@@ -880,7 +881,8 @@
                             </ListBoxItem>
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
-                                         Cursor="Help" ToolTip="Only takes effect if fixed positioning is enabled.">
+                                         Cursor="Help"
+                                         ToolTip="Only takes effect if fixed positioning is enabled.">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Fixed X position"
                                        Style="{StaticResource TextBlockDefault}"
@@ -908,7 +910,8 @@
                             </ListBoxItem>
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
-                                         Cursor="Help" ToolTip="Only takes effect if fixed positioning is enabled.">
+                                         Cursor="Help"
+                                         ToolTip="Only takes effect if fixed positioning is enabled.">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Fixed Y position"
                                        Style="{StaticResource TextBlockDefault}"
@@ -1403,7 +1406,7 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Tags:"
                                                            Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <TextBox x:Name="WordTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
-                                             Cursor="Help" ToolTip="Separated by a comma" />
+                                                         Cursor="Help" ToolTip="Separated by a comma" />
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
@@ -1441,7 +1444,7 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Tags:"
                                                            Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <TextBox x:Name="KanjiTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
-                                             Cursor="Help" ToolTip="Separated by a comma" />
+                                                         Cursor="Help" ToolTip="Separated by a comma" />
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
@@ -1479,7 +1482,7 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Tags:"
                                                            Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <TextBox x:Name="NameTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
-                                             Cursor="Help" ToolTip="Separated by a comma" />
+                                                         Cursor="Help" ToolTip="Separated by a comma" />
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
@@ -1517,7 +1520,7 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Tags:"
                                                            Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <TextBox x:Name="OtherTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
-                                             Cursor="Help" ToolTip="Separated by a comma" />
+                                                         Cursor="Help" ToolTip="Separated by a comma" />
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
