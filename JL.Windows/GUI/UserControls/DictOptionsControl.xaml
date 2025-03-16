@@ -109,7 +109,7 @@
                 <CheckBox Name="MiscInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show misc info" ToolTip="e.g. uk, col, euph" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
-                
+
                 <CheckBox Name="LoanwordEtymologyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show the etymology of loanwords" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>

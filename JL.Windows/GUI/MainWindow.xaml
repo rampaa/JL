@@ -16,7 +16,6 @@
     </Window.Background>
 
     <Grid x:Name="MainGrid">
-        
         <Border Name="TopBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="5" Background="Transparent"/>
         <Border Name="RightBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="5" Background="Transparent"/>
         <Border Name="LeftBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="5" Background="Transparent"/>
@@ -149,6 +148,5 @@
                 </TextBlock.Effect>
             </TextBlock>
         </DockPanel>
-        
     </Grid>
 </Window>

@@ -19,7 +19,7 @@
                          MaxHeight="300"
                          TextWrapping="Wrap"
                          Margin="10" />
-                
+
                 <ComboBox Name="TextToSpeechVoicesComboBox" Width="400" Margin="10" HorizontalAlignment="Left" Visibility="Collapsed" />
                 <Button Content="Info" Background="LightSlateGray" Foreground="White" Click="InfoButton_Click" />
             </DockPanel>
