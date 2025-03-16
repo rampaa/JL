@@ -98,6 +98,12 @@ internal static class PopupWindowUtils
 
         for (int i = 0; i < expressions.Length; i++)
         {
+            if (i > 0)
+            {
+                horizontalOffsetForReading +=
+                    WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo![i - 1]}、", fontSize).Width;
+            }
+
             byte pitchPosition = pitchPositions[i];
             if (pitchPosition is byte.MaxValue)
             {
@@ -105,12 +111,6 @@ internal static class PopupWindowUtils
             }
 
             List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
-
-            if (i > 0)
-            {
-                horizontalOffsetForReading +=
-                    WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo![i - 1]}、", fontSize).Width;
-            }
 
             Polyline polyline = new()
             {
