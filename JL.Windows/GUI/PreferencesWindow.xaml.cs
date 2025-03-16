@@ -676,7 +676,47 @@ internal sealed partial class PreferencesWindow
     private void ListBoxItem_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         ListBoxItem listBoxItem = (ListBoxItem)sender;
-        UIElement inputItem = ((DockPanel)listBoxItem.Content).Children[1];
-        _ = inputItem.Focus();
+        DockPanel dockPanel = (DockPanel)listBoxItem.Content;
+        if (dockPanel.Children.Count is 2)
+        {
+            UIElement inputItem = dockPanel.Children[1];
+            _ = inputItem.Focus();
+        }
+    }
+
+    private void MainWindowPreferencesSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        MainWindowPreferencesListBox.Items.Filter += MainWindowPreferencesFilter;
+    }
+
+    private void PopupPreferencesSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        PopupPreferencesListBox.Items.Filter += PopupPreferencesFilter;
+    }
+
+    private void HotkeysPreferencesSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        HotkeysPreferencesListBox.Items.Filter += HotkeysPreferencesFilter;
+    }
+
+    private bool MainWindowPreferencesFilter(object item)
+    {
+        ListBoxItem listBoxItem = (ListBoxItem)item;
+        string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
+        return preferenceName.Contains(MainWindowPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.Contains(MainWindowPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
+    }
+
+    private bool PopupPreferencesFilter(object item)
+    {
+        ListBoxItem listBoxItem = (ListBoxItem)item;
+        string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
+        return preferenceName.Contains(PopupPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.Contains(PopupPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
+    }
+
+    private bool HotkeysPreferencesFilter(object item)
+    {
+        ListBoxItem listBoxItem = (ListBoxItem)item;
+        string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
+        return preferenceName.Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
     }
 }

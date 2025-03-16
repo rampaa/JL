@@ -201,8 +201,10 @@
             <TabItem Header="Main Window">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel>
-                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                        <hc:TextBox x:Name="MainWindowPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="MainWindowPreferencesSearchTextBox_TextChanged" />
 
+                        <ListBox x:Name="MainWindowPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Font"
@@ -775,7 +777,10 @@
             <TabItem Header="Popup" HorizontalAlignment="Left" Width="66">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel>
-                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                        <hc:TextBox x:Name="PopupPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="PopupPreferencesSearchTextBox_TextChanged" />
+
+                        <ListBox x:Name="PopupPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Font"
@@ -1524,11 +1529,14 @@
             </TabItem>
             <TabItem Header="Hotkeys">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
-                    <StackPanel Margin="20,10,20,10" Name="HotKeysStackPanel">
-                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                    <StackPanel Name="HotKeysStackPanel">
+                        <hc:TextBox x:Name="HotkeysPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="HotkeysPreferencesSearchTextBox_TextChanged" />
+
+                        <ListBox x:Name="HotkeysPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="DisableHotkeysKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1541,7 +1549,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ClosePopupKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1554,7 +1562,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ToggleMinimizedStateKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1567,7 +1575,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="MiningModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1580,7 +1588,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ReconnectToWebSocketServerKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1593,7 +1601,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="PlayAudioKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1606,7 +1614,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ClickAudioButtonKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1619,7 +1627,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ClickMiningButtonKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1632,7 +1640,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="SelectedTextToSpeechTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1645,7 +1653,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ShowAddNameWindowKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1658,7 +1666,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ShowAddWordWindowKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1671,7 +1679,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="SearchWithBrowserKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1684,7 +1692,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="SteppedBacklogBackwardsKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1697,7 +1705,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="SteppedBacklogForwardsKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1710,7 +1718,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="InactiveLookupModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1723,7 +1731,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                      Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="MousePassThroughModeKeyGestureTextBox"
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1736,7 +1744,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="PreviousDictKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1749,7 +1757,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="NextDictKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1762,7 +1770,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ToggleVisibilityOfDictionaryTabsInMiningModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1775,7 +1783,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="AlwaysOnTopKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1788,7 +1796,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="CaptureTextFromClipboardKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1801,7 +1809,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="CaptureTextFromWebSocketKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1817,7 +1825,7 @@
                                        ToolTip="Delete the currently shown line from the main window.
                                        &#10;Line and character count stats will be updated accordingly.">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="DeleteCurrentLineKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1830,7 +1838,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ToggleAlwaysShowMainTextBoxCaretKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1843,7 +1851,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="MoveCaretLeftKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1856,7 +1864,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="MoveCaretRightKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1869,7 +1877,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="MoveCaretUpKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1882,7 +1890,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="MoveCaretDownKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1895,7 +1903,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="LookupTermAtCaretIndexKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1908,7 +1916,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="LookupFirstTermKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1921,7 +1929,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="LookupSelectedTextKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1939,7 +1947,7 @@
                                        &#10;If the spelling selection window for mining is open, it selects the next spelling.
                                        &#10;If neither of those windows are open, but a popup is open in mining mode, it selects the next lookup result">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="SelectNextItemKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1958,7 +1966,7 @@
                                        &#10;If the spelling selection window for mining is open, it selects the previous spelling.
                                        &#10;If neither of those windows are open, but a popup is open in mining mode, it selects the previous lookup result">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="SelectPreviousItemKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1977,7 +1985,7 @@
                                        &#10;If the spelling selection window for mining is open, it mines the selected spelling.
                                        &#10;If neither of those windows are open, but a popup is open in mining mode, it mines the selected entry using its primary spelling.">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ConfirmItemSelectionKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1991,7 +1999,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                      Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox"
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -2004,7 +2012,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                      Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ShowManageFrequenciesWindowKeyGestureTextBox"
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -2017,7 +2025,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                      Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ShowManageAudioSourcesWindowKeyGestureTextBox"
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -2030,7 +2038,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                      Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox"
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -2043,7 +2051,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ShowStatsKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -2056,7 +2064,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="TextBoxIsReadOnlyKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -2069,7 +2077,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="MotivationKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -2091,8 +2099,7 @@
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"
                                        Style="{StaticResource TextBlockDefault}"
-                                       TextWrapping="Wrap"
-                                       Height="26" Width="175" />
+                                       TextWrapping="Wrap" />
                                     <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="250" Minimum="1"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
