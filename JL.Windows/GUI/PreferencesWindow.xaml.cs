@@ -672,4 +672,11 @@ internal sealed partial class PreferencesWindow
             WindowStartupLocation = WindowStartupLocation.CenterOwner
         }.ShowDialog();
     }
+
+    private void ListBoxItem_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        ListBoxItem listBoxItem = (ListBoxItem)sender;
+        UIElement inputItem = ((DockPanel)listBoxItem.Content).Children[1];
+        _ = inputItem.Focus();
+    }
 }
