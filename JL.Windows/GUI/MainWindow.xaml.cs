@@ -677,11 +677,6 @@ internal sealed partial class MainWindow
             return WindowsUtils.Motivate();
         }
 
-        else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
-        {
-            FirstPopupWindow.HidePopup();
-        }
-
         else if (keyGesture.IsEqual(configManager.ShowStatsKeyGesture))
         {
             WindowsUtils.ShowStatsWindow();
