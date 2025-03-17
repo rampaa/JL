@@ -716,7 +716,7 @@ internal sealed partial class PreferencesWindow
     private bool HotkeysPreferencesFilter(object item)
     {
         ListBoxItem listBoxItem = (ListBoxItem)item;
-        string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
+        string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[2]).Text;
         return preferenceName.Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
     }
 }
