@@ -147,6 +147,11 @@ internal sealed class ConfigManager
     public KeyGesture DisableHotkeysKeyGesture { get; private set; } = new(Key.Pause, ModifierKeys.Alt);
     public KeyGesture MiningModeKeyGesture { get; private set; } = new(Key.M, ModifierKeys.Alt);
     public KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.NumPad1, ModifierKeys.Alt);
+    public KeyGesture KanjiModeKeyGesture { get; private set; } = new(Key.K, ModifierKeys.Alt);
+    public KeyGesture NameModeKeyGesture { get; private set; } = new(Key.E, ModifierKeys.Alt);
+    public KeyGesture WordModeKeyGesture { get; private set; } = new(Key.H, ModifierKeys.Alt);
+    public KeyGesture OtherModeKeyGesture { get; private set; } = new(Key.I, ModifierKeys.Alt);
+    public KeyGesture AllModeKeyGesture { get; private set; } = new(Key.A, ModifierKeys.Alt);
     public KeyGesture ClickAudioButtonKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Alt);
     public KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
     public KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
@@ -554,6 +559,11 @@ internal sealed class ConfigManager
         DisableHotkeysKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(MiningModeKeyGesture), MiningModeKeyGesture);
         PlayAudioKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(PlayAudioKeyGesture), PlayAudioKeyGesture);
+        KanjiModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(KanjiModeKeyGesture), KanjiModeKeyGesture);
+        NameModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(NameModeKeyGesture), NameModeKeyGesture);
+        WordModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(WordModeKeyGesture), WordModeKeyGesture);
+        OtherModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(OtherModeKeyGesture), OtherModeKeyGesture);
+        AllModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(AllModeKeyGesture), AllModeKeyGesture);
         ClickAudioButtonKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ClickAudioButtonKeyGesture), ClickAudioButtonKeyGesture);
         LookupKeyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(LookupKeyKeyGesture), LookupKeyKeyGesture);
         ClosePopupKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, nameof(ClosePopupKeyGesture), ClosePopupKeyGesture);
@@ -795,6 +805,11 @@ internal sealed class ConfigManager
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = DisableHotkeysKeyGesture.ToFormattedString();
         preferenceWindow.MiningModeKeyGestureTextBox.Text = MiningModeKeyGesture.ToFormattedString();
         preferenceWindow.PlayAudioKeyGestureTextBox.Text = PlayAudioKeyGesture.ToFormattedString();
+        preferenceWindow.KanjiModeKeyGestureTextBox.Text = KanjiModeKeyGesture.ToFormattedString();
+        preferenceWindow.NameModeKeyGestureTextBox.Text = NameModeKeyGesture.ToFormattedString();
+        preferenceWindow.WordModeKeyGestureTextBox.Text = WordModeKeyGesture.ToFormattedString();
+        preferenceWindow.OtherModeKeyGestureTextBox.Text = OtherModeKeyGesture.ToFormattedString();
+        preferenceWindow.AllModeKeyGestureTextBox.Text = AllModeKeyGesture.ToFormattedString();
         preferenceWindow.ClickAudioButtonKeyGestureTextBox.Text = ClickAudioButtonKeyGesture.ToFormattedString();
         preferenceWindow.LookupKeyKeyGestureTextBox.Text = LookupKeyKeyGesture.ToFormattedString();
 
@@ -1020,11 +1035,6 @@ internal sealed class ConfigManager
         preferenceWindow.MainWindowFixedRightPositionNumericUpDown.Value = MainWindowFixedRightPosition;
         preferenceWindow.MainWindowFixedBottomPositionNumericUpDown.Value = MainWindowFixedBottomPosition;
 
-        if (preferenceWindow.LookupModeComboBox.SelectedIndex < 0)
-        {
-            preferenceWindow.LookupModeComboBox.SelectedIndex = 0;
-        }
-
         preferenceWindow.LookupOnClickMouseButtonComboBox.SelectedValue = LookupOnClickMouseButton.ToString();
         preferenceWindow.MiningModeMouseButtonComboBox.SelectedValue = MiningModeMouseButton.ToString();
         preferenceWindow.MineMouseButtonComboBox.SelectedValue = MineMouseButton.ToString();
@@ -1048,7 +1058,18 @@ internal sealed class ConfigManager
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "MinimumLogLevel");
         preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupPositionRelativeToCursor");
         preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupFlip");
+
         preferenceWindow.LookupModeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "LookupMode");
+        if (preferenceWindow.LookupModeComboBox.SelectedIndex < 0)
+        {
+            preferenceWindow.LookupModeComboBox.SelectedIndex = 0;
+        }
+
+        preferenceWindow.LookupCategoryComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, nameof(CoreConfigManager.LookupCategory));
+        if (preferenceWindow.LookupCategoryComboBox.SelectedIndex < 0)
+        {
+            preferenceWindow.LookupCategoryComboBox.SelectedIndex = 0;
+        }
     }
 
     public async Task SavePreferences(PreferencesWindow preferenceWindow)
@@ -1059,6 +1080,11 @@ internal sealed class ConfigManager
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(MiningModeKeyGesture), preferenceWindow.MiningModeKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(PlayAudioKeyGesture), preferenceWindow.PlayAudioKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(KanjiModeKeyGesture), preferenceWindow.KanjiModeKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(NameModeKeyGesture), preferenceWindow.NameModeKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(WordModeKeyGesture), preferenceWindow.WordModeKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(OtherModeKeyGesture), preferenceWindow.OtherModeKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(AllModeKeyGesture), preferenceWindow.AllModeKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(ClickAudioButtonKeyGesture), preferenceWindow.ClickAudioButtonKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(LookupKeyKeyGesture), preferenceWindow.LookupKeyKeyGestureTextBox.Text);
 
@@ -1475,6 +1501,8 @@ internal sealed class ConfigManager
                 preferenceWindow.ShowDictionaryTabsInMiningModeCheckBox.IsChecked.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, "LookupMode", preferenceWindow.LookupModeComboBox.SelectedValue.ToString()!);
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.LookupCategory), preferenceWindow.LookupCategoryComboBox.SelectedValue.ToString()!);
 
             ConfigDBManager.UpdateSetting(connection, nameof(LookupOnClickMouseButton),
                 preferenceWindow.LookupOnClickMouseButtonComboBox.SelectedValue.ToString()!);

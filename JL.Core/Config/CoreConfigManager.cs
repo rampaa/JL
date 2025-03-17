@@ -1,3 +1,4 @@
+using JL.Core.Lookup;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -25,6 +26,7 @@ public sealed class CoreConfigManager
     public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public bool TrackTermLookupCounts { get; private set; } // = false;
     public int MinCharactersPerMinuteBeforeStoppingTimeTracking { get; private set; } = 10;
+    public LookupCategory LookupCategory { get; set; } = LookupCategory.All;
 
     private CoreConfigManager()
     {
@@ -122,5 +124,6 @@ public sealed class CoreConfigManager
         CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
         CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
         MinCharactersPerMinuteBeforeStoppingTimeTracking = ConfigDBManager.GetValueFromConfig(connection, MinCharactersPerMinuteBeforeStoppingTimeTracking, nameof(MinCharactersPerMinuteBeforeStoppingTimeTracking), int.TryParse);
+        LookupCategory = ConfigDBManager.GetValueFromConfig(connection, LookupCategory, nameof(LookupCategory), Enum.TryParse);
     }
 }

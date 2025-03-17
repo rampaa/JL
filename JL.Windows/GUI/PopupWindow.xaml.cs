@@ -1636,6 +1636,31 @@ internal sealed partial class PopupWindow
             HidePopup();
         }
 
+        else if (keyGesture.IsEqual(configManager.KanjiModeKeyGesture))
+        {
+            return HandleLookupCategoryKeyGesture(LookupCategory.Kanji);
+        }
+
+        else if (keyGesture.IsEqual(configManager.NameModeKeyGesture))
+        {
+            return HandleLookupCategoryKeyGesture(LookupCategory.Name);
+        }
+
+        else if (keyGesture.IsEqual(configManager.WordModeKeyGesture))
+        {
+            return HandleLookupCategoryKeyGesture(LookupCategory.Word);
+        }
+
+        else if (keyGesture.IsEqual(configManager.OtherModeKeyGesture))
+        {
+            return HandleLookupCategoryKeyGesture(LookupCategory.Other);
+        }
+
+        else if (keyGesture.IsEqual(configManager.AllModeKeyGesture))
+        {
+            return HandleLookupCategoryKeyGesture(LookupCategory.All);
+        }
+
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
             if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
@@ -1916,6 +1941,26 @@ internal sealed partial class PopupWindow
         else if (keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
         {
             HidePopup();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleLookupCategoryKeyGesture(LookupCategory lookupCategory)
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        coreConfigManager.LookupCategory = coreConfigManager.LookupCategory == lookupCategory
+            ? LookupCategory.All
+            : lookupCategory;
+
+        if (IsVisible && _previousTextBox is not null)
+        {
+            HidePopup();
+
+            return configManager.LookupOnSelectOnly
+                ? LookupOnSelect(_previousTextBox)
+                : LookupOnMouseMoveOrClick(_previousTextBox, configManager.LookupOnMouseClickOnly);
         }
 
         return Task.CompletedTask;

@@ -12,6 +12,7 @@ using HandyControl.Tools;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
+using JL.Core.Lookup;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -566,6 +567,39 @@ internal sealed partial class MainWindow
                 Background.Opacity = OpacitySlider.Value / 100;
                 _ = MainTextBox.Focus();
             }
+        }
+
+        else if (keyGesture.IsEqual(configManager.KanjiModeKeyGesture))
+        {
+            coreConfigManager.LookupCategory = coreConfigManager.LookupCategory is LookupCategory.Kanji
+                ? LookupCategory.All
+                : LookupCategory.Kanji;
+        }
+
+        else if (keyGesture.IsEqual(configManager.NameModeKeyGesture))
+        {
+            coreConfigManager.LookupCategory = coreConfigManager.LookupCategory is LookupCategory.Name
+                ? LookupCategory.All
+                : LookupCategory.Name;
+        }
+
+        else if (keyGesture.IsEqual(configManager.WordModeKeyGesture))
+        {
+            coreConfigManager.LookupCategory = coreConfigManager.LookupCategory is LookupCategory.Word
+                ? LookupCategory.All
+                : LookupCategory.Word;
+        }
+
+        else if (keyGesture.IsEqual(configManager.OtherModeKeyGesture))
+        {
+            coreConfigManager.LookupCategory = coreConfigManager.LookupCategory is LookupCategory.Other
+                ? LookupCategory.All
+                : LookupCategory.Other;
+        }
+
+        else if (keyGesture.IsEqual(configManager.AllModeKeyGesture))
+        {
+            coreConfigManager.LookupCategory = LookupCategory.All;
         }
 
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))

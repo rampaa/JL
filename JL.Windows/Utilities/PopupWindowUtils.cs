@@ -5,7 +5,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using JL.Core.Audio;
+using JL.Core.Config;
 using JL.Core.Dicts;
+using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.GUI.UserControls;
@@ -233,6 +235,12 @@ internal static class PopupWindowUtils
 
     public static bool NoAllDictFilter(object item)
     {
+        // Ignore "NoAll" option if the lookup category is not "All"
+        if (CoreConfigManager.Instance.LookupCategory is not LookupCategory.All)
+        {
+            return true;
+        }
+
         Dict dict = (Dict)((StackPanel)item).Tag;
         return !dict.Options.NoAll.Value;
     }

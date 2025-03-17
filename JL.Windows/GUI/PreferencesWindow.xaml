@@ -16,7 +16,7 @@
 
         <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65">
             <TabControl.Resources>
-                <Style x:Key="alternatingWithTriggers" TargetType="{x:Type ListBoxItem}">
+                <Style x:Key="AlternatingWithTriggers" TargetType="{x:Type ListBoxItem}">
                     <Style.Triggers>
                         <Trigger Property="ListBox.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="{StaticResource SecondaryRegionBrush}"/>
@@ -33,7 +33,7 @@
             <TabItem Header="General">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel>
-                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Profile"
@@ -69,6 +69,21 @@
                                         <ComboBoxItem Content="Mouse move" Tag="Hover" />
                                         <ComboBoxItem Content="Mouse click/Touch" Tag="Click" />
                                         <ComboBoxItem Content="Text select" Tag="Select" />
+                                    </ComboBox>
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Lookup category" Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <ComboBox x:Name="LookupCategoryComboBox" HorizontalAlignment="Right"
+                                      SelectedValuePath="Tag" Width="250">
+                                        <ComboBoxItem Content="All" Tag="All" />
+                                        <ComboBoxItem Content="Kanji Mode" Tag="Kanji" />
+                                        <ComboBoxItem Content="Name Mode" Tag="Name" />
+                                        <ComboBoxItem Content="Word Mode" Tag="Word" />
+                                        <ComboBoxItem Content="Other" Tag="Other" />
                                     </ComboBox>
                                 </DockPanel>
                             </ListBoxItem>
@@ -205,7 +220,7 @@
                         <hc:TextBox x:Name="MainWindowPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
                                         hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="MainWindowPreferencesSearchTextBox_TextChanged" />
 
-                        <ListBox x:Name="MainWindowPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                        <ListBox x:Name="MainWindowPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Font"
@@ -781,7 +796,7 @@
                         <hc:TextBox x:Name="PopupPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
                                         hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="PopupPreferencesSearchTextBox_TextChanged" />
 
-                        <ListBox x:Name="PopupPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                        <ListBox x:Name="PopupPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Font"
@@ -1327,7 +1342,7 @@
                         </DockPanel>
 
                         <StackPanel IsEnabled="{Binding ElementName=AnkiIntegrationCheckBox,Path=IsChecked}">
-                            <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                            <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                                 <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                     <DockPanel Margin="10,0,10,0">
                                         <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address" Style="{StaticResource TextBlockDefault}"
@@ -1536,7 +1551,7 @@
                         <hc:TextBox x:Name="HotkeysPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
                                         hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="HotkeysPreferencesSearchTextBox_TextChanged" />
 
-                        <ListBox x:Name="HotkeysPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                        <ListBox x:Name="HotkeysPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
@@ -1714,6 +1729,79 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                                     <TextBlock Text="Move forward (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Toggles between &quot;Kanji mode&quot; and &quot;All&quot;">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="KanjiModeKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Toggles between &quot;Name mode&quot; and &quot;All&quot;">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="NameModeKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Name mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Toggles between &quot;Word mode&quot; and &quot;All&quot;">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="WordModeKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Word mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Toggles between &quot;Other mode&quot; and &quot;All&quot;">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="OtherModeKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Other mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="AllModeKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Set &quot;Lookup Category&quot; to All" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                                 </DockPanel>
@@ -2097,7 +2185,7 @@
             <TabItem Header="Advanced">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel>
-                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource alternatingWithTriggers}">
+                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"

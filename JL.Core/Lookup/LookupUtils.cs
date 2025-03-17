@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using JL.Core.Config;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
@@ -226,7 +227,30 @@ public static class LookupUtils
             pitchAccentDict = pitchDict?.Contents;
         }
 
-        List<Dict> dicts = DictUtils.Dicts.Values.Where(static dict => dict is { Active: true, Type: not DictType.PitchAccentYomichan }).ToList();
+
+        LookupCategory lookupType = CoreConfigManager.Instance.LookupCategory;
+        List<Dict> dicts;
+        if (lookupType is LookupCategory.All)
+        {
+            dicts = DictUtils.Dicts.Values.Where(static dict => dict is { Active: true, Type: not DictType.PitchAccentYomichan }).ToList();
+        }
+        else if (lookupType is LookupCategory.Kanji)
+        {
+            dicts = DictUtils.AtLeastOneKanjiDictIsActive ? DictUtils.Dicts.Values.Where(static dict => dict.Active && DictUtils.KanjiDictTypes.Contains(dict.Type)).ToList() : [];
+        }
+        else if (lookupType is LookupCategory.Name)
+        {
+            dicts = DictUtils.Dicts.Values.Where(static dict => dict.Active && DictUtils.s_nameDictTypes.Contains(dict.Type)).ToList();
+        }
+        else if (lookupType is LookupCategory.Word)
+        {
+            dicts = DictUtils.Dicts.Values.Where(static dict => dict.Active && DictUtils.s_wordDictTypes.Contains(dict.Type)).ToList();
+        }
+        else // if (lookupType is LookupType.Other)
+        {
+            dicts = DictUtils.Dicts.Values.Where(static dict => dict.Active && DictUtils.s_otherDictTypes.Contains(dict.Type)).ToList();
+        }
+
         _ = Parallel.ForEach(dicts, dict =>
         {
             bool useDB = dict.Options.UseDB.Value && dict.Ready;
