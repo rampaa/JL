@@ -161,11 +161,11 @@ internal static class EpwingYomichanUtils
                         contentText = contentElement.GetString();
                     }
 
-                    bool appendSpace = tag is "span"
+                    bool appendWhitespace = tag is "span"
                         && jsonElement.TryGetProperty("style", out JsonElement styleElement)
                         && styleElement.TryGetProperty("marginRight", out _);
 
-                    return new YomichanContent(parentTag ?? tag, contentText, appendSpace);
+                    return new YomichanContent(parentTag ?? tag, contentText, appendWhitespace);
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Array)
