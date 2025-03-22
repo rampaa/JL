@@ -69,6 +69,15 @@ internal static class EpwingYomichanUtils
                     switch (contentResult.Tag)
                     {
                         case "span":
+                        {
+                            _ = stringBuilder.Append(contentResult.Content);
+                            if (contentResult.AppendWhitespace)
+                            {
+                                _ = stringBuilder.Append('\t');
+                            }
+                            break;
+                        }
+
                         case "ruby":
                         {
                             _ = stringBuilder.Append(contentResult.Content);
@@ -152,12 +161,16 @@ internal static class EpwingYomichanUtils
                         contentText = contentElement.GetString();
                     }
 
-                    return new YomichanContent(parentTag ?? tag, contentText);
+                    bool appendSpace = tag is "span"
+                        && jsonElement.TryGetProperty("style", out JsonElement styleElement)
+                        && styleElement.TryGetProperty("marginRight", out _);
+
+                    return new YomichanContent(parentTag ?? tag, contentText, appendSpace);
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Array)
                 {
-                    return new YomichanContent(parentTag ?? tag, GetDefinitionsFromJsonArray(contentElement, tag));
+                    return new YomichanContent(parentTag ?? tag, GetDefinitionsFromJsonArray(contentElement, tag), false);
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Object)
