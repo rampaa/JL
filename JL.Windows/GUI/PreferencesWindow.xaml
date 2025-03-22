@@ -18,7 +18,7 @@
             <TabControl.Resources>
                 <Style x:Key="AlternatingWithTriggers" TargetType="{x:Type ListBoxItem}">
                     <Style.Triggers>
-                        <Trigger Property="ListBox.AlternationIndex" Value="1">
+                        <Trigger Property="ListBox.AlternationIndex" Value="0">
                             <Setter Property="Background" Value="{StaticResource SecondaryRegionBrush}"/>
                         </Trigger>
                     </Style.Triggers>
@@ -31,9 +31,15 @@
             </TabControl.Resources>
 
             <TabItem Header="General">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
+                <ScrollViewer PanningMode="Both">
                     <StackPanel>
                         <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <ItemsPresenter></ItemsPresenter>
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Profile"
@@ -215,12 +221,18 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Main Window">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
+                <ScrollViewer PanningMode="Both">
                     <StackPanel>
                         <hc:TextBox x:Name="MainWindowPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
                                         hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="MainWindowPreferencesSearchTextBox_TextChanged" />
 
                         <ListBox x:Name="MainWindowPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <ItemsPresenter></ItemsPresenter>
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Font"
@@ -791,12 +803,18 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Popup" HorizontalAlignment="Left" Width="66">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
+                <ScrollViewer PanningMode="Both">
                     <StackPanel>
                         <hc:TextBox x:Name="PopupPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
                                         hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="PopupPreferencesSearchTextBox_TextChanged" />
 
                         <ListBox x:Name="PopupPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <ItemsPresenter></ItemsPresenter>
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Font"
@@ -1333,7 +1351,7 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Anki" Height="33" MouseUp="AnkiTabItem_MouseUp">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
+                <ScrollViewer PanningMode="Both">
                     <StackPanel>
                         <DockPanel Margin="18,0,18,0" Height="35">
                             <TextBlock HorizontalAlignment="Left" Text="Enable Anki integration" Style="{StaticResource TextBlockDefault}"
@@ -1343,6 +1361,12 @@
 
                         <StackPanel IsEnabled="{Binding ElementName=AnkiIntegrationCheckBox,Path=IsChecked}">
                             <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
+                                <ListBox.Template>
+                                    <ControlTemplate>
+                                        <ItemsPresenter></ItemsPresenter>
+                                    </ControlTemplate>
+                                </ListBox.Template>
+                                
                                 <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                     <DockPanel Margin="10,0,10,0">
                                         <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address" Style="{StaticResource TextBlockDefault}"
@@ -1546,12 +1570,18 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Hotkeys">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
+                <ScrollViewer PanningMode="Both">
                     <StackPanel Name="HotKeysStackPanel">
                         <hc:TextBox x:Name="HotkeysPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
                                         hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="HotkeysPreferencesSearchTextBox_TextChanged" />
 
                         <ListBox x:Name="HotkeysPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <ItemsPresenter></ItemsPresenter>
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
@@ -2183,9 +2213,15 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Advanced">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
+                <ScrollViewer PanningMode="Both">
                     <StackPanel>
                         <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <ItemsPresenter></ItemsPresenter>
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"
