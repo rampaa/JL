@@ -14,13 +14,13 @@ internal static class EpwingYomichanUtils
         {
             string? definition = definitionElement.ValueKind switch
             {
-                JsonValueKind.String => definitionElement.GetString()!.Trim(),
-                JsonValueKind.Array => GetDefinitionsFromJsonArray(definitionElement),
-                JsonValueKind.Object => GetDefinitionsFromJsonObject(definitionElement).Content,
-                JsonValueKind.Number => null,
-                JsonValueKind.Undefined => null,
+                JsonValueKind.String => definitionElement.GetString(),
+                JsonValueKind.Array => GetDefinitionsFromJsonArray(definitionElement)?.Trim(),
+                JsonValueKind.Object => GetDefinitionsFromJsonObject(definitionElement).Content?.Trim(),
+                JsonValueKind.Number => definitionElement.GetString(),
                 JsonValueKind.True => null,
                 JsonValueKind.False => null,
+                JsonValueKind.Undefined => null,
                 JsonValueKind.Null => null,
                 _ => null
             };
@@ -43,12 +43,16 @@ internal static class EpwingYomichanUtils
         {
             if (definitionElement.ValueKind is JsonValueKind.String)
             {
-                _ = stringBuilder.Append(definitionElement.GetString()).Append(' ');
+                _ = stringBuilder.Append(definitionElement.GetString());
             }
 
             else if (definitionElement.ValueKind is JsonValueKind.Array)
             {
-                _ = stringBuilder.Append(GetDefinitionsFromJsonArray(definitionElement));
+                string? content = GetDefinitionsFromJsonArray(definitionElement);
+                if (content is not null)
+                {
+                    _ = stringBuilder.Append(content);
+                }
             }
 
             else if (definitionElement.ValueKind is JsonValueKind.Object)
@@ -66,45 +70,58 @@ internal static class EpwingYomichanUtils
                     {
                         case "span":
                         case "ruby":
+                        {
                             _ = stringBuilder.Append(contentResult.Content);
                             break;
+                        }
 
                         case "rt":
+                        {
                             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"({contentResult.Content})");
                             break;
+                        }
 
                         case "li":
-                            if (!contentResult.Content.StartsWith('•'))
+                        {
+                            string content = contentResult.Content.TrimStart();
+                            if (!content.StartsWith('•'))
                             {
-                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n• {contentResult.Content}");
+                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n• {content}");
                             }
                             else
                             {
-                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content}");
+                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content}");
                             }
                             break;
+                        }
 
                         case "ul":
                         case "ol":
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content}\n");
+                        {
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.Trim()}\n");
                             break;
+                        }
 
                         case "th":
                         case "td":
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\t{contentResult.Content}");
+                        {
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\t{contentResult.Content.TrimStart()}");
                             break;
+                        }
 
                         // "div" or "a" or "tr" or "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot" or "img"
                         default:
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content}");
+                        {
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart()}");
                             break;
+                        }
                     }
                 }
             }
         }
 
         return stringBuilder.Length > 0
-            ? stringBuilder.ToString().Trim()
+            ? stringBuilder.ToString()
             : null;
     }
 
