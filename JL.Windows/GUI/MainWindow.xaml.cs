@@ -1786,7 +1786,7 @@ internal sealed partial class MainWindow
 
     private void MainTextBox_PreviewTouchUp(object sender, TouchEventArgs e)
     {
-        if (!FirstPopupWindow.IsVisible && MainTextBox.SelectionLength is 0)
+        if (MainTextBox.SelectionLength is 0)
         {
             Swipe(e.GetTouchPoint(this).Position);
         }
