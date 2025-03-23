@@ -239,8 +239,9 @@ internal static class Deconjugator
         while (novel.Count > 0)
         {
             List<Form> newNovel = [];
-            foreach (Form form in novel)
+            for (int i = 0; i < novel.Count; i++)
             {
+                Form form = novel[i];
                 for (int j = 0; j < rulesLength; j++)
                 {
                     ref Rule rule = ref Rules[j];
@@ -260,21 +261,19 @@ internal static class Deconjugator
                         continue;
                     }
 
-                    foreach (Form myForm in newForm)
+                    for (int k = 0; k < newForm.Count; k++)
                     {
+                        Form myForm = newForm[k];
                         if (!newNovel.Contains(myForm))
                         {
                             newNovel.Add(myForm);
                         }
                     }
                 }
-            }
 
-            for (int i = 0; i < novel.Count; i++)
-            {
                 if (addFormToProcess)
                 {
-                    processed.Add(novel[i]);
+                    processed.Add(form);
                 }
                 else
                 {
