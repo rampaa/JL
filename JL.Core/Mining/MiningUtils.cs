@@ -1270,7 +1270,7 @@ public static class MiningUtils
                             "filename", $"JL_audio_{selectedReading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}"
                         },
                         {
-                            "skipHash", Networking.Jpod101NoAudioMd5Hash
+                            "skipHash", NetworkUtils.Jpod101NoAudioMd5Hash
                         },
                         {
                             "fields", audioFields
@@ -1312,7 +1312,7 @@ public static class MiningUtils
             return;
         }
 
-        bool showNoAudioMessage = needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash);
+        bool showNoAudioMessage = needsAudio && (audioData is null || Utils.GetMd5String(audioData) is NetworkUtils.Jpod101NoAudioMd5Hash);
         bool showDuplicateCardMessage = !canAddNote.Value;
         string message = $"Mined {selectedSpelling}{(showNoAudioMessage ? " (No Audio)" : "")}{(showDuplicateCardMessage ? " (Duplicate)" : "")}";
 

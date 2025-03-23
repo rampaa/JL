@@ -309,7 +309,7 @@ internal static class WindowsUtils
 
     public static async Task UpdateJL(Uri latestReleaseUrl)
     {
-        using HttpResponseMessage downloadResponse = await Networking.Client.GetAsync(latestReleaseUrl, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+        using HttpResponseMessage downloadResponse = await NetworkUtils.Client.GetAsync(latestReleaseUrl, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
         if (downloadResponse.IsSuccessStatusCode)
         {
@@ -357,7 +357,7 @@ internal static class WindowsUtils
         {
             PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
             preferencesWindow.CheckForJLUpdatesButton.IsEnabled = false;
-            await Networking.CheckForJLUpdates(true).ConfigureAwait(true);
+            await NetworkUtils.CheckForJLUpdates(true).ConfigureAwait(true);
             preferencesWindow.CheckForJLUpdatesButton.IsEnabled = true;
         }
     }

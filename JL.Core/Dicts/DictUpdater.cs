@@ -34,7 +34,7 @@ public static class DictUpdater
                     Utils.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {dictName} is downloaded.", "Info");
                 }
 
-                using HttpResponseMessage response = await Networking.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

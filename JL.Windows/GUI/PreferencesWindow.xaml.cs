@@ -228,7 +228,7 @@ internal sealed partial class PreferencesWindow
     private async void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
     {
         CheckForJLUpdatesButton.IsEnabled = false;
-        await Networking.CheckForJLUpdates(false).ConfigureAwait(true);
+        await NetworkUtils.CheckForJLUpdates(false).ConfigureAwait(true);
         CheckForJLUpdatesButton.IsEnabled = true;
     }
 
@@ -398,8 +398,9 @@ internal sealed partial class PreferencesWindow
         string[] descriptions = fieldList
             .Select(static jlFieldName => jlFieldName.GetDescription() ?? jlFieldName.ToString()).ToArray();
 
-        foreach ((string fieldName, JLField jlField) in fields)
+        for (int i = 0; i < fields.Count; i++)
         {
+            (string fieldName, JLField jlField) = fields.GetAt(i);
             StackPanel stackPanel = new();
             TextBlock textBlockFieldName = new()
             {

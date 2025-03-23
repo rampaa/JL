@@ -8,7 +8,7 @@ using Timer = System.Timers.Timer;
 
 namespace JL.Core.Network;
 
-public static class Networking
+public static class NetworkUtils
 {
     public static readonly HttpClient Client = new(new HttpClientHandler
     {

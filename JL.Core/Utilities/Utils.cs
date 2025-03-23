@@ -120,7 +120,7 @@ public static partial class Utils
 
     public static async Task CoreInitialize()
     {
-        Networking.InitializeUpdaterTimer();
+        NetworkUtils.InitializeUpdaterTimer();
         StatsUtils.InitializeStatsTimer();
         DBUtils.InitializeOptimizePragmaTimer();
 

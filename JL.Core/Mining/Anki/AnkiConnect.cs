@@ -75,7 +75,7 @@ internal static class AnkiConnect
             using StringContent payload = new(JsonSerializer.Serialize(req, Utils.s_jsoIgnoringWhenWritingNull));
             Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
 
-            using HttpResponseMessage postResponse = await Networking.Client
+            using HttpResponseMessage postResponse = await NetworkUtils.Client
                 .PostAsync(CoreConfigManager.Instance.AnkiConnectUri, payload).ConfigureAwait(false);
 
             if (!postResponse.IsSuccessStatusCode)

@@ -35,7 +35,7 @@ public static class AudioUtils
     {
         try
         {
-            using HttpResponseMessage response = await Networking.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
@@ -47,7 +47,7 @@ public static class AudioUtils
 
                 byte[] audioData = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 
-                return Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash
+                return Utils.GetMd5String(audioData) is NetworkUtils.Jpod101NoAudioMd5Hash
                     ? null
                     : new AudioResponse(AudioSourceType.Url, audioFormat, audioData);
             }
@@ -66,7 +66,7 @@ public static class AudioUtils
     {
         try
         {
-            using HttpResponseMessage response = await Networking.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
