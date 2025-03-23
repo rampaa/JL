@@ -99,10 +99,12 @@ public static class TextUtils
             text = text.ReplaceLineEndings("");
         }
 
-        if (RegexReplacerUtils.s_regexReplacements is not null)
+        List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.s_regexReplacements;
+        if (regexReplacements is not null)
         {
-            foreach ((Regex regex, string replacement) in RegexReplacerUtils.s_regexReplacements)
+            for (int i = 0; i < regexReplacements.Count; i++)
             {
+                (Regex regex, string replacement) = regexReplacements[i];
                 text = regex.Replace(text, replacement);
             }
         }

@@ -27,11 +27,13 @@ public static class ExtensionMethods
 
     public static T GetEnum<T>(this string description) where T : struct, Enum
     {
-        foreach (T enumItem in Enum.GetValues<T>())
+        T[] enumValues = Enum.GetValues<T>();
+        for (int i = 0; i < enumValues.Length; i++)
         {
-            if (enumItem.GetDescription() == description)
+            T enumValue = enumValues[i];
+            if (enumValue.GetDescription() == description)
             {
-                return enumItem;
+                return enumValue;
             }
         }
 

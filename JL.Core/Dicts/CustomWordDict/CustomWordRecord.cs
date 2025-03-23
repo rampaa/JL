@@ -182,9 +182,9 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             if (AlternativeSpellings is not null)
             {
-                foreach (string alternativeSpelling in AlternativeSpellings)
+                for (int i = 0; i < AlternativeSpellings.Length; i++)
                 {
-                    hash = (hash * 37) + alternativeSpelling.GetHashCode(StringComparison.Ordinal);
+                    hash = (hash * 37) + AlternativeSpellings[i].GetHashCode(StringComparison.Ordinal);
                 }
             }
             else
@@ -195,9 +195,9 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
 
             if (Readings is not null)
             {
-                foreach (string reading in Readings)
+                for (int i = 0; i < Readings.Length; i++)
                 {
-                    hash = (hash * 37) + reading.GetHashCode(StringComparison.Ordinal);
+                    hash = (hash * 37) + Readings[i].GetHashCode(StringComparison.Ordinal);
                 }
             }
 
@@ -206,14 +206,14 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
                 hash *= 37;
             }
 
-            foreach (string definition in Definitions)
+            for (int i = 0; i < Definitions.Length; i++)
             {
-                hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + Definitions[i].GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (string wordClass in WordClasses)
+            for (int i = 0; i < WordClasses.Length; i++)
             {
-                hash = (hash * 37) + wordClass.GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + WordClasses[i].GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;

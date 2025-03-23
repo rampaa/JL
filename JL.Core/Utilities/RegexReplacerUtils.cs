@@ -56,9 +56,9 @@ public static partial class RegexReplacerUtils
 
                     char[] modifiers = match.Groups["modifiers"].Value.ToCharArray();
                     RegexOptions regexOptions = RegexOptions.None;
-                    foreach (char modifier in modifiers)
+                    for (int j = 0; j < modifiers.Length; j++)
                     {
-                        regexOptions |= modifier switch
+                        regexOptions |= modifiers[j] switch
                         {
                             'i' => RegexOptions.IgnoreCase,
                             'm' => RegexOptions.Multiline,

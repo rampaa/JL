@@ -22,21 +22,21 @@ internal readonly struct Rule(string type, string[] decEnd, string[] conEnd, str
             hash = (hash * 37) + Detail.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + ContextRule?.GetHashCode(StringComparison.Ordinal) ?? 37;
 
-            foreach (string decEnd in DecEnd)
+            for (int i = 0; i < DecEnd.Length; i++)
             {
-                hash = (hash * 37) + decEnd.GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + DecEnd[i].GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (string conEnd in ConEnd)
+            for (int i = 0; i < ConEnd.Length; i++)
             {
-                hash = (hash * 37) + conEnd.GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + ConEnd[i].GetHashCode(StringComparison.Ordinal);
             }
 
             if (DecTag is not null)
             {
-                foreach (string decTag in DecTag)
+                for (int i = 0; i < DecTag.Length; i++)
                 {
-                    hash = (hash * 37) + decTag.GetHashCode(StringComparison.Ordinal);
+                    hash = (hash * 37) + DecTag[i].GetHashCode(StringComparison.Ordinal);
                 }
             }
             else
@@ -46,9 +46,9 @@ internal readonly struct Rule(string type, string[] decEnd, string[] conEnd, str
 
             if (ConTag is not null)
             {
-                foreach (string conTag in ConTag)
+                for (int i = 0; i < ConTag.Length; i++)
                 {
-                    hash = (hash * 37) + conTag.GetHashCode(StringComparison.Ordinal);
+                    hash = (hash * 37) + ConTag[i].GetHashCode(StringComparison.Ordinal);
                 }
             }
             else

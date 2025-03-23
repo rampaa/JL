@@ -23,21 +23,23 @@ internal static class JmdictWordClassUtils
             DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, Utils.s_jso).ConfigureAwait(false))!;
         }
 
-        foreach (IList<JmdictWordClass> jmdictWordClassList in DictUtils.WordClassDictionary.Values.ToArray())
+        IList<JmdictWordClass>[] jmdictWordClasses = DictUtils.WordClassDictionary.Values.ToArray();
+        for (int i = 0; i < jmdictWordClasses.Length; i++)
         {
+            IList<JmdictWordClass> jmdictWordClassList = jmdictWordClasses[i];
             int jmdictWordClassListCount = jmdictWordClassList.Count;
-            for (int i = 0; i < jmdictWordClassListCount; i++)
+            for (int j = 0; j < jmdictWordClassListCount; j++)
             {
-                JmdictWordClass jmdictWordClass = jmdictWordClassList[i];
+                JmdictWordClass jmdictWordClass = jmdictWordClassList[j];
 
                 jmdictWordClass.Readings?.DeduplicateStringsInArray();
                 jmdictWordClass.WordClasses.DeduplicateStringsInArray();
 
                 if (jmdictWordClass.Readings is not null)
                 {
-                    for (int j = 0; j < jmdictWordClass.Readings.Length; j++)
+                    for (int k = 0; k < jmdictWordClass.Readings.Length; k++)
                     {
-                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(jmdictWordClass.Readings[j]).GetPooledString();
+                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(jmdictWordClass.Readings[k]).GetPooledString();
                         if (DictUtils.WordClassDictionary.TryGetValue(readingInHiragana, out IList<JmdictWordClass>? result))
                         {
                             result.Add(jmdictWordClass);

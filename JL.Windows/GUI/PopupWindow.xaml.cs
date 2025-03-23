@@ -2140,8 +2140,10 @@ internal sealed partial class PopupWindow
         _buttonAll.Background = Brushes.DodgerBlue;
         buttons.Add(_buttonAll);
 
-        foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToArray())
+        Dict[] dicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToArray();
+        for (int i = 0; i < dicts.Length; i++)
         {
+            Dict dict = dicts[i];
             if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.Instance.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
             {
                 continue;

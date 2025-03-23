@@ -86,9 +86,9 @@ public static class LookupUtils
                 int longVowelMarkCount = 0;
                 if (countLongVowelMark)
                 {
-                    foreach (char c in textInHiragana)
+                    for (int j = 1; j < textInHiragana.Length; j++)
                     {
-                        if (c is 'ー')
+                        if (textInHiragana[j] is 'ー')
                         {
                             ++longVowelMarkCount;
                         }
@@ -507,8 +507,9 @@ public static class LookupUtils
 
         if (deconjugationResults is not null)
         {
-            foreach (Form deconjugationResult in deconjugationResults)
+            for (int i = 0; i < deconjugationResults.Count; i++)
             {
+                Form deconjugationResult = deconjugationResults[i];
                 if (verbDict.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
                     List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);

@@ -36,14 +36,14 @@ internal sealed class Form(
             int hash = (17 * 37) + Text.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + OriginalText.GetHashCode(StringComparison.Ordinal);
 
-            foreach (string tag in Tags)
+            for (int i = 0; i < Tags.Count; i++)
             {
-                hash = (hash * 37) + tag.GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + Tags[i].GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (string process in Process)
+            for (int i = 0; i < Process.Count; i++)
             {
-                hash = (hash * 37) + process.GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + Process[i].GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;

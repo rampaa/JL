@@ -27,8 +27,9 @@ internal static class FrequencyYomichanLoader
                     .ConfigureAwait(false);
             }
 
-            foreach (List<JsonElement> value in frequencyJson!)
+            for (int i = 0; i < frequencyJson!.Count; i++)
             {
+                List<JsonElement> value = frequencyJson[i];
                 string primarySpelling = value[0].GetString()!.GetPooledString();
                 string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString();
                 string? reading = null;

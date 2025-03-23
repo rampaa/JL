@@ -59,9 +59,9 @@ public sealed class LookupResult
 
             if (Readings is not null)
             {
-                foreach (string reading in Readings)
+                for (int i = 0; i < Readings.Length; i++)
                 {
-                    hash = (hash * 37) + reading.GetHashCode(StringComparison.Ordinal);
+                    hash = (hash * 37) + Readings[i].GetHashCode(StringComparison.Ordinal);
                 }
             }
             else
