@@ -119,7 +119,7 @@ internal static class YomichanKanjiDBManager
         List<IDictRecord> results = [];
         while (dataReader.Read())
         {
-            results.Add(GetRecord(dataReader, 0));
+            results.Add(GetRecord(dataReader));
         }
 
         return results;
@@ -132,19 +132,19 @@ internal static class YomichanKanjiDBManager
 
         command.CommandText =
             """
-            SELECT r.kanji AS kanji,
-                   r.on_readings AS onReadings,
+            SELECT r.on_readings AS onReadings,
                    r.kun_readings AS kunReadings,
                    r.glossary AS definitions,
-                   r.stats AS stats
+                   r.stats AS stats,
+                   r.kanji AS kanji
             FROM record r;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string kanji = dataReader.GetString(0);
-            YomichanKanjiRecord record = GetRecord(dataReader, 1);
+            YomichanKanjiRecord record = GetRecord(dataReader);
+            string kanji = dataReader.GetString(4);
             if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -163,28 +163,28 @@ internal static class YomichanKanjiDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader, int offset)
+    private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)
     {
         string[]? onReadings = null;
-        if (dataReader[0 + offset] is string onReadingsFromDB)
+        if (dataReader[0] is string onReadingsFromDB)
         {
             onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jso);
         }
 
         string[]? kunReadings = null;
-        if (dataReader[1 + offset] is string kunReadingsFromDB)
+        if (dataReader[1] is string kunReadingsFromDB)
         {
             kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jso);
         }
 
         string[]? definitions = null;
-        if (dataReader[2 + offset] is string definitionsFromDB)
+        if (dataReader[2] is string definitionsFromDB)
         {
             definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jso);
         }
 
         string[]? stats = null;
-        if (dataReader[3 + offset] is string statsFromDB)
+        if (dataReader[3] is string statsFromDB)
         {
             stats = JsonSerializer.Deserialize<string[]>(statsFromDB, Utils.s_jso);
         }

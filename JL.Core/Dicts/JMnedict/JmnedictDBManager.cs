@@ -102,13 +102,13 @@ internal static class JmnedictDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
             $"""
-            SELECT r.primary_spelling_in_hiragana AS searchKey,
-                   r.jmnedict_id AS id,
+            SELECT r.jmnedict_id AS id,
                    r.primary_spelling AS primarySpelling,
                    r.readings AS readings,
                    r.alternative_spellings AS alternativeSpellings,
                    r.glossary AS definitions,
-                   r.name_types AS nameTypes
+                   r.name_types AS nameTypes,
+                   r.primary_spelling_in_hiragana AS searchKey
             FROM record r
             WHERE r.primary_spelling_in_hiragana IN {parameter}
             """;
@@ -130,7 +130,7 @@ internal static class JmnedictDBManager
         while (dataReader.Read())
         {
             JmnedictRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString(0);
+            string searchKey = dataReader.GetString(6);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -151,13 +151,13 @@ internal static class JmnedictDBManager
     //
     //     command.CommandText =
     //         """
-    //         SELECT r.primary_spelling_in_hiragana AS searchKey,
-    //                r.jmnedict_id AS id,
+    //         SELECT r.jmnedict_id AS id,
     //                r.primary_spelling AS primarySpelling,
     //                r.readings AS readings,
     //                r.alternative_spellings AS alternativeSpellings,
     //                r.glossary AS definitions,
-    //                r.name_types AS nameTypes
+    //                r.name_types AS nameTypes,
+    //                r.primary_spelling_in_hiragana AS searchKey
     //         FROM record r;
     //         """;
     //
@@ -165,7 +165,7 @@ internal static class JmnedictDBManager
     //     while (dataReader.Read())
     //     {
     //         JmnedictRecord record = GetRecord(dataReader);
-    //         string searchKey = dataReader.GetString(0);
+    //         string searchKey = dataReader.GetString(6);
     //         if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
     //         {
     //             result.Add(record);
@@ -186,23 +186,23 @@ internal static class JmnedictDBManager
 
     private static JmnedictRecord GetRecord(SqliteDataReader dataReader)
     {
-        int id = dataReader.GetInt32(1);
-        string primarySpelling = dataReader.GetString(2);
+        int id = dataReader.GetInt32(0);
+        string primarySpelling = dataReader.GetString(1);
 
         string[]? readings = null;
-        if (dataReader[3] is string readingsFromDB)
+        if (dataReader[2] is string readingsFromDB)
         {
             readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_jso);
         }
 
         string[]? alternativeSpellings = null;
-        if (dataReader[4] is string alternativeSpellingsFromDB)
+        if (dataReader[3] is string alternativeSpellingsFromDB)
         {
             alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jso);
         }
 
-        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(5), Utils.s_jso)!;
-        string[][] nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(6), Utils.s_jso)!;
+        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(4), Utils.s_jso)!;
+        string[][] nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(5), Utils.s_jso)!;
 
         return new JmnedictRecord(id, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);
     }

@@ -12,6 +12,8 @@ internal static class EpwingYomichanDBManager
 {
     public const int Version = 13;
 
+    private const int SearchKeyIndex = 5;
+
     private const string SingleTermQuery =
         """
         SELECT r.primary_spelling AS primarySpelling,
@@ -23,6 +25,46 @@ internal static class EpwingYomichanDBManager
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term;
         """;
+
+    public static string GetQuery(string parameter)
+    {
+        return
+            $"""
+            SELECT r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.glossary AS definitions,
+                   r.part_of_speech AS wordClasses,
+                   r.glossary_tags AS definitionTags,
+                   rsk.search_key AS searchKey
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key IN {parameter}
+            """;
+    }
+
+    public static string GetQuery(List<string> terms)
+    {
+        StringBuilder queryBuilder = new(
+            """
+            SELECT r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.glossary AS definitions,
+                   r.part_of_speech AS wordClasses,
+                   r.glossary_tags AS definitionTags,
+                   rsk.search_key AS searchKey
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key IN (@1
+            """);
+
+        int termsCount = terms.Count;
+        for (int i = 1; i < termsCount; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+        }
+
+        return queryBuilder.Append(");").ToString();
+    }
 
     public static void CreateDB(string dbName)
     {
@@ -160,8 +202,8 @@ internal static class EpwingYomichanDBManager
         Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
-            string searchKey = dataReader.GetString(0);
-            EpwingYomichanRecord record = GetRecord(dataReader, 1);
+            EpwingYomichanRecord record = GetRecord(dataReader);
+            string searchKey = dataReader.GetString(SearchKeyIndex);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -193,7 +235,7 @@ internal static class EpwingYomichanDBManager
         List<IDictRecord> results = [];
         while (dataReader.Read())
         {
-            results.Add(GetRecord(dataReader, 0));
+            results.Add(GetRecord(dataReader));
         }
         return results;
     }
@@ -205,12 +247,12 @@ internal static class EpwingYomichanDBManager
 
         command.CommandText =
             """
-            SELECT json_group_array(rsk.search_key) AS searchKeys,
-                   r.primary_spelling AS primarySpelling,
+            SELECT r.primary_spelling AS primarySpelling,
                    r.reading AS reading,
                    r.glossary AS definitions,
                    r.part_of_speech AS wordClasses,
-                   r.glossary_tags AS definitionTags
+                   r.glossary_tags AS definitionTags,
+                   json_group_array(rsk.search_key) AS searchKeys
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;
@@ -219,8 +261,8 @@ internal static class EpwingYomichanDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(0), Utils.s_jso)!;
-            EpwingYomichanRecord record = GetRecord(dataReader, 1);
+            EpwingYomichanRecord record = GetRecord(dataReader);
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -243,70 +285,30 @@ internal static class EpwingYomichanDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader, int offset)
+    private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader)
     {
-        string primarySpelling = dataReader.GetString(0 + offset);
+        string primarySpelling = dataReader.GetString(0);
 
         string? reading = null;
-        if (dataReader[1 + offset] is string readingFromDB)
+        if (dataReader[1] is string readingFromDB)
         {
             reading = readingFromDB;
         }
 
-        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(2 + offset), Utils.s_jso)!;
+        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)!;
 
         string[]? wordClasses = null;
-        if (dataReader[3 + offset] is string wordClassesFromDB)
+        if (dataReader[3] is string wordClassesFromDB)
         {
             wordClasses = JsonSerializer.Deserialize<string[]>(wordClassesFromDB, Utils.s_jso);
         }
 
         string[]? definitionTags = null;
-        if (dataReader[4 + offset] is string definitionTagsFromDB)
+        if (dataReader[4] is string definitionTagsFromDB)
         {
             definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jso);
         }
 
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
-    }
-
-    public static string GetQuery(string parameter)
-    {
-        return
-            $"""
-            SELECT rsk.search_key AS searchKey,
-                   r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.glossary AS definitions,
-                   r.part_of_speech AS wordClasses,
-                   r.glossary_tags AS definitionTags
-            FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key IN {parameter}
-            """;
-    }
-
-    public static string GetQuery(List<string> terms)
-    {
-        StringBuilder queryBuilder = new(
-            """
-            SELECT rsk.search_key AS searchKey,
-                   r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.glossary AS definitions,
-                   r.part_of_speech AS wordClasses,
-                   r.glossary_tags AS definitionTags
-            FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key IN (@1
-            """);
-
-        int termsCount = terms.Count;
-        for (int i = 1; i < termsCount; i++)
-        {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
-        }
-
-        return queryBuilder.Append(");").ToString();
     }
 }

@@ -12,6 +12,8 @@ internal static class YomichanPitchAccentDBManager
 {
     public const int Version = 4;
 
+    private const int SearchKeyIndex = 3;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
@@ -125,10 +127,10 @@ internal static class YomichanPitchAccentDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT rsk.search_key AS searchKey,
-                   r.spelling AS spelling,
+            SELECT r.spelling AS spelling,
                    r.reading AS reading,
-                   r.position AS position
+                   r.position AS position,
+                   rsk.search_key AS searchKey
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -162,8 +164,7 @@ internal static class YomichanPitchAccentDBManager
         while (dataReader.Read())
         {
             PitchAccentRecord record = GetRecord(dataReader);
-
-            string searchKey = dataReader.GetString(0);
+            string searchKey = dataReader.GetString(SearchKeyIndex);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -184,10 +185,10 @@ internal static class YomichanPitchAccentDBManager
 
         command.CommandText =
             """
-            SELECT json_group_array(rsk.search_key) AS searchKeys,
-                   r.spelling AS spelling,
+            SELECT r.spelling AS spelling,
                    r.reading AS reading,
-                   r.position AS position
+                   r.position AS position,
+                   json_group_array(rsk.search_key) AS searchKeys
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;
@@ -197,7 +198,7 @@ internal static class YomichanPitchAccentDBManager
         while (dataReader.Read())
         {
             PitchAccentRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(0), Utils.s_jso)!;
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -222,15 +223,15 @@ internal static class YomichanPitchAccentDBManager
 
     private static PitchAccentRecord GetRecord(SqliteDataReader dataReader)
     {
-        string spelling = dataReader.GetString(1);
+        string spelling = dataReader.GetString(0);
 
         string? reading = null;
-        if (dataReader[2] is string readingFromDB)
+        if (dataReader[1] is string readingFromDB)
         {
             reading = readingFromDB;
         }
 
-        byte position = dataReader.GetByte(3);
+        byte position = dataReader.GetByte(2);
 
         return new PitchAccentRecord(spelling, reading, position);
     }

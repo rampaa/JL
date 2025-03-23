@@ -11,6 +11,8 @@ internal static class JmdictDBManager
 {
     public const int Version = 7;
 
+    private const int SearchKeyIndex = 22;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
@@ -191,8 +193,7 @@ internal static class JmdictDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
             $"""
-            SELECT rsk.search_key AS searchKey,
-                   r.edict_id AS id,
+            SELECT r.edict_id AS id,
                    r.primary_spelling AS primarySpelling,
                    r.primary_spelling_orthography_info AS primarySpellingOrthographyInfo,
                    r.spelling_restrictions AS spellingRestrictions,
@@ -213,7 +214,8 @@ internal static class JmdictDBManager
                    r.dialects AS dialects,
                    r.loanword_etymology AS loanwordEtymology,
                    r.cross_references AS relatedTerms,
-                   r.antonyms AS antonyms
+                   r.antonyms AS antonyms,
+                   rsk.search_key AS searchKey
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN {parameter}
@@ -236,7 +238,7 @@ internal static class JmdictDBManager
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString(0);
+            string searchKey = dataReader.GetString(SearchKeyIndex);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -257,8 +259,7 @@ internal static class JmdictDBManager
 
         command.CommandText =
             """
-            SELECT json_group_array(rsk.search_key) AS searchKeys,
-                   r.edict_id AS id,
+            SELECT r.edict_id AS id,
                    r.primary_spelling AS primarySpelling,
                    r.primary_spelling_orthography_info AS primarySpellingOrthographyInfo,
                    r.spelling_restrictions AS spellingRestrictions,
@@ -279,7 +280,8 @@ internal static class JmdictDBManager
                    r.dialects AS dialects,
                    r.loanword_etymology AS loanwordEtymology,
                    r.cross_references AS relatedTerms,
-                   r.antonyms AS antonyms
+                   r.antonyms AS antonyms,
+                   json_group_array(rsk.search_key) AS searchKeys
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;
@@ -289,7 +291,7 @@ internal static class JmdictDBManager
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(0), Utils.s_jso)!;
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -314,121 +316,121 @@ internal static class JmdictDBManager
 
     private static JmdictRecord GetRecord(SqliteDataReader dataReader)
     {
-        int id = dataReader.GetInt32(1);
-        string primarySpelling = dataReader.GetString(2);
+        int id = dataReader.GetInt32(0);
+        string primarySpelling = dataReader.GetString(1);
 
         string[]? primarySpellingOrthographyInfo = null;
-        if (dataReader[3] is string primarySpellingOrthographyInfoFromDB)
+        if (dataReader[2] is string primarySpellingOrthographyInfoFromDB)
         {
             primarySpellingOrthographyInfo = JsonSerializer.Deserialize<string[]>(primarySpellingOrthographyInfoFromDB, Utils.s_jso);
         }
 
         string[]?[]? spellingRestrictions = null;
-        if (dataReader[4] is string spellingRestrictionsFromDB)
+        if (dataReader[3] is string spellingRestrictionsFromDB)
         {
             spellingRestrictions = JsonSerializer.Deserialize<string[]?[]>(spellingRestrictionsFromDB, Utils.s_jso);
         }
 
         string[]? alternativeSpellings = null;
-        if (dataReader[5] is string alternativeSpellingsFromDB)
+        if (dataReader[4] is string alternativeSpellingsFromDB)
         {
             alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jso);
         }
 
         string[]?[]? alternativeSpellingsOrthographyInfo = null;
-        if (dataReader[6] is string alternativeSpellingsOrthographyInfoFromDB)
+        if (dataReader[5] is string alternativeSpellingsOrthographyInfoFromDB)
         {
             alternativeSpellingsOrthographyInfo = JsonSerializer.Deserialize<string[]?[]>(alternativeSpellingsOrthographyInfoFromDB, Utils.s_jso);
         }
 
         string[]? readings = null;
-        if (dataReader[7] is string readingsFromDB)
+        if (dataReader[6] is string readingsFromDB)
         {
             readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_jso);
         }
 
         string[]?[]? readingsOrthographyInfo = null;
-        if (dataReader[8] is string readingsOrthographyInfoFromDB)
+        if (dataReader[7] is string readingsOrthographyInfoFromDB)
         {
             readingsOrthographyInfo = JsonSerializer.Deserialize<string[]?[]>(readingsOrthographyInfoFromDB, Utils.s_jso);
         }
 
         string[]?[]? readingRestrictions = null;
-        if (dataReader[9] is string readingRestrictionsFromDB)
+        if (dataReader[8] is string readingRestrictionsFromDB)
         {
             readingRestrictions = JsonSerializer.Deserialize<string[]?[]>(readingRestrictionsFromDB, Utils.s_jso);
         }
 
-        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(10), Utils.s_jso)!;
+        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(9), Utils.s_jso)!;
 
         string?[]? definitionInfo = null;
-        if (dataReader[11] is string definitionInfoFromDB)
+        if (dataReader[10] is string definitionInfoFromDB)
         {
             definitionInfo = JsonSerializer.Deserialize<string?[]>(definitionInfoFromDB, Utils.s_jso);
         }
 
         string[]? wordClassesSharedByAllSenses = null;
-        if (dataReader[12] is string wordClassesSharedByAllSensesFromDB)
+        if (dataReader[11] is string wordClassesSharedByAllSensesFromDB)
         {
             wordClassesSharedByAllSenses = JsonSerializer.Deserialize<string[]>(wordClassesSharedByAllSensesFromDB, Utils.s_jso);
         }
 
         string[]?[]? wordClasses = null;
-        if (dataReader[13] is string wordClassesFromDB)
+        if (dataReader[12] is string wordClassesFromDB)
         {
             wordClasses = JsonSerializer.Deserialize<string[]?[]>(wordClassesFromDB, Utils.s_jso);
         }
 
         string[]? fieldsSharedByAllSenses = null;
-        if (dataReader[14] is string fieldsSharedByAllSensesFromDB)
+        if (dataReader[13] is string fieldsSharedByAllSensesFromDB)
         {
             fieldsSharedByAllSenses = JsonSerializer.Deserialize<string[]>(fieldsSharedByAllSensesFromDB, Utils.s_jso);
         }
 
         string[]?[]? fields = null;
-        if (dataReader[15] is string fieldsFromDB)
+        if (dataReader[14] is string fieldsFromDB)
         {
             fields = JsonSerializer.Deserialize<string[]?[]>(fieldsFromDB, Utils.s_jso);
         }
 
         string[]? miscSharedByAllSenses = null;
-        if (dataReader[16] is string miscSharedByAllSensesFromDB)
+        if (dataReader[15] is string miscSharedByAllSensesFromDB)
         {
             miscSharedByAllSenses = JsonSerializer.Deserialize<string[]>(miscSharedByAllSensesFromDB, Utils.s_jso);
         }
 
         string[]?[]? misc = null;
-        if (dataReader[17] is string miscFromDB)
+        if (dataReader[16] is string miscFromDB)
         {
             misc = JsonSerializer.Deserialize<string[]?[]>(miscFromDB, Utils.s_jso);
         }
 
         string[]? dialectsSharedByAllSenses = null;
-        if (dataReader[18] is string dialectsSharedByAllSensesFromDB)
+        if (dataReader[17] is string dialectsSharedByAllSensesFromDB)
         {
             dialectsSharedByAllSenses = JsonSerializer.Deserialize<string[]>(dialectsSharedByAllSensesFromDB, Utils.s_jso);
         }
 
         string[]?[]? dialects = null;
-        if (dataReader[19] is string dialectsFromDB)
+        if (dataReader[18] is string dialectsFromDB)
         {
             dialects = JsonSerializer.Deserialize<string[]?[]>(dialectsFromDB, Utils.s_jso);
         }
 
         LoanwordSource[]?[]? loanwordEtymology = null;
-        if (dataReader[20] is string loanwordEtymologyFromDB)
+        if (dataReader[19] is string loanwordEtymologyFromDB)
         {
             loanwordEtymology = JsonSerializer.Deserialize<LoanwordSource[]?[]>(loanwordEtymologyFromDB, Utils.s_jso);
         }
 
         string[]?[]? relatedTerms = null;
-        if (dataReader[21] is string relatedTermsFromDB)
+        if (dataReader[20] is string relatedTermsFromDB)
         {
             relatedTerms = JsonSerializer.Deserialize<string[]?[]>(relatedTermsFromDB, Utils.s_jso);
         }
 
         string[]?[]? antonyms = null;
-        if (dataReader[22] is string antonymsFromDB)
+        if (dataReader[21] is string antonymsFromDB)
         {
             antonyms = JsonSerializer.Deserialize<string[]?[]>(antonymsFromDB, Utils.s_jso);
         }

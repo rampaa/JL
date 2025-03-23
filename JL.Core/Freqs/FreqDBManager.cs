@@ -11,6 +11,8 @@ internal static class FreqDBManager
 {
     public const int Version = 4;
 
+    private const int SearchKeyIndex = 2;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetFreqDBPath(dbName));
@@ -113,9 +115,9 @@ internal static class FreqDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT rsk.search_key AS searchKey,
-                   r.spelling as spelling,
-                   r.frequency AS frequency
+            SELECT r.spelling as spelling,
+                   r.frequency AS frequency,
+                   rsk.search_key AS searchKey
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -148,8 +150,8 @@ internal static class FreqDBManager
         Dictionary<string, List<FrequencyRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
-            string searchKey = dataReader.GetString(0);
-            FrequencyRecord record = GetRecord(dataReader, 1);
+            FrequencyRecord record = GetRecord(dataReader);
+            string searchKey = dataReader.GetString(SearchKeyIndex);
             if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
             {
                 result.Add(record);
@@ -187,7 +189,7 @@ internal static class FreqDBManager
         List<FrequencyRecord> records = [];
         while (dataReader.Read())
         {
-            records.Add(GetRecord(dataReader, 0));
+            records.Add(GetRecord(dataReader));
         }
         return records;
     }
@@ -215,7 +217,7 @@ internal static class FreqDBManager
 
         command.CommandText =
             """
-            SELECT json_group_array(rsk.search_key) AS searchKeys, r.spelling as spelling, r.frequency AS frequency
+            SELECT r.spelling as spelling, r.frequency AS frequency, json_group_array(rsk.search_key) AS searchKeys
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;
@@ -224,8 +226,8 @@ internal static class FreqDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(0), Utils.s_jso)!;
-            FrequencyRecord record = GetRecord(dataReader, 1);
+            FrequencyRecord record = GetRecord(dataReader);
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -248,10 +250,10 @@ internal static class FreqDBManager
         freq.Contents = freq.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static FrequencyRecord GetRecord(SqliteDataReader dataReader, int offset)
+    private static FrequencyRecord GetRecord(SqliteDataReader dataReader)
     {
-        string spelling = dataReader.GetString(0 + offset);
-        int frequency = dataReader.GetInt32(1 + offset);
+        string spelling = dataReader.GetString(0);
+        int frequency = dataReader.GetInt32(1);
 
         return new FrequencyRecord(spelling, frequency);
     }

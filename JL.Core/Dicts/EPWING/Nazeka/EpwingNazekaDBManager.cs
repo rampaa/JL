@@ -12,6 +12,8 @@ internal static class EpwingNazekaDBManager
 {
     public const int Version = 7;
 
+    private const int SearchKeyIndex = 4;
+
     private const string SingleTermQuery =
         """
         SELECT r.primary_spelling AS primarySpelling,
@@ -22,6 +24,44 @@ internal static class EpwingNazekaDBManager
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term;
         """;
+
+    public static string GetQuery(string parameter)
+    {
+        return
+            $"""
+            SELECT r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.alternative_spellings AS alternativeSpellings,
+                   r.glossary AS definitions,
+                   rsk.search_key AS searchKey
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key IN {parameter}
+            """;
+    }
+
+    public static string GetQuery(List<string> terms)
+    {
+        StringBuilder queryBuilder = new(
+            """
+            SELECT r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.alternative_spellings AS alternativeSpellings,
+                   r.glossary AS definitions,
+                   rsk.search_key AS searchKey
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key IN (@1
+            """);
+
+        int termCount = terms.Count;
+        for (int i = 1; i < termCount; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+        }
+
+        return queryBuilder.Append(");").ToString();
+    }
 
     public static void CreateDB(string dbName)
     {
@@ -156,8 +196,8 @@ internal static class EpwingNazekaDBManager
         Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
-            string searchKey = dataReader.GetString(0);
-            EpwingNazekaRecord epwingNazekaRecord = GetRecord(dataReader, 1);
+            EpwingNazekaRecord epwingNazekaRecord = GetRecord(dataReader);
+            string searchKey = dataReader.GetString(SearchKeyIndex);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(epwingNazekaRecord);
@@ -189,7 +229,7 @@ internal static class EpwingNazekaDBManager
         List<IDictRecord> results = [];
         while (dataReader.Read())
         {
-            results.Add(GetRecord(dataReader, 0));
+            results.Add(GetRecord(dataReader));
         }
 
         return results;
@@ -202,11 +242,11 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT json_group_array(rsk.search_key) AS searchKeys,
-                   r.primary_spelling AS primarySpelling,
+            SELECT r.primary_spelling AS primarySpelling,
                    r.reading AS reading,
                    r.alternative_spellings AS alternativeSpellings,
-                   r.glossary AS definitions
+                   r.glossary AS definitions,
+                   json_group_array(rsk.search_key) AS searchKeys
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;
@@ -215,8 +255,8 @@ internal static class EpwingNazekaDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(0), Utils.s_jso)!;
-            EpwingNazekaRecord record = GetRecord(dataReader, 1);
+            EpwingNazekaRecord record = GetRecord(dataReader);
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -239,62 +279,24 @@ internal static class EpwingNazekaDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader, int offset)
+    private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader)
     {
-        string primarySpelling = dataReader.GetString(0 + offset);
+        string primarySpelling = dataReader.GetString(0);
 
         string? reading = null;
-        if (dataReader[1 + offset] is string readingFromDB)
+        if (dataReader[1] is string readingFromDB)
         {
             reading = readingFromDB;
         }
 
         string[]? alternativeSpellings = null;
-        if (dataReader[2 + offset] is string alternativeSpellingsFromDB)
+        if (dataReader[2] is string alternativeSpellingsFromDB)
         {
             alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jso);
         }
 
-        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(3 + offset), Utils.s_jso)!;
+        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)!;
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
-    }
-
-    public static string GetQuery(string parameter)
-    {
-        return
-            $"""
-            SELECT rsk.search_key AS searchKey,
-                   r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.alternative_spellings AS alternativeSpellings,
-                   r.glossary AS definitions
-            FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key IN {parameter}
-            """;
-    }
-
-    public static string GetQuery(List<string> terms)
-    {
-        StringBuilder queryBuilder = new(
-            """
-            SELECT rsk.search_key AS searchKey,
-                   r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.alternative_spellings AS alternativeSpellings,
-                   r.glossary AS definitions
-            FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key IN (@1
-            """);
-
-        int termCount = terms.Count;
-        for (int i = 1; i < termCount; i++)
-        {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
-        }
-
-        return queryBuilder.Append(");").ToString();
     }
 }
