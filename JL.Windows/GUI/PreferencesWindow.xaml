@@ -102,6 +102,7 @@
                                        Style="{StaticResource TextBlockDefault}" />
                                     <ComboBox x:Name="MiningModeMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
+                                        <ComboBoxItem Content="Left button" Tag="Left" />
                                         <ComboBoxItem Content="Middle button" Tag="Middle" />
                                         <ComboBoxItem Content="Back button" Tag="XButton1" />
                                         <ComboBoxItem Content="Forward button" Tag="XButton2" />
