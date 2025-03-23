@@ -1,4 +1,3 @@
-using System.Data;
 using System.Globalization;
 using Microsoft.Data.Sqlite;
 
@@ -93,7 +92,7 @@ public static class ProfileDBUtils
 
         command.CommandText =
             """
-            SELECT id, name
+            SELECT name
             FROM profile
             WHERE id != 0;
             """;
@@ -103,7 +102,7 @@ public static class ProfileDBUtils
         List<string> profiles = [];
         while (dataReader.Read())
         {
-            profiles.Add(dataReader.GetString("name"));
+            profiles.Add(dataReader.GetString(0));
         }
 
         return profiles;

@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -149,41 +148,23 @@ internal static class EpwingNazekaDBManager
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-
         if (!dataReader.HasRows)
         {
             return null;
         }
 
         Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-
         while (dataReader.Read())
         {
-            string searchKey = dataReader.GetString(nameof(searchKey));
-            string primarySpelling = dataReader.GetString(nameof(primarySpelling));
-
-            string? reading = null;
-            if (dataReader[nameof(reading)] is string readingFromDB)
-            {
-                reading = readingFromDB;
-            }
-
-            string[]? alternativeSpellings = null;
-            if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
-            {
-                alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jso);
-            }
-
-            string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jso)!;
-
+            string searchKey = dataReader.GetString(0);
+            EpwingNazekaRecord epwingNazekaRecord = GetRecord(dataReader, 1);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
-                result.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
+                result.Add(epwingNazekaRecord);
             }
-
             else
             {
-                results[searchKey] = [new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions)];
+                results[searchKey] = [epwingNazekaRecord];
             }
         }
 
@@ -208,7 +189,7 @@ internal static class EpwingNazekaDBManager
         List<IDictRecord> results = [];
         while (dataReader.Read())
         {
-            results.Add(GetRecord(dataReader));
+            results.Add(GetRecord(dataReader, 0));
         }
 
         return results;
@@ -234,8 +215,8 @@ internal static class EpwingNazekaDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            EpwingNazekaRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(nameof(searchKeys)), Utils.s_jso)!;
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(0), Utils.s_jso)!;
+            EpwingNazekaRecord record = GetRecord(dataReader, 1);
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -258,23 +239,23 @@ internal static class EpwingNazekaDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader)
+    private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader, int offset)
     {
-        string primarySpelling = dataReader.GetString(nameof(primarySpelling));
+        string primarySpelling = dataReader.GetString(0 + offset);
 
         string? reading = null;
-        if (dataReader[nameof(reading)] is string readingFromDB)
+        if (dataReader[1 + offset] is string readingFromDB)
         {
             reading = readingFromDB;
         }
 
         string[]? alternativeSpellings = null;
-        if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
+        if (dataReader[2 + offset] is string alternativeSpellingsFromDB)
         {
             alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jso);
         }
 
-        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jso)!;
+        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(3 + offset), Utils.s_jso)!;
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
     }

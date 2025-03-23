@@ -1,4 +1,3 @@
-using System.Data;
 using System.Text.Json;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -117,8 +116,8 @@ public static class StatsDBUtils
         List<KeyValuePair<string, int>> termLookupCounts = [];
         while (dataReader.Read())
         {
-            string term = dataReader.GetString(nameof(term));
-            int count = dataReader.GetInt32(nameof(count));
+            string term = dataReader.GetString(0);
+            int count = dataReader.GetInt32(1);
 
             termLookupCounts.Add(KeyValuePair.Create(term, count));
         }

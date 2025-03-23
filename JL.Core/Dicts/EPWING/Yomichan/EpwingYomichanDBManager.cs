@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -161,9 +160,8 @@ internal static class EpwingYomichanDBManager
         Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
-            EpwingYomichanRecord record = GetRecord(dataReader);
-
-            string searchKey = dataReader.GetString(nameof(searchKey));
+            string searchKey = dataReader.GetString(0);
+            EpwingYomichanRecord record = GetRecord(dataReader, 1);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -195,7 +193,7 @@ internal static class EpwingYomichanDBManager
         List<IDictRecord> results = [];
         while (dataReader.Read())
         {
-            results.Add(GetRecord(dataReader));
+            results.Add(GetRecord(dataReader, 0));
         }
         return results;
     }
@@ -221,8 +219,8 @@ internal static class EpwingYomichanDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            EpwingYomichanRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(nameof(searchKeys)), Utils.s_jso)!;
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(0), Utils.s_jso)!;
+            EpwingYomichanRecord record = GetRecord(dataReader, 1);
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -230,7 +228,6 @@ internal static class EpwingYomichanDBManager
                 {
                     result.Add(record);
                 }
-
                 else
                 {
                     dict.Contents[searchKey] = [record];
@@ -246,26 +243,26 @@ internal static class EpwingYomichanDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader)
+    private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader, int offset)
     {
-        string primarySpelling = dataReader.GetString(nameof(primarySpelling));
+        string primarySpelling = dataReader.GetString(0 + offset);
 
         string? reading = null;
-        if (dataReader[nameof(reading)] is string readingFromDB)
+        if (dataReader[1 + offset] is string readingFromDB)
         {
             reading = readingFromDB;
         }
 
-        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jso)!;
+        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(2 + offset), Utils.s_jso)!;
 
         string[]? wordClasses = null;
-        if (dataReader[nameof(wordClasses)] is string wordClassesFromDB)
+        if (dataReader[3 + offset] is string wordClassesFromDB)
         {
             wordClasses = JsonSerializer.Deserialize<string[]>(wordClassesFromDB, Utils.s_jso);
         }
 
         string[]? definitionTags = null;
-        if (dataReader[nameof(definitionTags)] is string definitionTagsFromDB)
+        if (dataReader[4 + offset] is string definitionTagsFromDB)
         {
             definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jso);
         }

@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -149,9 +148,8 @@ internal static class FreqDBManager
         Dictionary<string, List<FrequencyRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
-            FrequencyRecord record = GetRecord(dataReader);
-
-            string searchKey = dataReader.GetString(nameof(searchKey));
+            string searchKey = dataReader.GetString(0);
+            FrequencyRecord record = GetRecord(dataReader, 1);
             if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
             {
                 result.Add(record);
@@ -189,7 +187,7 @@ internal static class FreqDBManager
         List<FrequencyRecord> records = [];
         while (dataReader.Read())
         {
-            records.Add(GetRecord(dataReader));
+            records.Add(GetRecord(dataReader, 0));
         }
         return records;
     }
@@ -226,9 +224,8 @@ internal static class FreqDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            FrequencyRecord record = GetRecord(dataReader);
-
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(nameof(searchKeys)), Utils.s_jso)!;
+            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(0), Utils.s_jso)!;
+            FrequencyRecord record = GetRecord(dataReader, 1);
             for (int i = 0; i < searchKeys.Count; i++)
             {
                 string searchKey = searchKeys[i];
@@ -251,10 +248,10 @@ internal static class FreqDBManager
         freq.Contents = freq.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static FrequencyRecord GetRecord(SqliteDataReader dataReader)
+    private static FrequencyRecord GetRecord(SqliteDataReader dataReader, int offset)
     {
-        string spelling = dataReader.GetString(nameof(spelling));
-        int frequency = dataReader.GetInt32(nameof(frequency));
+        string spelling = dataReader.GetString(0 + offset);
+        int frequency = dataReader.GetInt32(1 + offset);
 
         return new FrequencyRecord(spelling, frequency);
     }

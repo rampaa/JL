@@ -1,4 +1,3 @@
-using System.Data;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
@@ -131,8 +130,7 @@ internal static class JmnedictDBManager
         while (dataReader.Read())
         {
             JmnedictRecord record = GetRecord(dataReader);
-
-            string searchKey = dataReader.GetString(nameof(searchKey));
+            string searchKey = dataReader.GetString(0);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -167,8 +165,7 @@ internal static class JmnedictDBManager
     //     while (dataReader.Read())
     //     {
     //         JmnedictRecord record = GetRecord(dataReader);
-    //
-    //         string searchKey = dataReader.GetString(nameof(searchKey));
+    //         string searchKey = dataReader.GetString(0);
     //         if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
     //         {
     //             result.Add(record);
@@ -189,23 +186,23 @@ internal static class JmnedictDBManager
 
     private static JmnedictRecord GetRecord(SqliteDataReader dataReader)
     {
-        int id = dataReader.GetInt32(nameof(id));
-        string primarySpelling = dataReader.GetString(nameof(primarySpelling));
+        int id = dataReader.GetInt32(1);
+        string primarySpelling = dataReader.GetString(2);
 
         string[]? readings = null;
-        if (dataReader[nameof(readings)] is string readingsFromDB)
+        if (dataReader[3] is string readingsFromDB)
         {
             readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_jso);
         }
 
         string[]? alternativeSpellings = null;
-        if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
+        if (dataReader[4] is string alternativeSpellingsFromDB)
         {
             alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jso);
         }
 
-        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(definitions)), Utils.s_jso)!;
-        string[][] nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(nameTypes)), Utils.s_jso)!;
+        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(5), Utils.s_jso)!;
+        string[][] nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(6), Utils.s_jso)!;
 
         return new JmnedictRecord(id, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);
     }
