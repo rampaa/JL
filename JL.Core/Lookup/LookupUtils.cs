@@ -750,9 +750,8 @@ public static class LookupUtils
     private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(List<Freq> dbFreqs, HashSet<string> searchKeys)
     {
         ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Count, StringComparer.Ordinal);
-        _ = Parallel.For(0, dbFreqs.Count, i =>
+        _ = Parallel.ForEach(dbFreqs, freq =>
         {
-            Freq freq = dbFreqs[i];
             Dictionary<string, List<FrequencyRecord>>? freqRecords = FreqDBManager.GetRecordsFromDB(freq.Name, searchKeys);
             if (freqRecords is not null)
             {
