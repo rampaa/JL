@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using JL.Core.Audio;
 using JL.Core.Config;
@@ -256,7 +257,7 @@ public static class MiningUtils
 
             case JLField.Frequencies:
                 return lookupResult.Frequencies is not null
-                    ? LookupResultUtils.FrequenciesToText(lookupResult.Frequencies, true, lookupResult.Frequencies.Count is 1)
+                    ? LookupResultUtils.FrequenciesToText(CollectionsMarshal.AsSpan(lookupResult.Frequencies), true, lookupResult.Frequencies.Count is 1)
                     : null;
 
             case JLField.RawFrequencies:
@@ -311,8 +312,7 @@ public static class MiningUtils
                 StringBuilder expressionsWithPitchAccentBuilder = new();
                 _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
 
-                int expressionsLength = expressions.Length;
-                for (int i = 0; i < expressionsLength; i++)
+                for (int i = 0; i < expressions.Length; i++)
                 {
                     byte pitchPosition = lookupResult.PitchPositions[i];
                     if (pitchPosition is not byte.MaxValue)
@@ -333,8 +333,7 @@ public static class MiningUtils
 
                 string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
                 StringBuilder numericPitchAccentBuilder = new();
-                int expressionsLength = expressions.Length;
-                for (int i = 0; i < expressionsLength; i++)
+                for (int i = 0; i < expressions.Length; i++)
                 {
                     byte pitchPosition = lookupResult.PitchPositions[i];
                     if (pitchPosition is not byte.MaxValue)
@@ -542,7 +541,7 @@ public static class MiningUtils
 
             if (validFrequencies.Count > 0)
             {
-                miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies, true, lookupResult.Frequencies.Count is 1);
+                miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(CollectionsMarshal.AsSpan(lookupResult.Frequencies), true, lookupResult.Frequencies.Count is 1);
                 miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencies.Select(static f => f.Freq));
                 miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
 
@@ -745,10 +744,10 @@ public static class MiningUtils
 
     private static string? GetDefinitionsFromAllDictionariesWithHtmlTags(OrderedDictionary<string, List<LookupResult>> validLookupResults, string selectedRecordDictName, string? selectedRecordDefinitions)
     {
-        List<LookupResult> firstLookupResults = validLookupResults.GetAt(0).Value;
+        ReadOnlySpan<LookupResult> firstLookupResults = CollectionsMarshal.AsSpan(validLookupResults.GetAt(0).Value);
         if (validLookupResults.Count is 1)
         {
-            if (firstLookupResults.Count is 1)
+            if (firstLookupResults.Length is 1)
             {
                 return selectedRecordDefinitions;
             }
@@ -762,7 +761,7 @@ public static class MiningUtils
                 ++count;
             }
 
-            for (int i = 1; i < firstLookupResults.Count; i++)
+            for (int i = 1; i < firstLookupResults.Length; i++)
             {
                 _ = singleDictStringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{firstLookupResults[i].FormattedDefinitions!.ReplaceLineEndings("<br/>")}</dd>");
 
@@ -773,7 +772,7 @@ public static class MiningUtils
         }
 
         StringBuilder stringBuilder = new();
-        if (firstLookupResults.Count is 1)
+        if (firstLookupResults.Length is 1)
         {
             if (selectedRecordDefinitions is not null)
             {
@@ -791,7 +790,7 @@ public static class MiningUtils
                 ++count;
             }
 
-            for (int i = 1; i < firstLookupResults.Count; i++)
+            for (int i = 1; i < firstLookupResults.Length; i++)
             {
                 _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{firstLookupResults[i].FormattedDefinitions!.ReplaceLineEndings("<br/>")}</dd>");
                 ++count;
@@ -800,7 +799,8 @@ public static class MiningUtils
             _ = stringBuilder.Append(" </details>");
         }
 
-        for (int i = 1; i < validLookupResults.Count; i++)
+        int validLookupResultsCount = validLookupResults.Count;
+        for (int i = 1; i < validLookupResultsCount; i++)
         {
             (string dictName, List<LookupResult> otherLookupResults) = validLookupResults.GetAt(i);
             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" <details> <summary>{dictName}</summary> ");
@@ -810,9 +810,10 @@ public static class MiningUtils
             }
             else
             {
-                for (int j = 0; j < otherLookupResults.Count; j++)
+                ReadOnlySpan<LookupResult> otherLookupResultsSpan = CollectionsMarshal.AsSpan(otherLookupResults);
+                for (int j = 0; j < otherLookupResultsSpan.Length; j++)
                 {
-                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"<dt>{j + 1}.</dt> <dd>{otherLookupResults[j].FormattedDefinitions!.ReplaceLineEndings("<br/>")}</dd>");
+                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"<dt>{j + 1}.</dt> <dd>{otherLookupResultsSpan[j].FormattedDefinitions!.ReplaceLineEndings("<br/>")}</dd>");
                 }
 
                 _ = stringBuilder.Append(" </details>");
@@ -824,10 +825,10 @@ public static class MiningUtils
 
     private static string? GetDefinitionsFromAllDictionariesWithoutHtmlTags(OrderedDictionary<string, List<LookupResult>> validLookupResults, string selectedRecordDictName, string? selectedRecordDefinitions)
     {
-        List<LookupResult> firstLookupResults = validLookupResults.GetAt(0).Value;
+        ReadOnlySpan<LookupResult> firstLookupResults = CollectionsMarshal.AsSpan(validLookupResults.GetAt(0).Value);
         if (validLookupResults.Count is 1)
         {
-            if (firstLookupResults.Count is 1)
+            if (firstLookupResults.Length is 1)
             {
                 return selectedRecordDefinitions;
             }
@@ -841,7 +842,7 @@ public static class MiningUtils
                 ++count;
             }
 
-            for (int i = 1; i < firstLookupResults.Count; i++)
+            for (int i = 1; i < firstLookupResults.Length; i++)
             {
                 _ = singleDictStringBuilder.Append(CultureInfo.InvariantCulture, $"{count}.\n\t{firstLookupResults[i].FormattedDefinitions!.ReplaceLineEndings("\n\t")}");
                 ++count;
@@ -852,7 +853,7 @@ public static class MiningUtils
 
         StringBuilder stringBuilder = new();
 
-        if (firstLookupResults.Count is 1)
+        if (firstLookupResults.Length is 1)
         {
             if (selectedRecordDefinitions is not null)
             {
@@ -870,14 +871,15 @@ public static class MiningUtils
                 ++count;
             }
 
-            for (int i = 1; i < firstLookupResults.Count; i++)
+            for (int i = 1; i < firstLookupResults.Length; i++)
             {
                 _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{count}.\n\t{firstLookupResults[i].FormattedDefinitions!.ReplaceLineEndings("\n\t")}\n");
                 ++count;
             }
         }
 
-        for (int i = 1; i < validLookupResults.Count; i++)
+        int validLookupResultsCount = validLookupResults.Count;
+        for (int i = 1; i < validLookupResultsCount; i++)
         {
             (string dictName, List<LookupResult> otherLookupResults) = validLookupResults.GetAt(i);
             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{dictName}:\n");
@@ -888,10 +890,11 @@ public static class MiningUtils
             else
             {
                 int count = 1;
-                for (int j = 0; j < otherLookupResults.Count; j++)
+                ReadOnlySpan<LookupResult> otherLookupResultsSpan = CollectionsMarshal.AsSpan(otherLookupResults);
+                for (int j = 0; j < otherLookupResultsSpan.Length; j++)
                 {
-                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{count}.\n\t{otherLookupResults[j].FormattedDefinitions!.ReplaceLineEndings("\n\t")}");
-                    if (j + 1 < otherLookupResults.Count)
+                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{count}.\n\t{otherLookupResultsSpan[j].FormattedDefinitions!.ReplaceLineEndings("\n\t")}");
+                    if (j + 1 < otherLookupResultsSpan.Length)
                     {
                         _ = stringBuilder.Append('\n');
                     }
@@ -912,10 +915,9 @@ public static class MiningUtils
     private static int CalculateHarmonicMean(List<LookupFrequencyResult> lookupFrequencyResults)
     {
         double sumOfReciprocalOfFreqs = 0;
-        for (int i = 0; i < lookupFrequencyResults.Count; i++)
+        ReadOnlySpan<LookupFrequencyResult> lookupFrequencyResultSpan = CollectionsMarshal.AsSpan(lookupFrequencyResults);
+        foreach (LookupFrequencyResult lookupFrequencyResult in lookupFrequencyResultSpan)
         {
-            LookupFrequencyResult lookupFrequencyResult = lookupFrequencyResults[i];
-
             int freq = lookupFrequencyResult.HigherValueMeansHigherFrequency
                 ? FreqUtils.FreqDicts[lookupFrequencyResult.Name].MaxValue - lookupFrequencyResult.Freq + 1
                 : lookupFrequencyResult.Freq;
@@ -923,7 +925,7 @@ public static class MiningUtils
             sumOfReciprocalOfFreqs += 1d / freq;
         }
 
-        return double.ConvertToIntegerNative<int>(Math.Round(lookupFrequencyResults.Count / sumOfReciprocalOfFreqs));
+        return double.ConvertToIntegerNative<int>(Math.Round(lookupFrequencyResultSpan.Length / sumOfReciprocalOfFreqs));
     }
 
     private static string GetPitchAccentCategory(string expression, byte pitchPosition)
@@ -951,9 +953,8 @@ public static class MiningUtils
                 : new StringBuilder();
 
             string[]?[] wordClassesForSenses = lookupResult.JmdictLookupResult!.WordClassesForSenses!;
-            for (int i = 0; i < wordClassesForSenses.Length; i++)
+            foreach (string[]? wordClassesForSense in wordClassesForSenses)
             {
-                string[]? wordClassesForSense = wordClassesForSenses[i];
                 if (wordClassesForSense is not null)
                 {
                     if (sb.Length > 0)
@@ -988,7 +989,8 @@ public static class MiningUtils
         if (DictUtils.WordClassDictionary.TryGetValue(primarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
         {
             JmdictWordClass? foundRecord = null;
-            for (int i = 0; i < jmdictWcResults.Count; i++)
+            int jmdictWcResultsCount = jmdictWcResults.Count;
+            for (int i = 0; i < jmdictWcResultsCount; i++)
             {
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
@@ -1016,9 +1018,8 @@ public static class MiningUtils
     {
         bool lowPitch = false;
         StringBuilder expressionWithPitchAccentStringBuilder = new();
-        List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expression);
-        int combinedFormListCount = combinedFormList.Count;
-        for (int i = 0; i < combinedFormListCount; i++)
+        ReadOnlySpan<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expression);
+        for (int i = 0; i < combinedFormList.Length; i++)
         {
             if (i == position - 1)
             {
@@ -1162,9 +1163,10 @@ public static class MiningUtils
             return null;
         }
 
-        for (int i = 0; i < canAddNoteList.Count; i++)
+        ReadOnlySpan<bool> canAddNoteListSpan = CollectionsMarshal.AsSpan(canAddNoteList);
+        for (int i = 0; i < canAddNoteListSpan.Length; i++)
         {
-            results[positions[i]] = !canAddNoteList[i];
+            results[positions[i]] = !canAddNoteListSpan[i];
         }
 
         return results;
@@ -1339,8 +1341,10 @@ public static class MiningUtils
     private static Dictionary<string, string> ConvertFields(OrderedDictionary<string, JLField> userFields, Dictionary<JLField, string> miningParams)
     {
         Dictionary<string, string> dict = new(userFields.Count, StringComparer.Ordinal);
-        foreach ((string key, JLField value) in userFields)
+        int userFieldsCount = userFields.Count;
+        for (int i = 0; i < userFieldsCount; i++)
         {
+            (string key, JLField value) = userFields.GetAt(i);
             if (miningParams.TryGetValue(value, out string? fieldValue))
             {
                 dict.Add(key, fieldValue);

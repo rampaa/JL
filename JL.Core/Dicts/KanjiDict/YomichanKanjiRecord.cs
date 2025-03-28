@@ -23,7 +23,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
         Stats = stats;
     }
 
-    public YomichanKanjiRecord(List<JsonElement> jsonElement)
+    public YomichanKanjiRecord(ReadOnlySpan<JsonElement> jsonElement)
     {
         OnReadings = jsonElement[1].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (OnReadings.Length is 0)

@@ -218,9 +218,8 @@ public static partial class Utils
         int position = 0;
         int length = 0;
 
-        for (int i = 0; i < arrays.Length; i++)
+        foreach (T[]? array in arrays)
         {
-            T[]? array = arrays[i];
             if (array is not null)
             {
                 length += array.Length;
@@ -233,9 +232,8 @@ public static partial class Utils
         }
 
         T[] concatArray = new T[length];
-        for (int i = 0; i < arrays.Length; i++)
+        foreach (T[]? array in arrays)
         {
-            T[]? array = arrays[i];
             if (array is not null)
             {
                 Array.Copy(array, 0, concatArray, position, array.Length);

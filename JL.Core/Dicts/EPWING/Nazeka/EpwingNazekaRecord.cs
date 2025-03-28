@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
@@ -50,8 +51,8 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
     {
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
-            int freqResultCount = freqResults.Count;
-            for (int i = 0; i < freqResultCount; i++)
+            int freqResultsCount = freqResults.Count;
+            for (int i = 0; i < freqResultsCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling || freqResult.Spelling == Reading)
@@ -65,8 +66,8 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         {
             if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out IList<FrequencyRecord>? readingFreqResults))
             {
-                int readingFreqResultCount = readingFreqResults.Count;
-                for (int j = 0; j < readingFreqResultCount; j++)
+                int readingFreqResultsCount = readingFreqResults.Count;
+                for (int j = 0; j < readingFreqResultsCount; j++)
                 {
                     FrequencyRecord readingFreqResult = readingFreqResults[j];
                     if (readingFreqResult.Spelling == PrimarySpelling
@@ -85,10 +86,8 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
     {
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
-            int freqResultCount = freqResults.Count;
-            for (int i = 0; i < freqResultCount; i++)
+            foreach (FrequencyRecord freqResult in CollectionsMarshal.AsSpan(freqResults))
             {
-                FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling || freqResult.Spelling == Reading)
                 {
                     return freqResult.Frequency;
@@ -100,10 +99,8 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         {
             if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out List<FrequencyRecord>? readingFreqResults))
             {
-                int readingFreqResultCount = readingFreqResults.Count;
-                for (int j = 0; j < readingFreqResultCount; j++)
+                foreach (FrequencyRecord readingFreqResult in CollectionsMarshal.AsSpan(readingFreqResults))
                 {
-                    FrequencyRecord readingFreqResult = readingFreqResults[j];
                     if (readingFreqResult.Spelling == PrimarySpelling
                         || (readingFreqResult.Spelling == Reading && JapaneseUtils.IsKatakana(Reading[0])))
                     {

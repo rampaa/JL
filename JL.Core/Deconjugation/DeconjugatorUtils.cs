@@ -13,10 +13,10 @@ internal static class DeconjugatorUtils
             Deconjugator.Rules = (await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, Utils.s_jso).ConfigureAwait(false))!;
         }
 
-        int rulesLength = Deconjugator.Rules.Length;
-        for (int i = 0; i < rulesLength; i++)
+        Rule[] rules = Deconjugator.Rules;
+        for (int i = 0; i < rules.Length; i++)
         {
-            ref Rule rule = ref Deconjugator.Rules[i];
+            ref Rule rule = ref rules[i];
             rule.DecEnd.DeduplicateStringsInArray();
             rule.ConEnd.DeduplicateStringsInArray();
             rule.DecTag?.DeduplicateStringsInArray();

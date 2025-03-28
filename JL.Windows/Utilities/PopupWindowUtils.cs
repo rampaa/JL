@@ -112,8 +112,6 @@ internal static class PopupWindowUtils
                 continue;
             }
 
-            List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
-
             Polyline polyline = new()
             {
                 StrokeThickness = 2,
@@ -123,8 +121,8 @@ internal static class PopupWindowUtils
 
             bool lowPitch = false;
             double horizontalOffsetForChar = horizontalOffsetForReading;
-            int combinedFormListCount = combinedFormList.Count;
-            for (int j = 0; j < combinedFormListCount; j++)
+            ReadOnlySpan<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
+            for (int j = 0; j < combinedFormList.Length; j++)
             {
                 Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
 

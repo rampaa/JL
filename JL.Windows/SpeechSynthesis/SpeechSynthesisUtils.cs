@@ -1,4 +1,5 @@
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Speech.Synthesis;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,11 +30,12 @@ internal static class SpeechSynthesisUtils
             ? null
             : Application.Current.Dispatcher.Invoke(() =>
             {
-                ComboBoxItem[] installedVoiceComboboxItems = new ComboBoxItem[installedVoices.Count];
+                ReadOnlySpan<InstalledVoice> installedVoicesSpan = CollectionsMarshal.AsSpan(installedVoices);
+                ComboBoxItem[] installedVoiceComboboxItems = new ComboBoxItem[installedVoicesSpan.Length];
 
-                for (int i = 0; i < installedVoices.Count; i++)
+                for (int i = 0; i < installedVoicesSpan.Length; i++)
                 {
-                    InstalledVoice installedVoice = installedVoices[i];
+                    InstalledVoice installedVoice = installedVoicesSpan[i];
 
                     ComboBoxItem comboBoxItem = new()
                     {

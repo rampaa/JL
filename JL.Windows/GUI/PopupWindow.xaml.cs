@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -910,10 +911,10 @@ internal sealed partial class PopupWindow
 
         if (result.Frequencies is not null)
         {
-            List<LookupFrequencyResult> validFrequencies = result.Frequencies
-                .Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
+            ReadOnlySpan<LookupFrequencyResult> validFrequencies = CollectionsMarshal.AsSpan(result.Frequencies
+                .Where(static f => f.Freq is > 0 and < int.MaxValue).ToList());
 
-            if (validFrequencies.Count > 0)
+            if (validFrequencies.Length > 0)
             {
                 TextBlock frequencyTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Frequencies),
                     LookupResultUtils.FrequenciesToText(validFrequencies, false, result.Frequencies.Count is 1),
@@ -2140,10 +2141,9 @@ internal sealed partial class PopupWindow
         _buttonAll.Background = Brushes.DodgerBlue;
         buttons.Add(_buttonAll);
 
-        Dict[] dicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToArray();
-        for (int i = 0; i < dicts.Length; i++)
+        IOrderedEnumerable<Dict> dicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority);
+        foreach (Dict dict in dicts)
         {
-            Dict dict = dicts[i];
             if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.Instance.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
             {
                 continue;

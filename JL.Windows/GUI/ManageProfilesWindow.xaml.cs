@@ -45,11 +45,9 @@ internal sealed partial class ManageProfilesWindow
 
     private void UpdateProfilesDisplay()
     {
-        List<string> profileNames = ProfileDBUtils.GetProfileNames();
-
-        int profileCount = profileNames.Count;
-        DockPanel[] resultDockPanels = new DockPanel[profileCount];
-        for (int i = 0; i < profileCount; i++)
+        ReadOnlySpan<string> profileNames = ProfileDBUtils.GetProfileNames();
+        DockPanel[] resultDockPanels = new DockPanel[profileNames.Length];
+        for (int i = 0; i < profileNames.Length; i++)
         {
             string profileName = profileNames[i];
 

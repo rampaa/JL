@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace JL.Core.Deconjugation;
 
 // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
@@ -234,17 +236,18 @@ internal static class Deconjugator
         List<Form> processed = [];
         List<Form> novel = [new(text, text, [], [])];
 
-        int rulesLength = Rules.Length;
+        Rule[] rules = Rules;
         bool addFormToProcess = false;
         while (novel.Count > 0)
         {
             List<Form> newNovel = [];
-            for (int i = 0; i < novel.Count; i++)
+
+            ReadOnlySpan<Form> novelSpan = CollectionsMarshal.AsSpan(novel);
+            foreach (Form form in novelSpan)
             {
-                Form form = novel[i];
-                for (int j = 0; j < rulesLength; j++)
+                for (int j = 0; j < rules.Length; j++)
                 {
-                    ref Rule rule = ref Rules[j];
+                    ref Rule rule = ref rules[j];
                     List<Form>? newForm = rule.Type switch
                     {
                         "stdrule" => StdruleDeconjugate(form, rule),
@@ -261,9 +264,8 @@ internal static class Deconjugator
                         continue;
                     }
 
-                    for (int k = 0; k < newForm.Count; k++)
+                    foreach (Form myForm in CollectionsMarshal.AsSpan(newForm))
                     {
-                        Form myForm = newForm[k];
                         if (!newNovel.Contains(myForm))
                         {
                             newNovel.Add(myForm);

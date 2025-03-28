@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 
 namespace JL.Core.Dicts.JMnedict;
@@ -14,12 +15,12 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
         unchecked
         {
             int hash = 17 * 37;
-            foreach (string nameType in NameTypeList)
+            foreach (string nameType in CollectionsMarshal.AsSpan(NameTypeList))
             {
                 hash = (hash * 37) + nameType.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (string transDet in TransDetList)
+            foreach (string transDet in CollectionsMarshal.AsSpan(TransDetList))
             {
                 hash = (hash * 37) + transDet.GetHashCode(StringComparison.Ordinal);
             }

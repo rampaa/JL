@@ -20,24 +20,20 @@ internal static class YomichanPitchAccentLoader
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term*bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            List<List<JsonElement>>? jsonObjects;
+            ReadOnlyMemory<ReadOnlyMemory<JsonElement>> jsonObjects;
 
             FileStream fileStream = File.OpenRead(jsonFile);
             await using (fileStream.ConfigureAwait(false))
             {
                 jsonObjects = await JsonSerializer
-                    .DeserializeAsync<List<List<JsonElement>>>(fileStream, Utils.s_jso)
+                    .DeserializeAsync<ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>(fileStream, Utils.s_jso)
                     .ConfigureAwait(false);
             }
 
-            if (jsonObjects is null)
+            ReadOnlySpan<ReadOnlyMemory<JsonElement>> jsonObjectsSpan = jsonObjects.Span;
+            for (int i = 0; i < jsonObjects.Length; i++)
             {
-                continue;
-            }
-
-            foreach (List<JsonElement> jsonObject in jsonObjects)
-            {
-                PitchAccentRecord newEntry = new(jsonObject);
+                PitchAccentRecord newEntry = new(jsonObjectsSpan[i].Span);
                 if (newEntry.Position is byte.MaxValue || string.IsNullOrWhiteSpace(newEntry.Spelling))
                 {
                     continue;

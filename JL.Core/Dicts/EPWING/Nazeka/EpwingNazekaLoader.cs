@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -15,12 +16,12 @@ internal static class EpwingNazekaLoader
             return;
         }
 
-        List<JsonElement>? jsonObjects;
+        ReadOnlyMemory<JsonElement> jsonObjects;
 
         FileStream fileStream = File.OpenRead(fullPath);
         await using (fileStream.ConfigureAwait(false))
         {
-            jsonObjects = await JsonSerializer.DeserializeAsync<List<JsonElement>>(fileStream, Utils.s_jso).ConfigureAwait(false);
+            jsonObjects = await JsonSerializer.DeserializeAsync<ReadOnlyMemory<JsonElement>>(fileStream, Utils.s_jso).ConfigureAwait(false);
         }
 
         IDictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
@@ -28,8 +29,10 @@ internal static class EpwingNazekaLoader
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
 
-        foreach (JsonElement jsonObj in jsonObjects!.Skip(1))
+        ReadOnlySpan<JsonElement> jsonObjectsSpan = jsonObjects.Span;
+        for (int i = 1; i < jsonObjectsSpan.Length; i++)
         {
+            JsonElement jsonObj = jsonObjectsSpan[i];
             string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
 
             JsonElement spellingJsonArray = jsonObj.GetProperty("s");
@@ -90,10 +93,10 @@ internal static class EpwingNazekaLoader
                     }
                 }
 
-                int spellingListCount = spellingList.Count;
-                for (int i = 1; i < spellingListCount; i++)
+                ReadOnlySpan<string> spellingListSpan = CollectionsMarshal.AsSpan(spellingList);
+                for (int j = 1; j < spellingListSpan.Length; j++)
                 {
-                    string alternativeSpelling = spellingList[i];
+                    string alternativeSpelling = spellingListSpan[j];
                     if (!EpwingUtils.IsValidEpwingResultForDictType(alternativeSpelling, reading, definitions, dict))
                     {
                         continue;
@@ -105,7 +108,7 @@ internal static class EpwingNazekaLoader
 
                     if (primarySpellingInHiragana != alternativeSpellingInHiragana)
                     {
-                        AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(i), definitions), nazekaEpwingDict);
+                        AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions), nazekaEpwingDict);
                     }
                 }
             }

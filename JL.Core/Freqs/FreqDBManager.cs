@@ -76,8 +76,8 @@ internal static class FreqDBManager
 
         foreach ((string key, IList<FrequencyRecord> records) in freq.Contents)
         {
-            int recordCount = records.Count;
-            for (int i = 0; i < recordCount; i++)
+            int recordsCount = records.Count;
+            for (int i = 0; i < recordsCount; i++)
             {
                 FrequencyRecord record = records[i];
                 _ = insertRecordCommand.Parameters["@id"].Value = id;
@@ -123,7 +123,8 @@ internal static class FreqDBManager
             WHERE rsk.search_key IN (@1
             """);
 
-        for (int i = 1; i < terms.Count; i++)
+        int termsCount = terms.Count;
+        for (int i = 1; i < termsCount; i++)
         {
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
@@ -227,10 +228,9 @@ internal static class FreqDBManager
         while (dataReader.Read())
         {
             FrequencyRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
-            for (int i = 0; i < searchKeys.Count; i++)
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
+            foreach (string searchKey in searchKeys)
             {
-                string searchKey = searchKeys[i];
                 if (freq.Contents.TryGetValue(searchKey, out IList<FrequencyRecord>? result))
                 {
                     result.Add(record);

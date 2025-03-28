@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using JL.Core.Config;
 
@@ -45,9 +46,9 @@ public static partial class RegexReplacerUtils
         }
 
         s_regexReplacements = [];
-        for (int i = 0; i < filePaths.Count; i++)
+        foreach (string filePath in CollectionsMarshal.AsSpan(filePaths))
         {
-            foreach (string line in File.ReadLines(filePaths[i]))
+            foreach (string line in File.ReadLines(filePath))
             {
                 Match match = ReplacementRegex.Match(line);
                 if (match.Success)
@@ -56,9 +57,9 @@ public static partial class RegexReplacerUtils
 
                     char[] modifiers = match.Groups["modifiers"].Value.ToCharArray();
                     RegexOptions regexOptions = RegexOptions.None;
-                    for (int j = 0; j < modifiers.Length; j++)
+                    foreach (char modifier in modifiers)
                     {
-                        regexOptions |= modifiers[j] switch
+                        regexOptions |= modifier switch
                         {
                             'i' => RegexOptions.IgnoreCase,
                             'm' => RegexOptions.Multiline,

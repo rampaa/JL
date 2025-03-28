@@ -136,7 +136,8 @@ internal static class YomichanPitchAccentDBManager
             WHERE rsk.search_key IN (@1
             """);
 
-        for (int i = 1; i < terms.Count; i++)
+        int termCount = terms.Count;
+        for (int i = 1; i < termCount; i++)
         {
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
@@ -198,10 +199,9 @@ internal static class YomichanPitchAccentDBManager
         while (dataReader.Read())
         {
             PitchAccentRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
-            for (int i = 0; i < searchKeys.Count; i++)
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
+            foreach (string searchKey in searchKeys)
             {
-                string searchKey = searchKeys[i];
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
                 {
                     result.Add(record);

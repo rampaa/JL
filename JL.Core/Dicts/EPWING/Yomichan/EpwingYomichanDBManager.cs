@@ -42,7 +42,7 @@ internal static class EpwingYomichanDBManager
             """;
     }
 
-    public static string GetQuery(List<string> terms)
+    public static string GetQuery(int termCount)
     {
         StringBuilder queryBuilder = new(
             """
@@ -57,8 +57,7 @@ internal static class EpwingYomichanDBManager
             WHERE rsk.search_key IN (@1
             """);
 
-        int termsCount = terms.Count;
-        for (int i = 1; i < termsCount; i++)
+        for (int i = 1; i < termCount; i++)
         {
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
@@ -178,7 +177,7 @@ internal static class EpwingYomichanDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string query)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -187,8 +186,7 @@ internal static class EpwingYomichanDBManager
         command.CommandText = query;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        int termCount = terms.Count;
-        for (int i = 0; i < termCount; i++)
+        for (int i = 0; i < terms.Length; i++)
         {
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
@@ -262,10 +260,9 @@ internal static class EpwingYomichanDBManager
         while (dataReader.Read())
         {
             EpwingYomichanRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
-            for (int i = 0; i < searchKeys.Count; i++)
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
+            foreach (string searchKey in searchKeys)
             {
-                string searchKey = searchKeys[i];
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
                 {
                     result.Add(record);

@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Collections.Frozen;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -183,8 +184,7 @@ public static partial class JapaneseUtils
 
     private static int FirstKatakanaIndex(ReadOnlySpan<char> text)
     {
-        int textLength = text.Length;
-        for (int i = 0; i < textLength; i++)
+        for (int i = 0; i < text.Length; i++)
         {
             if (s_katakanaToHiraganaDict.ContainsKey(text[i]))
             {
@@ -213,9 +213,8 @@ public static partial class JapaneseUtils
             return normalizedText;
         }
 
-        int normalizedTextLength = normalizedText.Length;
-        StringBuilder textInHiragana = new(normalizedText[..firstKatakanaIndex], normalizedTextLength);
-        for (int i = firstKatakanaIndex; i < normalizedTextLength; i++)
+        StringBuilder textInHiragana = new(normalizedText[..firstKatakanaIndex], normalizedText.Length);
+        for (int i = firstKatakanaIndex; i < normalizedText.Length; i++)
         {
             char character = normalizedText[i];
             if (s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr))
@@ -233,24 +232,23 @@ public static partial class JapaneseUtils
 
     internal static List<string> LongVowelMarkToKana(ReadOnlySpan<char> text)
     {
-        List<string> unicodeTextList = text.ListUnicodeCharacters();
+        ReadOnlySpan<string> unicodeTextList = text.ListUnicodeCharacters();
 
         List<StringBuilder> stringBuilders = new(4)
         {
-            new StringBuilder(unicodeTextList[0], unicodeTextList.Count)
+            new StringBuilder(unicodeTextList[0], unicodeTextList.Length)
         };
 
-        int unicodeTextListCount = unicodeTextList.Count;
-        for (int i = 1; i < unicodeTextListCount; i++)
+        int unicodeTextListLength = unicodeTextList.Length;
+        for (int i = 1; i < unicodeTextListLength; i++)
         {
             if (unicodeTextList[i] is "ー" && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out char vowel))
             {
                 if (vowel is not 'お' and not 'え')
                 {
-                    int stringBuilderCount = stringBuilders.Count;
-                    for (int j = 0; j < stringBuilderCount; j++)
+                    foreach (StringBuilder stringBuilder in CollectionsMarshal.AsSpan(stringBuilders))
                     {
-                        _ = stringBuilders[j].Append(vowel);
+                        _ = stringBuilder.Append(vowel);
                     }
                 }
 
@@ -263,27 +261,26 @@ public static partial class JapaneseUtils
                         _ => ' '
                     };
 
-                    int listSize = stringBuilders.Count;
-                    for (int j = 0; j < listSize; j++)
+                    int stringBuildersCount = stringBuilders.Count;
+                    for (int j = 0; j < stringBuildersCount; j++)
                     {
-                        stringBuilders.Add(new StringBuilder(stringBuilders[j].ToString(), unicodeTextList.Count));
+                        stringBuilders.Add(new StringBuilder(stringBuilders[j].ToString(), unicodeTextListLength));
                     }
 
-                    listSize = stringBuilders.Count;
-                    for (int j = 0; j < listSize; j++)
+                    stringBuildersCount = stringBuilders.Count;
+                    ReadOnlySpan<StringBuilder> stringBuildersSpan = CollectionsMarshal.AsSpan(stringBuilders);
+                    for (int j = 0; j < stringBuildersSpan.Length; j++)
                     {
-                        _ = stringBuilders[j].Append(j < listSize / 2 ? vowel : alternativeVowel);
+                        _ = stringBuildersSpan[j].Append(j < stringBuildersCount / 2 ? vowel : alternativeVowel);
                     }
                 }
             }
 
             else
             {
-                int stringBuilderCount = stringBuilders.Count;
-                string unicodeText = unicodeTextList[i];
-                for (int j = 0; j < stringBuilderCount; j++)
+                foreach (StringBuilder stringBuilder in CollectionsMarshal.AsSpan(stringBuilders))
                 {
-                    _ = stringBuilders[j].Append(unicodeText);
+                    _ = stringBuilder.Append(unicodeTextList[i]);
                 }
             }
         }
@@ -291,7 +288,7 @@ public static partial class JapaneseUtils
         return stringBuilders.ConvertAll(static sb => sb.ToString());
     }
 
-    public static List<string> CreateCombinedForm(ReadOnlySpan<char> text)
+    public static ReadOnlySpan<string> CreateCombinedForm(ReadOnlySpan<char> text)
     {
         List<string> combinedForm = new(text.Length);
 
@@ -310,7 +307,7 @@ public static partial class JapaneseUtils
             }
         }
 
-        return combinedForm;
+        return CollectionsMarshal.AsSpan(combinedForm);
     }
 
     internal static int GetCombinedFormLength(ReadOnlySpan<char> text)
@@ -345,10 +342,8 @@ public static partial class JapaneseUtils
         int startPosition = -1;
         int endPosition = -1;
 
-        for (int i = 0; i < s_sentenceTerminatingCharacters.Length; i++)
+        foreach (char terminatingCharacter in s_sentenceTerminatingCharacters)
         {
-            char terminatingCharacter = s_sentenceTerminatingCharacters[i];
-
             int tempIndex = text.LastIndexOf(terminatingCharacter, position);
             if (tempIndex > startPosition)
             {
@@ -500,29 +495,29 @@ public static partial class JapaneseUtils
             }
         }
 
-        string? result = GetPrimarySpellingAndReadingMapping(primarySpellingSegments, reading);
+        string? result = GetPrimarySpellingAndReadingMapping(CollectionsMarshal.AsSpan(primarySpellingSegments), reading);
         return result ?? $"{primarySpelling}[{reading}]";
     }
 
-    private static string? GetPrimarySpellingAndReadingMapping(List<string> primarySpellingSegments, string reading)
+    private static string? GetPrimarySpellingAndReadingMapping(ReadOnlySpan<string> primarySpellingSegments, string reading)
     {
         StringBuilder stringBuilder = new();
 
         bool firstSegmentIsKana = KanaRegex.IsMatch(primarySpellingSegments[0]);
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
-        for (int i = currentReadingPosition; i < primarySpellingSegments.Count; i += 2)
+        for (int i = currentReadingPosition; i < primarySpellingSegments.Length; i += 2)
         {
             string segment = primarySpellingSegments[i];
-            int searchLength = reading.Length - currentReadingPosition - primarySpellingSegments.Count + i + 1;
+            int searchLength = reading.Length - currentReadingPosition - primarySpellingSegments.Length + i + 1;
             if (searchLength < 0)
             {
                 searchLength = reading.Length - currentReadingPosition;
             }
 
-            List<int> indexes = reading.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segment);
+            ReadOnlySpan<int> indexes = reading.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segment);
             bool hasKatakana = false;
             int index = -1;
-            if (indexes.Count is 0)
+            if (indexes.Length is 0)
             {
                 string readingInHiragana = KatakanaToHiragana(reading);
                 if (readingInHiragana.Length != reading.Length)
@@ -539,27 +534,26 @@ public static partial class JapaneseUtils
                 hasKatakana = true;
             }
 
-            if (indexes.Count is 0)
+            if (indexes.Length is 0)
             {
                 return null;
             }
 
-            if (indexes.Count == 1)
+            if (indexes.Length == 1)
             {
                 index = indexes[0];
             }
             else
             {
-                for (int j = 0; j < indexes.Count; j++)
+                foreach (int currentIndex in indexes)
                 {
-                    int currentIndex = indexes[j];
                     if (currentIndex is 0 && i is 0)
                     {
                         index = 0;
                         break;
                     }
 
-                    if (i + 1 == primarySpellingSegments.Count)
+                    if (i + 1 == primarySpellingSegments.Length)
                     {
                         if (currentIndex + segment.Length == reading.Length)
                         {
@@ -567,7 +561,7 @@ public static partial class JapaneseUtils
                             break;
                         }
                     }
-                    else if (i + 2 < primarySpellingSegments.Count)
+                    else if (i + 2 < primarySpellingSegments.Length)
                     {
                         bool unambiguous = IsPrimarySpellingAndReadingMappingUnambiguous(primarySpellingSegments[(i + 2)..], reading[(currentIndex + segment.Length + 1)..]);
                         if (unambiguous)
@@ -608,7 +602,7 @@ public static partial class JapaneseUtils
 
             currentReadingPosition = index + segment.Length;
 
-            if (i + 2 == primarySpellingSegments.Count)
+            if (i + 2 == primarySpellingSegments.Length)
             {
                 _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{primarySpellingSegments[i + 1]}[{reading[currentReadingPosition..]}]");
             }
@@ -619,22 +613,22 @@ public static partial class JapaneseUtils
         return stringBuilder.ToString();
     }
 
-    private static bool IsPrimarySpellingAndReadingMappingUnambiguous(List<string> primarySpellingSegments, string reading)
+    private static bool IsPrimarySpellingAndReadingMappingUnambiguous(ReadOnlySpan<string> primarySpellingSegments, string reading)
     {
         bool firstSegmentIsKana = KanaRegex.IsMatch(primarySpellingSegments[0]);
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
-        for (int i = currentReadingPosition; i < primarySpellingSegments.Count; i += 2)
+        for (int i = currentReadingPosition; i < primarySpellingSegments.Length; i += 2)
         {
             string segment = primarySpellingSegments[i];
-            int searchLength = reading.Length - currentReadingPosition - primarySpellingSegments.Count + i + 1;
+            int searchLength = reading.Length - currentReadingPosition - primarySpellingSegments.Length + i + 1;
             if (searchLength < 0)
             {
                 searchLength = reading.Length - currentReadingPosition;
             }
 
-            List<int> indexes = reading.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segment);
+            ReadOnlySpan<int> indexes = reading.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segment);
             int index = -1;
-            if (indexes.Count is 0)
+            if (indexes.Length is 0)
             {
                 string readingInHiragana = KatakanaToHiragana(reading);
                 if (readingInHiragana.Length != reading.Length)
@@ -650,27 +644,26 @@ public static partial class JapaneseUtils
                 indexes = readingInHiragana.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segmentInHiragana);
             }
 
-            if (indexes.Count is 0)
+            if (indexes.Length is 0)
             {
                 return false;
             }
 
-            if (indexes.Count == 1)
+            if (indexes.Length == 1)
             {
                 index = indexes[0];
             }
             else
             {
-                for (int j = 0; j < indexes.Count; j++)
+                foreach (int currentIndex in indexes)
                 {
-                    int currentIndex = indexes[j];
                     if (currentIndex is 0 && i is 0)
                     {
                         index = 0;
                         break;
                     }
 
-                    if (i + 1 == primarySpellingSegments.Count)
+                    if (i + 1 == primarySpellingSegments.Length)
                     {
                         if (currentIndex + segment.Length == reading.Length)
                         {
@@ -678,7 +671,7 @@ public static partial class JapaneseUtils
                             break;
                         }
                     }
-                    else if (i + 2 < primarySpellingSegments.Count)
+                    else if (i + 2 < primarySpellingSegments.Length)
                     {
                         bool unambiguous = IsPrimarySpellingAndReadingMappingUnambiguous(primarySpellingSegments[(i + 2)..], reading[(currentIndex + segment.Length + 1)..]);
                         if (unambiguous)

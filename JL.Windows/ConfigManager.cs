@@ -270,10 +270,10 @@ internal sealed class ConfigManager
             ulong characterCount = 0;
             ulong lineCount = 0;
 
-            int backlogCount = BacklogUtils.Backlog.Count;
-            for (int i = 0; i < backlogCount; i++)
+            List<string> backlog = BacklogUtils.Backlog;
+            for (int i = 0; i < backlog.Count; i++)
             {
-                string text = BacklogUtils.Backlog[i];
+                string text = backlog[i];
                 if (StripPunctuationBeforeCalculatingCharacterCount)
                 {
                     text = JapaneseUtils.RemovePunctuation(text);

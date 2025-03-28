@@ -412,9 +412,7 @@ internal static class WindowsUtils
         try
         {
             string[] filePaths = Directory.GetFiles(Path.Join(Utils.ResourcesPath, "Motivation"));
-            int numFiles = filePaths.Length;
-
-            if (numFiles is 0)
+            if (filePaths.Length is 0)
             {
                 Utils.Logger.Warning("Motivation folder is empty!");
                 Alert(AlertLevel.Warning, "Motivation folder is empty!");
@@ -422,7 +420,7 @@ internal static class WindowsUtils
             }
 
 #pragma warning disable CA5394 // Do not use insecure randomness
-            string randomFilePath = filePaths[Random.Shared.Next(numFiles)];
+            string randomFilePath = filePaths[Random.Shared.Next(filePaths.Length)];
 #pragma warning restore CA5394 // Do not use insecure randomness
 
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);

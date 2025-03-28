@@ -267,16 +267,16 @@ public static class DictUpdater
 
     internal static Task AutoUpdateBuiltInDicts()
     {
-        DictType[] dicts =
+        DictType[] dictTypes =
         [
             DictType.JMdict,
             DictType.JMnedict,
             DictType.Kanjidic
         ];
 
-        for (int i = 0; i < dicts.Length; i++)
+        foreach (DictType dictType in dictTypes)
         {
-            Dict dict = DictUtils.SingleDictTypeDicts[dicts[i]];
+            Dict dict = DictUtils.SingleDictTypeDicts[dictType];
             if (!dict.Active)
             {
                 continue;

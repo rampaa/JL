@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -352,9 +353,9 @@ internal sealed partial class PreferencesWindow
         if (fieldNames is not null)
         {
             OrderedDictionary<string, JLField> fields = new(fieldNames.Count, StringComparer.Ordinal);
-            for (int i = 0; i < fieldNames.Count; i++)
+            foreach (string fieldName in CollectionsMarshal.AsSpan(fieldNames))
             {
-                fields.Add(fieldNames[i], JLField.Nothing);
+                fields.Add(fieldName, JLField.Nothing);
             }
 
             CreateFieldElements(fields, fieldList, miningPanel);
@@ -398,7 +399,8 @@ internal sealed partial class PreferencesWindow
         string[] descriptions = fieldList
             .Select(static jlFieldName => jlFieldName.GetDescription() ?? jlFieldName.ToString()).ToArray();
 
-        for (int i = 0; i < fields.Count; i++)
+        int fieldsCount = fields.Count;
+        for (int i = 0; i < fieldsCount; i++)
         {
             (string fieldName, JLField jlField) = fields.GetAt(i);
             StackPanel stackPanel = new();

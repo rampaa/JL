@@ -1,31 +1,27 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace JL.Core.Lookup;
 
 public static class LookupResultUtils
 {
-    internal static string? DeconjugationProcessesToText(List<List<string>>? processList)
+    internal static string? DeconjugationProcessesToText(List<List<string>> processList)
     {
-        if (processList is null)
-        {
-            return null;
-        }
-
         StringBuilder deconjugation = new();
 
-        int processListCount = processList.Count;
-        for (int i = 0; i < processListCount; i++)
+        ReadOnlySpan<List<string>> processListSpan = CollectionsMarshal.AsSpan(processList);
+        for (int i = 0; i < processListSpan.Length; i++)
         {
-            List<string> form = processList[i];
+            List<string> form = processListSpan[i];
 
             StringBuilder formText = new();
             bool added = false;
 
-            for (int j = form.Count - 1; j >= 0; j--)
+            ReadOnlySpan<string> formSpan = CollectionsMarshal.AsSpan(form);
+            for (int j = formSpan.Length - 1; j >= 0; j--)
             {
-                string info = form[j];
-
+                string info = formSpan[j];
                 if (info.Length is 0)
                 {
                     continue;
@@ -82,7 +78,7 @@ public static class LookupResultUtils
         return gradeText;
     }
 
-    public static string FrequenciesToText(List<LookupFrequencyResult> frequencies, bool forMining, bool singleDict)
+    public static string FrequenciesToText(ReadOnlySpan<LookupFrequencyResult> frequencies, bool forMining, bool singleDict)
     {
         if (!forMining && singleDict)
         {
@@ -90,11 +86,11 @@ public static class LookupResultUtils
         }
 
         StringBuilder sb = new();
-        for (int i = 0; i < frequencies.Count; i++)
+        for (int i = 0; i < frequencies.Length; i++)
         {
             LookupFrequencyResult lookupFreqResult = frequencies[i];
             _ = sb.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: {lookupFreqResult.Freq}");
-            if (i + 1 != frequencies.Count)
+            if (i + 1 != frequencies.Length)
             {
                 _ = sb.Append(", ");
             }

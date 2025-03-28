@@ -18,7 +18,7 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
         Position = position;
     }
 
-    public PitchAccentRecord(List<JsonElement> jsonElements)
+    public PitchAccentRecord(ReadOnlySpan<JsonElement> jsonElements)
     {
         Spelling = jsonElements[0].GetString()!.GetPooledString();
 

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 
 namespace JL.Core.Dicts.JMdict;
@@ -14,7 +15,7 @@ internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEqu
         unchecked
         {
             int hash = (17 * 37) + Keb.GetHashCode(StringComparison.Ordinal);
-            foreach (string keInf in KeInfList)
+            foreach (string keInf in CollectionsMarshal.AsSpan(KeInfList))
             {
                 hash = (hash * 37) + keInf.GetHashCode(StringComparison.Ordinal);
             }

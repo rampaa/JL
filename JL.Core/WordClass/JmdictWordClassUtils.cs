@@ -24,9 +24,8 @@ internal static class JmdictWordClassUtils
         }
 
         IList<JmdictWordClass>[] jmdictWordClasses = DictUtils.WordClassDictionary.Values.ToArray();
-        for (int i = 0; i < jmdictWordClasses.Length; i++)
+        foreach (IList<JmdictWordClass> jmdictWordClassList in jmdictWordClasses)
         {
-            IList<JmdictWordClass> jmdictWordClassList = jmdictWordClasses[i];
             int jmdictWordClassListCount = jmdictWordClassList.Count;
             for (int j = 0; j < jmdictWordClassListCount; j++)
             {
@@ -37,9 +36,9 @@ internal static class JmdictWordClassUtils
 
                 if (jmdictWordClass.Readings is not null)
                 {
-                    for (int k = 0; k < jmdictWordClass.Readings.Length; k++)
+                    foreach (string reading in jmdictWordClass.Readings)
                     {
-                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(jmdictWordClass.Readings[k]).GetPooledString();
+                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
                         if (DictUtils.WordClassDictionary.TryGetValue(readingInHiragana, out IList<JmdictWordClass>? result))
                         {
                             result.Add(jmdictWordClass);

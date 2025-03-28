@@ -1661,10 +1661,13 @@ internal sealed partial class MainWindow
 
             if (configManager.GlobalHotKeys)
             {
-                List<int> keyGestureIdsToIgnore = new(KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length);
-                for (int i = 0; i < KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length; i++)
+                OrderedDictionary<string, KeyGesture> globalKeyGestureNameToKeyGestureDict = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict;
+
+                string[] namesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized = KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized;
+                List<int> keyGestureIdsToIgnore = new(namesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length);
+                foreach (string name in namesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized)
                 {
-                    int id = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.IndexOf(KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized[i]);
+                    int id = globalKeyGestureNameToKeyGestureDict.IndexOf(name);
                     if (id >= 0)
                     {
                         keyGestureIdsToIgnore.Add(id);

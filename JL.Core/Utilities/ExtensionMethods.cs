@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace JL.Core.Utilities;
 
@@ -27,10 +28,8 @@ public static class ExtensionMethods
 
     public static T GetEnum<T>(this string description) where T : struct, Enum
     {
-        T[] enumValues = Enum.GetValues<T>();
-        for (int i = 0; i < enumValues.Length; i++)
+        foreach (T enumValue in Enum.GetValues<T>())
         {
-            T enumValue = enumValues[i];
             if (enumValue.GetDescription() == description)
             {
                 return enumValue;
@@ -41,7 +40,7 @@ public static class ExtensionMethods
         // return default;
     }
 
-    internal static List<string> ListUnicodeCharacters(this ReadOnlySpan<char> text)
+    internal static ReadOnlySpan<string> ListUnicodeCharacters(this ReadOnlySpan<char> text)
     {
         List<string> textBlocks = new(text.Length);
         for (int i = 0; i < text.Length; i++)
@@ -67,7 +66,7 @@ public static class ExtensionMethods
             }
         }
 
-        return textBlocks;
+        return CollectionsMarshal.AsSpan(textBlocks);
     }
 
     internal static void AddRange<T>(this ConcurrentBag<T> source, IEnumerable<T> items)
@@ -125,10 +124,12 @@ public static class ExtensionMethods
             return null;
         }
 
+        ReadOnlySpan<T> listSpan = CollectionsMarshal.AsSpan(list);
+
         bool allElementsAreNull = true;
-        for (int i = 0; i < list.Count; i++)
+        for (int i = 0; i < listSpan.Length; i++)
         {
-            if (i != index && list[i] is not null)
+            if (i != index && listSpan[i] is not null)
             {
                 allElementsAreNull = false;
                 break;
@@ -140,15 +141,14 @@ public static class ExtensionMethods
             return null;
         }
 
-        T[] array = new T[list.Count - 1];
+        T[] array = new T[listSpan.Length - 1];
 
         int arrayIndex = 0;
-        int listCount = list.Count;
-        for (int i = 0; i < listCount; i++)
+        for (int i = 0; i < listSpan.Length; i++)
         {
             if (i != index)
             {
-                array[arrayIndex] = list[i];
+                array[arrayIndex] = listSpan[i];
                 ++arrayIndex;
             }
         }
@@ -171,9 +171,9 @@ public static class ExtensionMethods
         }
 
         bool allElementsAreNull = true;
-        for (int i = 0; i < list.Count; i++)
+        foreach (T? item in CollectionsMarshal.AsSpan(list))
         {
-            if (list[i] is not null)
+            if (item is not null)
             {
                 allElementsAreNull = false;
                 break;
@@ -200,9 +200,9 @@ public static class ExtensionMethods
 
     public static bool Contains(this string[] source, string item)
     {
-        for (int i = 0; i < source.Length; i++)
+        foreach (string sourceItem in source)
         {
-            if (source[i] == item)
+            if (sourceItem == item)
             {
                 return true;
             }
@@ -237,7 +237,7 @@ public static class ExtensionMethods
     //    return text[..startIndex].LastIndexOf(value);
     //}
 
-    internal static List<int> FindAllIndexes(this ReadOnlySpan<char> text, int startIndex, int length, ReadOnlySpan<char> value)
+    internal static ReadOnlySpan<int> FindAllIndexes(this ReadOnlySpan<char> text, int startIndex, int length, ReadOnlySpan<char> value)
     {
         ReadOnlySpan<char> textToSearch = text.Slice(startIndex, length);
 
@@ -247,6 +247,6 @@ public static class ExtensionMethods
             indexes.Add(i + startIndex);
         }
 
-        return indexes;
+        return CollectionsMarshal.AsSpan(indexes);
     }
 }

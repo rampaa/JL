@@ -118,9 +118,9 @@ public static class CustomWordLoader
 
             if (i is 0 && readings is not null)
             {
-                for (int j = 0; j < readings.Length; j++)
+                foreach (string reading in readings)
                 {
-                    if (!AddRecordToDictionary(readings[j], newWordRecord, customWordDictionary))
+                    if (!AddRecordToDictionary(reading, newWordRecord, customWordDictionary))
                     {
                         return;
                     }

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using JL.Core.Config;
@@ -102,9 +103,8 @@ public static class TextUtils
         List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.s_regexReplacements;
         if (regexReplacements is not null)
         {
-            for (int i = 0; i < regexReplacements.Count; i++)
+            foreach ((Regex regex, string replacement) in CollectionsMarshal.AsSpan(regexReplacements))
             {
-                (Regex regex, string replacement) = regexReplacements[i];
                 text = regex.Replace(text, replacement);
             }
         }

@@ -79,9 +79,10 @@ internal static class KanjidicDBManager
 
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
         {
-            foreach (IDictRecord record in records)
+            int recordsCount = records.Count;
+            for (int i = 0; i < recordsCount; i++)
             {
-                KanjidicRecord kanjidicRecord = (KanjidicRecord)record;
+                KanjidicRecord kanjidicRecord = (KanjidicRecord)records[i];
                 _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
                 _ = insertRecordCommand.Parameters["@on_readings"].Value = kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jso) : DBNull.Value;
                 _ = insertRecordCommand.Parameters["@kun_readings"].Value = kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_jso) : DBNull.Value;

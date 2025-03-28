@@ -13,10 +13,9 @@ internal static class KanjiCompositionUtils
         if (File.Exists(filePath))
         {
             string[] lines = await File.ReadAllLinesAsync(filePath).ConfigureAwait(false);
-
-            for (int i = 0; i < lines.Length; i++)
+            foreach (string line in lines)
             {
-                string[] lParts = lines[i].Split('\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[] lParts = line.Split('\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                 if (lParts.Length < 3)
                 {
                     continue;

@@ -71,9 +71,10 @@ internal static class YomichanKanjiDBManager
 
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
         {
-            foreach (IDictRecord record in records)
+            int recordsCount = records.Count;
+            for (int i = 0; i < recordsCount; i++)
             {
-                YomichanKanjiRecord yomichanKanjiRecord = (YomichanKanjiRecord)record;
+                YomichanKanjiRecord yomichanKanjiRecord = (YomichanKanjiRecord)records[i];
                 _ = insertRecordCommand.Parameters["@id"].Value = id;
                 _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
                 _ = insertRecordCommand.Parameters["@on_readings"].Value = yomichanKanjiRecord.OnReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.OnReadings, Utils.s_jso) : DBNull.Value;

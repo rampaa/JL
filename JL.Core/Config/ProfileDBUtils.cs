@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;
@@ -80,10 +81,10 @@ public static class ProfileDBUtils
         return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
     }
 
-    public static List<string> GetProfileNames()
+    public static ReadOnlySpan<string> GetProfileNames()
     {
         using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
-        return GetProfileNames(connection);
+        return CollectionsMarshal.AsSpan(GetProfileNames(connection));
     }
 
     public static List<string> GetProfileNames(SqliteConnection connection)

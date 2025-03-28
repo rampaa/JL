@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace JL.Core.Deconjugation;
 
 internal sealed class Form(
@@ -36,14 +38,14 @@ internal sealed class Form(
             int hash = (17 * 37) + Text.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + OriginalText.GetHashCode(StringComparison.Ordinal);
 
-            for (int i = 0; i < Tags.Count; i++)
+            foreach (string tag in CollectionsMarshal.AsSpan(Tags))
             {
-                hash = (hash * 37) + Tags[i].GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + tag.GetHashCode(StringComparison.Ordinal);
             }
 
-            for (int i = 0; i < Process.Count; i++)
+            foreach (string process in CollectionsMarshal.AsSpan(Process))
             {
-                hash = (hash * 37) + Process[i].GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + process.GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;

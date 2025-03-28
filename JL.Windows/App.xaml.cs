@@ -37,9 +37,8 @@ internal sealed partial class App
 
         if (processes.Length > 1)
         {
-            for (int i = 0; i < processes.Length; i++)
+            foreach (Process process in processes)
             {
-                Process process = processes[i];
                 if (currentProcess.Id != process.Id)
                 {
                     try

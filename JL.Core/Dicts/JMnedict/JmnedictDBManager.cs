@@ -94,7 +94,7 @@ internal static class JmnedictDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -114,8 +114,7 @@ internal static class JmnedictDBManager
             """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        int termCount = terms.Count;
-        for (int i = 0; i < termCount; i++)
+        for (int i = 0; i < terms.Length; i++)
         {
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }

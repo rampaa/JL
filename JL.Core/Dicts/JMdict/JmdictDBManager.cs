@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -69,8 +70,8 @@ internal static class JmdictDBManager
         Dictionary<JmdictRecord, List<string>> recordToKeysDict = [];
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
-            int recordCount = records.Count;
-            for (int i = 0; i < recordCount; i++)
+            int recordsCount = records.Count;
+            for (int i = 0; i < recordsCount; i++)
             {
                 JmdictRecord record = (JmdictRecord)records[i];
                 if (recordToKeysDict.TryGetValue(record, out List<string>? keys))
@@ -159,11 +160,10 @@ internal static class JmdictDBManager
             insertRecordCommand.Parameters["@antonyms"].Value = record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jso) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            int keyCount = keys.Count;
-            for (int i = 0; i < keyCount; i++)
+            insertSearchKeyCommand.Parameters["@record_id"].Value = id;
+            foreach (string key in CollectionsMarshal.AsSpan(keys))
             {
-                insertSearchKeyCommand.Parameters["@record_id"].Value = id;
-                insertSearchKeyCommand.Parameters["@search_key"].Value = keys[i];
+                insertSearchKeyCommand.Parameters["@search_key"].Value = key;
                 _ = insertSearchKeyCommand.ExecuteNonQuery();
             }
 
@@ -185,7 +185,7 @@ internal static class JmdictDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -222,8 +222,7 @@ internal static class JmdictDBManager
             """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        int termCount = terms.Count;
-        for (int i = 0; i < termCount; i++)
+        for (int i = 0; i < terms.Length; i++)
         {
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
@@ -291,10 +290,9 @@ internal static class JmdictDBManager
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
-            List<string> searchKeys = JsonSerializer.Deserialize<List<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso)!;
-            for (int i = 0; i < searchKeys.Count; i++)
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
+            foreach (string searchKey in searchKeys)
             {
-                string searchKey = searchKeys[i];
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
                 {
                     result.Add(record);

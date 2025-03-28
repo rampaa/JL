@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
@@ -74,8 +75,8 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
         bool readingsExist = Readings is not null;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
-            int freqResultCount = freqResults.Count;
-            for (int i = 0; i < freqResultCount; i++)
+            int freqResultsCount = freqResults.Count;
+            for (int i = 0; i < freqResultsCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling
@@ -93,8 +94,8 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
                 string reading = Readings[i];
                 if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out IList<FrequencyRecord>? readingFreqResults))
                 {
-                    int readingFreqResultCount = readingFreqResults.Count;
-                    for (int j = 0; j < readingFreqResultCount; j++)
+                    int readingFreqResultsCount = readingFreqResults.Count;
+                    for (int j = 0; j < readingFreqResultsCount; j++)
                     {
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
                         if (readingFreqResult.Spelling == PrimarySpelling
@@ -115,10 +116,8 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
         bool readingsExist = Readings is not null;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
-            int freqResultCount = freqResults.Count;
-            for (int i = 0; i < freqResultCount; i++)
+            foreach (FrequencyRecord freqResult in CollectionsMarshal.AsSpan(freqResults))
             {
-                FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling
                     || (readingsExist && Readings!.Contains(freqResult.Spelling)))
                 {
@@ -134,10 +133,8 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
                 string reading = Readings[i];
                 if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out List<FrequencyRecord>? readingFreqResults))
                 {
-                    int readingFreqResultCount = readingFreqResults.Count;
-                    for (int j = 0; j < readingFreqResultCount; j++)
+                    foreach (FrequencyRecord readingFreqResult in CollectionsMarshal.AsSpan(readingFreqResults))
                     {
-                        FrequencyRecord readingFreqResult = readingFreqResults[j];
                         if (readingFreqResult.Spelling == PrimarySpelling
                             || (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0])))
                         {
@@ -182,9 +179,9 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             if (AlternativeSpellings is not null)
             {
-                for (int i = 0; i < AlternativeSpellings.Length; i++)
+                foreach (string alternativeSpelling in AlternativeSpellings)
                 {
-                    hash = (hash * 37) + AlternativeSpellings[i].GetHashCode(StringComparison.Ordinal);
+                    hash = (hash * 37) + alternativeSpelling.GetHashCode(StringComparison.Ordinal);
                 }
             }
             else
@@ -195,9 +192,9 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
 
             if (Readings is not null)
             {
-                for (int i = 0; i < Readings.Length; i++)
+                foreach (string reading in Readings)
                 {
-                    hash = (hash * 37) + Readings[i].GetHashCode(StringComparison.Ordinal);
+                    hash = (hash * 37) + reading.GetHashCode(StringComparison.Ordinal);
                 }
             }
 
@@ -206,14 +203,14 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
                 hash *= 37;
             }
 
-            for (int i = 0; i < Definitions.Length; i++)
+            foreach (string definition in Definitions)
             {
-                hash = (hash * 37) + Definitions[i].GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
             }
 
-            for (int i = 0; i < WordClasses.Length; i++)
+            foreach (string wordClass in WordClasses)
             {
-                hash = (hash * 37) + WordClasses[i].GetHashCode(StringComparison.Ordinal);
+                hash = (hash * 37) + wordClass.GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;

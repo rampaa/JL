@@ -14,22 +14,22 @@ internal static class FrequencyNazekaLoader
             return;
         }
 
-        Dictionary<string, List<List<JsonElement>>>? frequencyJson;
+        Dictionary<string, ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>? frequencyJson;
 
         FileStream fileStream = File.OpenRead(fullPath);
         await using (fileStream.ConfigureAwait(false))
         {
             frequencyJson = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(fileStream, Utils.s_jso)
+                .DeserializeAsync<Dictionary<string, ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>>(fileStream, Utils.s_jso)
                 .ConfigureAwait(false);
         }
 
-        foreach ((string reading, List<List<JsonElement>> value) in frequencyJson!)
+        foreach ((string reading, ReadOnlyMemory<ReadOnlyMemory<JsonElement>> value) in frequencyJson!)
         {
-            int valueCount = value.Count;
-            for (int i = 0; i < valueCount; i++)
+            ReadOnlySpan<ReadOnlyMemory<JsonElement>> valueSpan = value.Span;
+            for (int i = 0; i < valueSpan.Length; i++)
             {
-                List<JsonElement> elementList = value[i];
+                ReadOnlySpan<JsonElement> elementList = valueSpan[i].Span;
 
                 string exactSpelling = elementList[0].GetString()!.GetPooledString();
                 int frequencyRank = elementList[1].GetInt32();

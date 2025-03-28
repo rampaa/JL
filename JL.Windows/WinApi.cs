@@ -245,16 +245,19 @@ internal sealed partial class WinApi
 
     public static void RegisterAllGlobalHotKeys(nint windowHandle)
     {
-        for (int id = 0; id < KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Count; id++)
+        OrderedDictionary<string, KeyGesture> globalKeyGestureNameToKeyGestureDict = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict;
+        int count = globalKeyGestureNameToKeyGestureDict.Count;
+        for (int id = 0; id < count; id++)
         {
-            KeyGesture keyGesture = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.GetAt(id).Value;
+            KeyGesture keyGesture = globalKeyGestureNameToKeyGestureDict.GetAt(id).Value;
             _ = RegisterHotKey(windowHandle, id, (uint)keyGesture.Modifiers | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(keyGesture.Key));
         }
     }
 
     public static void UnregisterAllGlobalHotKeys(nint windowHandle)
     {
-        for (int id = 0; id < KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Count; id++)
+        int count = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Count;
+        for (int id = 0; id < count; id++)
         {
             _ = UnregisterHotKey(windowHandle, id);
         }
@@ -262,7 +265,8 @@ internal sealed partial class WinApi
 
     public static void UnregisterAllGlobalHotKeys(nint windowHandle, params List<int> keyGestureIdsToIgnore)
     {
-        for (int id = 0; id < KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Count; id++)
+        int count = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Count;
+        for (int id = 0; id < count; id++)
         {
             if (keyGestureIdsToIgnore.Contains(id))
             {

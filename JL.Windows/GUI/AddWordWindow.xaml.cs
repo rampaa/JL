@@ -170,9 +170,9 @@ internal sealed partial class AddWordWindow
                 ? s_allVerbTypes
                 : s_allAdjectiveTypes;
 
-            for (int i = 0; i < wordClasses.Length; i++)
+            foreach (string wordClass in wordClasses)
             {
-                if (!validWordClasses.Contains(wordClasses[i]))
+                if (!validWordClasses.Contains(wordClass))
                 {
                     WordClassTextBox.BorderBrush = Brushes.Red;
                     WordClassTextBox.Cursor = Cursors.Help;
@@ -241,9 +241,8 @@ internal sealed partial class AddWordWindow
 
         string[] keys = showAllowedVerbTypeInfo ? s_allVerbTypes : s_allAdjectiveTypes;
         StringBuilder sb = new(keys.Length);
-        for (int i = 0; i < keys.Length; i++)
+        foreach (string key in keys)
         {
-            string key = keys[i];
             if (DictUtils.JmdictEntities.TryGetValue(key, out string? value))
             {
                 _ = sb.Append(CultureInfo.InvariantCulture, $"{key}: {value}\n");
