@@ -153,7 +153,7 @@ public static class LookupUtils
                     nazekaTextWithoutLongVowelMarkQueries ??= new List<string?>(textWithoutLongVowelMarkListSpanLength);
                 }
 
-                foreach (List<string>? textWithoutLongVowelMark in textWithoutLongVowelMarkListSpan)
+                foreach (ref readonly List<string>? textWithoutLongVowelMark in textWithoutLongVowelMarkListSpan)
                 {
                     if (textWithoutLongVowelMark is not null)
                     {
@@ -510,7 +510,7 @@ public static class LookupUtils
 
         if (deconjugationResults is not null)
         {
-            foreach (Form deconjugationResult in CollectionsMarshal.AsSpan(deconjugationResults))
+            foreach (ref readonly Form deconjugationResult in CollectionsMarshal.AsSpan(deconjugationResults))
             {
                 if (verbDict.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
@@ -525,7 +525,18 @@ public static class LookupUtils
                                 if (index >= 0)
                                 {
                                     List<List<string>> processes = result.Processes![index];
-                                    if (!processes.Any(p => p.SequenceEqual(deconjugationResult.Process)))
+
+                                    bool addProcess = true;
+                                    foreach (ref readonly List<string> process in CollectionsMarshal.AsSpan(processes))
+                                    {
+                                        if (process.SequenceEqual(deconjugationResult.Process))
+                                        {
+                                            addProcess = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (addProcess)
                                     {
                                         processes.Add(deconjugationResult.Process);
                                     }
@@ -589,7 +600,7 @@ public static class LookupUtils
                     ? getRecordsFromDB!(dict.Name, textsWithoutLongVowelMarkSpan, longVowelQueryOrParameters![i]!)
                     : null;
 
-                foreach (string textWithoutLongVowelMark in textsWithoutLongVowelMarkSpan)
+                foreach (ref readonly string textWithoutLongVowelMark in textsWithoutLongVowelMarkSpan)
                 {
                     GetWordResultsHelper(dict, results, null, text, textWithoutLongVowelMark, dbWordDictForLongVowelConversion, null);
                 }
@@ -803,7 +814,7 @@ public static class LookupUtils
                     ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i])
                     : null;
 
-                IList<IDictRecord> dictRecords = resultsSpan[i];
+                ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)
                 {
@@ -838,7 +849,7 @@ public static class LookupUtils
         HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
-            foreach (IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(intermediaryResult.Results))
+            foreach (ref readonly IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(intermediaryResult.Results))
             {
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)
@@ -863,7 +874,7 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         foreach (IntermediaryResult nameResult in jmnedictResults.Values)
         {
-            foreach (IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(nameResult.Results))
+            foreach (ref readonly IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(nameResult.Results))
             {
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)
@@ -918,7 +929,7 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(intermediaryResult.Results))
+        foreach (ref readonly IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(intermediaryResult.Results))
         {
             int dictRecordsCount = dictRecords.Count;
             for (int j = 0; j < dictRecordsCount; j++)
@@ -961,7 +972,7 @@ public static class LookupUtils
                     ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i])
                     : null;
 
-                IList<IDictRecord> dictRecords = resultsSpan[i];
+                ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)
                 {
@@ -995,7 +1006,7 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(intermediaryResult.Results))
+        foreach (ref readonly IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(intermediaryResult.Results))
         {
             int dictRecordsCount = dictRecords.Count;
             for (int j = 0; j < dictRecordsCount; j++)
@@ -1038,7 +1049,7 @@ public static class LookupUtils
                     ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i])
                     : null;
 
-                IList<IDictRecord> dictRecords = resultsSpan[i];
+                ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)
                 {
@@ -1095,7 +1106,7 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(intermediaryResult.Results))
+        foreach (ref readonly IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(intermediaryResult.Results))
         {
             int dictRecordsCount = dictRecords.Count;
             for (int j = 0; j < dictRecordsCount; j++)
@@ -1164,7 +1175,7 @@ public static class LookupUtils
                     ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i])
                     : null;
 
-                IList<IDictRecord> dictRecords = resultsSpan[i];
+                ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)
                 {
@@ -1201,7 +1212,7 @@ public static class LookupUtils
         foreach (IntermediaryResult customNameResult in customNameResults.Values)
         {
             int freq = 0;
-            foreach (IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(customNameResult.Results))
+            foreach (ref readonly IList<IDictRecord> dictRecords in CollectionsMarshal.AsSpan(customNameResult.Results))
             {
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)

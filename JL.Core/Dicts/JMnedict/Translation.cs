@@ -16,12 +16,12 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
         unchecked
         {
             int hash = 17 * 37;
-            foreach (string nameType in CollectionsMarshal.AsSpan(NameTypeList))
+            foreach (ref readonly string nameType in CollectionsMarshal.AsSpan(NameTypeList))
             {
                 hash = (hash * 37) + nameType.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (string transDet in CollectionsMarshal.AsSpan(TransDetList))
+            foreach (ref readonly string transDet in CollectionsMarshal.AsSpan(TransDetList))
             {
                 hash = (hash * 37) + transDet.GetHashCode(StringComparison.Ordinal);
             }

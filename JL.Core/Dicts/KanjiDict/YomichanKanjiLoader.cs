@@ -28,10 +28,9 @@ internal static class YomichanKanjiLoader
                     .ConfigureAwait(false);
             }
 
-            ReadOnlySpan<ReadOnlyMemory<JsonElement>> jsonObjectsSpan = jsonObjects.Span;
-            for (int i = 0; i < jsonObjectsSpan.Length; i++)
+            foreach (ref readonly ReadOnlyMemory<JsonElement> jsonObjMemory in jsonObjects.Span)
             {
-                ReadOnlySpan<JsonElement> jsonObj = jsonObjectsSpan[i].Span;
+                ReadOnlySpan<JsonElement> jsonObj = jsonObjMemory.Span;
                 YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
                 string kanji = jsonObj[0].GetString()!.GetPooledString();
                 if (string.IsNullOrWhiteSpace(kanji))

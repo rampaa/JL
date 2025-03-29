@@ -16,7 +16,7 @@ internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEqu
         unchecked
         {
             int hash = (17 * 37) + Keb.GetHashCode(StringComparison.Ordinal);
-            foreach (string keInf in CollectionsMarshal.AsSpan(KeInfList))
+            foreach (ref readonly string keInf in CollectionsMarshal.AsSpan(KeInfList))
             {
                 hash = (hash * 37) + keInf.GetHashCode(StringComparison.Ordinal);
             }

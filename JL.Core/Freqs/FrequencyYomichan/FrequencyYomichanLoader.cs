@@ -27,15 +27,14 @@ internal static class FrequencyYomichanLoader
                     .ConfigureAwait(false);
             }
 
-            ReadOnlySpan<ReadOnlyMemory<JsonElement>> frequencyJsonSpan = frequencyJson.Span;
-            for (int i = 0; i < frequencyJsonSpan.Length; i++)
+            foreach (ReadOnlyMemory<JsonElement> valueMemory in frequencyJson.Span)
             {
-                ReadOnlySpan<JsonElement> value = frequencyJsonSpan[i].Span;
+                ReadOnlySpan<JsonElement> value = valueMemory.Span;
                 string primarySpelling = value[0].GetString()!.GetPooledString();
                 string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString();
                 string? reading = null;
                 int frequency = int.MaxValue;
-                JsonElement thirdElement = value[2];
+                ref readonly JsonElement thirdElement = ref value[2];
 
 #pragma warning disable IDE0010 // Add missing cases to switch statement
                 // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault

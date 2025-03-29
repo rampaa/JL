@@ -241,13 +241,11 @@ internal static class Deconjugator
         while (novel.Count > 0)
         {
             List<Form> newNovel = [];
-
-            ReadOnlySpan<Form> novelSpan = CollectionsMarshal.AsSpan(novel);
-            foreach (Form form in novelSpan)
+            foreach (ref readonly Form form in CollectionsMarshal.AsSpan(novel))
             {
                 for (int j = 0; j < rules.Length; j++)
                 {
-                    ref Rule rule = ref rules[j];
+                    ref readonly Rule rule = ref rules[j];
                     List<Form>? newForm = rule.Type switch
                     {
                         "stdrule" => StdruleDeconjugate(form, rule),
@@ -264,7 +262,7 @@ internal static class Deconjugator
                         continue;
                     }
 
-                    foreach (Form myForm in CollectionsMarshal.AsSpan(newForm))
+                    foreach (ref readonly Form myForm in CollectionsMarshal.AsSpan(newForm))
                     {
                         if (!CollectionsMarshal.AsSpan(newNovel).Contains(myForm))
                         {

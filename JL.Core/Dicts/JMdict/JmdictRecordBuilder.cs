@@ -49,7 +49,7 @@ internal static class JmdictRecordBuilder
         Dictionary<string, JmdictRecord> recordDictionary = new(kanjiElemensSpanLength + readingElementsLength, StringComparer.Ordinal);
         if (spellingsWithoutSearchOnlyFormsExist)
         {
-            foreach (KanjiElement kanjiElement in kanjiElementsSpan)
+            foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)
             {
                 ReadOnlySpan<string> keInfListSpan = CollectionsMarshal.AsSpan(kanjiElement.KeInfList);
                 string key = JapaneseUtils.KatakanaToHiragana(kanjiElement.Keb).GetPooledString();
@@ -76,7 +76,7 @@ internal static class JmdictRecordBuilder
                 List<string> readingList = new(readingElementsLength);
                 List<string[]?> readingsOrthographyInfoList = new(readingElementsLength);
 
-                foreach (ReadingElement readingElement in readingElementsSpan)
+                foreach (ref readonly ReadingElement readingElement in readingElementsSpan)
                 {
                     if (!CollectionsMarshal.AsSpan(readingElement.ReInfList).Contains("sk"))
                     {
@@ -102,7 +102,7 @@ internal static class JmdictRecordBuilder
                 List<LoanwordSource[]?> loanwordSourceList = new(senseListSpanLength);
 
                 ReadOnlySpan<string> readingListSpan = CollectionsMarshal.AsSpan(readingList);
-                foreach (Sense sense in senseListSpan)
+                foreach (ref readonly Sense sense in senseListSpan)
                 {
                     ReadOnlySpan<string> stagKListSpan = CollectionsMarshal.AsSpan(sense.StagKList);
                     ReadOnlySpan<string> stagRListSpan = CollectionsMarshal.AsSpan(sense.StagRList);
@@ -167,7 +167,7 @@ internal static class JmdictRecordBuilder
             string[]?[] allROrthographyInfoWithoutSearchOnlyForms = new string[readingElementsWithoutSearchOnlyForms.Length][];
             for (int i = 0; i < readingElementsWithoutSearchOnlyForms.Length; i++)
             {
-                ReadingElement readingElement = readingElementsWithoutSearchOnlyForms[i];
+                ref readonly ReadingElement readingElement = ref readingElementsWithoutSearchOnlyForms[i];
                 allReadingsWithoutSearchOnlyForms[i] = readingElement.Reb;
                 allROrthographyInfoWithoutSearchOnlyForms[i] = readingElement.ReInfList.TrimToArray();
             }
@@ -177,7 +177,7 @@ internal static class JmdictRecordBuilder
             index = 0;
             for (int i = 0; i < readingElementsSpan.Length; i++)
             {
-                ReadingElement readingElement = readingElementsSpan[i];
+                ref readonly ReadingElement readingElement = ref readingElementsSpan[i];
 
                 ReadOnlySpan<string> reInfListSpan = CollectionsMarshal.AsSpan(readingElement.ReInfList);
                 string key = JapaneseUtils.KatakanaToHiragana(readingElement.Reb).GetPooledString();
@@ -253,7 +253,7 @@ internal static class JmdictRecordBuilder
                 List<LoanwordSource[]?> loanwordSourceList = new(senseListSpanLength);
 
                 bool alternativeSpellingsExist = alternativeSpellings is not null;
-                foreach (Sense sense in senseListSpan)
+                foreach (ref readonly Sense sense in senseListSpan)
                 {
                     ReadOnlySpan<string> stagKListSpan = CollectionsMarshal.AsSpan(sense.StagKList);
                     ReadOnlySpan<string> stagRListSpan = CollectionsMarshal.AsSpan(sense.StagRList);
@@ -313,7 +313,7 @@ internal static class JmdictRecordBuilder
 
                 if (i is 0 && allSpellingsWithoutSearchOnlyForms.Length is 0)
                 {
-                    foreach (KanjiElement kanjiElement in kanjiElementsSpan)
+                    foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)
                     {
                         _ = recordDictionary.TryAdd(JapaneseUtils.KatakanaToHiragana(kanjiElement.Keb.GetPooledString()), record);
                     }
@@ -355,7 +355,7 @@ internal static class JmdictRecordBuilder
             foreach (string senseFieldValue in senseFieldSpan[i])
             {
                 bool containsAll = true;
-                foreach (string[] senseItem in senseFieldSpan)
+                foreach (ref readonly string[] senseItem in senseFieldSpan)
                 {
                     if (!senseItem.Contains(senseFieldValue))
                     {
@@ -398,13 +398,13 @@ internal static class JmdictRecordBuilder
 
         for (int i = 0; i < senseFieldSpan.Length; i++)
         {
-            string[]? senseFieldValue = senseFieldSpan[i];
+            ref readonly string[]? senseFieldValue = ref senseFieldSpan[i];
             if (senseFieldValue is not null)
             {
                 foreach (string value in senseFieldValue)
                 {
                     bool containsAll = true;
-                    foreach (string[]? senseItem in senseFieldSpan)
+                    foreach (ref readonly string[]? senseItem in senseFieldSpan)
                     {
                         if (!senseItem?.Contains(value) ?? true)
                         {

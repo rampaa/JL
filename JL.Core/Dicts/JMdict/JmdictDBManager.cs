@@ -161,7 +161,7 @@ internal static class JmdictDBManager
             _ = insertRecordCommand.ExecuteNonQuery();
 
             insertSearchKeyCommand.Parameters["@record_id"].Value = id;
-            foreach (string key in CollectionsMarshal.AsSpan(keys))
+            foreach (ref readonly string key in CollectionsMarshal.AsSpan(keys))
             {
                 insertSearchKeyCommand.Parameters["@search_key"].Value = key;
                 _ = insertSearchKeyCommand.ExecuteNonQuery();

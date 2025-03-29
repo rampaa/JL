@@ -29,10 +29,8 @@ internal static class EpwingNazekaLoader
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
 
-        ReadOnlySpan<JsonElement> jsonObjectsSpan = jsonObjects.Span;
-        for (int i = 1; i < jsonObjectsSpan.Length; i++)
+        foreach (ref readonly JsonElement jsonObj in jsonObjects.Span)
         {
-            JsonElement jsonObj = jsonObjectsSpan[i];
             string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
 
             JsonElement spellingJsonArray = jsonObj.GetProperty("s");
@@ -96,7 +94,7 @@ internal static class EpwingNazekaLoader
                 ReadOnlySpan<string> spellingListSpan = CollectionsMarshal.AsSpan(spellingList);
                 for (int j = 1; j < spellingListSpan.Length; j++)
                 {
-                    string alternativeSpelling = spellingListSpan[j];
+                    ref readonly string alternativeSpelling = ref spellingListSpan[j];
                     if (!EpwingUtils.IsValidEpwingResultForDictType(alternativeSpelling, reading, definitions, dict))
                     {
                         continue;

@@ -246,7 +246,7 @@ public static partial class JapaneseUtils
             {
                 if (vowel is not 'お' and not 'え')
                 {
-                    foreach (StringBuilder stringBuilder in CollectionsMarshal.AsSpan(stringBuilders))
+                    foreach (ref readonly StringBuilder stringBuilder in CollectionsMarshal.AsSpan(stringBuilders))
                     {
                         _ = stringBuilder.Append(vowel);
                     }
@@ -278,7 +278,7 @@ public static partial class JapaneseUtils
 
             else
             {
-                foreach (StringBuilder stringBuilder in CollectionsMarshal.AsSpan(stringBuilders))
+                foreach (ref readonly StringBuilder stringBuilder in CollectionsMarshal.AsSpan(stringBuilders))
                 {
                     _ = stringBuilder.Append(unicodeTextList[i]);
                 }

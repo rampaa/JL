@@ -39,12 +39,12 @@ internal sealed class Form(
             int hash = (17 * 37) + Text.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + OriginalText.GetHashCode(StringComparison.Ordinal);
 
-            foreach (string tag in CollectionsMarshal.AsSpan(Tags))
+            foreach (ref readonly string tag in CollectionsMarshal.AsSpan(Tags))
             {
                 hash = (hash * 37) + tag.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (string process in CollectionsMarshal.AsSpan(Process))
+            foreach (ref readonly string process in CollectionsMarshal.AsSpan(Process))
             {
                 hash = (hash * 37) + process.GetHashCode(StringComparison.Ordinal);
             }

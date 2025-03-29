@@ -18,12 +18,12 @@ internal readonly struct ReadingElement(string reb, List<string> reRestrList, Li
         unchecked
         {
             int hash = (17 * 37) + Reb.GetHashCode(StringComparison.Ordinal);
-            foreach (string reRestr in CollectionsMarshal.AsSpan(ReRestrList))
+            foreach (ref readonly string reRestr in CollectionsMarshal.AsSpan(ReRestrList))
             {
                 hash = (hash * 37) + reRestr.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (string reInf in CollectionsMarshal.AsSpan(ReInfList))
+            foreach (ref readonly string reInf in CollectionsMarshal.AsSpan(ReInfList))
             {
                 hash = (hash * 37) + reInf.GetHashCode(StringComparison.Ordinal);
             }

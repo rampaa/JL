@@ -13,7 +13,7 @@ public static class LookupResultUtils
         ReadOnlySpan<List<string>> processListSpan = CollectionsMarshal.AsSpan(processList);
         for (int i = 0; i < processListSpan.Length; i++)
         {
-            List<string> form = processListSpan[i];
+            ref readonly List<string> form = ref processListSpan[i];
 
             StringBuilder formText = new();
             bool added = false;

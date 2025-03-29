@@ -26,10 +26,9 @@ internal static class FrequencyNazekaLoader
 
         foreach ((string reading, ReadOnlyMemory<ReadOnlyMemory<JsonElement>> value) in frequencyJson!)
         {
-            ReadOnlySpan<ReadOnlyMemory<JsonElement>> valueSpan = value.Span;
-            for (int i = 0; i < valueSpan.Length; i++)
+            foreach (ref readonly ReadOnlyMemory<JsonElement> elementListMemory in value.Span)
             {
-                ReadOnlySpan<JsonElement> elementList = valueSpan[i].Span;
+                ReadOnlySpan<JsonElement> elementList = elementListMemory.Span;
 
                 string exactSpelling = elementList[0].GetString()!.GetPooledString();
                 int frequencyRank = elementList[1].GetInt32();

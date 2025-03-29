@@ -32,11 +32,9 @@ internal static class EpwingYomichanLoader
                     .ConfigureAwait(false);
             }
 
-            ReadOnlySpan<ReadOnlyMemory<JsonElement>> jsonElementListsSpan = jsonElementLists.Span;
-
-            for (int i = 0; i < jsonElementListsSpan.Length; i++)
+            foreach(ref readonly ReadOnlyMemory<JsonElement> jsonElements in jsonElementLists.Span)
             {
-                EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElementListsSpan[i].Span, dict);
+                EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElements.Span, dict);
                 if (record is not null)
                 {
                     AddToDictionary(record, dict, nonKanjiDict, nonNameDict);
@@ -72,7 +70,7 @@ internal static class EpwingYomichanLoader
         }
 
         string[]? definitionTags = null;
-        JsonElement definitionTagsElement = jsonElements[2];
+        ref readonly JsonElement definitionTagsElement = ref jsonElements[2];
         if (definitionTagsElement.ValueKind is JsonValueKind.String)
         {
             definitionTags = definitionTagsElement.GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);

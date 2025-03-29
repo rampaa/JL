@@ -116,7 +116,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
         bool readingsExist = Readings is not null;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
-            foreach (FrequencyRecord freqResult in CollectionsMarshal.AsSpan(freqResults))
+            foreach (ref readonly FrequencyRecord freqResult in CollectionsMarshal.AsSpan(freqResults))
             {
                 if (freqResult.Spelling == PrimarySpelling
                     || (readingsExist && Readings!.Contains(freqResult.Spelling)))
@@ -133,7 +133,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
                 string reading = Readings[i];
                 if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out List<FrequencyRecord>? readingFreqResults))
                 {
-                    foreach (FrequencyRecord readingFreqResult in CollectionsMarshal.AsSpan(readingFreqResults))
+                    foreach (ref readonly FrequencyRecord readingFreqResult in CollectionsMarshal.AsSpan(readingFreqResults))
                     {
                         if (readingFreqResult.Spelling == PrimarySpelling
                             || (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0])))

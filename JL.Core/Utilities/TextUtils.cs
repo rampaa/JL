@@ -103,9 +103,9 @@ public static class TextUtils
         List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.s_regexReplacements;
         if (regexReplacements is not null)
         {
-            foreach ((Regex regex, string replacement) in CollectionsMarshal.AsSpan(regexReplacements))
+            foreach (ref readonly KeyValuePair<Regex, string> regexReplacementKeyValuePair in CollectionsMarshal.AsSpan(regexReplacements))
             {
-                text = regex.Replace(text, replacement);
+                text = regexReplacementKeyValuePair.Key.Replace(text, regexReplacementKeyValuePair.Value);
             }
         }
 

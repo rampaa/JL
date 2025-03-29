@@ -35,7 +35,7 @@ internal static class SpeechSynthesisUtils
 
                 for (int i = 0; i < installedVoicesSpan.Length; i++)
                 {
-                    InstalledVoice installedVoice = installedVoicesSpan[i];
+                    ref readonly InstalledVoice installedVoice = ref installedVoicesSpan[i];
 
                     ComboBoxItem comboBoxItem = new()
                     {

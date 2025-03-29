@@ -916,7 +916,7 @@ public static class MiningUtils
     {
         double sumOfReciprocalOfFreqs = 0;
         ReadOnlySpan<LookupFrequencyResult> lookupFrequencyResultSpan = CollectionsMarshal.AsSpan(lookupFrequencyResults);
-        foreach (LookupFrequencyResult lookupFrequencyResult in lookupFrequencyResultSpan)
+        foreach (ref readonly LookupFrequencyResult lookupFrequencyResult in lookupFrequencyResultSpan)
         {
             int freq = lookupFrequencyResult.HigherValueMeansHigherFrequency
                 ? FreqUtils.FreqDicts[lookupFrequencyResult.Name].MaxValue - lookupFrequencyResult.Freq + 1

@@ -20,7 +20,7 @@ internal static class JmnedictRecordBuilder
             recordDictionary = new Dictionary<string, JmnedictRecord>(kebListSpanLength, StringComparer.Ordinal);
             for (int i = 0; i < kebListSpan.Length; i++)
             {
-                string keb = kebListSpan[i];
+                ref readonly string keb = ref kebListSpan[i];
                 string key = JapaneseUtils.KatakanaToHiragana(keb).GetPooledString();
 
                 if (recordDictionary.ContainsKey(key))
@@ -34,7 +34,7 @@ internal static class JmnedictRecordBuilder
 
                 for (int j = 0; j < translationListSpan.Length; j++)
                 {
-                    Translation translation = translationListSpan[j];
+                    ref readonly Translation translation = ref translationListSpan[j];
 
                     definitionsArray[j] = translation.TransDetList.ToArray();
                     nameTypesArray[j] = translation.NameTypeList.ToArray();
@@ -54,7 +54,7 @@ internal static class JmnedictRecordBuilder
             recordDictionary = new Dictionary<string, JmnedictRecord>(rebListSpan.Length, StringComparer.Ordinal);
             for (int i = 0; i < rebListSpan.Length; i++)
             {
-                string reb = rebListSpan[i];
+                ref readonly string reb = ref rebListSpan[i];
                 string key = JapaneseUtils.KatakanaToHiragana(reb).GetPooledString();
 
                 if (recordDictionary.ContainsKey(key))
@@ -68,7 +68,7 @@ internal static class JmnedictRecordBuilder
 
                 for (int j = 0; j < translationListSpan.Length; j++)
                 {
-                    Translation translation = translationListSpan[j];
+                    ref readonly Translation translation = ref translationListSpan[j];
 
                     definitionsArray[j] = translation.TransDetList.ToArray();
                     nameTypesArray[j] = translation.NameTypeList.ToArray();

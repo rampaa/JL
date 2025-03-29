@@ -229,14 +229,14 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (showLoanwordEtymology)
             {
-                LoanwordSource[]? lSources = LoanwordEtymology![i];
+                ref readonly LoanwordSource[]? lSources = ref LoanwordEtymology![i];
                 if (lSources is not null)
                 {
                     _ = defResult.Append('(');
 
                     for (int j = 0; j < lSources.Length; j++)
                     {
-                        ref LoanwordSource lSource = ref lSources[j];
+                        ref readonly LoanwordSource lSource = ref lSources[j];
                         if (lSource.IsWasei)
                         {
                             _ = defResult.Append("wasei ");
@@ -336,7 +336,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         bool readingsExist = Readings is not null;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
-            foreach (FrequencyRecord freqResult in CollectionsMarshal.AsSpan(freqResults))
+            foreach (ref readonly FrequencyRecord freqResult in CollectionsMarshal.AsSpan(freqResults))
             {
                 if (freqResult.Spelling == PrimarySpelling
                     || (readingsExist && Readings!.Contains(freqResult.Spelling)))
@@ -353,7 +353,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 string reading = Readings[i];
                 if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out List<FrequencyRecord>? readingFreqResults))
                 {
-                    foreach (FrequencyRecord readingFreqResult in CollectionsMarshal.AsSpan(readingFreqResults))
+                    foreach (ref readonly FrequencyRecord readingFreqResult in CollectionsMarshal.AsSpan(readingFreqResults))
                     {
                         if (readingFreqResult.Spelling == PrimarySpelling
                             || (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0])))
