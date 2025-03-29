@@ -21,7 +21,7 @@ public static class LookupResultUtils
             ReadOnlySpan<string> formSpan = CollectionsMarshal.AsSpan(form);
             for (int j = formSpan.Length - 1; j >= 0; j--)
             {
-                ref readonly string info = ref formSpan[j];
+                string info = formSpan[j];
                 if (info.Length is 0)
                 {
                     continue;
