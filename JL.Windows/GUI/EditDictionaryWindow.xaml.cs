@@ -138,6 +138,8 @@ internal sealed partial class EditDictionaryWindow
             //}
         }
 
+        _dict.Options = options;
+
         if (_dict.Name != name)
         {
             if (dbExists)
@@ -148,11 +150,8 @@ internal sealed partial class EditDictionaryWindow
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);
-            _dict.Name = name;
-            DictUtils.Dicts.Add(name, _dict);
+            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, _dict.Options));
         }
-
-        _dict.Options = options;
 
         Close();
     }

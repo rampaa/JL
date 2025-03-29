@@ -117,6 +117,7 @@ internal sealed partial class EditFrequencyWindow
             //}
         }
 
+        _freq.Options = options;
         if (_freq.Name != name)
         {
             if (dbExists)
@@ -127,11 +128,8 @@ internal sealed partial class EditFrequencyWindow
             }
 
             _ = FreqUtils.FreqDicts.Remove(_freq.Name);
-            _freq.Name = name;
-            FreqUtils.FreqDicts.Add(name, _freq);
+            FreqUtils.FreqDicts.Add(name, new Freq(_freq.Type, name, _freq.Path, _freq.Active, _freq.Priority, _freq.Size, _freq.MaxValue, _freq.Options));
         }
-
-        _freq.Options = options;
 
         Close();
     }

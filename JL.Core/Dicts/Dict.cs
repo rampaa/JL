@@ -8,7 +8,7 @@ namespace JL.Core.Dicts;
 public sealed class Dict(DictType type, string name, string path, bool active, int priority, int size, DictOptions options) : IEquatable<Dict>
 {
     public DictType Type { get; } = type;
-    public string Name { get; set; } = name;
+    public string Name { get; } = name;
     public string Path { get; set; } = path;
     public bool Active { get; set; } = active;
     public int Priority { get; set; } = priority;
@@ -24,22 +24,19 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Name.GetHashCode(StringComparison.Ordinal), Path.GetHashCode(StringComparison.Ordinal), Type);
+        return Name.GetHashCode(StringComparison.Ordinal);
     }
 
     public override bool Equals(object? obj)
     {
-        return obj is Dict dict
-            && Name == dict.Name
-            && Path == dict.Path
-            && Type == dict.Type;
+        return obj is Dict dict && Name == dict.Name;
     }
 
     public bool Equals(Dict? other)
     {
-        return other is not null
-            && Name == other.Name
-            && Path == other.Path
-            && Type == other.Type;
+        return other is not null && Name == other.Name;
     }
+
+    public static bool operator ==(Dict? left, Dict? right) => left?.Equals(right) ?? right is null;
+    public static bool operator !=(Dict? left, Dict? right) => !left?.Equals(right) ?? right is not null;
 }

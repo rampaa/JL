@@ -237,8 +237,8 @@ public static class ExtensionMethods
         return CollectionsMarshal.AsSpan(indexes);
     }
 
-    public static bool SequenceEqual<T>(this List<T> source, List<T> target)
+    internal static bool SequenceEqual<T>(this List<T> source, List<T> target)
     {
-        return MemoryExtensions.SequenceEqual(CollectionsMarshal.AsSpan(source), CollectionsMarshal.AsSpan(target));
+        return CollectionsMarshal.AsSpan(source).SequenceEqual(CollectionsMarshal.AsSpan(target));
     }
 }
