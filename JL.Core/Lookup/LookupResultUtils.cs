@@ -21,7 +21,7 @@ public static class LookupResultUtils
             ReadOnlySpan<string> formSpan = CollectionsMarshal.AsSpan(form);
             for (int j = formSpan.Length - 1; j >= 0; j--)
             {
-                string info = formSpan[j];
+                ref readonly string info = ref formSpan[j];
                 if (info.Length is 0)
                 {
                     continue;
@@ -88,7 +88,7 @@ public static class LookupResultUtils
         StringBuilder sb = new();
         for (int i = 0; i < frequencies.Length; i++)
         {
-            LookupFrequencyResult lookupFreqResult = frequencies[i];
+            ref readonly LookupFrequencyResult lookupFreqResult = ref frequencies[i];
             _ = sb.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: {lookupFreqResult.Freq}");
             if (i + 1 != frequencies.Length)
             {

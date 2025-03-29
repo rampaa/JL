@@ -507,7 +507,7 @@ public static partial class JapaneseUtils
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
         for (int i = currentReadingPosition; i < primarySpellingSegments.Length; i += 2)
         {
-            string segment = primarySpellingSegments[i];
+            ref readonly string segment = ref primarySpellingSegments[i];
             int searchLength = reading.Length - currentReadingPosition - primarySpellingSegments.Length + i + 1;
             if (searchLength < 0)
             {
@@ -619,7 +619,7 @@ public static partial class JapaneseUtils
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
         for (int i = currentReadingPosition; i < primarySpellingSegments.Length; i += 2)
         {
-            string segment = primarySpellingSegments[i];
+            ref readonly string segment = ref primarySpellingSegments[i];
             int searchLength = reading.Length - currentReadingPosition - primarySpellingSegments.Length + i + 1;
             if (searchLength < 0)
             {

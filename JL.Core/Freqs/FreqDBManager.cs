@@ -229,7 +229,7 @@ internal static class FreqDBManager
         {
             FrequencyRecord record = GetRecord(dataReader);
             ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
-            foreach (string searchKey in searchKeys)
+            foreach (ref readonly string searchKey in searchKeys)
             {
                 if (freq.Contents.TryGetValue(searchKey, out IList<FrequencyRecord>? result))
                 {

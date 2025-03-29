@@ -53,7 +53,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
         //    Tags = null;
         //}
 
-        JsonElement definitionsArray = jsonElement[4];
+        ref readonly JsonElement definitionsArray = ref jsonElement[4];
         List<string> definitionList = new(definitionsArray.GetArrayLength());
         foreach (JsonElement definitionElement in definitionsArray.EnumerateArray())
         {

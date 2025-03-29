@@ -49,7 +49,7 @@ internal sealed partial class ManageProfilesWindow
         DockPanel[] resultDockPanels = new DockPanel[profileNames.Length];
         for (int i = 0; i < profileNames.Length; i++)
         {
-            string profileName = profileNames[i];
+            ref readonly string profileName = ref profileNames[i];
 
             DockPanel dockPanel = new();
 

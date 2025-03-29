@@ -13,7 +13,7 @@ internal static class JmdictRecordBuilder
         string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length][];
         for (int i = 0; i < kanjiElementsWithoutSearchOnlyForms.Length; i++)
         {
-            KanjiElement kanjiElement = kanjiElementsWithoutSearchOnlyForms[i];
+            ref readonly KanjiElement kanjiElement = ref kanjiElementsWithoutSearchOnlyForms[i];
             allSpellingsWithoutSearchOnlyForms[i] = kanjiElement.Keb;
             allKanjiOrthographyInfoWithoutSearchOnlyForms[i] = kanjiElement.KeInfList.TrimToArray();
         }

@@ -261,7 +261,7 @@ internal static class EpwingYomichanDBManager
         {
             EpwingYomichanRecord record = GetRecord(dataReader);
             ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
-            foreach (string searchKey in searchKeys)
+            foreach (ref readonly string searchKey in searchKeys)
             {
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
                 {

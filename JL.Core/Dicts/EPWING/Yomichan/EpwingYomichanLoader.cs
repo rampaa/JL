@@ -32,7 +32,7 @@ internal static class EpwingYomichanLoader
                     .ConfigureAwait(false);
             }
 
-            foreach(ref readonly ReadOnlyMemory<JsonElement> jsonElements in jsonElementLists.Span)
+            foreach (ref readonly ReadOnlyMemory<JsonElement> jsonElements in jsonElementLists.Span)
             {
                 EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElements.Span, dict);
                 if (record is not null)

@@ -588,7 +588,7 @@ public static class LookupUtils
         Dictionary<string, IntermediaryResult> results = new(StringComparer.Ordinal);
         for (int i = 0; i < textList.Length; i++)
         {
-            string text = textList[i];
+            ref readonly string text = ref textList[i];
             GetWordResultsHelper(dict, results, deconjugationResultsList[i], text, textInHiraganaList[i], dbWordDict, dbVerbDict);
 
             List<string>? textsWithoutLongVowelMark = textWithoutLongVowelMarkListExist ? textWithoutLongVowelMarkList![i] : null;

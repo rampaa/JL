@@ -27,7 +27,7 @@ internal static class FrequencyYomichanLoader
                     .ConfigureAwait(false);
             }
 
-            foreach (ReadOnlyMemory<JsonElement> valueMemory in frequencyJson.Span)
+            foreach (ref readonly ReadOnlyMemory<JsonElement> valueMemory in frequencyJson.Span)
             {
                 ReadOnlySpan<JsonElement> value = valueMemory.Span;
                 string primarySpelling = value[0].GetString()!.GetPooledString();

@@ -30,10 +30,9 @@ internal static class YomichanPitchAccentLoader
                     .ConfigureAwait(false);
             }
 
-            ReadOnlySpan<ReadOnlyMemory<JsonElement>> jsonObjectsSpan = jsonObjects.Span;
-            for (int i = 0; i < jsonObjects.Length; i++)
+            foreach (ref readonly ReadOnlyMemory<JsonElement> jsonObjectMemory in jsonObjects.Span)
             {
-                PitchAccentRecord newEntry = new(jsonObjectsSpan[i].Span);
+                PitchAccentRecord newEntry = new(jsonObjectMemory.Span);
                 if (newEntry.Position is byte.MaxValue || string.IsNullOrWhiteSpace(newEntry.Spelling))
                 {
                     continue;

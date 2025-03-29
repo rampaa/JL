@@ -218,7 +218,7 @@ public static partial class Utils
         int position = 0;
         int length = 0;
 
-        foreach (T[]? array in arrays)
+        foreach (ref readonly T[]? array in arrays)
         {
             if (array is not null)
             {
@@ -232,7 +232,7 @@ public static partial class Utils
         }
 
         T[] concatArray = new T[length];
-        foreach (T[]? array in arrays)
+        foreach (ref readonly T[]? array in arrays)
         {
             if (array is not null)
             {

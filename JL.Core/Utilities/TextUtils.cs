@@ -16,7 +16,7 @@ public static class TextUtils
     {
         for (int i = text.IndexOfAnyInRange(HighSurrogateStart, Noncharacter); (uint)i < (uint)text.Length; i++)
         {
-            char c = text[i];
+            ref readonly char c = ref text[i];
 
             if (c < HighSurrogateStart)
             {
