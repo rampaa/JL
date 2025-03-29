@@ -263,7 +263,7 @@ internal sealed partial class WinApi
         }
     }
 
-    public static void UnregisterAllGlobalHotKeys(nint windowHandle, params List<int> keyGestureIdsToIgnore)
+    public static void UnregisterAllGlobalHotKeys(nint windowHandle, params ReadOnlySpan<int> keyGestureIdsToIgnore)
     {
         int count = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Count;
         for (int id = 0; id < count; id++)

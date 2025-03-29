@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMdict;
 

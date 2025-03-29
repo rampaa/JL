@@ -198,19 +198,6 @@ public static class ExtensionMethods
         }
     }
 
-    public static bool Contains(this string[] source, string item)
-    {
-        foreach (string sourceItem in source)
-        {
-            if (sourceItem == item)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     internal static int IndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
     {
         int index = text[startIndex..].IndexOf(value);
@@ -248,5 +235,10 @@ public static class ExtensionMethods
         }
 
         return CollectionsMarshal.AsSpan(indexes);
+    }
+
+    public static bool SequenceEqual<T>(this List<T> source, List<T> target)
+    {
+        return MemoryExtensions.SequenceEqual(CollectionsMarshal.AsSpan(source), CollectionsMarshal.AsSpan(target));
     }
 }

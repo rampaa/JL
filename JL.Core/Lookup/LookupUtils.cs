@@ -32,7 +32,7 @@ public static class LookupUtils
         ConcurrentBag<LookupResult> lookupResults = [];
 
         List<LookupFrequencyResult>? kanjiFrequencyResults = null;
-        List<Freq>? kanjiFreqs = FreqUtils.KanjiFreqs;
+        Freq[]? kanjiFreqs = FreqUtils.KanjiFreqs;
         string kanji = "";
         string[]? kanjiComposition = null;
         if (DictUtils.AtLeastOneKanjiDictIsActive)
@@ -41,19 +41,19 @@ public static class LookupUtils
             _ = KanjiCompositionUtils.KanjiCompositionDict.TryGetValue(kanji, out kanjiComposition);
 
             kanjiFrequencyResults = kanjiFreqs is not null
-                ? GetKanjiFrequencies(kanji, CollectionsMarshal.AsSpan(kanjiFreqs))
+                ? GetKanjiFrequencies(kanji, kanjiFreqs)
                 : null;
         }
 
-        List<Freq>? wordFreqs = FreqUtils.WordFreqs;
-        List<Freq>? dbWordFreqs = null;
+        Freq[]? wordFreqs = FreqUtils.WordFreqs;
+        Freq[]? dbWordFreqs = null;
         if (wordFreqs is not null)
         {
             dbWordFreqs = wordFreqs
                 .Where(static f => f is { Options.UseDB.Value: true, Ready: true })
-                .ToList();
+                .ToArray();
 
-            if (dbWordFreqs.Count is 0)
+            if (dbWordFreqs.Length is 0)
             {
                 dbWordFreqs = null;
             }
@@ -230,7 +230,6 @@ public static class LookupUtils
         {
             pitchAccentDict = pitchDict?.Contents;
         }
-
 
         LookupCategory lookupType = CoreConfigManager.Instance.LookupCategory;
         List<Dict> dicts;
@@ -747,9 +746,9 @@ public static class LookupUtils
             : null;
     }
 
-    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(List<Freq> dbFreqs, HashSet<string> searchKeys)
+    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, HashSet<string> searchKeys)
     {
-        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Count, StringComparer.Ordinal);
+        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Length, StringComparer.Ordinal);
         _ = Parallel.ForEach(dbFreqs, freq =>
         {
             Dictionary<string, List<FrequencyRecord>>? freqRecords = FreqDBManager.GetRecordsFromDB(freq.Name, searchKeys);
@@ -763,7 +762,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildJmdictResult(
-        Dictionary<string, IntermediaryResult> jmdictResults, List<Freq>? wordFreqs, List<Freq>? dbWordFreqs, bool dbIsUsedForPitchDict, Dict? pitchDict)
+        Dictionary<string, IntermediaryResult> jmdictResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, bool dbIsUsedForPitchDict, Dict? pitchDict)
     {
         bool wordFreqsExist = wordFreqs is not null;
         bool dbWordFreqsExist = dbWordFreqs is not null;
@@ -818,7 +817,7 @@ public static class LookupUtils
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
-                        frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, CollectionsMarshal.AsSpan(wordFreqs!), frequencyDicts) : null,
+                        frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
                         jmdictLookupResult: new JmdictLookupResult(jmdictResult.PrimarySpellingOrthographyInfo, jmdictResult.ReadingsOrthographyInfo, jmdictResult.AlternativeSpellingsOrthographyInfo, jmdictResult.MiscSharedByAllSenses, jmdictResult.Misc, jmdictResult.WordClasses),
                         dict: wordResult.Dict,
                         formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
@@ -946,7 +945,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildEpwingYomichanResult(
-        IDictionary<string, IntermediaryResult> epwingResults, List<Freq>? freqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        IDictionary<string, IntermediaryResult> epwingResults, Freq[]? freqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool freqsExist = freqs is not null;
         bool pitchAccentDictExists = pitchAccentDict is not null;
@@ -975,7 +974,7 @@ public static class LookupUtils
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
-                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, CollectionsMarshal.AsSpan(freqs!), frequencyDicts) : null,
+                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
@@ -1023,7 +1022,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildEpwingNazekaResult(
-        IDictionary<string, IntermediaryResult> epwingNazekaResults, List<Freq>? freqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        IDictionary<string, IntermediaryResult> epwingNazekaResults, Freq[]? freqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         bool freqsExist = freqs is not null;
@@ -1053,7 +1052,7 @@ public static class LookupUtils
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
-                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, CollectionsMarshal.AsSpan(freqs!), frequencyDicts) : null,
+                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
@@ -1124,7 +1123,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildCustomWordResult(
-        Dictionary<string, IntermediaryResult> customWordResults, List<Freq>? wordFreqs, List<Freq>? dbWordFreqs, bool dbIsUsedForPitchDict, Dict? pitchDict)
+        Dictionary<string, IntermediaryResult> customWordResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, bool dbIsUsedForPitchDict, Dict? pitchDict)
     {
         bool wordFreqsExist = wordFreqs is not null;
         bool dbWordFreqsExist = dbWordFreqs is not null;
@@ -1182,7 +1181,7 @@ public static class LookupUtils
                         alternativeSpellings: customWordDictResult.AlternativeSpellings,
                         formattedDefinitions: customWordDictResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
-                        frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, CollectionsMarshal.AsSpan(wordFreqs!), frequencyDicts) : null,
+                        frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
                         wordClasses: customWordDictResult.WordClasses
                     );
 
@@ -1229,7 +1228,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static List<LookupFrequencyResult>? GetWordFrequencies<T>(T record, ReadOnlySpan<Freq> wordFreqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB) where T : IGetFrequency
+    private static List<LookupFrequencyResult>? GetWordFrequencies<T>(T record, Freq[] wordFreqs, IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB) where T : IGetFrequency
     {
         bool freqDictsFromDBExist = freqDictsFromDB is not null;
         List<LookupFrequencyResult> freqsList = new(wordFreqs.Length);
@@ -1256,7 +1255,7 @@ public static class LookupUtils
             : null;
     }
 
-    private static List<LookupFrequencyResult>? GetKanjiFrequencies(string kanji, ReadOnlySpan<Freq> kanjiFreqs)
+    private static List<LookupFrequencyResult>? GetKanjiFrequencies(string kanji, Freq[] kanjiFreqs)
     {
         List<LookupFrequencyResult> freqsList = new(kanjiFreqs.Length);
         foreach (Freq kanjiFreq in kanjiFreqs)

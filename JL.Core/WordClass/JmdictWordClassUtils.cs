@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
@@ -88,7 +89,7 @@ internal static class JmdictWordClassUtils
                 JmdictWordClass record = new(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings);
                 if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? results))
                 {
-                    if (!results.Contains(record))
+                    if (!CollectionsMarshal.AsSpan(results).Contains(record))
                     {
                         results.Add(record);
                     }

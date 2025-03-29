@@ -266,7 +266,7 @@ internal static class Deconjugator
 
                     foreach (Form myForm in CollectionsMarshal.AsSpan(newForm))
                     {
-                        if (!newNovel.Contains(myForm))
+                        if (!CollectionsMarshal.AsSpan(newNovel).Contains(myForm))
                         {
                             newNovel.Add(myForm);
                         }

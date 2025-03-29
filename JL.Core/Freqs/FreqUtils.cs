@@ -15,8 +15,8 @@ public static class FreqUtils
 
     public static Dictionary<string, Freq> FreqDicts { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-    internal static List<Freq>? WordFreqs { get; private set; }
-    internal static List<Freq>? KanjiFreqs { get; private set; }
+    internal static Freq[]? WordFreqs { get; private set; }
+    internal static Freq[]? KanjiFreqs { get; private set; }
 
     internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3, StringComparer.OrdinalIgnoreCase)
     {
@@ -389,18 +389,18 @@ public static class FreqUtils
     {
         WordFreqs = freqs.Where(static f => f is { Type: not FreqType.YomichanKanji, Active: true })
             .OrderBy(static f => f.Priority)
-            .ToList();
+            .ToArray();
 
-        if (WordFreqs.Count is 0)
+        if (WordFreqs.Length is 0)
         {
             WordFreqs = null;
         }
 
         KanjiFreqs = freqs.Where(static f => f is { Type: FreqType.YomichanKanji, Active: true })
             .OrderBy(static f => f.Priority)
-            .ToList();
+            .ToArray();
 
-        if (KanjiFreqs.Count is 0)
+        if (KanjiFreqs.Length is 0)
         {
             KanjiFreqs = null;
         }
