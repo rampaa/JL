@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -349,18 +348,17 @@ internal sealed partial class PreferencesWindow
     {
         string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
-        List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
-        if (fieldNames is not null)
+        ReadOnlyMemory<string> fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
+        if (fieldNames.Length > 0)
         {
-            OrderedDictionary<string, JLField> fields = new(fieldNames.Count, StringComparer.Ordinal);
-            foreach (ref readonly string fieldName in CollectionsMarshal.AsSpan(fieldNames))
+            OrderedDictionary<string, JLField> fields = new(fieldNames.Length, StringComparer.Ordinal);
+            foreach (ref readonly string fieldName in fieldNames.Span)
             {
                 fields.Add(fieldName, JLField.Nothing);
             }
 
             CreateFieldElements(fields, fieldList, miningPanel);
         }
-
         else
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
