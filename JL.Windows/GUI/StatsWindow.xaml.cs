@@ -76,7 +76,7 @@ internal sealed partial class StatsWindow
             StatsMode.Session => StatsUtils.SessionStats,
             StatsMode.Profile => StatsUtils.ProfileLifetimeStats,
             StatsMode.Lifetime => StatsUtils.LifetimeStats,
-            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "StatsMode out of range")
+            _ => StatsUtils.SessionStats
         };
 
         TextBlockCharacters.Text = stats.Characters.ToString("N0", CultureInfo.InvariantCulture);
@@ -205,7 +205,7 @@ internal sealed partial class StatsWindow
                 StatsMode.Session => _sessionLookupCountsForCurrentProfile,
                 StatsMode.Profile => _termLookupCountsForCurrentProfile,
                 StatsMode.Lifetime => _termLookupCountsForLifetime,
-                _ => throw new ArgumentOutOfRangeException(null, mode, "StatsMode out of range")
+                _ => _sessionLookupCountsForCurrentProfile
             };
 
             infoDataGridWindow.InfoDataGrid.ItemsSource = termLookupCounts;

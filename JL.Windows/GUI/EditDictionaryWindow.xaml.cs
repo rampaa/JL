@@ -225,9 +225,11 @@ internal sealed partial class EditDictionaryWindow
             case DictType.JMdict:
                 BrowseForDictionaryFile("JMdict file|JMdict.xml");
                 break;
+
             case DictType.JMnedict:
                 BrowseForDictionaryFile("JMnedict file|JMnedict.xml");
                 break;
+
             case DictType.Kanjidic:
                 BrowseForDictionaryFile("kanjidic2 file|kanjidic2.xml");
                 break;

@@ -217,7 +217,7 @@ public static class StatsUtils
             StatsMode.Lifetime => LifetimeStats,
             StatsMode.Profile => ProfileLifetimeStats,
             StatsMode.Session => SessionStats,
-            _ => throw new ArgumentOutOfRangeException(nameof(statsMode), statsMode, "Invalid StatsMode")
+            _ => SessionStats
         };
 
         stats.ResetStats();

@@ -835,14 +835,7 @@ public static class DictUtils
                             {
                                 int dictSize = dict.Size > 0
                                     ? dict.Size
-                                    : dict.Type switch
-                                    {
-                                        DictType.NonspecificWordYomichan => 250000,
-                                        DictType.NonspecificKanjiWithWordSchemaYomichan => 250000,
-                                        DictType.NonspecificNameYomichan => 250000,
-                                        DictType.NonspecificYomichan => 250000,
-                                        _ => throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType")
-                                    };
+                                    : 250000;
 
                                 dict.Contents = new Dictionary<string, IList<IDictRecord>>(dictSize, StringComparer.Ordinal);
 
@@ -1103,14 +1096,7 @@ public static class DictUtils
                             {
                                 int size = dict.Size > 0
                                     ? dict.Size
-                                    : dict.Type switch
-                                    {
-                                        DictType.NonspecificWordNazeka => 250000,
-                                        DictType.NonspecificKanjiNazeka => 250000,
-                                        DictType.NonspecificNameNazeka => 250000,
-                                        DictType.NonspecificNazeka => 250000,
-                                        _ => throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid DictType")
-                                    };
+                                    : 250000;
 
                                 dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
 
@@ -1271,7 +1257,11 @@ public static class DictUtils
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, dict.Type, "Invalid dictionary type");
+                {
+                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(DictUtils), nameof(LoadDictionaries), dict.Type);
+                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
+                    break;
+                }
             }
         }
 

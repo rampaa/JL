@@ -43,6 +43,7 @@ internal static class FrequencyYomichanLoader
                     case JsonValueKind.Number:
                         frequency = thirdElement.GetInt32();
                         break;
+
                     case JsonValueKind.Object when thirdElement.TryGetProperty("value", out JsonElement freqValue):
                         frequency = freqValue.GetInt32();
                         break;

@@ -285,7 +285,11 @@ public static class FreqUtils
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, freq.Type, "Invalid freq type");
+                {
+                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(FreqUtils), nameof(LoadFrequencies), freq.Type);
+                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid frequency type: {freq.Type}");
+                    break;
+                }
             }
         }
 

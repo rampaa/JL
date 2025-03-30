@@ -28,8 +28,9 @@ internal sealed partial class AlertWindow
             AlertLevel.Warning => Brushes.Orange,
             AlertLevel.Information => Brushes.White,
             AlertLevel.Success => Brushes.Green,
-            _ => throw new ArgumentOutOfRangeException(nameof(alertLevel), alertLevel, "Invalid AlertLevel")
+            _ => Brushes.White
         };
+
         AlertWindowTextBlock.Text = message;
     }
 }
