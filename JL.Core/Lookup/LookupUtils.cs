@@ -130,7 +130,7 @@ public static class LookupUtils
         {
             parameter = DBUtils.GetParameter(textInHiraganaList.Count);
 
-            if (deconjugatedTexts?.Count > 0)
+            if (deconjugatedTexts is not null && deconjugatedTexts.Count > 0)
             {
                 verbParameter = DBUtils.GetParameter(deconjugatedTexts.Count);
             }
@@ -399,7 +399,7 @@ public static class LookupUtils
         return lookupResults
             .OrderByDescending(static lookupResult => lookupResult.MatchedText.Length)
             .ThenByDescending(static lookupResult => lookupResult.PrimarySpelling == lookupResult.MatchedText)
-            .ThenByDescending(static lookupResult => lookupResult.Readings?.Contains(lookupResult.MatchedText) ?? false)
+            .ThenByDescending(static lookupResult => lookupResult.Readings is not null && lookupResult.Readings.Contains(lookupResult.MatchedText))
             .ThenByDescending(static lookupResult => lookupResult.DeconjugationProcess is null ? int.MaxValue : lookupResult.PrimarySpelling.Length)
             .ThenBy(static lookupResult => lookupResult.Dict.Priority)
             .ThenBy(static lookupResult =>
@@ -432,7 +432,7 @@ public static class LookupUtils
                 JmdictLookupResult? jmdictLookupResult = lookupResult.JmdictLookupResult;
                 if (jmdictLookupResult is not null)
                 {
-                    if (jmdictLookupResult.MiscSharedByAllSenses?.Contains("uk") ?? false)
+                    if (jmdictLookupResult.MiscSharedByAllSenses is not null && jmdictLookupResult.MiscSharedByAllSenses.Contains("uk"))
                     {
                         return 0;
                     }
@@ -441,7 +441,7 @@ public static class LookupUtils
                     {
                         foreach (string[]? misc in jmdictLookupResult.MiscList)
                         {
-                            if (misc?.Contains("uk") ?? false)
+                            if (misc is not null && misc.Contains("uk"))
                             {
                                 return 0;
                             }
@@ -465,7 +465,7 @@ public static class LookupUtils
             })
             .ThenBy(static lookupResult =>
             {
-                if (lookupResult.Frequencies?.Count > 0)
+                if (lookupResult.Frequencies is not null && lookupResult.Frequencies.Count > 0)
                 {
                     LookupFrequencyResult freqResult = lookupResult.Frequencies[0];
                     return !freqResult.HigherValueMeansHigherFrequency
@@ -765,7 +765,7 @@ public static class LookupUtils
     {
         List<IDictRecord>? results = getKanjiRecordsFromDB(dict.Name, kanji);
 
-        return results?.Count > 0
+        return results is not null && results.Count > 0
             ? new IntermediaryResult(kanji, dict, [results])
             : null;
     }

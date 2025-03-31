@@ -169,8 +169,9 @@ internal sealed partial class PopupWindow
         }
         else
         {
-            text = _lastInteractedTextBox?.SelectionLength > 0
-                ? _lastInteractedTextBox.SelectedText
+            TextBox? lastInteractedTextBox = _lastInteractedTextBox;
+            text = lastInteractedTextBox?.SelectionLength > 0
+                ? lastInteractedTextBox.SelectedText
                 : LastLookupResults[_listViewItemIndex].PrimarySpelling;
         }
 
@@ -195,8 +196,9 @@ internal sealed partial class PopupWindow
         }
         else
         {
-            text = _lastInteractedTextBox?.SelectionLength > 0
-                ? _lastInteractedTextBox.SelectedText
+            TextBox? lastInteractedTextBox = _lastInteractedTextBox;
+            text = lastInteractedTextBox?.SelectionLength > 0
+                ? lastInteractedTextBox.SelectedText
                 : LastLookupResults[_listViewItemIndex].PrimarySpelling;
         }
 
@@ -246,7 +248,7 @@ internal sealed partial class PopupWindow
 
         LookupResult[]? lookupResults = LookupUtils.LookupText(textToLookUp);
 
-        if (lookupResults?.Length > 0)
+        if (lookupResults is not null && lookupResults.Length > 0)
         {
             _previousTextBox = textBox;
             LookupResult firstLookupResult = lookupResults[0];
@@ -368,7 +370,7 @@ internal sealed partial class PopupWindow
 
         LookupResult[]? lookupResults = LookupUtils.LookupText(textBox.SelectedText);
 
-        if (lookupResults?.Length > 0)
+        if (lookupResults is not null && lookupResults.Length > 0)
         {
             _previousTextBox = textBox;
             LookupResult firstLookupResult = lookupResults[0];
@@ -699,7 +701,8 @@ internal sealed partial class PopupWindow
         }
 
         JmdictLookupResult? jmdictLookupResult = result.JmdictLookupResult;
-        if (showPOrthographyInfo && jmdictLookupResult?.PrimarySpellingOrthographyInfoList is not null)
+        bool jmdictLookupResultExist = jmdictLookupResult is not null;
+        if (showPOrthographyInfo && jmdictLookupResultExist && jmdictLookupResult!.PrimarySpellingOrthographyInfoList is not null)
         {
             TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(jmdictLookupResult.PrimarySpellingOrthographyInfoList),
                 $"[{string.Join(", ", jmdictLookupResult.PrimarySpellingOrthographyInfoList)}]",
@@ -714,7 +717,7 @@ internal sealed partial class PopupWindow
         if (result.Readings is not null && configManager.ReadingsFontSize > 0
                                         && (pitchPositionsExist || result.KanjiLookupResult is null || (result.KanjiLookupResult.KunReadings is null && result.KanjiLookupResult.OnReadings is null)))
         {
-            string readingsText = showROrthographyInfo && jmdictLookupResult?.ReadingsOrthographyInfoList is not null
+            string readingsText = showROrthographyInfo && jmdictLookupResultExist && jmdictLookupResult!.ReadingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, jmdictLookupResult.ReadingsOrthographyInfoList)
                 : string.Join('、', result.Readings);
 
@@ -817,8 +820,8 @@ internal sealed partial class PopupWindow
 
         if (result.AlternativeSpellings is not null && configManager.AlternativeSpellingsFontSize > 0)
         {
-            string alternativeSpellingsText = showAOrthographyInfo && result.JmdictLookupResult?.AlternativeSpellingsOrthographyInfoList is not null
-                ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, result.JmdictLookupResult.AlternativeSpellingsOrthographyInfoList)
+            string alternativeSpellingsText = showAOrthographyInfo && jmdictLookupResultExist && jmdictLookupResult!.AlternativeSpellingsOrthographyInfoList is not null
+                ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, jmdictLookupResult.AlternativeSpellingsOrthographyInfoList)
                 : $"[{string.Join('、', result.AlternativeSpellings)}]";
 
             if (MiningMode)
@@ -878,7 +881,7 @@ internal sealed partial class PopupWindow
                     _ = top.Children.Add(deconjugationProcessTextBlock);
                 }
             }
-            else if (result.PrimarySpelling != result.MatchedText && (!result.Readings?.Contains(result.MatchedText) ?? true))
+            else if (result.PrimarySpelling != result.MatchedText && (result.Readings is null || !result.Readings.Contains(result.MatchedText)))
             {
                 if (MiningMode)
                 {
@@ -1467,7 +1470,12 @@ internal sealed partial class PopupWindow
             || DictUtils.KanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
             TextBox? definitionsTextBox = GetDefinitionTextBox(listViewItemIndex);
-            string? formattedDefinitions = definitionsTextBox?.Text;
+            string? formattedDefinitions = null;
+            if (definitionsTextBox is not null)
+            {
+                formattedDefinitions = definitionsTextBox.Text;
+            }
+
             string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
 
             HidePopup();
@@ -1540,9 +1548,10 @@ internal sealed partial class PopupWindow
         else
         {
             text = _lastInteractedTextBox.SelectedText;
-            if (text == ChildPopupWindow?.LastSelectedText)
+            PopupWindow? childPopupWindow = ChildPopupWindow;
+            if (childPopupWindow is not null && text == childPopupWindow.LastSelectedText)
             {
-                string[]? readings = ChildPopupWindow.LastLookupResults[0].Readings;
+                string[]? readings = childPopupWindow.LastLookupResults[0].Readings;
                 reading = readings?.Length is 1
                     ? readings[0]
                     : "";
@@ -1861,8 +1870,9 @@ internal sealed partial class PopupWindow
                 }
                 else
                 {
-                    text = _lastInteractedTextBox?.SelectionLength > 0
-                        ? _lastInteractedTextBox.SelectedText
+                    TextBox? lastInteractedTextBox = _lastInteractedTextBox;
+                    text = lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0
+                        ? lastInteractedTextBox.SelectedText
                         : LastLookupResults[_listViewItemIndex].PrimarySpelling;
                 }
 
@@ -1912,14 +1922,15 @@ internal sealed partial class PopupWindow
         {
             if (MiningMode)
             {
-                if (_lastInteractedTextBox?.SelectionLength > 0)
+                TextBox? lastInteractedTextBox = _lastInteractedTextBox;
+                if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0)
                 {
                     ChildPopupWindow ??= new PopupWindow
                     {
                         Owner = this
                     };
 
-                    return ChildPopupWindow.LookupOnSelect(_lastInteractedTextBox);
+                    return ChildPopupWindow.LookupOnSelect(lastInteractedTextBox);
                 }
 
                 UpdatePosition();
@@ -1927,9 +1938,10 @@ internal sealed partial class PopupWindow
 
             else if (Owner is PopupWindow previousPopupWindow)
             {
-                if (previousPopupWindow._lastInteractedTextBox?.SelectionLength > 0)
+                TextBox? lastInteractedTextBox = previousPopupWindow._lastInteractedTextBox;
+                if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0)
                 {
-                    return LookupOnSelect(previousPopupWindow._lastInteractedTextBox);
+                    return LookupOnSelect(lastInteractedTextBox);
                 }
             }
 
@@ -2011,15 +2023,16 @@ internal sealed partial class PopupWindow
     private void OnMouseEnter(object sender, MouseEventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
+        PopupWindow? childPopupWindow = ChildPopupWindow;
         if (configManager is { LookupOnSelectOnly: false, LookupOnMouseClickOnly: false }
-            && ChildPopupWindow is { IsVisible: true, MiningMode: false })
+            && childPopupWindow is { IsVisible: true, MiningMode: false })
         {
-            ChildPopupWindow.HidePopup();
+            childPopupWindow.HidePopup();
         }
 
         if (MiningMode)
         {
-            if (!ChildPopupWindow?.IsVisible ?? true)
+            if (childPopupWindow is null || !childPopupWindow.IsVisible)
             {
                 PopupWindowUtils.PopupAutoHideTimer.Stop();
             }
@@ -2096,9 +2109,10 @@ internal sealed partial class PopupWindow
 
     private void OnMouseLeave(object sender, MouseEventArgs e)
     {
-        if (ChildPopupWindow is { IsVisible: true, MiningMode: false, UnavoidableMouseEnter: false })
+        PopupWindow? childPopupWindow = ChildPopupWindow;
+        if (childPopupWindow is { IsVisible: true, MiningMode: false, UnavoidableMouseEnter: false })
         {
-            ChildPopupWindow.HidePopup();
+            childPopupWindow.HidePopup();
         }
 
         if (IsMouseOver)
@@ -2121,7 +2135,7 @@ internal sealed partial class PopupWindow
                     PopupWindowUtils.PopupAutoHideTimer.Stop();
                 }
 
-                else if (!ChildPopupWindow?.IsVisible ?? true)
+                else if (childPopupWindow is null || !childPopupWindow.IsVisible)
                 {
                     PopupWindowUtils.PopupAutoHideTimer.Stop();
                     PopupWindowUtils.PopupAutoHideTimer.Start();
@@ -2235,11 +2249,12 @@ internal sealed partial class PopupWindow
         MiningSelectionWindow.CloseWindow();
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (ChildPopupWindow is not null
+        PopupWindow? childPopupWindow = ChildPopupWindow;
+        if (childPopupWindow is not null
             && e.ChangedButton is not MouseButton.Right
             && e.ChangedButton != configManager.MiningModeMouseButton)
         {
-            PopupWindowUtils.HidePopups(ChildPopupWindow);
+            PopupWindowUtils.HidePopups(childPopupWindow);
         }
         else if (e.ChangedButton == configManager.MiningModeMouseButton)
         {
@@ -2248,15 +2263,15 @@ internal sealed partial class PopupWindow
                 ShowMiningModeResults();
             }
 
-            else if (ChildPopupWindow?.IsVisible ?? false)
+            else if (childPopupWindow is not null && childPopupWindow.IsVisible)
             {
-                if (!ChildPopupWindow.MiningMode)
+                if (!childPopupWindow.MiningMode)
                 {
-                    ChildPopupWindow.ShowMiningModeResults();
+                    childPopupWindow.ShowMiningModeResults();
                 }
                 else
                 {
-                    PopupWindowUtils.HidePopups(ChildPopupWindow);
+                    PopupWindowUtils.HidePopups(childPopupWindow);
                 }
             }
         }
@@ -2472,7 +2487,8 @@ internal sealed partial class PopupWindow
 
     private void PopupListView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        if ((ChildPopupWindow?.IsVisible ?? false)
+        PopupWindow? childPopupWindow = ChildPopupWindow;
+        if ((childPopupWindow is not null && childPopupWindow.IsVisible)
             || ReadingSelectionWindow.IsItVisible()
             || MiningSelectionWindow.IsItVisible())
         {
