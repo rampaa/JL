@@ -176,6 +176,11 @@ internal sealed partial class AddFrequencyWindow
 
     private void FreqTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        FreqTypeComboBox.ClearValue(BorderBrushProperty);
+        PathTextBlock.ClearValue(BorderBrushProperty);
+        PathTextBlock.ClearValue(CursorProperty);
+        PathTextBlock.ClearValue(ToolTipProperty);
+        PathTextBlock.Clear();
         GenerateDictOptions();
     }
 }
