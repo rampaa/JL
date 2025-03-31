@@ -170,7 +170,7 @@ internal sealed partial class PopupWindow
         else
         {
             TextBox? lastInteractedTextBox = _lastInteractedTextBox;
-            text = lastInteractedTextBox?.SelectionLength > 0
+            text = lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0
                 ? lastInteractedTextBox.SelectedText
                 : LastLookupResults[_listViewItemIndex].PrimarySpelling;
         }
@@ -197,7 +197,7 @@ internal sealed partial class PopupWindow
         else
         {
             TextBox? lastInteractedTextBox = _lastInteractedTextBox;
-            text = lastInteractedTextBox?.SelectionLength > 0
+            text = lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0
                 ? lastInteractedTextBox.SelectedText
                 : LastLookupResults[_listViewItemIndex].PrimarySpelling;
         }
