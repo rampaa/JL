@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
         s_instance = this;
         InitializeComponent();
         ConfigHelper.Instance.SetLang("en");
-        FirstPopupWindow = new PopupWindow();
+        FirstPopupWindow = new PopupWindow(0);
     }
 
     // ReSharper disable once AsyncVoidMethod

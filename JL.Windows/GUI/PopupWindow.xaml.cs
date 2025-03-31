@@ -69,9 +69,12 @@ internal sealed partial class PopupWindow
 
     private readonly ContextMenu _editableTextBoxContextMenu = new();
 
-    public PopupWindow()
+    private readonly int _popupIndex;
+
+    public PopupWindow(int popupIndex)
     {
         InitializeComponent();
+        _popupIndex = popupIndex;
         Init();
     }
 
@@ -214,7 +217,7 @@ internal sealed partial class PopupWindow
 
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        bool isFirstPopupWindow = this == mainWindow.FirstPopupWindow;
+        bool isFirstPopupWindow = _popupIndex is 0;
         if (isFirstPopupWindow
                 ? configManager.DisableLookupsForNonJapaneseCharsInMainWindow
                   && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString())
@@ -403,7 +406,7 @@ internal sealed partial class PopupWindow
             if (configManager.Focusable)
             {
                 MainWindow mainWindow = MainWindow.Instance;
-                if (configManager.RestoreFocusToPreviouslyActiveWindow && this == mainWindow.FirstPopupWindow)
+                if (configManager.RestoreFocusToPreviouslyActiveWindow && _popupIndex is 0)
                 {
                     nint previousWindowHandle = WinApi.GetActiveWindowHandle();
                     if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
@@ -542,7 +545,7 @@ internal sealed partial class PopupWindow
 
     private void UpdatePosition()
     {
-        if (ConfigManager.Instance.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+        if (ConfigManager.Instance.FixedPopupPositioning && _popupIndex is 0)
         {
             UpdatePositionToFixedPosition();
         }
@@ -1348,7 +1351,7 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        ChildPopupWindow ??= new PopupWindow
+        ChildPopupWindow ??= new PopupWindow(_popupIndex + 1)
         {
             Owner = this
         };
@@ -1378,7 +1381,10 @@ internal sealed partial class PopupWindow
     // ReSharper disable once AsyncVoidMethod
     private async void TextBox_MouseMove(object sender, MouseEventArgs e)
     {
-        await HandleTextBoxMouseMove((TextBox)sender, e).ConfigureAwait(false);
+        if (_popupIndex < 40)
+        {
+            await HandleTextBoxMouseMove((TextBox)sender, e).ConfigureAwait(false);
+        }
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -1605,7 +1611,7 @@ internal sealed partial class PopupWindow
 
             if (configManager.Focusable)
             {
-                if (configManager.RestoreFocusToPreviouslyActiveWindow && this == mainWindow.FirstPopupWindow)
+                if (configManager.RestoreFocusToPreviouslyActiveWindow && _popupIndex is 0)
                 {
                     nint previousWindowHandle = WinApi.GetActiveWindowHandle();
                     if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
@@ -1923,17 +1929,15 @@ internal sealed partial class PopupWindow
             if (MiningMode)
             {
                 TextBox? lastInteractedTextBox = _lastInteractedTextBox;
-                if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0)
+                if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0 && _popupIndex < 40)
                 {
-                    ChildPopupWindow ??= new PopupWindow
+                    ChildPopupWindow ??= new PopupWindow(_popupIndex + 1)
                     {
                         Owner = this
                     };
 
                     return ChildPopupWindow.LookupOnSelect(lastInteractedTextBox);
                 }
-
-                UpdatePosition();
             }
 
             else if (Owner is PopupWindow previousPopupWindow)
@@ -2041,7 +2045,7 @@ internal sealed partial class PopupWindow
         }
 
         if (UnavoidableMouseEnter
-            || (configManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow))
+            || (configManager.FixedPopupPositioning && _popupIndex is 0))
         {
             return;
         }
@@ -2097,7 +2101,12 @@ internal sealed partial class PopupWindow
 
     private Task HandleTextBoxMouseUp(TextBox textBox)
     {
-        ChildPopupWindow ??= new PopupWindow
+        if (_popupIndex >= 49)
+        {
+            return Task.CompletedTask;
+        }
+
+        ChildPopupWindow ??= new PopupWindow(_popupIndex + 1)
         {
             Owner = this
         };
@@ -2290,7 +2299,7 @@ internal sealed partial class PopupWindow
     public void HidePopup()
     {
         MainWindow mainWindow = MainWindow.Instance;
-        bool isFirstPopup = this == mainWindow.FirstPopupWindow;
+        bool isFirstPopup = _popupIndex is 0;
 
         ConfigManager configManager = ConfigManager.Instance;
         if (isFirstPopup
@@ -2460,7 +2469,7 @@ internal sealed partial class PopupWindow
         if (configManager.Focusable)
         {
             MainWindow mainWindow = MainWindow.Instance;
-            if (configManager.RestoreFocusToPreviouslyActiveWindow && this == mainWindow.FirstPopupWindow)
+            if (configManager.RestoreFocusToPreviouslyActiveWindow && _popupIndex is 0)
             {
                 nint previousWindowHandle = WinApi.GetActiveWindowHandle();
                 if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
