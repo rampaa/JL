@@ -525,11 +525,12 @@ public static class LookupUtils
                                 if (index >= 0)
                                 {
                                     List<List<string>> processes = result.Processes![index];
+                                    ReadOnlySpan<string> processSpan = CollectionsMarshal.AsSpan(deconjugationResult.Process);
 
                                     bool addProcess = true;
                                     foreach (ref readonly List<string> process in CollectionsMarshal.AsSpan(processes))
                                     {
-                                        if (process.SequenceEqual(deconjugationResult.Process))
+                                        if (CollectionsMarshal.AsSpan(process).SequenceEqual(processSpan))
                                         {
                                             addProcess = false;
                                             break;
@@ -622,10 +623,22 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultsCount; i++)
                 {
                     JmdictRecord dictResult = (JmdictRecord)dictResults[i];
-                    if ((dictResult.WordClassesSharedByAllSenses?.Contains(lastTag) ?? false)
-                        || (dictResult.WordClasses?.Any(wordClasses => wordClasses?.Contains(lastTag) ?? false) ?? false))
+                    if (dictResult.WordClassesSharedByAllSenses is not null
+                        && dictResult.WordClassesSharedByAllSenses.Contains(lastTag))
                     {
                         resultsList.Add(dictResult);
+                    }
+
+                    else if (dictResult.WordClasses is not null)
+                    {
+                        foreach (string[]? wordClasses in dictResult.WordClasses)
+                        {
+                            if (wordClasses is not null && wordClasses.Contains(lastTag))
+                            {
+                                resultsList.Add(dictResult);
+                                break;
+                            }
+                        }
                     }
                 }
 
