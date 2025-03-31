@@ -197,7 +197,7 @@ internal sealed partial class EditDictionaryWindow
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        string type = _dict.Type.GetDescription() ?? _dict.Type.ToString();
+        string type = _dict.Type.GetDescription();
         _ = ComboBoxDictType.Items.Add(type);
         ComboBoxDictType.SelectedValue = type;
         PathTextBlock.Text = _dict.Path;

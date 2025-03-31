@@ -8,7 +8,7 @@ namespace JL.Core.Utilities;
 public static class ExtensionMethods
 {
     // Falls back to name
-    public static string? GetDescription(this Enum value)
+    public static string GetDescription(this Enum value)
     {
         Type type = value.GetType();
         string? name = Enum.GetName(type, value);
@@ -23,7 +23,7 @@ public static class ExtensionMethods
             }
         }
 
-        return null;
+        return value.ToString();
     }
 
     public static T GetEnum<T>(this string description) where T : struct, Enum

@@ -165,7 +165,7 @@ internal sealed partial class AddDictionaryWindow
         IEnumerable<DictType> loadedDictTypes = DictUtils.Dicts.Values.Select(static dict => dict.Type);
         IEnumerable<DictType> validTypes = types.Except(loadedDictTypes.Except(DictUtils.NonspecificDictTypes));
 
-        ComboBoxDictType.ItemsSource = validTypes.Select(static d => d.GetDescription() ?? d.ToString());
+        ComboBoxDictType.ItemsSource = validTypes.Select(static d => d.GetDescription());
     }
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)

@@ -131,7 +131,7 @@ internal sealed partial class AddFrequencyWindow
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        FreqTypeComboBox.ItemsSource = Enum.GetValues<FreqType>().Select(static ft => ft.GetDescription() ?? ft.ToString());
+        FreqTypeComboBox.ItemsSource = Enum.GetValues<FreqType>().Select(static ft => ft.GetDescription());
     }
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)

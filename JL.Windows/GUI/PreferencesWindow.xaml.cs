@@ -394,8 +394,12 @@ internal sealed partial class PreferencesWindow
     {
         fieldPanel.Children.Clear();
 
-        string[] descriptions = fieldList
-            .Select(static jlFieldName => jlFieldName.GetDescription() ?? jlFieldName.ToString()).ToArray();
+        string[] descriptions = new string[fieldList.Length];
+        for (int i = 0; i < fieldList.Length; i++)
+        {
+            JLField jLField = fieldList[i];
+            descriptions[i] = jLField.GetDescription();
+        }
 
         int fieldsCount = fields.Count;
         for (int i = 0; i < fieldsCount; i++)
@@ -409,7 +413,7 @@ internal sealed partial class PreferencesWindow
             ComboBox comboBoxJLFields = new()
             {
                 ItemsSource = descriptions,
-                SelectedItem = jlField.GetDescription() ?? jlField.ToString(),
+                SelectedItem = jlField.GetDescription(),
                 Margin = new Thickness(0, 10, 0, 15)
             };
 
@@ -439,8 +443,16 @@ internal sealed partial class PreferencesWindow
             ComboBox comboBox = (ComboBox)stackPanel.Children[1];
 
             string selectedDescription = comboBox.SelectionBoxItem.ToString()!;
-            JLField result = jlFieldList.FirstOrDefault(jlFieldName =>
-                (jlFieldName.GetDescription() ?? jlFieldName.ToString()) == selectedDescription, JLField.Nothing);
+
+            JLField result = JLField.Nothing;
+            foreach (JLField jlField in jlFieldList)
+            {
+                if (jlField.GetDescription() == selectedDescription)
+                {
+                    result = jlField;
+                    break;
+                }
+            }
 
             dict.Add(textBlock.Text, result);
         }

@@ -175,7 +175,7 @@ internal sealed partial class EditFrequencyWindow
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        string type = _freq.Type.GetDescription() ?? _freq.Type.ToString();
+        string type = _freq.Type.GetDescription();
         _ = FreqTypeComboBox.Items.Add(type);
         FreqTypeComboBox.SelectedValue = type;
         PathTextBlock.Text = _freq.Path;

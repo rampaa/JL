@@ -15,7 +15,7 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class AddAudioSourceWindow
 {
-    private static readonly string[] s_audioSourceTypes = Enum.GetValues<AudioSourceType>().Select(static audioSourceType => audioSourceType.GetDescription() ?? audioSourceType.ToString()).ToArray();
+    private static readonly string[] s_audioSourceTypes = Enum.GetValues<AudioSourceType>().Select(static audioSourceType => audioSourceType.GetDescription()).ToArray();
 
     public AddAudioSourceWindow()
     {

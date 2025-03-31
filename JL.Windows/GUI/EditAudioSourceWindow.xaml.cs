@@ -26,7 +26,7 @@ internal sealed partial class EditAudioSourceWindow
         _audioSource = audioSource;
         InitializeComponent();
 
-        string type = _audioSource.Type.GetDescription() ?? _audioSource.Type.ToString();
+        string type = _audioSource.Type.GetDescription();
         _ = AudioSourceTypeComboBox.Items.Add(type);
         AudioSourceTypeComboBox.SelectedValue = type;
 
