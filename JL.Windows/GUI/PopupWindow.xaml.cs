@@ -2101,7 +2101,7 @@ internal sealed partial class PopupWindow
 
     private Task HandleTextBoxMouseUp(TextBox textBox)
     {
-        if (_popupIndex >= 49)
+        if (_popupIndex >= 40)
         {
             return Task.CompletedTask;
         }
