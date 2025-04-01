@@ -907,7 +907,10 @@ public static class LookupUtils
                     _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling));
                     if (record.Readings is not null)
                     {
-                        searchKeys.UnionWith(record.Readings.Select(JapaneseUtils.KatakanaToHiragana));
+                        foreach (string reading in record.Readings)
+                        {
+                            _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(reading));
+                        }
                     }
                 }
             }
