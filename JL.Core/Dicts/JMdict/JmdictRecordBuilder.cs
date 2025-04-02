@@ -373,11 +373,33 @@ internal static class JmdictRecordBuilder
             }
         }
 
-        return senseFieldValuesSharedByAllSenses.Count is 0
-            ? (senseField.TrimToArray(), null)
-            : exclusiveSenseFieldValues.All(static ewc => ewc is null)
-                ? (null, senseFieldValuesSharedByAllSenses.TrimToArray())
-                : (exclusiveSenseFieldValues.Select(static ewc => ewc?.TrimToArray()).ToArray(), senseFieldValuesSharedByAllSenses.TrimToArray());
+        if (senseFieldValuesSharedByAllSenses.Count is 0)
+        {
+            return (senseField.TrimToArray(), null);
+        }
+
+        bool allElementsAreNull = true;
+        foreach (List<string>? item in exclusiveSenseFieldValues)
+        {
+            if (item is not null)
+            {
+                allElementsAreNull = false;
+                break;
+            }
+        }
+
+        if (allElementsAreNull)
+        {
+            return (null, senseFieldValuesSharedByAllSenses.TrimToArray());
+        }
+
+        string[]?[] exclusiveSenseFieldValuesArray = new string[exclusiveSenseFieldValues.Length][];
+        for (int i = 0; i < exclusiveSenseFieldValues.Length; i++)
+        {
+            exclusiveSenseFieldValuesArray[i] = exclusiveSenseFieldValues[i]?.TrimToArray();
+        }
+
+        return (exclusiveSenseFieldValuesArray, senseFieldValuesSharedByAllSenses.TrimToArray());
     }
 
     private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNullableSenseField(List<string[]?> senseField)
@@ -423,10 +445,32 @@ internal static class JmdictRecordBuilder
             }
         }
 
-        return senseFieldValuesSharedByAllSenses.Count is 0
-            ? (senseField.TrimListOfNullableElementsToArray(), null)
-            : exclusiveSenseFieldValues.All(static ewc => ewc is null)
-                ? (null, senseFieldValuesSharedByAllSenses.TrimToArray())
-                : (exclusiveSenseFieldValues.Select(static ewc => ewc?.TrimToArray()).ToArray(), senseFieldValuesSharedByAllSenses.TrimToArray());
+        if (senseFieldValuesSharedByAllSenses.Count is 0)
+        {
+            return (senseField.TrimListOfNullableElementsToArray(), null);
+        }
+
+        bool allElementsAreNull = true;
+        foreach (List<string>? item in exclusiveSenseFieldValues)
+        {
+            if (item is not null)
+            {
+                allElementsAreNull = false;
+                break;
+            }
+        }
+
+        if (allElementsAreNull)
+        {
+            return (null, senseFieldValuesSharedByAllSenses.TrimToArray());
+        }
+
+        string[]?[] exclusiveSenseFieldValuesArray = new string[exclusiveSenseFieldValues.Length][];
+        for (int i = 0; i < exclusiveSenseFieldValues.Length; i++)
+        {
+            exclusiveSenseFieldValuesArray[i] = exclusiveSenseFieldValues[i]?.TrimToArray();
+        }
+
+        return (exclusiveSenseFieldValuesArray, senseFieldValuesSharedByAllSenses.TrimToArray());
     }
 }

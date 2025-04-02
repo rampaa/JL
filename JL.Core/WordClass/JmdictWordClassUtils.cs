@@ -72,18 +72,82 @@ internal static class JmdictWordClassUtils
             for (int i = 0; i < jmdictRecordListCount; i++)
             {
                 JmdictRecord jmdictRecord = (JmdictRecord)jmdictRecordList[i];
-                string[] wordClasses = s_usedWordClasses
-                    .Intersect((jmdictRecord.WordClasses?.Where(static wc => wc is not null).SelectMany(static wc => wc!) ?? [])
-                        .Union(jmdictRecord.WordClassesSharedByAllSenses ?? [])).ToArray();
+                List<string> wordClassList = [];
+                if (jmdictRecord.WordClasses is not null)
+                {
+                    foreach (string[]? wordClassArray in jmdictRecord.WordClasses)
+                    {
+                        if (wordClassArray is not null)
+                        {
+                            foreach (string wordClass in wordClassArray)
+                            {
+                                if (s_usedWordClasses.Contains(wordClass))
+                                {
+                                    wordClassList.Add(wordClass);
+                                }
+                            }
+                        }
+                    }
+                }
 
-                if (wordClasses.Length is 0)
+                if (jmdictRecord.WordClassesSharedByAllSenses is not null)
+                {
+                    foreach (string wordClass in jmdictRecord.WordClassesSharedByAllSenses)
+                    {
+                        if (s_usedWordClasses.Contains(wordClass))
+                        {
+                            wordClassList.Add(wordClass);
+                        }
+                    }
+                }
+
+                if (wordClassList.Count is 0)
                 {
                     continue;
                 }
 
-                if (jmdictRecord.Readings?.Select(JapaneseUtils.KatakanaToHiragana).Contains(key) ?? false)
+                string[] wordClasses = wordClassList.ToArray();
+
+                if (jmdictRecord.Readings is not null)
                 {
-                    continue;
+                    bool keyFromReading = false;
+                    foreach (string reading in jmdictRecord.Readings)
+                    {
+                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading);
+                        if (readingInHiragana == key)
+                        {
+                            keyFromReading = true;
+                            break;
+                        }
+                    }
+
+                    if (keyFromReading)
+                    {
+                        if (JapaneseUtils.KatakanaToHiragana(jmdictRecord.PrimarySpelling) != key)
+                        {
+                            continue;
+                        }
+
+                        if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? prevResults))
+                        {
+                            bool alreadyAdded = false;
+                            foreach (JmdictWordClass wordClass in CollectionsMarshal.AsSpan(prevResults))
+                            {
+                                if (wordClass.Spelling == jmdictRecord.PrimarySpelling
+                                    && wordClass.Readings.AsSpan().SequenceEqual(jmdictRecord.Readings)
+                                    && wordClass.WordClasses.AsSpan().SequenceEqual(wordClasses))
+                                {
+                                    alreadyAdded = true;
+                                    break;
+                                }
+                            }
+
+                            if (alreadyAdded)
+                            {
+                                continue;
+                            }
+                        }
+                    }
                 }
 
                 JmdictWordClass record = new(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings);

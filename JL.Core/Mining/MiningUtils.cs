@@ -267,8 +267,15 @@ public static class MiningUtils
                     return null;
                 }
 
-                List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
-                return string.Join(", ", validFrequencies.Select(static f => f.Freq).ToList());
+                List<int> validFrequencies = new(lookupResult.Frequencies.Count);
+                foreach (LookupFrequencyResult lookupFrequencyResult in CollectionsMarshal.AsSpan(lookupResult.Frequencies))
+                {
+                    if (lookupFrequencyResult.Freq is > 0 and < int.MaxValue)
+                    {
+                        validFrequencies.Add(lookupFrequencyResult.Freq);
+                    }
+                }
+                return string.Join(", ", validFrequencies);
             }
 
             case JLField.PreferredFrequency:
@@ -536,13 +543,21 @@ public static class MiningUtils
 
         if (lookupResult.Frequencies is not null)
         {
-            List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies
-                .Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
+            List<LookupFrequencyResult> validFrequencies = new(lookupResult.Frequencies.Count);
+            List<int> validFrequencyValues = new(lookupResult.Frequencies.Count);
+            foreach (LookupFrequencyResult lookupFrequencyResult in CollectionsMarshal.AsSpan(lookupResult.Frequencies))
+            {
+                if (lookupFrequencyResult.Freq is > 0 and < int.MaxValue)
+                {
+                    validFrequencies.Add(lookupFrequencyResult);
+                    validFrequencyValues.Add(lookupFrequencyResult.Freq);
+                }
+            }
 
             if (validFrequencies.Count > 0)
             {
                 miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(CollectionsMarshal.AsSpan(lookupResult.Frequencies), true, lookupResult.Frequencies.Count is 1);
-                miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencies.Select(static f => f.Freq));
+                miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencyValues);
                 miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
 
                 int firstFrequency = lookupResult.Frequencies[0].Freq;

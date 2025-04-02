@@ -48,7 +48,22 @@ internal static class YomichanPitchAccentDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        HashSet<PitchAccentRecord> yomichanPitchAccentRecord = dict.Contents.Values.SelectMany(static v => v).Select(static v => (PitchAccentRecord)v).ToHashSet();
+        int totalRecordCount = 0;
+        ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
+        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        {
+            totalRecordCount += dictRecords.Count;
+        }
+
+        HashSet<PitchAccentRecord> yomichanPitchAccentRecord = new(totalRecordCount);
+        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        {
+            int dictRecordsCount = dictRecords.Count;
+            for (int i = 0; i < dictRecordsCount; i++)
+            {
+                _ = yomichanPitchAccentRecord.Add((PitchAccentRecord)dictRecords[i]);
+            }
+        }
 
         ulong id = 1;
 

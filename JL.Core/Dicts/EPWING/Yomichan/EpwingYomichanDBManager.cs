@@ -101,7 +101,22 @@ internal static class EpwingYomichanDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        HashSet<EpwingYomichanRecord> yomichanWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingYomichanRecord)v).ToHashSet();
+        int totalRecordCount = 0;
+        ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
+        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        {
+            totalRecordCount += dictRecords.Count;
+        }
+
+        HashSet<EpwingYomichanRecord> yomichanWordRecords = new(totalRecordCount);
+        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        {
+            int dictRecordsCount = dictRecords.Count;
+            for (int i = 0; i < dictRecordsCount; i++)
+            {
+                _ = yomichanWordRecords.Add((EpwingYomichanRecord)dictRecords[i]);
+            }
+        }
 
         ulong id = 1;
 

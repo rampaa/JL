@@ -97,7 +97,22 @@ internal static class EpwingNazekaDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        HashSet<EpwingNazekaRecord> nazekaWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingNazekaRecord)v).ToHashSet();
+        int totalRecordCount = 0;
+        ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
+        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        {
+            totalRecordCount += dictRecords.Count;
+        }
+
+        HashSet<EpwingNazekaRecord> nazekaWordRecords = new(totalRecordCount);
+        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        {
+            int dictRecordsCount = dictRecords.Count;
+            for (int i = 0; i < dictRecordsCount; i++)
+            {
+                _ = nazekaWordRecords.Add((EpwingNazekaRecord)dictRecords[i]);
+            }
+        }
 
         ulong id = 1;
 
