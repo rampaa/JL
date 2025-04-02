@@ -430,7 +430,7 @@ public static class LookupUtils
             : SortLookupResults(lookupResults);
     }
 
-    private static LookupResult[] SortLookupResults(IEnumerable<LookupResult> lookupResults)
+    private static LookupResult[] SortLookupResults(ConcurrentBag<LookupResult> lookupResults)
     {
         return lookupResults
             .OrderByDescending(static lookupResult => lookupResult.MatchedText.Length)

@@ -69,9 +69,9 @@ public static class ExtensionMethods
         return CollectionsMarshal.AsSpan(textBlocks);
     }
 
-    internal static void AddRange<T>(this ConcurrentBag<T> source, IEnumerable<T> items)
+    internal static void AddRange<T>(this ConcurrentBag<T> source, List<T> items)
     {
-        foreach (T item in items)
+        foreach (T item in CollectionsMarshal.AsSpan(items))
         {
             source.Add(item);
         }
