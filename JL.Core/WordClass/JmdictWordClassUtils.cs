@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
@@ -131,7 +130,7 @@ internal static class JmdictWordClassUtils
                         if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? prevResults))
                         {
                             bool alreadyAdded = false;
-                            foreach (JmdictWordClass wordClass in CollectionsMarshal.AsSpan(prevResults))
+                            foreach (JmdictWordClass wordClass in prevResults.AsSpan())
                             {
                                 if (wordClass.Spelling == jmdictRecord.PrimarySpelling
                                     && wordClass.Readings.AsSpan().SequenceEqual(jmdictRecord.Readings)
@@ -153,7 +152,7 @@ internal static class JmdictWordClassUtils
                 JmdictWordClass record = new(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings);
                 if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? results))
                 {
-                    if (!CollectionsMarshal.AsSpan(results).Contains(record))
+                    if (!results.AsSpan().Contains(record))
                     {
                         results.Add(record);
                     }

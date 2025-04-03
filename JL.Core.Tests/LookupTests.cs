@@ -73,7 +73,7 @@ internal sealed class LookupTests
             .Using<LookupResult, LookupResult>(static (a, e) =>
                 a.MatchedText == e.MatchedText
                 && a.Dict == e.Dict
-                && (e.Frequencies is not null ? a.Frequencies?.SequenceEqual(e.Frequencies) ?? false : a.Frequencies is null)
+                && (e.Frequencies is not null ? a.Frequencies?.AsSpan().SequenceEqual(e.Frequencies.AsSpan()) ?? false : a.Frequencies is null)
                 && a.PrimarySpelling == e.PrimarySpelling
                 && a.DeconjugatedMatchedText == e.DeconjugatedMatchedText
                 && (e.Readings is not null ? a.Readings?.SequenceEqual(e.Readings) ?? false : a.Readings is null)

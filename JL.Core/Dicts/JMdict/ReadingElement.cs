@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -18,12 +17,12 @@ internal readonly struct ReadingElement(string reb, List<string> reRestrList, Li
         unchecked
         {
             int hash = (17 * 37) + Reb.GetHashCode(StringComparison.Ordinal);
-            foreach (ref readonly string reRestr in CollectionsMarshal.AsSpan(ReRestrList))
+            foreach (ref readonly string reRestr in ReRestrList.AsSpan())
             {
                 hash = (hash * 37) + reRestr.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (ref readonly string reInf in CollectionsMarshal.AsSpan(ReInfList))
+            foreach (ref readonly string reInf in ReInfList.AsSpan())
             {
                 hash = (hash * 37) + reInf.GetHashCode(StringComparison.Ordinal);
             }
@@ -40,8 +39,8 @@ internal readonly struct ReadingElement(string reb, List<string> reRestrList, Li
     public bool Equals(ReadingElement other)
     {
         return Reb == other.Reb
-            && ReRestrList.SequenceEqual(other.ReRestrList)
-            && ReInfList.SequenceEqual(other.ReInfList);
+            && ReRestrList.AsSpan().SequenceEqual(other.ReRestrList.AsSpan())
+            && ReInfList.AsSpan().SequenceEqual(other.ReInfList.AsSpan());
     }
 
     public static bool operator ==(in ReadingElement left, in ReadingElement right) => left.Equals(right);

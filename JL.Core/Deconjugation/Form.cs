@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
@@ -19,8 +18,8 @@ internal sealed class Form(
         return obj is Form form
                && Text == form.Text
                && OriginalText == form.OriginalText
-               && Tags.SequenceEqual(form.Tags)
-               && Process.SequenceEqual(form.Process);
+               && Tags.AsSpan().SequenceEqual(form.Tags.AsSpan())
+               && Process.AsSpan().SequenceEqual(form.Process.AsSpan());
     }
 
     public bool Equals(Form? other)
@@ -28,8 +27,8 @@ internal sealed class Form(
         return other is not null
                && Text == other.Text
                && OriginalText == other.OriginalText
-               && Tags.SequenceEqual(other.Tags)
-               && Process.SequenceEqual(other.Process);
+               && Tags.AsSpan().SequenceEqual(other.Tags.AsSpan())
+               && Process.AsSpan().SequenceEqual(other.Process.AsSpan());
     }
 
     public override int GetHashCode()
@@ -39,12 +38,12 @@ internal sealed class Form(
             int hash = (17 * 37) + Text.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + OriginalText.GetHashCode(StringComparison.Ordinal);
 
-            foreach (ref readonly string tag in CollectionsMarshal.AsSpan(Tags))
+            foreach (ref readonly string tag in Tags.AsSpan())
             {
                 hash = (hash * 37) + tag.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (ref readonly string process in CollectionsMarshal.AsSpan(Process))
+            foreach (ref readonly string process in Process.AsSpan())
             {
                 hash = (hash * 37) + process.GetHashCode(StringComparison.Ordinal);
             }

@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
 
@@ -241,7 +241,7 @@ internal static class Deconjugator
         while (novel.Count > 0)
         {
             List<Form> newNovel = [];
-            foreach (ref readonly Form form in CollectionsMarshal.AsSpan(novel))
+            foreach (ref readonly Form form in novel.AsSpan())
             {
                 for (int j = 0; j < rules.Length; j++)
                 {
@@ -262,9 +262,9 @@ internal static class Deconjugator
                         continue;
                     }
 
-                    foreach (ref readonly Form myForm in CollectionsMarshal.AsSpan(newForm))
+                    foreach (ref readonly Form myForm in newForm.AsSpan())
                     {
-                        if (!CollectionsMarshal.AsSpan(newNovel).Contains(myForm))
+                        if (!newNovel.AsSpan().Contains(myForm))
                         {
                             newNovel.Add(myForm);
                         }

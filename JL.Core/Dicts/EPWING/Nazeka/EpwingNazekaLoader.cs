@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -92,7 +91,7 @@ internal static class EpwingNazekaLoader
                     }
                 }
 
-                ReadOnlySpan<string> spellingListSpan = CollectionsMarshal.AsSpan(spellingList);
+                ReadOnlySpan<string> spellingListSpan = spellingList.AsSpan();
                 for (int j = 1; j < spellingListSpan.Length; j++)
                 {
                     ref readonly string alternativeSpelling = ref spellingListSpan[j];

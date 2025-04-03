@@ -66,12 +66,12 @@ public static class ExtensionMethods
             }
         }
 
-        return CollectionsMarshal.AsSpan(textBlocks);
+        return textBlocks.AsSpan();
     }
 
     internal static void AddRange<T>(this ConcurrentBag<T> source, List<T> items)
     {
-        foreach (T item in CollectionsMarshal.AsSpan(items))
+        foreach (T item in items.AsSpan())
         {
             source.Add(item);
         }
@@ -124,7 +124,7 @@ public static class ExtensionMethods
             return null;
         }
 
-        ReadOnlySpan<T> listSpan = CollectionsMarshal.AsSpan(list);
+        ReadOnlySpan<T> listSpan = list.AsSpan();
 
         bool allElementsAreNull = true;
         for (int i = 0; i < listSpan.Length; i++)
@@ -171,7 +171,7 @@ public static class ExtensionMethods
         }
 
         bool allElementsAreNull = true;
-        foreach (T? item in CollectionsMarshal.AsSpan(list))
+        foreach (T? item in list.AsSpan())
         {
             if (item is not null)
             {
@@ -234,11 +234,11 @@ public static class ExtensionMethods
             indexes.Add(i + startIndex);
         }
 
-        return CollectionsMarshal.AsSpan(indexes);
+        return indexes.AsSpan();
     }
 
-    internal static bool SequenceEqual<T>(this List<T> source, List<T> target)
+    public static ReadOnlySpan<T> AsSpan<T>(this List<T>? list)
     {
-        return CollectionsMarshal.AsSpan(source).SequenceEqual(CollectionsMarshal.AsSpan(target));
+        return CollectionsMarshal.AsSpan(list);
     }
 }

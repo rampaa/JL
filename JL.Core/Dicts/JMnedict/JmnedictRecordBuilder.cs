@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
@@ -8,8 +7,8 @@ internal static class JmnedictRecordBuilder
 {
     public static void AddToDictionary(in JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
     {
-        ReadOnlySpan<string> kebListSpan = CollectionsMarshal.AsSpan(entry.KebList);
-        ReadOnlySpan<Translation> translationListSpan = CollectionsMarshal.AsSpan(entry.TranslationList);
+        ReadOnlySpan<string> kebListSpan = entry.KebList.AsSpan();
+        ReadOnlySpan<Translation> translationListSpan = entry.TranslationList.AsSpan();
 
         int kebListSpanLength = kebListSpan.Length;
         int translationListSpanLength = translationListSpan.Length;
@@ -50,7 +49,7 @@ internal static class JmnedictRecordBuilder
 
         else
         {
-            ReadOnlySpan<string> rebListSpan = CollectionsMarshal.AsSpan(entry.RebList);
+            ReadOnlySpan<string> rebListSpan = entry.RebList.AsSpan();
             recordDictionary = new Dictionary<string, JmnedictRecord>(rebListSpan.Length, StringComparer.Ordinal);
             for (int i = 0; i < rebListSpan.Length; i++)
             {

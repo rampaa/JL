@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using JL.Core.Config;
 
@@ -46,7 +45,7 @@ public static partial class RegexReplacerUtils
         }
 
         s_regexReplacements = [];
-        foreach (ref readonly string filePath in CollectionsMarshal.AsSpan(filePaths))
+        foreach (ref readonly string filePath in filePaths.AsSpan())
         {
             foreach (string line in File.ReadLines(filePath))
             {

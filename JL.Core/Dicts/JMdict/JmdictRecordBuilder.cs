@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
@@ -8,7 +7,7 @@ internal static class JmdictRecordBuilder
 {
     public static void AddToDictionary(in JmdictEntry entry, IDictionary<string, IList<IDictRecord>> jmdictDictionary)
     {
-        ReadOnlySpan<KanjiElement> kanjiElementsWithoutSearchOnlyForms = CollectionsMarshal.AsSpan(entry.KanjiElements.Where(static ke => !CollectionsMarshal.AsSpan(ke.KeInfList).Contains("sK")).ToList());
+        ReadOnlySpan<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.AsSpan().Contains("sK")).ToList().AsSpan();
         string[] allSpellingsWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length];
         string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length][];
         for (int i = 0; i < kanjiElementsWithoutSearchOnlyForms.Length; i++)
@@ -34,9 +33,9 @@ internal static class JmdictRecordBuilder
         }
 
         int index = 0;
-        ReadOnlySpan<KanjiElement> kanjiElementsSpan = CollectionsMarshal.AsSpan(entry.KanjiElements);
-        ReadOnlySpan<ReadingElement> readingElementsSpan = CollectionsMarshal.AsSpan(entry.ReadingElements);
-        ReadOnlySpan<Sense> senseListSpan = CollectionsMarshal.AsSpan(entry.SenseList);
+        ReadOnlySpan<KanjiElement> kanjiElementsSpan = entry.KanjiElements.AsSpan();
+        ReadOnlySpan<ReadingElement> readingElementsSpan = entry.ReadingElements.AsSpan();
+        ReadOnlySpan<Sense> senseListSpan = entry.SenseList.AsSpan();
 
         int kanjiElemensSpanLength = kanjiElementsSpan.Length;
         int readingElementsLength = readingElementsSpan.Length;
@@ -51,7 +50,7 @@ internal static class JmdictRecordBuilder
         {
             foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)
             {
-                ReadOnlySpan<string> keInfListSpan = CollectionsMarshal.AsSpan(kanjiElement.KeInfList);
+                ReadOnlySpan<string> keInfListSpan = kanjiElement.KeInfList.AsSpan();
                 string key = JapaneseUtils.KatakanaToHiragana(kanjiElement.Keb).GetPooledString();
                 if (recordDictionary.ContainsKey(key))
                 {
@@ -78,9 +77,9 @@ internal static class JmdictRecordBuilder
 
                 foreach (ref readonly ReadingElement readingElement in readingElementsSpan)
                 {
-                    if (!CollectionsMarshal.AsSpan(readingElement.ReInfList).Contains("sk"))
+                    if (!readingElement.ReInfList.AsSpan().Contains("sk"))
                     {
-                        ReadOnlySpan<string> reRestrListSpan = CollectionsMarshal.AsSpan(readingElement.ReRestrList);
+                        ReadOnlySpan<string> reRestrListSpan = readingElement.ReRestrList.AsSpan();
                         if (reRestrListSpan.Length is 0 || reRestrListSpan.Contains(kanjiElement.Keb))
                         {
                             readingList.Add(readingElement.Reb);
@@ -101,11 +100,11 @@ internal static class JmdictRecordBuilder
                 List<string[]?> antonymList = new(senseListSpanLength);
                 List<LoanwordSource[]?> loanwordSourceList = new(senseListSpanLength);
 
-                ReadOnlySpan<string> readingListSpan = CollectionsMarshal.AsSpan(readingList);
+                ReadOnlySpan<string> readingListSpan = readingList.AsSpan();
                 foreach (ref readonly Sense sense in senseListSpan)
                 {
-                    ReadOnlySpan<string> stagKListSpan = CollectionsMarshal.AsSpan(sense.StagKList);
-                    ReadOnlySpan<string> stagRListSpan = CollectionsMarshal.AsSpan(sense.StagRList);
+                    ReadOnlySpan<string> stagKListSpan = sense.StagKList.AsSpan();
+                    ReadOnlySpan<string> stagRListSpan = sense.StagRList.AsSpan();
 
                     if ((stagKListSpan.Length is 0 && stagRListSpan.Length is 0)
                         || stagKListSpan.Contains(kanjiElement.Keb)
@@ -159,7 +158,7 @@ internal static class JmdictRecordBuilder
             }
         }
 
-        ReadOnlySpan<ReadingElement> readingElementsWithoutSearchOnlyForms = CollectionsMarshal.AsSpan(entry.ReadingElements.Where(static ke => !CollectionsMarshal.AsSpan(ke.ReInfList).Contains("sk")).ToList());
+        ReadOnlySpan<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => !ke.ReInfList.AsSpan().Contains("sk")).ToList().AsSpan();
         bool readingElementsWithoutSearchOnlyFormsExist = readingElementsWithoutSearchOnlyForms.Length > 0;
         if (readingElementsWithoutSearchOnlyFormsExist)
         {
@@ -179,7 +178,7 @@ internal static class JmdictRecordBuilder
             {
                 ref readonly ReadingElement readingElement = ref readingElementsSpan[i];
 
-                ReadOnlySpan<string> reInfListSpan = CollectionsMarshal.AsSpan(readingElement.ReInfList);
+                ReadOnlySpan<string> reInfListSpan = readingElement.ReInfList.AsSpan();
                 string key = JapaneseUtils.KatakanaToHiragana(readingElement.Reb).GetPooledString();
                 if (recordDictionary.ContainsKey(key))
                 {
@@ -255,8 +254,8 @@ internal static class JmdictRecordBuilder
                 bool alternativeSpellingsExist = alternativeSpellings is not null;
                 foreach (ref readonly Sense sense in senseListSpan)
                 {
-                    ReadOnlySpan<string> stagKListSpan = CollectionsMarshal.AsSpan(sense.StagKList);
-                    ReadOnlySpan<string> stagRListSpan = CollectionsMarshal.AsSpan(sense.StagRList);
+                    ReadOnlySpan<string> stagKListSpan = sense.StagKList.AsSpan();
+                    ReadOnlySpan<string> stagRListSpan = sense.StagRList.AsSpan();
 
                     if ((stagKListSpan.Length is 0 && stagRListSpan.Length is 0)
                         || stagRListSpan.Contains(readingElement.Reb)
@@ -346,7 +345,7 @@ internal static class JmdictRecordBuilder
             return (null, senseField[0]);
         }
 
-        ReadOnlySpan<string[]> senseFieldSpan = CollectionsMarshal.AsSpan(senseField);
+        ReadOnlySpan<string[]> senseFieldSpan = senseField.AsSpan();
         List<string>?[] exclusiveSenseFieldValues = new List<string>?[senseFieldSpan.Length];
         List<string> senseFieldValuesSharedByAllSenses = [];
 
@@ -366,7 +365,7 @@ internal static class JmdictRecordBuilder
                     }
                 }
 
-                if (containsAll && !CollectionsMarshal.AsSpan(senseFieldValuesSharedByAllSenses).Contains(senseFieldValue))
+                if (containsAll && !senseFieldValuesSharedByAllSenses.AsSpan().Contains(senseFieldValue))
                 {
                     senseFieldValuesSharedByAllSenses.Add(senseFieldValue);
                 }
@@ -414,7 +413,7 @@ internal static class JmdictRecordBuilder
             return (null, senseField[0]);
         }
 
-        ReadOnlySpan<string[]?> senseFieldSpan = CollectionsMarshal.AsSpan(senseField);
+        ReadOnlySpan<string[]?> senseFieldSpan = senseField.AsSpan();
         List<string>?[] exclusiveSenseFieldValues = new List<string>?[senseFieldSpan.Length];
         List<string> senseFieldValuesSharedByAllSenses = [];
 
@@ -437,7 +436,7 @@ internal static class JmdictRecordBuilder
                         }
                     }
 
-                    if (containsAll && !CollectionsMarshal.AsSpan(senseFieldValuesSharedByAllSenses).Contains(value))
+                    if (containsAll && !senseFieldValuesSharedByAllSenses.AsSpan().Contains(value))
                     {
                         senseFieldValuesSharedByAllSenses.Add(value);
                     }

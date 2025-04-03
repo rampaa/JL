@@ -1,7 +1,6 @@
 using System.Buffers;
 using System.Collections.Frozen;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -246,7 +245,7 @@ public static partial class JapaneseUtils
             {
                 if (vowel is not 'お' and not 'え')
                 {
-                    foreach (ref readonly StringBuilder stringBuilder in CollectionsMarshal.AsSpan(stringBuilders))
+                    foreach (ref readonly StringBuilder stringBuilder in stringBuilders.AsSpan())
                     {
                         _ = stringBuilder.Append(vowel);
                     }
@@ -268,7 +267,7 @@ public static partial class JapaneseUtils
                     }
 
                     stringBuildersCount = stringBuilders.Count;
-                    ReadOnlySpan<StringBuilder> stringBuildersSpan = CollectionsMarshal.AsSpan(stringBuilders);
+                    ReadOnlySpan<StringBuilder> stringBuildersSpan = stringBuilders.AsSpan();
                     for (int j = 0; j < stringBuildersSpan.Length; j++)
                     {
                         _ = stringBuildersSpan[j].Append(j < stringBuildersCount / 2 ? vowel : alternativeVowel);
@@ -278,7 +277,7 @@ public static partial class JapaneseUtils
 
             else
             {
-                foreach (ref readonly StringBuilder stringBuilder in CollectionsMarshal.AsSpan(stringBuilders))
+                foreach (ref readonly StringBuilder stringBuilder in stringBuilders.AsSpan())
                 {
                     _ = stringBuilder.Append(unicodeTextList[i]);
                 }
@@ -307,7 +306,7 @@ public static partial class JapaneseUtils
             }
         }
 
-        return CollectionsMarshal.AsSpan(combinedForm);
+        return combinedForm.AsSpan();
     }
 
     internal static int GetCombinedFormLength(ReadOnlySpan<char> text)
@@ -495,7 +494,7 @@ public static partial class JapaneseUtils
             }
         }
 
-        string? result = GetPrimarySpellingAndReadingMapping(CollectionsMarshal.AsSpan(primarySpellingSegments), reading);
+        string? result = GetPrimarySpellingAndReadingMapping(primarySpellingSegments.AsSpan(), reading);
         return result ?? $"{primarySpelling}[{reading}]";
     }
 

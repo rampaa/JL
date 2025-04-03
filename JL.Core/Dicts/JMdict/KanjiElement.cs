@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -16,7 +15,7 @@ internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEqu
         unchecked
         {
             int hash = (17 * 37) + Keb.GetHashCode(StringComparison.Ordinal);
-            foreach (ref readonly string keInf in CollectionsMarshal.AsSpan(KeInfList))
+            foreach (ref readonly string keInf in KeInfList.AsSpan())
             {
                 hash = (hash * 37) + keInf.GetHashCode(StringComparison.Ordinal);
             }
@@ -32,7 +31,7 @@ internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEqu
 
     public bool Equals(KanjiElement other)
     {
-        return Keb == other.Keb && KeInfList.SequenceEqual(other.KeInfList);
+        return Keb == other.Keb && KeInfList.AsSpan().SequenceEqual(other.KeInfList.AsSpan());
     }
 
     public static bool operator ==(KanjiElement left, KanjiElement right) => left.Equals(right);

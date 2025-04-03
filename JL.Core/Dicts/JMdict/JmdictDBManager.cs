@@ -1,6 +1,5 @@
 using System.Collections.Frozen;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -161,7 +160,7 @@ internal static class JmdictDBManager
             _ = insertRecordCommand.ExecuteNonQuery();
 
             insertSearchKeyCommand.Parameters["@record_id"].Value = id;
-            foreach (ref readonly string key in CollectionsMarshal.AsSpan(keys))
+            foreach (ref readonly string key in keys.AsSpan())
             {
                 insertSearchKeyCommand.Parameters["@search_key"].Value = key;
                 _ = insertSearchKeyCommand.ExecuteNonQuery();

@@ -1,10 +1,10 @@
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Speech.Synthesis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using JL.Core.Audio;
+using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using NAudio.Wave;
 
@@ -30,7 +30,7 @@ internal static class SpeechSynthesisUtils
             ? null
             : Application.Current.Dispatcher.Invoke(() =>
             {
-                ReadOnlySpan<InstalledVoice> installedVoicesSpan = CollectionsMarshal.AsSpan(installedVoices);
+                ReadOnlySpan<InstalledVoice> installedVoicesSpan = installedVoices.AsSpan();
                 ComboBoxItem[] installedVoiceComboboxItems = new ComboBoxItem[installedVoicesSpan.Length];
 
                 for (int i = 0; i < installedVoicesSpan.Length; i++)

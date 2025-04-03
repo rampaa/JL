@@ -1,5 +1,5 @@
 using System.Globalization;
-using System.Runtime.InteropServices;
+using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;
@@ -84,7 +84,7 @@ public static class ProfileDBUtils
     public static ReadOnlySpan<string> GetProfileNames()
     {
         using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
-        return CollectionsMarshal.AsSpan(GetProfileNames(connection));
+        return GetProfileNames(connection).AsSpan();
     }
 
     public static List<string> GetProfileNames(SqliteConnection connection)

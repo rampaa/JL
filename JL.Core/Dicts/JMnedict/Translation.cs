@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -16,12 +15,12 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
         unchecked
         {
             int hash = 17 * 37;
-            foreach (ref readonly string nameType in CollectionsMarshal.AsSpan(NameTypeList))
+            foreach (ref readonly string nameType in NameTypeList.AsSpan())
             {
                 hash = (hash * 37) + nameType.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (ref readonly string transDet in CollectionsMarshal.AsSpan(TransDetList))
+            foreach (ref readonly string transDet in TransDetList.AsSpan())
             {
                 hash = (hash * 37) + transDet.GetHashCode(StringComparison.Ordinal);
             }
@@ -37,7 +36,7 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
 
     public bool Equals(Translation other)
     {
-        return NameTypeList.SequenceEqual(other.NameTypeList) && TransDetList.SequenceEqual(other.TransDetList);
+        return NameTypeList.AsSpan().SequenceEqual(other.NameTypeList.AsSpan()) && TransDetList.AsSpan().SequenceEqual(other.TransDetList.AsSpan());
     }
 
     public static bool operator ==(Translation left, Translation right) => left.Equals(right);

@@ -1,6 +1,6 @@
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text;
+using JL.Core.Utilities;
 
 namespace JL.Core.Lookup;
 
@@ -10,7 +10,7 @@ public static class LookupResultUtils
     {
         StringBuilder deconjugation = new();
 
-        ReadOnlySpan<List<string>> processListSpan = CollectionsMarshal.AsSpan(processList);
+        ReadOnlySpan<List<string>> processListSpan = processList.AsSpan();
         for (int i = 0; i < processListSpan.Length; i++)
         {
             ref readonly List<string> form = ref processListSpan[i];
@@ -18,7 +18,7 @@ public static class LookupResultUtils
             StringBuilder formText = new();
             bool added = false;
 
-            ReadOnlySpan<string> formSpan = CollectionsMarshal.AsSpan(form);
+            ReadOnlySpan<string> formSpan = form.AsSpan();
             for (int j = formSpan.Length - 1; j >= 0; j--)
             {
                 string info = formSpan[j];
