@@ -556,7 +556,7 @@ public static class LookupUtils
                         {
                             if (result.MatchedText == deconjugationResult.OriginalText)
                             {
-                                int index = result.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
+                                int index = result.Results.FindIndex(rs => rs.AsSpan().SequenceEqual(resultsList));
                                 if (index >= 0)
                                 {
                                     List<List<string>> processes = result.Processes![index];

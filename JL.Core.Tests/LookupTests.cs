@@ -76,11 +76,11 @@ internal sealed class LookupTests
                 && (e.Frequencies is not null ? a.Frequencies?.AsSpan().SequenceEqual(e.Frequencies.AsSpan()) ?? false : a.Frequencies is null)
                 && a.PrimarySpelling == e.PrimarySpelling
                 && a.DeconjugatedMatchedText == e.DeconjugatedMatchedText
-                && (e.Readings is not null ? a.Readings?.SequenceEqual(e.Readings) ?? false : a.Readings is null)
+                && (e.Readings is not null ? a.Readings?.AsSpan().SequenceEqual(e.Readings) ?? false : a.Readings is null)
                 && a.FormattedDefinitions == e.FormattedDefinitions
                 && a.EntryId == e.EntryId
                 && e.WordClasses is not null
-                    ? a.WordClasses?.SequenceEqual(e.WordClasses) ?? false
+                    ? a.WordClasses?.AsSpan().SequenceEqual(e.WordClasses) ?? false
                     : a.WordClasses is null));
     }
 

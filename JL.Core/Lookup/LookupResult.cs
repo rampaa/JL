@@ -81,7 +81,7 @@ public sealed class LookupResult
             && Dict == other.Dict
             && FormattedDefinitions == other.FormattedDefinitions
             && other.Readings is not null
-                ? Readings?.SequenceEqual(other.Readings) ?? false
+                ? Readings?.AsSpan().SequenceEqual(other.Readings) ?? false
                 : Readings is null;
     }
 
@@ -93,7 +93,7 @@ public sealed class LookupResult
             && Dict == other.Dict
             && FormattedDefinitions == other.FormattedDefinitions
             && other.Readings is not null
-                ? Readings?.SequenceEqual(other.Readings) ?? false
+                ? Readings?.AsSpan().SequenceEqual(other.Readings) ?? false
                 : Readings is null;
     }
 

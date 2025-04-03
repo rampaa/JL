@@ -151,24 +151,24 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
     {
         return obj is CustomWordRecord customWordRecord
                && PrimarySpelling == customWordRecord.PrimarySpelling
-               && customWordRecord.Definitions.SequenceEqual(Definitions)
-               && ((AlternativeSpellings is not null && customWordRecord.AlternativeSpellings is not null && customWordRecord.AlternativeSpellings.SequenceEqual(AlternativeSpellings))
+               && customWordRecord.Definitions.AsSpan().SequenceEqual(Definitions)
+               && ((AlternativeSpellings is not null && customWordRecord.AlternativeSpellings is not null && customWordRecord.AlternativeSpellings.AsSpan().SequenceEqual(AlternativeSpellings))
                    || (AlternativeSpellings is null && customWordRecord.AlternativeSpellings is null))
-               && ((Readings is not null && customWordRecord.Readings is not null && customWordRecord.Readings.SequenceEqual(Readings))
+               && ((Readings is not null && customWordRecord.Readings is not null && customWordRecord.Readings.AsSpan().SequenceEqual(Readings))
                    || (Readings is null && customWordRecord.Readings is null))
-               && customWordRecord.WordClasses.SequenceEqual(WordClasses);
+               && customWordRecord.WordClasses.AsSpan().SequenceEqual(WordClasses);
     }
 
     public bool Equals(CustomWordRecord? other)
     {
         return other is not null
                && PrimarySpelling == other.PrimarySpelling
-               && other.Definitions.SequenceEqual(Definitions)
-               && ((AlternativeSpellings is not null && other.AlternativeSpellings is not null && other.AlternativeSpellings.SequenceEqual(AlternativeSpellings))
+               && other.Definitions.AsSpan().SequenceEqual(Definitions)
+               && ((AlternativeSpellings is not null && other.AlternativeSpellings is not null && other.AlternativeSpellings.AsSpan().SequenceEqual(AlternativeSpellings))
                    || (AlternativeSpellings is null && other.AlternativeSpellings is null))
-               && ((Readings is not null && other.Readings is not null && other.Readings.SequenceEqual(Readings))
+               && ((Readings is not null && other.Readings is not null && other.Readings.AsSpan().SequenceEqual(Readings))
                    || (Readings is null && other.Readings is null))
-               && other.WordClasses.SequenceEqual(WordClasses);
+               && other.WordClasses.AsSpan().SequenceEqual(WordClasses);
     }
 
     public override int GetHashCode()
