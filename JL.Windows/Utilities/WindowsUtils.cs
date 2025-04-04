@@ -353,14 +353,14 @@ internal static class WindowsUtils
 
         if (CoreConfigManager.Instance.CheckForJLUpdatesOnStartUp)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.Invoke(static () =>
             {
                 PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
             });
 
-            await Task.Run(() => NetworkUtils.CheckForJLUpdates(true)).ConfigureAwait(false);
+            await Task.Run(static () => NetworkUtils.CheckForJLUpdates(true)).ConfigureAwait(false);
 
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.Invoke(static () =>
             {
                 PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
             });

@@ -62,7 +62,7 @@ internal sealed partial class ManageFrequenciesWindow
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
 
-        await Task.Run(async () =>
+        await Task.Run(static async () =>
         {
             await FreqUtils.SerializeFreqs().ConfigureAwait(false);
             await FreqUtils.LoadFrequencies().ConfigureAwait(false);

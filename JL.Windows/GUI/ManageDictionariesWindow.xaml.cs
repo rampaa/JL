@@ -65,7 +65,7 @@ internal sealed partial class ManageDictionariesWindow
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
 
-        await Task.Run(async () =>
+        await Task.Run(static async () =>
         {
             await DictUtils.SerializeDicts().ConfigureAwait(false);
             await DictUtils.LoadDictionaries().ConfigureAwait(false);

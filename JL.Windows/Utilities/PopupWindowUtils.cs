@@ -173,7 +173,6 @@ internal static class PopupWindowUtils
     {
         _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.InvokeAsync(static () =>
         {
-            MainWindow mainWindow = MainWindow.Instance;
             PopupWindow? hoveredPopup = null;
             PopupWindow? currentPopupWindow = PopupWindows[0];
             while (currentPopupWindow is not null)
