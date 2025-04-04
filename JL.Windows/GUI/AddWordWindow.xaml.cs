@@ -172,7 +172,7 @@ internal sealed partial class AddWordWindow
 
             foreach (string wordClass in wordClasses)
             {
-                if (!validWordClasses.Contains(wordClass))
+                if (!validWordClasses.AsSpan().Contains(wordClass))
                 {
                     WordClassTextBox.BorderBrush = Brushes.Red;
                     WordClassTextBox.Cursor = Cursors.Help;
@@ -205,7 +205,7 @@ internal sealed partial class AddWordWindow
             CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);
         }
 
-        PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
+        PopupWindowUtils.HidePopups(0);
         Close();
 
         string line = string.IsNullOrWhiteSpace(rawWordClasses)

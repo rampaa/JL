@@ -100,7 +100,7 @@ internal static class KeyGestureUtils
         while (currentPopup?.IsVisible ?? false)
         {
             lastPopup = currentPopup;
-            currentPopup = currentPopup.ChildPopupWindow;
+            currentPopup = PopupWindowUtils.PopupWindows[currentPopup.PopupIndex + 1];
         }
 
         return lastPopup is not null

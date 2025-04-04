@@ -18,6 +18,8 @@ namespace JL.Windows.Utilities;
 
 internal static class PopupWindowUtils
 {
+    public const int MaxPopupWindowsIndex = 40;
+    public static PopupWindow?[] PopupWindows { get; } = new PopupWindow?[MaxPopupWindowsIndex + 2];
     private static string? s_primarySpellingOfLastPlayedAudio;
     private static string? s_readingOfLastPlayedAudio;
     private static DoubleCollection StrokeDashArray { get; set; } = [1, 1];
@@ -173,8 +175,8 @@ internal static class PopupWindowUtils
         {
             MainWindow mainWindow = MainWindow.Instance;
             PopupWindow? hoveredPopup = null;
-            PopupWindow currentPopupWindow = mainWindow.FirstPopupWindow;
-            while (currentPopupWindow.ChildPopupWindow is not null)
+            PopupWindow? currentPopupWindow = PopupWindows[0];
+            while (currentPopupWindow is not null)
             {
                 if (currentPopupWindow.IsMouseOver)
                 {
@@ -182,26 +184,26 @@ internal static class PopupWindowUtils
                     break;
                 }
 
-                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+                currentPopupWindow = PopupWindows[currentPopupWindow.PopupIndex + 1];
             }
 
-            HidePopups(hoveredPopup?.ChildPopupWindow ?? mainWindow.FirstPopupWindow);
+            HidePopups(hoveredPopup?.PopupIndex + 1 ?? 0);
         });
     }
 
-    public static void HidePopups(PopupWindow? rootPopup)
+    public static void HidePopups(int rootPopupIndex)
     {
-        if (rootPopup == MainWindow.Instance.FirstPopupWindow)
+        if (rootPopupIndex is 0)
         {
-            rootPopup.HidePopup();
+            PopupWindows[rootPopupIndex]!.HidePopup();
         }
         else
         {
-            PopupWindow? currentPopupWindow = rootPopup;
+            PopupWindow? currentPopupWindow = PopupWindows[rootPopupIndex];
             while (currentPopupWindow is not null)
             {
                 currentPopupWindow.HidePopup();
-                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+                currentPopupWindow = PopupWindows[currentPopupWindow.PopupIndex + 1];
             }
         }
     }

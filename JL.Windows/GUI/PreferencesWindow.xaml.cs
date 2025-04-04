@@ -206,7 +206,7 @@ internal sealed partial class PreferencesWindow
             _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
         }
 
-        await DictUtils.LoadDictionaries().ConfigureAwait(false);
+        await Task.Run(DictUtils.LoadDictionaries).ConfigureAwait(false);
     }
 
     // ReSharper disable once AsyncVoidMethod

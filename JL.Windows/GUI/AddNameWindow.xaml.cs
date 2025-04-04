@@ -82,7 +82,7 @@ internal sealed partial class AddNameWindow
             CustomNameLoader.AddToDictionary(spelling, reading, nameType, extraInfo, dict.Contents);
         }
 
-        PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
+        PopupWindowUtils.HidePopups(0);
         Close();
 
         string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);

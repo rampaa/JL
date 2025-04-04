@@ -349,16 +349,21 @@ internal static class WindowsUtils
 
     public static async Task InitializeMainWindow()
     {
-        Utils.Frontend = new WindowsFrontend();
-
-        await Utils.CoreInitialize().ConfigureAwait(true);
+        await Task.Run(Utils.CoreInitialize).ConfigureAwait(false);
 
         if (CoreConfigManager.Instance.CheckForJLUpdatesOnStartUp)
         {
-            PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
-            preferencesWindow.CheckForJLUpdatesButton.IsEnabled = false;
-            await NetworkUtils.CheckForJLUpdates(true).ConfigureAwait(true);
-            preferencesWindow.CheckForJLUpdatesButton.IsEnabled = true;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
+            });
+
+            await Task.Run(() => NetworkUtils.CheckForJLUpdates(true)).ConfigureAwait(false);
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
+            });
         }
     }
 

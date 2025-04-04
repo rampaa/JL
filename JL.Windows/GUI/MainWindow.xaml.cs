@@ -66,6 +66,7 @@ internal sealed partial class MainWindow
     {
         base.OnSourceInitialized(e);
 
+        Utils.Frontend = new WindowsFrontend();
         _input = InputMethod.Current;
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
@@ -244,7 +245,7 @@ internal sealed partial class MainWindow
 
         if (configManager.HidePopupsOnTextChange)
         {
-            PopupWindowUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(0);
         }
 
         if (notMinimized)
@@ -430,7 +431,7 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            PopupWindowUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(0);
         }
     }
 
@@ -453,7 +454,7 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            PopupWindowUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(0);
         }
     }
 
@@ -759,7 +760,7 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
-            PopupWindowUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(0);
 
             if (configManager.Focusable)
             {
@@ -1111,7 +1112,7 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is not MouseButton.Right)
         {
-            PopupWindowUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(0);
         }
     }
 
@@ -1208,7 +1209,7 @@ internal sealed partial class MainWindow
         while (currentPopupWindow is not null)
         {
             currentPopupWindow.SetSizeToContent(configManager.PopupDynamicWidth, configManager.PopupDynamicHeight, configManager.PopupMaxWidth, configManager.PopupMaxHeight, configManager.PopupMinWidth, configManager.PopupMinHeight);
-            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+            currentPopupWindow = PopupWindowUtils.PopupWindows[currentPopupWindow.PopupIndex + 1];
         }
 
         if (configManager.AutoAdjustFontSizesOnResolutionChange)
@@ -1393,7 +1394,7 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            PopupWindowUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(0);
         }
     }
 
@@ -1532,7 +1533,7 @@ internal sealed partial class MainWindow
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;
 
-        PopupWindowUtils.HidePopups(FirstPopupWindow);
+        PopupWindowUtils.HidePopups(0);
 
         if (!ContextMenuIsOpening && MainTextBox.SelectionLength > 0)
         {
@@ -1676,7 +1677,7 @@ internal sealed partial class MainWindow
 
                 if (keyGestureIdsToIgnore.Count > 0)
                 {
-                    WinApi.UnregisterAllGlobalHotKeys(WindowHandle, CollectionsMarshal.AsSpan(keyGestureIdsToIgnore));
+                    WinApi.UnregisterAllGlobalHotKeys(WindowHandle, keyGestureIdsToIgnore.AsSpan());
                 }
                 else
                 {
@@ -1797,7 +1798,7 @@ internal sealed partial class MainWindow
 
     private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        PopupWindowUtils.HidePopups(FirstPopupWindow);
+        PopupWindowUtils.HidePopups(0);
     }
 
     public void UpdatePosition()
