@@ -356,7 +356,7 @@ internal static class JmdictRecordBuilder
                 bool containsAll = true;
                 foreach (ref readonly string[] senseItem in senseFieldSpan)
                 {
-                    if (!senseItem.Contains(senseFieldValue))
+                    if (!senseItem.AsSpan().Contains(senseFieldValue))
                     {
                         exclusiveSenseFieldValues[i] ??= [];
                         exclusiveSenseFieldValues[i]!.Add(senseFieldValue);
@@ -427,7 +427,7 @@ internal static class JmdictRecordBuilder
                     bool containsAll = true;
                     foreach (ref readonly string[]? senseItem in senseFieldSpan)
                     {
-                        if (!senseItem?.Contains(value) ?? true)
+                        if (!senseItem?.AsSpan().Contains(value) ?? true)
                         {
                             exclusiveSenseFieldValues[i] ??= [];
                             exclusiveSenseFieldValues[i]!.Add(value);

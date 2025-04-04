@@ -735,7 +735,7 @@ public static class MiningUtils
 
             if (selectedLookupResult.PrimarySpelling == otherLookupResult.PrimarySpelling
                 && otherLookupResult.FormattedDefinitions is not null
-                && ((readingIsSelected && otherLookupResult.Readings is not null && otherLookupResult.Readings.Contains(selectedSpelling))
+                && ((readingIsSelected && otherLookupResult.Readings is not null && otherLookupResult.Readings.AsSpan().Contains(selectedSpelling))
                     || (!readingIsSelected
                         && ((selectedLookupResult.Readings is null && otherLookupResult.Readings is null)
                             || (selectedLookupResult.Readings is not null && otherLookupResult.Readings is not null && selectedLookupResult.Readings.Any(otherLookupResult.Readings.Contains))))))
@@ -1009,7 +1009,7 @@ public static class MiningUtils
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
                     && ((reading is null && result.Readings is null)
-                        || (reading is not null && result.Readings is not null && result.Readings.Contains(reading))))
+                        || (reading is not null && result.Readings is not null && result.Readings.AsSpan().Contains(reading))))
                 {
                     // If there is more than one valid result, we can't be sure which one applies to the current record, so we return null.
                     // See the entries for 駆ける and 振りかえる in JMdict as examples, where the spelling and reading are the same, but the word classes differ.

@@ -1,4 +1,5 @@
 using JL.Core.Deconjugation;
+using JL.Core.Utilities;
 using NUnit.Framework;
 
 namespace JL.Core.Tests.Deconjugation;
@@ -51,9 +52,9 @@ internal sealed class DeconjugatorTests
         foreach (Form form in result)
         {
             if (form.Text is expectedText
-                && form.Process.Contains("potential")
-                && form.Process.Contains("negative")
-                && form.Process.Contains("past"))
+                && form.Process.AsSpan().Contains("potential")
+                && form.Process.AsSpan().Contains("negative")
+                && form.Process.AsSpan().Contains("past"))
             {
                 success = true;
                 break;

@@ -434,7 +434,7 @@ public static class LookupUtils
         return lookupResults
             .OrderByDescending(static lookupResult => lookupResult.MatchedText.Length)
             .ThenByDescending(static lookupResult => lookupResult.PrimarySpelling == lookupResult.MatchedText)
-            .ThenByDescending(static lookupResult => lookupResult.Readings is not null && lookupResult.Readings.Contains(lookupResult.MatchedText))
+            .ThenByDescending(static lookupResult => lookupResult.Readings is not null && lookupResult.Readings.AsSpan().Contains(lookupResult.MatchedText))
             .ThenByDescending(static lookupResult => lookupResult.DeconjugationProcess is null ? int.MaxValue : lookupResult.PrimarySpelling.Length)
             .ThenBy(static lookupResult => lookupResult.Dict.Priority)
             .ThenBy(static lookupResult =>
@@ -467,7 +467,7 @@ public static class LookupUtils
                 JmdictLookupResult? jmdictLookupResult = lookupResult.JmdictLookupResult;
                 if (jmdictLookupResult is not null)
                 {
-                    if (jmdictLookupResult.MiscSharedByAllSenses is not null && jmdictLookupResult.MiscSharedByAllSenses.Contains("uk"))
+                    if (jmdictLookupResult.MiscSharedByAllSenses is not null && jmdictLookupResult.MiscSharedByAllSenses.AsSpan().Contains("uk"))
                     {
                         return 0;
                     }
@@ -476,7 +476,7 @@ public static class LookupUtils
                     {
                         foreach (string[]? misc in jmdictLookupResult.MiscList)
                         {
-                            if (misc is not null && misc.Contains("uk"))
+                            if (misc is not null && misc.AsSpan().Contains("uk"))
                             {
                                 return 0;
                             }
@@ -556,7 +556,7 @@ public static class LookupUtils
                         {
                             if (result.MatchedText == deconjugationResult.OriginalText)
                             {
-                                int index = result.Results.FindIndex(rs => rs.AsSpan().SequenceEqual(resultsList));
+                                int index = result.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
                                 if (index >= 0)
                                 {
                                     List<List<string>> processes = result.Processes![index];
@@ -659,7 +659,7 @@ public static class LookupUtils
                 {
                     JmdictRecord dictResult = (JmdictRecord)dictResults[i];
                     if (dictResult.WordClassesSharedByAllSenses is not null
-                        && dictResult.WordClassesSharedByAllSenses.Contains(lastTag))
+                        && dictResult.WordClassesSharedByAllSenses.AsSpan().Contains(lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -668,7 +668,7 @@ public static class LookupUtils
                     {
                         foreach (string[]? wordClasses in dictResult.WordClasses)
                         {
-                            if (wordClasses is not null && wordClasses.Contains(lastTag))
+                            if (wordClasses is not null && wordClasses.AsSpan().Contains(lastTag))
                             {
                                 resultsList.Add(dictResult);
                                 break;
@@ -687,7 +687,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultsCount; i++)
                 {
                     CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
-                    if (dictResult.WordClasses.Contains(lastTag))
+                    if (dictResult.WordClasses.AsSpan().Contains(lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -1140,9 +1140,9 @@ public static class LookupUtils
             {
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
-                    && ((hasReading && result.Readings is not null && result.Readings.Contains(reading!))
+                    && ((hasReading && result.Readings is not null && result.Readings.AsSpan().Contains(reading!))
                         || (!hasReading && result.Readings is null))
-                    && result.WordClasses.Contains(tag))
+                    && result.WordClasses.AsSpan().Contains(tag))
                 {
                     return true;
                 }

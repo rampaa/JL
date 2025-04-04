@@ -79,7 +79,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings!.Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings!.AsSpan().Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
@@ -118,7 +118,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             foreach (ref readonly FrequencyRecord freqResult in freqResults.AsSpan())
             {
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings!.Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings!.AsSpan().Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
