@@ -716,20 +716,20 @@ internal sealed partial class PreferencesWindow
     {
         ListBoxItem listBoxItem = (ListBoxItem)item;
         string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
-        return preferenceName.Contains(MainWindowPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.Contains(MainWindowPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
+        return preferenceName.AsSpan().Contains(MainWindowPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.AsSpan().Contains(MainWindowPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
     }
 
     private bool PopupPreferencesFilter(object item)
     {
         ListBoxItem listBoxItem = (ListBoxItem)item;
         string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
-        return preferenceName.Contains(PopupPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.Contains(PopupPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
+        return preferenceName.AsSpan().Contains(PopupPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.AsSpan().Contains(PopupPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
     }
 
     private bool HotkeysPreferencesFilter(object item)
     {
         ListBoxItem listBoxItem = (ListBoxItem)item;
         string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[2]).Text;
-        return preferenceName.Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
+        return preferenceName.AsSpan().Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.AsSpan().Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
     }
 }

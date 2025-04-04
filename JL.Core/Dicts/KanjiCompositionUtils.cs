@@ -25,12 +25,14 @@ internal static class KanjiCompositionUtils
                 for (int j = 2; j < lParts.Length; j++)
                 {
                     string currentPart = lParts[j];
-                    int endIndex = currentPart.IndexOf('[', StringComparison.Ordinal);
+
+                    ReadOnlySpan<char> currentPartSpan = currentPart.AsSpan();
+                    int endIndex = currentPartSpan.IndexOf('[');
                     if (endIndex < 0)
                     {
                         components.Add(currentPart);
                     }
-                    else if (currentPart.Contains('J', StringComparison.Ordinal))
+                    else if (currentPartSpan.Contains('J'))
                     {
                         components.Add(currentPart[..endIndex]);
                     }

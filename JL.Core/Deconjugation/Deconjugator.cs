@@ -151,7 +151,7 @@ internal static class Deconjugator
     private static Form? SubstitutionInner(Form myForm, in Rule myRule)
     {
         string conEnd = myRule.ConEnd[0];
-        if (!myForm.Text.Contains(conEnd, StringComparison.Ordinal))
+        if (!myForm.Text.AsSpan().Contains(conEnd, StringComparison.Ordinal))
         {
             return null;
         }

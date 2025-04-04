@@ -59,7 +59,7 @@ public static class NetworkUtils
                         foreach (JsonElement asset in assets.EnumerateArray())
                         {
                             string latestReleaseUrl = asset.GetProperty("browser_download_url").GetString()!;
-                            if (latestReleaseUrl.Contains(architecture, StringComparison.Ordinal))
+                            if (latestReleaseUrl.AsSpan().Contains(architecture, StringComparison.Ordinal))
                             {
                                 foundRelease = true;
 
