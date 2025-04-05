@@ -10,7 +10,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 14;
+    public const int Version = 15;
 
     private const int SearchKeyIndex = 5;
 

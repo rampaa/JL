@@ -184,6 +184,10 @@ internal static class EpwingYomichanUtils
                     continue;
                 }
             }
+            else if (jsonElement.TryGetProperty("tag", out JsonElement tagElement) && tagElement.GetString() is "th")
+            {
+                return new YomichanContent("th", "×", false);
+            }
 
             return default;
         }
