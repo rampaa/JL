@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -210,6 +209,12 @@ internal sealed partial class PopupWindow
         string textBoxText = textBox.Text;
 
         _currentSourceText = textBoxText;
+
+        if (char.IsLowSurrogate(textBox.Text[charPosition]))
+        {
+            --charPosition;
+        }
+
         _currentSourceTextCharPosition = charPosition;
 
         ConfigManager configManager = ConfigManager.Instance;
@@ -225,14 +230,22 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        string textToLookUp = textBoxText.Length - charPosition > configManager.MaxSearchLength
-            ? textBoxText[..(charPosition + configManager.MaxSearchLength)]
-            : textBoxText;
+        string textToLookUp = textBoxText;
+        if (textBoxText.Length - charPosition > configManager.MaxSearchLength)
+        {
+            int newLength = charPosition + configManager.MaxSearchLength;
+            if (char.IsLowSurrogate(textBoxText[newLength - 1]))
+            {
+                --newLength;
+            }
+
+            textToLookUp = textBoxText[..newLength];
+        }
 
         int endPosition = JapaneseUtils.FindExpressionBoundary(textToLookUp, charPosition);
         textToLookUp = textToLookUp[charPosition..endPosition];
 
-        if (string.IsNullOrEmpty(textToLookUp) || Rune.IsWhiteSpace(textToLookUp.EnumerateRunes().First()))
+        if (string.IsNullOrEmpty(textToLookUp) || TextUtils.StartsWithWhiteSpace(textToLookUp))
         {
             HidePopup();
             return Task.CompletedTask;
@@ -339,11 +352,6 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        if (charPosition > 0 && char.IsHighSurrogate(textBox.Text[charPosition - 1]))
-        {
-            --charPosition;
-        }
-
         return LookupOnCharPosition(textBox, charPosition, enableMiningMode);
     }
 
@@ -353,7 +361,7 @@ internal sealed partial class PopupWindow
         _currentSourceTextCharPosition = textBox.SelectionStart;
 
         string selectedText = textBox.SelectedText;
-        if (string.IsNullOrEmpty(selectedText) || Rune.IsWhiteSpace(selectedText.EnumerateRunes().First()))
+        if (string.IsNullOrEmpty(selectedText) || TextUtils.StartsWithWhiteSpace(selectedText))
         {
             HidePopup();
             return Task.CompletedTask;
