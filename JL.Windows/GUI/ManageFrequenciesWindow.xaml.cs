@@ -238,14 +238,30 @@ internal sealed partial class ManageFrequenciesWindow
     private void IncreasePriorityButton_Click(object sender, RoutedEventArgs e)
     {
         Freq freq = (Freq)((Button)sender).Tag;
-        PrioritizeFreq(freq);
+        if (Keyboard.Modifiers is ModifierKeys.Control)
+        {
+            PrioritizeFreqToMax(freq);
+        }
+        else
+        {
+            PrioritizeFreq(freq);
+        }
+
         UpdateFreqsDisplay();
     }
 
     private void DecreasePriorityButton_Click(object sender, RoutedEventArgs e)
     {
         Freq freq = (Freq)((Button)sender).Tag;
-        DeprioritizeFreq(freq);
+        if (Keyboard.Modifiers is ModifierKeys.Control)
+        {
+            DeprioritizeFreqToMin(freq);
+        }
+        else
+        {
+            DeprioritizeFreq(freq);
+        }
+
         UpdateFreqsDisplay();
     }
 
@@ -302,6 +318,24 @@ internal sealed partial class ManageFrequenciesWindow
         freq.Priority -= 1;
     }
 
+    private static void PrioritizeFreqToMax(Freq freq)
+    {
+        if (freq.Priority is 1)
+        {
+            return;
+        }
+
+        foreach (Freq otherFreq in FreqUtils.FreqDicts.Values)
+        {
+            if (otherFreq.Priority < freq.Priority)
+            {
+                otherFreq.Priority += 1;
+            }
+        }
+
+        freq.Priority = 1;
+    }
+
     private static void DeprioritizeFreq(Freq freq)
     {
         if (freq.Priority == FreqUtils.FreqDicts.Count)
@@ -311,6 +345,24 @@ internal sealed partial class ManageFrequenciesWindow
 
         FreqUtils.FreqDicts.First(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
         freq.Priority += 1;
+    }
+
+    private static void DeprioritizeFreqToMin(Freq freq)
+    {
+        if (freq.Priority == FreqUtils.FreqDicts.Count)
+        {
+            return;
+        }
+
+        foreach (Freq otherFreq in FreqUtils.FreqDicts.Values)
+        {
+            if (otherFreq.Priority > freq.Priority)
+            {
+                otherFreq.Priority -= 1;
+            }
+        }
+
+        freq.Priority = FreqUtils.FreqDicts.Count;
     }
 
     private void ButtonAddFrequency_OnClick(object sender, RoutedEventArgs e)

@@ -187,14 +187,30 @@ internal sealed partial class ManageAudioSourcesWindow
     private void IncreasePriorityButton_Click(object sender, RoutedEventArgs e)
     {
         AudioSource audioSource = (AudioSource)((Button)sender).Tag;
-        PrioritizeAudioSource(audioSource);
+        if (Keyboard.Modifiers is ModifierKeys.Control)
+        {
+            PrioritizeAudioSourceToMax(audioSource);
+        }
+        else
+        {
+            PrioritizeAudioSource(audioSource);
+        }
+
         UpdateAudioSourcesDisplay();
     }
 
     private void DecreasePriorityButton_Click(object sender, RoutedEventArgs e)
     {
         AudioSource audioSource = (AudioSource)((Button)sender).Tag;
-        DeprioritizeAudioSource(audioSource);
+        if (Keyboard.Modifiers is ModifierKeys.Control)
+        {
+            DeprioritizeAudioSourceToMin(audioSource);
+        }
+        else
+        {
+            DeprioritizeAudioSource(audioSource);
+        }
+
         UpdateAudioSourcesDisplay();
     }
 
@@ -250,6 +266,24 @@ internal sealed partial class ManageAudioSourcesWindow
         audioSource.Priority -= 1;
     }
 
+    private static void PrioritizeAudioSourceToMax(AudioSource audioSource)
+    {
+        if (audioSource.Priority is 1)
+        {
+            return;
+        }
+
+        foreach (AudioSource otherAudioSource in AudioUtils.AudioSources.Values)
+        {
+            if (otherAudioSource.Priority < audioSource.Priority)
+            {
+                otherAudioSource.Priority += 1;
+            }
+        }
+
+        audioSource.Priority = 1;
+    }
+
     private static void DeprioritizeAudioSource(AudioSource audioSource)
     {
         if (audioSource.Priority == AudioUtils.AudioSources.Count)
@@ -259,6 +293,24 @@ internal sealed partial class ManageAudioSourcesWindow
 
         AudioUtils.AudioSources.First(a => a.Value.Priority == audioSource.Priority + 1).Value.Priority -= 1;
         audioSource.Priority += 1;
+    }
+
+    private static void DeprioritizeAudioSourceToMin(AudioSource audioSource)
+    {
+        if (audioSource.Priority == AudioUtils.AudioSources.Count)
+        {
+            return;
+        }
+
+        foreach (AudioSource otherAudioSource in AudioUtils.AudioSources.Values)
+        {
+            if (otherAudioSource.Priority > audioSource.Priority)
+            {
+                otherAudioSource.Priority -= 1;
+            }
+        }
+
+        audioSource.Priority = AudioUtils.AudioSources.Count;
     }
 
     private void ButtonAddAudioSource_OnClick(object sender, RoutedEventArgs e)

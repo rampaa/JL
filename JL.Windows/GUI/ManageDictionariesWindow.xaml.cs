@@ -303,14 +303,30 @@ internal sealed partial class ManageDictionariesWindow
     private void IncreasePriorityButton_Click(object sender, RoutedEventArgs e)
     {
         Dict dict = (Dict)((Button)sender).Tag;
-        PrioritizeDict(dict);
+        if (Keyboard.Modifiers is ModifierKeys.Control)
+        {
+            PrioritizeDictToMax(dict);
+        }
+        else
+        {
+            PrioritizeDict(dict);
+        }
+
         UpdateDictionariesDisplay();
     }
 
     private void DecreasePriorityButton_Click(object sender, RoutedEventArgs e)
     {
         Dict dict = (Dict)((Button)sender).Tag;
-        DeprioritizeDict(dict);
+        if (Keyboard.Modifiers is ModifierKeys.Control)
+        {
+            DeprioritizeToMin(dict);
+        }
+        else
+        {
+            DeprioritizeDict(dict);
+        }
+
         UpdateDictionariesDisplay();
     }
 
@@ -398,6 +414,24 @@ internal sealed partial class ManageDictionariesWindow
         dict.Priority -= 1;
     }
 
+    private static void PrioritizeDictToMax(Dict dict)
+    {
+        if (dict.Priority is 1)
+        {
+            return;
+        }
+
+        foreach (Dict otherDict in DictUtils.Dicts.Values)
+        {
+            if (otherDict.Priority < dict.Priority)
+            {
+                otherDict.Priority += 1;
+            }
+        }
+
+        dict.Priority = 1;
+    }
+
     private static void DeprioritizeDict(Dict dict)
     {
         if (dict.Priority == DictUtils.Dicts.Count)
@@ -407,6 +441,24 @@ internal sealed partial class ManageDictionariesWindow
 
         DictUtils.Dicts.First(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
         dict.Priority += 1;
+    }
+
+    private static void DeprioritizeToMin(Dict dict)
+    {
+        if (dict.Priority == DictUtils.Dicts.Count)
+        {
+            return;
+        }
+
+        foreach (Dict otherDict in DictUtils.Dicts.Values)
+        {
+            if (otherDict.Priority > dict.Priority)
+            {
+                otherDict.Priority -= 1;
+            }
+        }
+
+        dict.Priority = DictUtils.Dicts.Count;
     }
 
     private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
