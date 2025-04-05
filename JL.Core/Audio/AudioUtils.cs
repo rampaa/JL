@@ -182,10 +182,7 @@ public static class AudioUtils
 
     public static async Task GetAndPlayAudio(string foundSpelling, string? reading)
     {
-        if (string.IsNullOrEmpty(reading))
-        {
-            reading = foundSpelling;
-        }
+        reading ??= foundSpelling;
 
         AudioResponse? audioResponse = await GetPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
         if (audioResponse?.AudioData is not null)

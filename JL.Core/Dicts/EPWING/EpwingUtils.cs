@@ -26,7 +26,7 @@ internal static class EpwingUtils
                 if (previousResult.Definitions.AsSpan().SequenceEqual(definitions))
                 {
                     // If an entry has reading info while others don't, keep the one with the reading info.
-                    if (string.IsNullOrEmpty(previousResult.Reading) && !string.IsNullOrEmpty(reading))
+                    if (previousResult.Reading is null && reading is not null)
                     {
                         previousResults.RemoveAt(i);
                         break;
@@ -49,7 +49,7 @@ internal static class EpwingUtils
 
                 if (previousResult.Definitions.AsSpan().SequenceEqual(definitions))
                 {
-                    if (string.IsNullOrEmpty(previousResult.Reading))
+                    if (previousResult.Reading is null)
                     {
                         previousResults.RemoveAt(i);
                         break;

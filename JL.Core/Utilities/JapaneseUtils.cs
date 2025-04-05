@@ -477,18 +477,17 @@ public static partial class JapaneseUtils
 
         List<string> primarySpellingSegments = new(primarySpelling.Length);
         bool wasKana = true;
-        foreach (Rune rune in primarySpelling.EnumerateRunes())
+        foreach (ref readonly string rune in primarySpelling.AsSpan().ListUnicodeCharacters())
         {
-            string runeAsString = rune.ToString();
-            bool isKana = KanaRegex.IsMatch(runeAsString);
+            bool isKana = KanaRegex.IsMatch(rune);
             if (primarySpellingSegments.Count is 0 || wasKana != isKana)
             {
                 wasKana = isKana;
-                primarySpellingSegments.Add(runeAsString);
+                primarySpellingSegments.Add(rune);
             }
             else
             {
-                primarySpellingSegments[^1] += runeAsString;
+                primarySpellingSegments[^1] += rune;
             }
         }
 

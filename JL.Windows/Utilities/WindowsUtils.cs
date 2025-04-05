@@ -286,6 +286,11 @@ internal static class WindowsUtils
 
     public static void SearchWithBrowser(string? selectedText)
     {
+        if (string.IsNullOrWhiteSpace(selectedText))
+        {
+            return;
+        }
+
         string browserPath = "";
         ConfigManager configManager = ConfigManager.Instance;
         if (!string.IsNullOrWhiteSpace(configManager.BrowserPath))
@@ -293,18 +298,15 @@ internal static class WindowsUtils
             browserPath = $"\"{configManager.BrowserPath}\"";
         }
 
-        if (selectedText?.Length > 0)
-        {
-            string urlToBeSearched = Uri.IsWellFormedUriString(selectedText, UriKind.Absolute)
-                ? selectedText
-                : configManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.OrdinalIgnoreCase);
+        string urlToBeSearched = Uri.IsWellFormedUriString(selectedText, UriKind.Absolute)
+            ? selectedText
+            : configManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.OrdinalIgnoreCase);
 
-            _ = Process.Start(new ProcessStartInfo("cmd",
-                $"/c start \"\" {browserPath} \"{urlToBeSearched}\"")
-            {
-                CreateNoWindow = true
-            });
-        }
+        _ = Process.Start(new ProcessStartInfo("cmd",
+            $"/c start \"\" {browserPath} \"{urlToBeSearched}\"")
+        {
+            CreateNoWindow = true
+        });
     }
 
     public static async Task UpdateJL(Uri latestReleaseUrl)

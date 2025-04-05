@@ -111,8 +111,7 @@ internal static class EpwingNazekaLoader
                 }
             }
 
-            else if (!string.IsNullOrWhiteSpace(reading)
-                && EpwingUtils.IsValidEpwingResultForDictType(reading, null, definitions, dict))
+            else if (EpwingUtils.IsValidEpwingResultForDictType(reading, null, definitions, dict))
             {
                 EpwingNazekaRecord record = new(reading, null, null, definitions);
                 AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.KatakanaToHiragana(reading).GetPooledString() : reading, record, nazekaEpwingDict);

@@ -52,7 +52,7 @@ internal static class YomichanPitchAccentLoader
                     pitchDict[spellingInHiragana] = [newEntry];
                 }
 
-                if (!string.IsNullOrEmpty(newEntry.Reading))
+                if (newEntry.Reading is not null)
                 {
                     string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading).GetPooledString();
                     if (spellingInHiragana != readingInHiragana)
