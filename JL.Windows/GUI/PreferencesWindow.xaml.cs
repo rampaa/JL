@@ -693,7 +693,10 @@ internal sealed partial class PreferencesWindow
         if (dockPanel.Children.Count is 2)
         {
             UIElement inputItem = dockPanel.Children[1];
-            _ = inputItem.Focus();
+            if (inputItem is not HandyControl.Controls.NumericUpDown)
+            {
+                _ = inputItem.Focus();
+            }
         }
     }
 
