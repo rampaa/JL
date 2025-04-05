@@ -110,4 +110,20 @@ public static class TextUtils
 
         return text;
     }
+
+    public static bool StartsWithWhiteSpace(string text)
+    {
+        char firstChar = text[0];
+        return !char.IsHighSurrogate(firstChar)
+            ? char.IsWhiteSpace(firstChar)
+            : Rune.IsWhiteSpace(new Rune(firstChar, text[1]));
+    }
+
+    public static string GetFirstCharacter(string text)
+    {
+        char firstChar = text[0];
+        return !char.IsHighSurrogate(firstChar)
+            ? firstChar.ToString()
+            : char.ConvertFromUtf32(char.ConvertToUtf32(firstChar, text[1]));
+    }
 }
