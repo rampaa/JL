@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace JL.Core.Utilities;
@@ -8,22 +9,11 @@ namespace JL.Core.Utilities;
 public static class ExtensionMethods
 {
     // Falls back to name
-    public static string GetDescription(this Enum value)
+    public static string GetDescription<T>(this T value) where T : struct, Enum
     {
-        Type type = value.GetType();
-        string? name = Enum.GetName(type, value);
-        if (name is not null)
-        {
-            FieldInfo? fieldInfo = type.GetField(name);
-            if (fieldInfo is not null)
-            {
-                return Attribute.GetCustomAttribute(fieldInfo, typeof(DescriptionAttribute)) is DescriptionAttribute attr
-                    ? attr.Description
-                    : name;
-            }
-        }
-
-        return value.ToString();
+        string name = Enum.GetName(value)!;
+        Type enumType = typeof(T);
+        return enumType.GetField(name)?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? name;
     }
 
     public static T GetEnum<T>(this string description) where T : struct, Enum
@@ -46,8 +36,7 @@ public static class ExtensionMethods
         for (int i = 0; i < text.Length; i++)
         {
             char highSurrogateCandidate = text[i];
-            if (char.IsHighSurrogate(highSurrogateCandidate)
-                && text.Length > i + 1)
+            if (char.IsHighSurrogate(highSurrogateCandidate) && i < text.Length - 1)
             {
                 char lowSurrogateCandidate = text[i + 1];
                 if (char.IsLowSurrogate(lowSurrogateCandidate))
@@ -156,6 +145,7 @@ public static class ExtensionMethods
         return array;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static T[]? TrimToArray<T>(this List<T> list) where T : notnull
     {
         return list.Count is 0
@@ -237,6 +227,7 @@ public static class ExtensionMethods
         return indexes.AsSpan();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ReadOnlySpan<T> AsSpan<T>(this List<T>? list)
     {
         return CollectionsMarshal.AsSpan(list);

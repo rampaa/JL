@@ -43,7 +43,8 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
         StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)
         {
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
+            int sequence = i + 1;
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{sequence}. ");
 
             string[] nameTypes = NameTypes[i];
             if (nameTypes.Length > 1 || nameTypes[0] is not "unclass")
@@ -62,7 +63,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             //     }
             // }
 
-            if (i + 1 != Definitions.Length)
+            if (sequence != Definitions.Length)
             {
                 _ = defResult.Append(separator);
             }

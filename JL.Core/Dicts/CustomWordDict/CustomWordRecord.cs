@@ -59,8 +59,9 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
         StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)
         {
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. [{tempWordClass}] {Definitions[i]}");
-            if (i + 1 != Definitions.Length)
+            int sequence = i + 1;
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{sequence}. [{tempWordClass}] {Definitions[i]}");
+            if (sequence != Definitions.Length)
             {
                 _ = defResult.Append(separator);
             }

@@ -293,8 +293,7 @@ public static partial class JapaneseUtils
 
         for (int i = 0; i < text.Length; i++)
         {
-            if (i + 1 < text.Length
-                && s_smallCombiningKanaSet.Contains(text[i + 1]))
+            if (i + 1 < text.Length && s_smallCombiningKanaSet.Contains(text[i + 1]))
             {
                 combinedForm.Add(string.Create(CultureInfo.InvariantCulture, $"{text[i]}{text[i + 1]}"));
                 ++i;
@@ -315,8 +314,7 @@ public static partial class JapaneseUtils
         for (int i = 0; i < text.Length; i++)
         {
             ++length;
-            if (i + 1 < text.Length
-                && s_smallCombiningKanaSet.Contains(text[i + 1]))
+            if (i + 1 < text.Length & s_smallCombiningKanaSet.Contains(text[i + 1]))
             {
                 ++i;
             }
