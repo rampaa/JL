@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
 
     private static DpiScale? s_previousDpi;
 
-    private MainWindow()
+    public MainWindow()
     {
         s_instance = this;
         InitializeComponent();
