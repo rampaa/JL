@@ -267,7 +267,14 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 string[]? relatedTerms = RelatedTerms![i];
                 if (relatedTerms is not null)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"(related terms: {string.Join(", ", relatedTerms)}) ");
+                    if (relatedTerms.Length is 1)
+                    {
+                        _ = defResult.Append(CultureInfo.InvariantCulture, $"(related term: {relatedTerms[0]}) ");
+                    }
+                    else
+                    {
+                        _ = defResult.Append(CultureInfo.InvariantCulture, $"(related terms: {string.Join(", ", relatedTerms)}) ");
+                    }
                 }
             }
 
@@ -276,7 +283,14 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 string[]? antonyms = Antonyms![i];
                 if (antonyms is not null)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonyms: {string.Join(", ", antonyms)}) ");
+                    if (antonyms.Length is 1)
+                    {
+                        _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonym: {antonyms[0]}) ");
+                    }
+                    else
+                    {
+                        _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonyms: {string.Join(", ", antonyms)}) ");
+                    }
                 }
             }
 

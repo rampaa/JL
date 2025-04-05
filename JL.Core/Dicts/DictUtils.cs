@@ -102,8 +102,8 @@ public static class DictUtils
                     spellingRestrictionInfo: new SpellingRestrictionInfoOption(true),
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
-                    relatedTerm: new RelatedTermOption(false),
-                    antonym: new AntonymOption(false),
+                    relatedTerm: new RelatedTermOption(true),
+                    antonym: new AntonymOption(true),
                     autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)
                 ))
         },
