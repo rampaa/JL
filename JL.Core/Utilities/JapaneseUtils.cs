@@ -314,7 +314,7 @@ public static partial class JapaneseUtils
         for (int i = 0; i < text.Length; i++)
         {
             ++length;
-            if (i + 1 < text.Length & s_smallCombiningKanaSet.Contains(text[i + 1]))
+            if (i < text.Length - 1 && s_smallCombiningKanaSet.Contains(text[i + 1]))
             {
                 ++i;
             }
