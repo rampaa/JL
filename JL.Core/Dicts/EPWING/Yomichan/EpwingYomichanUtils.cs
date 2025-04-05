@@ -25,9 +25,13 @@ internal static class EpwingYomichanUtils
                 _ => null
             };
 
-            if (!string.IsNullOrWhiteSpace(definition))
+            if (definition is not null)
             {
-                definitions.Add(definition.GetPooledString());
+                string trimmedDefinition = definition.Trim();
+                if (trimmedDefinition.Length is not 0)
+                {
+                    definitions.Add(trimmedDefinition.GetPooledString());
+                }
             }
         }
 
