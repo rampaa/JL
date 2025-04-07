@@ -285,7 +285,7 @@
       "来",
       "來",
       "し",
-      "",
+      "っ",
       "し",
       "っ"
     ],
@@ -626,14 +626,6 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "っ" ],
-    "con_end": [ "いた" ],
-    "dec_tag": [ "stem-ren-less" ],
-    "con_tag": [ "v5k-s" ],
-    "detail": "past"
-  },
-  {
-    "type": "stdrule",
     "dec_end": [ "" ],
     "con_end": [ "だ" ],
     "dec_tag": [ "stem-ren-less-v" ],
@@ -650,8 +642,8 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "", "" ],
-    "con_end": [ "て", "って" ],
+    "dec_end": [ "" ],
+    "con_end": [ "て" ],
     "dec_tag": [ "stem-ren-less" ],
     "con_tag": [ "stem-te-verbal" ],
     "detail": "(te form)"
@@ -1097,14 +1089,6 @@
     "dec_tag": [ "stem-te" ],
     "con_tag": [ "v5k-s" ],
     "detail": "teku (teiku)"
-  },
-  {
-    "type": "stdrule",
-    "dec_end": [ "っ" ],
-    "con_end": [ "いて" ],
-    "dec_tag": [ "stem-ren-less" ],
-    "con_tag": [ "stem-te" ],
-    "detail": "(te form)"
   },
   {
     "type": "stdrule",
