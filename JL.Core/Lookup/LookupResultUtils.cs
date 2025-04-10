@@ -6,14 +6,12 @@ namespace JL.Core.Lookup;
 
 public static class LookupResultUtils
 {
-    internal static string? DeconjugationProcessesToText(List<List<string>> processList)
+    internal static string? DeconjugationProcessesToText(ReadOnlySpan<List<string>> processList)
     {
         StringBuilder deconjugation = new();
-
-        ReadOnlySpan<List<string>> processListSpan = processList.AsSpan();
-        for (int i = 0; i < processListSpan.Length; i++)
+        for (int i = 0; i < processList.Length; i++)
         {
-            ref readonly List<string> form = ref processListSpan[i];
+            ref readonly List<string> form = ref processList[i];
 
             StringBuilder formText = new();
             bool added = false;

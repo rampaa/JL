@@ -859,7 +859,7 @@ public static class LookupUtils
             for (int i = 0; i < resultsSpan.Length; i++)
             {
                 string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i])
+                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsSpan())
                     : null;
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
@@ -1020,7 +1020,7 @@ public static class LookupUtils
             for (int i = 0; i < resultsSpan.Length; i++)
             {
                 string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i])
+                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsSpan())
                     : null;
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
@@ -1097,7 +1097,7 @@ public static class LookupUtils
             for (int i = 0; i < resultsSpan.Length; i++)
             {
                 string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i])
+                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsSpan())
                     : null;
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
@@ -1223,7 +1223,7 @@ public static class LookupUtils
             for (int i = 0; i < resultsSpan.Length; i++)
             {
                 string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i])
+                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsSpan())
                     : null;
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
