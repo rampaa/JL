@@ -20,7 +20,7 @@
   <!--Transitive dependencies-->
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Reflection.Metadata" Version="9.0.3" />
+    <PackageReference Include="System.Reflection.Metadata" Version="9.0.4" />
   </ItemGroup>
 
   <ItemGroup>
