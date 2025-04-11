@@ -826,9 +826,15 @@ internal sealed partial class MainWindow
         {
             if (MainTextBox.Text.Length > 0)
             {
-                return configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex
-                    ? FirstPopupWindow.LookupOnSelect(MainTextBox)
-                    : FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true);
+                if (configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
+                {
+                    return FirstPopupWindow.LookupOnSelect(MainTextBox);
+                }
+
+                if (MainTextBox.Text.Length > MainTextBox.CaretIndex)
+                {
+                    return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true);
+                }
             }
         }
 
