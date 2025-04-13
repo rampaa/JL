@@ -2,7 +2,7 @@ using JL.Core.Dicts.Interfaces;
 
 namespace JL.Core.Dicts.CustomNameDict;
 
-internal sealed record class CustomNameRecord : IDictRecordWithSingleReading
+internal sealed record class CustomNameRecord : IDictRecordWithSingleReading, IEquatable<CustomNameRecord>
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
