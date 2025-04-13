@@ -45,8 +45,7 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
                 hash *= 37;
             }
 
-            string[] wordClasses = WordClasses;
-            foreach (string wordClass in wordClasses)
+            foreach (string wordClass in WordClasses)
             {
                 hash = (hash * 37) + wordClass.GetHashCode(StringComparison.Ordinal);
             }

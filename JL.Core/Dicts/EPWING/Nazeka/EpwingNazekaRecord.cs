@@ -137,8 +137,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
 
-            string[] definitions = Definitions;
-            foreach (string definition in definitions)
+            foreach (string definition in Definitions)
             {
                 hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
             }

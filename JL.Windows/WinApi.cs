@@ -35,7 +35,7 @@ internal sealed partial class WinApi
         internal const int MOD_NOREPEAT = 0x4000;
 
         [StructLayout(LayoutKind.Sequential)]
-        internal readonly record struct LPPOINT : IEquatable<LPPOINT>
+        internal readonly record struct LPPOINT
         {
             public readonly int X;
             public readonly int Y;

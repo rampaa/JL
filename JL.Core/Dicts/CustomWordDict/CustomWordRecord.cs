@@ -209,14 +209,12 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
                 hash *= 37;
             }
 
-            string[] definitions = Definitions;
-            foreach (string definition in definitions)
+            foreach (string definition in Definitions)
             {
                 hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
             }
 
-            string[] wordClasses = WordClasses;
-            foreach (string wordClass in wordClasses)
+            foreach (string wordClass in WordClasses)
             {
                 hash = (hash * 37) + wordClass.GetHashCode(StringComparison.Ordinal);
             }
