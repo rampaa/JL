@@ -32,9 +32,10 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
         unchecked
         {
             int hash = (17 * 37) + Spelling.GetHashCode(StringComparison.Ordinal);
-            if (Readings is not null)
+            string[]? readings = Readings;
+            if (readings is not null)
             {
-                foreach (string reading in Readings)
+                foreach (string reading in readings)
                 {
                     hash = (hash * 37) + reading.GetHashCode(StringComparison.Ordinal);
                 }
@@ -44,7 +45,8 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
                 hash *= 37;
             }
 
-            foreach (string wordClass in WordClasses)
+            string[] wordClasses = WordClasses;
+            foreach (string wordClass in wordClasses)
             {
                 hash = (hash * 37) + wordClass.GetHashCode(StringComparison.Ordinal);
             }

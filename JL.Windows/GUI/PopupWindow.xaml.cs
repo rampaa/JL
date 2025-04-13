@@ -1780,10 +1780,11 @@ internal sealed partial class PopupWindow
             bool foundSelectedButton = false;
 
             Button? nextButton = null;
-            int buttonCount = DictTabButtonsItemsControl.Items.Count;
+            ItemCollection dictButtons = DictTabButtonsItemsControl.Items;
+            int buttonCount = dictButtons.Count;
             for (int i = 0; i < buttonCount; i++)
             {
-                Button button = (Button)DictTabButtonsItemsControl.Items[i]!;
+                Button button = (Button)dictButtons[i]!;
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1806,10 +1807,11 @@ internal sealed partial class PopupWindow
             bool foundSelectedButton = false;
             Button? previousButton = null;
 
-            int dictCount = DictTabButtonsItemsControl.Items.Count;
+            ItemCollection dictButtons = DictTabButtonsItemsControl.Items;
+            int dictCount = dictButtons.Count;
             for (int i = dictCount - 1; i >= 0; i--)
             {
-                Button button = (Button)DictTabButtonsItemsControl.Items[i]!;
+                Button button = (Button)dictButtons[i]!;
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1833,7 +1835,7 @@ internal sealed partial class PopupWindow
             {
                 for (int i = dictCount - 1; i > 0; i--)
                 {
-                    Button button = (Button)DictTabButtonsItemsControl.Items[i]!;
+                    Button button = (Button)dictButtons[i]!;
                     if (button.IsEnabled)
                     {
                         ClickDictTypeButton(button);

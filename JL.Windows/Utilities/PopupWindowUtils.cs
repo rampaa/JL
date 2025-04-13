@@ -96,7 +96,7 @@ internal static class PopupWindowUtils
             ? configManager.ReadingsFontSize
             : configManager.PrimarySpellingFontSize;
 
-        string[] expressions = hasReading ? readings! : [primarySpelling];
+        ReadOnlySpan<string> expressions = hasReading ? readings! : [primarySpelling];
 
         double horizontalOffsetForReading = leftMargin;
 

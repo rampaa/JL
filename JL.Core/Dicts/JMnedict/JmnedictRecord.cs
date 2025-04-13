@@ -41,7 +41,9 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             : '；';
 
         StringBuilder defResult = new();
-        for (int i = 0; i < Definitions.Length; i++)
+
+        string[][] definitions = Definitions;
+        for (int i = 0; i < definitions.Length; i++)
         {
             int sequence = i + 1;
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{sequence}. ");
@@ -52,7 +54,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", nameTypes)}] ");
             }
 
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])}");
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions[i])}");
 
             // if (showRelatedTerms)
             // {
@@ -63,7 +65,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             //     }
             // }
 
-            if (sequence != Definitions.Length)
+            if (sequence != definitions.Length)
             {
                 _ = defResult.Append(separator);
             }

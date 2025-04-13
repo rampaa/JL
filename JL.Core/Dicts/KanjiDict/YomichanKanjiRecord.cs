@@ -89,21 +89,23 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
 
     public string? BuildFormattedStats()
     {
-        if (Stats is null)
+        string[]? stats = Stats;
+
+        if (stats is null)
         {
             return null;
         }
 
-        if (Stats.Length is 1)
+        if (stats.Length is 1)
         {
-            return Stats[0];
+            return stats[0];
         }
 
         StringBuilder statResult = new();
-        for (int i = 0; i < Stats.Length; i++)
+        for (int i = 0; i < stats.Length; i++)
         {
-            _ = statResult.Append(Stats[i]);
-            if (i + 1 != Stats.Length)
+            _ = statResult.Append(stats[i]);
+            if (i + 1 != stats.Length)
             {
                 _ = statResult.Append('\n');
             }
@@ -139,9 +141,10 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
         unchecked
         {
             int hash = 17 * 37;
-            if (OnReadings is not null)
+            string[]? onReadings = OnReadings;
+            if (onReadings is not null)
             {
-                foreach (string onReading in OnReadings)
+                foreach (string onReading in onReadings)
                 {
                     hash = (hash * 37) + onReading.GetHashCode(StringComparison.Ordinal);
                 }
@@ -151,9 +154,10 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
                 hash *= 37;
             }
 
-            if (KunReadings is not null)
+            string[]? kunReadings = KunReadings;
+            if (kunReadings is not null)
             {
-                foreach (string kunReading in KunReadings)
+                foreach (string kunReading in kunReadings)
                 {
                     hash = (hash * 37) + kunReading.GetHashCode(StringComparison.Ordinal);
                 }
@@ -163,9 +167,10 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
                 hash *= 37;
             }
 
-            if (Definitions is not null)
+            string[]? definitions = Definitions;
+            if (definitions is not null)
             {
-                foreach (string definition in Definitions)
+                foreach (string definition in definitions)
                 {
                     hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
                 }

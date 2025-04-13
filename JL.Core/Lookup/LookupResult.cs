@@ -57,9 +57,10 @@ public sealed class LookupResult
             hash = (hash * 37) + Dict.GetHashCode();
             hash = (hash * 37) + FormattedDefinitions?.GetHashCode(StringComparison.Ordinal) ?? 37;
 
-            if (Readings is not null)
+            string[]? readings = Readings;
+            if (readings is not null)
             {
-                foreach (string reading in Readings)
+                foreach (string reading in readings)
                 {
                     hash = (hash * 37) + reading.GetHashCode(StringComparison.Ordinal);
                 }

@@ -62,20 +62,20 @@ internal static class Deconjugator
             return null;
         }
 
-        if (myRule.DecEnd.Length is 0)
+        if (myRule.DecEnds.Length is 0)
         {
             return null;
         }
 
-        string[] array = myRule.DecEnd;
+        string[] array = myRule.DecEnds;
         if (array.Length is 1)
         {
             VirtualRule virtualRule = new
             (
-                myRule.DecEnd[0],
-                myRule.ConEnd[0],
-                myRule.DecTag![0],
-                myRule.ConTag![0],
+                myRule.DecEnds[0],
+                myRule.ConEnds[0],
+                myRule.DecTags![0],
+                myRule.ConTags![0],
                 myRule.Detail
             );
 
@@ -86,19 +86,19 @@ internal static class Deconjugator
         }
 
         List<Form> collection = new(array.Length);
-        bool multiDecTag = myRule.DecTag!.Length > 1;
-        string? singleDecTag = multiDecTag ? null : myRule.DecTag![0];
-        bool multiConTag = myRule.ConTag!.Length > 1;
-        string? singleConTag = multiConTag ? null : myRule.ConTag![0];
+        bool multiDecTag = myRule.DecTags!.Length > 1;
+        string? singleDecTag = multiDecTag ? null : myRule.DecTags![0];
+        bool multiConTag = myRule.ConTags!.Length > 1;
+        string? singleConTag = multiConTag ? null : myRule.ConTags![0];
 
         for (int i = 0; i < array.Length; i++)
         {
             VirtualRule virtualRule = new
             (
-                myRule.DecEnd[i],
-                myRule.ConEnd[i],
-                multiDecTag ? myRule.DecTag![i] : singleDecTag!,
-                multiConTag ? myRule.ConTag![i] : singleConTag!,
+                myRule.DecEnds[i],
+                myRule.ConEnds[i],
+                multiDecTag ? myRule.DecTags![i] : singleDecTag!,
+                multiConTag ? myRule.ConTags![i] : singleConTag!,
                 myRule.Detail
             );
             Form? ret = StdruleDeconjugateInner(myForm, virtualRule);
@@ -115,7 +115,7 @@ internal static class Deconjugator
 
     private static List<Form>? RewriteruleDeconjugate(Form myForm, in Rule myRule)
     {
-        return myForm.Text != myRule.ConEnd[0]
+        return myForm.Text != myRule.ConEnds[0]
             ? null
             : StdruleDeconjugate(myForm, myRule);
     }
@@ -150,13 +150,13 @@ internal static class Deconjugator
 
     private static Form? SubstitutionInner(Form myForm, in Rule myRule)
     {
-        string conEnd = myRule.ConEnd[0];
+        string conEnd = myRule.ConEnds[0];
         if (!myForm.Text.AsSpan().Contains(conEnd, StringComparison.Ordinal))
         {
             return null;
         }
 
-        string newText = myForm.Text.Replace(conEnd, myRule.DecEnd[0], StringComparison.Ordinal);
+        string newText = myForm.Text.Replace(conEnd, myRule.DecEnds[0], StringComparison.Ordinal);
         return new Form(newText, myForm.OriginalText, myForm.Tags.ToList(), [.. myForm.Process, myRule.Detail]);
     }
 
@@ -173,12 +173,12 @@ internal static class Deconjugator
             return null;
         }
 
-        if (myRule.DecEnd.Length is 0)
+        if (myRule.DecEnds.Length is 0)
         {
             return null;
         }
 
-        string[] array = myRule.DecEnd;
+        string[] array = myRule.DecEnds;
         if (array.Length is 1)
         {
             Form? result = SubstitutionInner(myForm, myRule);
@@ -193,8 +193,8 @@ internal static class Deconjugator
             Rule virtualRule = new
             (
                 myRule.Type,
-                [myRule.DecEnd[i]],
-                [myRule.ConEnd[i]],
+                [myRule.DecEnds[i]],
+                [myRule.ConEnds[i]],
                 myRule.Detail
             );
             Form? ret = SubstitutionInner(myForm, virtualRule);
@@ -221,7 +221,7 @@ internal static class Deconjugator
             return false;
         }
 
-        string conEnd = myRule.ConEnd[0];
+        string conEnd = myRule.ConEnds[0];
         if (!myForm.Text.EndsWith(conEnd, StringComparison.Ordinal))
         {
             return false;

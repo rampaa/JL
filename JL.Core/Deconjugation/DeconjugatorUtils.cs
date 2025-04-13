@@ -17,10 +17,10 @@ internal static class DeconjugatorUtils
         for (int i = 0; i < rules.Length; i++)
         {
             ref readonly Rule rule = ref rules[i];
-            rule.DecEnd.DeduplicateStringsInArray();
-            rule.ConEnd.DeduplicateStringsInArray();
-            rule.DecTag?.DeduplicateStringsInArray();
-            rule.ConTag?.DeduplicateStringsInArray();
+            rule.DecEnds.DeduplicateStringsInArray();
+            rule.ConEnds.DeduplicateStringsInArray();
+            rule.DecTags?.DeduplicateStringsInArray();
+            rule.ConTags?.DeduplicateStringsInArray();
         }
     }
 }

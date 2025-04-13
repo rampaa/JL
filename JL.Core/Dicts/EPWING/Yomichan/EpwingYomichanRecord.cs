@@ -48,11 +48,12 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", DefinitionTags!)}]{(newline ? '\n' : ' ')}");
         }
 
-        for (int i = 0; i < Definitions.Length; i++)
+        string[] definitions = Definitions;
+        for (int i = 0; i < definitions.Length; i++)
         {
             int sequence = i + 1;
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{sequence}. {Definitions[i]}");
-            if (sequence != Definitions.Length)
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{sequence}. {definitions[i]}");
+            if (sequence != definitions.Length)
             {
                 _ = defResult.Append(separator);
             }
@@ -145,7 +146,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
 
-            foreach (string definition in Definitions)
+            string[] definitions = Definitions;
+            foreach (string definition in definitions)
             {
                 hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
             }
