@@ -35,22 +35,22 @@ internal sealed partial class WinApi
         internal const int MOD_NOREPEAT = 0x4000;
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct LPPOINT : IEquatable<LPPOINT>
+        internal readonly struct LPPOINT : IEquatable<LPPOINT>
         {
-            public int X;
-            public int Y;
+            public readonly int X;
+            public readonly int Y;
 
-            public override readonly int GetHashCode()
+            public override int GetHashCode()
             {
                 return HashCode.Combine(X, Y);
             }
 
-            public override readonly bool Equals(object? obj)
+            public override bool Equals(object? obj)
             {
                 return obj is LPPOINT lpPoint && Equals(lpPoint);
             }
 
-            public readonly bool Equals(LPPOINT other)
+            public bool Equals(LPPOINT other)
             {
                 return X == other.X && Y == other.Y;
             }
