@@ -1,3 +1,4 @@
+using System.Data;
 using System.Globalization;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
@@ -62,7 +63,9 @@ public static class ProfileDBUtils
             """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        _ = reader.Read();
+        return reader.GetInt32(0);
     }
 
     public static int GetProfileId(SqliteConnection connection, string profileName)
@@ -78,7 +81,9 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@name", profileName);
 
-        return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        _ = reader.Read();
+        return reader.GetInt32(0);
     }
 
     public static ReadOnlySpan<string> GetProfileNames()
@@ -125,7 +130,10 @@ public static class ProfileDBUtils
             """;
 
         _ = command.Parameters.AddWithValue("@profileId", profileId);
-        return Convert.ToBoolean(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        _ = reader.Read();
+        return reader.GetBoolean(0);
     }
 
     public static bool ProfileExists(string profileName)
@@ -144,7 +152,10 @@ public static class ProfileDBUtils
             """;
 
         _ = command.Parameters.AddWithValue("@name", profileName);
-        return Convert.ToBoolean(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        _ = reader.Read();
+        return reader.GetBoolean(0);
     }
 
     private static string GetProfileName(SqliteConnection connection, int profileId)
@@ -160,7 +171,9 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@id", profileId);
 
-        return (string)command.ExecuteScalar()!;
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        _ = reader.Read();
+        return reader.GetString(0);
     }
 
     public static void DeleteProfile(SqliteConnection connection, string profileName)

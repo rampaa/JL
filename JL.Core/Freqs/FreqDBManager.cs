@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -206,7 +207,10 @@ internal static class FreqDBManager
             FROM record
             """;
 
-        freq.MaxValue = Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        freq.MaxValue = !reader.IsDBNull(0)
+            ? reader.GetInt32(0)
+            : 0;
     }
 
     public static void LoadFromDB(Freq freq)

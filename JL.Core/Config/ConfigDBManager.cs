@@ -1,3 +1,4 @@
+using System.Data;
 using System.Globalization;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -181,7 +182,11 @@ public static class ConfigDBManager
         command.CommandText = GetSettingValueQuery;
         _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
         _ = command.Parameters.AddWithValue("@name", settingName);
-        return (string?)command.ExecuteScalar();
+
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        return reader.Read()
+            ? reader.GetString(0)
+            : null;
     }
 
     public static void CopyProfileSettings(SqliteConnection connection, int sourceProfileId, int targetProfileId)

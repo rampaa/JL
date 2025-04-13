@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Timers;
@@ -104,7 +105,10 @@ public static class DBUtils
         using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
-        return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        _ = reader.Read();
+        return reader.GetInt32(0);
     }
 
     internal static bool CheckIfDBSchemaIsOutOfDate(int version, string dbPath)
@@ -164,7 +168,9 @@ public static class DBUtils
             );
             """;
 
-        return Convert.ToBoolean(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        _ = reader.Read();
+        return reader.GetBoolean(0);
     }
 
     //public static string GetSqliteVersion()
@@ -173,7 +179,10 @@ public static class DBUtils
     //    connection.Open();
     //    using SqliteCommand command = connection.CreateCommand();
     //    command.CommandText = "SELECT SQLITE_VERSION();";
-    //    return (string)command.ExecuteScalar()!;
+
+    //    SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+    //    _ = reader.Read();
+    //    return reader.GetString(0);
     //}
 
     //public static List<string> GetCompileOptions()

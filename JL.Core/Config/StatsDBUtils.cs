@@ -1,3 +1,4 @@
+using System.Data;
 using System.Text.Json;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -86,10 +87,10 @@ public static class StatsDBUtils
             """;
 
         _ = command.Parameters.AddWithValue("@profileId", profileId);
-        string? statsValue = (string?)command.ExecuteScalar();
 
-        return statsValue is not null
-            ? JsonSerializer.Deserialize<Stats>(statsValue, Utils.s_jsoWithEnumConverter)
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        return reader.Read()
+            ? JsonSerializer.Deserialize<Stats>(reader.GetString(0), Utils.s_jsoWithEnumConverter)
             : null;
     }
 
