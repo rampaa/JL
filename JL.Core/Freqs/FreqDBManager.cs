@@ -10,7 +10,7 @@ namespace JL.Core.Freqs;
 
 internal static class FreqDBManager
 {
-    public const int Version = 4;
+    public const int Version = 5;
 
     private const int SearchKeyIndex = 2;
 
@@ -30,9 +30,9 @@ internal static class FreqDBManager
 
             CREATE TABLE IF NOT EXISTS record_search_key
             (
-                record_id INTEGER NOT NULL,
                 search_key TEXT NOT NULL,
-                PRIMARY KEY (record_id, search_key),
+                record_id INTEGER NOT NULL,
+                PRIMARY KEY (search_key, record_id),
                 FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
@@ -93,10 +93,6 @@ internal static class FreqDBManager
                 ++id;
             }
         }
-
-        using SqliteCommand createIndexCommand = connection.CreateCommand();
-        createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);";
-        _ = createIndexCommand.ExecuteNonQuery();
 
         transaction.Commit();
 

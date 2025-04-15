@@ -84,8 +84,8 @@ internal static class EpwingYomichanDBManager
 
             CREATE TABLE IF NOT EXISTS record_search_key
             (
-                record_id INTEGER NOT NULL,
                 search_key TEXT NOT NULL,
+                record_id INTEGER NOT NULL,
                 PRIMARY KEY (search_key, record_id),
                 FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
