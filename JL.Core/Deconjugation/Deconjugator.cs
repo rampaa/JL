@@ -27,13 +27,11 @@ internal static class Deconjugator
         }
 
         string newText = myForm.Text[..^myRule.ConEnd.Length] + myRule.DecEnd;
-        return newText == myForm.OriginalText
-            ? null
-            : new Form(newText, myForm.OriginalText,
-                myForm.Tags.Count is 0
-                    ? [myRule.ConTag, myRule.DecTag]
-                    : [.. myForm.Tags, myRule.DecTag],
-                [.. myForm.Process, myRule.Detail]);
+        return new Form(newText, myForm.OriginalText,
+            myForm.Tags.Count is 0
+                ? [myRule.ConTag, myRule.DecTag]
+                : [.. myForm.Tags, myRule.DecTag],
+            [.. myForm.Process, myRule.Detail]);
     }
 
     private static List<Form>? StdruleDeconjugate(Form myForm, in Rule myRule)
@@ -58,11 +56,6 @@ internal static class Deconjugator
 
         // blank detail mean it can't be the last (first applied, but rightmost) rule
         if (myRule.Detail.Length is 0 && myForm.Tags.Count is 0)
-        {
-            return null;
-        }
-
-        if (myRule.DecEnds.Length is 0)
         {
             return null;
         }
@@ -148,67 +141,6 @@ internal static class Deconjugator
             : null;
     }
 
-    private static Form? SubstitutionInner(Form myForm, in Rule myRule)
-    {
-        string conEnd = myRule.ConEnds[0];
-        if (!myForm.Text.AsSpan().Contains(conEnd, StringComparison.Ordinal))
-        {
-            return null;
-        }
-
-        string newText = myForm.Text.Replace(conEnd, myRule.DecEnds[0], StringComparison.Ordinal);
-        return new Form(newText, myForm.OriginalText, myForm.Tags.ToList(), [.. myForm.Process, myRule.Detail]);
-    }
-
-    private static List<Form>? SubstitutionDeconjugate(Form myForm, in Rule myRule)
-    {
-        if (myForm.Process.Count is not 0)
-        {
-            return null;
-        }
-
-        // can't deconjugate nothingness
-        if (myForm.Text.Length is 0)
-        {
-            return null;
-        }
-
-        if (myRule.DecEnds.Length is 0)
-        {
-            return null;
-        }
-
-        string[] array = myRule.DecEnds;
-        if (array.Length is 1)
-        {
-            Form? result = SubstitutionInner(myForm, myRule);
-            return result is not null
-                ? [result]
-                : null;
-        }
-
-        List<Form> collection = new(array.Length);
-        for (int i = 0; i < array.Length; i++)
-        {
-            Rule virtualRule = new
-            (
-                myRule.Type,
-                [myRule.DecEnds[i]],
-                [myRule.ConEnds[i]],
-                myRule.Detail
-            );
-            Form? ret = SubstitutionInner(myForm, virtualRule);
-            if (ret is not null)
-            {
-                collection.Add(ret);
-            }
-        }
-
-        return collection.Count > 0
-            ? collection
-            : null;
-    }
-
     private static bool V1InftrapCheck(Form myForm)
     {
         return myForm.Tags.Count is not 1 || myForm.Tags[0] is not "stem-ren";
@@ -253,7 +185,6 @@ internal static class Deconjugator
                         "onlyfinalrule" => OnlyfinalruleDeconjugate(form, rule),
                         "neverfinalrule" => NeverfinalruleDeconjugate(form, rule),
                         "contextrule" => ContextruleDeconjugate(form, rule),
-                        "substitution" => SubstitutionDeconjugate(form, rule),
                         _ => null
                     };
 
