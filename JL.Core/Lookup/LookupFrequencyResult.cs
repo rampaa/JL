@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Lookup;
 
-public readonly record struct LookupFrequencyResult : IEquatable<LookupFrequencyResult>
+public readonly record struct LookupFrequencyResult
 {
     internal string Name { get; }
     public int Freq { get; }
