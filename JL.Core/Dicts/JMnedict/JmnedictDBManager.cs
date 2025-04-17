@@ -203,17 +203,13 @@ internal static class JmnedictDBManager
         int id = dataReader.GetInt32(0);
         string primarySpelling = dataReader.GetString(1);
 
-        string[]? readings = null;
-        if (dataReader[2] is string readingsFromDB)
-        {
-            readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_jso);
-        }
+        string[]? readings = !dataReader.IsDBNull(2)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
+            : null;
 
-        string[]? alternativeSpellings = null;
-        if (dataReader[3] is string alternativeSpellingsFromDB)
-        {
-            alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jso);
-        }
+        string[]? alternativeSpellings = !dataReader.IsDBNull(3)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)
+            : null;
 
         string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(4), Utils.s_jso)!;
         string[][] nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(5), Utils.s_jso)!;

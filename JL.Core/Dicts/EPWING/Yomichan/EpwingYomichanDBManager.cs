@@ -297,25 +297,19 @@ internal static class EpwingYomichanDBManager
     {
         string primarySpelling = dataReader.GetString(0);
 
-        string? reading = null;
-        if (dataReader[1] is string readingFromDB)
-        {
-            reading = readingFromDB;
-        }
+        string? reading = !dataReader.IsDBNull(1)
+            ? dataReader.GetString(1)
+            : null;
 
         string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)!;
 
-        string[]? wordClasses = null;
-        if (dataReader[3] is string wordClassesFromDB)
-        {
-            wordClasses = JsonSerializer.Deserialize<string[]>(wordClassesFromDB, Utils.s_jso);
-        }
+        string[]? wordClasses = !dataReader.IsDBNull(3)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)
+            : null;
 
-        string[]? definitionTags = null;
-        if (dataReader[4] is string definitionTagsFromDB)
-        {
-            definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jso);
-        }
+        string[]? definitionTags = !dataReader.IsDBNull(4)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(4), Utils.s_jso)
+            : null;
 
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
     }

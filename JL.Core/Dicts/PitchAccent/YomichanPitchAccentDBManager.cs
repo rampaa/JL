@@ -236,11 +236,9 @@ internal static class YomichanPitchAccentDBManager
     {
         string spelling = dataReader.GetString(0);
 
-        string? reading = null;
-        if (dataReader[1] is string readingFromDB)
-        {
-            reading = readingFromDB;
-        }
+        string? reading = !dataReader.IsDBNull(1)
+            ? dataReader.GetString(1)
+            : null;
 
         byte position = dataReader.GetByte(2);
 

@@ -291,17 +291,13 @@ internal static class EpwingNazekaDBManager
     {
         string primarySpelling = dataReader.GetString(0);
 
-        string? reading = null;
-        if (dataReader[1] is string readingFromDB)
-        {
-            reading = readingFromDB;
-        }
+        string? reading = !dataReader.IsDBNull(1)
+            ? dataReader.GetString(1)
+            : null;
 
-        string[]? alternativeSpellings = null;
-        if (dataReader[2] is string alternativeSpellingsFromDB)
-        {
-            alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jso);
-        }
+        string[]? alternativeSpellings = !dataReader.IsDBNull(2)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
+            : null;
 
         string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)!;
 

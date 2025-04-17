@@ -166,29 +166,21 @@ internal static class YomichanKanjiDBManager
 
     private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)
     {
-        string[]? onReadings = null;
-        if (dataReader[0] is string onReadingsFromDB)
-        {
-            onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jso);
-        }
+        string[]? onReadings = !dataReader.IsDBNull(0)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(0), Utils.s_jso)
+            : null;
 
-        string[]? kunReadings = null;
-        if (dataReader[1] is string kunReadingsFromDB)
-        {
-            kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jso);
-        }
+        string[]? kunReadings = !dataReader.IsDBNull(1)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(1), Utils.s_jso)
+            : null;
 
-        string[]? definitions = null;
-        if (dataReader[2] is string definitionsFromDB)
-        {
-            definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jso);
-        }
+        string[]? definitions = !dataReader.IsDBNull(2)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
+            : null;
 
-        string[]? stats = null;
-        if (dataReader[3] is string statsFromDB)
-        {
-            stats = JsonSerializer.Deserialize<string[]>(statsFromDB, Utils.s_jso);
-        }
+        string[]? stats = !dataReader.IsDBNull(3)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)
+            : null;
 
         return new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats);
     }

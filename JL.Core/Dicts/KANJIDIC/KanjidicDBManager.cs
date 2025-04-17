@@ -162,35 +162,25 @@ internal static class KanjidicDBManager
 
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)
     {
-        string[]? onReadings = null;
-        if (dataReader[0] is string onReadingsFromDB)
-        {
-            onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jso);
-        }
+        string[]? onReadings = !dataReader.IsDBNull(0)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(0), Utils.s_jso)
+            : null;
 
-        string[]? kunReadings = null;
-        if (dataReader[1] is string kunReadingsFromDB)
-        {
-            kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jso);
-        }
+        string[]? kunReadings = !dataReader.IsDBNull(1)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(1), Utils.s_jso)
+            : null;
 
-        string[]? nanoriReadings = null;
-        if (dataReader[2] is string nanoriReadingsFromDB)
-        {
-            nanoriReadings = JsonSerializer.Deserialize<string[]>(nanoriReadingsFromDB, Utils.s_jso);
-        }
+        string[]? nanoriReadings = !dataReader.IsDBNull(2)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
+            : null;
 
-        string[]? radicalNames = null;
-        if (dataReader[3] is string radicalNamesFromDB)
-        {
-            radicalNames = JsonSerializer.Deserialize<string[]>(radicalNamesFromDB, Utils.s_jso);
-        }
+        string[]? radicalNames = !dataReader.IsDBNull(3)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)
+            : null;
 
-        string[]? definitions = null;
-        if (dataReader[4] is string definitionsFromDB)
-        {
-            definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jso);
-        }
+        string[]? definitions = !dataReader.IsDBNull(4)
+            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(4), Utils.s_jso)
+            : null;
 
         byte strokeCount = dataReader.GetByte(5);
         byte grade = dataReader.GetByte(6);
