@@ -104,17 +104,17 @@ internal sealed partial class StatsWindow
             {
                 case StatsMode.Session:
                     UpdateStatsDisplay(StatsMode.Profile);
-                    ButtonSwapStats.Content = StatsMode.Profile.ToString();
+                    ButtonSwapStats.Content = nameof(StatsMode.Profile);
                     break;
 
                 case StatsMode.Profile:
                     UpdateStatsDisplay(StatsMode.Lifetime);
-                    ButtonSwapStats.Content = StatsMode.Lifetime.ToString();
+                    ButtonSwapStats.Content = nameof(StatsMode.Lifetime);
                     break;
 
                 case StatsMode.Lifetime:
                     UpdateStatsDisplay(StatsMode.Session);
-                    ButtonSwapStats.Content = StatsMode.Session.ToString();
+                    ButtonSwapStats.Content = nameof(StatsMode.Session);
                     break;
 
                 default:

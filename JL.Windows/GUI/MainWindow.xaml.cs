@@ -1298,40 +1298,24 @@ internal sealed partial class MainWindow
         }
 
         // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)/default(Point)
-        if (e.GetPosition(this) == default)
+        if (e.GetPosition(this) == default || sender is not Border border)
         {
             return;
         }
 
-        if (LeftBorder == sender)
+        if (LeftBorder == border || RightBorder == border)
         {
             Mouse.OverrideCursor = Cursors.SizeWE;
         }
-        else if (RightBorder == sender)
-        {
-            Mouse.OverrideCursor = Cursors.SizeWE;
-        }
-        else if (TopBorder == sender)
+        else if (TopBorder == border || BottomBorder == border)
         {
             Mouse.OverrideCursor = Cursors.SizeNS;
         }
-        else if (TopRightBorder == sender)
+        else if (TopRightBorder == border || BottomLeftBorder == border)
         {
             Mouse.OverrideCursor = Cursors.SizeNESW;
         }
-        else if (BottomBorder == sender)
-        {
-            Mouse.OverrideCursor = Cursors.SizeNS;
-        }
-        else if (BottomLeftBorder == sender)
-        {
-            Mouse.OverrideCursor = Cursors.SizeNESW;
-        }
-        else if (BottomRightBorder == sender)
-        {
-            Mouse.OverrideCursor = Cursors.SizeNWSE;
-        }
-        else if (TopLeftBorder == sender)
+        else if (BottomRightBorder == border || TopLeftBorder == border)
         {
             Mouse.OverrideCursor = Cursors.SizeNWSE;
         }

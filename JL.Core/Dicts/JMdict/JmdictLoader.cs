@@ -135,7 +135,7 @@ internal static class JmdictLoader
             {
                 bool downloaded = await DictUpdater.DownloadDict(fullPath,
                     DictUtils.s_jmdictUrl,
-                    DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
+                    nameof(DictType.JMdict), false, false).ConfigureAwait(false);
 
                 if (downloaded)
                 {
@@ -392,7 +392,7 @@ internal static class JmdictLoader
 
                             else if (s_canHandleCulture)
                             {
-                                Utils.Logger.Error($"JMdict: English name of {lang} is missing!");
+                                Utils.Logger.Error("JMdict: English name of {Lang} is missing!", lang);
 
                                 try
                                 {

@@ -44,7 +44,7 @@ internal static class KanjidicLoader
             {
                 bool downloaded = await DictUpdater.DownloadDict(fullPath,
                     DictUtils.s_kanjidicUrl,
-                    DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
+                    nameof(DictType.Kanjidic), false, false).ConfigureAwait(false);
 
                 if (downloaded)
                 {

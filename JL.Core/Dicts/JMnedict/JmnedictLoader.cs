@@ -52,7 +52,7 @@ internal static class JmnedictLoader
             {
                 bool downloaded = await DictUpdater.DownloadDict(fullPath,
                     DictUtils.s_jmnedictUrl,
-                    DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
+                    nameof(DictType.JMnedict), false, false).ConfigureAwait(false);
 
                 if (downloaded)
                 {

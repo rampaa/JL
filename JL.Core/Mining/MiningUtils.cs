@@ -1332,7 +1332,7 @@ public static class MiningUtils
         bool showDuplicateCardMessage = !canAddNote.Value;
         string message = $"Mined {selectedSpelling}{(showNoAudioMessage ? " (No Audio)" : "")}{(showDuplicateCardMessage ? " (Duplicate)" : "")}";
 
-        Utils.Logger.Information(message);
+        Utils.Logger.Information("{Message}", message);
         if (coreConfigManager.NotifyWhenMiningSucceeds)
         {
             Utils.Frontend.Alert(showNoAudioMessage || showDuplicateCardMessage ? AlertLevel.Warning : AlertLevel.Success, message);

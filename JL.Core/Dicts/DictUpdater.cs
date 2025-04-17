@@ -112,7 +112,7 @@ public static class DictUpdater
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_jmdictUrl,
-                DictType.JMdict.ToString(), isUpdate, noPrompt)
+                nameof(DictType.JMdict), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
         if (downloaded)
@@ -169,7 +169,7 @@ public static class DictUpdater
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
         bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_jmnedictUrl,
-                DictType.JMnedict.ToString(), isUpdate, noPrompt)
+                nameof(DictType.JMnedict), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
         if (downloaded)
@@ -223,7 +223,7 @@ public static class DictUpdater
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
         bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_kanjidicUrl,
-                DictType.Kanjidic.ToString(), isUpdate, noPrompt)
+                nameof(DictType.Kanjidic), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
         if (downloaded)

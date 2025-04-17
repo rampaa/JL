@@ -22,12 +22,7 @@ public static class TextUtils
                 continue;
             }
 
-            if (c is Noncharacter)
-            {
-                return i;
-            }
-
-            if (char.IsLowSurrogate(c))
+            if (c is Noncharacter || char.IsLowSurrogate(c))
             {
                 return i;
             }
