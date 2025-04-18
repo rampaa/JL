@@ -491,7 +491,6 @@ public static class DictUtils
 
     private static readonly FrozenSet<DictType> s_nazekaWordAndNameDictTypeSet = NazekaDictTypes.Where(static d => d is not DictType.NonspecificKanjiNazeka).ToFrozenSet();
 
-#pragma warning disable IDE0072 // Add missing cases to switch expression
     public static async Task LoadDictionaries()
     {
         DictsReady = false;
@@ -1323,7 +1322,6 @@ public static class DictUtils
 
         DictsReady = true;
     }
-#pragma warning restore IDE0072 // Add missing cases to switch expression
 
     public static Task CreateDefaultDictsConfig()
     {

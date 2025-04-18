@@ -36,56 +36,47 @@ internal static class FrequencyYomichanLoader
                 int frequency = int.MaxValue;
                 ref readonly JsonElement thirdElement = ref value[2];
 
-#pragma warning disable IDE0010 // Add missing cases to switch statement
-                // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
-                switch (thirdElement.ValueKind)
+                if (thirdElement.ValueKind is JsonValueKind.Number)
                 {
-                    case JsonValueKind.Number:
-                        frequency = thirdElement.GetInt32();
-                        break;
-
-                    case JsonValueKind.Object when thirdElement.TryGetProperty("value", out JsonElement freqValue):
-                        frequency = freqValue.GetInt32();
-                        break;
-
-                    case JsonValueKind.Object:
-                    {
-                        if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
-                        {
-                            reading = readingValue.GetString()!.GetPooledString();
-                            JsonElement frequencyElement = thirdElement.GetProperty("frequency");
-                            frequency = frequencyElement.ValueKind is JsonValueKind.Number
-                                ? frequencyElement.GetInt32()
-                                : frequencyElement.GetProperty("value").GetInt32();
-                        }
-
-                        break;
-                    }
-
-                    case JsonValueKind.String:
-                    {
-                        string freqStr = thirdElement.GetString()!;
-                        Match match = Utils.NumberRegex.Match(freqStr);
-                        if (match.Success)
-                        {
-                            if (int.TryParse(match.ValueSpan, out int parsedFreq))
-                            {
-                                frequency = parsedFreq;
-                            }
-                        }
-
-                        break;
-                    }
-
-                    // Check if there is any frequency dictionary with this format
-                    case JsonValueKind.Array:
-                        reading = thirdElement[0].GetString()!.GetPooledString();
-                        frequency = thirdElement[1].GetInt32();
-                        break;
+                    frequency = thirdElement.GetInt32();
                 }
-#pragma warning restore IDE0010 // Add missing cases to switch statement
 
-                if (frequency is int.MaxValue)
+                else if (thirdElement.ValueKind is JsonValueKind.Object)
+                {
+                    if (thirdElement.TryGetProperty("value", out JsonElement freqValue))
+                    {
+                        frequency = freqValue.GetInt32();
+                    }
+                    else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
+                    {
+                        reading = readingValue.GetString()!.GetPooledString();
+                        JsonElement frequencyElement = thirdElement.GetProperty("frequency");
+                        frequency = frequencyElement.ValueKind is JsonValueKind.Number
+                            ? frequencyElement.GetInt32()
+                            : frequencyElement.GetProperty("value").GetInt32();
+                    }
+                }
+
+                else if (thirdElement.ValueKind is JsonValueKind.String)
+                {
+                    string freqStr = thirdElement.GetString()!;
+                    Match match = Utils.NumberRegex.Match(freqStr);
+                    if (match.Success)
+                    {
+                        if (int.TryParse(match.ValueSpan, out int parsedFreq))
+                        {
+                            frequency = parsedFreq;
+                        }
+                    }
+                }
+
+                else if (thirdElement.ValueKind is JsonValueKind.Array)
+                {
+                    reading = thirdElement[0].GetString()!.GetPooledString();
+                    frequency = thirdElement[1].GetInt32();
+                }
+
+                else
                 {
                     continue;
                 }
