@@ -120,8 +120,7 @@ public static class DictUpdater
             dict.Ready = false;
             dict.Contents = new Dictionary<string, IList<IDictRecord>>(450000, StringComparer.Ordinal);
 
-            await Task.Run(async () => await JmdictLoader
-                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+            await Task.Run(() => JmdictLoader.Load(dict)).ConfigureAwait(false);
 
             await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
             await JmdictWordClassUtils.Load().ConfigureAwait(false);
@@ -177,8 +176,7 @@ public static class DictUpdater
             dict.Ready = false;
             dict.Contents = new Dictionary<string, IList<IDictRecord>>(620000, StringComparer.Ordinal);
 
-            await Task.Run(async () => await JmnedictLoader
-                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+            await Task.Run(() => JmnedictLoader.Load(dict)).ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
             bool useDB = dict.Options.UseDB.Value;
@@ -231,8 +229,7 @@ public static class DictUpdater
             dict.Ready = false;
             dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
 
-            await Task.Run(async () => await KanjidicLoader
-                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+            await Task.Run(() => KanjidicLoader.Load(dict)).ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
             bool useDB = dict.Options.UseDB.Value;

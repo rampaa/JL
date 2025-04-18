@@ -188,8 +188,8 @@ public static partial class Utils
                 await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
                 Frontend.SetInstalledVoiceWithHighestPriority();
             }),
-            Task.Run(static async () => await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false)),
-            Task.Run(static async () => await KanjiCompositionUtils.InitializeKanjiCompositionDict().ConfigureAwait(false))).ConfigureAwait(false);
+            Task.Run(static () => DeconjugatorUtils.DeserializeRules()),
+            Task.Run(static () => KanjiCompositionUtils.InitializeKanjiCompositionDict())).ConfigureAwait(false);
 
         StringPoolInstance.Reset();
     }
