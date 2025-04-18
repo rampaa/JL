@@ -9,6 +9,7 @@
     <PublishReadyToRun>false</PublishReadyToRun>
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
     <AnalysisLevel>9-all</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   
   <ItemGroup>

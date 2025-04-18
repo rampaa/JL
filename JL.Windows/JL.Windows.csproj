@@ -17,6 +17,7 @@
     <PublishReadyToRun>false</PublishReadyToRun>
     <AnalysisLevel>9-all</AnalysisLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
