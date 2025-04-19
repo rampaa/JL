@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
@@ -94,15 +95,23 @@ public static class CustomWordLoader
         ReadOnlySpan<char> rawPartOfSpeech, string[]? wordClasses, IDictionary<string, IList<IDictRecord>> customWordDictionary)
     {
         bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
-        string[] wordClassArray = hasUserDefinedWordClasses
-            ? wordClasses!
-            : rawPartOfSpeech switch
+
+        string[] wordClassArray;
+        if (hasUserDefinedWordClasses)
+        {
+            Debug.Assert(wordClasses is not null);
+            wordClassArray = wordClasses;
+        }
+        else
+        {
+            wordClassArray = rawPartOfSpeech switch
             {
                 "Verb" => s_verbs,
                 "Adjective" => s_adjectives,
                 "Noun" => s_noun,
                 _ => s_other
             };
+        }
 
         for (int i = 0; i < spellings.Length; i++)
         {

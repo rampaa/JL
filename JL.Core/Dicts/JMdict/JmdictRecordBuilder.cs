@@ -349,7 +349,7 @@ internal static class JmdictRecordBuilder
         }
 
         ReadOnlySpan<string[]> senseFieldSpan = senseField.AsSpan();
-        List<string>?[] exclusiveSenseFieldValues = new List<string>?[senseFieldSpan.Length];
+        List<string>?[] exclusiveSenseFieldListArray = new List<string>?[senseFieldSpan.Length];
         List<string> senseFieldValuesSharedByAllSenses = [];
 
         for (int i = 0; i < senseFieldSpan.Length; i++)
@@ -361,8 +361,12 @@ internal static class JmdictRecordBuilder
                 {
                     if (!senseItem.AsSpan().Contains(senseFieldValue))
                     {
-                        exclusiveSenseFieldValues[i] ??= [];
-                        exclusiveSenseFieldValues[i]!.Add(senseFieldValue);
+                        exclusiveSenseFieldListArray[i] ??= [];
+
+                        List<string>? exclusiveSenseFieldList = exclusiveSenseFieldListArray[i];
+                        Debug.Assert(exclusiveSenseFieldList is not null);
+
+                        exclusiveSenseFieldList.Add(senseFieldValue);
                         containsAll = false;
                         break;
                     }
@@ -381,7 +385,7 @@ internal static class JmdictRecordBuilder
         }
 
         bool allElementsAreNull = true;
-        foreach (List<string>? item in exclusiveSenseFieldValues)
+        foreach (List<string>? item in exclusiveSenseFieldListArray)
         {
             if (item is not null)
             {
@@ -395,10 +399,10 @@ internal static class JmdictRecordBuilder
             return (null, senseFieldValuesSharedByAllSenses.TrimToArray());
         }
 
-        string[]?[] exclusiveSenseFieldValuesArray = new string[exclusiveSenseFieldValues.Length][];
-        for (int i = 0; i < exclusiveSenseFieldValues.Length; i++)
+        string[]?[] exclusiveSenseFieldValuesArray = new string[exclusiveSenseFieldListArray.Length][];
+        for (int i = 0; i < exclusiveSenseFieldListArray.Length; i++)
         {
-            exclusiveSenseFieldValuesArray[i] = exclusiveSenseFieldValues[i]?.TrimToArray();
+            exclusiveSenseFieldValuesArray[i] = exclusiveSenseFieldListArray[i]?.TrimToArray();
         }
 
         return (exclusiveSenseFieldValuesArray, senseFieldValuesSharedByAllSenses.TrimToArray());
@@ -417,7 +421,7 @@ internal static class JmdictRecordBuilder
         }
 
         ReadOnlySpan<string[]?> senseFieldSpan = senseField.AsSpan();
-        List<string>?[] exclusiveSenseFieldValues = new List<string>?[senseFieldSpan.Length];
+        List<string>?[] exclusiveSenseFieldListArray = new List<string>?[senseFieldSpan.Length];
         List<string> senseFieldValuesSharedByAllSenses = [];
 
         for (int i = 0; i < senseFieldSpan.Length; i++)
@@ -432,8 +436,12 @@ internal static class JmdictRecordBuilder
                     {
                         if (!senseItem?.AsSpan().Contains(value) ?? true)
                         {
-                            exclusiveSenseFieldValues[i] ??= [];
-                            exclusiveSenseFieldValues[i]!.Add(value);
+                            exclusiveSenseFieldListArray[i] ??= [];
+
+                            List<string>? exclusiveSenseFieldList = exclusiveSenseFieldListArray[i];
+                            Debug.Assert(exclusiveSenseFieldList is not null);
+
+                            exclusiveSenseFieldList.Add(value);
                             containsAll = false;
                             break;
                         }
@@ -453,7 +461,7 @@ internal static class JmdictRecordBuilder
         }
 
         bool allElementsAreNull = true;
-        foreach (List<string>? item in exclusiveSenseFieldValues)
+        foreach (List<string>? item in exclusiveSenseFieldListArray)
         {
             if (item is not null)
             {
@@ -467,10 +475,10 @@ internal static class JmdictRecordBuilder
             return (null, senseFieldValuesSharedByAllSenses.TrimToArray());
         }
 
-        string[]?[] exclusiveSenseFieldValuesArray = new string[exclusiveSenseFieldValues.Length][];
-        for (int i = 0; i < exclusiveSenseFieldValues.Length; i++)
+        string[]?[] exclusiveSenseFieldValuesArray = new string[exclusiveSenseFieldListArray.Length][];
+        for (int i = 0; i < exclusiveSenseFieldListArray.Length; i++)
         {
-            exclusiveSenseFieldValuesArray[i] = exclusiveSenseFieldValues[i]?.TrimToArray();
+            exclusiveSenseFieldValuesArray[i] = exclusiveSenseFieldListArray[i]?.TrimToArray();
         }
 
         return (exclusiveSenseFieldValuesArray, senseFieldValuesSharedByAllSenses.TrimToArray());

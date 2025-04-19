@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -73,7 +74,10 @@ internal static class EpwingYomichanLoader
         ref readonly JsonElement definitionTagsElement = ref jsonElements[2];
         if (definitionTagsElement.ValueKind is JsonValueKind.String)
         {
-            definitionTags = definitionTagsElement.GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            string? definitionTagsStr = definitionTagsElement.GetString();
+            Debug.Assert(definitionTagsStr is not null);
+
+            definitionTags = definitionTagsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             if (definitionTags.Length is 0)
             {
                 definitionTags = null;

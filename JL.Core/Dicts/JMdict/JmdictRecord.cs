@@ -232,8 +232,19 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (showSpellingRestrictionInfo)
             {
-                string[]? spellingRestrictionsElement = showSpellingRestrictions ? spellingRestrictions![i] : null;
-                string[]? readingRestrictionsElement = showReadingRestrictionss ? readingRestrictions![i] : null;
+                string[]? spellingRestrictionsElement = null;
+                if (showSpellingRestrictions)
+                {
+                    Debug.Assert(spellingRestrictions is not null);
+                    spellingRestrictionsElement = spellingRestrictions[i];
+                }
+
+                string[]? readingRestrictionsElement = null;
+                if (showReadingRestrictionss)
+                {
+                    Debug.Assert(readingRestrictions is not null);
+                    readingRestrictionsElement = readingRestrictions[i];
+                }
 
                 bool spellingRestrictionsExist = spellingRestrictionsElement is not null;
                 bool readingRestrictionsExist = readingRestrictionsElement is not null;

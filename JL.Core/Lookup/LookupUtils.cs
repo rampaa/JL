@@ -261,9 +261,15 @@ public static class LookupUtils
             },
             () =>
             {
-                pitchAccentDict = dbIsUsedForPitchDict
-                    ? YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, allSearchKeys)
-                    : pitchDict?.Contents;
+                if (dbIsUsedForPitchDict)
+                {
+                    Debug.Assert(pitchDict is not null);
+                    pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.Name, allSearchKeys);
+                }
+                else
+                {
+                    pitchAccentDict = pitchDict?.Contents;
+                }
             });
         }
         else
@@ -634,14 +640,27 @@ public static class LookupUtils
             ref readonly string text = ref textList[i];
             GetWordResultsHelper(dict, results, deconjugationResultsList[i], text, textInHiraganaList[i], dbWordDict, dbVerbDict);
 
-            List<string>? textsWithoutLongVowelMark = textWithoutLongVowelMarkListExist ? textWithoutLongVowelMarkList![i] : null;
+            List<string>? textsWithoutLongVowelMark = null;
+            if (textWithoutLongVowelMarkListExist)
+            {
+                Debug.Assert(textWithoutLongVowelMarkList is not null);
+                textsWithoutLongVowelMark = textWithoutLongVowelMarkList[i];
+            }
+
             if (textsWithoutLongVowelMark is not null)
             {
                 ReadOnlySpan<string> textsWithoutLongVowelMarkSpan = textsWithoutLongVowelMark.AsSpan();
+                Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = null;
+                if (useDB)
+                {
+                    Debug.Assert(getRecordsFromDB is not null);
+                    Debug.Assert(longVowelQueryOrParameters is not null);
 
-                Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = useDB
-                    ? getRecordsFromDB!(dict.Name, textsWithoutLongVowelMarkSpan, longVowelQueryOrParameters![i]!)
-                    : null;
+                    string? longVowelQueryOrParameter = longVowelQueryOrParameters[i];
+                    Debug.Assert(longVowelQueryOrParameter is not null);
+
+                    dbWordDictForLongVowelConversion = getRecordsFromDB(dict.Name, textsWithoutLongVowelMarkSpan, longVowelQueryOrParameter);
+                }
 
                 foreach (ref readonly string textWithoutLongVowelMark in textsWithoutLongVowelMarkSpan)
                 {
@@ -771,9 +790,17 @@ public static class LookupUtils
 
     private static Dictionary<string, IntermediaryResult>? GetNameResults(ReadOnlySpan<string> textList, ReadOnlySpan<string> textInHiraganaList, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB, string? queryOrParameter)
     {
-        IDictionary<string, IList<IDictRecord>>? nameDict = useDB
-            ? getRecordsFromDB!(dict.Name, textInHiraganaList, queryOrParameter!)
-            : dict.Contents;
+        IDictionary<string, IList<IDictRecord>>? nameDict;
+        if (useDB)
+        {
+            Debug.Assert(getRecordsFromDB is not null);
+            Debug.Assert(queryOrParameter is not null);
+            nameDict = getRecordsFromDB(dict.Name, textInHiraganaList, queryOrParameter);
+        }
+        else
+        {
+            nameDict = dict.Contents;
+        }
 
         if (nameDict is null)
         {
@@ -852,9 +879,16 @@ public static class LookupUtils
         },
         () =>
         {
-            pitchAccentDict = dbIsUsedForPitchDict
-                ? YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys!)
-                : pitchDict?.Contents;
+            if (dbIsUsedForPitchDict)
+            {
+                Debug.Assert(pitchDict is not null);
+                Debug.Assert(searchKeys is not null);
+                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.Name, searchKeys);
+            }
+            else
+            {
+                pitchAccentDict = pitchDict?.Contents;
+            }
 
             pitchAccentDictExists = pitchAccentDict is not null;
         });
@@ -1218,9 +1252,16 @@ public static class LookupUtils
         },
         () =>
         {
-            pitchAccentDict = dbIsUsedForPitchDict
-                ? YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys!)
-                : pitchDict?.Contents;
+            if (dbIsUsedForPitchDict)
+            {
+                Debug.Assert(pitchDict is not null);
+                Debug.Assert(searchKeys is not null);
+                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.Name, searchKeys);
+            }
+            else
+            {
+                pitchAccentDict = pitchDict?.Contents;
+            }
 
             pitchAccentDictExists = pitchAccentDict is not null;
         });
@@ -1311,9 +1352,13 @@ public static class LookupUtils
 
             if (useDB)
             {
-                if (freqDictsFromDBExist && freqDictsFromDB!.TryGetValue(freq.Name, out Dictionary<string, List<FrequencyRecord>>? freqDict))
+                if (freqDictsFromDBExist)
                 {
-                    freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freqDict), freq.Options.HigherValueMeansHigherFrequency.Value));
+                    Debug.Assert(freqDictsFromDB is not null);
+                    if (freqDictsFromDB.TryGetValue(freq.Name, out Dictionary<string, List<FrequencyRecord>>? freqDict))
+                    {
+                        freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freqDict), freq.Options.HigherValueMeansHigherFrequency.Value));
+                    }
                 }
             }
 
