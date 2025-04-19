@@ -113,8 +113,7 @@ public static partial class Utils
 #pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms
     internal static string GetMd5String(ReadOnlySpan<byte> bytes)
     {
-        byte[] hash = MD5.HashData(bytes);
-        return Convert.ToHexString(hash);
+        return Convert.ToHexString(MD5.HashData(bytes).AsSpan());
     }
 #pragma warning restore CA5351 // Do Not Use Broken Cryptographic Algorithms
 
@@ -189,7 +188,8 @@ public static partial class Utils
                 Frontend.SetInstalledVoiceWithHighestPriority();
             }),
             Task.Run(static () => DeconjugatorUtils.DeserializeRules()),
-            Task.Run(static () => KanjiCompositionUtils.InitializeKanjiCompositionDict())).ConfigureAwait(false);
+            Task.Run(static () => KanjiCompositionUtils.InitializeKanjiCompositionDict()))
+            .ConfigureAwait(false);
 
         StringPoolInstance.Reset();
     }
