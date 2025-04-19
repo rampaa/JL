@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Windows.GUI;
@@ -13,15 +14,19 @@ internal static class DictOptionManager
     public static void ApplyDictOptions()
     {
         Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        string pOrthographyInfoColorString = jmdict.Options.POrthographyInfoColor!.Value;
+
+        Debug.Assert(jmdict.Options.POrthographyInfoColor is not null);
+        string pOrthographyInfoColorString = jmdict.Options.POrthographyInfoColor.Value;
         POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(pOrthographyInfoColorString);
 
         if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchAccentDict))
         {
-            string pitchAccentMarkerColorString = pitchAccentDict.Options.PitchAccentMarkerColor!.Value;
+            Debug.Assert(pitchAccentDict.Options.PitchAccentMarkerColor is not null);
+            string pitchAccentMarkerColorString = pitchAccentDict.Options.PitchAccentMarkerColor.Value;
             PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorString);
 
-            MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetStrokeDashArray(pitchAccentDict.Options.ShowPitchAccentWithDottedLines!.Value));
+            Debug.Assert(pitchAccentDict.Options.ShowPitchAccentWithDottedLines is not null);
+            MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetStrokeDashArray(pitchAccentDict.Options.ShowPitchAccentWithDottedLines.Value));
         }
         else
         {

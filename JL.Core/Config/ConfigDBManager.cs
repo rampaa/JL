@@ -23,8 +23,6 @@ public static class ConfigDBManager
         """;
 
     private static readonly string s_configsPath = Path.Join(Utils.ConfigPath, "Configs.sqlite");
-    public delegate bool TryParseHandler<T>(string value, out T? result);
-    public delegate bool TryParseHandlerWithCultureInfo<T>(string value, NumberStyles numberStyles, CultureInfo cultureInfo, out T result);
 
     public static void CreateDB()
     {
@@ -87,7 +85,7 @@ public static class ConfigDBManager
             if (defaultProfileExists)
             {
                 ProfileUtils.CurrentProfileId = ProfileDBUtils.GetCurrentProfileIdFromDB(connection, ProfileUtils.DefaultProfileId);
-                StatsUtils.LifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.DefaultProfileId)!;
+                StatsUtils.LifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.DefaultProfileId);
             }
 
             ProfileDBUtils.InsertGlobalProfile(connection);
@@ -205,21 +203,41 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static T GetValueFromConfig<T>(SqliteConnection connection, T defaultValue, string configKey, TryParseHandler<T> tryParseHandler) where T : struct
+    public static T GetValueFromConfig<T>(SqliteConnection connection, T defaultValue, string configKey) where T : struct, IConvertible, IParsable<T>
     {
         string? configValue = GetSettingValue(connection, configKey);
-        if (configValue is not null && tryParseHandler(configValue, out T value))
+        if (configValue is not null && T.TryParse(configValue, CultureInfo.InvariantCulture, out T value))
         {
             return value;
         }
 
         if (configValue is null)
         {
-            InsertSetting(connection, configKey, Convert.ToString(defaultValue, CultureInfo.InvariantCulture)!);
+            InsertSetting(connection, configKey, defaultValue.ToString(CultureInfo.InvariantCulture));
         }
         else
         {
-            UpdateSetting(connection, configKey, Convert.ToString(defaultValue, CultureInfo.InvariantCulture)!);
+            UpdateSetting(connection, configKey, defaultValue.ToString(CultureInfo.InvariantCulture));
+        }
+
+        return defaultValue;
+    }
+
+    public static T GetValueEnumValueFromConfig<T>(SqliteConnection connection, T defaultValue, string configKey) where T : struct, Enum
+    {
+        string? configValue = GetSettingValue(connection, configKey);
+        if (configValue is not null && Enum.TryParse(configValue, out T value))
+        {
+            return value;
+        }
+
+        if (configValue is null)
+        {
+            InsertSetting(connection, configKey, defaultValue.ToString());
+        }
+        else
+        {
+            UpdateSetting(connection, configKey, defaultValue.ToString());
         }
 
         return defaultValue;
@@ -234,26 +252,6 @@ public static class ConfigDBManager
         }
 
         InsertSetting(connection, configKey, defaultValue);
-        return defaultValue;
-    }
-
-    public static T GetNumberWithDecimalPointFromConfig<T>(SqliteConnection connection, T defaultValue, string configKey, TryParseHandlerWithCultureInfo<T> tryParseHandler) where T : struct
-    {
-        string? configValue = GetSettingValue(connection, configKey);
-        if (configValue is not null && tryParseHandler(configValue, NumberStyles.Number, CultureInfo.InvariantCulture, out T value))
-        {
-            return value;
-        }
-
-        if (configValue is null)
-        {
-            InsertSetting(connection, configKey, Convert.ToString(defaultValue, CultureInfo.InvariantCulture)!);
-        }
-        else
-        {
-            UpdateSetting(connection, configKey, Convert.ToString(defaultValue, CultureInfo.InvariantCulture)!);
-        }
-
         return defaultValue;
     }
 

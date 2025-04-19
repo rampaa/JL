@@ -246,7 +246,7 @@ internal sealed class ConfigManager
 
         MainWindow mainWindow = MainWindow.Instance;
 
-        SkinType theme = ConfigDBManager.GetValueFromConfig(connection, Theme, nameof(Theme), Enum.TryParse);
+        SkinType theme = ConfigDBManager.GetValueEnumValueFromConfig(connection, Theme, nameof(Theme));
         if (theme != Theme)
         {
             Theme = theme;
@@ -264,7 +264,7 @@ internal sealed class ConfigManager
         }
 
         bool stripPunctuationBeforeCalculatingCharacterCount = StripPunctuationBeforeCalculatingCharacterCount;
-        StripPunctuationBeforeCalculatingCharacterCount = ConfigDBManager.GetValueFromConfig(connection, StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount), bool.TryParse);
+        StripPunctuationBeforeCalculatingCharacterCount = ConfigDBManager.GetValueFromConfig(connection, StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount));
         if (stripPunctuationBeforeCalculatingCharacterCount != StripPunctuationBeforeCalculatingCharacterCount && BacklogUtils.Backlog.Count > 0)
         {
             ulong characterCount = 0;
@@ -298,11 +298,11 @@ internal sealed class ConfigManager
             }
         }
 
-        LookupOnClickMouseButton = ConfigDBManager.GetValueFromConfig(connection, LookupOnClickMouseButton, nameof(LookupOnClickMouseButton), Enum.TryParse);
-        MiningModeMouseButton = ConfigDBManager.GetValueFromConfig(connection, MiningModeMouseButton, nameof(MiningModeMouseButton), Enum.TryParse);
+        LookupOnClickMouseButton = ConfigDBManager.GetValueEnumValueFromConfig(connection, LookupOnClickMouseButton, nameof(LookupOnClickMouseButton));
+        MiningModeMouseButton = ConfigDBManager.GetValueEnumValueFromConfig(connection, MiningModeMouseButton, nameof(MiningModeMouseButton));
 
-        MouseButton mineMouseButton = ConfigDBManager.GetValueFromConfig(connection, MineMouseButton, nameof(MineMouseButton), Enum.TryParse);
-        MouseButton minePrimarySpellingMouseButton = ConfigDBManager.GetValueFromConfig(connection, MinePrimarySpellingMouseButton, nameof(MinePrimarySpellingMouseButton), Enum.TryParse);
+        MouseButton mineMouseButton = ConfigDBManager.GetValueEnumValueFromConfig(connection, MineMouseButton, nameof(MineMouseButton));
+        MouseButton minePrimarySpellingMouseButton = ConfigDBManager.GetValueEnumValueFromConfig(connection, MinePrimarySpellingMouseButton, nameof(MinePrimarySpellingMouseButton));
         if (mineMouseButton == minePrimarySpellingMouseButton)
         {
             if (minePrimarySpellingMouseButton == MouseButton.Left)
@@ -318,22 +318,22 @@ internal sealed class ConfigManager
         MineMouseButton = mineMouseButton;
         MinePrimarySpellingMouseButton = minePrimarySpellingMouseButton;
 
-        MainWindowTextVerticalAlignment = ConfigDBManager.GetValueFromConfig(connection, MainWindowTextVerticalAlignment, nameof(MainWindowTextVerticalAlignment), Enum.TryParse);
+        MainWindowTextVerticalAlignment = ConfigDBManager.GetValueEnumValueFromConfig(connection, MainWindowTextVerticalAlignment, nameof(MainWindowTextVerticalAlignment));
         mainWindow.MainTextBox.VerticalContentAlignment = MainWindowTextVerticalAlignment;
 
-        AutoAdjustFontSizesOnResolutionChange = ConfigDBManager.GetValueFromConfig(connection, AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
-        HighlightLongestMatch = ConfigDBManager.GetValueFromConfig(connection, HighlightLongestMatch, nameof(HighlightLongestMatch), bool.TryParse);
-        AutoPlayAudio = ConfigDBManager.GetValueFromConfig(connection, AutoPlayAudio, nameof(AutoPlayAudio), bool.TryParse);
-        GlobalHotKeys = ConfigDBManager.GetValueFromConfig(connection, GlobalHotKeys, nameof(GlobalHotKeys), bool.TryParse);
-        StopIncreasingTimeAndCharStatsWhenMinimized = ConfigDBManager.GetValueFromConfig(connection, StopIncreasingTimeAndCharStatsWhenMinimized, nameof(StopIncreasingTimeAndCharStatsWhenMinimized), bool.TryParse);
-        MineToFileInsteadOfAnki = ConfigDBManager.GetValueFromConfig(connection, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki), bool.TryParse);
-        AlwaysOnTop = ConfigDBManager.GetValueFromConfig(connection, AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
+        AutoAdjustFontSizesOnResolutionChange = ConfigDBManager.GetValueFromConfig(connection, AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange));
+        HighlightLongestMatch = ConfigDBManager.GetValueFromConfig(connection, HighlightLongestMatch, nameof(HighlightLongestMatch));
+        AutoPlayAudio = ConfigDBManager.GetValueFromConfig(connection, AutoPlayAudio, nameof(AutoPlayAudio));
+        GlobalHotKeys = ConfigDBManager.GetValueFromConfig(connection, GlobalHotKeys, nameof(GlobalHotKeys));
+        StopIncreasingTimeAndCharStatsWhenMinimized = ConfigDBManager.GetValueFromConfig(connection, StopIncreasingTimeAndCharStatsWhenMinimized, nameof(StopIncreasingTimeAndCharStatsWhenMinimized));
+        MineToFileInsteadOfAnki = ConfigDBManager.GetValueFromConfig(connection, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki));
+        AlwaysOnTop = ConfigDBManager.GetValueFromConfig(connection, AlwaysOnTop, nameof(AlwaysOnTop));
         mainWindow.Topmost = AlwaysOnTop;
 
-        RequireLookupKeyPress = ConfigDBManager.GetValueFromConfig(connection, RequireLookupKeyPress, nameof(RequireLookupKeyPress), bool.TryParse);
-        DisableHotkeys = ConfigDBManager.GetValueFromConfig(connection, DisableHotkeys, nameof(DisableHotkeys), bool.TryParse);
+        RequireLookupKeyPress = ConfigDBManager.GetValueFromConfig(connection, RequireLookupKeyPress, nameof(RequireLookupKeyPress));
+        DisableHotkeys = ConfigDBManager.GetValueFromConfig(connection, DisableHotkeys, nameof(DisableHotkeys));
 
-        Focusable = ConfigDBManager.GetValueFromConfig(connection, Focusable, nameof(Focusable), bool.TryParse);
+        Focusable = ConfigDBManager.GetValueFromConfig(connection, Focusable, nameof(Focusable));
         if (Focusable)
         {
             WinApi.AllowActivation(mainWindow.WindowHandle);
@@ -343,30 +343,30 @@ internal sealed class ConfigManager
             WinApi.PreventActivation(mainWindow.WindowHandle);
         }
 
-        RestoreFocusToPreviouslyActiveWindow = ConfigDBManager.GetValueFromConfig(connection, RestoreFocusToPreviouslyActiveWindow, nameof(RestoreFocusToPreviouslyActiveWindow), bool.TryParse);
-        PopupFocusOnLookup = ConfigDBManager.GetValueFromConfig(connection, PopupFocusOnLookup, nameof(PopupFocusOnLookup), bool.TryParse);
-        DisableLookupsForNonJapaneseCharsInPopups = ConfigDBManager.GetValueFromConfig(connection, DisableLookupsForNonJapaneseCharsInPopups, nameof(DisableLookupsForNonJapaneseCharsInPopups), bool.TryParse);
-        FixedPopupPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupPositioning, nameof(FixedPopupPositioning), bool.TryParse);
-        FixedPopupRightPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupRightPositioning, nameof(FixedPopupRightPositioning), bool.TryParse);
-        FixedPopupBottomPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupBottomPositioning, nameof(FixedPopupBottomPositioning), bool.TryParse);
-        ChangeMainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetValueFromConfig(connection, ChangeMainWindowBackgroundOpacityOnUnhover, nameof(ChangeMainWindowBackgroundOpacityOnUnhover), bool.TryParse);
-        TextOnlyVisibleOnHover = ConfigDBManager.GetValueFromConfig(connection, TextOnlyVisibleOnHover, nameof(TextOnlyVisibleOnHover), bool.TryParse);
-        OnlyCaptureTextWithJapaneseChars = ConfigDBManager.GetValueFromConfig(connection, OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars), bool.TryParse);
-        DisableLookupsForNonJapaneseCharsInMainWindow = ConfigDBManager.GetValueFromConfig(connection, DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow), bool.TryParse);
-        MainWindowFocusOnHover = ConfigDBManager.GetValueFromConfig(connection, MainWindowFocusOnHover, nameof(MainWindowFocusOnHover), bool.TryParse);
-        SteppedBacklogWithMouseWheel = ConfigDBManager.GetValueFromConfig(connection, SteppedBacklogWithMouseWheel, nameof(SteppedBacklogWithMouseWheel), bool.TryParse);
-        MainWindowDynamicHeight = ConfigDBManager.GetValueFromConfig(connection, MainWindowDynamicHeight, nameof(MainWindowDynamicHeight), bool.TryParse);
-        MainWindowDynamicWidth = ConfigDBManager.GetValueFromConfig(connection, MainWindowDynamicWidth, nameof(MainWindowDynamicWidth), bool.TryParse);
-        PopupDynamicHeight = ConfigDBManager.GetValueFromConfig(connection, PopupDynamicHeight, nameof(PopupDynamicHeight), bool.TryParse);
-        PopupDynamicWidth = ConfigDBManager.GetValueFromConfig(connection, PopupDynamicWidth, nameof(PopupDynamicWidth), bool.TryParse);
-        HideDictTabsWithNoResults = ConfigDBManager.GetValueFromConfig(connection, HideDictTabsWithNoResults, nameof(HideDictTabsWithNoResults), bool.TryParse);
-        AutoHidePopupIfMouseIsNotOverIt = ConfigDBManager.GetValueFromConfig(connection, AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt), bool.TryParse);
-        AutoLookupFirstTermWhenTextIsCopiedFromClipboard = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermWhenTextIsCopiedFromClipboard, nameof(AutoLookupFirstTermWhenTextIsCopiedFromClipboard), bool.TryParse);
-        AutoLookupFirstTermWhenTextIsCopiedFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermWhenTextIsCopiedFromWebSocket, nameof(AutoLookupFirstTermWhenTextIsCopiedFromWebSocket), bool.TryParse);
-        AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized), bool.TryParse);
-        ShowDictionaryTabsInMiningMode = ConfigDBManager.GetValueFromConfig(connection, ShowDictionaryTabsInMiningMode, nameof(ShowDictionaryTabsInMiningMode), bool.TryParse);
+        RestoreFocusToPreviouslyActiveWindow = ConfigDBManager.GetValueFromConfig(connection, RestoreFocusToPreviouslyActiveWindow, nameof(RestoreFocusToPreviouslyActiveWindow));
+        PopupFocusOnLookup = ConfigDBManager.GetValueFromConfig(connection, PopupFocusOnLookup, nameof(PopupFocusOnLookup));
+        DisableLookupsForNonJapaneseCharsInPopups = ConfigDBManager.GetValueFromConfig(connection, DisableLookupsForNonJapaneseCharsInPopups, nameof(DisableLookupsForNonJapaneseCharsInPopups));
+        FixedPopupPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupPositioning, nameof(FixedPopupPositioning));
+        FixedPopupRightPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupRightPositioning, nameof(FixedPopupRightPositioning));
+        FixedPopupBottomPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupBottomPositioning, nameof(FixedPopupBottomPositioning));
+        ChangeMainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetValueFromConfig(connection, ChangeMainWindowBackgroundOpacityOnUnhover, nameof(ChangeMainWindowBackgroundOpacityOnUnhover));
+        TextOnlyVisibleOnHover = ConfigDBManager.GetValueFromConfig(connection, TextOnlyVisibleOnHover, nameof(TextOnlyVisibleOnHover));
+        OnlyCaptureTextWithJapaneseChars = ConfigDBManager.GetValueFromConfig(connection, OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars));
+        DisableLookupsForNonJapaneseCharsInMainWindow = ConfigDBManager.GetValueFromConfig(connection, DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow));
+        MainWindowFocusOnHover = ConfigDBManager.GetValueFromConfig(connection, MainWindowFocusOnHover, nameof(MainWindowFocusOnHover));
+        SteppedBacklogWithMouseWheel = ConfigDBManager.GetValueFromConfig(connection, SteppedBacklogWithMouseWheel, nameof(SteppedBacklogWithMouseWheel));
+        MainWindowDynamicHeight = ConfigDBManager.GetValueFromConfig(connection, MainWindowDynamicHeight, nameof(MainWindowDynamicHeight));
+        MainWindowDynamicWidth = ConfigDBManager.GetValueFromConfig(connection, MainWindowDynamicWidth, nameof(MainWindowDynamicWidth));
+        PopupDynamicHeight = ConfigDBManager.GetValueFromConfig(connection, PopupDynamicHeight, nameof(PopupDynamicHeight));
+        PopupDynamicWidth = ConfigDBManager.GetValueFromConfig(connection, PopupDynamicWidth, nameof(PopupDynamicWidth));
+        HideDictTabsWithNoResults = ConfigDBManager.GetValueFromConfig(connection, HideDictTabsWithNoResults, nameof(HideDictTabsWithNoResults));
+        AutoHidePopupIfMouseIsNotOverIt = ConfigDBManager.GetValueFromConfig(connection, AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt));
+        AutoLookupFirstTermWhenTextIsCopiedFromClipboard = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermWhenTextIsCopiedFromClipboard, nameof(AutoLookupFirstTermWhenTextIsCopiedFromClipboard));
+        AutoLookupFirstTermWhenTextIsCopiedFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermWhenTextIsCopiedFromWebSocket, nameof(AutoLookupFirstTermWhenTextIsCopiedFromWebSocket));
+        AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized = ConfigDBManager.GetValueFromConfig(connection, AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized));
+        ShowDictionaryTabsInMiningMode = ConfigDBManager.GetValueFromConfig(connection, ShowDictionaryTabsInMiningMode, nameof(ShowDictionaryTabsInMiningMode));
 
-        TextBoxIsReadOnly = ConfigDBManager.GetValueFromConfig(connection, TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
+        TextBoxIsReadOnly = ConfigDBManager.GetValueFromConfig(connection, TextBoxIsReadOnly, nameof(TextBoxIsReadOnly));
         if (mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
         {
             mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
@@ -376,39 +376,39 @@ internal sealed class ConfigManager
             mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
         }
 
-        AlwaysShowMainTextBoxCaret = ConfigDBManager.GetValueFromConfig(connection, AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret), bool.TryParse);
+        AlwaysShowMainTextBoxCaret = ConfigDBManager.GetValueFromConfig(connection, AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret));
         mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
 
-        HorizontallyCenterMainWindowText = ConfigDBManager.GetValueFromConfig(connection, HorizontallyCenterMainWindowText, nameof(HorizontallyCenterMainWindowText), bool.TryParse);
+        HorizontallyCenterMainWindowText = ConfigDBManager.GetValueFromConfig(connection, HorizontallyCenterMainWindowText, nameof(HorizontallyCenterMainWindowText));
         mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
             ? HorizontalAlignment.Center
             : HorizontalAlignment.Left;
 
-        EnableBacklog = ConfigDBManager.GetValueFromConfig(connection, EnableBacklog, nameof(EnableBacklog), bool.TryParse);
+        EnableBacklog = ConfigDBManager.GetValueFromConfig(connection, EnableBacklog, nameof(EnableBacklog));
         if (!EnableBacklog)
         {
             BacklogUtils.Backlog.Clear();
             BacklogUtils.Backlog.TrimExcess();
         }
 
-        AutoSaveBacklogBeforeClosing = ConfigDBManager.GetValueFromConfig(connection, AutoSaveBacklogBeforeClosing, nameof(AutoSaveBacklogBeforeClosing), bool.TryParse);
+        AutoSaveBacklogBeforeClosing = ConfigDBManager.GetValueFromConfig(connection, AutoSaveBacklogBeforeClosing, nameof(AutoSaveBacklogBeforeClosing));
 
-        TextToSpeechOnTextChange = ConfigDBManager.GetValueFromConfig(connection, TextToSpeechOnTextChange, nameof(TextToSpeechOnTextChange), bool.TryParse);
+        TextToSpeechOnTextChange = ConfigDBManager.GetValueFromConfig(connection, TextToSpeechOnTextChange, nameof(TextToSpeechOnTextChange));
 
-        HidePopupsOnTextChange = ConfigDBManager.GetValueFromConfig(connection, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange), bool.TryParse);
+        HidePopupsOnTextChange = ConfigDBManager.GetValueFromConfig(connection, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange));
 
-        DiscardIdenticalText = ConfigDBManager.GetValueFromConfig(connection, DiscardIdenticalText, nameof(DiscardIdenticalText), bool.TryParse);
-        MergeSequentialTextsWhenTheyMatch = ConfigDBManager.GetValueFromConfig(connection, MergeSequentialTextsWhenTheyMatch, nameof(MergeSequentialTextsWhenTheyMatch), bool.TryParse);
-        AllowPartialMatchingForTextMerge = ConfigDBManager.GetValueFromConfig(connection, AllowPartialMatchingForTextMerge, nameof(AllowPartialMatchingForTextMerge), bool.TryParse);
+        DiscardIdenticalText = ConfigDBManager.GetValueFromConfig(connection, DiscardIdenticalText, nameof(DiscardIdenticalText));
+        MergeSequentialTextsWhenTheyMatch = ConfigDBManager.GetValueFromConfig(connection, MergeSequentialTextsWhenTheyMatch, nameof(MergeSequentialTextsWhenTheyMatch));
+        AllowPartialMatchingForTextMerge = ConfigDBManager.GetValueFromConfig(connection, AllowPartialMatchingForTextMerge, nameof(AllowPartialMatchingForTextMerge));
 
-        HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = ConfigDBManager.GetValueFromConfig(connection, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
+        HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = ConfigDBManager.GetValueFromConfig(connection, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar));
         mainWindow.ChangeVisibilityOfTitleBarButtons();
 
-        MainTextBoxDropShadowEffectShadowDepth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainTextBoxDropShadowEffectShadowDepth, nameof(MainTextBoxDropShadowEffectShadowDepth), double.TryParse);
-        MainTextBoxDropShadowEffectDirection = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectDirection, nameof(MainTextBoxDropShadowEffectDirection), int.TryParse);
-        MainTextBoxDropShadowEffectBlurRadius = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectBlurRadius, nameof(MainTextBoxDropShadowEffectBlurRadius), int.TryParse);
-        MainTextBoxDropShadowEffectBlurOpacity = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectBlurOpacity, nameof(MainTextBoxDropShadowEffectBlurOpacity), int.TryParse);
-        TextBoxApplyDropShadowEffect = ConfigDBManager.GetValueFromConfig(connection, TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect), bool.TryParse);
+        MainTextBoxDropShadowEffectShadowDepth = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectShadowDepth, nameof(MainTextBoxDropShadowEffectShadowDepth));
+        MainTextBoxDropShadowEffectDirection = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectDirection, nameof(MainTextBoxDropShadowEffectDirection));
+        MainTextBoxDropShadowEffectBlurRadius = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectBlurRadius, nameof(MainTextBoxDropShadowEffectBlurRadius));
+        MainTextBoxDropShadowEffectBlurOpacity = ConfigDBManager.GetValueFromConfig(connection, MainTextBoxDropShadowEffectBlurOpacity, nameof(MainTextBoxDropShadowEffectBlurOpacity));
+        TextBoxApplyDropShadowEffect = ConfigDBManager.GetValueFromConfig(connection, TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect));
         MainTextBoxDropShadowEffectColor = ConfigUtils.GetColorFromConfig(connection, MainTextBoxDropShadowEffectColor, nameof(MainTextBoxDropShadowEffectColor));
         if (TextBoxApplyDropShadowEffect)
         {
@@ -431,21 +431,21 @@ internal sealed class ConfigManager
             mainWindow.MainTextBox.Effect = null;
         }
 
-        MaxSearchLength = ConfigDBManager.GetValueFromConfig(connection, MaxSearchLength, nameof(MaxSearchLength), int.TryParse);
-        PrimarySpellingFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PrimarySpellingFontSize, nameof(PrimarySpellingFontSize), double.TryParse);
-        ReadingsFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, ReadingsFontSize, nameof(ReadingsFontSize), double.TryParse);
-        AlternativeSpellingsFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AlternativeSpellingsFontSize, nameof(AlternativeSpellingsFontSize), double.TryParse);
-        DefinitionsFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DefinitionsFontSize, nameof(DefinitionsFontSize), double.TryParse);
-        FrequencyFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FrequencyFontSize, nameof(FrequencyFontSize), double.TryParse);
-        DeconjugationInfoFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize), double.TryParse);
-        DictTypeFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, DictTypeFontSize, nameof(DictTypeFontSize), double.TryParse);
-        AudioButtonFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AudioButtonFontSize, nameof(AudioButtonFontSize), double.TryParse);
-        MiningButtonFontSize = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MiningButtonFontSize, nameof(MiningButtonFontSize), double.TryParse);
-        MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds), double.TryParse);
-        MaxNumResultsNotInMiningMode = ConfigDBManager.GetValueFromConfig(connection, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
+        MaxSearchLength = ConfigDBManager.GetValueFromConfig(connection, MaxSearchLength, nameof(MaxSearchLength));
+        PrimarySpellingFontSize = ConfigDBManager.GetValueFromConfig(connection, PrimarySpellingFontSize, nameof(PrimarySpellingFontSize));
+        ReadingsFontSize = ConfigDBManager.GetValueFromConfig(connection, ReadingsFontSize, nameof(ReadingsFontSize));
+        AlternativeSpellingsFontSize = ConfigDBManager.GetValueFromConfig(connection, AlternativeSpellingsFontSize, nameof(AlternativeSpellingsFontSize));
+        DefinitionsFontSize = ConfigDBManager.GetValueFromConfig(connection, DefinitionsFontSize, nameof(DefinitionsFontSize));
+        FrequencyFontSize = ConfigDBManager.GetValueFromConfig(connection, FrequencyFontSize, nameof(FrequencyFontSize));
+        DeconjugationInfoFontSize = ConfigDBManager.GetValueFromConfig(connection, DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize));
+        DictTypeFontSize = ConfigDBManager.GetValueFromConfig(connection, DictTypeFontSize, nameof(DictTypeFontSize));
+        AudioButtonFontSize = ConfigDBManager.GetValueFromConfig(connection, AudioButtonFontSize, nameof(AudioButtonFontSize));
+        MiningButtonFontSize = ConfigDBManager.GetValueFromConfig(connection, MiningButtonFontSize, nameof(MiningButtonFontSize));
+        MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds = ConfigDBManager.GetValueFromConfig(connection, MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds));
+        MaxNumResultsNotInMiningMode = ConfigDBManager.GetValueFromConfig(connection, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode));
 
-        TextBoxUseCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, TextBoxUseCustomLineHeight, nameof(TextBoxUseCustomLineHeight), bool.TryParse);
-        TextBoxCustomLineHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, TextBoxCustomLineHeight, nameof(TextBoxCustomLineHeight), double.TryParse);
+        TextBoxUseCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, TextBoxUseCustomLineHeight, nameof(TextBoxUseCustomLineHeight));
+        TextBoxCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, TextBoxCustomLineHeight, nameof(TextBoxCustomLineHeight));
         if (TextBoxUseCustomLineHeight)
         {
             mainWindow.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.BlockLineHeight);
@@ -457,51 +457,51 @@ internal sealed class ConfigManager
             mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, double.NaN);
         }
 
-        AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
+        AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetValueFromConfig(connection, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds));
         PopupWindowUtils.PopupAutoHideTimer.Enabled = false;
         PopupWindowUtils.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
 
         DpiScale dpi = WindowsUtils.Dpi;
 
-        PopupXOffset = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupXOffset, nameof(PopupXOffset), double.TryParse);
+        PopupXOffset = ConfigDBManager.GetValueFromConfig(connection, PopupXOffset, nameof(PopupXOffset));
         WindowsUtils.DpiAwareXOffset = PopupXOffset * dpi.DpiScaleX;
 
-        PopupYOffset = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupYOffset, nameof(PopupYOffset), double.TryParse);
+        PopupYOffset = ConfigDBManager.GetValueFromConfig(connection, PopupYOffset, nameof(PopupYOffset));
         WindowsUtils.DpiAwareYOffset = PopupYOffset * dpi.DpiScaleY;
 
-        PopupMaxWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMaxWidth, nameof(PopupMaxWidth), double.TryParse);
-        PopupMaxHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMaxHeight, nameof(PopupMaxHeight), double.TryParse);
-        PopupMinWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMinWidth, nameof(PopupMinWidth), double.TryParse);
-        PopupMinHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, PopupMinHeight, nameof(PopupMinHeight), double.TryParse);
+        PopupMaxWidth = ConfigDBManager.GetValueFromConfig(connection, PopupMaxWidth, nameof(PopupMaxWidth));
+        PopupMaxHeight = ConfigDBManager.GetValueFromConfig(connection, PopupMaxHeight, nameof(PopupMaxHeight));
+        PopupMinWidth = ConfigDBManager.GetValueFromConfig(connection, PopupMinWidth, nameof(PopupMinWidth));
+        PopupMinHeight = ConfigDBManager.GetValueFromConfig(connection, PopupMinHeight, nameof(PopupMinHeight));
 
-        FixedPopupXPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FixedPopupXPosition, nameof(FixedPopupXPosition), double.TryParse);
-        FixedPopupYPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, FixedPopupYPosition, nameof(FixedPopupYPosition), double.TryParse);
+        FixedPopupXPosition = ConfigDBManager.GetValueFromConfig(connection, FixedPopupXPosition, nameof(FixedPopupXPosition));
+        FixedPopupYPosition = ConfigDBManager.GetValueFromConfig(connection, FixedPopupYPosition, nameof(FixedPopupYPosition));
 
-        mainWindow.OpacitySlider.Value = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, mainWindow.OpacitySlider.Value, "MainWindowOpacity", double.TryParse);
-        mainWindow.FontSizeSlider.Value = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, mainWindow.FontSizeSlider.Value, "MainWindowFontSize", double.TryParse);
-        MainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowBackgroundOpacityOnUnhover, nameof(MainWindowBackgroundOpacityOnUnhover), double.TryParse);
+        mainWindow.OpacitySlider.Value = ConfigDBManager.GetValueFromConfig(connection, mainWindow.OpacitySlider.Value, "MainWindowOpacity");
+        mainWindow.FontSizeSlider.Value = ConfigDBManager.GetValueFromConfig(connection, mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
+        MainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetValueFromConfig(connection, MainWindowBackgroundOpacityOnUnhover, nameof(MainWindowBackgroundOpacityOnUnhover));
 
-        MainWindowHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowHeight, nameof(MainWindowHeight), double.TryParse);
-        MainWindowWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowWidth, nameof(MainWindowWidth), double.TryParse);
-        MainWindowMaxDynamicWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMaxDynamicWidth, nameof(MainWindowMaxDynamicWidth), double.TryParse);
-        MainWindowMaxDynamicHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMaxDynamicHeight, nameof(MainWindowMaxDynamicHeight), double.TryParse);
-        MainWindowMinDynamicWidth = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMinDynamicWidth, nameof(MainWindowMinDynamicWidth), double.TryParse);
-        MainWindowMinDynamicHeight = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowMinDynamicHeight, nameof(MainWindowMinDynamicHeight), double.TryParse);
+        MainWindowHeight = ConfigDBManager.GetValueFromConfig(connection, MainWindowHeight, nameof(MainWindowHeight));
+        MainWindowWidth = ConfigDBManager.GetValueFromConfig(connection, MainWindowWidth, nameof(MainWindowWidth));
+        MainWindowMaxDynamicWidth = ConfigDBManager.GetValueFromConfig(connection, MainWindowMaxDynamicWidth, nameof(MainWindowMaxDynamicWidth));
+        MainWindowMaxDynamicHeight = ConfigDBManager.GetValueFromConfig(connection, MainWindowMaxDynamicHeight, nameof(MainWindowMaxDynamicHeight));
+        MainWindowMinDynamicWidth = ConfigDBManager.GetValueFromConfig(connection, MainWindowMinDynamicWidth, nameof(MainWindowMinDynamicWidth));
+        MainWindowMinDynamicHeight = ConfigDBManager.GetValueFromConfig(connection, MainWindowMinDynamicHeight, nameof(MainWindowMinDynamicHeight));
         mainWindow.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowMinDynamicWidth, MainWindowMinDynamicHeight, MainWindowWidth, MainWindowHeight);
         mainWindow.WidthBeforeResolutionChange = MainWindowWidth;
         mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
 
-        double mainWindowTop = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, mainWindow.Top, "MainWindowTopPosition", double.TryParse);
-        double mainWindowLeft = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, mainWindow.Left, "MainWindowLeftPosition", double.TryParse);
+        double mainWindowTop = ConfigDBManager.GetValueFromConfig(connection, mainWindow.Top, "MainWindowTopPosition");
+        double mainWindowLeft = ConfigDBManager.GetValueFromConfig(connection, mainWindow.Left, "MainWindowLeftPosition");
         WinApi.MoveWindowToPosition(mainWindow.WindowHandle, mainWindowLeft, mainWindowTop);
 
         mainWindow.TopPositionBeforeResolutionChange = mainWindow.Top;
         mainWindow.LeftPositionBeforeResolutionChange = mainWindow.Left;
 
-        RepositionMainWindowOnTextChangeByBottomPosition = ConfigDBManager.GetValueFromConfig(connection, RepositionMainWindowOnTextChangeByBottomPosition, nameof(RepositionMainWindowOnTextChangeByBottomPosition), bool.TryParse);
-        RepositionMainWindowOnTextChangeByRightPosition = ConfigDBManager.GetValueFromConfig(connection, RepositionMainWindowOnTextChangeByRightPosition, nameof(RepositionMainWindowOnTextChangeByRightPosition), bool.TryParse);
-        MainWindowFixedBottomPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowFixedBottomPosition, nameof(MainWindowFixedBottomPosition), double.TryParse);
-        MainWindowFixedRightPosition = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, MainWindowFixedRightPosition, nameof(MainWindowFixedRightPosition), double.TryParse);
+        RepositionMainWindowOnTextChangeByBottomPosition = ConfigDBManager.GetValueFromConfig(connection, RepositionMainWindowOnTextChangeByBottomPosition, nameof(RepositionMainWindowOnTextChangeByBottomPosition));
+        RepositionMainWindowOnTextChangeByRightPosition = ConfigDBManager.GetValueFromConfig(connection, RepositionMainWindowOnTextChangeByRightPosition, nameof(RepositionMainWindowOnTextChangeByRightPosition));
+        MainWindowFixedBottomPosition = ConfigDBManager.GetValueFromConfig(connection, MainWindowFixedBottomPosition, nameof(MainWindowFixedBottomPosition));
+        MainWindowFixedRightPosition = ConfigDBManager.GetValueFromConfig(connection, MainWindowFixedRightPosition, nameof(MainWindowFixedRightPosition));
         mainWindow.UpdatePosition();
 
         mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0 : 1;
@@ -532,7 +532,7 @@ internal sealed class ConfigManager
         mainWindow.MainTextBox.SelectionBrush = HighlightColor;
 
         PopupBackgroundColor = ConfigUtils.GetBrushFromConfig(connection, PopupBackgroundColor, nameof(PopupBackgroundColor));
-        PopupBackgroundColor.Opacity = ConfigDBManager.GetNumberWithDecimalPointFromConfig(connection, 80.0, "PopupOpacity", double.TryParse) / 100;
+        PopupBackgroundColor.Opacity = ConfigDBManager.GetValueFromConfig(connection, 80.0, "PopupOpacity") / 100;
         PopupBackgroundColor.Freeze();
 
         mainWindow.Background = ConfigUtils.GetBrushFromConfig(connection, mainWindow.Background, "MainWindowBackgroundColor");

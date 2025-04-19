@@ -39,7 +39,7 @@ public sealed class CoreConfigManager
 
     public void ApplyPreferences(SqliteConnection connection)
     {
-        Utils.s_loggingLevelSwitch.MinimumLevel = ConfigDBManager.GetValueFromConfig(connection, LogEventLevel.Error, "MinimumLogLevel", Enum.TryParse);
+        Utils.s_loggingLevelSwitch.MinimumLevel = ConfigDBManager.GetValueEnumValueFromConfig(connection, LogEventLevel.Error, "MinimumLogLevel");
 
         {
             string? ankiConnectUriStr = ConfigDBManager.GetSettingValue(connection, nameof(AnkiConnectUri));
@@ -67,8 +67,8 @@ public sealed class CoreConfigManager
         }
 
         {
-            CaptureTextFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket), bool.TryParse);
-            AutoReconnectToWebSocket = ConfigDBManager.GetValueFromConfig(connection, AutoReconnectToWebSocket, nameof(AutoReconnectToWebSocket), bool.TryParse);
+            CaptureTextFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket));
+            AutoReconnectToWebSocket = ConfigDBManager.GetValueFromConfig(connection, AutoReconnectToWebSocket, nameof(AutoReconnectToWebSocket));
 
             string? webSocketUriStr = ConfigDBManager.GetSettingValue(connection, nameof(WebSocketUri));
             if (webSocketUriStr is null)
@@ -108,22 +108,22 @@ public sealed class CoreConfigManager
             }
         }
 
-        TrackTermLookupCounts = ConfigDBManager.GetValueFromConfig(connection, TrackTermLookupCounts, nameof(TrackTermLookupCounts), bool.TryParse);
+        TrackTermLookupCounts = ConfigDBManager.GetValueFromConfig(connection, TrackTermLookupCounts, nameof(TrackTermLookupCounts));
         if (!TrackTermLookupCounts)
         {
             StatsUtils.SessionStats.TermLookupCountDict.Clear();
         }
 
-        AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);
-        ForceSyncAnki = ConfigDBManager.GetValueFromConfig(connection, ForceSyncAnki, nameof(ForceSyncAnki), bool.TryParse);
-        NotifyWhenMiningSucceeds = ConfigDBManager.GetValueFromConfig(connection, NotifyWhenMiningSucceeds, nameof(NotifyWhenMiningSucceeds), bool.TryParse);
-        AllowDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, AllowDuplicateCards, nameof(AllowDuplicateCards), bool.TryParse);
-        CheckForDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, CheckForDuplicateCards, nameof(CheckForDuplicateCards), bool.TryParse);
-        TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
-        TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
-        CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
-        CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
-        MinCharactersPerMinuteBeforeStoppingTimeTracking = ConfigDBManager.GetValueFromConfig(connection, MinCharactersPerMinuteBeforeStoppingTimeTracking, nameof(MinCharactersPerMinuteBeforeStoppingTimeTracking), int.TryParse);
-        LookupCategory = ConfigDBManager.GetValueFromConfig(connection, LookupCategory, nameof(LookupCategory), Enum.TryParse);
+        AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, AnkiIntegration, nameof(AnkiIntegration));
+        ForceSyncAnki = ConfigDBManager.GetValueFromConfig(connection, ForceSyncAnki, nameof(ForceSyncAnki));
+        NotifyWhenMiningSucceeds = ConfigDBManager.GetValueFromConfig(connection, NotifyWhenMiningSucceeds, nameof(NotifyWhenMiningSucceeds));
+        AllowDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, AllowDuplicateCards, nameof(AllowDuplicateCards));
+        CheckForDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, CheckForDuplicateCards, nameof(CheckForDuplicateCards));
+        TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters));
+        TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines));
+        CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp));
+        CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard));
+        MinCharactersPerMinuteBeforeStoppingTimeTracking = ConfigDBManager.GetValueFromConfig(connection, MinCharactersPerMinuteBeforeStoppingTimeTracking, nameof(MinCharactersPerMinuteBeforeStoppingTimeTracking));
+        LookupCategory = ConfigDBManager.GetValueEnumValueFromConfig(connection, LookupCategory, nameof(LookupCategory));
     }
 }

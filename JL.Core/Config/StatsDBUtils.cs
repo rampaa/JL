@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -75,7 +76,7 @@ public static class StatsDBUtils
         transaction.Commit();
     }
 
-    public static Stats? GetStatsFromDB(SqliteConnection connection, int profileId)
+    public static Stats GetStatsFromDB(SqliteConnection connection, int profileId)
     {
         using SqliteCommand command = connection.CreateCommand();
 
@@ -89,9 +90,13 @@ public static class StatsDBUtils
         _ = command.Parameters.AddWithValue("@profileId", profileId);
 
         SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
-        return reader.Read()
-            ? JsonSerializer.Deserialize<Stats>(reader.GetString(0), Utils.s_jsoWithEnumConverter)
-            : null;
+
+        Debug.Assert(reader.HasRows);
+
+        _ = reader.Read();
+        Stats? stats = JsonSerializer.Deserialize<Stats>(reader.GetString(0), Utils.s_jsoWithEnumConverter);
+        Debug.Assert(stats is not null);
+        return stats;
     }
 
     public static List<KeyValuePair<string, int>>? GetTermLookupCountsFromDB(SqliteConnection connection, int profileId)
@@ -160,8 +165,8 @@ public static class StatsDBUtils
 
     public static void SetStatsFromDB(SqliteConnection connection)
     {
-        StatsUtils.LifetimeStats = GetStatsFromDB(connection, ProfileUtils.GlobalProfileId)!;
-        StatsUtils.ProfileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
+        StatsUtils.LifetimeStats = GetStatsFromDB(connection, ProfileUtils.GlobalProfileId);
+        StatsUtils.ProfileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId);
     }
 
     internal static void ResetAllTermLookupCounts(int profileId)
