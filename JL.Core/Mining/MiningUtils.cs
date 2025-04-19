@@ -496,10 +496,7 @@ public static class MiningUtils
             miningParams[JLField.WordClasses] = wordClasses;
         }
 
-        int selectedSpellingIndex = lookupResult.Readings is not null
-            ? Array.IndexOf(lookupResult.Readings, selectedSpelling)
-            : 0;
-
+        int selectedSpellingIndex = lookupResult.Readings.AsSpan().IndexOf(selectedSpelling);
         if (selectedSpellingIndex is -1)
         {
             selectedSpellingIndex = 0;

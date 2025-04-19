@@ -455,10 +455,7 @@ public static class LookupUtils
             })
             .ThenBy(static lookupResult =>
             {
-                int index = lookupResult.Readings is not null
-                    ? Array.IndexOf(lookupResult.Readings, lookupResult.MatchedText)
-                    : -1;
-
+                int index = lookupResult.Readings.AsSpan().IndexOf(lookupResult.MatchedText);
                 if (index < 0)
                 {
                     return 2;
@@ -514,10 +511,7 @@ public static class LookupUtils
             })
             .ThenBy(static lookupResult =>
             {
-                int index = lookupResult.Readings is not null
-                    ? Array.IndexOf(lookupResult.Readings, lookupResult.MatchedText)
-                    : -1;
-
+                int index = lookupResult.Readings.AsSpan().IndexOf(lookupResult.MatchedText);
                 return index >= 0
                     ? index
                     : int.MaxValue;
