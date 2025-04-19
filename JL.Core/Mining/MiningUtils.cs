@@ -775,7 +775,9 @@ public static class MiningUtils
 
             for (int i = 1; i < firstLookupResults.Length; i++)
             {
-                _ = singleDictStringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{firstLookupResults[i].FormattedDefinitions!.ReplaceLineEndings("<br/>")}</dd>");
+                string? formattedDefinitions = firstLookupResults[i].FormattedDefinitions;
+                Debug.Assert(formattedDefinitions is not null);
+                _ = singleDictStringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings("<br/>")}</dd>");
 
                 ++count;
             }
@@ -804,7 +806,9 @@ public static class MiningUtils
 
             for (int i = 1; i < firstLookupResults.Length; i++)
             {
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{firstLookupResults[i].FormattedDefinitions!.ReplaceLineEndings("<br/>")}</dd>");
+                string? formattedDefinitions = firstLookupResults[i].FormattedDefinitions;
+                Debug.Assert(formattedDefinitions is not null);
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings("<br/>")}</dd>");
                 ++count;
             }
 
@@ -818,14 +822,18 @@ public static class MiningUtils
             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" <details> <summary>{dictName}</summary> ");
             if (otherLookupResults.Count is 1)
             {
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{otherLookupResults[0].FormattedDefinitions!.ReplaceLineEndings("<br/>")} </details>");
+                string? formattedDefinitions = firstLookupResults[0].FormattedDefinitions;
+                Debug.Assert(formattedDefinitions is not null);
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{formattedDefinitions.ReplaceLineEndings("<br/>")} </details>");
             }
             else
             {
                 ReadOnlySpan<LookupResult> otherLookupResultsSpan = otherLookupResults.AsSpan();
                 for (int j = 0; j < otherLookupResultsSpan.Length; j++)
                 {
-                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"<dt>{j + 1}.</dt> <dd>{otherLookupResultsSpan[j].FormattedDefinitions!.ReplaceLineEndings("<br/>")}</dd>");
+                    string? formattedDefinitions = firstLookupResults[j].FormattedDefinitions;
+                    Debug.Assert(formattedDefinitions is not null);
+                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"<dt>{j + 1}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings("<br/>")}</dd>");
                 }
 
                 _ = stringBuilder.Append(" </details>");
@@ -905,7 +913,9 @@ public static class MiningUtils
                 ReadOnlySpan<LookupResult> otherLookupResultsSpan = otherLookupResults.AsSpan();
                 for (int j = 0; j < otherLookupResultsSpan.Length; j++)
                 {
-                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{count}.\n\t{otherLookupResultsSpan[j].FormattedDefinitions!.ReplaceLineEndings("\n\t")}");
+                    string? formattedDefinitions = firstLookupResults[j].FormattedDefinitions;
+                    Debug.Assert(formattedDefinitions is not null);
+                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{count}.\n\t{formattedDefinitions.ReplaceLineEndings("\n\t")}");
                     if (j + 1 < otherLookupResultsSpan.Length)
                     {
                         _ = stringBuilder.Append('\n');

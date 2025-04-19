@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,10 +46,14 @@ internal sealed partial class AddNameWindow
         SpellingTextBox.ClearValue(CursorProperty);
         SpellingTextBox.ClearValue(ToolTipProperty);
 
+        object? nameTypeRadioButtonContent = NameTypeStackPanel.Children.OfType<RadioButton>().First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content;
+        Debug.Assert(nameTypeRadioButtonContent is not null);
+
+        string? nameType = nameTypeRadioButtonContent.ToString();
+        Debug.Assert(nameType is not null);
+
 #pragma warning disable CA1308 // Normalize strings to uppercase
-        string nameType =
-            NameTypeStackPanel.Children.OfType<RadioButton>()
-                .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString()!.ToLowerInvariant();
+        nameType = nameType.ToLowerInvariant();
 #pragma warning restore CA1308 // Normalize strings to uppercase
 
         string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();

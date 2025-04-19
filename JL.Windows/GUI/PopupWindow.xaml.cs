@@ -1432,13 +1432,15 @@ internal sealed partial class PopupWindow
         int listViewItemIndex;
         if (useSelectedListViewItemIfItExists && PopupListView.SelectedItem is not null)
         {
-            popupListViewItem = (StackPanel)PopupListView.SelectedItem;
+            popupListViewItem = (StackPanel?)PopupListView.SelectedItem;
+            Debug.Assert(popupListViewItem is not null);
+
             listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(popupListViewItem);
         }
         else
         {
             listViewItemIndex = _listViewItemIndex;
-            popupListViewItem = (StackPanel)PopupListView.Items[listViewItemIndex]!;
+            popupListViewItem = (StackPanel?)PopupListView.Items[listViewItemIndex]!;
         }
 
         LookupResult lookupResult = LastLookupResults[listViewItemIndex];
@@ -1478,17 +1480,17 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        StackPanel popupListViewItem;
+        StackPanel? popupListViewItem;
         int listViewItemIndex;
         if (useSelectedListViewItemIfItExists && PopupListView.SelectedItem is not null)
         {
-            popupListViewItem = (StackPanel)PopupListView.SelectedItem!;
+            popupListViewItem = (StackPanel)PopupListView.SelectedItem;
             listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(popupListViewItem);
         }
         else
         {
             listViewItemIndex = _listViewItemIndex;
-            popupListViewItem = (StackPanel)PopupListView.Items[listViewItemIndex]!;
+            popupListViewItem = (StackPanel?)PopupListView.Items[listViewItemIndex];
         }
 
         LookupResult[] lookupResults = LastLookupResults;
@@ -1519,6 +1521,7 @@ internal sealed partial class PopupWindow
         Point position;
         if (useSelectedListViewItemIfItExists)
         {
+            Debug.Assert(popupListViewItem is not null);
             Button? audioButton = popupListViewItem.GetChildByName<Button>("MiningButton");
             if (audioButton is not null)
             {
@@ -1564,9 +1567,17 @@ internal sealed partial class PopupWindow
             || _lastInteractedTextBox is null
             || _lastInteractedTextBox.SelectionLength is 0)
         {
-            int listViewItemIndex = useSelectedItem
-                ? PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem!)
-                : _listViewItemIndex;
+            int listViewItemIndex;
+            if (useSelectedItem)
+            {
+                StackPanel? mainStackPanel = (StackPanel?)PopupListView.SelectedItem;
+                Debug.Assert(mainStackPanel is not null);
+                listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(mainStackPanel);
+            }
+            else
+            {
+                listViewItemIndex = _listViewItemIndex;
+            }
 
             LookupResult lookupResult = LastLookupResults[listViewItemIndex];
 
@@ -1710,7 +1721,9 @@ internal sealed partial class PopupWindow
                 {
                     if (PopupIndex > 0)
                     {
-                        PopupWindowUtils.PopupWindows[PopupIndex - 1]!.ShowAddNameWindow(true);
+                        PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+                        Debug.Assert(popupWindow is not null);
+                        popupWindow.ShowAddNameWindow(true);
                     }
 
                     else
@@ -1738,7 +1751,9 @@ internal sealed partial class PopupWindow
                 {
                     if (PopupIndex > 0)
                     {
-                        PopupWindowUtils.PopupWindows[PopupIndex - 1]!.ShowAddWordWindow(true);
+                        PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+                        Debug.Assert(popupWindow is not null);
+                        popupWindow.ShowAddWordWindow(true);
                     }
 
                     else
@@ -1764,7 +1779,9 @@ internal sealed partial class PopupWindow
             {
                 if (PopupIndex > 0)
                 {
-                    PopupWindowUtils.PopupWindows[PopupIndex - 1]!.SearchWithBrowser(true);
+                    PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+                    Debug.Assert(popupWindow is not null);
+                    popupWindow.SearchWithBrowser(true);
                 }
 
                 else
@@ -1979,7 +1996,10 @@ internal sealed partial class PopupWindow
 
             else if (PopupIndex > 0)
             {
-                TextBox? lastInteractedTextBox = PopupWindowUtils.PopupWindows[PopupIndex - 1]!._lastInteractedTextBox;
+                PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+                Debug.Assert(popupWindow is not null);
+
+                TextBox? lastInteractedTextBox = popupWindow._lastInteractedTextBox;
                 if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0)
                 {
                     return LookupOnSelect(lastInteractedTextBox);
@@ -2455,7 +2475,11 @@ internal sealed partial class PopupWindow
     public TextBox? GetDefinitionTextBox(int listViewIndex)
     {
         PopupListView.Items.Filter = null;
-        return ((StackPanel)((StackPanel)PopupListView.Items[listViewIndex]!).Children[1]).GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));
+
+        StackPanel? mainStackPanel = (StackPanel?)PopupListView.Items[listViewIndex];
+        Debug.Assert(mainStackPanel is not null);
+
+        return mainStackPanel.Children[1].GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)

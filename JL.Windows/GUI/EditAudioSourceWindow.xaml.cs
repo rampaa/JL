@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -86,7 +87,10 @@ internal sealed partial class EditAudioSourceWindow
         TextToSpeechVoicesComboBox.ClearValue(CursorProperty);
         TextToSpeechVoicesComboBox.ClearValue(ToolTipProperty);
 
-        AudioSourceType type = AudioSourceTypeComboBox.SelectionBoxItem.ToString()!.GetEnum<AudioSourceType>();
+        string? audioSourceTypeStr = AudioSourceTypeComboBox.SelectionBoxItem.ToString();
+        Debug.Assert(audioSourceTypeStr is not null);
+
+        AudioSourceType type = audioSourceTypeStr.GetEnum<AudioSourceType>();
         string? uri;
 
         switch (type)

@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -136,8 +137,10 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void UpdateSetting(SqliteConnection connection, string settingName, string value, int? profileId = null)
+    public static void UpdateSetting(SqliteConnection connection, string settingName, string? value, int? profileId = null)
     {
+        Debug.Assert(value is not null);
+
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = UpdateSettingQuery;
         _ = command.Parameters.AddWithValue("@profileId", profileId ?? ProfileUtils.CurrentProfileId);

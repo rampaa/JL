@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -119,8 +120,10 @@ internal sealed partial class EditDictionaryWindow
         DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
         if (_dict.Type is DictType.PitchAccentYomichan)
         {
-            bool oldDottedLinesOption = _dict.Options.ShowPitchAccentWithDottedLines!.Value;
-            bool newDottedLinesOption = options.ShowPitchAccentWithDottedLines!.Value;
+            Debug.Assert(_dict.Options.ShowPitchAccentWithDottedLines is not null);
+            Debug.Assert(options.ShowPitchAccentWithDottedLines is not null);
+            bool oldDottedLinesOption = _dict.Options.ShowPitchAccentWithDottedLines.Value;
+            bool newDottedLinesOption = options.ShowPitchAccentWithDottedLines.Value;
 
             if (oldDottedLinesOption != newDottedLinesOption)
             {
@@ -216,7 +219,8 @@ internal sealed partial class EditDictionaryWindow
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
     {
-        string typeString = ComboBoxDictType.SelectionBoxItem.ToString()!;
+        string? typeString = ComboBoxDictType.SelectionBoxItem.ToString();
+        Debug.Assert(typeString is not null);
         DictType selectedDictType = typeString.GetEnum<DictType>();
 
         switch (selectedDictType)

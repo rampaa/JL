@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -173,7 +174,10 @@ internal sealed partial class AddAudioSourceWindow
 
     private void AudioSourceTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        AudioSourceType audioSourceType = ((ComboBox)sender).SelectedItem.ToString()!.GetEnum<AudioSourceType>();
+        string? audioSourceTypeStr = ((ComboBox)sender).SelectedItem.ToString();
+        Debug.Assert(audioSourceTypeStr is not null);
+
+        AudioSourceType audioSourceType = audioSourceTypeStr.GetEnum<AudioSourceType>();
 
         switch (audioSourceType)
         {

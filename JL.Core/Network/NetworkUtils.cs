@@ -44,7 +44,10 @@ public static class NetworkUtils
                 {
                     JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
                     JsonElement rootElement = jsonDocument.RootElement;
-                    Version latestJLVersion = new(rootElement.GetProperty("tag_name").GetString()!);
+                    string? tagName = rootElement.GetProperty("tag_name").GetString();
+                    Debug.Assert(tagName is not null);
+
+                    Version latestJLVersion = new(tagName);
 
                     if (latestJLVersion > Utils.JLVersion)
                     {

@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -186,7 +187,9 @@ internal sealed partial class EditFrequencyWindow
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
     {
-        string typeString = FreqTypeComboBox.SelectionBoxItem.ToString()!;
+        string? typeString = FreqTypeComboBox.SelectionBoxItem.ToString();
+        Debug.Assert(typeString is not null);
+
         FreqType selectedFreqType = typeString.GetEnum<FreqType>();
 
         switch (selectedFreqType)

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -223,7 +224,10 @@ internal sealed partial class ManageAudioSourcesWindow
 
         Button removeButton = (Button)sender;
 
-        string uri = removeButton.Parent.GetChildByName<TextBlock>("audioSourceUriTextBlock")!.Text;
+        TextBlock? audioSourceUriTextBlock = removeButton.Parent.GetChildByName<TextBlock>("audioSourceUriTextBlock");
+        Debug.Assert(audioSourceUriTextBlock is not null);
+
+        string uri = audioSourceUriTextBlock.Text;
         _ = AudioUtils.AudioSources.Remove(uri);
 
         AudioSource audioSource = (AudioSource)removeButton.Tag;

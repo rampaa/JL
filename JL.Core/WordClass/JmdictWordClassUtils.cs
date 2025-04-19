@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
@@ -20,7 +21,9 @@ internal static class JmdictWordClassUtils
         FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "PoS.json"));
         await using (fileStream.ConfigureAwait(false))
         {
-            DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, Utils.s_jso).ConfigureAwait(false))!;
+            Dictionary<string, IList<JmdictWordClass>>? wordClassDictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, Utils.s_jso).ConfigureAwait(false);
+            Debug.Assert(wordClassDictionary is not null);
+            DictUtils.WordClassDictionary = wordClassDictionary;
         }
 
         IList<JmdictWordClass>[] jmdictWordClasses = DictUtils.WordClassDictionary.Values.ToArray();
