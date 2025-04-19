@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -29,23 +30,23 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
 
     public string BuildFormattedDefinition(DictOptions options)
     {
-        bool definitionTagsExist = DefinitionTags is not null;
         if (Definitions.Length is 1)
         {
-            return definitionTagsExist
-                ? $"[{DefinitionTags![0]}] {Definitions[0]}"
+            return DefinitionTags is not null
+                ? $"[{DefinitionTags[0]}] {Definitions[0]}"
                 : Definitions[0];
         }
 
-        bool newline = options.NewlineBetweenDefinitions!.Value;
+        Debug.Assert(options.NewlineBetweenDefinitions is not null);
+        bool newline = options.NewlineBetweenDefinitions.Value;
         char separator = newline
             ? '\n'
             : '；';
 
         StringBuilder defResult = new();
-        if (definitionTagsExist)
+        if (DefinitionTags is not null)
         {
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", DefinitionTags!)}]{(newline ? '\n' : ' ')}");
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", DefinitionTags)}]{(newline ? '\n' : ' ')}");
         }
 
         string[] definitions = Definitions;

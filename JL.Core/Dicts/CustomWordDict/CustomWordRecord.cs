@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -52,7 +53,8 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             return $"[{tempWordClass}] {Definitions[0]}";
         }
 
-        char separator = options.NewlineBetweenDefinitions!.Value
+        Debug.Assert(options.NewlineBetweenDefinitions is not null);
+        char separator = options.NewlineBetweenDefinitions.Value
             ? '\n'
             : '；';
 
@@ -82,7 +84,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings!.AsSpan().Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings.AsSpan().Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
@@ -91,7 +93,8 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
 
         else if (readingsExist)
         {
-            string[] readings = Readings!;
+            Debug.Assert(Readings is not null);
+            string[] readings = Readings;
             for (int i = 0; i < readings.Length; i++)
             {
                 string reading = readings[i];
@@ -122,7 +125,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             foreach (ref readonly FrequencyRecord freqResult in freqResults.AsSpan())
             {
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings!.AsSpan().Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings.AsSpan().Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
@@ -131,7 +134,8 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
 
         else if (readingsExist)
         {
-            string[] readings = Readings!;
+            Debug.Assert(Readings is not null);
+            string[] readings = Readings;
             for (int i = 0; i < readings.Length; i++)
             {
                 string reading = readings[i];

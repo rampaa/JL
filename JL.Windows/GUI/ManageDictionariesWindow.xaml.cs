@@ -383,7 +383,9 @@ internal sealed partial class ManageDictionariesWindow
         Button updateButton = (Button)sender;
         updateButton.IsEnabled = false;
 
-        Button editButton = ((DockPanel)updateButton.Parent).GetChildByName<Button>("editButton")!;
+        Button? editButton = ((DockPanel)updateButton.Parent).GetChildByName<Button>("editButton");
+        Debug.Assert(editButton is not null);
+
         editButton.IsEnabled = false;
 
         Dict dict = (Dict)updateButton.Tag;

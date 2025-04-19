@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -299,7 +300,8 @@ internal static class EpwingNazekaDBManager
             ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
             : null;
 
-        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)!;
+        string[]? definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso);
+        Debug.Assert(definitions is not null);
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
     }

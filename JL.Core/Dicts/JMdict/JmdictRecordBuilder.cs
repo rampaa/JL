@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
@@ -64,7 +65,8 @@ internal static class JmdictRecordBuilder
 
                 if (keInfListSpan.Contains("sK"))
                 {
-                    if (recordDictionary.TryGetValue(firstPrimarySpellingInHiragana!, out JmdictRecord? primaryRecord))
+                    Debug.Assert(firstPrimarySpellingInHiragana is not null);
+                    if (recordDictionary.TryGetValue(firstPrimarySpellingInHiragana, out JmdictRecord? primaryRecord))
                     {
                         recordDictionary.Add(key, primaryRecord);
                     }
@@ -217,7 +219,8 @@ internal static class JmdictRecordBuilder
 
                     else
                     {
-                        primarySpelling = firstPrimarySpelling!;
+                        Debug.Assert(firstPrimarySpelling is not null);
+                        primarySpelling = firstPrimarySpelling;
                         alternativeSpellings = alternativeSpellingsForFirstPrimarySpelling;
                     }
 

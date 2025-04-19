@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
@@ -341,7 +342,8 @@ internal static class JmdictDBManager
             ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(8), Utils.s_jso)
             : null;
 
-        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(9), Utils.s_jso)!;
+        string[][]? definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(9), Utils.s_jso);
+        Debug.Assert(definitions is not null);
 
         string?[]? definitionInfo = !dataReader.IsDBNull(10)
             ? JsonSerializer.Deserialize<string?[]>(dataReader.GetString(10), Utils.s_jso)

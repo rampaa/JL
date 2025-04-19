@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
@@ -211,8 +212,11 @@ internal static class JmnedictDBManager
             ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)
             : null;
 
-        string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(4), Utils.s_jso)!;
-        string[][] nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(5), Utils.s_jso)!;
+        string[][]? definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(4), Utils.s_jso);
+        Debug.Assert(definitions is not null);
+
+        string[][]? nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(5), Utils.s_jso);
+        Debug.Assert(nameTypes is not null);
 
         return new JmnedictRecord(id, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);
     }

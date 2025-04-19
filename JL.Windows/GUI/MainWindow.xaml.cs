@@ -278,7 +278,8 @@ internal sealed partial class MainWindow
         {
             if (mergeTexts)
             {
-                BacklogUtils.ReplaceLastBacklogText(mergedText!);
+                Debug.Assert(mergedText is not null);
+                BacklogUtils.ReplaceLastBacklogText(mergedText);
             }
             else
             {
@@ -1750,7 +1751,10 @@ internal sealed partial class MainWindow
     {
         WinApi.ActivateWindow(WindowHandle);
 
-        MainTextBox.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(MainTextBox)!, 0, key)
+        PresentationSource? mainTextBoxSource = PresentationSource.FromVisual(MainTextBox);
+        Debug.Assert(mainTextBoxSource is not null);
+
+        MainTextBox.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, mainTextBoxSource, 0, key)
         {
             RoutedEvent = Keyboard.KeyDownEvent
         });

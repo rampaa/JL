@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -104,8 +105,8 @@ internal static class PopupWindowUtils
         {
             if (i > 0)
             {
-                horizontalOffsetForReading +=
-                    WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo![i - 1]}、", fontSize).Width;
+                Debug.Assert(splitReadingsWithRInfo is not null);
+                horizontalOffsetForReading += WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo[i - 1]}、", fontSize).Width;
             }
 
             byte pitchPosition = pitchPositions[i];
@@ -194,7 +195,10 @@ internal static class PopupWindowUtils
     {
         if (rootPopupIndex is 0)
         {
-            PopupWindows[rootPopupIndex]!.HidePopup();
+            PopupWindow? popupWindow = PopupWindows[rootPopupIndex];
+            Debug.Assert(popupWindow is not null);
+
+            popupWindow.HidePopup();
         }
         else
         {

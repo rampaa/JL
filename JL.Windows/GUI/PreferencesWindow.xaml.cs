@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Windows;
@@ -346,7 +347,8 @@ internal sealed partial class PreferencesWindow
 
     private static async Task GetFields(ComboBox modelNamesComboBox, Panel miningPanel, JLField[] fieldList)
     {
-        string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
+        string? modelName = modelNamesComboBox.SelectionBoxItem.ToString();
+        Debug.Assert(modelName is not null);
 
         ReadOnlyMemory<string> fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
         if (fieldNames.Length > 0)
@@ -433,8 +435,11 @@ internal sealed partial class PreferencesWindow
             return null;
         }
 
-        string deckName = deckNamesSelector.SelectedItem.ToString()!;
-        string modelName = modelNamesSelector.SelectedItem.ToString()!;
+        string? deckName = deckNamesSelector.SelectedItem.ToString();
+        Debug.Assert(deckName is not null);
+
+        string? modelName = modelNamesSelector.SelectedItem.ToString();
+        Debug.Assert(modelName is not null);
 
         OrderedDictionary<string, JLField> dict = new(miningPanel.Children.Count, StringComparer.Ordinal);
         foreach (StackPanel stackPanel in miningPanel.Children.Cast<StackPanel>())
@@ -442,7 +447,8 @@ internal sealed partial class PreferencesWindow
             TextBlock textBlock = (TextBlock)stackPanel.Children[0];
             ComboBox comboBox = (ComboBox)stackPanel.Children[1];
 
-            string selectedDescription = comboBox.SelectionBoxItem.ToString()!;
+            string? selectedDescription = comboBox.SelectionBoxItem.ToString();
+            Debug.Assert(selectedDescription is not null);
 
             JLField result = JLField.Nothing;
             foreach (JLField jlField in jlFieldList)
@@ -660,7 +666,7 @@ internal sealed partial class PreferencesWindow
             ProfileUtils.CurrentProfileName = selectedProfileName;
             ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
             ProfileDBUtils.UpdateCurrentProfile(connection);
-            StatsUtils.ProfileLifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
+            StatsUtils.ProfileLifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.CurrentProfileId);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
         }
 

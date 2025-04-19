@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -184,7 +185,9 @@ internal static class KeyGestureUtils
                 ? rawKeyGesture
                 : $"Win+{rawKeyGesture}";
 
-            KeyGesture newKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromInvariantString(keyGestureString)!;
+            KeyGesture? newKeyGesture = (KeyGesture?)keyGestureConverter.ConvertFromInvariantString(keyGestureString);
+            Debug.Assert(newKeyGesture is not null);
+
             if (configManager.GlobalHotKeys)
             {
                 WinApi.AddHotKeyToGlobalKeyGestureDict(keyGestureName, newKeyGesture);

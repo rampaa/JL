@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using JL.Core.Config;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -182,15 +183,18 @@ public static class LookupUtils
                         int textWithoutLongVowelMarkCount = textWithoutLongVowelMark.Count;
                         if (DictUtils.DBIsUsedForJmdict)
                         {
-                            jmdictTextWithoutLongVowelMarkParameters!.Add(DBUtils.GetParameter(textWithoutLongVowelMarkCount));
+                            Debug.Assert(jmdictTextWithoutLongVowelMarkParameters is not null);
+                            jmdictTextWithoutLongVowelMarkParameters.Add(DBUtils.GetParameter(textWithoutLongVowelMarkCount));
                         }
                         if (DictUtils.DBIsUsedForAtLeastOneYomichanDict)
                         {
-                            yomichanTextWithoutLongVowelMarkQueries!.Add(EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarkCount));
+                            Debug.Assert(yomichanTextWithoutLongVowelMarkQueries is not null);
+                            yomichanTextWithoutLongVowelMarkQueries.Add(EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarkCount));
                         }
                         if (DictUtils.DBIsUsedForAtLeastOneNazekaDict)
                         {
-                            nazekaTextWithoutLongVowelMarkQueries!.Add(EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarkCount));
+                            Debug.Assert(nazekaTextWithoutLongVowelMarkQueries is not null);
+                            nazekaTextWithoutLongVowelMarkQueries.Add(EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarkCount));
                         }
                     }
                     else
@@ -227,7 +231,8 @@ public static class LookupUtils
         HashSet<string>? allSearchKeys = null;
         if (dbIsUsedForPitchDict || dbIsUsedAtLeastOneYomichanOrNazekaWordDict)
         {
-            allSearchKeys = new HashSet<string>(textInHiraganaList.Count + deconjugatedTexts!.Length + textWithoutLongVowelMarksCount, StringComparer.Ordinal);
+            Debug.Assert(deconjugatedTexts is not null);
+            allSearchKeys = new HashSet<string>(textInHiraganaList.Count + deconjugatedTexts.Length + textWithoutLongVowelMarksCount, StringComparer.Ordinal);
             allSearchKeys.UnionWith(textInHiraganaList);
             allSearchKeys.UnionWith(deconjugatedTexts);
 
@@ -553,7 +558,8 @@ public static class LookupUtils
                                 int index = result.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
                                 if (index >= 0)
                                 {
-                                    List<List<string>> processes = result.Processes![index];
+                                    Debug.Assert(result.Processes is not null);
+                                    List<List<string>> processes = result.Processes[index];
                                     ReadOnlySpan<string> processSpan = deconjugationResult.Process.AsSpan();
 
                                     bool addProcess = true;
@@ -574,7 +580,9 @@ public static class LookupUtils
                                 else
                                 {
                                     result.Results.Add(resultsList);
-                                    result.Processes!.Add([deconjugationResult.Process]);
+
+                                    Debug.Assert(result.Processes is not null);
+                                    result.Processes.Add([deconjugationResult.Process]);
                                 }
                             }
                         }
@@ -603,14 +611,19 @@ public static class LookupUtils
 
         if (useDB)
         {
+            Debug.Assert(getRecordsFromDB is not null);
+            Debug.Assert(queryOrParameter is not null);
+            Debug.Assert(deconjugatedTexts is not null);
+            Debug.Assert(verbQueryOrParameter is not null);
+
             Parallel.Invoke(
                 () =>
                 {
-                    dbWordDict = getRecordsFromDB!(dict.Name, textInHiraganaList.AsSpan(), queryOrParameter!);
+                    dbWordDict = getRecordsFromDB(dict.Name, textInHiraganaList.AsSpan(), queryOrParameter);
                 },
                 () =>
                 {
-                    dbVerbDict = getRecordsFromDB!(dict.Name, deconjugatedTexts!.AsSpan(), verbQueryOrParameter!);
+                    dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts.AsSpan(), verbQueryOrParameter);
                 });
         }
 
@@ -832,7 +845,9 @@ public static class LookupUtils
         {
             if (dbWordFreqsExist)
             {
-                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs!, searchKeys!);
+                Debug.Assert(dbWordFreqs is not null);
+                Debug.Assert(searchKeys is not null);
+                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, searchKeys);
             }
         },
         () =>
@@ -1196,7 +1211,9 @@ public static class LookupUtils
         {
             if (dbWordFreqsExist)
             {
-                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs!, searchKeys!);
+                Debug.Assert(dbWordFreqs is not null);
+                Debug.Assert(searchKeys is not null);
+                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, searchKeys);
             }
         },
         () =>

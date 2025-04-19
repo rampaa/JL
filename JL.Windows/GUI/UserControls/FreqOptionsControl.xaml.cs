@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
@@ -13,13 +14,27 @@ internal sealed partial class FreqOptionsControl
 
     public FreqOptions GetFreqOptions(FreqType type)
     {
-        UseDBOption useDBOption = UseDBOption.ValidFreqTypes.Contains(type)
-            ? new UseDBOption(UseDBCheckBox.IsChecked!.Value)
-            : new UseDBOption(false);
+        UseDBOption useDBOption;
+        if (UseDBOption.ValidFreqTypes.Contains(type))
+        {
+            Debug.Assert(UseDBCheckBox.IsChecked is not null);
+            useDBOption = new UseDBOption(UseDBCheckBox.IsChecked.Value);
+        }
+        else
+        {
+            useDBOption = new UseDBOption(false);
+        }
 
-        HigherValueMeansHigherFrequencyOption higherValueMeansHigherFrequencyOption = HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(type)
-            ? new HigherValueMeansHigherFrequencyOption(HigherValueMeansHigherFrequencyCheckBox.IsChecked!.Value)
-            : new HigherValueMeansHigherFrequencyOption(false);
+        HigherValueMeansHigherFrequencyOption higherValueMeansHigherFrequencyOption;
+        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(type))
+        {
+            Debug.Assert(HigherValueMeansHigherFrequencyCheckBox.IsChecked is not null);
+            higherValueMeansHigherFrequencyOption = new HigherValueMeansHigherFrequencyOption(HigherValueMeansHigherFrequencyCheckBox.IsChecked.Value);
+        }
+        else
+        {
+            higherValueMeansHigherFrequencyOption = new HigherValueMeansHigherFrequencyOption(false);
+        }
 
         FreqOptions options = new(useDBOption, higherValueMeansHigherFrequencyOption);
 

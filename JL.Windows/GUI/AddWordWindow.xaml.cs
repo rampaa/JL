@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -153,8 +154,9 @@ internal sealed partial class AddWordWindow
         string[]? wordClasses = rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         bool noWordClass = wordClasses.Length is 0;
 
-        string rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
-            .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString()!;
+        string? rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
+            .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString();
+        Debug.Assert(rawPartOfSpeech is not null);
 
         if (WordClassStackPanel.Visibility is Visibility.Visible)
         {

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using JL.Core.Audio;
@@ -963,7 +964,9 @@ public static class MiningUtils
                 ? new StringBuilder(string.Join(", ", lookupResult.WordClasses))
                 : new StringBuilder();
 
-            string[]?[] wordClassesForSenses = lookupResult.JmdictLookupResult!.WordClassesForSenses!;
+            Debug.Assert(lookupResult.JmdictLookupResult is not null);
+            Debug.Assert(lookupResult.JmdictLookupResult.WordClassesForSenses is not null);
+            string[]?[] wordClassesForSenses = lookupResult.JmdictLookupResult.WordClassesForSenses;
             foreach (string[]? wordClassesForSense in wordClassesForSenses)
             {
                 if (wordClassesForSense is not null)
@@ -1272,6 +1275,7 @@ public static class MiningUtils
 
         if (audioData is not null)
         {
+            Debug.Assert(audioResponse is not null);
             note.Audios =
                 [
                     new Dictionary<string, object>(4, StringComparer.Ordinal)
@@ -1280,7 +1284,7 @@ public static class MiningUtils
                             "data", audioData
                         },
                         {
-                            "filename", $"JL_audio_{selectedReading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}"
+                            "filename", $"JL_audio_{selectedReading}_{lookupResult.PrimarySpelling}.{audioResponse.AudioFormat}"
                         },
                         {
                             "skipHash", NetworkUtils.Jpod101NoAudioMd5Hash

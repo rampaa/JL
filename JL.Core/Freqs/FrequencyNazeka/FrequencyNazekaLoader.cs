@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -24,7 +25,8 @@ internal static class FrequencyNazekaLoader
                 .ConfigureAwait(false);
         }
 
-        foreach ((string reading, ReadOnlyMemory<ReadOnlyMemory<JsonElement>> value) in frequencyJson!)
+        Debug.Assert(frequencyJson is not null);
+        foreach ((string reading, ReadOnlyMemory<ReadOnlyMemory<JsonElement>> value) in frequencyJson)
         {
             foreach (ref readonly ReadOnlyMemory<JsonElement> elementListMemory in value.Span)
             {

@@ -51,6 +51,11 @@ internal static class WindowsUtils
         List<ComboBoxItem> japaneseFonts = new(Fonts.SystemFontFamilies.Count);
         foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
         {
+            if (fontFamily.FamilyNames.Keys is null)
+            {
+                continue;
+            }
+
             ComboBoxItem comboBoxItem = new()
             {
                 Content = fontFamily.Source,
@@ -62,7 +67,7 @@ internal static class WindowsUtils
                 japaneseFonts.Add(comboBoxItem);
             }
 
-            else if (fontFamily.FamilyNames.Keys!.Count is 1
+            else if (fontFamily.FamilyNames.Keys.Count is 1
                      && fontFamily.FamilyNames.ContainsKey(englishXmlLanguage))
             {
                 bool foundGlyph = false;
@@ -443,12 +448,16 @@ internal static class WindowsUtils
 
     public static Brush BrushFromHex(string hexColorString)
     {
-        return (Brush)new BrushConverter().ConvertFromInvariantString(hexColorString)!;
+        Brush? brush = (Brush?)new BrushConverter().ConvertFromInvariantString(hexColorString);
+        Debug.Assert(brush is not null);
+        return brush;
     }
 
     public static Brush FrozenBrushFromHex(string hexColorString)
     {
-        Brush brush = (Brush)new BrushConverter().ConvertFromInvariantString(hexColorString)!;
+        Brush? brush = (Brush?)new BrushConverter().ConvertFromInvariantString(hexColorString);
+        Debug.Assert(brush is not null);
+
         brush.Freeze();
         return brush;
     }

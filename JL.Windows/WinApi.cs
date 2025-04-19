@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -380,7 +381,9 @@ internal sealed partial class WinApi
             if (s_clipboardSequenceNo != clipboardSequenceNo)
             {
                 s_clipboardSequenceNo = clipboardSequenceNo;
-                ClipboardChanged!.Invoke(null, EventArgs.Empty);
+
+                Debug.Assert(ClipboardChanged is not null);
+                ClipboardChanged.Invoke(null, EventArgs.Empty);
                 handled = true;
             }
         }

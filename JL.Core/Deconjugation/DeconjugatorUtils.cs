@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -8,12 +9,15 @@ internal static class DeconjugatorUtils
     public static async Task DeserializeRules()
     {
         FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "deconjugation_rules.json"));
+
+        Rule[]? rules;
         await using (fileStream.ConfigureAwait(false))
         {
-            Deconjugator.Rules = (await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, Utils.s_jso).ConfigureAwait(false))!;
+            rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, Utils.s_jso).ConfigureAwait(false);
+            Debug.Assert(rules is not null);
+            Deconjugator.Rules = rules;
         }
 
-        Rule[] rules = Deconjugator.Rules;
         for (int i = 0; i < rules.Length; i++)
         {
             ref readonly Rule rule = ref rules[i];

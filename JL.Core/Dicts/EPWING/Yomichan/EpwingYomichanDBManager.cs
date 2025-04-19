@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -301,7 +302,8 @@ internal static class EpwingYomichanDBManager
             ? dataReader.GetString(1)
             : null;
 
-        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)!;
+        string[]? definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso);
+        Debug.Assert(definitions is not null);
 
         string[]? wordClasses = !dataReader.IsDBNull(3)
             ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)

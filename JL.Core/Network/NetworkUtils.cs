@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Timers;
@@ -58,7 +59,9 @@ public static class NetworkUtils
 
                         foreach (JsonElement asset in assets.EnumerateArray())
                         {
-                            string latestReleaseUrl = asset.GetProperty("browser_download_url").GetString()!;
+                            string? latestReleaseUrl = asset.GetProperty("browser_download_url").GetString();
+                            Debug.Assert(latestReleaseUrl is not null);
+
                             if (latestReleaseUrl.AsSpan().Contains(architecture, StringComparison.Ordinal))
                             {
                                 foundRelease = true;

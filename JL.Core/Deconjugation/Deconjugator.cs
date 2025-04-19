@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
@@ -60,6 +61,8 @@ internal static class Deconjugator
             return null;
         }
 
+        Debug.Assert(myRule.ConTags is not null);
+        Debug.Assert(myRule.DecTags is not null);
         string[] array = myRule.DecEnds;
         if (array.Length is 1)
         {
@@ -67,8 +70,8 @@ internal static class Deconjugator
             (
                 myRule.DecEnds[0],
                 myRule.ConEnds[0],
-                myRule.DecTags![0],
-                myRule.ConTags![0],
+                myRule.DecTags[0],
+                myRule.ConTags[0],
                 myRule.Detail
             );
 
@@ -79,10 +82,10 @@ internal static class Deconjugator
         }
 
         List<Form> collection = new(array.Length);
-        bool multiDecTag = myRule.DecTags!.Length > 1;
-        string? singleDecTag = multiDecTag ? null : myRule.DecTags![0];
-        bool multiConTag = myRule.ConTags!.Length > 1;
-        string? singleConTag = multiConTag ? null : myRule.ConTags![0];
+        bool multiDecTag = myRule.DecTags.Length > 1;
+        string? singleDecTag = multiDecTag ? null : myRule.DecTags[0];
+        bool multiConTag = myRule.ConTags.Length > 1;
+        string? singleConTag = multiConTag ? null : myRule.ConTags[0];
 
         for (int i = 0; i < array.Length; i++)
         {
@@ -90,8 +93,8 @@ internal static class Deconjugator
             (
                 myRule.DecEnds[i],
                 myRule.ConEnds[i],
-                multiDecTag ? myRule.DecTags![i] : singleDecTag!,
-                multiConTag ? myRule.ConTags![i] : singleConTag!,
+                multiDecTag ? myRule.DecTags[i] : singleDecTag!,
+                multiConTag ? myRule.ConTags[i] : singleConTag!,
                 myRule.Detail
             );
             Form? ret = StdruleDeconjugateInner(myForm, virtualRule);

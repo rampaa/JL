@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -79,6 +80,7 @@ internal sealed partial class PopupWindow
         base.OnSourceInitialized(e);
         WindowHandle = new WindowInteropHelper(this).Handle;
         _popupListViewScrollViewer = PopupListView.GetChildOfType<ScrollViewer>();
+        Debug.Assert(_popupListViewScrollViewer is not null);
     }
 
     protected override void OnActivated(EventArgs e)
@@ -142,7 +144,12 @@ internal sealed partial class PopupWindow
 
     private void PressBackSpace(object sender, RoutedEventArgs e)
     {
-        _lastInteractedTextBox!.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(_lastInteractedTextBox)!, 0, Key.Back)
+        Debug.Assert(_lastInteractedTextBox is not null);
+
+        PresentationSource? lastInteractedTextBoxSource = PresentationSource.FromVisual(_lastInteractedTextBox);
+        Debug.Assert(lastInteractedTextBoxSource is not null);
+
+        _lastInteractedTextBox.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, lastInteractedTextBoxSource, 0, Key.Back)
         {
             RoutedEvent = Keyboard.KeyDownEvent
         });
@@ -570,10 +577,18 @@ internal sealed partial class PopupWindow
         PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
 
         Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        bool showPOrthographyInfo = jmdict.Options.POrthographyInfo!.Value;
-        bool showROrthographyInfo = jmdict.Options.ROrthographyInfo!.Value;
-        bool showAOrthographyInfo = jmdict.Options.AOrthographyInfo!.Value;
-        double pOrthographyInfoFontSize = jmdict.Options.POrthographyInfoFontSize!.Value;
+
+        Debug.Assert(jmdict.Options.POrthographyInfo is not null);
+        bool showPOrthographyInfo = jmdict.Options.POrthographyInfo.Value;
+
+        Debug.Assert(jmdict.Options.ROrthographyInfo is not null);
+        bool showROrthographyInfo = jmdict.Options.ROrthographyInfo.Value;
+
+        Debug.Assert(jmdict.Options.AOrthographyInfo is not null);
+        bool showAOrthographyInfo = jmdict.Options.AOrthographyInfo.Value;
+
+        Debug.Assert(jmdict.Options.POrthographyInfoFontSize is not null);
+        double pOrthographyInfoFontSize = jmdict.Options.POrthographyInfoFontSize.Value;
 
         Button[]? duplicateIcons;
         int resultCount;
@@ -611,7 +626,8 @@ internal sealed partial class PopupWindow
 
         if (checkForDuplicateCards)
         {
-            _ = CheckResultForDuplicates(duplicateIcons!);
+            Debug.Assert(duplicateIcons is not null);
+            _ = CheckResultForDuplicates(duplicateIcons);
         }
 
         GenerateDictTypeButtons();
@@ -690,7 +706,7 @@ internal sealed partial class PopupWindow
                 null,
                 null,
                 primarySpellingFrameworkElement.Margin.Left,
-                result.PitchPositions!);
+                result.PitchPositions);
 
             if (pitchAccentGrid.Children.Count is 0)
             {
@@ -744,7 +760,7 @@ internal sealed partial class PopupWindow
                         result.Readings,
                         readingTextBox.Text.Split('、'),
                         readingTextBox.Margin.Left,
-                        result.PitchPositions!);
+                        result.PitchPositions);
 
                     if (pitchAccentGrid.Children.Count is 0)
                     {
@@ -780,7 +796,7 @@ internal sealed partial class PopupWindow
                         result.Readings,
                         readingTextBlock.Text.Split('、'),
                         readingTextBlock.Margin.Left,
-                        result.PitchPositions!);
+                        result.PitchPositions);
 
                     if (pitchAccentGrid.Children.Count is 0)
                     {
@@ -1416,7 +1432,7 @@ internal sealed partial class PopupWindow
         int listViewItemIndex;
         if (useSelectedListViewItemIfItExists && PopupListView.SelectedItem is not null)
         {
-            popupListViewItem = (StackPanel)PopupListView.SelectedItem!;
+            popupListViewItem = (StackPanel)PopupListView.SelectedItem;
             listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(popupListViewItem);
         }
         else
@@ -1784,7 +1800,8 @@ internal sealed partial class PopupWindow
             int buttonCount = dictButtons.Count;
             for (int i = 0; i < buttonCount; i++)
             {
-                Button button = (Button)dictButtons[i]!;
+                Button? button = (Button?)dictButtons[i];
+                Debug.Assert(button is not null);
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1811,7 +1828,8 @@ internal sealed partial class PopupWindow
             int dictCount = dictButtons.Count;
             for (int i = dictCount - 1; i >= 0; i--)
             {
-                Button button = (Button)dictButtons[i]!;
+                Button? button = (Button?)dictButtons[i];
+                Debug.Assert(button is not null);
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1835,7 +1853,9 @@ internal sealed partial class PopupWindow
             {
                 for (int i = dictCount - 1; i > 0; i--)
                 {
-                    Button button = (Button)dictButtons[i]!;
+                    Button? button = (Button?)dictButtons[i];
+                    Debug.Assert(button is not null);
+
                     if (button.IsEnabled)
                     {
                         ClickDictTypeButton(button);
@@ -2240,7 +2260,8 @@ internal sealed partial class PopupWindow
             PopupListView.Items.Filter = DictFilter;
         }
 
-        _popupListViewScrollViewer!.ScrollToTop();
+        Debug.Assert(_popupListViewScrollViewer is not null);
+        _popupListViewScrollViewer.ScrollToTop();
         _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
         _listViewItemIndex = _firstVisibleListViewItemIndex;
         LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
@@ -2353,11 +2374,9 @@ internal sealed partial class PopupWindow
         DictTabButtonsItemsControl.Visibility = Visibility.Collapsed;
         DictTabButtonsItemsControl.ItemsSource = null;
 
-        if (_popupListViewScrollViewer is not null)
-        {
-            _popupListViewScrollViewer.ScrollToTop();
-            PopupListView.UpdateLayout();
-        }
+        Debug.Assert(_popupListViewScrollViewer is not null);
+        _popupListViewScrollViewer.ScrollToTop();
+        PopupListView.UpdateLayout();
 
         PopupListView.ItemsSource = null;
         _lastLookedUpText = "";
@@ -2399,7 +2418,9 @@ internal sealed partial class PopupWindow
 
         else
         {
-            PopupWindow previousPopup = PopupWindowUtils.PopupWindows[PopupIndex - 1]!;
+            PopupWindow? previousPopup = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+            Debug.Assert(previousPopup is not null);
+
             if (previousPopup.IsVisible)
             {
                 WinApi.ActivateWindow(previousPopup.WindowHandle);

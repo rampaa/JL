@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using JL.Core.Utilities;
@@ -59,7 +60,9 @@ internal static class FrequencyYomichanLoader
 
                 else if (thirdElement.ValueKind is JsonValueKind.String)
                 {
-                    string freqStr = thirdElement.GetString()!;
+                    string? freqStr = thirdElement.GetString();
+                    Debug.Assert(freqStr is not null);
+
                     Match match = Utils.NumberRegex.Match(freqStr);
                     if (match.Success)
                     {

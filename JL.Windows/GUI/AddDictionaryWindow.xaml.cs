@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -175,7 +176,9 @@ internal sealed partial class AddDictionaryWindow
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
     {
-        string typeString = ComboBoxDictType.SelectionBoxItem.ToString()!;
+        string? typeString = ComboBoxDictType.SelectionBoxItem.ToString();
+        Debug.Assert(typeString is not null);
+
         DictType selectedDictType = typeString.GetEnum<DictType>();
 
         switch (selectedDictType)

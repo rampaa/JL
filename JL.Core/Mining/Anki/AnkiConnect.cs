@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text.Json;
 using JL.Core.Config;
@@ -91,8 +92,11 @@ internal static class AnkiConnect
                 return json;
             }
 
-            Utils.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
-            Utils.Logger.Error("{JsonError}", json.Error.ToString());
+            string? error = json.Error.ToString();
+            Debug.Assert(error is not null);
+
+            Utils.Frontend.Alert(AlertLevel.Error, error);
+            Utils.Logger.Error("{JsonError}", error);
 
             return null;
         }

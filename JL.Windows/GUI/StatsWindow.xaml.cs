@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -132,14 +133,20 @@ internal sealed partial class StatsWindow
 
     private void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
     {
+        string? statType = ButtonSwapStats.Content.ToString();
+        Debug.Assert(statType is not null);
+
 #pragma warning disable CA1308 // Normalize strings to uppercase
+        statType = statType.ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
+
         if (!WindowsUtils.ShowYesNoDialog(
-                $"Are you really sure that you want to reset the {ButtonSwapStats.Content.ToString()!.ToLowerInvariant()} stats?",
+                $"Are you really sure that you want to reset the {statType} stats?",
                 string.Create(CultureInfo.InvariantCulture, $"Reset {ButtonSwapStats.Content} Stats?")))
         {
             return;
         }
-#pragma warning restore CA1308 // Normalize strings to uppercase
+
 
         if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode statsMode))
         {

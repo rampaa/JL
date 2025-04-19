@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
 using JL.Core.Dicts.Interfaces;
@@ -279,7 +280,8 @@ public static class DictUpdater
                 continue;
             }
 
-            int dueDate = dict.Options.AutoUpdateAfterNDays!.Value;
+            Debug.Assert(dict.Options.AutoUpdateAfterNDays is not null);
+            int dueDate = dict.Options.AutoUpdateAfterNDays.Value;
             if (dueDate is 0)
             {
                 continue;

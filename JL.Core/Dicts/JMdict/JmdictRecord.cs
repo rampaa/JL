@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -82,58 +83,74 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
     public string BuildFormattedDefinition(DictOptions options)
     {
-        bool newlines = options.NewlineBetweenDefinitions!.Value;
+        Debug.Assert(options.NewlineBetweenDefinitions is not null);
+        bool newlines = options.NewlineBetweenDefinitions.Value;
         char separator = newlines ? '\n' : '；';
 
         bool multipleDefinitions = Definitions.Length > 1;
 
-        bool showWordClassInfoOptionValue = options.WordClassInfo!.Value;
+        Debug.Assert(options.WordClassInfo is not null);
+        bool showWordClassInfoOptionValue = options.WordClassInfo.Value;
         bool showWordClassInfo = showWordClassInfoOptionValue && WordClasses is not null;
         bool showWordClassesSharedByAllSenses = showWordClassInfoOptionValue && WordClassesSharedByAllSenses is not null;
 
-        bool showMiscInfoOptionValue = options.MiscInfo!.Value;
+        Debug.Assert(options.MiscInfo is not null);
+        bool showMiscInfoOptionValue = options.MiscInfo.Value;
         bool showMiscInfo = showMiscInfoOptionValue && Misc is not null;
         bool showMiscSharedByAllSenses = showMiscInfoOptionValue && MiscSharedByAllSenses is not null;
 
-        bool showDialectInfoOptionValue = options.DialectInfo!.Value;
+        Debug.Assert(options.DialectInfo is not null);
+        bool showDialectInfoOptionValue = options.DialectInfo.Value;
         bool showDialectInfo = showDialectInfoOptionValue && Dialects is not null;
         bool showDialectsSharedByAllSenses = showDialectInfoOptionValue && DialectsSharedByAllSenses is not null;
 
-        bool showFieldInfoOptionValue = options.WordTypeInfo!.Value;
+        Debug.Assert(options.WordTypeInfo is not null);
+        bool showFieldInfoOptionValue = options.WordTypeInfo.Value;
         bool showFieldsInfo = showFieldInfoOptionValue && Fields is not null;
         bool showFieldsSharedByAllSenses = showFieldInfoOptionValue && FieldsSharedByAllSenses is not null;
 
-        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo!.Value && DefinitionInfo is not null;
+        Debug.Assert(options.ExtraDefinitionInfo is not null);
+        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo.Value && DefinitionInfo is not null;
 
-        bool showSpellingRestrictionInfo = options.SpellingRestrictionInfo!.Value;
+        Debug.Assert(options.SpellingRestrictionInfo is not null);
+        bool showSpellingRestrictionInfo = options.SpellingRestrictionInfo.Value;
         bool showSpellingRestrictions = showSpellingRestrictionInfo && SpellingRestrictions is not null;
         bool showReadingRestrictionss = showSpellingRestrictionInfo && ReadingRestrictions is not null;
 
-        bool showLoanwordEtymology = options.LoanwordEtymology!.Value && LoanwordEtymology is not null;
-        bool showRelatedTerms = options.RelatedTerm!.Value && RelatedTerms is not null;
-        bool showAntonyms = options.Antonym!.Value && Antonyms is not null;
+        Debug.Assert(options.LoanwordEtymology is not null);
+        bool showLoanwordEtymology = options.LoanwordEtymology.Value && LoanwordEtymology is not null;
+
+        Debug.Assert(options.RelatedTerm is not null);
+        bool showRelatedTerms = options.RelatedTerm.Value && RelatedTerms is not null;
+
+        Debug.Assert(options.Antonym is not null);
+        bool showAntonyms = options.Antonym.Value && Antonyms is not null;
 
         StringBuilder defResult = new();
         if (showWordClassesSharedByAllSenses || showMiscSharedByAllSenses || showDialectsSharedByAllSenses || showFieldsSharedByAllSenses)
         {
             if (showWordClassesSharedByAllSenses)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", WordClassesSharedByAllSenses!)}] ");
+                Debug.Assert(WordClassesSharedByAllSenses is not null);
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", WordClassesSharedByAllSenses)}] ");
             }
 
             if (showMiscSharedByAllSenses)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", MiscSharedByAllSenses!)}] ");
+                Debug.Assert(MiscSharedByAllSenses is not null);
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", MiscSharedByAllSenses)}] ");
             }
 
             if (showDialectsSharedByAllSenses)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", DialectsSharedByAllSenses!)}] ");
+                Debug.Assert(DialectsSharedByAllSenses is not null);
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", DialectsSharedByAllSenses)}] ");
             }
 
             if (showFieldsSharedByAllSenses)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", FieldsSharedByAllSenses!)}] ");
+                Debug.Assert(FieldsSharedByAllSenses is not null);
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", FieldsSharedByAllSenses)}] ");
             }
 
             if (multipleDefinitions && newlines)
@@ -162,7 +179,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
                 if (showWordClassInfo)
                 {
-                    string[]? wordClassesElement = wordClasses![i];
+                    Debug.Assert(wordClasses is not null);
+                    string[]? wordClassesElement = wordClasses[i];
                     if (wordClassesElement is not null)
                     {
                         _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", wordClassesElement)}] ");
@@ -171,7 +189,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
                 if (showMiscInfo)
                 {
-                    string[]? miscElement = misc![i];
+                    Debug.Assert(misc is not null);
+                    string[]? miscElement = misc[i];
                     if (miscElement is not null)
                     {
                         _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", miscElement)}] ");
@@ -180,7 +199,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
                 if (showDialectInfo)
                 {
-                    string[]? dialectsElement = dialects![i];
+                    Debug.Assert(dialects is not null);
+                    string[]? dialectsElement = dialects[i];
                     if (dialectsElement is not null)
                     {
                         _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", dialectsElement)}] ");
@@ -189,7 +209,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
                 if (showFieldsInfo)
                 {
-                    string[]? fieldsElement = fields![i];
+                    Debug.Assert(fields is not null);
+                    string[]? fieldsElement = fields[i];
                     if (fieldsElement is not null)
                     {
                         _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", fieldsElement)}] ");
@@ -201,7 +222,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (showExtraDefinitionInfo)
             {
-                string? definitionInfoElement = definitionInfo![i];
+                Debug.Assert(definitionInfo is not null);
+                string? definitionInfoElement = definitionInfo[i];
                 if (definitionInfoElement is not null)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({definitionInfoElement}) ");
@@ -221,7 +243,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
                     if (spellingRestrictionsExist)
                     {
-                        _ = defResult.Append(string.Join("; ", spellingRestrictionsElement!));
+                        Debug.Assert(spellingRestrictionsElement is not null);
+                        _ = defResult.Append(string.Join("; ", spellingRestrictionsElement));
                     }
 
                     if (readingRestrictionsExist)
@@ -231,7 +254,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                             _ = defResult.Append("; ");
                         }
 
-                        _ = defResult.Append(string.Join("; ", readingRestrictionsElement!));
+                        Debug.Assert(readingRestrictionsElement is not null);
+                        _ = defResult.Append(string.Join("; ", readingRestrictionsElement));
                     }
 
                     _ = defResult.Append(") ");
@@ -240,7 +264,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (showLoanwordEtymology)
             {
-                ref readonly LoanwordSource[]? lSources = ref loanwordEtymology![i];
+                Debug.Assert(loanwordEtymology is not null);
+                ref readonly LoanwordSource[]? lSources = ref loanwordEtymology[i];
                 if (lSources is not null)
                 {
                     _ = defResult.Append('(');
@@ -276,7 +301,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (showRelatedTerms)
             {
-                string[]? relatedTermsElement = relatedTerms![i];
+                Debug.Assert(relatedTerms is not null);
+                string[]? relatedTermsElement = relatedTerms[i];
                 if (relatedTermsElement is not null)
                 {
                     if (relatedTermsElement.Length is 1)
@@ -292,7 +318,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (showAntonyms)
             {
-                string[]? antonymsElement = antonyms![i];
+                Debug.Assert(antonyms is not null);
+                string[]? antonymsElement = antonyms[i];
                 if (antonymsElement is not null)
                 {
                     if (antonymsElement.Length is 1)
@@ -325,7 +352,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings!.AsSpan().Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings.AsSpan().Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
@@ -334,7 +361,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
         else if (readingsExist)
         {
-            string[] readings = Readings!;
+            Debug.Assert(Readings is not null);
+            string[] readings = Readings;
             for (int i = 0; i < readings.Length; i++)
             {
                 string reading = readings[i];
@@ -365,7 +393,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             foreach (ref readonly FrequencyRecord freqResult in freqResults.AsSpan())
             {
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings!.AsSpan().Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings.AsSpan().Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
@@ -374,7 +402,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
         else if (readingsExist)
         {
-            string[] readings = Readings!;
+            Debug.Assert(Readings is not null);
+            string[] readings = Readings;
             for (int i = 0; i < readings.Length; i++)
             {
                 string reading = readings[i];

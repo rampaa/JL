@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -36,7 +37,8 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
                 : string.Join("; ", Definitions[0]);
         }
 
-        char separator = options.NewlineBetweenDefinitions!.Value
+        Debug.Assert(options.NewlineBetweenDefinitions is not null);
+        char separator = options.NewlineBetweenDefinitions.Value
             ? '\n'
             : '；';
 
