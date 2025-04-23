@@ -52,9 +52,9 @@ internal sealed class DeconjugatorTests
         foreach (Form form in result)
         {
             if (form.Text is expectedText
-                && form.Process.AsSpan().Contains("potential")
-                && form.Process.AsSpan().Contains("negative")
-                && form.Process.AsSpan().Contains("past"))
+                && form.Process.AsReadOnlySpan().Contains("potential")
+                && form.Process.AsReadOnlySpan().Contains("negative")
+                && form.Process.AsReadOnlySpan().Contains("past"))
             {
                 success = true;
                 break;
