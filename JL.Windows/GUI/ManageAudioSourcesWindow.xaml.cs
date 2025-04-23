@@ -248,7 +248,9 @@ internal sealed partial class ManageAudioSourcesWindow
     {
         Button editButton = (Button)sender;
         AudioSource audioSource = (AudioSource)editButton.Tag;
-        string uri = editButton.Parent.GetChildByName<TextBlock>("audioSourceUriTextBlock")!.Text;
+        TextBlock? audioSourceUriTextBlock = editButton.Parent.GetChildByName<TextBlock>("audioSourceUriTextBlock");
+        Debug.Assert(audioSourceUriTextBlock is not null);
+        string uri = audioSourceUriTextBlock.Text;
 
         _ = new EditAudioSourceWindow(uri, audioSource)
         {

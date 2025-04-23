@@ -109,14 +109,18 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             }
         }
 
-        else if (readingExists && freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out List<FrequencyRecord>? readingFreqResults))
+        else if (readingExists)
         {
-            foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsReadOnlySpan())
+            Debug.Assert(Reading is not null);
+            if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out List<FrequencyRecord>? readingFreqResults))
             {
-                if (readingFreqResult.Spelling == PrimarySpelling
-                    || (readingFreqResult.Spelling == Reading && JapaneseUtils.IsKatakana(Reading[0])))
+                foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsReadOnlySpan())
                 {
-                    return readingFreqResult.Frequency;
+                    if (readingFreqResult.Spelling == PrimarySpelling
+                        || (readingFreqResult.Spelling == Reading && JapaneseUtils.IsKatakana(Reading[0])))
+                    {
+                        return readingFreqResult.Frequency;
+                    }
                 }
             }
         }

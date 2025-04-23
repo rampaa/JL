@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -25,7 +26,9 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
 
     public YomichanKanjiRecord(ReadOnlySpan<JsonElement> jsonElement)
     {
-        OnReadings = jsonElement[1].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        string? onReadingsStr = jsonElement[1].GetString();
+        Debug.Assert(onReadingsStr is not null);
+        OnReadings = onReadingsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (OnReadings.Length is 0)
         {
             OnReadings = null;
@@ -36,7 +39,9 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
             OnReadings.DeduplicateStringsInArray();
         }
 
-        KunReadings = jsonElement[2].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        string? kunReadingsStr = jsonElement[2].GetString();
+        Debug.Assert(kunReadingsStr is not null);
+        KunReadings = kunReadingsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (KunReadings.Length is 0)
         {
             KunReadings = null;

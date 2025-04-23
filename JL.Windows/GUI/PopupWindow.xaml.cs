@@ -736,16 +736,20 @@ internal sealed partial class PopupWindow
 
         JmdictLookupResult? jmdictLookupResult = result.JmdictLookupResult;
         bool jmdictLookupResultExist = jmdictLookupResult is not null;
-        if (showPOrthographyInfo && jmdictLookupResultExist && jmdictLookupResult!.PrimarySpellingOrthographyInfoList is not null)
+        if (showPOrthographyInfo && jmdictLookupResultExist)
         {
-            TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(jmdictLookupResult.PrimarySpellingOrthographyInfoList),
-                $"[{string.Join(", ", jmdictLookupResult.PrimarySpellingOrthographyInfoList)}]",
-                DictOptionManager.POrthographyInfoColor,
-                pOrthographyInfoFontSize,
-                VerticalAlignment.Center,
-                new Thickness(3, 0, 0, 0));
+            Debug.Assert(jmdictLookupResult is not null);
+            if (jmdictLookupResult.PrimarySpellingOrthographyInfoList is not null)
+            {
+                TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(jmdictLookupResult.PrimarySpellingOrthographyInfoList),
+                    $"[{string.Join(", ", jmdictLookupResult.PrimarySpellingOrthographyInfoList)}]",
+                    DictOptionManager.POrthographyInfoColor,
+                    pOrthographyInfoFontSize,
+                    VerticalAlignment.Center,
+                    new Thickness(3, 0, 0, 0));
 
-            _ = top.Children.Add(textBlockPOrthographyInfo);
+                _ = top.Children.Add(textBlockPOrthographyInfo);
+            }
         }
 
         if (result.Readings is not null && configManager.ReadingsFontSize > 0

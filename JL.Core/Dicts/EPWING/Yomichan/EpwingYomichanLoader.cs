@@ -102,7 +102,9 @@ internal static class EpwingYomichanLoader
             return null;
         }
 
-        string[]? wordClasses = jsonElements[3].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        string? wordClassesStr = jsonElements[3].GetString();
+        Debug.Assert(wordClassesStr is not null);
+        string[]? wordClasses = wordClassesStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (wordClasses.Length is 0)
         {
             wordClasses = null;
