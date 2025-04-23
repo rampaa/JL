@@ -70,7 +70,7 @@ public static class ExtensionMethods
 
     internal static T[]? RemoveAt<T>(this T[] source, int index)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, source.Length);
+        Debug.Assert(source.Length > index);
 
         if (source.Length is 1)
         {
@@ -108,7 +108,7 @@ public static class ExtensionMethods
 
     internal static T[]? RemoveAtToArray<T>(this List<T> list, int index)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, list.Count);
+        Debug.Assert(list.Count > index);
 
         if (list.Count is 1)
         {
