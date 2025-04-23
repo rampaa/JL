@@ -41,7 +41,7 @@ public static class AnkiUtils
         string? resultString = response?.Result?.ToString() ?? null;
 
         return resultString is not null
-            ? JsonSerializer.Deserialize<bool>(resultString.AsSpan()[1..^1], Utils.s_jso)
+            ? JsonSerializer.Deserialize<bool>(resultString.AsSpan(1, resultString.Length - 2), Utils.s_jso)
             : null;
     }
 
