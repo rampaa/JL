@@ -133,7 +133,7 @@ internal static class JmdictWordClassUtils
                         if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? prevResults))
                         {
                             bool alreadyAdded = false;
-                            foreach (JmdictWordClass wordClass in prevResults.AsSpan())
+                            foreach (JmdictWordClass wordClass in prevResults.AsReadOnlySpan())
                             {
                                 if (wordClass.Spelling == jmdictRecord.PrimarySpelling
                                     && wordClass.Readings.AsSpan().SequenceEqual(jmdictRecord.Readings)
@@ -155,7 +155,7 @@ internal static class JmdictWordClassUtils
                 JmdictWordClass record = new(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings);
                 if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? results))
                 {
-                    if (!results.AsSpan().Contains(record))
+                    if (!results.AsReadOnlySpan().Contains(record))
                     {
                         results.Add(record);
                     }

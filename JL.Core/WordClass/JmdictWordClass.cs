@@ -14,8 +14,8 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
         return obj is JmdictWordClass jmdictWordClass
                && Spelling == jmdictWordClass.Spelling
                && ((Readings is null && jmdictWordClass.Readings is null)
-                    || (Readings is not null && jmdictWordClass.Readings is not null && Readings.AsSpan().SequenceEqual(jmdictWordClass.Readings)))
-               && WordClasses.AsSpan().SequenceEqual(jmdictWordClass.WordClasses);
+                    || (Readings is not null && jmdictWordClass.Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(jmdictWordClass.Readings)))
+               && WordClasses.AsReadOnlySpan().SequenceEqual(jmdictWordClass.WordClasses);
     }
 
     public bool Equals(JmdictWordClass? other)
@@ -23,8 +23,8 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
         return other is not null
                && Spelling == other.Spelling
                && ((Readings is null && other.Readings is null)
-                    || (Readings is not null && other.Readings is not null && Readings.AsSpan().SequenceEqual(other.Readings)))
-               && WordClasses.AsSpan().SequenceEqual(other.WordClasses);
+                    || (Readings is not null && other.Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(other.Readings)))
+               && WordClasses.AsReadOnlySpan().SequenceEqual(other.WordClasses);
     }
 
     public override int GetHashCode()

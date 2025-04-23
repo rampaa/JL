@@ -113,7 +113,7 @@ public static partial class Utils
 #pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms
     internal static string GetMd5String(ReadOnlySpan<byte> bytes)
     {
-        return Convert.ToHexString(MD5.HashData(bytes).AsSpan());
+        return Convert.ToHexString(MD5.HashData(bytes).AsReadOnlySpan());
     }
 #pragma warning restore CA5351 // Do Not Use Broken Cryptographic Algorithms
 
@@ -236,7 +236,7 @@ public static partial class Utils
         {
             if (array is not null)
             {
-                Array.Copy(array, 0, concatArray, position, array.Length);
+                array.AsReadOnlySpan().CopyTo(concatArray.AsSpan(position, array.Length));
                 position += array.Length;
             }
         }

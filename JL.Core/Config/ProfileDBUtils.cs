@@ -89,7 +89,7 @@ public static class ProfileDBUtils
     public static ReadOnlySpan<string> GetProfileNames()
     {
         using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
-        return GetProfileNames(connection).AsSpan();
+        return GetProfileNames(connection).AsReadOnlySpan();
     }
 
     public static List<string> GetProfileNames(SqliteConnection connection)

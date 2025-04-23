@@ -138,9 +138,9 @@ public static class LookupUtils
         if (DictUtils.DBIsUsedForAtLeastOneWordDict || dbIsUsedForPitchDict || dbIsUsedForAtLeastOneWordFreqDict)
         {
             HashSet<string> deconjugatedTextsHashSet = new(Math.Min(estimatedDeconjugatedTextCapacity, 256), StringComparer.Ordinal);
-            foreach (ref readonly List<Form> deconjugationResults in deconjugationResultsList.AsSpan())
+            foreach (ref readonly List<Form> deconjugationResults in deconjugationResultsList.AsReadOnlySpan())
             {
-                foreach (ref readonly Form form in deconjugationResults.AsSpan())
+                foreach (ref readonly Form form in deconjugationResults.AsReadOnlySpan())
                 {
                     _ = deconjugatedTextsHashSet.Add(form.Text);
                 }
@@ -160,7 +160,7 @@ public static class LookupUtils
 
             if (textWithoutLongVowelMarksList is not null)
             {
-                ReadOnlySpan<List<string>?> textWithoutLongVowelMarkListSpan = textWithoutLongVowelMarksList.AsSpan();
+                ReadOnlySpan<List<string>?> textWithoutLongVowelMarkListSpan = textWithoutLongVowelMarksList.AsReadOnlySpan();
                 int textWithoutLongVowelMarkListSpanLength = textWithoutLongVowelMarkListSpan.Length;
 
                 if (DictUtils.DBIsUsedForJmdict)
@@ -238,7 +238,7 @@ public static class LookupUtils
 
             if (textWithoutLongVowelMarksList is not null)
             {
-                foreach (ref readonly List<string>? textWithoutLongVowelMarks in textWithoutLongVowelMarksList.AsSpan())
+                foreach (ref readonly List<string>? textWithoutLongVowelMarks in textWithoutLongVowelMarksList.AsReadOnlySpan())
                 {
                     if (textWithoutLongVowelMarks is not null)
                     {
@@ -306,7 +306,7 @@ public static class LookupUtils
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    Dictionary<string, IntermediaryResult> jmdictResults = GetWordResults(textList.AsSpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, JmdictDBManager.GetRecordsFromDB, parameter, verbParameter, jmdictTextWithoutLongVowelMarkParameters);
+                    Dictionary<string, IntermediaryResult> jmdictResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, JmdictDBManager.GetRecordsFromDB, parameter, verbParameter, jmdictTextWithoutLongVowelMarkParameters);
                     if (jmdictResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildJmdictResult(jmdictResults, wordFreqs, dbWordFreqs, dbIsUsedForPitchDict, pitchDict));
@@ -314,7 +314,7 @@ public static class LookupUtils
                     break;
 
                 case DictType.JMnedict:
-                    Dictionary<string, IntermediaryResult>? jmnedictResults = GetNameResults(textList.AsSpan(), textInHiraganaList.AsSpan(), dict, useDB, JmnedictDBManager.GetRecordsFromDB, parameter);
+                    Dictionary<string, IntermediaryResult>? jmnedictResults = GetNameResults(textList.AsReadOnlySpan(), textInHiraganaList.AsReadOnlySpan(), dict, useDB, JmnedictDBManager.GetRecordsFromDB, parameter);
                     if (jmnedictResults is not null)
                     {
                         lookupResults.AddRange(BuildJmnedictResult(jmnedictResults, pitchAccentDict));
@@ -349,7 +349,7 @@ public static class LookupUtils
 
                 case DictType.CustomWordDictionary:
                 case DictType.ProfileCustomWordDictionary:
-                    Dictionary<string, IntermediaryResult> customWordResults = GetWordResults(textList.AsSpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, false, null, parameter, verbParameter, null);
+                    Dictionary<string, IntermediaryResult> customWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, false, null, parameter, verbParameter, null);
                     if (customWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildCustomWordResult(customWordResults, wordFreqs, dbWordFreqs, dbIsUsedForPitchDict, pitchDict));
@@ -358,7 +358,7 @@ public static class LookupUtils
 
                 case DictType.CustomNameDictionary:
                 case DictType.ProfileCustomNameDictionary:
-                    Dictionary<string, IntermediaryResult>? customNameResults = GetNameResults(textList.AsSpan(), textInHiraganaList.AsSpan(), dict, false, null, parameter);
+                    Dictionary<string, IntermediaryResult>? customNameResults = GetNameResults(textList.AsReadOnlySpan(), textInHiraganaList.AsReadOnlySpan(), dict, false, null, parameter);
                     if (customNameResults is not null)
                     {
                         lookupResults.AddRange(BuildCustomNameResult(customNameResults, pitchAccentDict));
@@ -377,7 +377,7 @@ public static class LookupUtils
                     break;
 
                 case DictType.NonspecificNameYomichan:
-                    Dictionary<string, IntermediaryResult>? epwingYomichanNameResults = GetNameResults(textList.AsSpan(), textInHiraganaList.AsSpan(), dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery);
+                    Dictionary<string, IntermediaryResult>? epwingYomichanNameResults = GetNameResults(textList.AsReadOnlySpan(), textInHiraganaList.AsReadOnlySpan(), dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery);
                     if (epwingYomichanNameResults is not null)
                     {
                         lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanNameResults, null, null, pitchAccentDict));
@@ -387,7 +387,7 @@ public static class LookupUtils
 
                 case DictType.NonspecificWordYomichan:
                 case DictType.NonspecificYomichan:
-                    Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList.AsSpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, yomichanTextWithoutLongVowelMarkQueries);
+                    Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, yomichanTextWithoutLongVowelMarkQueries);
                     if (epwingYomichanWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResults, wordFreqs, frequencyDicts, pitchAccentDict));
@@ -408,7 +408,7 @@ public static class LookupUtils
                     break;
 
                 case DictType.NonspecificNameNazeka:
-                    Dictionary<string, IntermediaryResult>? epwingNazekaNameResults = GetNameResults(textList.AsSpan(), textInHiraganaList.AsSpan(), dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery);
+                    Dictionary<string, IntermediaryResult>? epwingNazekaNameResults = GetNameResults(textList.AsReadOnlySpan(), textInHiraganaList.AsReadOnlySpan(), dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery);
                     if (epwingNazekaNameResults is not null)
                     {
                         lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaNameResults, null, null, pitchAccentDict));
@@ -418,7 +418,7 @@ public static class LookupUtils
 
                 case DictType.NonspecificWordNazeka:
                 case DictType.NonspecificNazeka:
-                    Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList.AsSpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQueries);
+                    Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQueries);
                     if (epwingNazekaWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResults, wordFreqs, frequencyDicts, pitchAccentDict));
@@ -550,7 +550,7 @@ public static class LookupUtils
 
         if (deconjugationResults is not null)
         {
-            foreach (ref readonly Form deconjugationResult in deconjugationResults.AsSpan())
+            foreach (ref readonly Form deconjugationResult in deconjugationResults.AsReadOnlySpan())
             {
                 if (verbDict.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
@@ -566,12 +566,12 @@ public static class LookupUtils
                                 {
                                     Debug.Assert(result.Processes is not null);
                                     List<List<string>> processes = result.Processes[index];
-                                    ReadOnlySpan<string> processSpan = deconjugationResult.Process.AsSpan();
+                                    ReadOnlySpan<string> processSpan = deconjugationResult.Process.AsReadOnlySpan();
 
                                     bool addProcess = true;
-                                    foreach (ref readonly List<string> process in processes.AsSpan())
+                                    foreach (ref readonly List<string> process in processes.AsReadOnlySpan())
                                     {
-                                        if (process.AsSpan().SequenceEqual(processSpan))
+                                        if (process.AsReadOnlySpan().SequenceEqual(processSpan))
                                         {
                                             addProcess = false;
                                             break;
@@ -625,11 +625,11 @@ public static class LookupUtils
             Parallel.Invoke(
                 () =>
                 {
-                    dbWordDict = getRecordsFromDB(dict.Name, textInHiraganaList.AsSpan(), queryOrParameter);
+                    dbWordDict = getRecordsFromDB(dict.Name, textInHiraganaList.AsReadOnlySpan(), queryOrParameter);
                 },
                 () =>
                 {
-                    dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts.AsSpan(), verbQueryOrParameter);
+                    dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts.AsReadOnlySpan(), verbQueryOrParameter);
                 });
         }
 
@@ -649,7 +649,7 @@ public static class LookupUtils
 
             if (textsWithoutLongVowelMark is not null)
             {
-                ReadOnlySpan<string> textsWithoutLongVowelMarkSpan = textsWithoutLongVowelMark.AsSpan();
+                ReadOnlySpan<string> textsWithoutLongVowelMarkSpan = textsWithoutLongVowelMark.AsReadOnlySpan();
                 Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = null;
                 if (useDB)
                 {
@@ -897,12 +897,12 @@ public static class LookupUtils
         foreach (IntermediaryResult wordResult in jmdictResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
-            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsSpan();
-            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsSpan();
+            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsReadOnlySpan();
+            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
                 string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsSpan())
+                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsReadOnlySpan())
                     : null;
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
@@ -940,7 +940,7 @@ public static class LookupUtils
         HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
-            foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsSpan())
+            foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsReadOnlySpan())
             {
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)
@@ -968,7 +968,7 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         foreach (IntermediaryResult nameResult in jmnedictResults.Values)
         {
-            foreach (ref readonly IList<IDictRecord> dictRecords in nameResult.Results.AsSpan())
+            foreach (ref readonly IList<IDictRecord> dictRecords in nameResult.Results.AsReadOnlySpan())
             {
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)
@@ -1023,7 +1023,7 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsSpan())
+        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsReadOnlySpan())
         {
             int dictRecordsCount = dictRecords.Count;
             for (int j = 0; j < dictRecordsCount; j++)
@@ -1058,12 +1058,12 @@ public static class LookupUtils
         foreach (IntermediaryResult wordResult in epwingResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
-            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsSpan();
-            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsSpan();
+            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsReadOnlySpan();
+            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
                 string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsSpan())
+                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsReadOnlySpan())
                     : null;
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
@@ -1100,7 +1100,7 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsSpan())
+        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsReadOnlySpan())
         {
             int dictRecordsCount = dictRecords.Count;
             for (int j = 0; j < dictRecordsCount; j++)
@@ -1135,12 +1135,12 @@ public static class LookupUtils
         foreach (IntermediaryResult wordResult in epwingNazekaResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
-            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsSpan();
-            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsSpan();
+            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsReadOnlySpan();
+            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
                 string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsSpan())
+                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsReadOnlySpan())
                     : null;
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
@@ -1200,7 +1200,7 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsSpan())
+        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsReadOnlySpan())
         {
             int dictRecordsCount = dictRecords.Count;
             for (int j = 0; j < dictRecordsCount; j++)
@@ -1270,12 +1270,12 @@ public static class LookupUtils
         foreach (IntermediaryResult wordResult in customWordResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
-            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsSpan();
-            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsSpan();
+            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsReadOnlySpan();
+            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
                 string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsSpan())
+                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsReadOnlySpan())
                     : null;
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
@@ -1315,7 +1315,7 @@ public static class LookupUtils
         foreach (IntermediaryResult customNameResult in customNameResults.Values)
         {
             int freq = 0;
-            foreach (ref readonly IList<IDictRecord> dictRecords in customNameResult.Results.AsSpan())
+            foreach (ref readonly IList<IDictRecord> dictRecords in customNameResult.Results.AsReadOnlySpan())
             {
                 int dictRecordsCount = dictRecords.Count;
                 for (int j = 0; j < dictRecordsCount; j++)

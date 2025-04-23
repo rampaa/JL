@@ -401,7 +401,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         bool readingsExist = Readings is not null;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
-            foreach (ref readonly FrequencyRecord freqResult in freqResults.AsSpan())
+            foreach (ref readonly FrequencyRecord freqResult in freqResults.AsReadOnlySpan())
             {
                 if (freqResult.Spelling == PrimarySpelling
                     || (readingsExist && Readings.AsSpan().Contains(freqResult.Spelling)))
@@ -420,7 +420,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 string reading = readings[i];
                 if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out List<FrequencyRecord>? readingFreqResults))
                 {
-                    foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsSpan())
+                    foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsReadOnlySpan())
                     {
                         if (readingFreqResult.Spelling == PrimarySpelling
                             || (reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading[0])))

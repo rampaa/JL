@@ -245,7 +245,7 @@ public static partial class JapaneseUtils
             {
                 if (vowel is not 'お' and not 'え')
                 {
-                    foreach (ref readonly StringBuilder stringBuilder in stringBuilders.AsSpan())
+                    foreach (ref readonly StringBuilder stringBuilder in stringBuilders.AsReadOnlySpan())
                     {
                         _ = stringBuilder.Append(vowel);
                     }
@@ -267,7 +267,7 @@ public static partial class JapaneseUtils
                     }
 
                     stringBuildersCount = stringBuilders.Count;
-                    ReadOnlySpan<StringBuilder> stringBuildersSpan = stringBuilders.AsSpan();
+                    ReadOnlySpan<StringBuilder> stringBuildersSpan = stringBuilders.AsReadOnlySpan();
                     for (int j = 0; j < stringBuildersSpan.Length; j++)
                     {
                         _ = stringBuildersSpan[j].Append(j < stringBuildersCount / 2 ? vowel : alternativeVowel);
@@ -277,7 +277,7 @@ public static partial class JapaneseUtils
 
             else
             {
-                foreach (ref readonly StringBuilder stringBuilder in stringBuilders.AsSpan())
+                foreach (ref readonly StringBuilder stringBuilder in stringBuilders.AsReadOnlySpan())
                 {
                     _ = stringBuilder.Append(unicodeTextList[i]);
                 }
@@ -305,7 +305,7 @@ public static partial class JapaneseUtils
             }
         }
 
-        return combinedForm.AsSpan();
+        return combinedForm.AsReadOnlySpan();
     }
 
     internal static int GetCombinedFormLength(ReadOnlySpan<char> text)
@@ -491,7 +491,7 @@ public static partial class JapaneseUtils
             }
         }
 
-        string? result = GetPrimarySpellingAndReadingMapping(primarySpellingSegments.AsSpan(), reading);
+        string? result = GetPrimarySpellingAndReadingMapping(primarySpellingSegments.AsReadOnlySpan(), reading);
         return result ?? $"{primarySpelling}[{reading}]";
     }
 

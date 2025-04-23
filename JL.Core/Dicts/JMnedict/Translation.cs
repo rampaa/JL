@@ -15,12 +15,12 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
         unchecked
         {
             int hash = 17 * 37;
-            foreach (ref readonly string nameType in NameTypeList.AsSpan())
+            foreach (ref readonly string nameType in NameTypeList.AsReadOnlySpan())
             {
                 hash = (hash * 37) + nameType.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (ref readonly string transDet in TransDetList.AsSpan())
+            foreach (ref readonly string transDet in TransDetList.AsReadOnlySpan())
             {
                 hash = (hash * 37) + transDet.GetHashCode(StringComparison.Ordinal);
             }
@@ -36,7 +36,7 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
 
     public bool Equals(Translation other)
     {
-        return NameTypeList.AsSpan().SequenceEqual(other.NameTypeList.AsSpan()) && TransDetList.AsSpan().SequenceEqual(other.TransDetList.AsSpan());
+        return NameTypeList.AsReadOnlySpan().SequenceEqual(other.NameTypeList.AsReadOnlySpan()) && TransDetList.AsReadOnlySpan().SequenceEqual(other.TransDetList.AsReadOnlySpan());
     }
 
     public static bool operator ==(Translation left, Translation right) => left.Equals(right);

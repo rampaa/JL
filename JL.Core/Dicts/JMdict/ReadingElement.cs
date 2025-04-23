@@ -17,12 +17,12 @@ internal readonly struct ReadingElement(string reb, List<string> reRestrList, Li
         unchecked
         {
             int hash = (17 * 37) + Reb.GetHashCode(StringComparison.Ordinal);
-            foreach (ref readonly string reRestr in ReRestrList.AsSpan())
+            foreach (ref readonly string reRestr in ReRestrList.AsReadOnlySpan())
             {
                 hash = (hash * 37) + reRestr.GetHashCode(StringComparison.Ordinal);
             }
 
-            foreach (ref readonly string reInf in ReInfList.AsSpan())
+            foreach (ref readonly string reInf in ReInfList.AsReadOnlySpan())
             {
                 hash = (hash * 37) + reInf.GetHashCode(StringComparison.Ordinal);
             }
@@ -39,8 +39,8 @@ internal readonly struct ReadingElement(string reb, List<string> reRestrList, Li
     public bool Equals(ReadingElement other)
     {
         return Reb == other.Reb
-            && ReRestrList.AsSpan().SequenceEqual(other.ReRestrList.AsSpan())
-            && ReInfList.AsSpan().SequenceEqual(other.ReInfList.AsSpan());
+            && ReRestrList.AsReadOnlySpan().SequenceEqual(other.ReRestrList.AsReadOnlySpan())
+            && ReInfList.AsReadOnlySpan().SequenceEqual(other.ReInfList.AsReadOnlySpan());
     }
 
     public static bool operator ==(in ReadingElement left, in ReadingElement right) => left.Equals(right);

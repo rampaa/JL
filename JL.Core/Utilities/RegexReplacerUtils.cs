@@ -45,7 +45,7 @@ public static partial class RegexReplacerUtils
         }
 
         s_regexReplacements = [];
-        foreach (ref readonly string filePath in filePaths.AsSpan())
+        foreach (ref readonly string filePath in filePaths.AsReadOnlySpan())
         {
             foreach (string line in File.ReadLines(filePath))
             {

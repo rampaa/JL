@@ -257,7 +257,7 @@ public static class MiningUtils
 
             case JLField.Frequencies:
                 return lookupResult.Frequencies is not null
-                    ? LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsSpan(), true, lookupResult.Frequencies.Count is 1)
+                    ? LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsReadOnlySpan(), true, lookupResult.Frequencies.Count is 1)
                     : null;
 
             case JLField.RawFrequencies:
@@ -268,7 +268,7 @@ public static class MiningUtils
                 }
 
                 List<int> validFrequencies = new(lookupResult.Frequencies.Count);
-                foreach (LookupFrequencyResult lookupFrequencyResult in lookupResult.Frequencies.AsSpan())
+                foreach (LookupFrequencyResult lookupFrequencyResult in lookupResult.Frequencies.AsReadOnlySpan())
                 {
                     if (lookupFrequencyResult.Freq is > 0 and < int.MaxValue)
                     {
@@ -542,7 +542,7 @@ public static class MiningUtils
         {
             List<LookupFrequencyResult> validFrequencies = new(lookupResult.Frequencies.Count);
             List<int> validFrequencyValues = new(lookupResult.Frequencies.Count);
-            foreach (LookupFrequencyResult lookupFrequencyResult in lookupResult.Frequencies.AsSpan())
+            foreach (LookupFrequencyResult lookupFrequencyResult in lookupResult.Frequencies.AsReadOnlySpan())
             {
                 if (lookupFrequencyResult.Freq is > 0 and < int.MaxValue)
                 {
@@ -553,7 +553,7 @@ public static class MiningUtils
 
             if (validFrequencies.Count > 0)
             {
-                miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsSpan(), true, lookupResult.Frequencies.Count is 1);
+                miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsReadOnlySpan(), true, lookupResult.Frequencies.Count is 1);
                 miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencyValues);
                 miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
 
@@ -756,7 +756,7 @@ public static class MiningUtils
 
     private static string? GetDefinitionsFromAllDictionariesWithHtmlTags(OrderedDictionary<string, List<LookupResult>> validLookupResults, string selectedRecordDictName, string? selectedRecordDefinitions)
     {
-        ReadOnlySpan<LookupResult> firstLookupResults = validLookupResults.GetAt(0).Value.AsSpan();
+        ReadOnlySpan<LookupResult> firstLookupResults = validLookupResults.GetAt(0).Value.AsReadOnlySpan();
         if (validLookupResults.Count is 1)
         {
             if (firstLookupResults.Length is 1)
@@ -828,7 +828,7 @@ public static class MiningUtils
             }
             else
             {
-                ReadOnlySpan<LookupResult> otherLookupResultsSpan = otherLookupResults.AsSpan();
+                ReadOnlySpan<LookupResult> otherLookupResultsSpan = otherLookupResults.AsReadOnlySpan();
                 for (int j = 0; j < otherLookupResultsSpan.Length; j++)
                 {
                     string? formattedDefinitions = firstLookupResults[j].FormattedDefinitions;
@@ -845,7 +845,7 @@ public static class MiningUtils
 
     private static string? GetDefinitionsFromAllDictionariesWithoutHtmlTags(OrderedDictionary<string, List<LookupResult>> validLookupResults, string selectedRecordDictName, string? selectedRecordDefinitions)
     {
-        ReadOnlySpan<LookupResult> firstLookupResults = validLookupResults.GetAt(0).Value.AsSpan();
+        ReadOnlySpan<LookupResult> firstLookupResults = validLookupResults.GetAt(0).Value.AsReadOnlySpan();
         if (validLookupResults.Count is 1)
         {
             if (firstLookupResults.Length is 1)
@@ -910,7 +910,7 @@ public static class MiningUtils
             else
             {
                 int count = 1;
-                ReadOnlySpan<LookupResult> otherLookupResultsSpan = otherLookupResults.AsSpan();
+                ReadOnlySpan<LookupResult> otherLookupResultsSpan = otherLookupResults.AsReadOnlySpan();
                 for (int j = 0; j < otherLookupResultsSpan.Length; j++)
                 {
                     string? formattedDefinitions = firstLookupResults[j].FormattedDefinitions;
@@ -937,7 +937,7 @@ public static class MiningUtils
     private static int CalculateHarmonicMean(List<LookupFrequencyResult> lookupFrequencyResults)
     {
         double sumOfReciprocalOfFreqs = 0;
-        ReadOnlySpan<LookupFrequencyResult> lookupFrequencyResultSpan = lookupFrequencyResults.AsSpan();
+        ReadOnlySpan<LookupFrequencyResult> lookupFrequencyResultSpan = lookupFrequencyResults.AsReadOnlySpan();
         foreach (ref readonly LookupFrequencyResult lookupFrequencyResult in lookupFrequencyResultSpan)
         {
             int freq = lookupFrequencyResult.HigherValueMeansHigherFrequency

@@ -16,7 +16,7 @@ public static class LookupResultUtils
             StringBuilder formText = new();
             bool added = false;
 
-            ReadOnlySpan<string> formSpan = form.AsSpan();
+            ReadOnlySpan<string> formSpan = form.AsReadOnlySpan();
             for (int j = formSpan.Length - 1; j >= 0; j--)
             {
                 string info = formSpan[j];

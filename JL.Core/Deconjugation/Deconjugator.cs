@@ -176,7 +176,7 @@ internal static class Deconjugator
         while (novel.Count > 0)
         {
             List<Form> newNovel = [];
-            foreach (ref readonly Form form in novel.AsSpan())
+            foreach (ref readonly Form form in novel.AsReadOnlySpan())
             {
                 for (int j = 0; j < rules.Length; j++)
                 {
@@ -196,9 +196,9 @@ internal static class Deconjugator
                         continue;
                     }
 
-                    foreach (ref readonly Form myForm in newForm.AsSpan())
+                    foreach (ref readonly Form myForm in newForm.AsReadOnlySpan())
                     {
-                        if (!newNovel.AsSpan().Contains(myForm))
+                        if (!newNovel.AsReadOnlySpan().Contains(myForm))
                         {
                             newNovel.Add(myForm);
                         }

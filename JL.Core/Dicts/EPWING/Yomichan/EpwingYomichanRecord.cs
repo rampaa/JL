@@ -100,7 +100,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         bool readingExists = Reading is not null;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
-            foreach (ref readonly FrequencyRecord freqResult in freqResults.AsSpan())
+            foreach (ref readonly FrequencyRecord freqResult in freqResults.AsReadOnlySpan())
             {
                 if (freqResult.Spelling == PrimarySpelling || freqResult.Spelling == Reading)
                 {
@@ -111,7 +111,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
 
         else if (readingExists && freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading!), out List<FrequencyRecord>? readingFreqResults))
         {
-            foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsSpan())
+            foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsReadOnlySpan())
             {
                 if (readingFreqResult.Spelling == PrimarySpelling
                     || (readingFreqResult.Spelling == Reading && JapaneseUtils.IsKatakana(Reading[0])))

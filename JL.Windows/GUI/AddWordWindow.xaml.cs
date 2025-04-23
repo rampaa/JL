@@ -174,7 +174,7 @@ internal sealed partial class AddWordWindow
 
             foreach (string wordClass in wordClasses)
             {
-                if (!validWordClasses.AsSpan().Contains(wordClass))
+                if (!validWordClasses.AsReadOnlySpan().Contains(wordClass))
                 {
                     WordClassTextBox.BorderBrush = Brushes.Red;
                     WordClassTextBox.Cursor = Cursors.Help;

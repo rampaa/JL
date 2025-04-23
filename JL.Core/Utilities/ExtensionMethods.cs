@@ -1,8 +1,10 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using CommunityToolkit.HighPerformance;
 
 namespace JL.Core.Utilities;
 
@@ -11,7 +13,8 @@ public static class ExtensionMethods
     // Falls back to name
     public static string GetDescription<T>(this T value) where T : struct, Enum
     {
-        string name = Enum.GetName(value)!;
+        string? name = Enum.GetName(value);
+        Debug.Assert(name is not null);
         Type enumType = typeof(T);
         return enumType.GetField(name)?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? name;
     }
@@ -55,12 +58,12 @@ public static class ExtensionMethods
             }
         }
 
-        return textBlocks.AsSpan();
+        return textBlocks.AsReadOnlySpan();
     }
 
     internal static void AddRange<T>(this ConcurrentBag<T> source, List<T> items)
     {
-        foreach (T item in items.AsSpan())
+        foreach (T item in items.AsReadOnlySpan())
         {
             source.Add(item);
         }
@@ -93,12 +96,12 @@ public static class ExtensionMethods
         T[] destination = new T[source.Length - 1];
         if (index > 0)
         {
-            Array.Copy(source, destination, index);
+            source.AsReadOnlySpan(0, index).CopyTo(destination.AsSpan());
         }
 
         if (index < source.Length - 1)
         {
-            Array.Copy(source, index + 1, destination, index, source.Length - index - 1);
+            source.AsReadOnlySpan(index + 1, source.Length - index - 1).CopyTo(destination.AsSpan(index));
         }
 
         return destination;
@@ -113,7 +116,7 @@ public static class ExtensionMethods
             return null;
         }
 
-        ReadOnlySpan<T> listSpan = list.AsSpan();
+        ReadOnlySpan<T> listSpan = list.AsReadOnlySpan();
 
         bool allElementsAreNull = true;
         for (int i = 0; i < listSpan.Length; i++)
@@ -161,7 +164,7 @@ public static class ExtensionMethods
         }
 
         bool allElementsAreNull = true;
-        foreach (T? item in list.AsSpan())
+        foreach (T? item in list.AsReadOnlySpan())
         {
             if (item is not null)
             {
@@ -224,12 +227,36 @@ public static class ExtensionMethods
             indexes.Add(i + startIndex);
         }
 
-        return indexes.AsSpan();
+        return indexes.AsReadOnlySpan();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ReadOnlySpan<T> AsSpan<T>(this List<T>? list)
+    public static ReadOnlySpan<T> AsReadOnlySpan<T>(this List<T>? list)
     {
         return CollectionsMarshal.AsSpan(list);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[]? array)
+    {
+        return new ReadOnlySpan<T>(array);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[]? array, int start, int length)
+    {
+        return new ReadOnlySpan<T>(array, start, length);
+    }
+
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[]? array)
+    //{
+    //    return new ReadOnlyMemory<T>(array);
+    //}
+
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[]? array, int start, int length)
+    //{
+    //    return new ReadOnlyMemory<T>(array, start, length);
+    //}
 }

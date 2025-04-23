@@ -74,10 +74,10 @@ internal readonly struct Rule(string type, string[] decEnds, string[] conEnds, s
         return Type == other.Type
                && Detail == other.Detail
                && ContextRule == other.ContextRule
-               && DecEnds.AsSpan().SequenceEqual(other.DecEnds)
-               && ConEnds.AsSpan().SequenceEqual(other.ConEnds)
-               && (other.DecTags is not null ? DecTags?.AsSpan().SequenceEqual(other.DecTags) ?? false : DecTags is null)
-               && (other.ConTags is not null ? ConTags?.AsSpan().SequenceEqual(other.ConTags) ?? false : ConTags is null);
+               && DecEnds.AsReadOnlySpan().SequenceEqual(other.DecEnds)
+               && ConEnds.AsReadOnlySpan().SequenceEqual(other.ConEnds)
+               && (other.DecTags is not null ? DecTags?.AsReadOnlySpan().SequenceEqual(other.DecTags) ?? false : DecTags is null)
+               && (other.ConTags is not null ? ConTags?.AsReadOnlySpan().SequenceEqual(other.ConTags) ?? false : ConTags is null);
     }
 
     public static bool operator ==(Rule left, Rule right) => left.Equals(right);

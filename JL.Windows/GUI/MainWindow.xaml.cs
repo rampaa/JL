@@ -1668,7 +1668,7 @@ internal sealed partial class MainWindow
 
                 if (keyGestureIdsToIgnore.Count > 0)
                 {
-                    WinApi.UnregisterAllGlobalHotKeys(WindowHandle, keyGestureIdsToIgnore.AsSpan());
+                    WinApi.UnregisterAllGlobalHotKeys(WindowHandle, keyGestureIdsToIgnore.AsReadOnlySpan());
                 }
                 else
                 {

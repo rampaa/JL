@@ -7,8 +7,8 @@ internal static class JmnedictRecordBuilder
 {
     public static void AddToDictionary(in JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
     {
-        ReadOnlySpan<string> kebListSpan = entry.KebList.AsSpan();
-        ReadOnlySpan<Translation> translationListSpan = entry.TranslationList.AsSpan();
+        ReadOnlySpan<string> kebListSpan = entry.KebList.AsReadOnlySpan();
+        ReadOnlySpan<Translation> translationListSpan = entry.TranslationList.AsReadOnlySpan();
 
         int kebListSpanLength = kebListSpan.Length;
         int translationListSpanLength = translationListSpan.Length;
@@ -49,7 +49,7 @@ internal static class JmnedictRecordBuilder
 
         else
         {
-            ReadOnlySpan<string> rebListSpan = entry.RebList.AsSpan();
+            ReadOnlySpan<string> rebListSpan = entry.RebList.AsReadOnlySpan();
             recordDictionary = new Dictionary<string, JmnedictRecord>(rebListSpan.Length, StringComparer.Ordinal);
             for (int i = 0; i < rebListSpan.Length; i++)
             {

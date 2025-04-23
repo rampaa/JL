@@ -91,7 +91,7 @@ internal static class EpwingNazekaLoader
                     }
                 }
 
-                ReadOnlySpan<string> spellingListSpan = spellingList.AsSpan();
+                ReadOnlySpan<string> spellingListSpan = spellingList.AsReadOnlySpan();
                 for (int j = 1; j < spellingListSpan.Length; j++)
                 {
                     ref readonly string alternativeSpelling = ref spellingListSpan[j];
