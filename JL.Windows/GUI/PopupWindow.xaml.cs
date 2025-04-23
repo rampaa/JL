@@ -39,11 +39,21 @@ internal sealed partial class PopupWindow
 
     private string _currentSourceText = "";
 
-    private readonly Button _buttonAll = new()
+    public Button AllDictionaryTabButton { get; } = new()
     {
+        Name = nameof(AllDictionaryTabButton),
         Content = "All",
         Margin = new Thickness(1),
-        Background = Brushes.DodgerBlue
+        Background = Brushes.DodgerBlue,
+        Cursor = Cursors.Arrow,
+        VerticalAlignment = VerticalAlignment.Top,
+        VerticalContentAlignment = VerticalAlignment.Center,
+        HorizontalAlignment = HorizontalAlignment.Left,
+        HorizontalContentAlignment = HorizontalAlignment.Center,
+        FontSize = ConfigManager.Instance.PopupDictionaryTabFontSize,
+        Padding = new Thickness(5, 3, 5, 3),
+        Height = double.NaN,
+        Width = double.NaN,
     };
 
     public string? LastSelectedText { get; private set; }
@@ -110,7 +120,7 @@ internal sealed partial class PopupWindow
         AddWordMenuItem.SetInputGestureText(configManager.ShowAddWordWindowKeyGesture);
         SearchMenuItem.SetInputGestureText(configManager.SearchWithBrowserKeyGesture);
 
-        _buttonAll.Click += DictTypeButtonOnClick;
+        AllDictionaryTabButton.Click += DictTypeButtonOnClick;
 
         AddMenuItemsToEditableTextBoxContextMenu();
     }
@@ -825,16 +835,18 @@ internal sealed partial class PopupWindow
                 Content = "🔊",
                 Foreground = configManager.AudioButtonColor,
                 VerticalAlignment = VerticalAlignment.Top,
-                // VerticalContentAlignment = VerticalAlignment.Top,
+                VerticalContentAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(3, 0, 0, 0),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                // HorizontalContentAlignment = HorizontalAlignment.Left,
+                HorizontalContentAlignment = HorizontalAlignment.Left,
                 Background = Brushes.Transparent,
                 Cursor = Cursors.Arrow,
                 BorderThickness = new Thickness(0),
                 Padding = new Thickness(0),
                 FontSize = configManager.AudioButtonFontSize,
-                Focusable = false
+                Focusable = false,
+                Height = double.NaN,
+                Width = double.NaN
             };
 
             audioButton.PreviewMouseUp += AudioButton_Click;
@@ -905,7 +917,7 @@ internal sealed partial class PopupWindow
                     _ = top.Children.Add(deconjugationProcessTextBlock);
                 }
             }
-            else if (result.PrimarySpelling != result.MatchedText && (result.Readings is null || !result.Readings.AsSpan().Contains(result.MatchedText)))
+            else if (result.PrimarySpelling != result.MatchedText && (result.Readings is null || !result.Readings.AsReadOnlySpan().Contains(result.MatchedText)))
             {
                 if (MiningMode)
                 {
@@ -938,7 +950,7 @@ internal sealed partial class PopupWindow
 
         if (result.Frequencies is not null)
         {
-            ReadOnlySpan<LookupFrequencyResult> validFrequencies = result.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList().AsSpan();
+            ReadOnlySpan<LookupFrequencyResult> validFrequencies = result.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList().AsReadOnlySpan();
             if (validFrequencies.Length > 0)
             {
                 TextBlock frequencyTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Frequencies),
@@ -982,7 +994,9 @@ internal sealed partial class PopupWindow
                 BorderThickness = new Thickness(0),
                 Padding = new Thickness(0),
                 FontSize = configManager.MiningButtonFontSize,
-                Focusable = false
+                Focusable = false,
+                Height = double.NaN,
+                Width = double.NaN
             };
 
             miningButton.PreviewMouseUp += MiningButton_PreviewMouseUp;
@@ -1833,7 +1847,7 @@ internal sealed partial class PopupWindow
                 }
             }
 
-            ClickDictTypeButton(nextButton ?? _buttonAll);
+            ClickDictTypeButton(nextButton ?? AllDictionaryTabButton);
         }
 
         else if (keyGesture.IsEqual(configManager.PreviousDictKeyGesture))
@@ -2224,9 +2238,11 @@ internal sealed partial class PopupWindow
     private void GenerateDictTypeButtons()
     {
         List<Button> buttons = new(DictUtils.Dicts.Values.Count + 1);
-        _buttonAll.Background = Brushes.DodgerBlue;
-        buttons.Add(_buttonAll);
+        AllDictionaryTabButton.Background = Brushes.DodgerBlue;
+        buttons.Add(AllDictionaryTabButton);
 
+
+        double buttonFontSize = ConfigManager.Instance.PopupDictionaryTabFontSize;
         IOrderedEnumerable<Dict> dicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority);
         foreach (Dict dict in dicts)
         {
@@ -2239,8 +2255,18 @@ internal sealed partial class PopupWindow
             {
                 Content = dict.Name,
                 Margin = new Thickness(1),
-                Tag = dict
+                Tag = dict,
+                Cursor = Cursors.Arrow,
+                VerticalAlignment = VerticalAlignment.Top,
+                VerticalContentAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                HorizontalContentAlignment = HorizontalAlignment.Center,
+                FontSize = buttonFontSize,
+                Padding = new Thickness(5, 3, 5, 3),
+                Height = double.NaN,
+                Width = double.NaN
             };
+
             button.Click += DictTypeButtonOnClick;
 
             if (!_dictsWithResults.Contains(dict))
@@ -2268,7 +2294,7 @@ internal sealed partial class PopupWindow
 
         button.Background = Brushes.DodgerBlue;
 
-        bool isAllButton = button == _buttonAll;
+        bool isAllButton = button == AllDictionaryTabButton;
         if (isAllButton)
         {
             PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
@@ -2589,6 +2615,6 @@ internal sealed partial class PopupWindow
         _lastInteractedTextBox = null;
         Array.Clear(LastLookupResults, 0, LastLookupResults.Length);
         _dictsWithResults.Clear();
-        _buttonAll.Click -= DictTypeButtonOnClick;
+        AllDictionaryTabButton.Click -= DictTypeButtonOnClick;
     }
 }

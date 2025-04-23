@@ -132,6 +132,7 @@ internal sealed class ConfigManager
     public Brush SeparatorColor { get; private set; } = Brushes.White;
     public bool HideDictTabsWithNoResults { get; private set; } = true;
     public bool ShowDictionaryTabsInMiningMode { get; private set; } = true;
+    public double PopupDictionaryTabFontSize { get; private set; } = 12;
     public bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } // = false;
     public double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
     public bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } // = false;
@@ -456,6 +457,8 @@ internal sealed class ConfigManager
             mainWindow.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.MaxHeight);
             mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, double.NaN);
         }
+
+        PopupDictionaryTabFontSize = ConfigDBManager.GetValueFromConfig(connection, PopupDictionaryTabFontSize, nameof(PopupDictionaryTabFontSize));
 
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetValueFromConfig(connection, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds));
         PopupWindowUtils.PopupAutoHideTimer.Enabled = false;
@@ -787,6 +790,8 @@ internal sealed class ConfigManager
             currentPopupWindow.Foreground = DefinitionsColor;
             currentPopupWindow.FontFamily = PopupFont;
 
+            currentPopupWindow.AllDictionaryTabButton.FontSize = PopupDictionaryTabFontSize;
+
             currentPopupWindow.SetSizeToContent(PopupDynamicWidth, PopupDynamicHeight, PopupMaxWidth, PopupMaxHeight, PopupMinWidth, PopupMinHeight);
 
             currentPopupWindow.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
@@ -798,6 +803,7 @@ internal sealed class ConfigManager
 
             currentPopupWindow.DictTabButtonsItemsControlToggleVisibilityOfDictTabsMenuItem.SetInputGestureText(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
             currentPopupWindow.DictTabButtonsItemsControlHidePopupMenuItem.SetInputGestureText(ClosePopupKeyGesture);
+
             currentPopupWindow = PopupWindowUtils.PopupWindows[currentPopupWindow.PopupIndex + 1];
         }
     }
@@ -1025,6 +1031,7 @@ internal sealed class ConfigManager
         preferenceWindow.MiningButtonFontSizeNumericUpDown.Value = MiningButtonFontSize;
         preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value = MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds;
         preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value = TextBoxCustomLineHeight;
+        preferenceWindow.PopupDictionaryTabFontSizeNumericUpDown.Value = PopupDictionaryTabFontSize;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
         preferenceWindow.MinCharactersPerMinuteBeforeStoppingTimeTrackingNumericUpDown.Value = coreConfigManager.MinCharactersPerMinuteBeforeStoppingTimeTracking;
         preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
@@ -1484,6 +1491,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoHidePopupIfMouseIsNotOverIt),
                 preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupDictionaryTabFontSize),
+                preferenceWindow.PopupDictionaryTabFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds),
                 preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));

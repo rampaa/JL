@@ -980,6 +980,16 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Dictionary tab font size"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <hc:NumericUpDown x:Name="PopupDictionaryTabFontSizeNumericUpDown" Maximum="100" Minimum="1" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Hide dictionary tabs with no results"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
