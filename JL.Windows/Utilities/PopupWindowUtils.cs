@@ -48,7 +48,7 @@ internal static class PopupWindowUtils
             Background = Brushes.Transparent,
             Cursor = Cursors.Arrow,
             TextWrapping = TextWrapping.Wrap,
-            Padding = new Thickness(0)
+            Padding = new Thickness()
         };
     }
 
@@ -73,8 +73,8 @@ internal static class PopupWindowUtils
             IsReadOnly = true,
             IsUndoEnabled = false,
             UndoLimit = 0,
-            BorderThickness = new Thickness(0),
-            Padding = new Thickness(0),
+            BorderThickness = new Thickness(),
+            Padding = new Thickness(),
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Disabled
         };

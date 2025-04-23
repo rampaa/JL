@@ -45,7 +45,7 @@
             </Button>
         </Grid>
 
-        <ItemsControl Grid.Row="2" Name="DictTabButtonsItemsControl" Visibility="Collapsed"
+        <ItemsControl Grid.Row="2" Name="DictTabButtonsItemsControl" Margin="2,2,2,0" Visibility="Collapsed"
                           Background="Transparent">
             <ItemsControl.ContextMenu>
                 <ContextMenu Name="DictTabButtonsItemsControlContextMenu" IsVisibleChanged="ContextMenu_IsVisibleChanged">

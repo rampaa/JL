@@ -43,7 +43,7 @@ internal sealed partial class PopupWindow
     {
         Name = nameof(AllDictionaryTabButton),
         Content = "All",
-        Margin = new Thickness(1),
+        Margin = new Thickness(),
         Background = Brushes.DodgerBlue,
         Cursor = Cursors.Arrow,
         VerticalAlignment = VerticalAlignment.Top,
@@ -693,7 +693,7 @@ internal sealed partial class PopupWindow
             configManager.PrimarySpellingColor,
             configManager.PrimarySpellingFontSize,
             VerticalAlignment.Center,
-            new Thickness(2, 0, 0, 0),
+            new Thickness(),
             PopupContextMenu);
 
             AddEventHandlersToPrimarySpellingTextBox(primarySpellingFrameworkElement);
@@ -845,8 +845,8 @@ internal sealed partial class PopupWindow
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 Background = Brushes.Transparent,
                 Cursor = Cursors.Arrow,
-                BorderThickness = new Thickness(0),
-                Padding = new Thickness(0),
+                BorderThickness = new Thickness(),
+                Padding = new Thickness(),
                 FontSize = configManager.AudioButtonFontSize,
                 Focusable = false,
                 Height = double.NaN,
@@ -995,8 +995,8 @@ internal sealed partial class PopupWindow
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 Background = Brushes.Transparent,
                 Cursor = Cursors.Arrow,
-                BorderThickness = new Thickness(0),
-                Padding = new Thickness(0),
+                BorderThickness = new Thickness(),
+                Padding = new Thickness(),
                 FontSize = configManager.MiningButtonFontSize,
                 Focusable = false,
                 Height = double.NaN,
@@ -2258,7 +2258,7 @@ internal sealed partial class PopupWindow
             Button button = new()
             {
                 Content = dict.Name,
-                Margin = new Thickness(1),
+                Margin = new Thickness(2, 0, 0, 0),
                 Tag = dict,
                 Cursor = Cursors.Arrow,
                 VerticalAlignment = VerticalAlignment.Top,
@@ -2617,7 +2617,7 @@ internal sealed partial class PopupWindow
         DictTabButtonsItemsControl.ItemsSource = null;
         PopupListView.ItemsSource = null;
         _lastInteractedTextBox = null;
-        Array.Clear(LastLookupResults, 0, LastLookupResults.Length);
+        LastLookupResults.AsSpan().Clear();
         _dictsWithResults.Clear();
         AllDictionaryTabButton.Click -= DictTypeButtonOnClick;
     }
