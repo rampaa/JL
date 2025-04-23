@@ -53,7 +53,7 @@ internal sealed partial class PopupWindow
         FontSize = ConfigManager.Instance.PopupDictionaryTabFontSize,
         Padding = new Thickness(5, 3, 5, 3),
         Height = double.NaN,
-        Width = double.NaN,
+        Width = double.NaN
     };
 
     public string? LastSelectedText { get; private set; }

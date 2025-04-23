@@ -2375,7 +2375,7 @@
                                        VerticalAlignment="Center"
                                        TextWrapping="Wrap"
                                        Style="{StaticResource TextBlockDefault}" />
-                                    <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap" />
+                                    <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="NoWrap" />
                                 </DockPanel>
                             </ListBoxItem>
 
