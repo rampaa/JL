@@ -735,7 +735,7 @@ public static class LookupUtils
                         // Yomichan dictionaries simply store the general v5 tag
                         foreach (string wordClass in dictResult.WordClasses)
                         {
-                            if (lastTag.StartsWith(wordClass, StringComparison.Ordinal))
+                            if (lastTag.AsSpan().StartsWith(wordClass, StringComparison.Ordinal))
                             {
                                 resultsList.Add(dictResult);
                                 break;

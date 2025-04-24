@@ -66,7 +66,7 @@ internal sealed partial class AddAudioSourceWindow
                 }
 
                 string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
-                uri = relativePath.StartsWith('.')
+                uri = relativePath.AsSpan().StartsWith('.')
                     ? fullPath
                     : relativePath;
 

@@ -210,7 +210,7 @@ public static partial class Utils
     {
         string fullPath = Path.GetFullPath(path, ApplicationPath);
         string relativePath = Path.GetRelativePath(ApplicationPath, fullPath);
-        return relativePath.StartsWith('.') ? fullPath : relativePath;
+        return relativePath.AsSpan().StartsWith('.') ? fullPath : relativePath;
     }
 
     internal static T[]? ConcatNullableArrays<T>(params ReadOnlySpan<T[]?> arrays)

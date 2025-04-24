@@ -97,7 +97,7 @@ internal static class EpwingYomichanUtils
                         case "li":
                         {
                             string content = contentResult.Content.TrimStart();
-                            if (!content.StartsWith('•'))
+                            if (!content.AsSpan().StartsWith('•'))
                             {
                                 _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n• {content}");
                             }
@@ -156,7 +156,7 @@ internal static class EpwingYomichanUtils
                     if (tag is "a" && jsonElement.TryGetProperty("href", out JsonElement hrefElement))
                     {
                         string? hrefText = hrefElement.GetString();
-                        contentText = hrefText?.StartsWith("?query=", StringComparison.Ordinal) ?? true
+                        contentText = hrefText?.AsSpan().StartsWith("?query=", StringComparison.Ordinal) ?? true
                             ? contentElement.GetString()
                             : $"{contentElement.GetString()}: {hrefText}";
                     }

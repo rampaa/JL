@@ -182,7 +182,7 @@ internal sealed partial class MainWindow
             DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
             mergeTexts = (configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
                           || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
-                          && previousText.Length > 0;
+                            && previousText.Length > 0;
 
             s_lastTextCopyTime = preciseTimeNow;
 
@@ -195,7 +195,7 @@ internal sealed partial class MainWindow
 
                 if (!configManager.AllowPartialMatchingForTextMerge)
                 {
-                    if (sanitizedNewText.StartsWith(previousText, StringComparison.Ordinal))
+                    if (sanitizedNewText.AsSpan().StartsWith(previousText, StringComparison.Ordinal))
                     {
                         subsequentText = sanitizedNewText[previousText.Length..];
                     }
@@ -205,13 +205,13 @@ internal sealed partial class MainWindow
                     int startIndex = Math.Max(previousText.Length - sanitizedNewText.Length, 0);
                     for (int i = startIndex; i < previousText.Length; i++)
                     {
-                        if (sanitizedNewText.StartsWith(previousText[i..], StringComparison.Ordinal))
+                        ReadOnlySpan<char> sanitizedNewTextSpan = sanitizedNewText.AsSpan();
+                        ReadOnlySpan<char> previousTextSlice = previousText.AsSpan(i);
+                        if (sanitizedNewTextSpan.StartsWith(previousTextSlice, StringComparison.Ordinal))
                         {
-                            subsequentText = sanitizedNewText[(previousText.Length - i)..];
-                            if (subsequentText.Length is 0 && sanitizedNewText != previousText)
-                            {
-                                subsequentText = null;
-                            }
+                            subsequentText = sanitizedNewTextSpan.Length == previousTextSlice.Length
+                                ? null
+                                : sanitizedNewText[(previousText.Length - i)..];
 
                             break;
                         }
@@ -941,7 +941,7 @@ internal sealed partial class MainWindow
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) >= 0
               || (FirstPopupWindow.LastSelectedText is not null
-                  && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                  && MainTextBox.Text.AsSpan().StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                 ? FirstPopupWindow.LastSelectedText
                 : null;
 
@@ -974,7 +974,7 @@ internal sealed partial class MainWindow
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) >= 0
               || (FirstPopupWindow.LastSelectedText is not null
-                  && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                  && MainTextBox.Text.AsSpan().StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                 ? FirstPopupWindow.LastSelectedText
                 : null;
 
@@ -997,7 +997,7 @@ internal sealed partial class MainWindow
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) >= 0
               || (FirstPopupWindow.LastSelectedText is not null
-                  && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                  && MainTextBox.Text.AsSpan().StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                 ? FirstPopupWindow.LastSelectedText
                 : null;
 

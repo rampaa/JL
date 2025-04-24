@@ -216,7 +216,7 @@ internal static class KeyGestureUtils
 
     public static void UpdateKeyGesture(SqliteConnection connection, string key, string rawKeyGesture)
     {
-        string value = rawKeyGesture.StartsWith("Win+", StringComparison.Ordinal)
+        string value = rawKeyGesture.AsSpan().StartsWith("Win+", StringComparison.Ordinal)
             ? rawKeyGesture[4..]
             : rawKeyGesture;
 
