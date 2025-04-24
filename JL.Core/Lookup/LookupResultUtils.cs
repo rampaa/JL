@@ -25,7 +25,7 @@ public static class LookupResultUtils
                     continue;
                 }
 
-                bool startsWithParentheses = info.AsSpan().StartsWith('(');
+                bool startsWithParentheses = info.StartsWith('(');
                 if (startsWithParentheses)
                 {
                     if (j is not 0)

@@ -97,7 +97,7 @@ internal static class EpwingYomichanUtils
                         case "li":
                         {
                             string content = contentResult.Content.TrimStart();
-                            if (!content.AsSpan().StartsWith('•'))
+                            if (!content.StartsWith('•'))
                             {
                                 _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n• {content}");
                             }
