@@ -1310,15 +1310,16 @@ internal sealed partial class PopupWindow
 
     private void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
     {
+        StackPanel stackPanel = (StackPanel)sender;
         if (PopupContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || DictTabButtonsItemsControlContextMenu.IsVisible)
         {
-            _listViewItemIndexAfterContextMenuIsClosed = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
+            _listViewItemIndexAfterContextMenuIsClosed = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(stackPanel);
         }
         else
         {
-            _listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
+            _listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(stackPanel);
             LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
         }
     }

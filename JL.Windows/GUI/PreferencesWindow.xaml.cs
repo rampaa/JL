@@ -611,28 +611,30 @@ internal sealed partial class PreferencesWindow
 
     private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        Button button = (Button)sender;
+
         string title = "JL Fields for ";
         string text;
 
-        if (WordInfoButton == sender)
+        if (WordInfoButton == button)
         {
             title += "Words";
             text = s_wordJLFieldsInfo;
         }
 
-        else if (KanjiInfoButton == sender)
+        else if (KanjiInfoButton == button)
         {
             title += "Kanjis";
             text = s_kanjiJLFieldsInfo;
         }
 
-        else if (NameInfoButton == sender)
+        else if (NameInfoButton == button)
         {
             title += "Names";
             text = s_nameJLFieldsInfo;
         }
 
-        else // if (OtherInfoButton == sender)
+        else // if (OtherInfoButton == button)
         {
             title += "Others";
             text = s_wordJLFieldsInfo;
