@@ -17,7 +17,7 @@ internal static class Deconjugator
         }
 
         // ending doesn't match
-        if (!myForm.Text.EndsWith(myRule.ConEnd, StringComparison.Ordinal))
+        if (!myForm.Text.AsSpan().EndsWith(myRule.ConEnd, StringComparison.Ordinal))
         {
             return null;
         }
@@ -157,7 +157,7 @@ internal static class Deconjugator
         }
 
         string conEnd = myRule.ConEnds[0];
-        if (!myForm.Text.EndsWith(conEnd, StringComparison.Ordinal))
+        if (!myForm.Text.AsSpan().EndsWith(conEnd, StringComparison.Ordinal))
         {
             return false;
         }
