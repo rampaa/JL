@@ -363,7 +363,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings.AsSpan().Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings.AsReadOnlySpan().Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
@@ -404,7 +404,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             foreach (ref readonly FrequencyRecord freqResult in freqResults.AsReadOnlySpan())
             {
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings.AsSpan().Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings.AsReadOnlySpan().Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }

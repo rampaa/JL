@@ -133,7 +133,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         return obj is EpwingYomichanRecord epwingYomichanRecord
                && PrimarySpelling == epwingYomichanRecord.PrimarySpelling
                && Reading == epwingYomichanRecord.Reading
-               && epwingYomichanRecord.Definitions.AsSpan().SequenceEqual(Definitions);
+               && epwingYomichanRecord.Definitions.AsReadOnlySpan().SequenceEqual(Definitions);
     }
 
     public bool Equals(EpwingYomichanRecord? other)
@@ -141,7 +141,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         return other is not null
                && PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
-               && other.Definitions.AsSpan().SequenceEqual(Definitions);
+               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions);
     }
 
     public override int GetHashCode()

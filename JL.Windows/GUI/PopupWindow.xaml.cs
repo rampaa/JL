@@ -954,7 +954,18 @@ internal sealed partial class PopupWindow
 
         if (result.Frequencies is not null)
         {
-            ReadOnlySpan<LookupFrequencyResult> validFrequencies = result.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList().AsReadOnlySpan();
+            ReadOnlySpan<LookupFrequencyResult> allFrequencies = result.Frequencies.AsReadOnlySpan();
+            List<LookupFrequencyResult> filteredFrequencies = new(allFrequencies.Length);
+            foreach (ref readonly LookupFrequencyResult frequency in allFrequencies)
+            {
+                if (frequency.Freq is > 0 and < int.MaxValue)
+                {
+                    filteredFrequencies.Add(frequency);
+                }
+            }
+
+            ReadOnlySpan<LookupFrequencyResult> validFrequencies = filteredFrequencies.AsReadOnlySpan();
+
             if (validFrequencies.Length > 0)
             {
                 TextBlock frequencyTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Frequencies),

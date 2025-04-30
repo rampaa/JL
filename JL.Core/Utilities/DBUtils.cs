@@ -86,17 +86,23 @@ public static class DBUtils
 
     private static void SendOptimizePragmaToAllDicts()
     {
-        foreach (Dict dict in DictUtils.Dicts.Values.Where(static dict => dict is { Active: true, Ready: true, Options.UseDB.Value: true }))
+        foreach (Dict dict in DictUtils.Dicts.Values)
         {
-            SendOptimizePragma(GetDictDBPath(dict.Name));
+            if (dict is { Active: true, Ready: true, Options.UseDB.Value: true })
+            {
+                SendOptimizePragma(GetDictDBPath(dict.Name));
+            }
         }
     }
 
     private static void SendOptimizePragmaToAllFreqDicts()
     {
-        foreach (Freq freq in FreqUtils.FreqDicts.Values.Where(static freq => freq is { Active: true, Ready: true, Options.UseDB.Value: true }))
+        foreach (Freq freq in FreqUtils.FreqDicts.Values)
         {
-            SendOptimizePragma(GetFreqDBPath(freq.Name));
+            if (freq is { Active: true, Ready: true, Options.UseDB.Value: true })
+            {
+                SendOptimizePragma(GetFreqDBPath(freq.Name));
+            }
         }
     }
 
