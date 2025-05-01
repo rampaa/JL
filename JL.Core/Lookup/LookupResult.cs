@@ -112,21 +112,19 @@ public sealed class LookupResult
             return -1;
         }
 
-        string matchedText = MatchedText;
         string otherMatchedText = other.MatchedText;
 
         // 1. Order by MatchedText.Length descending
-        int cmpResult = otherMatchedText.Length.CompareTo(matchedText.Length);
+        int cmpResult = otherMatchedText.Length.CompareTo(MatchedText.Length);
         if (cmpResult is not 0)
         {
             return cmpResult;
         }
 
         // 2. ThenByDescending: PrimarySpelling == MatchedText
-        string primarySpelling = PrimarySpelling;
         string otherPrimarySpelling = other.PrimarySpelling;
 
-        bool matchedPrimarySpelling = primarySpelling == matchedText;
+        bool matchedPrimarySpelling = PrimarySpelling == MatchedText;
         bool otherMatchedPrimarySpelling = otherPrimarySpelling == otherMatchedText;
         cmpResult = otherMatchedPrimarySpelling.CompareTo(matchedPrimarySpelling);
         if (cmpResult is not 0)
@@ -135,7 +133,7 @@ public sealed class LookupResult
         }
 
         // 3. ThenByDescending: Readings contains MatchedText
-        int readingIndexOfMatchedText = Readings?.AsReadOnlySpan().IndexOf(matchedText) ?? -1;
+        int readingIndexOfMatchedText = Readings?.AsReadOnlySpan().IndexOf(MatchedText) ?? -1;
         int otherReadingIndexOfMatchedText = other.Readings?.AsReadOnlySpan().IndexOf(otherMatchedText) ?? -1;
 
         bool readingsContainMatchedText = readingIndexOfMatchedText >= 0;
@@ -147,7 +145,7 @@ public sealed class LookupResult
         }
 
         // 4. ThenByDescending: Results with no deconjugation process, after that, the length of the primary spelling
-        int deconjugationScore = DeconjugationProcess is null ? int.MaxValue : primarySpelling.Length;
+        int deconjugationScore = DeconjugationProcess is null ? int.MaxValue : PrimarySpelling.Length;
         int otherDeconjugationScore = other.DeconjugationProcess is null ? int.MaxValue : otherPrimarySpelling.Length;
         cmpResult = otherDeconjugationScore.CompareTo(deconjugationScore);
         if (cmpResult is not 0)

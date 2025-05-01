@@ -298,7 +298,7 @@ public static class LookupUtils
         {
             foreach (Dict dict in DictUtils.Dicts.Values)
             {
-                if (dict.Active && dict.Type is not DictType.PitchAccentYomichan)
+                if (dict is { Active: true, Type: not DictType.PitchAccentYomichan })
                 {
                     dicts.Add(dict);
                 }
