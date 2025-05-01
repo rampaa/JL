@@ -114,7 +114,7 @@ public static class TextUtils
             : Rune.IsWhiteSpace(new Rune(firstChar, text[1]));
     }
 
-    public static string GetFirstCharacter(string text)
+    internal static string GetFirstCharacter(string text)
     {
         char firstChar = text[0];
         return !char.IsHighSurrogate(firstChar)
