@@ -49,13 +49,27 @@ public static class LookupUtils
         Freq[]? dbWordFreqs = null;
         if (wordFreqs is not null)
         {
-            dbWordFreqs = wordFreqs
-                .Where(static f => f is { Options.UseDB.Value: true, Ready: true })
-                .ToArray();
-
-            if (dbWordFreqs.Length is 0)
+            int validFreqCount = 0;
+            foreach (Freq freq in wordFreqs)
             {
-                dbWordFreqs = null;
+                if (freq.Options.UseDB.Value && freq.Ready)
+                {
+                    ++validFreqCount;
+                }
+            }
+
+            if (validFreqCount > 0)
+            {
+                dbWordFreqs = new Freq[validFreqCount];
+                int currentIndex = 0;
+                foreach (Freq freq in wordFreqs)
+                {
+                    if (freq.Options.UseDB.Value && freq.Ready)
+                    {
+                        dbWordFreqs[currentIndex] = freq;
+                        ++currentIndex;
+                    }
+                }
             }
         }
 
@@ -278,26 +292,60 @@ public static class LookupUtils
         }
 
         LookupCategory lookupType = CoreConfigManager.Instance.LookupCategory;
-        List<Dict> dicts;
+        List<Dict> dicts = new(DictUtils.Dicts.Count);
+
         if (lookupType is LookupCategory.All)
         {
-            dicts = DictUtils.Dicts.Values.Where(static dict => dict is { Active: true, Type: not DictType.PitchAccentYomichan }).ToList();
+            foreach (Dict dict in DictUtils.Dicts.Values)
+            {
+                if (dict.Active && dict.Type is not DictType.PitchAccentYomichan)
+                {
+                    dicts.Add(dict);
+                }
+            }
         }
         else if (lookupType is LookupCategory.Kanji)
         {
-            dicts = DictUtils.AtLeastOneKanjiDictIsActive ? DictUtils.Dicts.Values.Where(static dict => dict.Active && DictUtils.KanjiDictTypes.Contains(dict.Type)).ToList() : [];
+            if (DictUtils.AtLeastOneKanjiDictIsActive)
+            {
+                foreach (Dict dict in DictUtils.Dicts.Values)
+                {
+                    if (dict.Active && DictUtils.KanjiDictTypes.Contains(dict.Type))
+                    {
+                        dicts.Add(dict);
+                    }
+                }
+            }
         }
         else if (lookupType is LookupCategory.Name)
         {
-            dicts = DictUtils.Dicts.Values.Where(static dict => dict.Active && DictUtils.s_nameDictTypes.Contains(dict.Type)).ToList();
+            foreach (Dict dict in DictUtils.Dicts.Values)
+            {
+                if (dict.Active && DictUtils.s_nameDictTypes.Contains(dict.Type))
+                {
+                    dicts.Add(dict);
+                }
+            }
         }
         else if (lookupType is LookupCategory.Word)
         {
-            dicts = DictUtils.Dicts.Values.Where(static dict => dict.Active && DictUtils.s_wordDictTypes.Contains(dict.Type)).ToList();
+            foreach (Dict dict in DictUtils.Dicts.Values)
+            {
+                if (dict.Active && DictUtils.s_wordDictTypes.Contains(dict.Type))
+                {
+                    dicts.Add(dict);
+                }
+            }
         }
-        else // if (lookupType is LookupType.Other)
+        else // if (lookupType is LookupCategory.Other)
         {
-            dicts = DictUtils.Dicts.Values.Where(static dict => dict.Active && DictUtils.s_otherDictTypes.Contains(dict.Type)).ToList();
+            foreach (Dict dict in DictUtils.Dicts.Values)
+            {
+                if (dict.Active && DictUtils.s_otherDictTypes.Contains(dict.Type))
+                {
+                    dicts.Add(dict);
+                }
+            }
         }
 
         _ = Parallel.ForEach(dicts, dict =>
@@ -435,100 +483,14 @@ public static class LookupUtils
             }
         });
 
-        return lookupResults.IsEmpty
-            ? null
-            : SortLookupResults(lookupResults);
-    }
+        if (lookupResults.IsEmpty)
+        {
+            return null;
+        }
 
-    private static LookupResult[] SortLookupResults(ConcurrentBag<LookupResult> lookupResults)
-    {
-        return lookupResults
-            .OrderByDescending(static lookupResult => lookupResult.MatchedText.Length)
-            .ThenByDescending(static lookupResult => lookupResult.PrimarySpelling == lookupResult.MatchedText)
-            .ThenByDescending(static lookupResult => lookupResult.Readings is not null && lookupResult.Readings.AsSpan().Contains(lookupResult.MatchedText))
-            .ThenByDescending(static lookupResult => lookupResult.DeconjugationProcess is null ? int.MaxValue : lookupResult.PrimarySpelling.Length)
-            .ThenBy(static lookupResult => lookupResult.Dict.Priority)
-            .ThenBy(static lookupResult =>
-            {
-                JmdictLookupResult? jmdictResult = lookupResult.JmdictLookupResult;
-                if (jmdictResult?.PrimarySpellingOrthographyInfoList is not null && lookupResult.PrimarySpelling == lookupResult.MatchedText)
-                {
-                    foreach (string primarySpellingOrthographyInfo in jmdictResult.PrimarySpellingOrthographyInfoList)
-                    {
-                        if (primarySpellingOrthographyInfo is "oK" or "iK" or "rK")
-                        {
-                            return 1;
-                        }
-                    }
-                }
-
-                return 0;
-            })
-            .ThenBy(static lookupResult =>
-            {
-                int index = lookupResult.Readings.AsSpan().IndexOf(lookupResult.MatchedText);
-                if (index < 0)
-                {
-                    return 2;
-                }
-
-                JmdictLookupResult? jmdictLookupResult = lookupResult.JmdictLookupResult;
-                if (jmdictLookupResult is not null)
-                {
-                    if (jmdictLookupResult.MiscSharedByAllSenses is not null && jmdictLookupResult.MiscSharedByAllSenses.AsSpan().Contains("uk"))
-                    {
-                        return 0;
-                    }
-
-                    if (jmdictLookupResult.MiscList is not null)
-                    {
-                        foreach (string[]? misc in jmdictLookupResult.MiscList)
-                        {
-                            if (misc is not null && misc.AsSpan().Contains("uk"))
-                            {
-                                return 0;
-                            }
-                        }
-                    }
-
-                    string[]? readingsOrthographyInfo = jmdictLookupResult.ReadingsOrthographyInfoList?[index];
-                    if (readingsOrthographyInfo is not null)
-                    {
-                        foreach (string readingsOrthographyInfoItem in readingsOrthographyInfo)
-                        {
-                            if (readingsOrthographyInfoItem is "ok" or "ik" or "rk")
-                            {
-                                return 3;
-                            }
-                        }
-                    }
-                }
-
-                return 1;
-            })
-            .ThenBy(static lookupResult =>
-            {
-                if (lookupResult.Frequencies is not null && lookupResult.Frequencies.Count > 0)
-                {
-                    LookupFrequencyResult freqResult = lookupResult.Frequencies[0];
-                    return !freqResult.HigherValueMeansHigherFrequency
-                        ? freqResult.Freq
-                        : freqResult.Freq is int.MaxValue
-                            ? int.MaxValue
-                            : int.MaxValue - freqResult.Freq;
-                }
-
-                return int.MaxValue;
-            })
-            .ThenBy(static lookupResult =>
-            {
-                int index = lookupResult.Readings.AsSpan().IndexOf(lookupResult.MatchedText);
-                return index >= 0
-                    ? index
-                    : int.MaxValue;
-            })
-            // .ThenBy(static lookupResult => lookupResult.EntryId)
-            .ToArray();
+        LookupResult[] sortedLookupResults = lookupResults.ToArray();
+        Array.Sort(sortedLookupResults);
+        return sortedLookupResults;
     }
 
     private static void GetWordResultsHelper(Dict dict,
@@ -685,7 +647,7 @@ public static class LookupUtils
                 {
                     JmdictRecord dictResult = (JmdictRecord)dictResults[i];
                     if (dictResult.WordClassesSharedByAllSenses is not null
-                        && dictResult.WordClassesSharedByAllSenses.AsSpan().Contains(lastTag))
+                        && dictResult.WordClassesSharedByAllSenses.AsReadOnlySpan().Contains(lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -694,7 +656,7 @@ public static class LookupUtils
                     {
                         foreach (string[]? wordClasses in dictResult.WordClasses)
                         {
-                            if (wordClasses is not null && wordClasses.AsSpan().Contains(lastTag))
+                            if (wordClasses is not null && wordClasses.AsReadOnlySpan().Contains(lastTag))
                             {
                                 resultsList.Add(dictResult);
                                 break;
@@ -713,7 +675,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultsCount; i++)
                 {
                     CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
-                    if (dictResult.WordClasses.AsSpan().Contains(lastTag))
+                    if (dictResult.WordClasses.AsReadOnlySpan().Contains(lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -1183,9 +1145,9 @@ public static class LookupUtils
             {
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
-                    && ((hasReading && result.Readings is not null && result.Readings.AsSpan().Contains(reading!))
+                    && ((hasReading && result.Readings is not null && result.Readings.AsReadOnlySpan().Contains(reading!))
                         || (!hasReading && result.Readings is null))
-                    && result.WordClasses.AsSpan().Contains(tag))
+                    && result.WordClasses.AsReadOnlySpan().Contains(tag))
                 {
                     return true;
                 }
