@@ -5,7 +5,8 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Lookup;
 
-public sealed class LookupResult(
+public sealed class LookupResult
+    (
         string primarySpelling,
         string matchedText,
         Dict dict,
