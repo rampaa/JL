@@ -76,11 +76,11 @@ internal sealed class LookupTests
                 && (e.Frequencies is not null ? a.Frequencies?.AsReadOnlySpan().SequenceEqual(e.Frequencies.AsReadOnlySpan()) ?? false : a.Frequencies is null)
                 && a.PrimarySpelling == e.PrimarySpelling
                 && a.DeconjugatedMatchedText == e.DeconjugatedMatchedText
-                && (e.Readings is not null ? a.Readings?.AsSpan().SequenceEqual(e.Readings) ?? false : a.Readings is null)
+                && (e.Readings is not null ? a.Readings?.AsReadOnlySpan().SequenceEqual(e.Readings) ?? false : a.Readings is null)
                 && a.FormattedDefinitions == e.FormattedDefinitions
                 && a.EntryId == e.EntryId
                 && e.WordClasses is not null
-                    ? a.WordClasses?.AsSpan().SequenceEqual(e.WordClasses) ?? false
+                    ? a.WordClasses?.AsReadOnlySpan().SequenceEqual(e.WordClasses) ?? false
                     : a.WordClasses is null));
     }
 
@@ -149,7 +149,7 @@ internal sealed class LookupTests
         // Act
         LookupResult[]? result = LookupUtils.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.Readings?.AsSpan().Contains("ひ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.AsReadOnlySpan().Contains("ひ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -167,7 +167,7 @@ internal sealed class LookupTests
         // Act
         LookupResult[]? result = LookupUtils.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.Readings?.AsSpan().Contains("にち") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.AsReadOnlySpan().Contains("にち") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -186,7 +186,7 @@ internal sealed class LookupTests
         LookupResult[]? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.AsSpan().Contains("か") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.AsReadOnlySpan().Contains("か") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -224,7 +224,7 @@ internal sealed class LookupTests
         LookupResult[]? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.AsSpan().Contains("なつかしい") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.AsReadOnlySpan().Contains("なつかしい") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -243,7 +243,7 @@ internal sealed class LookupTests
         LookupResult[]? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.AsSpan().Contains("はいきょ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.AsReadOnlySpan().Contains("はいきょ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -262,7 +262,7 @@ internal sealed class LookupTests
         LookupResult[]? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.AsSpan().Contains("はいきょ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.AsReadOnlySpan().Contains("はいきょ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -281,7 +281,7 @@ internal sealed class LookupTests
         LookupResult[]? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.AsSpan().Contains("エッチ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.AsReadOnlySpan().Contains("エッチ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -300,7 +300,7 @@ internal sealed class LookupTests
         LookupResult[]? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.AsSpan().Contains("た") ?? false).Frequencies?[0].Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.AsReadOnlySpan().Contains("た") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
