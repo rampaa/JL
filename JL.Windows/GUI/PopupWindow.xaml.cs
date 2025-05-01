@@ -292,7 +292,7 @@ internal sealed partial class PopupWindow
 
             if (configManager.HighlightLongestMatch)
             {
-                Debug.Assert(!isFirstPopupWindow && PopupWindowUtils.PopupWindows[PopupIndex - 1] is not null);
+                Debug.Assert(isFirstPopupWindow || PopupWindowUtils.PopupWindows[PopupIndex - 1] is not null);
                 WinApi.ActivateWindow(isFirstPopupWindow
                     ? mainWindow.WindowHandle
                     : PopupWindowUtils.PopupWindows[PopupIndex - 1]!.WindowHandle);
@@ -756,8 +756,7 @@ internal sealed partial class PopupWindow
         if (result.Readings is not null && configManager.ReadingsFontSize > 0
                                         && (pitchPositionsExist || result.KanjiLookupResult is null || (result.KanjiLookupResult.KunReadings is null && result.KanjiLookupResult.OnReadings is null)))
         {
-            Debug.Assert(showROrthographyInfo && jmdictLookupResultExist && jmdictLookupResult is not null);
-            string readingsText = showROrthographyInfo && jmdictLookupResultExist && jmdictLookupResult.ReadingsOrthographyInfoList is not null
+            string readingsText = showROrthographyInfo && jmdictLookupResultExist && jmdictLookupResult!.ReadingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, jmdictLookupResult.ReadingsOrthographyInfoList)
                 : string.Join('、', result.Readings);
 
@@ -862,8 +861,7 @@ internal sealed partial class PopupWindow
 
         if (result.AlternativeSpellings is not null && configManager.AlternativeSpellingsFontSize > 0)
         {
-            Debug.Assert(showAOrthographyInfo && jmdictLookupResultExist && jmdictLookupResult is not null);
-            string alternativeSpellingsText = showAOrthographyInfo && jmdictLookupResultExist && jmdictLookupResult.AlternativeSpellingsOrthographyInfoList is not null
+            string alternativeSpellingsText = showAOrthographyInfo && jmdictLookupResultExist && jmdictLookupResult!.AlternativeSpellingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, jmdictLookupResult.AlternativeSpellingsOrthographyInfoList)
                 : $"[{string.Join('、', result.AlternativeSpellings)}]";
 
