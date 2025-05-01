@@ -299,8 +299,17 @@ public static class MiningUtils
                     return null;
                 }
 
-                List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies.Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
-                return CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
+                ReadOnlySpan<LookupFrequencyResult> allFrequencies = lookupResult.Frequencies.AsReadOnlySpan();
+                List<LookupFrequencyResult> filteredFrequencies = new(allFrequencies.Length);
+                foreach (ref readonly LookupFrequencyResult frequency in allFrequencies)
+                {
+                    if (frequency.Freq is > 0 and < int.MaxValue)
+                    {
+                        filteredFrequencies.Add(frequency);
+                    }
+                }
+
+                return CalculateHarmonicMean(filteredFrequencies.AsReadOnlySpan()).ToString(CultureInfo.InvariantCulture);
             }
 
             case JLField.WordClasses:
@@ -497,7 +506,7 @@ public static class MiningUtils
             miningParams[JLField.WordClasses] = wordClasses;
         }
 
-        int selectedSpellingIndex = lookupResult.Readings.AsSpan().IndexOf(selectedSpelling);
+        int selectedSpellingIndex = lookupResult.Readings.AsReadOnlySpan().IndexOf(selectedSpelling);
         if (selectedSpellingIndex is -1)
         {
             selectedSpellingIndex = 0;
@@ -555,7 +564,7 @@ public static class MiningUtils
             {
                 miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsReadOnlySpan(), true, lookupResult.Frequencies.Count is 1);
                 miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencyValues);
-                miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
+                miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies.AsReadOnlySpan()).ToString(CultureInfo.InvariantCulture);
 
                 int firstFrequency = lookupResult.Frequencies[0].Freq;
                 if (firstFrequency is > 0 and < int.MaxValue)
@@ -733,7 +742,7 @@ public static class MiningUtils
 
             if (selectedLookupResult.PrimarySpelling == otherLookupResult.PrimarySpelling
                 && otherLookupResult.FormattedDefinitions is not null
-                && ((readingIsSelected && otherLookupResult.Readings is not null && otherLookupResult.Readings.AsSpan().Contains(selectedSpelling))
+                && ((readingIsSelected && otherLookupResult.Readings is not null && otherLookupResult.Readings.AsReadOnlySpan().Contains(selectedSpelling))
                     || (!readingIsSelected
                         && ((selectedLookupResult.Readings is null && otherLookupResult.Readings is null)
                             || (selectedLookupResult.Readings is not null && otherLookupResult.Readings is not null && selectedLookupResult.Readings.Any(otherLookupResult.Readings.Contains))))))
@@ -940,11 +949,10 @@ public static class MiningUtils
         return stringBuilder.ToString();
     }
 
-    private static int CalculateHarmonicMean(List<LookupFrequencyResult> lookupFrequencyResults)
+    private static int CalculateHarmonicMean(ReadOnlySpan<LookupFrequencyResult> lookupFrequencyResults)
     {
         double sumOfReciprocalOfFreqs = 0;
-        ReadOnlySpan<LookupFrequencyResult> lookupFrequencyResultSpan = lookupFrequencyResults.AsReadOnlySpan();
-        foreach (ref readonly LookupFrequencyResult lookupFrequencyResult in lookupFrequencyResultSpan)
+        foreach (ref readonly LookupFrequencyResult lookupFrequencyResult in lookupFrequencyResults)
         {
             int freq = lookupFrequencyResult.HigherValueMeansHigherFrequency
                 ? FreqUtils.FreqDicts[lookupFrequencyResult.Name].MaxValue - lookupFrequencyResult.Freq + 1
@@ -953,7 +961,7 @@ public static class MiningUtils
             sumOfReciprocalOfFreqs += 1d / freq;
         }
 
-        return double.ConvertToIntegerNative<int>(Math.Round(lookupFrequencyResultSpan.Length / sumOfReciprocalOfFreqs));
+        return double.ConvertToIntegerNative<int>(Math.Round(lookupFrequencyResults.Length / sumOfReciprocalOfFreqs));
     }
 
     private static string GetPitchAccentCategory(string expression, byte pitchPosition)
@@ -1025,7 +1033,7 @@ public static class MiningUtils
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
                     && ((reading is null && result.Readings is null)
-                        || (reading is not null && result.Readings is not null && result.Readings.AsSpan().Contains(reading))))
+                        || (reading is not null && result.Readings is not null && result.Readings.AsReadOnlySpan().Contains(reading))))
                 {
                     // If there is more than one valid result, we can't be sure which one applies to the current record, so we return null.
                     // See the entries for 駆ける and 振りかえる in JMdict as examples, where the spelling and reading are the same, but the word classes differ.
@@ -1387,6 +1395,15 @@ public static class MiningUtils
 
     private static List<string> FindFields(JLField jlField, OrderedDictionary<string, JLField> userFields)
     {
-        return userFields.Keys.Where(key => userFields[key] == jlField).ToList();
+        List<string> matchingFieldNames = [];
+        foreach ((string fieldName, JLField fieldValue) in userFields)
+        {
+            if (fieldValue == jlField)
+            {
+                matchingFieldNames.Add(fieldName);
+            }
+        }
+
+        return matchingFieldNames;
     }
 }
