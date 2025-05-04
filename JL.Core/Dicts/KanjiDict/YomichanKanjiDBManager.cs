@@ -1,7 +1,6 @@
 using System.Collections.Frozen;
 using System.Globalization;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -47,7 +46,7 @@ internal static class YomichanKanjiDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static void InsertRecordsToDB(Dict<YomichanKanjiRecord> dict)
     {
         ulong id = 1;
 
@@ -69,12 +68,12 @@ internal static class YomichanKanjiDBManager
         _ = insertRecordCommand.Parameters.Add("@stats", SqliteType.Text);
         insertRecordCommand.Prepare();
 
-        foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
+        foreach ((string kanji, IList<YomichanKanjiRecord> records) in dict.Contents)
         {
             int recordsCount = records.Count;
             for (int i = 0; i < recordsCount; i++)
             {
-                YomichanKanjiRecord yomichanKanjiRecord = (YomichanKanjiRecord)records[i];
+                YomichanKanjiRecord yomichanKanjiRecord = records[i];
                 _ = insertRecordCommand.Parameters["@id"].Value = id;
                 _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
                 _ = insertRecordCommand.Parameters["@on_readings"].Value = yomichanKanjiRecord.OnReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.OnReadings, Utils.s_jso) : DBNull.Value;
@@ -102,7 +101,7 @@ internal static class YomichanKanjiDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
+    public static List<YomichanKanjiRecord>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -117,7 +116,7 @@ internal static class YomichanKanjiDBManager
             return null;
         }
 
-        List<IDictRecord> results = [];
+        List<YomichanKanjiRecord> results = [];
         while (dataReader.Read())
         {
             results.Add(GetRecord(dataReader));
@@ -126,7 +125,7 @@ internal static class YomichanKanjiDBManager
         return results;
     }
 
-    public static void LoadFromDB(Dict dict)
+    public static void LoadFromDB(Dict<YomichanKanjiRecord> dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteCommand command = connection.CreateCommand();
@@ -146,7 +145,7 @@ internal static class YomichanKanjiDBManager
         {
             YomichanKanjiRecord record = GetRecord(dataReader);
             string kanji = dataReader.GetString(4);
-            if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
+            if (dict.Contents.TryGetValue(kanji, out IList<YomichanKanjiRecord>? result))
             {
                 result.Add(record);
             }
@@ -156,7 +155,7 @@ internal static class YomichanKanjiDBManager
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        foreach ((string key, IList<YomichanKanjiRecord> recordList) in dict.Contents)
         {
             dict.Contents[key] = recordList.ToArray();
         }

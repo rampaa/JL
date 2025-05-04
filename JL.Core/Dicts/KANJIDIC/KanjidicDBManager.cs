@@ -1,7 +1,6 @@
 using System.Collections.Frozen;
 using System.Globalization;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -54,7 +53,7 @@ internal static class KanjidicDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static void InsertRecordsToDB(Dict<KanjidicRecord> dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -77,12 +76,12 @@ internal static class KanjidicDBManager
         _ = insertRecordCommand.Parameters.Add("@frequency", SqliteType.Integer);
         insertRecordCommand.Prepare();
 
-        foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
+        foreach ((string kanji, IList<KanjidicRecord> records) in dict.Contents)
         {
             int recordsCount = records.Count;
             for (int i = 0; i < recordsCount; i++)
             {
-                KanjidicRecord kanjidicRecord = (KanjidicRecord)records[i];
+                KanjidicRecord kanjidicRecord = records[i];
                 _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
                 _ = insertRecordCommand.Parameters["@on_readings"].Value = kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jso) : DBNull.Value;
                 _ = insertRecordCommand.Parameters["@kun_readings"].Value = kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_jso) : DBNull.Value;
@@ -107,7 +106,7 @@ internal static class KanjidicDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
+    public static List<KanjidicRecord>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -122,7 +121,7 @@ internal static class KanjidicDBManager
             return null;
         }
 
-        List<IDictRecord> results = [];
+        List<KanjidicRecord> results = [];
         while (dataReader.Read())
         {
             results.Add(GetRecord(dataReader));
@@ -131,7 +130,7 @@ internal static class KanjidicDBManager
         return results;
     }
 
-    public static void LoadFromDB(Dict dict)
+    public static void LoadFromDB(Dict<KanjidicRecord> dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteCommand command = connection.CreateCommand();

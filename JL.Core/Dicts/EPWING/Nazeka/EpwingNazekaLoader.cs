@@ -1,13 +1,12 @@
 using System.Collections.Frozen;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaLoader
 {
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict<EpwingNazekaRecord> dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (!File.Exists(fullPath))
@@ -23,7 +22,7 @@ internal static class EpwingNazekaLoader
             jsonObjects = await JsonSerializer.DeserializeAsync<ReadOnlyMemory<JsonElement>>(fileStream, Utils.s_jso).ConfigureAwait(false);
         }
 
-        IDictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
+        IDictionary<string, IList<EpwingNazekaRecord>> nazekaEpwingDict = dict.Contents;
 
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
@@ -118,7 +117,7 @@ internal static class EpwingNazekaLoader
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        foreach ((string key, IList<EpwingNazekaRecord> recordList) in dict.Contents)
         {
             dict.Contents[key] = recordList.ToArray();
         }
@@ -126,9 +125,9 @@ internal static class EpwingNazekaLoader
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static void AddRecordToDictionary(string keyInHiragana, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
+    private static void AddRecordToDictionary(string keyInHiragana, EpwingNazekaRecord record, IDictionary<string, IList<EpwingNazekaRecord>> dictionary)
     {
-        if (dictionary.TryGetValue(keyInHiragana, out IList<IDictRecord>? result))
+        if (dictionary.TryGetValue(keyInHiragana, out IList<EpwingNazekaRecord>? result))
         {
             result.Add(record);
         }

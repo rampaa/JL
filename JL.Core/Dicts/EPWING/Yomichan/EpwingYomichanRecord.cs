@@ -8,7 +8,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
 
-internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEquatable<EpwingYomichanRecord>
+public sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEquatable<EpwingYomichanRecord>
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }

@@ -7,6 +7,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Config;
 using JL.Core.Dicts;
+using JL.Core.Dicts.JMdict;
 using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Core.Statistics;
@@ -62,9 +63,9 @@ internal sealed partial class PopupWindow
 
     public LookupResult[] LastLookupResults { get; private set; } = [];
 
-    private readonly List<Dict> _dictsWithResults = [];
+    private readonly List<DictBase> _dictsWithResults = [];
 
-    private Dict? _filteredDict;
+    private DictBase? _filteredDict;
 
     public bool UnavoidableMouseEnter { get; private set; } // = false;
 
@@ -587,7 +588,7 @@ internal sealed partial class PopupWindow
 
         PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
 
-        Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+        Dict<JmdictRecord> jmdict = (Dict<JmdictRecord>)DictUtils.SingleDictTypeDicts[DictType.JMdict];
 
         Debug.Assert(jmdict.Options.POrthographyInfo is not null);
         bool showPOrthographyInfo = jmdict.Options.POrthographyInfo.Value;
@@ -2261,8 +2262,8 @@ internal sealed partial class PopupWindow
 
 
         double buttonFontSize = ConfigManager.Instance.PopupDictionaryTabFontSize;
-        IOrderedEnumerable<Dict> dicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority);
-        foreach (Dict dict in dicts)
+        IOrderedEnumerable<DictBase> dicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority);
+        foreach (DictBase dict in dicts)
         {
             if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.Instance.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
             {
@@ -2320,7 +2321,7 @@ internal sealed partial class PopupWindow
 
         else
         {
-            _filteredDict = (Dict)button.Tag;
+            _filteredDict = (DictBase)button.Tag;
             PopupListView.Items.Filter = DictFilter;
         }
 
@@ -2337,7 +2338,7 @@ internal sealed partial class PopupWindow
     private bool DictFilter(object item)
     {
         StackPanel items = (StackPanel)item;
-        return (Dict)items.Tag == _filteredDict;
+        return (DictBase)items.Tag == _filteredDict;
     }
 
     private void ContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

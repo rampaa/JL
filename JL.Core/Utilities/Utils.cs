@@ -73,6 +73,18 @@ public static partial class Utils
         }
     };
 
+    internal static readonly JsonSerializerOptions s_jsoWithDictEnumConverter = new()
+    {
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        Converters =
+        {
+            new JsonStringEnumConverter(),
+            new DictBaseJsonConverter()
+        }
+    };
+
     //internal static readonly JsonSerializerOptions s_jsoIgnoringWhenWritingNullWithEnumConverter = new()
     //{
     //    RespectNullableAnnotations = true,

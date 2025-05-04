@@ -8,7 +8,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMdict;
 
-internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFrequency, IEquatable<JmdictRecord>
+public sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFrequency, IEquatable<JmdictRecord>
 {
     public int Id { get; }
     public string PrimarySpelling { get; }

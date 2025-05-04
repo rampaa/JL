@@ -8,7 +8,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.KanjiDict;
 
-internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanjiRecord>
+public sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanjiRecord>
 {
     public string[]? OnReadings { get; }
     public string[]? KunReadings { get; }

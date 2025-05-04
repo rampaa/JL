@@ -2,7 +2,7 @@ using JL.Core.Dicts.Interfaces;
 
 namespace JL.Core.Dicts.KANJIDIC;
 
-internal sealed class KanjidicRecord(
+public sealed class KanjidicRecord(
     string[]? definitions,
     string[]? onReadings,
     string[]? kunReadings,

@@ -2,7 +2,6 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -65,15 +64,15 @@ internal static class JmdictDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static void InsertRecordsToDB(Dict<JmdictRecord> dict)
     {
         Dictionary<JmdictRecord, List<string>> recordToKeysDict = [];
-        foreach ((string key, IList<IDictRecord> records) in dict.Contents)
+        foreach ((string key, IList<JmdictRecord> records) in dict.Contents)
         {
             int recordsCount = records.Count;
             for (int i = 0; i < recordsCount; i++)
             {
-                JmdictRecord record = (JmdictRecord)records[i];
+                JmdictRecord record = records[i];
                 if (recordToKeysDict.TryGetValue(record, out List<string>? keys))
                 {
                     keys.Add(key);
@@ -181,7 +180,7 @@ internal static class JmdictDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
+    public static Dictionary<string, IList<JmdictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -229,12 +228,12 @@ internal static class JmdictDBManager
             return null;
         }
 
-        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+        Dictionary<string, IList<JmdictRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
             string searchKey = dataReader.GetString(SearchKeyIndex);
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<JmdictRecord>? result))
             {
                 result.Add(record);
             }
@@ -247,7 +246,7 @@ internal static class JmdictDBManager
         return results;
     }
 
-    public static void LoadFromDB(Dict dict)
+    public static void LoadFromDB(Dict<JmdictRecord> dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteCommand command = connection.CreateCommand();
@@ -289,7 +288,7 @@ internal static class JmdictDBManager
             ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
-                if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                if (dict.Contents.TryGetValue(searchKey, out IList<JmdictRecord>? result))
                 {
                     result.Add(record);
                 }
@@ -300,7 +299,7 @@ internal static class JmdictDBManager
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        foreach ((string key, IList<JmdictRecord> recordList) in dict.Contents)
         {
             dict.Contents[key] = recordList.ToArray();
         }

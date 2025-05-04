@@ -1,13 +1,12 @@
 using System.Collections.Frozen;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.PitchAccent;
 
 internal static class YomichanPitchAccentLoader
 {
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict<PitchAccentRecord> dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (!Directory.Exists(fullPath))
@@ -15,7 +14,7 @@ internal static class YomichanPitchAccentLoader
             return;
         }
 
-        IDictionary<string, IList<IDictRecord>> pitchDict = dict.Contents;
+        IDictionary<string, IList<PitchAccentRecord>> pitchDict = dict.Contents;
 
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term*bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
@@ -39,7 +38,7 @@ internal static class YomichanPitchAccentLoader
                 }
 
                 string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Spelling).GetPooledString();
-                if (pitchDict.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
+                if (pitchDict.TryGetValue(spellingInHiragana, out IList<PitchAccentRecord>? result))
                 {
                     if (!result.Contains(newEntry))
                     {
@@ -57,7 +56,7 @@ internal static class YomichanPitchAccentLoader
                     string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading).GetPooledString();
                     if (spellingInHiragana != readingInHiragana)
                     {
-                        if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))
+                        if (pitchDict.TryGetValue(readingInHiragana, out IList<PitchAccentRecord>? readingResult))
                         {
                             if (!readingResult.Contains(newEntry))
                             {
@@ -73,7 +72,7 @@ internal static class YomichanPitchAccentLoader
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in pitchDict)
+        foreach ((string key, IList<PitchAccentRecord> recordList) in pitchDict)
         {
             pitchDict[key] = recordList.ToArray();
         }

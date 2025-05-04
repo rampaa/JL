@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -39,22 +38,22 @@ internal static class JmnedictDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static void InsertRecordsToDB(Dict<JmnedictRecord> dict)
     {
         int totalRecordCount = 0;
-        ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        ICollection<IList<JmnedictRecord>> dictRecordValues = dict.Contents.Values;
+        foreach (IList<JmnedictRecord> dictRecords in dictRecordValues)
         {
             totalRecordCount += dictRecords.Count;
         }
 
         HashSet<JmnedictRecord> jmnedictRecords = new(totalRecordCount);
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        foreach (IList<JmnedictRecord> dictRecords in dictRecordValues)
         {
             int dictRecordsCount = dictRecords.Count;
             for (int i = 0; i < dictRecordsCount; i++)
             {
-                _ = jmnedictRecords.Add((JmnedictRecord)dictRecords[i]);
+                _ = jmnedictRecords.Add(dictRecords[i]);
             }
         }
 
@@ -110,7 +109,7 @@ internal static class JmnedictDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
+    public static Dictionary<string, IList<JmnedictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -141,12 +140,12 @@ internal static class JmnedictDBManager
             return null;
         }
 
-        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+        Dictionary<string, IList<JmnedictRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
             JmnedictRecord record = GetRecord(dataReader);
             string searchKey = dataReader.GetString(6);
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<JmnedictRecord>? result))
             {
                 result.Add(record);
             }

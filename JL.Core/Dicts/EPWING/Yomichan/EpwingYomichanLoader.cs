@@ -1,14 +1,13 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanLoader
 {
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict<EpwingYomichanRecord> dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (!Directory.Exists(fullPath))
@@ -43,7 +42,7 @@ internal static class EpwingYomichanLoader
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        foreach ((string key, IList<EpwingYomichanRecord> recordList) in dict.Contents)
         {
             dict.Contents[key] = recordList.ToArray();
         }
@@ -51,7 +50,7 @@ internal static class EpwingYomichanLoader
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static EpwingYomichanRecord? GetEpwingYomichanRecord(ReadOnlySpan<JsonElement> jsonElements, Dict dict)
+    private static EpwingYomichanRecord? GetEpwingYomichanRecord(ReadOnlySpan<JsonElement> jsonElements, Dict<EpwingYomichanRecord> dict)
     {
         string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
         string? reading = jsonElements[1].GetString();
@@ -121,13 +120,13 @@ internal static class EpwingYomichanLoader
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
     }
 
-    private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict, bool nonKanjiDict, bool nonNameDict)
+    private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict<EpwingYomichanRecord> dict, bool nonKanjiDict, bool nonNameDict)
     {
         string primarySpellingInHiragana = nonKanjiDict
             ? JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling).GetPooledString()
             : yomichanRecord.PrimarySpelling.GetPooledString();
 
-        if (dict.Contents.TryGetValue(primarySpellingInHiragana, out IList<IDictRecord>? records))
+        if (dict.Contents.TryGetValue(primarySpellingInHiragana, out IList<EpwingYomichanRecord>? records))
         {
             records.Add(yomichanRecord);
         }

@@ -7,7 +7,8 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using JL.Core.Config;
 using JL.Core.Dicts;
-using JL.Core.Dicts.Interfaces;
+using JL.Core.Dicts.CustomNameDict;
+using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Mining;
 using JL.Core.Mining.Anki;
 using JL.Core.Network;
@@ -27,15 +28,15 @@ internal sealed partial class PreferencesWindow
     public static PreferencesWindow Instance => s_instance ??= new PreferencesWindow();
     public bool SetAnkiConfig { get; private set; } // = false;
     private string _profileName;
-    private readonly Dict _profileNamesDict;
-    private readonly Dict _profileWordsDict;
+    private readonly Dict<CustomNameRecord> _profileNamesDict;
+    private readonly Dict<CustomWordRecord> _profileWordsDict;
 
     private PreferencesWindow()
     {
         InitializeComponent();
         _profileName = ProfileUtils.CurrentProfileName;
-        _profileNamesDict = DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary];
-        _profileWordsDict = DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary];
+        _profileNamesDict = (Dict<CustomNameRecord>)DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary];
+        _profileWordsDict = (Dict<CustomWordRecord>)DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary];
     }
 
     public static bool IsItVisible()
@@ -194,7 +195,7 @@ internal sealed partial class PreferencesWindow
                 await DictUtils.ProfileCustomNamesCancellationTokenSource.CancelAsync().ConfigureAwait(false);
             }
 
-            _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
+            _profileNamesDict.Contents = new Dictionary<string, IList<CustomNameRecord>>(256, StringComparer.Ordinal);
         }
 
         if (_profileWordsDict.Active)
@@ -204,7 +205,7 @@ internal sealed partial class PreferencesWindow
                 await DictUtils.ProfileCustomWordsCancellationTokenSource.CancelAsync().ConfigureAwait(false);
             }
 
-            _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
+            _profileWordsDict.Contents = new Dictionary<string, IList<CustomWordRecord>>(256, StringComparer.Ordinal);
         }
 
         await Task.Run(DictUtils.LoadDictionaries).ConfigureAwait(false);

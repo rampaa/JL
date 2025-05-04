@@ -5,7 +5,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.PitchAccent;
 
-internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRecord>
+public sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRecord>
 {
     public string Spelling { get; }
     public string? Reading { get; }

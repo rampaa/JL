@@ -6,7 +6,6 @@ using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EPWING.Nazeka;
 using JL.Core.Dicts.EPWING.Yomichan;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.JMnedict;
 using JL.Core.Dicts.KANJIDIC;
@@ -25,7 +24,7 @@ public static class DictUtils
     public static bool UpdatingJmdict { get; internal set; } // = false;
     public static bool UpdatingJmnedict { get; internal set; } // = false;
     public static bool UpdatingKanjidic { get; internal set; } // = false;
-    public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
+    public static readonly Dictionary<string, DictBase> Dicts = new(StringComparer.OrdinalIgnoreCase);
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
@@ -42,10 +41,10 @@ public static class DictUtils
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
 
-    public static readonly Dictionary<string, Dict> BuiltInDicts = new(7, StringComparer.OrdinalIgnoreCase)
+    public static readonly Dictionary<string, DictBase> BuiltInDicts = new(7, StringComparer.OrdinalIgnoreCase)
     {
         {
-            nameof(DictType.ProfileCustomWordDictionary), new Dict(DictType.ProfileCustomWordDictionary,
+            nameof(DictType.ProfileCustomWordDictionary), new Dict<CustomWordRecord>(DictType.ProfileCustomWordDictionary,
                 "Custom Word Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Words.txt"),
                 true, -1, 128,
@@ -55,7 +54,7 @@ public static class DictUtils
                     new NewlineBetweenDefinitionsOption(true)))
         },
         {
-            nameof(DictType.ProfileCustomNameDictionary), new Dict(DictType.ProfileCustomNameDictionary,
+            nameof(DictType.ProfileCustomNameDictionary), new Dict<CustomNameRecord>(DictType.ProfileCustomNameDictionary,
                 "Custom Name Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Names.txt"),
                 true, 0, 128,
@@ -64,7 +63,7 @@ public static class DictUtils
                     new NoAllOption(false)))
         },
         {
-            nameof(DictType.CustomWordDictionary), new Dict(DictType.CustomWordDictionary,
+            nameof(DictType.CustomWordDictionary), new Dict<CustomWordRecord>(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_words.txt"),
                 true, 1, 128,
@@ -74,7 +73,7 @@ public static class DictUtils
                     new NewlineBetweenDefinitionsOption(true)))
         },
         {
-            nameof(DictType.CustomNameDictionary), new Dict(DictType.CustomNameDictionary,
+            nameof(DictType.CustomNameDictionary), new Dict<CustomNameRecord>(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_names.txt"),
                 true, 2, 128,
@@ -83,7 +82,7 @@ public static class DictUtils
                     new NoAllOption(false)))
         },
         {
-            nameof(DictType.JMdict), new Dict(DictType.JMdict, nameof(DictType.JMdict),
+            nameof(DictType.JMdict), new Dict<JmdictRecord>(DictType.JMdict, nameof(DictType.JMdict),
                 Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMdict)}.xml"),
                 true, 3, 500000,
                 new DictOptions(
@@ -108,7 +107,7 @@ public static class DictUtils
                 ))
         },
         {
-            nameof(DictType.Kanjidic), new Dict(DictType.Kanjidic, nameof(DictType.Kanjidic),
+            nameof(DictType.Kanjidic), new Dict<KanjidicRecord>(DictType.Kanjidic, nameof(DictType.Kanjidic),
                 Path.Join(Utils.ResourcesPath, "kanjidic2.xml"),
                 true, 4, 13108,
                 new DictOptions(
@@ -117,7 +116,7 @@ public static class DictUtils
                     autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
         },
         {
-            nameof(DictType.JMnedict), new Dict(DictType.JMnedict, nameof(DictType.JMnedict),
+            nameof(DictType.JMnedict), new Dict<JmnedictRecord>(DictType.JMnedict, nameof(DictType.JMnedict),
                 Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMnedict)}.xml"),
                 true, 5, 700000,
                 new DictOptions(
@@ -128,7 +127,7 @@ public static class DictUtils
         }
     };
 
-    public static readonly Dictionary<DictType, Dict> SingleDictTypeDicts = new(8);
+    public static readonly Dictionary<DictType, DictBase> SingleDictTypeDicts = new(8);
 
     public static readonly Dictionary<string, string> JmdictEntities = new(254, StringComparer.Ordinal)
     {
@@ -511,14 +510,14 @@ public static class DictUtils
 
         List<Task> tasks = [];
 
-        Dict[] dicts = Dicts.Values.ToArray();
+        DictBase[] dicts = Dicts.Values.ToArray();
 
         CheckDBUsageForDicts(dicts);
 
         int customDictionaryTaskCount = 0;
         bool anyCustomDictionaryTaskIsActuallyUsed = false;
 
-        foreach (Dict dict in dicts)
+        foreach (DictBase dict in dicts)
         {
             bool useDB = dict.Options.UseDB.Value;
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
@@ -572,69 +571,70 @@ public static class DictUtils
                     }
                     loadFromDB = dbExists && !useDB;
 
-                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+                    Dict<JmdictRecord> jmdict = (Dict<JmdictRecord>)dict;
+                    if (jmdict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
                             try
                             {
                                 // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739, 2023/12/16: 419334, 2024/02/22: 421519
-                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 450000, StringComparer.Ordinal);
+                                jmdict.Contents = new Dictionary<string, IList<JmdictRecord>>(jmdict.Size > 0 ? jmdict.Size : 450000, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
-                                    JmdictDBManager.LoadFromDB(dict);
-                                    dict.Size = dict.Contents.Count;
+                                    JmdictDBManager.LoadFromDB(jmdict);
+                                    jmdict.Size = jmdict.Contents.Count;
                                 }
                                 else
                                 {
-                                    await JmdictLoader.Load(dict).ConfigureAwait(false);
-                                    if (dict.Active)
+                                    await JmdictLoader.Load(jmdict).ConfigureAwait(false);
+                                    if (jmdict.Active)
                                     {
-                                        dict.Size = dict.Contents.Count;
+                                        jmdict.Size = jmdict.Contents.Count;
 
                                         if (!dbExists && (useDB || dbExisted))
                                         {
-                                            JmdictDBManager.CreateDB(dict.Name);
-                                            JmdictDBManager.InsertRecordsToDB(dict);
+                                            JmdictDBManager.CreateDB(jmdict.Name);
+                                            JmdictDBManager.InsertRecordsToDB(jmdict);
 
                                             if (useDB)
                                             {
-                                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                                jmdict.Contents = FrozenDictionary<string, IList<JmdictRecord>>.Empty;
                                             }
                                         }
                                     }
                                 }
 
-                                dict.Ready = true;
+                                jmdict.Ready = true;
                             }
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                string fullDictPath = Path.GetFullPath(jmdict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", jmdict.Type.GetDescription(), jmdict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {jmdict.Name}");
                                 File.Delete(fullDictPath);
                                 await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(false);
                             }
                         }));
                     }
 
-                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                    else if (jmdict.Contents.Count > 0 && (!jmdict.Active || useDB))
                     {
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
                             {
-                                JmdictDBManager.CreateDB(dict.Name);
-                                JmdictDBManager.InsertRecordsToDB(dict);
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                dict.Ready = true;
+                                JmdictDBManager.CreateDB(jmdict.Name);
+                                JmdictDBManager.InsertRecordsToDB(jmdict);
+                                jmdict.Contents = FrozenDictionary<string, IList<JmdictRecord>>.Empty;
+                                jmdict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            dict.Ready = true;
+                            jmdict.Contents = FrozenDictionary<string, IList<JmdictRecord>>.Empty;
+                            jmdict.Ready = true;
                         }
 
                         dictCleared = true;
@@ -642,7 +642,7 @@ public static class DictUtils
 
                     else
                     {
-                        dict.Ready = true;
+                        jmdict.Ready = true;
                     }
 
                     break;
@@ -661,62 +661,63 @@ public static class DictUtils
                     }
                     // loadFromDB = dbExists && !useDB;
 
-                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+                    Dict<JmnedictRecord> jmnedict = (Dict<JmnedictRecord>)dict;
+                    if (jmnedict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
                             try
                             {
                                 // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055, 2023/12/16: 609238, 2024/02/22: 609265
-                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 620000, StringComparer.Ordinal);
+                                jmnedict.Contents = new Dictionary<string, IList<JmnedictRecord>>(jmnedict.Size > 0 ? jmnedict.Size : 620000, StringComparer.Ordinal);
 
                                 // We don't load JMnedict from DB because it is slower and allocates more memory for JMnedict for some reason
-                                await JmnedictLoader.Load(dict).ConfigureAwait(false);
-                                if (dict.Active)
+                                await JmnedictLoader.Load(jmnedict).ConfigureAwait(false);
+                                if (jmnedict.Active)
                                 {
-                                    dict.Size = dict.Contents.Count;
+                                    jmnedict.Size = jmnedict.Contents.Count;
 
                                     if (!dbExists && (useDB || dbExisted))
                                     {
-                                        JmnedictDBManager.CreateDB(dict.Name);
-                                        JmnedictDBManager.InsertRecordsToDB(dict);
+                                        JmnedictDBManager.CreateDB(jmnedict.Name);
+                                        JmnedictDBManager.InsertRecordsToDB(jmnedict);
 
                                         if (useDB)
                                         {
-                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            jmnedict.Contents = FrozenDictionary<string, IList<JmnedictRecord>>.Empty;
                                         }
                                     }
                                 }
 
-                                dict.Ready = true;
+                                jmnedict.Ready = true;
                             }
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                string fullDictPath = Path.GetFullPath(jmnedict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", jmnedict.Type.GetDescription(), jmnedict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {jmnedict.Name}");
                                 File.Delete(fullDictPath);
                                 await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(false);
                             }
                         }));
                     }
 
-                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                    else if (jmnedict.Contents.Count > 0 && (!jmnedict.Active || useDB))
                     {
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
                             {
-                                JmnedictDBManager.CreateDB(dict.Name);
-                                JmnedictDBManager.InsertRecordsToDB(dict);
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                dict.Ready = true;
+                                JmnedictDBManager.CreateDB(jmnedict.Name);
+                                JmnedictDBManager.InsertRecordsToDB(jmnedict);
+                                jmnedict.Contents = FrozenDictionary<string, IList<JmnedictRecord>>.Empty;
+                                jmnedict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            dict.Ready = true;
+                            jmnedict.Contents = FrozenDictionary<string, IList<JmnedictRecord>>.Empty;
+                            jmnedict.Ready = true;
                         }
 
                         dictCleared = true;
@@ -724,7 +725,7 @@ public static class DictUtils
 
                     else
                     {
-                        dict.Ready = true;
+                        jmnedict.Ready = true;
                     }
 
                     break;
@@ -743,75 +744,76 @@ public static class DictUtils
                     }
                     loadFromDB = dbExists && !useDB;
 
-                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+                    Dict<KanjidicRecord> kanjidic = (Dict<KanjidicRecord>)dict;
+                    if (kanjidic is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
                             try
                             {
                                 // 2022/05/11: 13108, 2023/12/16: 13108, 2024/02/02 13108
-                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 13108, StringComparer.Ordinal);
+                                kanjidic.Contents = new Dictionary<string, IList<KanjidicRecord>>(kanjidic.Size > 0 ? kanjidic.Size : 13108, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
-                                    KanjidicDBManager.LoadFromDB(dict);
-                                    dict.Size = dict.Contents.Count;
+                                    KanjidicDBManager.LoadFromDB(kanjidic);
+                                    kanjidic.Size = kanjidic.Contents.Count;
                                 }
                                 else
                                 {
-                                    await KanjidicLoader.Load(dict).ConfigureAwait(false);
-                                    if (dict.Active)
+                                    await KanjidicLoader.Load(kanjidic).ConfigureAwait(false);
+                                    if (kanjidic.Active)
                                     {
-                                        dict.Size = dict.Contents.Count;
+                                        kanjidic.Size = kanjidic.Contents.Count;
 
                                         if (!dbExists && (useDB || dbExisted))
                                         {
-                                            KanjidicDBManager.CreateDB(dict.Name);
-                                            KanjidicDBManager.InsertRecordsToDB(dict);
+                                            KanjidicDBManager.CreateDB(kanjidic.Name);
+                                            KanjidicDBManager.InsertRecordsToDB(kanjidic);
 
                                             if (useDB)
                                             {
-                                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                                kanjidic.Contents = FrozenDictionary<string, IList<KanjidicRecord>>.Empty;
                                             }
                                         }
                                     }
                                 }
 
-                                dict.Ready = true;
+                                kanjidic.Ready = true;
                             }
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                string fullDictPath = Path.GetFullPath(kanjidic.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", kanjidic.Type.GetDescription(), kanjidic.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {kanjidic.Name}");
                                 File.Delete(fullDictPath);
                                 await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(false);
                             }
                         }));
                     }
 
-                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                    else if (kanjidic.Contents.Count > 0 && (!kanjidic.Active || useDB))
                     {
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
                             {
-                                KanjidicDBManager.CreateDB(dict.Name);
-                                KanjidicDBManager.InsertRecordsToDB(dict);
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                dict.Ready = true;
+                                KanjidicDBManager.CreateDB(kanjidic.Name);
+                                KanjidicDBManager.InsertRecordsToDB(kanjidic);
+                                kanjidic.Contents = FrozenDictionary<string, IList<KanjidicRecord>>.Empty;
+                                kanjidic.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            dict.Ready = true;
+                            kanjidic.Contents = FrozenDictionary<string, IList<KanjidicRecord>>.Empty;
+                            kanjidic.Ready = true;
                         }
                     }
 
                     else
                     {
-                        dict.Ready = true;
+                        kanjidic.Ready = true;
                     }
 
                     break;
@@ -820,6 +822,7 @@ public static class DictUtils
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
+                {
                     if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(EpwingYomichanDBManager.Version, dbPath))
                     {
                         DBUtils.DeleteDB(dbPath);
@@ -828,49 +831,50 @@ public static class DictUtils
                     }
                     loadFromDB = dbExists && !useDB;
 
-                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+                    Dict<EpwingYomichanRecord> yomichanDict = (Dict<EpwingYomichanRecord>)dict;
+                    if (yomichanDict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
                             try
                             {
-                                int dictSize = dict.Size > 0
-                                    ? dict.Size
+                                int dictSize = yomichanDict.Size > 0
+                                    ? yomichanDict.Size
                                     : 250000;
 
-                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dictSize, StringComparer.Ordinal);
+                                yomichanDict.Contents = new Dictionary<string, IList<EpwingYomichanRecord>>(dictSize, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
-                                    EpwingYomichanDBManager.LoadFromDB(dict);
-                                    dict.Size = dict.Contents.Count;
+                                    EpwingYomichanDBManager.LoadFromDB(yomichanDict);
+                                    yomichanDict.Size = yomichanDict.Contents.Count;
                                 }
                                 else
                                 {
-                                    await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
-                                    dict.Size = dict.Contents.Count;
+                                    await EpwingYomichanLoader.Load(yomichanDict).ConfigureAwait(false);
+                                    yomichanDict.Size = yomichanDict.Contents.Count;
 
                                     if (!dbExists && (useDB || dbExisted))
                                     {
-                                        EpwingYomichanDBManager.CreateDB(dict.Name);
-                                        EpwingYomichanDBManager.InsertRecordsToDB(dict);
+                                        EpwingYomichanDBManager.CreateDB(yomichanDict.Name);
+                                        EpwingYomichanDBManager.InsertRecordsToDB(yomichanDict);
 
                                         if (useDB)
                                         {
-                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            yomichanDict.Contents = FrozenDictionary<string, IList<EpwingYomichanRecord>>.Empty;
                                         }
                                     }
                                 }
 
-                                dict.Ready = true;
+                                yomichanDict.Ready = true;
                             }
 
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                _ = Dicts.Remove(dict.Name);
+                                string fullDictPath = Path.GetFullPath(yomichanDict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", yomichanDict.Type.GetDescription(), yomichanDict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {yomichanDict.Name}");
+                                _ = Dicts.Remove(yomichanDict.Name);
                                 dictRemoved = true;
 
                                 if (File.Exists(dbPath))
@@ -881,22 +885,22 @@ public static class DictUtils
                         }));
                     }
 
-                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                    else if (yomichanDict.Contents.Count > 0 && (!yomichanDict.Active || useDB))
                     {
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
                             {
-                                EpwingYomichanDBManager.CreateDB(dict.Name);
-                                EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                dict.Ready = true;
+                                EpwingYomichanDBManager.CreateDB(yomichanDict.Name);
+                                EpwingYomichanDBManager.InsertRecordsToDB(yomichanDict);
+                                yomichanDict.Contents = FrozenDictionary<string, IList<EpwingYomichanRecord>>.Empty;
+                                yomichanDict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            dict.Ready = true;
+                            yomichanDict.Contents = FrozenDictionary<string, IList<EpwingYomichanRecord>>.Empty;
+                            yomichanDict.Ready = true;
                         }
 
                         dictCleared = true;
@@ -904,12 +908,14 @@ public static class DictUtils
 
                     else
                     {
-                        dict.Ready = true;
+                        yomichanDict.Ready = true;
                     }
 
                     break;
+                }
 
                 case DictType.NonspecificKanjiYomichan:
+                {
                     if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(YomichanKanjiDBManager.Version, dbPath))
                     {
                         DBUtils.DeleteDB(dbPath);
@@ -918,45 +924,45 @@ public static class DictUtils
                     }
                     loadFromDB = dbExists && !useDB;
 
-                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+                    Dict<YomichanKanjiRecord> yomichanKanjiDict = (Dict<YomichanKanjiRecord>)dict;
+                    if (yomichanKanjiDict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
-                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 250000, StringComparer.Ordinal);
-
+                            yomichanKanjiDict.Contents = new Dictionary<string, IList<YomichanKanjiRecord>>(yomichanKanjiDict.Size > 0 ? yomichanKanjiDict.Size : 250000, StringComparer.Ordinal);
                             try
                             {
                                 if (loadFromDB)
                                 {
-                                    YomichanKanjiDBManager.LoadFromDB(dict);
-                                    dict.Size = dict.Contents.Count;
+                                    YomichanKanjiDBManager.LoadFromDB(yomichanKanjiDict);
+                                    yomichanKanjiDict.Size = yomichanKanjiDict.Contents.Count;
                                 }
                                 else
                                 {
-                                    await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
-                                    dict.Size = dict.Contents.Count;
+                                    await YomichanKanjiLoader.Load(yomichanKanjiDict).ConfigureAwait(false);
+                                    yomichanKanjiDict.Size = yomichanKanjiDict.Contents.Count;
 
                                     if (!dbExists && (useDB || dbExisted))
                                     {
-                                        YomichanKanjiDBManager.CreateDB(dict.Name);
-                                        YomichanKanjiDBManager.InsertRecordsToDB(dict);
+                                        YomichanKanjiDBManager.CreateDB(yomichanKanjiDict.Name);
+                                        YomichanKanjiDBManager.InsertRecordsToDB(yomichanKanjiDict);
 
                                         if (useDB)
                                         {
-                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            yomichanKanjiDict.Contents = FrozenDictionary<string, IList<YomichanKanjiRecord>>.Empty;
                                         }
                                     }
                                 }
 
-                                dict.Ready = true;
+                                yomichanKanjiDict.Ready = true;
                             }
 
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                _ = Dicts.Remove(dict.Name);
+                                string fullDictPath = Path.GetFullPath(yomichanKanjiDict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", yomichanKanjiDict.Type.GetDescription(), yomichanKanjiDict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {yomichanKanjiDict.Name}");
+                                _ = Dicts.Remove(yomichanKanjiDict.Name);
                                 dictRemoved = true;
 
                                 if (File.Exists(dbPath))
@@ -967,22 +973,22 @@ public static class DictUtils
                         }));
                     }
 
-                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                    else if (yomichanKanjiDict.Contents.Count > 0 && (!yomichanKanjiDict.Active || useDB))
                     {
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
                             {
-                                YomichanKanjiDBManager.CreateDB(dict.Name);
-                                YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                dict.Ready = true;
+                                YomichanKanjiDBManager.CreateDB(yomichanKanjiDict.Name);
+                                YomichanKanjiDBManager.InsertRecordsToDB(yomichanKanjiDict);
+                                yomichanKanjiDict.Contents = FrozenDictionary<string, IList<YomichanKanjiRecord>>.Empty;
+                                yomichanKanjiDict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            dict.Ready = true;
+                            yomichanKanjiDict.Contents = FrozenDictionary<string, IList<YomichanKanjiRecord>>.Empty;
+                            yomichanKanjiDict.Ready = true;
                         }
 
                         dictCleared = true;
@@ -990,97 +996,105 @@ public static class DictUtils
 
                     else
                     {
-                        dict.Ready = true;
+                        yomichanKanjiDict.Ready = true;
                     }
 
                     break;
+                }
 
                 case DictType.CustomWordDictionary:
                 case DictType.ProfileCustomWordDictionary:
-                    if (dict is { Active: true, Contents.Count: 0 })
+                {
+                    Dict<CustomWordRecord> customWordDict = (Dict<CustomWordRecord>)dict;
+                    if (customWordDict is { Active: true, Contents.Count: 0 })
                     {
                         tasks.Add(Task.Run(() =>
                         {
                             ++customDictionaryTaskCount;
 
-                            int size = dict.Size > 0
-                                ? dict.Size
-                                : dict.Type is DictType.CustomWordDictionary
+                            int size = customWordDict.Size > 0
+                                ? customWordDict.Size
+                                : customWordDict.Type is DictType.CustomWordDictionary
                                     ? 1024
                                     : 256;
 
-                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                            customWordDict.Contents = new Dictionary<string, IList<CustomWordRecord>>(size, StringComparer.Ordinal);
 
-                            CustomWordLoader.Load(dict,
-                                dict.Type is DictType.CustomWordDictionary
+                            CustomWordLoader.Load(customWordDict,
+                                customWordDict.Type is DictType.CustomWordDictionary
                                     ? CancellationToken.None
                                     : ProfileCustomWordsCancellationTokenSource.Token);
 
-                            dict.Size = dict.Contents.Count;
-                            anyCustomDictionaryTaskIsActuallyUsed = dict.Size > 0 || anyCustomDictionaryTaskIsActuallyUsed;
-                            dict.Ready = true;
+                            customWordDict.Size = customWordDict.Contents.Count;
+                            anyCustomDictionaryTaskIsActuallyUsed = customWordDict.Size > 0 || anyCustomDictionaryTaskIsActuallyUsed;
+                            customWordDict.Ready = true;
                         }));
                     }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 })
+                    else if (customWordDict is { Active: false, Contents.Count: > 0 })
                     {
-                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                        customWordDict.Contents = FrozenDictionary<string, IList<CustomWordRecord>>.Empty;
                         dictCleared = true;
-                        dict.Ready = true;
+                        customWordDict.Ready = true;
                     }
 
                     else
                     {
-                        dict.Ready = true;
+                        customWordDict.Ready = true;
                     }
 
                     break;
+                }
 
                 case DictType.CustomNameDictionary:
                 case DictType.ProfileCustomNameDictionary:
-                    if (dict is { Active: true, Contents.Count: 0 })
+                {
+                    Dict<CustomNameRecord> customNameDict = (Dict<CustomNameRecord>)dict;
+                    if (customNameDict is { Active: true, Contents.Count: 0 })
                     {
                         tasks.Add(Task.Run(() =>
                         {
                             ++customDictionaryTaskCount;
 
-                            int size = dict.Size is not 0
-                                ? dict.Size
-                                : dict.Type is DictType.CustomNameDictionary
+                            int size = customNameDict.Size is not 0
+                                ? customNameDict.Size
+                                : customNameDict.Type is DictType.CustomNameDictionary
                                     ? 1024
                                     : 256;
 
-                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                            customNameDict.Contents = new Dictionary<string, IList<CustomNameRecord>>(size, StringComparer.Ordinal);
 
-                            CustomNameLoader.Load(dict,
-                                dict.Type is DictType.CustomNameDictionary
+                            CustomNameLoader.Load(customNameDict,
+                                customNameDict.Type is DictType.CustomNameDictionary
                                     ? CancellationToken.None
                                     : ProfileCustomNamesCancellationTokenSource.Token);
 
-                            dict.Size = dict.Contents.Count;
-                            anyCustomDictionaryTaskIsActuallyUsed = dict.Size > 0 || anyCustomDictionaryTaskIsActuallyUsed;
-                            dict.Ready = true;
+                            customNameDict.Size = customNameDict.Contents.Count;
+                            anyCustomDictionaryTaskIsActuallyUsed = customNameDict.Size > 0 || anyCustomDictionaryTaskIsActuallyUsed;
+                            customNameDict.Ready = true;
                         }));
                     }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 })
+                    else if (customNameDict is { Active: false, Contents.Count: > 0 })
                     {
-                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                        customNameDict.Contents = FrozenDictionary<string, IList<CustomNameRecord>>.Empty;
                         dictCleared = true;
-                        dict.Ready = true;
+                        customNameDict.Ready = true;
                     }
 
                     else
                     {
-                        dict.Ready = true;
+                        customNameDict.Ready = true;
                     }
 
                     break;
+                }
 
                 case DictType.NonspecificWordNazeka:
                 case DictType.NonspecificKanjiNazeka:
                 case DictType.NonspecificNameNazeka:
                 case DictType.NonspecificNazeka:
+                {
                     if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(EpwingNazekaDBManager.Version, dbPath))
                     {
                         DBUtils.DeleteDB(dbPath);
@@ -1089,49 +1103,50 @@ public static class DictUtils
                     }
                     loadFromDB = dbExists && !useDB;
 
-                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+                    Dict<EpwingNazekaRecord> nazekaDict = (Dict<EpwingNazekaRecord>)dict;
+                    if (nazekaDict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
                             try
                             {
-                                int size = dict.Size > 0
-                                    ? dict.Size
+                                int size = nazekaDict.Size > 0
+                                    ? nazekaDict.Size
                                     : 250000;
 
-                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                                nazekaDict.Contents = new Dictionary<string, IList<EpwingNazekaRecord>>(size, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
-                                    EpwingNazekaDBManager.LoadFromDB(dict);
-                                    dict.Size = dict.Contents.Count;
+                                    EpwingNazekaDBManager.LoadFromDB(nazekaDict);
+                                    nazekaDict.Size = nazekaDict.Contents.Count;
                                 }
                                 else
                                 {
-                                    await EpwingNazekaLoader.Load(dict).ConfigureAwait(false);
-                                    dict.Size = dict.Contents.Count;
+                                    await EpwingNazekaLoader.Load(nazekaDict).ConfigureAwait(false);
+                                    nazekaDict.Size = nazekaDict.Contents.Count;
 
                                     if (!dbExists && (useDB || dbExisted))
                                     {
-                                        EpwingNazekaDBManager.CreateDB(dict.Name);
-                                        EpwingNazekaDBManager.InsertRecordsToDB(dict);
+                                        EpwingNazekaDBManager.CreateDB(nazekaDict.Name);
+                                        EpwingNazekaDBManager.InsertRecordsToDB(nazekaDict);
 
                                         if (useDB)
                                         {
-                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            nazekaDict.Contents = FrozenDictionary<string, IList<EpwingNazekaRecord>>.Empty;
                                         }
                                     }
                                 }
 
-                                dict.Ready = true;
+                                nazekaDict.Ready = true;
                             }
 
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                _ = Dicts.Remove(dict.Name);
+                                string fullDictPath = Path.GetFullPath(nazekaDict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", nazekaDict.Type.GetDescription(), nazekaDict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {nazekaDict.Name}");
+                                _ = Dicts.Remove(nazekaDict.Name);
                                 dictRemoved = true;
 
                                 if (File.Exists(dbPath))
@@ -1142,22 +1157,22 @@ public static class DictUtils
                         }));
                     }
 
-                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                    else if (nazekaDict.Contents.Count > 0 && (!nazekaDict.Active || useDB))
                     {
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
                             {
-                                EpwingNazekaDBManager.CreateDB(dict.Name);
-                                EpwingNazekaDBManager.InsertRecordsToDB(dict);
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                dict.Ready = true;
+                                EpwingNazekaDBManager.CreateDB(nazekaDict.Name);
+                                EpwingNazekaDBManager.InsertRecordsToDB(nazekaDict);
+                                nazekaDict.Contents = FrozenDictionary<string, IList<EpwingNazekaRecord>>.Empty;
+                                nazekaDict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            dict.Ready = true;
+                            nazekaDict.Contents = FrozenDictionary<string, IList<EpwingNazekaRecord>>.Empty;
+                            nazekaDict.Ready = true;
                         }
 
                         dictCleared = true;
@@ -1165,12 +1180,14 @@ public static class DictUtils
 
                     else
                     {
-                        dict.Ready = true;
+                        nazekaDict.Ready = true;
                     }
 
                     break;
+                }
 
                 case DictType.PitchAccentYomichan:
+                {
                     if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(YomichanPitchAccentDBManager.Version, dbPath))
                     {
                         DBUtils.DeleteDB(dbPath);
@@ -1179,45 +1196,46 @@ public static class DictUtils
                     }
                     loadFromDB = dbExists && !useDB;
 
-                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+                    Dict<PitchAccentRecord> pitchAccentDict = (Dict<PitchAccentRecord>)dict;
+                    if (pitchAccentDict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
                             try
                             {
-                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 434991, StringComparer.Ordinal);
+                                pitchAccentDict.Contents = new Dictionary<string, IList<PitchAccentRecord>>(pitchAccentDict.Size > 0 ? pitchAccentDict.Size : 434991, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
-                                    YomichanPitchAccentDBManager.LoadFromDB(dict);
-                                    dict.Size = dict.Contents.Count;
+                                    YomichanPitchAccentDBManager.LoadFromDB(pitchAccentDict);
+                                    pitchAccentDict.Size = pitchAccentDict.Contents.Count;
                                 }
                                 else
                                 {
-                                    await YomichanPitchAccentLoader.Load(dict).ConfigureAwait(false);
-                                    dict.Size = dict.Contents.Count;
+                                    await YomichanPitchAccentLoader.Load(pitchAccentDict).ConfigureAwait(false);
+                                    pitchAccentDict.Size = pitchAccentDict.Contents.Count;
 
                                     if (!dbExists && (useDB || dbExisted))
                                     {
-                                        YomichanPitchAccentDBManager.CreateDB(dict.Name);
-                                        YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
+                                        YomichanPitchAccentDBManager.CreateDB(pitchAccentDict.Name);
+                                        YomichanPitchAccentDBManager.InsertRecordsToDB(pitchAccentDict);
 
                                         if (useDB)
                                         {
-                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            pitchAccentDict.Contents = FrozenDictionary<string, IList<PitchAccentRecord>>.Empty;
                                         }
                                     }
                                 }
 
-                                dict.Ready = true;
+                                pitchAccentDict.Ready = true;
                             }
 
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                _ = Dicts.Remove(dict.Name);
+                                string fullDictPath = Path.GetFullPath(pitchAccentDict.Path, Utils.ApplicationPath);
+                                Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", pitchAccentDict.Type.GetDescription(), pitchAccentDict.Name, fullDictPath);
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {pitchAccentDict.Name}");
+                                _ = Dicts.Remove(pitchAccentDict.Name);
                                 _ = SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
                                 dictRemoved = true;
 
@@ -1229,22 +1247,22 @@ public static class DictUtils
                         }));
                     }
 
-                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                    else if (pitchAccentDict.Contents.Count > 0 && (!pitchAccentDict.Active || useDB))
                     {
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
                             {
-                                YomichanPitchAccentDBManager.CreateDB(dict.Name);
-                                YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                dict.Ready = true;
+                                YomichanPitchAccentDBManager.CreateDB(pitchAccentDict.Name);
+                                YomichanPitchAccentDBManager.InsertRecordsToDB(pitchAccentDict);
+                                pitchAccentDict.Contents = FrozenDictionary<string, IList<PitchAccentRecord>>.Empty;
+                                pitchAccentDict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            dict.Ready = true;
+                            pitchAccentDict.Contents = FrozenDictionary<string, IList<PitchAccentRecord>>.Empty;
+                            pitchAccentDict.Ready = true;
                         }
 
                         dictCleared = true;
@@ -1252,10 +1270,11 @@ public static class DictUtils
 
                     else
                     {
-                        dict.Ready = true;
+                        pitchAccentDict.Ready = true;
                     }
 
                     break;
+                }
 
                 default:
                 {
@@ -1300,10 +1319,10 @@ public static class DictUtils
 
                 if (dictRemoved)
                 {
-                    IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
+                    IOrderedEnumerable<DictBase> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
                     int priority = 1;
 
-                    foreach (Dict dict in orderedDicts)
+                    foreach (DictBase dict in orderedDicts)
                     {
                         dict.Priority = priority;
                         ++priority;
@@ -1343,12 +1362,12 @@ public static class DictUtils
         FileStream dictStream = File.OpenRead(Path.Join(Utils.ConfigPath, "dicts.json"));
         await using (dictStream.ConfigureAwait(false))
         {
-            Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+            Dictionary<string, DictBase>? deserializedDicts = await JsonSerializer
+                .DeserializeAsync<Dictionary<string, DictBase>>(dictStream, Utils.s_jsoWithDictEnumConverter).ConfigureAwait(false);
 
             if (deserializedDicts is not null)
             {
-                foreach (Dict dict in BuiltInDicts.Values)
+                foreach (DictBase dict in BuiltInDicts.Values)
                 {
                     if (deserializedDicts.Values.All(d => d.Type != dict.Type))
                     {
@@ -1356,10 +1375,10 @@ public static class DictUtils
                     }
                 }
 
-                IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static dict => dict.Priority);
+                IOrderedEnumerable<DictBase> orderedDicts = deserializedDicts.Values.OrderBy(static dict => dict.Priority);
 
                 int priority = 1;
-                foreach (Dict dict in orderedDicts)
+                foreach (DictBase dict in orderedDicts)
                 {
                     dict.Priority = priority;
                     ++priority;
@@ -1398,7 +1417,7 @@ public static class DictUtils
         }
     }
 
-    private static void InitDictOptions(Dict dict)
+    private static void InitDictOptions(DictBase dict)
     {
         if (dict.Type is DictType.JMdict)
         {
@@ -1455,7 +1474,7 @@ public static class DictUtils
         }
     }
 
-    private static void CheckDBUsageForDicts(Dict[] dicts)
+    private static void CheckDBUsageForDicts(DictBase[] dicts)
     {
         DBIsUsedForAtLeastOneDict = dicts.Any(static dict => dict is { Active: true, Options.UseDB.Value: true });
         DBIsUsedForAtLeastOneWordDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict is { Type: DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificWordNazeka, Active: true, Options.UseDB.Value: true });

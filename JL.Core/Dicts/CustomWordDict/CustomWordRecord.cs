@@ -8,7 +8,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.CustomWordDict;
 
-internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFrequency, IEquatable<CustomWordRecord>
+public sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFrequency, IEquatable<CustomWordRecord>
 {
     public string PrimarySpelling { get; }
     public string[]? AlternativeSpellings { get; }

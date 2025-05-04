@@ -2,7 +2,6 @@ using System.Collections.Frozen;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -46,22 +45,22 @@ internal static class YomichanPitchAccentDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static void InsertRecordsToDB(Dict<PitchAccentRecord> dict)
     {
         int totalRecordCount = 0;
-        ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        ICollection<IList<PitchAccentRecord>> dictRecordValues = dict.Contents.Values;
+        foreach (IList<PitchAccentRecord> dictRecords in dictRecordValues)
         {
             totalRecordCount += dictRecords.Count;
         }
 
         HashSet<PitchAccentRecord> yomichanPitchAccentRecord = new(totalRecordCount);
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        foreach (IList<PitchAccentRecord> dictRecords in dictRecordValues)
         {
             int dictRecordsCount = dictRecords.Count;
             for (int i = 0; i < dictRecordsCount; i++)
             {
-                _ = yomichanPitchAccentRecord.Add((PitchAccentRecord)dictRecords[i]);
+                _ = yomichanPitchAccentRecord.Add(dictRecords[i]);
             }
         }
 
@@ -131,7 +130,7 @@ internal static class YomichanPitchAccentDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
+    public static Dictionary<string, IList<PitchAccentRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -172,12 +171,12 @@ internal static class YomichanPitchAccentDBManager
             return null;
         }
 
-        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+        Dictionary<string, IList<PitchAccentRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
             PitchAccentRecord record = GetRecord(dataReader);
             string searchKey = dataReader.GetString(SearchKeyIndex);
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<PitchAccentRecord>? result))
             {
                 result.Add(record);
             }
@@ -190,7 +189,7 @@ internal static class YomichanPitchAccentDBManager
         return results;
     }
 
-    public static void LoadFromDB(Dict dict)
+    public static void LoadFromDB(Dict<PitchAccentRecord> dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteCommand command = connection.CreateCommand();
@@ -213,7 +212,7 @@ internal static class YomichanPitchAccentDBManager
             ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
-                if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                if (dict.Contents.TryGetValue(searchKey, out IList<PitchAccentRecord>? result))
                 {
                     result.Add(record);
                 }
@@ -224,7 +223,7 @@ internal static class YomichanPitchAccentDBManager
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        foreach ((string key, IList<PitchAccentRecord> recordList) in dict.Contents)
         {
             dict.Contents[key] = recordList.ToArray();
         }

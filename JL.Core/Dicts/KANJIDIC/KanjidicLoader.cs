@@ -1,13 +1,12 @@
 using System.Collections.Frozen;
 using System.Xml;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.KANJIDIC;
 
 internal static class KanjidicLoader
 {
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict<KanjidicRecord> dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (File.Exists(fullPath))
@@ -60,7 +59,7 @@ internal static class KanjidicLoader
         }
     }
 
-    private static async Task ReadCharacter(XmlReader xmlReader, IDictionary<string, IList<IDictRecord>> kanjidicDictionary)
+    private static async Task ReadCharacter(XmlReader xmlReader, IDictionary<string, IList<KanjidicRecord>> kanjidicDictionary)
     {
         string key = (await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString();
 

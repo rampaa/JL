@@ -77,11 +77,11 @@ internal sealed partial class ManageDictionariesWindow
 
     private void UpdateDictionariesDisplay()
     {
-        Dict[] sortedDicts = DictUtils.Dicts.Values.OrderBy(static d => d.Priority).ToArray();
+        DictBase[] sortedDicts = DictUtils.Dicts.Values.OrderBy(static d => d.Priority).ToArray();
         DockPanel[] resultDockPanels = new DockPanel[sortedDicts.Length];
         for (int i = 0; i < sortedDicts.Length; i++)
         {
-            Dict dict = sortedDicts[i];
+            DictBase dict = sortedDicts[i];
 
             DockPanel dockPanel = new();
 
@@ -290,19 +290,19 @@ internal sealed partial class ManageDictionariesWindow
     }
     private static void CheckBox_Checked(object sender, RoutedEventArgs e)
     {
-        Dict dict = (Dict)((CheckBox)sender).Tag;
+        DictBase dict = (DictBase)((CheckBox)sender).Tag;
         dict.Active = true;
     }
 
     private static void CheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
-        Dict dict = (Dict)((CheckBox)sender).Tag;
+        DictBase dict = (DictBase)((CheckBox)sender).Tag;
         dict.Active = false;
     }
 
     private void IncreasePriorityButton_Click(object sender, RoutedEventArgs e)
     {
-        Dict dict = (Dict)((Button)sender).Tag;
+        DictBase dict = (DictBase)((Button)sender).Tag;
         if (Keyboard.Modifiers is ModifierKeys.Control)
         {
             PrioritizeDictToMax(dict);
@@ -317,7 +317,7 @@ internal sealed partial class ManageDictionariesWindow
 
     private void DecreasePriorityButton_Click(object sender, RoutedEventArgs e)
     {
-        Dict dict = (Dict)((Button)sender).Tag;
+        DictBase dict = (DictBase)((Button)sender).Tag;
         if (Keyboard.Modifiers is ModifierKeys.Control)
         {
             DeprioritizeToMin(dict);
@@ -337,7 +337,7 @@ internal sealed partial class ManageDictionariesWindow
             return;
         }
 
-        Dict dict = (Dict)((Button)sender).Tag;
+        Dict<IDictRecord> dict = (Dict<IDictRecord>)(DictBase)((Button)sender).Tag;
         dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
         _ = DictUtils.Dicts.Remove(dict.Name);
 
@@ -354,7 +354,7 @@ internal sealed partial class ManageDictionariesWindow
 
         int priorityOfDeletedDict = dict.Priority;
 
-        foreach (Dict d in DictUtils.Dicts.Values)
+        foreach (DictBase d in DictUtils.Dicts.Values)
         {
             if (d.Priority > priorityOfDeletedDict)
             {
@@ -367,7 +367,7 @@ internal sealed partial class ManageDictionariesWindow
 
     private void EditButton_Click(object sender, RoutedEventArgs e)
     {
-        Dict dict = (Dict)((Button)sender).Tag;
+        DictBase dict = (DictBase)((Button)sender).Tag;
         _ = new EditDictionaryWindow(dict)
         {
             Owner = this,
@@ -388,7 +388,7 @@ internal sealed partial class ManageDictionariesWindow
 
         editButton.IsEnabled = false;
 
-        Dict dict = (Dict)updateButton.Tag;
+        DictBase dict = (DictBase)updateButton.Tag;
         if (dict.Type is DictType.JMdict)
         {
             await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
@@ -405,7 +405,7 @@ internal sealed partial class ManageDictionariesWindow
         UpdateDictionariesDisplay();
     }
 
-    private static void PrioritizeDict(Dict dict)
+    private static void PrioritizeDict(DictBase dict)
     {
         if (dict.Priority is 1)
         {
@@ -416,14 +416,14 @@ internal sealed partial class ManageDictionariesWindow
         dict.Priority -= 1;
     }
 
-    private static void PrioritizeDictToMax(Dict dict)
+    private static void PrioritizeDictToMax(DictBase dict)
     {
         if (dict.Priority is 1)
         {
             return;
         }
 
-        foreach (Dict otherDict in DictUtils.Dicts.Values)
+        foreach (DictBase otherDict in DictUtils.Dicts.Values)
         {
             if (otherDict.Priority < dict.Priority)
             {
@@ -434,7 +434,7 @@ internal sealed partial class ManageDictionariesWindow
         dict.Priority = 1;
     }
 
-    private static void DeprioritizeDict(Dict dict)
+    private static void DeprioritizeDict(DictBase dict)
     {
         if (dict.Priority == DictUtils.Dicts.Count)
         {
@@ -445,14 +445,14 @@ internal sealed partial class ManageDictionariesWindow
         dict.Priority += 1;
     }
 
-    private static void DeprioritizeToMin(Dict dict)
+    private static void DeprioritizeToMin(DictBase dict)
     {
         if (dict.Priority == DictUtils.Dicts.Count)
         {
             return;
         }
 
-        foreach (Dict otherDict in DictUtils.Dicts.Values)
+        foreach (DictBase otherDict in DictUtils.Dicts.Values)
         {
             if (otherDict.Priority > dict.Priority)
             {

@@ -1,11 +1,10 @@
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.CustomNameDict;
 
 public static class CustomNameLoader
 {
-    internal static void Load(Dict dict, CancellationToken cancellationToken)
+    internal static void Load(Dict<CustomNameRecord> dict, CancellationToken cancellationToken)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (!File.Exists(fullPath))
@@ -13,7 +12,7 @@ public static class CustomNameLoader
             return;
         }
 
-        IDictionary<string, IList<IDictRecord>> customNameDictionary = dict.Contents;
+        IDictionary<string, IList<CustomNameRecord>> customNameDictionary = dict.Contents;
 
         foreach (string line in File.ReadLines(fullPath))
         {
@@ -51,12 +50,12 @@ public static class CustomNameLoader
         }
     }
 
-    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, IDictionary<string, IList<IDictRecord>> customNameDictionary)
+    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, IDictionary<string, IList<CustomNameRecord>> customNameDictionary)
     {
         CustomNameRecord newNameRecord = new(spelling, reading, nameType, extraInfo);
 
         string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
-        if (customNameDictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? entry))
+        if (customNameDictionary.TryGetValue(spellingInHiragana, out IList<CustomNameRecord>? entry))
         {
             //int entryIndex = entry.IndexOf(newNameRecord);
             //if (entryIndex >= 0)

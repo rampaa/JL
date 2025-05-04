@@ -607,13 +607,13 @@ internal sealed partial class MainWindow
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
             bool customNameDictReady = false;
-            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict))
+            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out DictBase? customNameDict))
             {
                 customNameDictReady = customNameDict.Ready;
             }
 
             bool profileCustomNameDictReady = false;
-            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict))
+            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out DictBase? profileCustomNameDict))
             {
                 profileCustomNameDictReady = profileCustomNameDict.Ready;
             }
@@ -627,13 +627,13 @@ internal sealed partial class MainWindow
         else if (keyGesture.IsEqual(configManager.ShowAddWordWindowKeyGesture))
         {
             bool customWordDictReady = false;
-            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict))
+            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out DictBase? customWordDict))
             {
                 customWordDictReady = customWordDict.Ready;
             }
 
             bool profileCustomWordDictReady = false;
-            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict))
+            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out DictBase? profileCustomWordDict))
             {
                 profileCustomWordDictReady = profileCustomWordDict.Ready;
             }
@@ -1496,13 +1496,13 @@ internal sealed partial class MainWindow
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady;
 
         bool customNameDictReady = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict))
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out DictBase? customNameDict))
         {
             customNameDictReady = customNameDict.Ready;
         }
 
         bool profileCustomNameDictReady = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict))
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out DictBase? profileCustomNameDict))
         {
             profileCustomNameDictReady = profileCustomNameDict.Ready;
         }
@@ -1510,13 +1510,13 @@ internal sealed partial class MainWindow
         AddNameMenuItem.IsEnabled = customNameDictReady && profileCustomNameDictReady;
 
         bool customWordDictReady = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict))
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out DictBase? customWordDict))
         {
             customWordDictReady = customWordDict.Ready;
         }
 
         bool profileCustomWordDictReady = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict))
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out DictBase? profileCustomWordDict))
         {
             profileCustomWordDictReady = profileCustomWordDict.Ready;
         }

@@ -1,13 +1,12 @@
 using System.Collections.Frozen;
 using System.Xml;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictLoader
 {
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict<JmnedictRecord> dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (File.Exists(fullPath))
@@ -31,7 +30,7 @@ internal static class JmnedictLoader
                 }
             }
 
-            foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+            foreach ((string key, IList<JmnedictRecord> recordList) in dict.Contents)
             {
                 dict.Contents[key] = recordList.ToArray();
             }

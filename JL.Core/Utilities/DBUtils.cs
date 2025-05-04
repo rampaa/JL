@@ -86,7 +86,7 @@ public static class DBUtils
 
     private static void SendOptimizePragmaToAllDicts()
     {
-        foreach (Dict dict in DictUtils.Dicts.Values)
+        foreach (DictBase dict in DictUtils.Dicts.Values)
         {
             if (dict is { Active: true, Ready: true, Options.UseDB.Value: true })
             {

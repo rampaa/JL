@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.CustomWordDict;
@@ -47,7 +46,7 @@ public static class CustomWordLoader
         "other"
     ];
 
-    internal static void Load(Dict dict, CancellationToken cancellationToken)
+    internal static void Load(Dict<CustomWordRecord> dict, CancellationToken cancellationToken)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (!File.Exists(fullPath))
@@ -55,7 +54,7 @@ public static class CustomWordLoader
             return;
         }
 
-        IDictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
+        IDictionary<string, IList<CustomWordRecord>> customWordDictionary = dict.Contents;
 
         foreach (string line in File.ReadLines(fullPath))
         {
@@ -92,7 +91,7 @@ public static class CustomWordLoader
     }
 
     public static void AddToDictionary(string[] spellings, string[]? readings, string[] definitions,
-        ReadOnlySpan<char> rawPartOfSpeech, string[]? wordClasses, IDictionary<string, IList<IDictRecord>> customWordDictionary)
+        ReadOnlySpan<char> rawPartOfSpeech, string[]? wordClasses, IDictionary<string, IList<CustomWordRecord>> customWordDictionary)
     {
         bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
 
@@ -138,10 +137,10 @@ public static class CustomWordLoader
         }
     }
 
-    private static bool AddRecordToDictionary(string spelling, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
+    private static bool AddRecordToDictionary(string spelling, CustomWordRecord record, IDictionary<string, IList<CustomWordRecord>> dictionary)
     {
         string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
-        if (dictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
+        if (dictionary.TryGetValue(spellingInHiragana, out IList<CustomWordRecord>? result))
         {
             if (result.Contains(record))
             {

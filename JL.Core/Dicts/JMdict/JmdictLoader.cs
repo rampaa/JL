@@ -89,7 +89,7 @@ internal static class JmdictLoader
         new("yid", "Yiddish")
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict<JmdictRecord> dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (File.Exists(fullPath))
@@ -113,7 +113,7 @@ internal static class JmdictLoader
                 }
             }
 
-            foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+            foreach ((string key, IList<JmdictRecord> recordList) in dict.Contents)
             {
                 dict.Contents[key] = recordList.ToArray();
             }

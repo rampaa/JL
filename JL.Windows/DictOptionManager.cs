@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows.Media;
 using JL.Core.Dicts;
+using JL.Core.Dicts.JMdict;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
 
@@ -13,13 +14,13 @@ internal static class DictOptionManager
 
     public static void ApplyDictOptions()
     {
-        Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+        Dict<JmdictRecord> jmdict = (Dict<JmdictRecord>)DictUtils.SingleDictTypeDicts[DictType.JMdict];
 
         Debug.Assert(jmdict.Options.POrthographyInfoColor is not null);
         string pOrthographyInfoColorString = jmdict.Options.POrthographyInfoColor.Value;
         POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(pOrthographyInfoColorString);
 
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchAccentDict))
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out DictBase? pitchAccentDict))
         {
             Debug.Assert(pitchAccentDict.Options.PitchAccentMarkerColor is not null);
             string pitchAccentMarkerColorString = pitchAccentDict.Options.PitchAccentMarkerColor.Value;

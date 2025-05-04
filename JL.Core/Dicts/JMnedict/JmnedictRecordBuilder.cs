@@ -1,11 +1,10 @@
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictRecordBuilder
 {
-    public static void AddToDictionary(in JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
+    public static void AddToDictionary(in JmnedictEntry entry, IDictionary<string, IList<JmnedictRecord>> jmnedictDictionary)
     {
         ReadOnlySpan<string> kebListSpan = entry.KebList.AsReadOnlySpan();
         ReadOnlySpan<Translation> translationListSpan = entry.TranslationList.AsReadOnlySpan();
@@ -83,7 +82,7 @@ internal static class JmnedictRecordBuilder
 
         foreach ((string key, JmnedictRecord jmnedictRecord) in recordDictionary)
         {
-            if (jmnedictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
+            if (jmnedictDictionary.TryGetValue(key, out IList<JmnedictRecord>? tempRecordList))
             {
                 tempRecordList.Add(jmnedictRecord);
             }

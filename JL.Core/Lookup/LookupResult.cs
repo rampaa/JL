@@ -9,7 +9,7 @@ public sealed class LookupResult
     (
         string primarySpelling,
         string matchedText,
-        Dict dict,
+        DictBase dict,
         string[]? readings,
         List<LookupFrequencyResult>? frequencies = null,
         string[]? alternativeSpellings = null,
@@ -27,7 +27,7 @@ public sealed class LookupResult
     public string PrimarySpelling { get; } = primarySpelling;
     public string[]? Readings { get; } = readings;
     public string? FormattedDefinitions { get; } = formattedDefinitions;
-    public Dict Dict { get; } = dict;
+    public DictBase Dict { get; } = dict;
     public string MatchedText { get; } = matchedText;
     public List<LookupFrequencyResult>? Frequencies { get; } = frequencies;
 

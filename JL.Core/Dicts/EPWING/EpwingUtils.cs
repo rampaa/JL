@@ -1,5 +1,4 @@
 using System.Buffers;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING;
@@ -8,20 +7,20 @@ internal static class EpwingUtils
 {
     private static readonly SearchValues<char> s_invalidCharacters = SearchValues.Create('�', '〓', '\n');
 
-    public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[] definitions, Dict dict)
+    public static bool IsValidEpwingResultForDictType<T>(string primarySpelling, string? reading, string[] definitions, Dict<T> dict) where T : IEpwingRecord
     {
         return !MemoryExtensions.ContainsAny(primarySpelling, s_invalidCharacters)
             && FilterDuplicateEntries(primarySpelling, reading, definitions, dict);
     }
 
-    private static bool FilterDuplicateEntries(string primarySpelling, string? reading, string[] definitions, Dict dict)
+    private static bool FilterDuplicateEntries<T>(string primarySpelling, string? reading, string[] definitions, Dict<T> dict) where T : IEpwingRecord
     {
-        if (dict.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(primarySpelling), out IList<IDictRecord>? previousResults))
+        if (dict.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(primarySpelling), out IList<T>? previousResults))
         {
             int previousResultCount = previousResults.Count;
             for (int i = 0; i < previousResultCount; i++)
             {
-                IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
+                IEpwingRecord previousResult = previousResults[i];
 
                 if (previousResult.Definitions.AsReadOnlySpan().SequenceEqual(definitions))
                 {
@@ -45,7 +44,7 @@ internal static class EpwingUtils
             int previousResultCount = previousResults.Count;
             for (int i = 0; i < previousResultCount; i++)
             {
-                IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
+                IEpwingRecord previousResult = previousResults[i];
 
                 if (previousResult.Definitions.AsReadOnlySpan().SequenceEqual(definitions))
                 {

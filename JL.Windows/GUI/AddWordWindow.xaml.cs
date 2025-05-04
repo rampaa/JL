@@ -201,7 +201,7 @@ internal sealed partial class AddWordWindow
             ? DictType.CustomWordDictionary
             : DictType.ProfileCustomWordDictionary;
 
-        Dict dict = DictUtils.SingleDictTypeDicts[dictType];
+        Dict<CustomWordRecord> dict = (Dict<CustomWordRecord>)DictUtils.SingleDictTypeDicts[dictType];
         if (dict.Active)
         {
             CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);

@@ -244,7 +244,7 @@ internal static class PopupWindowUtils
             return true;
         }
 
-        Dict dict = (Dict)((StackPanel)item).Tag;
+        DictBase dict = (DictBase)((StackPanel)item).Tag;
         return !dict.Options.NoAll.Value;
     }
 

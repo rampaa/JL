@@ -5,8 +5,16 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core.Dicts;
-using JL.Core.Dicts.Interfaces;
+using JL.Core.Dicts.CustomNameDict;
+using JL.Core.Dicts.CustomWordDict;
+using JL.Core.Dicts.EPWING.Nazeka;
+using JL.Core.Dicts.EPWING.Yomichan;
+using JL.Core.Dicts.JMdict;
+using JL.Core.Dicts.JMnedict;
+using JL.Core.Dicts.KANJIDIC;
+using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.Options;
+using JL.Core.Dicts.PitchAccent;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.Utilities;
@@ -20,11 +28,11 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class EditDictionaryWindow
 {
-    private readonly Dict _dict;
+    private readonly DictBase _dict;
 
     private readonly DictOptionsControl _dictOptionsControl;
 
-    public EditDictionaryWindow(Dict dict)
+    public EditDictionaryWindow(DictBase dict)
     {
         _dict = dict;
         _dictOptionsControl = new DictOptionsControl();
@@ -107,8 +115,71 @@ internal sealed partial class EditDictionaryWindow
             }
 
             _dict.Path = path;
-            _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             _dict.Ready = false;
+
+            switch (_dict)
+            {
+                case Dict<CustomWordRecord> customWordDict:
+                {
+                    customWordDict.Contents = FrozenDictionary<string, IList<CustomWordRecord>>.Empty;
+                    break;
+                }
+
+                case Dict<CustomNameRecord> customNameDict:
+                {
+                    customNameDict.Contents = FrozenDictionary<string, IList<CustomNameRecord>>.Empty;
+                    break;
+                }
+
+                case Dict<JmdictRecord> jmdict:
+                {
+                    jmdict.Contents = FrozenDictionary<string, IList<JmdictRecord>>.Empty;
+                    break;
+                }
+
+                case Dict<JmnedictRecord> jmnedict:
+                {
+                    jmnedict.Contents = FrozenDictionary<string, IList<JmnedictRecord>>.Empty;
+                    break;
+                }
+
+                case Dict<KanjidicRecord> kanjidic:
+                {
+                    kanjidic.Contents = FrozenDictionary<string, IList<KanjidicRecord>>.Empty;
+                    break;
+                }
+
+                case Dict<PitchAccentRecord> pitchAccent:
+                {
+                    pitchAccent.Contents = FrozenDictionary<string, IList<PitchAccentRecord>>.Empty;
+                    break;
+                }
+
+                case Dict<EpwingYomichanRecord> yomichanRecord:
+                {
+                    yomichanRecord.Contents = FrozenDictionary<string, IList<EpwingYomichanRecord>>.Empty;
+                    break;
+                }
+
+                case Dict<YomichanKanjiRecord> yomichanKanji:
+                {
+                    yomichanKanji.Contents = FrozenDictionary<string, IList<YomichanKanjiRecord>>.Empty;
+                    break;
+                }
+
+                case Dict<EpwingNazekaRecord> nazeka:
+                {
+                    nazeka.Contents = FrozenDictionary<string, IList<EpwingNazekaRecord>>.Empty;
+                    break;
+                }
+
+                default:
+                {
+                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(EditDictionaryWindow), nameof(SaveButton_Click), _dict.Type);
+                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {_dict.Type}");
+                    break;
+                }
+            }
 
             if (dbExists)
             {
@@ -153,7 +224,62 @@ internal sealed partial class EditDictionaryWindow
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);
-            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, _dict.Options));
+
+
+            DictBase? dict = null;
+            switch (_dict.Type)
+            {
+                case DictType.NonspecificKanjiWithWordSchemaYomichan:
+                case DictType.NonspecificNameYomichan:
+                case DictType.NonspecificYomichan:
+                {
+                    dict = new Dict<EpwingYomichanRecord>(_dict.Type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+                    break;
+                }
+
+                case DictType.NonspecificKanjiYomichan:
+                {
+                    dict = new Dict<YomichanKanjiRecord>(_dict.Type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+                    break;
+                }
+
+                case DictType.PitchAccentYomichan:
+                {
+                    dict = new Dict<PitchAccentRecord>(_dict.Type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+                    break;
+                }
+
+                case DictType.NonspecificWordNazeka:
+                case DictType.NonspecificKanjiNazeka:
+                case DictType.NonspecificNameNazeka:
+                case DictType.NonspecificNazeka:
+                {
+                    dict = new Dict<EpwingNazekaRecord>(_dict.Type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+                    break;
+                }
+
+                case DictType.JMdict:
+                case DictType.JMnedict:
+                case DictType.Kanjidic:
+                case DictType.CustomWordDictionary:
+                case DictType.CustomNameDictionary:
+                case DictType.ProfileCustomWordDictionary:
+                case DictType.ProfileCustomNameDictionary:
+                case DictType.NonspecificWordYomichan:
+                    break;
+
+                default:
+                {
+                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(AddDictionaryWindow), nameof(SaveButton_Click), _dict.Type);
+                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {_dict.Type}");
+                    break;
+                }
+            }
+
+            if (dict is not null)
+            {
+                DictUtils.Dicts.Add(name, dict);
+            }
         }
 
         Close();

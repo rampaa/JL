@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -100,22 +99,22 @@ internal static class EpwingYomichanDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static void InsertRecordsToDB(Dict<EpwingYomichanRecord> dict)
     {
         int totalRecordCount = 0;
-        ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        ICollection<IList<EpwingYomichanRecord>> dictRecordValues = dict.Contents.Values;
+        foreach (IList<EpwingYomichanRecord> dictRecords in dictRecordValues)
         {
             totalRecordCount += dictRecords.Count;
         }
 
         HashSet<EpwingYomichanRecord> yomichanWordRecords = new(totalRecordCount);
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        foreach (IList<EpwingYomichanRecord> dictRecords in dictRecordValues)
         {
             int dictRecordsCount = dictRecords.Count;
             for (int i = 0; i < dictRecordsCount; i++)
             {
-                _ = yomichanWordRecords.Add((EpwingYomichanRecord)dictRecords[i]);
+                _ = yomichanWordRecords.Add(dictRecords[i]);
             }
         }
 
@@ -189,7 +188,7 @@ internal static class EpwingYomichanDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query)
+    public static Dictionary<string, IList<EpwingYomichanRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -209,12 +208,12 @@ internal static class EpwingYomichanDBManager
             return null;
         }
 
-        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+        Dictionary<string, IList<EpwingYomichanRecord>> results = new(StringComparer.Ordinal);
         while (dataReader.Read())
         {
             EpwingYomichanRecord record = GetRecord(dataReader);
             string searchKey = dataReader.GetString(SearchKeyIndex);
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<EpwingYomichanRecord>? result))
             {
                 result.Add(record);
             }
@@ -227,7 +226,7 @@ internal static class EpwingYomichanDBManager
         return results;
     }
 
-    public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
+    public static List<EpwingYomichanRecord>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
@@ -242,7 +241,7 @@ internal static class EpwingYomichanDBManager
             return null;
         }
 
-        List<IDictRecord> results = [];
+        List<EpwingYomichanRecord> results = [];
         while (dataReader.Read())
         {
             results.Add(GetRecord(dataReader));
@@ -250,7 +249,7 @@ internal static class EpwingYomichanDBManager
         return results;
     }
 
-    public static void LoadFromDB(Dict dict)
+    public static void LoadFromDB(Dict<EpwingYomichanRecord> dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteCommand command = connection.CreateCommand();
@@ -275,7 +274,7 @@ internal static class EpwingYomichanDBManager
             ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
-                if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                if (dict.Contents.TryGetValue(searchKey, out IList<EpwingYomichanRecord>? result))
                 {
                     result.Add(record);
                 }
@@ -286,7 +285,7 @@ internal static class EpwingYomichanDBManager
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        foreach ((string key, IList<EpwingYomichanRecord> recordList) in dict.Contents)
         {
             dict.Contents[key] = recordList.ToArray();
         }

@@ -7,7 +7,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 
-internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquatable<EpwingNazekaRecord>
+public sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquatable<EpwingNazekaRecord>
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }

@@ -5,7 +5,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core.Dicts;
+using JL.Core.Dicts.EPWING.Nazeka;
+using JL.Core.Dicts.EPWING.Yomichan;
+using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.Options;
+using JL.Core.Dicts.PitchAccent;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using Microsoft.Win32;
@@ -105,12 +109,65 @@ internal sealed partial class AddDictionaryWindow
         }
 
         DictOptions options = _dictOptionsControl.GetDictOptions(type);
-        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
-        DictUtils.Dicts.Add(name, dict);
 
-        if (dict.Type is DictType.PitchAccentYomichan)
+        DictBase? dict = null;
+        switch (type)
         {
-            DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan] = dict;
+            case DictType.NonspecificKanjiWithWordSchemaYomichan:
+            case DictType.NonspecificNameYomichan:
+            case DictType.NonspecificYomichan:
+            {
+                dict = new Dict<EpwingYomichanRecord>(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+                break;
+            }
+
+            case DictType.NonspecificKanjiYomichan:
+            {
+                dict = new Dict<YomichanKanjiRecord>(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+                break;
+            }
+
+            case DictType.PitchAccentYomichan:
+            {
+                dict = new Dict<PitchAccentRecord>(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+                break;
+            }
+
+            case DictType.NonspecificWordNazeka:
+            case DictType.NonspecificKanjiNazeka:
+            case DictType.NonspecificNameNazeka:
+            case DictType.NonspecificNazeka:
+            {
+                dict = new Dict<EpwingNazekaRecord>(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+                break;
+            }
+
+            case DictType.JMdict:
+            case DictType.JMnedict:
+            case DictType.Kanjidic:
+            case DictType.CustomWordDictionary:
+            case DictType.CustomNameDictionary:
+            case DictType.ProfileCustomWordDictionary:
+            case DictType.ProfileCustomNameDictionary:
+            case DictType.NonspecificWordYomichan:
+                break;
+
+            default:
+            {
+                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(AddDictionaryWindow), nameof(SaveButton_Click), type);
+                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {type}");
+                break;
+            }
+        }
+
+        if (dict is not null)
+        {
+            DictUtils.Dicts.Add(name, dict);
+
+            if (dict.Type is DictType.PitchAccentYomichan)
+            {
+                DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan] = dict;
+            }
         }
 
         Close();

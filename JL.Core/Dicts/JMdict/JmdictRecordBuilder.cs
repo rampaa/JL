@@ -6,7 +6,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictRecordBuilder
 {
-    public static void AddToDictionary(in JmdictEntry entry, IDictionary<string, IList<IDictRecord>> jmdictDictionary)
+    public static void AddToDictionary(in JmdictEntry entry, IDictionary<string, IList<JmdictRecord>> jmdictDictionary)
     {
         ReadOnlySpan<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.AsReadOnlySpan().Contains("sK")).ToList().AsReadOnlySpan();
         string[] allSpellingsWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length];
@@ -325,7 +325,7 @@ internal static class JmdictRecordBuilder
 
         foreach ((string key, JmdictRecord jmdictRecord) in recordDictionary)
         {
-            if (jmdictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
+            if (jmdictDictionary.TryGetValue(key, out IList<JmdictRecord>? tempRecordList))
             {
                 tempRecordList.Add(jmdictRecord);
             }

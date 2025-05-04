@@ -2,7 +2,6 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Utilities;
 
@@ -67,13 +66,13 @@ internal static class JmdictWordClassUtils
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new(StringComparer.Ordinal);
 
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        foreach ((string key, IList<IDictRecord> jmdictRecordList) in dict.Contents)
+        Dict<JmdictRecord> dict = (Dict<JmdictRecord>)DictUtils.SingleDictTypeDicts[DictType.JMdict];
+        foreach ((string key, IList<JmdictRecord> jmdictRecordList) in dict.Contents)
         {
             int jmdictRecordListCount = jmdictRecordList.Count;
             for (int i = 0; i < jmdictRecordListCount; i++)
             {
-                JmdictRecord jmdictRecord = (JmdictRecord)jmdictRecordList[i];
+                JmdictRecord jmdictRecord = jmdictRecordList[i];
                 List<string> wordClassList = [];
                 if (jmdictRecord.WordClasses is not null)
                 {
@@ -174,7 +173,7 @@ internal static class JmdictWordClassUtils
 
     internal static async Task Initialize()
     {
-        Dict jmdictDict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+        Dict<JmdictRecord> jmdictDict = (Dict<JmdictRecord>)DictUtils.SingleDictTypeDicts[DictType.JMdict];
         string jmdictPath = Path.GetFullPath(jmdictDict.Path, Utils.ApplicationPath);
         string partOfSpeechFilePath = Path.Join(Utils.ResourcesPath, "PoS.json");
 
@@ -203,10 +202,10 @@ internal static class JmdictWordClassUtils
                     }
                 }
 
-                jmdictDict.Contents = new Dictionary<string, IList<IDictRecord>>(jmdictDict.Size > 0 ? jmdictDict.Size : 450000, StringComparer.Ordinal);
+                jmdictDict.Contents = new Dictionary<string, IList<JmdictRecord>>(jmdictDict.Size > 0 ? jmdictDict.Size : 450000, StringComparer.Ordinal);
                 await JmdictLoader.Load(jmdictDict).ConfigureAwait(false);
                 await Serialize().ConfigureAwait(false);
-                jmdictDict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                jmdictDict.Contents = FrozenDictionary<string, IList<JmdictRecord>>.Empty;
 
                 if (deleteJmdictFile)
                 {

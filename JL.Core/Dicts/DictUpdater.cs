@@ -2,7 +2,6 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.JMnedict;
 using JL.Core.Dicts.KANJIDIC;
@@ -110,7 +109,7 @@ public static class DictUpdater
 
         DictUtils.UpdatingJmdict = true;
 
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+        Dict<JmdictRecord> dict = (Dict<JmdictRecord>)DictUtils.SingleDictTypeDicts[DictType.JMdict];
         bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_jmdictUrl,
                 nameof(DictType.JMdict), isUpdate, noPrompt)
@@ -119,7 +118,7 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(450000, StringComparer.Ordinal);
+            dict.Contents = new Dictionary<string, IList<JmdictRecord>>(450000, StringComparer.Ordinal);
 
             await Task.Run(() => JmdictLoader.Load(dict)).ConfigureAwait(false);
 
@@ -146,7 +145,7 @@ public static class DictUpdater
 
             if (!dict.Active || useDB)
             {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                dict.Contents = FrozenDictionary<string, IList<JmdictRecord>>.Empty;
             }
 
             dict.Ready = true;
@@ -166,7 +165,7 @@ public static class DictUpdater
 
         DictUtils.UpdatingJmnedict = true;
 
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
+        Dict<JmnedictRecord> dict = (Dict<JmnedictRecord>)DictUtils.SingleDictTypeDicts[DictType.JMnedict];
         bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_jmnedictUrl,
                 nameof(DictType.JMnedict), isUpdate, noPrompt)
@@ -175,7 +174,7 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(620000, StringComparer.Ordinal);
+            dict.Contents = new Dictionary<string, IList<JmnedictRecord>>(620000, StringComparer.Ordinal);
 
             await Task.Run(() => JmnedictLoader.Load(dict)).ConfigureAwait(false);
 
@@ -199,7 +198,7 @@ public static class DictUpdater
 
             if (!dict.Active || useDB)
             {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                dict.Contents = FrozenDictionary<string, IList<JmnedictRecord>>.Empty;
             }
 
             dict.Ready = true;
@@ -219,7 +218,7 @@ public static class DictUpdater
 
         DictUtils.UpdatingKanjidic = true;
 
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
+        Dict<KanjidicRecord> dict = (Dict<KanjidicRecord>)DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
         bool downloaded = await DownloadDict(dict.Path,
                 DictUtils.s_kanjidicUrl,
                 nameof(DictType.Kanjidic), isUpdate, noPrompt)
@@ -228,7 +227,7 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
+            dict.Contents = new Dictionary<string, IList<KanjidicRecord>>(13108, StringComparer.Ordinal);
 
             await Task.Run(() => KanjidicLoader.Load(dict)).ConfigureAwait(false);
 
@@ -252,7 +251,7 @@ public static class DictUpdater
 
             if (!dict.Active || useDB)
             {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                dict.Contents = FrozenDictionary<string, IList<KanjidicRecord>>.Empty;
             }
 
             dict.Ready = true;
@@ -274,7 +273,7 @@ public static class DictUpdater
 
         foreach (DictType dictType in dictTypes)
         {
-            Dict dict = DictUtils.SingleDictTypeDicts[dictType];
+            DictBase dict = DictUtils.SingleDictTypeDicts[dictType];
             if (!dict.Active)
             {
                 continue;

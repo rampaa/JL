@@ -1,13 +1,12 @@
 using System.Collections.Frozen;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.KanjiDict;
 
 internal static class YomichanKanjiLoader
 {
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict<YomichanKanjiRecord> dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (!Directory.Exists(fullPath))
@@ -38,7 +37,7 @@ internal static class YomichanKanjiLoader
                     continue;
                 }
 
-                if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
+                if (dict.Contents.TryGetValue(kanji, out IList<YomichanKanjiRecord>? kanjiResult))
                 {
                     if (!kanjiResult.Contains(yomichanKanjiRecord))
                     {
@@ -52,7 +51,7 @@ internal static class YomichanKanjiLoader
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        foreach ((string key, IList<YomichanKanjiRecord> recordList) in dict.Contents)
         {
             dict.Contents[key] = recordList.ToArray();
         }
