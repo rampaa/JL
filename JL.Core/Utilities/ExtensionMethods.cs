@@ -22,7 +22,7 @@ public static class ExtensionMethods
     {
         foreach (T enumValue in Enum.GetValues<T>())
         {
-            if (enumValue.GetDescription() == description)
+            if (description == Enum.GetName(enumValue) || description == enumValue.GetDescription())
             {
                 return enumValue;
             }
