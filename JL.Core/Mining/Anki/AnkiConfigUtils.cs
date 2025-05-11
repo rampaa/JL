@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -42,6 +43,43 @@ public static class AnkiConfigUtils
                 {
                     s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
                         Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                }
+
+                Debug.Assert(s_ankiConfigDict is not null);
+                bool firstFieldChanged = false;
+                foreach (AnkiConfig ankiConfig in s_ankiConfigDict.Values)
+                {
+                    Debug.Assert(ankiConfig.Fields.Count > 0);
+                    ReadOnlyMemory<string> fields = await AnkiUtils.GetFieldNames(ankiConfig.ModelName).ConfigureAwait(false);
+                    if (!fields.IsEmpty)
+                    {
+                        ReadOnlySpan<string> fieldsSpan = fields.Span;
+                        if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
+                        {
+                            firstFieldChanged = true;
+
+                            OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length);
+                            for (int i = 0; i < fieldsSpan.Length; i++)
+                            {
+                                string fieldName = fieldsSpan[i];
+                                if (ankiConfig.Fields.TryGetValue(fieldName, out JLField field))
+                                {
+                                    upToDateFields.Add(fieldName, field);
+                                }
+                                else
+                                {
+                                    upToDateFields.Add(fieldName, JLField.Nothing);
+                                }
+                            }
+
+                            ankiConfig.Fields = upToDateFields;
+                        }
+                    }
+                }
+
+                if (firstFieldChanged)
+                {
+                    await WriteAnkiConfig(s_ankiConfigDict).ConfigureAwait(false);
                 }
 
                 return s_ankiConfigDict;

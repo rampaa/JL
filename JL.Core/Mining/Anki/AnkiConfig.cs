@@ -6,6 +6,6 @@ public sealed class AnkiConfig(string deckName, string modelName, OrderedDiction
 {
     [JsonPropertyName("deckName")] public string DeckName { get; } = deckName;
     [JsonPropertyName("modelName")] public string ModelName { get; } = modelName;
-    [JsonPropertyName("fields")] public OrderedDictionary<string, JLField> Fields { get; } = fields;
+    [JsonPropertyName("fields")] public OrderedDictionary<string, JLField> Fields { get; internal set; } = fields;
     [JsonPropertyName("tags")] public string[]? Tags { get; } = tags;
 }
