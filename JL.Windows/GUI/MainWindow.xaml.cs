@@ -151,7 +151,7 @@ internal sealed partial class MainWindow
     private bool CopyText(string text)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.OnlyCaptureTextWithJapaneseChars && !JapaneseUtils.JapaneseRegex.IsMatch(text))
+        if (configManager.OnlyCaptureTextWithJapaneseChars && !JapaneseUtils.ContainsJapaneseCharacters(text))
         {
             return false;
         }

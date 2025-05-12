@@ -109,7 +109,7 @@ internal sealed partial class DictOptionsControl
         if (SpellingRestrictionInfoOption.ValidDictTypes.Contains(type))
         {
             Debug.Assert(SpellingRestrictionInfoCheckBox.IsChecked is not null);
-            spellingRestrictionInfo =  new SpellingRestrictionInfoOption(SpellingRestrictionInfoCheckBox.IsChecked.Value);
+            spellingRestrictionInfo = new SpellingRestrictionInfoOption(SpellingRestrictionInfoCheckBox.IsChecked.Value);
         }
 
         ExtraDefinitionInfoOption? extraDefinitionInfo = null;

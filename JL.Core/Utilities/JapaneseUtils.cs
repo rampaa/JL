@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,7 +12,7 @@ public static partial class JapaneseUtils
     // Matches the following Unicode ranges:
     // × (\u00D7)
     // General Punctuation (2000-206F): ‥, …, •, ※
-    // Geometric Shapes (25A0-U+25FF): ◦, ◎, ○, △, ◉
+    // Geometric Shapes (25A0-25FF): ◦, ◎, ○, △, ◉
     // CJK Radicals Supplement (2E80–2EFF)
     // Kangxi Radicals (2F00–2FDF)
     // Ideographic Description Characters (2FF0–2FFF)
@@ -21,13 +22,13 @@ public static partial class JapaneseUtils
     // Kanbun (3190–319F)
     // CJK Strokes (31C0–31EF)
     // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included in the regex.
-    // Enclosed CJK Letters and Months (3200–32FF)
+    // Enclosed CJK Letters and Months (3200–32FF) 3220-325F, 3280-32FF
     // CJK Compatibility (3300–33FF)
     // CJK Unified Ideographs Extension A (3400–4DBF)
     // CJK Unified Ideographs (4E00–9FFF)
     // CJK Compatibility Ideographs (F900–FAFF)
     // CJK Compatibility Forms (FE30–FE4F)
-    // Halfwidth and Fullwidth Forms (FF00–FFEF)
+    // Halfwidth and Fullwidth Forms (FF00–FFEF) FF00-FF9F,FFE0-FFEF
     // Ideographic Symbols and Punctuation (16FE0-16FFF): It does not contain any Japanese characters, so it's not included in the regex.
     // Kana Extended-B (1AFF0-1AFFF): The range does not contain any Japanese characters; it only includes Taiwanese kana, so it's not included in the regex.
     // Kana Supplement (1B000-1B0FF)
@@ -43,14 +44,8 @@ public static partial class JapaneseUtils
     // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
-    [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD82C[\uDC00-\uDD6F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD868][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]|\uD869[\uDF00-\uDFFF]|[\uD86A-\uD87A][\uDC00-\uDFFF]|\uD87B[\uDC00-\uDE5F]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u2FDF\u2FF0-\u30FF\u3190-\u319F\u31C0-\u31FF\u3220-\u325F\u3280-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFF9F\uFFE0-\uFFEF]|\uD82C[\uDC00-\uDD6F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD868][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]|\uD869[\uDF00-\uDFFF]|[\uD86A-\uD87A][\uDC00-\uDFFF]|\uD87B[\uDC00-\uDE5F]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]", RegexOptions.CultureInvariant)]
     public static partial Regex JapaneseRegex { get; }
-
-    // Hiragana (3040–309F)
-    // Katakana (30A0–30FF)
-    // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included in the regex.
-    [GeneratedRegex(@"[\u3040-\u31FF]", RegexOptions.CultureInvariant)]
-    private static partial Regex KanaRegex { get; }
 
     private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new KeyValuePair<char, string>[]
     {
@@ -323,9 +318,32 @@ public static partial class JapaneseUtils
         return length;
     }
 
-    internal static bool IsKatakana(char character)
+    // Katakana (30A0–30FF)
+    // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included
+    // Halfwidth Katakana (FF66-FF9D)
+    public static bool IsKatakana(char character)
     {
-        return s_katakanaToHiraganaDict.ContainsKey(character);
+        int codePoint = character;
+        return codePoint is (>= 0x30A0 and <= 0x31FF) or (>= 0xFF66 and <= 0xFF9D);
+    }
+
+    // Hiragana (3040–309F)
+    // Katakana (30A0–30FF)
+    // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included
+    // Halfwidth Katakana (FF66-FF9D)
+    internal static bool ContainsKana(ReadOnlySpan<char> text)
+    {
+        int textLength = text.Length;
+        for (int i = 0; i < textLength; i++)
+        {
+            int codePoint = text[i];
+            if (codePoint is (>= 0x3040 and <= 0x31FF) or (>= 0xFF66 and <= 0xFF9D))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static int FindExpressionBoundary(ReadOnlySpan<char> text, int position)
@@ -470,7 +488,7 @@ public static partial class JapaneseUtils
 
     internal static string GetPrimarySpellingAndReadingMapping(string primarySpelling, string reading)
     {
-        if (!KanaRegex.IsMatch(primarySpelling))
+        if (!ContainsKana(primarySpelling))
         {
             return $"{primarySpelling}[{reading}]";
         }
@@ -479,7 +497,7 @@ public static partial class JapaneseUtils
         bool wasKana = true;
         foreach (ref readonly string rune in primarySpelling.AsSpan().ListUnicodeCharacters())
         {
-            bool isKana = KanaRegex.IsMatch(rune);
+            bool isKana = ContainsKana(rune);
             if (primarySpellingSegments.Count is 0 || wasKana != isKana)
             {
                 wasKana = isKana;
@@ -499,7 +517,7 @@ public static partial class JapaneseUtils
     {
         StringBuilder stringBuilder = new();
 
-        bool firstSegmentIsKana = KanaRegex.IsMatch(primarySpellingSegments[0]);
+        bool firstSegmentIsKana = ContainsKana(primarySpellingSegments[0]);
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
         for (int i = currentReadingPosition; i < primarySpellingSegments.Length; i += 2)
         {
@@ -611,7 +629,7 @@ public static partial class JapaneseUtils
 
     private static bool IsPrimarySpellingAndReadingMappingUnambiguous(ReadOnlySpan<string> primarySpellingSegments, string reading)
     {
-        bool firstSegmentIsKana = KanaRegex.IsMatch(primarySpellingSegments[0]);
+        bool firstSegmentIsKana = ContainsKana(primarySpellingSegments[0]);
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
         for (int i = currentReadingPosition; i < primarySpellingSegments.Length; i += 2)
         {
@@ -691,5 +709,74 @@ public static partial class JapaneseUtils
         }
 
         return true;
+    }
+
+    public static bool ContainsJapaneseCharacters(params ReadOnlySpan<char> text)
+    {
+        // The regex approach is faster if the text is longer than 15 characters and does not start with a Japanese character
+        if (text.Length > 15)
+        {
+            char firstChar = text[0];
+            return (char.IsHighSurrogate(firstChar)
+                    ? ContainsJapaneseCharactersHelper(text[..2])
+                    : ContainsJapaneseCharactersHelper(firstChar))
+                || JapaneseRegex.IsMatch(text);
+        }
+
+        return ContainsJapaneseCharactersHelper(text);
+    }
+
+    private static bool ContainsJapaneseCharactersHelper(params ReadOnlySpan<char> text)
+    {
+        int textLength = text.Length;
+        for (int i = 0; i < textLength; i++)
+        {
+            char currentChar = text[i];
+            if (char.IsHighSurrogate(currentChar))
+            {
+                Debug.Assert(textLength > i + 2);
+                Debug.Assert(char.IsLowSurrogate(text[i + 1]));
+                int codePoint = char.ConvertToUtf32(currentChar, text[i + 1]);
+
+                // Ideographic Symbols and Punctuation (16FE0-16FFF): It does not contain any Japanese characters, so it's not included
+                // Kana Extended-B (1AFF0-1AFFF): The range does not contain any Japanese characters; it only includes Taiwanese kana, so it's not included
+                // CJK Unified Ideographs Extension I (2EBF0–2EE5F): It's a Chinese-only range, so it's not included in the regex.
+                if (codePoint is
+                    (>= 0x1B000 and <= 0x1B16F) // Kana Supplement (1B000-1B0FF), Kana Extended-A (1B100-1B12F), Small Kana Extension (1B130-1B16F)
+                    or (>= 0x1F200 and <= 0x1F2FF) // Enclosed Ideographic Supplement (1F200-1F2FF)
+                    or (>= 0x20000 and <= 0x2A6DF) // CJK Unified Ideographs Extension B (20000–2A6DF)
+                    or (>= 0x2A700 and <= 0x2EBEF) // CJK Unified Ideographs Extension C (2A700–2B73F), CJK Unified Ideographs Extension D (2B740–2B81F), CJK Unified Ideographs Extension E (2B820–2CEAF), CJK Unified Ideographs Extension F (2CEB0–2EBEF)
+                    or (>= 0x2F800 and <= 0x2FA1F) // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
+                    or (>= 0x30000 and <= 0x323AF)) // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF)
+                {
+                    return true;
+                }
+
+                i += 1;
+            }
+            else
+            {
+                // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included
+                int codePoint = currentChar;
+                if (codePoint is 0x00D7 // × (\u00D7)
+                    or (>= 0x2000 and <= 0x206F) // General Punctuation (2000-206F): ‥, …, •, ※
+                    or (>= 0x25A0 and <= 0x25FF) // Geometric Shapes (25A0-U+25FF): ◦, ◎, ○, △, ◉
+                    or (>= 0x2E80 and <= 0x2FDF) // CJK Radicals Supplement (2E80–2EFF), Kangxi Radicals (2F00–2FDF)
+                    or (>= 0x2FF0 and <= 0x30FF) // Ideographic Description Characters (2FF0–2FFF), CJK Symbols and Punctuation (3000–303F), Hiragana (3040–309F), Katakana (30A0–30FF)
+                    or (>= 0x3190 and <= 0x319F) // Kanbun (3190–319F)
+                    or (>= 0x31C0 and <= 0x325F) // CJK Strokes (31C0–31EF), Katakana Phonetic Extensions (31F0–31FF), Enclosed CJK Letters and Months 3220-325F
+                    or (>= 0x3280 and <= 0x4DBF) // Enclosed CJK Letters and Months 3280-32FF, CJK Compatibility (3300–33FF), CJK Unified Ideographs Extension A (3400–4DBF)
+                    or (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
+                    or (>= 0xF900 and <= 0xFAFF) // CJK Compatibility Ideographs(F900–FAFF)
+                    or (>= 0xFE30 and <= 0xFE4F) // CJK Compatibility Forms (FE30–FE4F)
+                    or (>= 0xFF00 and <= 0xFF9F) // Halfwidth and Fullwidth Forms FF00-FF9F
+                    or (>= 0xFFE0 and <= 0xFFEF)) // Halfwidth and Fullwidth Forms FFE0-FFEF
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
