@@ -734,7 +734,7 @@ public static partial class JapaneseUtils
             char currentChar = text[i];
             if (char.IsHighSurrogate(currentChar))
             {
-                Debug.Assert(textLength > i + 2);
+                Debug.Assert(textLength > i + 1);
                 Debug.Assert(char.IsLowSurrogate(text[i + 1]));
                 int codePoint = char.ConvertToUtf32(currentChar, text[i + 1]);
 
