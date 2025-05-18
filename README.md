@@ -58,7 +58,7 @@ Press the opacity slider button located top-left of the main window. You can als
 ### How can I use JL with Magpie?
 Enable the "Preferences>Main Window>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
 
-Optional: Grant UIAccess privilege to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [Granting UIAccess privilege to JL](https://github.com/rampaa/JL/blob/master/Docs/UIAccess.md) page for more details.
+Optional: Grant UIAccess privilege to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [Granting UIAccess privilege to JL](https://github.com/rampaa/JL/blob/master/Docs/Granting%20UIAccess%20Privilege%20to%20JL.md) page for more details.
 
 If you use JL v2.0.0+ and Magpie v0.11.0+ then you don't necessarily need to change the following settings.
 
