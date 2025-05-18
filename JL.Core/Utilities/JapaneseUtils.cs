@@ -45,7 +45,7 @@ public static partial class JapaneseUtils
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
     [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u2FDF\u2FF0-\u30FF\u3190-\u319F\u31C0-\u31FF\u3220-\u325F\u3280-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFF9F\uFFE0-\uFFEF]|\uD82C[\uDC00-\uDD6F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD868][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]|\uD869[\uDF00-\uDFFF]|[\uD86A-\uD87A][\uDC00-\uDFFF]|\uD87B[\uDC00-\uDE5F]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]", RegexOptions.CultureInvariant)]
-    public static partial Regex JapaneseRegex { get; }
+    private static partial Regex JapaneseRegex { get; }
 
     private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new KeyValuePair<char, string>[]
     {
@@ -331,7 +331,7 @@ public static partial class JapaneseUtils
     // Katakana (30A0–30FF)
     // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included
     // Halfwidth Katakana (FF66-FF9D)
-    internal static bool ContainsKana(ReadOnlySpan<char> text)
+    private static bool ContainsKana(ReadOnlySpan<char> text)
     {
         int textLength = text.Length;
         for (int i = 0; i < textLength; i++)

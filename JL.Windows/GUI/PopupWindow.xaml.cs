@@ -237,14 +237,17 @@ internal sealed partial class PopupWindow
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
         bool isFirstPopupWindow = PopupIndex is 0;
-        if (isFirstPopupWindow
-                ? configManager.DisableLookupsForNonJapaneseCharsInMainWindow
-                  && !JapaneseUtils.ContainsJapaneseCharacters(textBoxText[charPosition])
-                : configManager.DisableLookupsForNonJapaneseCharsInPopups
-                  && !JapaneseUtils.ContainsJapaneseCharacters(textBoxText[charPosition]))
+        if (isFirstPopupWindow ? configManager.DisableLookupsForNonJapaneseCharsInMainWindow : configManager.DisableLookupsForNonJapaneseCharsInPopups)
         {
-            HidePopup();
-            return Task.CompletedTask;
+            char firstChar = textBoxText[charPosition];
+            Debug.Assert(!char.IsHighSurrogate(firstChar) || textBoxText.Length - charPosition > 1);
+            if (char.IsHighSurrogate(firstChar)
+                ? !JapaneseUtils.ContainsJapaneseCharacters(textBoxText.AsSpan(charPosition, 2))
+                : !JapaneseUtils.ContainsJapaneseCharacters(firstChar))
+            {
+                HidePopup();
+                return Task.CompletedTask;
+            }
         }
 
         string textToLookUp = textBoxText;
@@ -1420,7 +1423,7 @@ internal sealed partial class PopupWindow
         if (MiningMode)
         {
             _lastInteractedTextBox = textBox;
-            if (JapaneseUtils.ContainsJapaneseCharacters(textBox.Text))
+            if (!configManager.DisableLookupsForNonJapaneseCharsInPopups || JapaneseUtils.ContainsJapaneseCharacters(textBox.Text))
             {
                 return childPopupWindow.LookupOnMouseMoveOrClick(textBox, false);
             }
