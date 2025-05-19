@@ -59,7 +59,7 @@ internal static class JmdictLoader
         new("mao", "Maori"),
         new("may", "Malay"),
         new("mnc", "Manchu"),
-        new("mol", "Moldovan"),
+        new("mol", "Moldavian"),
         new("mon", "Mongolian"),
         new("nor", "Norwegian"),
         new("per", "Persian"),
