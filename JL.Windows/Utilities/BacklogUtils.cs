@@ -185,7 +185,7 @@ internal static class BacklogUtils
             bool changeCurrentNodeToLast = false;
             while (Backlog.Count > configManager.MaxBacklogCapacity)
             {
-                changeCurrentNodeToLast |= changeCurrentNodeToLast || Backlog.Last == s_currentNode;
+                changeCurrentNodeToLast = changeCurrentNodeToLast || Backlog.Last == s_currentNode;
                 Backlog.RemoveLast();
             }
 
