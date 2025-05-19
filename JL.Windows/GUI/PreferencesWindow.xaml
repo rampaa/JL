@@ -740,12 +740,17 @@
                                 </DockPanel>
                             </ListBoxItem>
 
-                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Sets the maximum capacity of the backlog.
+                                         &#10;Set to -1 for unlimited capacity.
+                                         &#10;Set to 0 to disable the backlog.
+                                         &#10;Set to a positive number to limit how many entries the backlog can store.">
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="Enable backlog"
+                                    <TextBlock HorizontalAlignment="Left" Text="Max backlog capacity"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <CheckBox x:Name="EnableBacklogCheckBox"
+                                    <hc:NumericUpDown x:Name="MaxBacklogCapacityNumericUpDown" Minimum="-1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>

@@ -11,70 +11,78 @@ namespace JL.Windows.Utilities;
 
 internal static class BacklogUtils
 {
-    private static int s_currentTextIndex; // 0
-    public static List<string> Backlog { get; } = [];
+    private static LinkedListNode<string>? s_currentNode;
+    public static LinkedList<string> Backlog { get; } = [];
 
     public static void AddToBacklog(string text)
     {
-        Backlog.Add(text);
-        s_currentTextIndex = Backlog.Count - 1;
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.MaxBacklogCapacity is not -1 && Backlog.Count > configManager.MaxBacklogCapacity)
+        {
+            Backlog.RemoveFirst();
+        }
+
+        s_currentNode = Backlog.AddLast(text);
     }
 
     public static void ReplaceLastBacklogText(string text)
     {
-        Backlog[^1] = text;
+        if (Backlog.Last is not null)
+        {
+            Backlog.Last.Value = text;
+        }
+        else
+        {
+            s_currentNode = Backlog.AddLast(text);
+        }
     }
 
     public static void ShowPreviousBacklogItem()
     {
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        if (!configManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
+        if (s_currentNode is null || mainWindow.FirstPopupWindow.MiningMode)
         {
             return;
         }
 
-        if (s_currentTextIndex > 0)
+        if (s_currentNode.Previous is not null)
         {
-            --s_currentTextIndex;
             mainWindow.MainTextBox.Foreground = configManager.MainWindowBacklogTextColor;
+            mainWindow.MainTextBox.Text = s_currentNode.Previous.Value;
+            s_currentNode = s_currentNode.Previous;
         }
-
-        mainWindow.MainTextBox.Text = Backlog[s_currentTextIndex];
     }
 
     public static void ShowNextBacklogItem()
     {
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        if (!configManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
+        if (s_currentNode is null || mainWindow.FirstPopupWindow.MiningMode)
         {
             return;
         }
 
-        if (s_currentTextIndex < Backlog.Count - 1)
+        if (s_currentNode.Next is not null)
         {
-            ++s_currentTextIndex;
-            mainWindow.MainTextBox.Foreground = configManager.MainWindowBacklogTextColor;
-        }
+            mainWindow.MainTextBox.Foreground = s_currentNode.Next != Backlog.Last
+                ? configManager.MainWindowBacklogTextColor
+                : configManager.MainWindowTextColor;
 
-        if (s_currentTextIndex == Backlog.Count - 1)
-        {
-            mainWindow.MainTextBox.Foreground = configManager.MainWindowTextColor;
+            mainWindow.MainTextBox.Text = s_currentNode.Next.Value;
+            s_currentNode = s_currentNode.Next;
         }
-
-        mainWindow.MainTextBox.Text = Backlog[s_currentTextIndex];
     }
 
     public static void DeleteCurrentLine()
     {
         TextBox mainTextBox = MainWindow.Instance.MainTextBox;
-        if (Backlog.Count is 0)
+        if (s_currentNode is null)
         {
             return;
         }
 
-        string text = Backlog[s_currentTextIndex];
+        string text = s_currentNode.Value;
         if (text != mainTextBox.Text)
         {
             return;
@@ -94,18 +102,16 @@ internal static class BacklogUtils
             StatsUtils.IncrementStat(StatType.Characters, -textLength);
         }
 
-        Backlog.RemoveAt(s_currentTextIndex);
-        if (s_currentTextIndex > 0)
-        {
-            --s_currentTextIndex;
-        }
+        LinkedListNode<string>? newCurrentNode = s_currentNode.Previous ?? Backlog.Last;
+        Backlog.Remove(s_currentNode);
+        s_currentNode = newCurrentNode;
 
-        mainTextBox.Foreground = s_currentTextIndex < Backlog.Count - 1
+        mainTextBox.Foreground = newCurrentNode != Backlog.Last
             ? configManager.MainWindowBacklogTextColor
             : configManager.MainWindowTextColor;
 
-        mainTextBox.Text = Backlog.Count > 0
-            ? Backlog[s_currentTextIndex]
+        mainTextBox.Text = newCurrentNode is not null
+            ? newCurrentNode.Value
             : "";
     }
 
@@ -113,7 +119,7 @@ internal static class BacklogUtils
     {
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        if (!configManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
+        if (configManager.MaxBacklogCapacity is 0 || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
         {
             return;
         }
@@ -139,7 +145,7 @@ internal static class BacklogUtils
     public static Task WriteBacklog()
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (!configManager.EnableBacklog
+        if (configManager.MaxBacklogCapacity is 0
             || !configManager.AutoSaveBacklogBeforeClosing
             || Backlog.Count is 0)
         {
@@ -153,5 +159,44 @@ internal static class BacklogUtils
         }
 
         return File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{ProfileUtils.CurrentProfileName}_{Process.GetCurrentProcess().StartTime:yyyy.MM.dd_HH.mm.ss}-{DateTime.Now:yyyy.MM.dd_HH.mm.ss}.txt")), Backlog);
+    }
+
+    public static void ClearBacklog()
+    {
+        string? lastText = Backlog.Last?.Value;
+        Backlog.Clear();
+        s_currentNode = null;
+
+        if (lastText is not null)
+        {
+            TextBox mainTextBox = MainWindow.Instance.MainTextBox;
+            ConfigManager configManager = ConfigManager.Instance;
+
+            mainTextBox.Foreground = configManager.MainWindowTextColor;
+            mainTextBox.Text = lastText;
+        }
+    }
+
+    public static void TrimBacklog()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.MaxBacklogCapacity > 0)
+        {
+            bool changeCurrentNodeToLast = false;
+            while (Backlog.Count > configManager.MaxBacklogCapacity)
+            {
+                changeCurrentNodeToLast |= changeCurrentNodeToLast || Backlog.Last == s_currentNode;
+                Backlog.RemoveLast();
+            }
+
+            if (changeCurrentNodeToLast)
+            {
+                s_currentNode = Backlog.Last;
+                Debug.Assert(s_currentNode is not null);
+                TextBox mainTextBox = MainWindow.Instance.MainTextBox;
+                mainTextBox.Foreground = configManager.MainWindowTextColor;
+                mainTextBox.Text = s_currentNode.Value;
+            }
+        }
     }
 }

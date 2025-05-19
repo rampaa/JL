@@ -55,7 +55,7 @@ internal sealed class ConfigManager
     public bool MainWindowFocusOnHover { get; private set; } // = false;
     public bool SteppedBacklogWithMouseWheel { get; private set; } = true;
     public bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } = true;
-    public bool EnableBacklog { get; private set; } = true;
+    public int MaxBacklogCapacity { get; private set; } = -1;
     public bool AutoSaveBacklogBeforeClosing { get; private set; } // = false;
     public bool TextToSpeechOnTextChange { get; private set; } // = false;
     public bool HidePopupsOnTextChange { get; private set; } = true;
@@ -271,10 +271,10 @@ internal sealed class ConfigManager
             ulong characterCount = 0;
             ulong lineCount = 0;
 
-            List<string> backlog = BacklogUtils.Backlog;
-            for (int i = 0; i < backlog.Count; i++)
+            LinkedListNode<string>? currentBacklogNode = BacklogUtils.Backlog.First;
+            while (currentBacklogNode is not null)
             {
-                string text = backlog[i];
+                string text = currentBacklogNode.Value;
                 if (StripPunctuationBeforeCalculatingCharacterCount)
                 {
                     text = JapaneseUtils.RemovePunctuation(text);
@@ -285,6 +285,8 @@ internal sealed class ConfigManager
                     ++lineCount;
                     characterCount += (ulong)new StringInfo(text).LengthInTextElements;
                 }
+
+                currentBacklogNode = currentBacklogNode.Previous;
             }
 
             if (StripPunctuationBeforeCalculatingCharacterCount)
@@ -385,11 +387,14 @@ internal sealed class ConfigManager
             ? HorizontalAlignment.Center
             : HorizontalAlignment.Left;
 
-        EnableBacklog = ConfigDBManager.GetValueFromConfig(connection, EnableBacklog, nameof(EnableBacklog));
-        if (!EnableBacklog)
+        MaxBacklogCapacity = ConfigDBManager.GetValueFromConfig(connection, MaxBacklogCapacity, nameof(MaxBacklogCapacity));
+        if (MaxBacklogCapacity is 0)
         {
-            BacklogUtils.Backlog.Clear();
-            BacklogUtils.Backlog.TrimExcess();
+            BacklogUtils.ClearBacklog();
+        }
+        else
+        {
+            BacklogUtils.TrimBacklog();
         }
 
         AutoSaveBacklogBeforeClosing = ConfigDBManager.GetValueFromConfig(connection, AutoSaveBacklogBeforeClosing, nameof(AutoSaveBacklogBeforeClosing));
@@ -514,7 +519,7 @@ internal sealed class ConfigManager
         MainWindowTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, MainWindowTextColor, nameof(MainWindowTextColor));
         MainWindowBacklogTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
 
-        mainWindow.MainTextBox.Foreground = !EnableBacklog || mainWindow.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
+        mainWindow.MainTextBox.Foreground = MaxBacklogCapacity is 0 || mainWindow.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
             ? MainWindowTextColor
             : MainWindowBacklogTextColor;
 
@@ -976,7 +981,7 @@ internal sealed class ConfigManager
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
-        preferenceWindow.EnableBacklogCheckBox.IsChecked = EnableBacklog;
+        preferenceWindow.MaxBacklogCapacityNumericUpDown.Value = MaxBacklogCapacity;
         preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
@@ -1257,7 +1262,8 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(SteppedBacklogWithMouseWheel),
                 preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked.ToString());
 
-            ConfigDBManager.UpdateSetting(connection, nameof(EnableBacklog), preferenceWindow.EnableBacklogCheckBox.IsChecked.ToString());
+            ConfigDBManager.UpdateSetting(connection, nameof(MaxBacklogCapacity),
+                preferenceWindow.MaxBacklogCapacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoSaveBacklogBeforeClosing),
                 preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked.ToString());

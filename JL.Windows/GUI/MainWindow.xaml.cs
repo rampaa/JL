@@ -274,7 +274,7 @@ internal sealed partial class MainWindow
             }
         }
 
-        if (configManager.EnableBacklog)
+        if (configManager.MaxBacklogCapacity is not 0)
         {
             if (mergeTexts)
             {
