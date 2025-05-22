@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
     <PackageReference Include="NUnit" Version="4.3.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
   </ItemGroup>
@@ -24,8 +24,8 @@
     <PackageReference Include="System.Reflection.Metadata" Version="9.0.5" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.5" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />
-    <PackageReference Include="Microsoft.Testing.Extensions.VSTestBridge" Version="1.6.3" />
-    <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="1.6.3" />
+    <PackageReference Include="Microsoft.Testing.Extensions.VSTestBridge" Version="1.7.0" />
+    <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>
