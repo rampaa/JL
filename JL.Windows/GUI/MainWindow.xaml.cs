@@ -497,7 +497,11 @@ internal sealed partial class MainWindow
     // ReSharper disable once AsyncVoidMethod
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        e.Handled = true;
+        if (e.OriginalSource is not TextBox textBox || textBox.IsReadOnly)
+        {
+            e.Handled = true;
+        }
+
         await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
     }
 
