@@ -82,6 +82,7 @@ internal static class EpwingYomichanUtils
                             break;
                         }
 
+                        case "a":
                         case "ruby":
                         {
                             _ = stringBuilder.Append(contentResult.Content);
@@ -122,7 +123,7 @@ internal static class EpwingYomichanUtils
                             break;
                         }
 
-                        // "div" or "a" or "tr" or "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot" or "img"
+                        // "div" or "tr" or "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot" or "img"
                         default:
                         {
                             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart()}");
