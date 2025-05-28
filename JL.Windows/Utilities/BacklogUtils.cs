@@ -119,7 +119,7 @@ internal static class BacklogUtils
     {
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
-        if (configManager.MaxBacklogCapacity is 0 || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
+        if (Backlog.Count is 0 || mainWindow.FirstPopupWindow.MiningMode)
         {
             return;
         }
@@ -144,10 +144,7 @@ internal static class BacklogUtils
 
     public static Task WriteBacklog()
     {
-        ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.MaxBacklogCapacity is 0
-            || !configManager.AutoSaveBacklogBeforeClosing
-            || Backlog.Count is 0)
+        if (Backlog.Count is 0 || !ConfigManager.Instance.AutoSaveBacklogBeforeClosing)
         {
             return Task.CompletedTask;
         }
