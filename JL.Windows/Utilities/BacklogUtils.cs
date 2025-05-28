@@ -12,28 +12,29 @@ namespace JL.Windows.Utilities;
 internal static class BacklogUtils
 {
     private static LinkedListNode<string>? s_currentNode;
-    public static LinkedList<string> Backlog { get; } = [];
+    private static readonly LinkedList<string> s_backlog = [];
+    public static string? LastItem => s_backlog.Last?.Value;
 
     public static void AddToBacklog(string text)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.MaxBacklogCapacity is not -1 && Backlog.Count > configManager.MaxBacklogCapacity)
+        if (configManager.MaxBacklogCapacity is not -1 && s_backlog.Count > configManager.MaxBacklogCapacity)
         {
-            Backlog.RemoveFirst();
+            s_backlog.RemoveFirst();
         }
 
-        s_currentNode = Backlog.AddLast(text);
+        s_currentNode = s_backlog.AddLast(text);
     }
 
     public static void ReplaceLastBacklogText(string text)
     {
-        if (Backlog.Last is not null)
+        if (s_backlog.Last is not null)
         {
-            Backlog.Last.Value = text;
+            s_backlog.Last.Value = text;
         }
         else
         {
-            s_currentNode = Backlog.AddLast(text);
+            s_currentNode = s_backlog.AddLast(text);
         }
     }
 
@@ -73,7 +74,7 @@ internal static class BacklogUtils
 
         if (s_currentNode.Next is not null)
         {
-            mainWindow.MainTextBox.Foreground = s_currentNode.Next != Backlog.Last
+            mainWindow.MainTextBox.Foreground = s_currentNode.Next != s_backlog.Last
                 ? ConfigManager.Instance.MainWindowBacklogTextColor
                 : ConfigManager.Instance.MainWindowTextColor;
 
@@ -110,11 +111,11 @@ internal static class BacklogUtils
             StatsUtils.IncrementStat(StatType.Characters, -textLength);
         }
 
-        LinkedListNode<string>? newCurrentNode = s_currentNode.Previous ?? Backlog.Last;
-        Backlog.Remove(s_currentNode);
+        LinkedListNode<string>? newCurrentNode = s_currentNode.Previous ?? s_backlog.Last;
+        s_backlog.Remove(s_currentNode);
         s_currentNode = newCurrentNode;
 
-        mainTextBox.Foreground = newCurrentNode != Backlog.Last
+        mainTextBox.Foreground = newCurrentNode != s_backlog.Last
             ? configManager.MainWindowBacklogTextColor
             : configManager.MainWindowTextColor;
 
@@ -125,7 +126,7 @@ internal static class BacklogUtils
 
     public static void ShowAllBacklog()
     {
-        if (Backlog.Count is 0)
+        if (s_backlog.Count is 0)
         {
             return;
         }
@@ -136,7 +137,7 @@ internal static class BacklogUtils
             return;
         }
 
-        string allBacklogText = string.Join('\n', Backlog);
+        string allBacklogText = string.Join('\n', s_backlog);
         if (mainWindow.MainTextBox.Text != allBacklogText
             && mainWindow.MainTextBox.GetFirstVisibleLineIndex() is 0)
         {
@@ -156,7 +157,7 @@ internal static class BacklogUtils
 
     public static Task WriteBacklog()
     {
-        if (Backlog.Count is 0 || !ConfigManager.Instance.AutoSaveBacklogBeforeClosing)
+        if (s_backlog.Count is 0 || !ConfigManager.Instance.AutoSaveBacklogBeforeClosing)
         {
             return Task.CompletedTask;
         }
@@ -167,13 +168,13 @@ internal static class BacklogUtils
             _ = Directory.CreateDirectory(directory);
         }
 
-        return File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{ProfileUtils.CurrentProfileName}_{Process.GetCurrentProcess().StartTime:yyyy.MM.dd_HH.mm.ss}-{DateTime.Now:yyyy.MM.dd_HH.mm.ss}.txt")), Backlog);
+        return File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{ProfileUtils.CurrentProfileName}_{Process.GetCurrentProcess().StartTime:yyyy.MM.dd_HH.mm.ss}-{DateTime.Now:yyyy.MM.dd_HH.mm.ss}.txt")), s_backlog);
     }
 
     public static void ClearBacklog()
     {
-        string? lastText = Backlog.Last?.Value;
-        Backlog.Clear();
+        string? lastText = s_backlog.Last?.Value;
+        s_backlog.Clear();
         s_currentNode = null;
 
         if (lastText is not null)
@@ -190,20 +191,61 @@ internal static class BacklogUtils
         if (configManager.MaxBacklogCapacity > 0)
         {
             bool changeCurrentNodeToLast = false;
-            while (Backlog.Count > configManager.MaxBacklogCapacity)
+            while (s_backlog.Count > configManager.MaxBacklogCapacity)
             {
-                changeCurrentNodeToLast = changeCurrentNodeToLast || Backlog.Last == s_currentNode;
-                Backlog.RemoveLast();
+                changeCurrentNodeToLast = changeCurrentNodeToLast || s_backlog.Last == s_currentNode;
+                s_backlog.RemoveLast();
             }
 
             if (changeCurrentNodeToLast)
             {
-                s_currentNode = Backlog.Last;
+                s_currentNode = s_backlog.Last;
                 Debug.Assert(s_currentNode is not null);
                 TextBox mainTextBox = MainWindow.Instance.MainTextBox;
                 mainTextBox.Foreground = configManager.MainWindowTextColor;
                 mainTextBox.Text = s_currentNode.Value;
             }
+        }
+    }
+
+    public static void RecalculateCharacterCountStats()
+    {
+        if (s_backlog.Count is 0)
+        {
+            return;
+        }
+
+        ulong characterCount = 0;
+        ulong lineCount = 0;
+
+        ConfigManager configManager = ConfigManager.Instance;
+        LinkedListNode<string>? currentBacklogNode = s_backlog.First;
+        while (currentBacklogNode is not null)
+        {
+            string text = currentBacklogNode.Value;
+            if (configManager.StripPunctuationBeforeCalculatingCharacterCount)
+            {
+                text = JapaneseUtils.RemovePunctuation(text);
+            }
+
+            if (text.Length > 0)
+            {
+                ++lineCount;
+                characterCount += (ulong)new StringInfo(text).LengthInTextElements;
+            }
+
+            currentBacklogNode = currentBacklogNode.Previous;
+        }
+
+        if (configManager.StripPunctuationBeforeCalculatingCharacterCount)
+        {
+            StatsUtils.IncrementStat(StatType.Characters, -(long)(StatsUtils.SessionStats.Characters - characterCount));
+            StatsUtils.IncrementStat(StatType.Lines, -(long)(StatsUtils.SessionStats.Lines - lineCount));
+        }
+        else
+        {
+            StatsUtils.IncrementStat(StatType.Characters, (long)(characterCount - StatsUtils.SessionStats.Characters));
+            StatsUtils.IncrementStat(StatType.Lines, (long)(lineCount - StatsUtils.SessionStats.Lines));
         }
     }
 }

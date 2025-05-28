@@ -266,39 +266,9 @@ internal sealed class ConfigManager
 
         bool stripPunctuationBeforeCalculatingCharacterCount = StripPunctuationBeforeCalculatingCharacterCount;
         StripPunctuationBeforeCalculatingCharacterCount = ConfigDBManager.GetValueFromConfig(connection, StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount));
-        if (stripPunctuationBeforeCalculatingCharacterCount != StripPunctuationBeforeCalculatingCharacterCount && BacklogUtils.Backlog.Count > 0)
+        if (stripPunctuationBeforeCalculatingCharacterCount != StripPunctuationBeforeCalculatingCharacterCount)
         {
-            ulong characterCount = 0;
-            ulong lineCount = 0;
-
-            LinkedListNode<string>? currentBacklogNode = BacklogUtils.Backlog.First;
-            while (currentBacklogNode is not null)
-            {
-                string text = currentBacklogNode.Value;
-                if (StripPunctuationBeforeCalculatingCharacterCount)
-                {
-                    text = JapaneseUtils.RemovePunctuation(text);
-                }
-
-                if (text.Length > 0)
-                {
-                    ++lineCount;
-                    characterCount += (ulong)new StringInfo(text).LengthInTextElements;
-                }
-
-                currentBacklogNode = currentBacklogNode.Previous;
-            }
-
-            if (StripPunctuationBeforeCalculatingCharacterCount)
-            {
-                StatsUtils.IncrementStat(StatType.Characters, -(long)(StatsUtils.SessionStats.Characters - characterCount));
-                StatsUtils.IncrementStat(StatType.Lines, -(long)(StatsUtils.SessionStats.Lines - lineCount));
-            }
-            else
-            {
-                StatsUtils.IncrementStat(StatType.Characters, (long)(characterCount - StatsUtils.SessionStats.Characters));
-                StatsUtils.IncrementStat(StatType.Lines, (long)(lineCount - StatsUtils.SessionStats.Lines));
-            }
+            BacklogUtils.RecalculateCharacterCountStats();
         }
 
         LookupOnClickMouseButton = ConfigDBManager.GetValueEnumValueFromConfig(connection, LookupOnClickMouseButton, nameof(LookupOnClickMouseButton));
@@ -519,7 +489,7 @@ internal sealed class ConfigManager
         MainWindowTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, MainWindowTextColor, nameof(MainWindowTextColor));
         MainWindowBacklogTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
 
-        mainWindow.MainTextBox.Foreground = MaxBacklogCapacity is 0 || mainWindow.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
+        mainWindow.MainTextBox.Foreground = MaxBacklogCapacity is 0 || mainWindow.MainTextBox.Text == (BacklogUtils.LastItem ?? "")
             ? MainWindowTextColor
             : MainWindowBacklogTextColor;
 
