@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Timers;
@@ -69,8 +70,11 @@ public static class NetworkUtils
                             {
                                 foundRelease = true;
 
+                                string? changelog = rootElement.GetProperty("body").GetString();
+                                changelog = string.IsNullOrWhiteSpace(changelog) ? "" : $"\n\nChangelog:\n{changelog}";
+
                                 if (Utils.Frontend.ShowYesNoDialog(
-                                        "A new version of JL is available. Would you like to download it now?", "Update JL?"))
+                                        string.Create(CultureInfo.InvariantCulture, $"JL v{latestJLVersion} is available.{changelog}\n\nWould you like to download it now?"), "Update JL?"))
                                 {
                                     Utils.Frontend.ShowOkDialog(
                                         "This may take a while. Please don't manually shut down the program until it's updated.", "Info");
