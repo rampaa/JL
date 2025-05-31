@@ -120,7 +120,7 @@ internal sealed partial class StatsWindow
 
                 default:
                     Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatsMode), nameof(StatsWindow), nameof(ButtonSwapStats_OnClick), mode);
-                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid stats mode: {mode}");
+                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid stats mode: {mode}");
                     break;
             }
         }

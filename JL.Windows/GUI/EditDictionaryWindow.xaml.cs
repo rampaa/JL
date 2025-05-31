@@ -262,7 +262,7 @@ internal sealed partial class EditDictionaryWindow
 
             default:
                 Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(EditDictionaryWindow), nameof(BrowsePathButton_OnClick), selectedDictType);
-                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {selectedDictType}");
+                WindowsUtils.Alert(AlertLevel.Error, $"Invalid dictionary type: {selectedDictType}");
                 break;
         }
     }

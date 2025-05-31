@@ -694,7 +694,7 @@ internal sealed class ConfigManager
                 default:
                     ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursor", "BottomRight");
                     Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupPositionRelativeToCursor", nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorStr);
-                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor option: {popupPositionRelativeToCursorStr}");
+                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor option: {popupPositionRelativeToCursorStr}");
                     break;
             }
         }
@@ -721,7 +721,7 @@ internal sealed class ConfigManager
                 default:
                     ConfigDBManager.UpdateSetting(connection, "PopupFlip", "Both");
                     Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupFlip", nameof(ConfigManager), nameof(ApplyPreferences), popupFlipStr);
-                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid PopupFlip: {popupFlipStr}");
+                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid PopupFlip: {popupFlipStr}");
                     break;
             }
         }

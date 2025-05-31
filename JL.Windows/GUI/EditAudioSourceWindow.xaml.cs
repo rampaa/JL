@@ -68,7 +68,7 @@ internal sealed partial class EditAudioSourceWindow
 
             default:
                 Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(EditAudioSourceWindow), nameof(EditAudioSourceWindow), _audioSource.Type);
-                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid audio source type: {_audioSource.Type}");
+                WindowsUtils.Alert(AlertLevel.Error, $"Invalid audio source type: {_audioSource.Type}");
                 break;
         }
     }

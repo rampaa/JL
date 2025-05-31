@@ -202,7 +202,7 @@ internal sealed partial class AddAudioSourceWindow
 
             default:
                 Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AddAudioSourceWindow), nameof(AudioSourceTypeComboBox_SelectionChanged), audioSourceType);
-                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSourceType}");
+                WindowsUtils.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSourceType}");
                 break;
         }
     }

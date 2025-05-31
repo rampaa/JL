@@ -8,6 +8,7 @@ using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
+using JL.Windows.Utilities;
 using Microsoft.Win32;
 
 namespace JL.Windows.GUI;
@@ -156,7 +157,7 @@ internal sealed partial class AddFrequencyWindow
 
             default:
                 Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(AddFrequencyWindow), nameof(BrowsePathButton_OnClick), selectedFreqType);
-                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid frequency type: {selectedFreqType}");
+                WindowsUtils.Alert(AlertLevel.Error, $"Invalid frequency type: {selectedFreqType}");
                 break;
         }
     }
