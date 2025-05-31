@@ -522,7 +522,7 @@ public static class DictUtils
         {
             bool useDB = dict.Options.UseDB.Value;
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
-            string dbJournalPath = dbPath + "-journal";
+            string dbJournalPath = $"{dbPath}-journal";
             bool dbExists = File.Exists(dbPath);
             bool dbExisted = dbExists;
             bool dbJournalExists = File.Exists(dbJournalPath);

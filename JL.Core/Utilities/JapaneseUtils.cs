@@ -290,7 +290,7 @@ public static partial class JapaneseUtils
         {
             if (i + 1 < text.Length && s_smallCombiningKanaSet.Contains(text[i + 1]))
             {
-                combinedForm.Add(string.Create(CultureInfo.InvariantCulture, $"{text[i]}{text[i + 1]}"));
+                combinedForm.Add(text.Slice(i, 2).ToString());
                 ++i;
             }
 

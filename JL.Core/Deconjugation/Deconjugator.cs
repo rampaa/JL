@@ -8,7 +8,7 @@ internal static class Deconjugator
 {
     public static Rule[] Rules { get; set; } = [];
 
-    private static Form? StdruleDeconjugateInner(Form myForm, in VirtualRule myRule)
+    private static Form? StandardRuleDeconjugateInner(Form myForm, in VirtualRule myRule)
     {
         // tag doesn't match
         if (myForm.Tags.Count > 0 && myForm.Tags[^1] != myRule.ConTag)
@@ -27,7 +27,7 @@ internal static class Deconjugator
             return null;
         }
 
-        string newText = myForm.Text[..^myRule.ConEnd.Length] + myRule.DecEnd;
+        string newText = string.Concat(myForm.Text.AsSpan(0, myForm.Text.Length - myRule.ConEnd.Length), myRule.DecEnd);
         return new Form(newText, myForm.OriginalText,
             myForm.Tags.Count is 0
                 ? [myRule.ConTag, myRule.DecTag]
@@ -35,7 +35,7 @@ internal static class Deconjugator
             [.. myForm.Process, myRule.Detail]);
     }
 
-    private static List<Form>? StdruleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? StandardRuleDeconjugate(Form myForm, in Rule myRule)
     {
         // can't deconjugate nothingness
         if (myForm.Text.Length is 0)
@@ -75,7 +75,7 @@ internal static class Deconjugator
                 myRule.Detail
             );
 
-            Form? result = StdruleDeconjugateInner(myForm, virtualRule);
+            Form? result = StandardRuleDeconjugateInner(myForm, virtualRule);
             return result is not null
                 ? [result]
                 : null;
@@ -97,7 +97,7 @@ internal static class Deconjugator
                 multiConTag ? myRule.ConTags[i] : singleConTag!,
                 myRule.Detail
             );
-            Form? ret = StdruleDeconjugateInner(myForm, virtualRule);
+            Form? ret = StandardRuleDeconjugateInner(myForm, virtualRule);
             if (ret is not null)
             {
                 collection.Add(ret);
@@ -109,47 +109,47 @@ internal static class Deconjugator
             : null;
     }
 
-    private static List<Form>? RewriteruleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? RewriteRuleDeconjugate(Form myForm, in Rule myRule)
     {
         return myForm.Text != myRule.ConEnds[0]
             ? null
-            : StdruleDeconjugate(myForm, myRule);
+            : StandardRuleDeconjugate(myForm, myRule);
     }
 
-    private static List<Form>? OnlyfinalruleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? OnlyFinalRuleDeconjugate(Form myForm, in Rule myRule)
     {
         return myForm.Tags.Count is not 0
             ? null
-            : StdruleDeconjugate(myForm, myRule);
+            : StandardRuleDeconjugate(myForm, myRule);
     }
 
-    private static List<Form>? NeverfinalruleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? NeverFinalRuleDeconjugate(Form myForm, in Rule myRule)
     {
         return myForm.Tags.Count is 0
             ? null
-            : StdruleDeconjugate(myForm, myRule);
+            : StandardRuleDeconjugate(myForm, myRule);
     }
 
-    private static List<Form>? ContextruleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? ContextRuleDeconjugate(Form myForm, in Rule myRule)
     {
         bool result = myRule.ContextRule switch
         {
-            "v1inftrap" => V1InftrapCheck(myForm),
-            "saspecial" => SaspecialCheck(myForm, myRule),
+            "v1inftrap" => V1InfTrapCheck(myForm),
+            "saspecial" => SaSpecialCheck(myForm, myRule),
             _ => false
         };
 
         return result
-            ? StdruleDeconjugate(myForm, myRule)
+            ? StandardRuleDeconjugate(myForm, myRule)
             : null;
     }
 
-    private static bool V1InftrapCheck(Form myForm)
+    private static bool V1InfTrapCheck(Form myForm)
     {
         return myForm.Tags.Count is not 1 || myForm.Tags[0] is not "stem-ren";
     }
 
-    private static bool SaspecialCheck(Form myForm, in Rule myRule)
+    private static bool SaSpecialCheck(Form myForm, in Rule myRule)
     {
         if (myForm.Text.Length is 0)
         {
@@ -157,13 +157,8 @@ internal static class Deconjugator
         }
 
         string conEnd = myRule.ConEnds[0];
-        if (!myForm.Text.AsSpan().EndsWith(conEnd, StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        string baseText = myForm.Text[..^conEnd.Length];
-        return !baseText.EndsWith('さ');
+        return myForm.Text.AsSpan().EndsWith(conEnd, StringComparison.Ordinal)
+            && !myForm.Text.AsSpan(0, myForm.Text.Length - conEnd.Length).EndsWith('さ');
     }
 
     public static List<Form> Deconjugate(string text)
@@ -183,11 +178,11 @@ internal static class Deconjugator
                     ref readonly Rule rule = ref rules[j];
                     List<Form>? newForm = rule.Type switch
                     {
-                        "stdrule" => StdruleDeconjugate(form, rule),
-                        "rewriterule" => RewriteruleDeconjugate(form, rule),
-                        "onlyfinalrule" => OnlyfinalruleDeconjugate(form, rule),
-                        "neverfinalrule" => NeverfinalruleDeconjugate(form, rule),
-                        "contextrule" => ContextruleDeconjugate(form, rule),
+                        "stdrule" => StandardRuleDeconjugate(form, rule),
+                        "rewriterule" => RewriteRuleDeconjugate(form, rule),
+                        "onlyfinalrule" => OnlyFinalRuleDeconjugate(form, rule),
+                        "neverfinalrule" => NeverFinalRuleDeconjugate(form, rule),
+                        "contextrule" => ContextRuleDeconjugate(form, rule),
                         _ => null
                     };
 

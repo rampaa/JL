@@ -56,7 +56,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", nameTypes)}] ");
             }
 
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions[i])}");
+            _ = defResult.Append(string.Join("; ", definitions[i]));
 
             // if (showRelatedTerms)
             // {
