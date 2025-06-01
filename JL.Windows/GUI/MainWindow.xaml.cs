@@ -59,6 +59,7 @@ internal sealed partial class MainWindow
         InitializeComponent();
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow(0);
+        Utils.Frontend = new WindowsFrontend();
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -66,7 +67,6 @@ internal sealed partial class MainWindow
     {
         base.OnSourceInitialized(e);
 
-        Utils.Frontend = new WindowsFrontend();
         _input = InputMethod.Current;
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;

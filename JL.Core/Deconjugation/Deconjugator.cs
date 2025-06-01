@@ -157,8 +157,9 @@ internal static class Deconjugator
         }
 
         string conEnd = myRule.ConEnds[0];
-        return myForm.Text.AsSpan().EndsWith(conEnd, StringComparison.Ordinal)
-            && !myForm.Text.AsSpan(0, myForm.Text.Length - conEnd.Length).EndsWith('さ');
+        ReadOnlySpan<char> textSpan = myForm.Text.AsSpan();
+        return textSpan.EndsWith(conEnd, StringComparison.Ordinal)
+            && !textSpan[..^conEnd.Length].EndsWith('さ');
     }
 
     public static List<Form> Deconjugate(string text)
