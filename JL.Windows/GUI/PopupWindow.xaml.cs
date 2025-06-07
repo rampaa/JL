@@ -2417,10 +2417,7 @@ internal sealed partial class PopupWindow
         bool isFirstPopup = PopupIndex is 0;
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (isFirstPopup
-            && (configManager.TextOnlyVisibleOnHover || configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
-            && !AddNameWindow.IsItVisible()
-            && !AddWordWindow.IsItVisible())
+        if (isFirstPopup)
         {
             _ = mainWindow.ChangeVisibility().ConfigureAwait(true);
         }

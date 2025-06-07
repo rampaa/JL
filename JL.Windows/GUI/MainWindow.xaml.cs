@@ -1575,6 +1575,11 @@ internal sealed partial class MainWindow
             {
                 Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
             }
+
+            if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                await MpvUtils.ResumePlayback().ConfigureAwait(false);
+            }
         }
     }
 
@@ -1612,7 +1617,7 @@ internal sealed partial class MainWindow
         }
     }
 
-    private void Window_MouseEnter(object sender, MouseEventArgs e)
+    private async void Window_MouseEnter(object sender, MouseEventArgs e)
     {
         if (FirstPopupWindow.IsVisible)
         {
@@ -1643,6 +1648,11 @@ internal sealed partial class MainWindow
 
             WinApi.StealFocus(WindowHandle);
             _ = Focus();
+        }
+
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+        {
+            await MpvUtils.PausePlayback().ConfigureAwait(false);
         }
     }
 

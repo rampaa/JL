@@ -1,5 +1,4 @@
 using System.Net.WebSockets;
-using System.Text;
 using JL.Core.Config;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -10,9 +9,6 @@ public static class WebSocketUtils
 {
     private static Task? s_webSocketTask;
     private static CancellationTokenSource? s_webSocketCancellationTokenSource;
-
-    private static readonly Encoding s_utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
-
     public static bool Connected => !s_webSocketTask?.IsCompleted ?? false;
 
     public static void HandleWebSocket()
@@ -70,7 +66,7 @@ public static class WebSocketUtils
 
                                 _ = memoryStream.Seek(0, SeekOrigin.Begin);
 
-                                string text = s_utf8NoBom.GetString(memoryStream.ToArray());
+                                string text = NetworkUtils.s_utf8NoBom.GetString(memoryStream.ToArray());
                                 _ = Task.Run(() => Utils.Frontend.CopyFromWebSocket(text), cancellationToken).ConfigureAwait(false);
                             }
                         }

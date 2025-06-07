@@ -612,6 +612,32 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                        Cursor="Help"
+                                       ToolTip="Automatically pause the video playing in MPV when the mouse hovers over JL.
+                                         &#10;Playback resumes when the mouse leaves JL, but only if the video was paused by this setting.
+                                         &#10;For this to work, you must add the following line to your mpv.conf file:
+                                         &#10;input-ipc-server=&lt;&quot;MPV named pipe path&quot;&gt; (e.g., input-ipc-server=/tmp/mpv-socket)" >
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Automatically pause the video playing in MPV on hover and resume on mouse leave"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <CheckBox x:Name="AutoPauseOrResumeMpvOnHoverChangeCheckBox" HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                       Cursor="Help"
+                                       ToolTip="This is the path of the named pipe JL uses to communicate with MPV.
+                                         &#10;To create this pipe, add input-ipc-server=&lt;path&gt; (e.g., input-ipc-server=/tmp/mpv-socket) to your mpv.conf file.
+                                         &#10;This is required for the &quot;Automatically pause the video playing in MPV on hover and resume on mouse leave&quot; option to work." >
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="MPV named pipe path" VerticalAlignment="Center" TextWrapping="Wrap"
+                                       Style="{StaticResource TextBlockDefault}"/>
+                                    <hc:TextBox x:Name="MpvNamedPipePathTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                       Cursor="Help"
                                        ToolTip="Attempts to steal focus from the currently active window on mouse hover.
                                        &#10;Note that JL may need to attach itself to currently activated window's thread to do this, which could be seen as an intrusive action.
                                        &#10;Keep that in mind before enabling this option.

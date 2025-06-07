@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using System.Timers;
 using JL.Core.Config;
@@ -17,6 +18,8 @@ public static class NetworkUtils
         UseProxy = false,
         CheckCertificateRevocationList = true
     });
+
+    internal static readonly Encoding s_utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
 
     internal const string Jpod101NoAudioMd5Hash = "7E2C2F954EF6051373BA916F000168DC";
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");

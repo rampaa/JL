@@ -49,6 +49,7 @@ internal sealed class ConfigManager
     public bool TextOnlyVisibleOnHover { get; set; } // = false;
     public bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } // = false;
     public double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100
+    public bool AutoPauseOrResumeMpvOnHoverChange { get; private set; } // = false;
     public bool TextBoxIsReadOnly { get; set; } = true;
     public bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
     public bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } // = false;
@@ -324,6 +325,7 @@ internal sealed class ConfigManager
         FixedPopupBottomPositioning = ConfigDBManager.GetValueFromConfig(connection, FixedPopupBottomPositioning, nameof(FixedPopupBottomPositioning));
         ChangeMainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetValueFromConfig(connection, ChangeMainWindowBackgroundOpacityOnUnhover, nameof(ChangeMainWindowBackgroundOpacityOnUnhover));
         TextOnlyVisibleOnHover = ConfigDBManager.GetValueFromConfig(connection, TextOnlyVisibleOnHover, nameof(TextOnlyVisibleOnHover));
+        AutoPauseOrResumeMpvOnHoverChange = ConfigDBManager.GetValueFromConfig(connection, AutoPauseOrResumeMpvOnHoverChange, nameof(AutoPauseOrResumeMpvOnHoverChange));
         OnlyCaptureTextWithJapaneseChars = ConfigDBManager.GetValueFromConfig(connection, OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars));
         DisableLookupsForNonJapaneseCharsInMainWindow = ConfigDBManager.GetValueFromConfig(connection, DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow));
         MainWindowFocusOnHover = ConfigDBManager.GetValueFromConfig(connection, MainWindowFocusOnHover, nameof(MainWindowFocusOnHover));
@@ -894,6 +896,7 @@ internal sealed class ConfigManager
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         preferenceWindow.SearchUrlTextBox.Text = SearchUrl;
         preferenceWindow.BrowserPathTextBox.Text = BrowserPath;
+        preferenceWindow.MpvNamedPipePathTextBox.Text = coreConfigManager.MpvNamedPipePath;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = coreConfigManager.AnkiConnectUri.OriginalString;
         preferenceWindow.WebSocketUriTextBox.Text = coreConfigManager.WebSocketUri.OriginalString;
@@ -916,6 +919,7 @@ internal sealed class ConfigManager
         preferenceWindow.FocusableCheckBox.IsChecked = Focusable;
         preferenceWindow.RestoreFocusToPreviouslyActiveWindowCheckBox.IsChecked = RestoreFocusToPreviouslyActiveWindow;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
+        preferenceWindow.AutoPauseOrResumeMpvOnHoverChangeCheckBox.IsChecked = AutoPauseOrResumeMpvOnHoverChange;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = coreConfigManager.AnkiIntegration;
 
         preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked = MainWindowDynamicWidth;
@@ -1150,6 +1154,7 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(SearchUrl), preferenceWindow.SearchUrlTextBox.Text);
             ConfigDBManager.UpdateSetting(connection, nameof(BrowserPath), preferenceWindow.BrowserPathTextBox.Text);
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.MpvNamedPipePath), preferenceWindow.MpvNamedPipePathTextBox.Text);
 
             ConfigDBManager.UpdateSetting(connection, nameof(MaxSearchLength),
                 preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
@@ -1332,6 +1337,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(TextOnlyVisibleOnHover),
                 preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(AutoPauseOrResumeMpvOnHoverChange),
+                preferenceWindow.AutoPauseOrResumeMpvOnHoverChangeCheckBox.IsChecked.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiIntegration),
                 preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString());

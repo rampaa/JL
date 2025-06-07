@@ -23,6 +23,7 @@ public sealed class CoreConfigManager
     public bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public bool TextBoxRemoveNewlines { get; private set; } // = false;
     public Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
+    public string MpvNamedPipePath { get; private set; } = "/tmp/mpv-socket";
     public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public bool TrackTermLookupCounts { get; private set; } // = false;
     public int MinCharactersPerMinuteBeforeStoppingTimeTracking { get; private set; } = 10;
@@ -71,9 +72,11 @@ public sealed class CoreConfigManager
             AutoReconnectToWebSocket = ConfigDBManager.GetValueFromConfig(connection, AutoReconnectToWebSocket, nameof(AutoReconnectToWebSocket));
 
             string? webSocketUriStr = ConfigDBManager.GetSettingValue(connection, nameof(WebSocketUri));
+            bool webSocketUriChanged = true;
             if (webSocketUriStr is null)
             {
                 ConfigDBManager.InsertSetting(connection, nameof(WebSocketUri), WebSocketUri.OriginalString);
+                webSocketUriChanged = true;
             }
             else
             {
@@ -83,7 +86,11 @@ public sealed class CoreConfigManager
 
                 if (Uri.TryCreate(webSocketUriStr, UriKind.Absolute, out Uri? webSocketUri))
                 {
-                    WebSocketUri = webSocketUri;
+                    if (WebSocketUri.OriginalString != webSocketUri.OriginalString)
+                    {
+                        WebSocketUri = webSocketUri;
+                        webSocketUriChanged = true;
+                    }
                 }
                 else
                 {
@@ -92,7 +99,10 @@ public sealed class CoreConfigManager
                 }
             }
 
-            WebSocketUtils.HandleWebSocket();
+            if (!WebSocketUtils.Connected || webSocketUriChanged)
+            {
+                WebSocketUtils.HandleWebSocket();
+            }
         }
 
         if (TrackTermLookupCounts)
@@ -125,5 +135,6 @@ public sealed class CoreConfigManager
         CaptureTextFromClipboard = ConfigDBManager.GetValueFromConfig(connection, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard));
         MinCharactersPerMinuteBeforeStoppingTimeTracking = ConfigDBManager.GetValueFromConfig(connection, MinCharactersPerMinuteBeforeStoppingTimeTracking, nameof(MinCharactersPerMinuteBeforeStoppingTimeTracking));
         LookupCategory = ConfigDBManager.GetValueEnumValueFromConfig(connection, LookupCategory, nameof(LookupCategory));
+        MpvNamedPipePath = ConfigDBManager.GetValueFromConfig(connection, MpvNamedPipePath, nameof(MpvNamedPipePath));
     }
 }

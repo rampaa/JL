@@ -606,6 +606,11 @@ internal static class WindowsUtils
                         mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
                     }
 
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        _ = MpvUtils.ResumePlayback();
+                    }
+
                     nint lastActiveWindowHandle = LastActiveWindowHandle;
                     if (configManager.RestoreFocusToPreviouslyActiveWindow
                         && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
