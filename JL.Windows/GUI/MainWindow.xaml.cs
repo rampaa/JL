@@ -469,6 +469,7 @@ internal sealed partial class MainWindow
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
+        await WebSocketUtils.Disconnect().ConfigureAwait(true);
 
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(false))
@@ -725,8 +726,6 @@ internal sealed partial class MainWindow
         else if (keyGesture.IsEqual(configManager.CaptureTextFromWebSocketKeyGesture))
         {
             coreConfigManager.CaptureTextFromWebSocket = !coreConfigManager.CaptureTextFromWebSocket;
-            WebSocketUtils.HandleWebSocket();
-
             if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
             {
                 StatsUtils.StopTimeStatStopWatch();
@@ -735,6 +734,8 @@ internal sealed partial class MainWindow
             {
                 StatsUtils.StartTimeStatStopWatch();
             }
+
+            return WebSocketUtils.HandleWebSocket();
         }
 
         else if (keyGesture.IsEqual(configManager.ReconnectToWebSocketServerKeyGesture))
@@ -746,7 +747,8 @@ internal sealed partial class MainWindow
                 {
                     StatsUtils.StartTimeStatStopWatch();
                 }
-                WebSocketUtils.HandleWebSocket();
+
+                return WebSocketUtils.HandleWebSocket();
             }
         }
 

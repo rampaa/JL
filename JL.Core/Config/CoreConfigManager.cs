@@ -101,7 +101,7 @@ public sealed class CoreConfigManager
 
             if (!WebSocketUtils.Connected || webSocketUriChanged)
             {
-                WebSocketUtils.HandleWebSocket();
+                _ = WebSocketUtils.HandleWebSocket();
             }
         }
 
