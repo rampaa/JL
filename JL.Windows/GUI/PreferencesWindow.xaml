@@ -612,12 +612,12 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                        Cursor="Help"
-                                       ToolTip="Automatically pause the video playing in MPV when the mouse hovers over JL.
+                                       ToolTip="Automatically pause the video playing in mpv when the mouse hovers over JL.
                                          &#10;Playback resumes when the mouse leaves JL, but only if the video was paused by this setting.
                                          &#10;For this to work, you must add the following line to your mpv.conf file:
-                                         &#10;input-ipc-server=&lt;&quot;MPV named pipe path&quot;&gt; (e.g., input-ipc-server=/tmp/mpv-socket)" >
+                                         &#10;input-ipc-server=&lt;&quot;Named pipe path for mpv&quot;&gt; (e.g., input-ipc-server=/tmp/mpv-socket)" >
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="Automatically pause the video playing in MPV on hover and resume on mouse leave"
+                                    <TextBlock HorizontalAlignment="Left" Text="Automatically pause the video playing in mpv on hover and resume on mouse leave"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                                     <CheckBox x:Name="AutoPauseOrResumeMpvOnHoverChangeCheckBox" HorizontalAlignment="Right" />
@@ -626,11 +626,11 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                        Cursor="Help"
-                                       ToolTip="This is the path of the named pipe JL uses to communicate with MPV.
+                                       ToolTip="This is the path of the named pipe JL uses to communicate with mpv.
                                          &#10;To create this pipe, add input-ipc-server=&lt;path&gt; (e.g., input-ipc-server=/tmp/mpv-socket) to your mpv.conf file.
-                                         &#10;This is required for the &quot;Automatically pause the video playing in MPV on hover and resume on mouse leave&quot; option to work." >
+                                         &#10;This is required for the &quot;Automatically pause the video playing in mpv on hover and resume on mouse leave&quot; option to work." >
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="MPV named pipe path" VerticalAlignment="Center" TextWrapping="Wrap"
+                                    <TextBlock HorizontalAlignment="Left" Text="Named pipe path for mpv" VerticalAlignment="Center" TextWrapping="Wrap"
                                        Style="{StaticResource TextBlockDefault}"/>
                                     <hc:TextBox x:Name="MpvNamedPipePathTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap" />
                                 </DockPanel>
