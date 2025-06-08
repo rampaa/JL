@@ -321,7 +321,7 @@ public static partial class JapaneseUtils
     // Katakana (30A0–30FF)
     // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included
     // Halfwidth Katakana (FF66-FF9D)
-    public static bool IsKatakana(char character)
+    internal static bool IsKatakana(char character)
     {
         int codePoint = character;
         return codePoint is (>= 0x30A0 and <= 0x31FF) or (>= 0xFF66 and <= 0xFF9D);
