@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text.Json;
 using JL.Core.Config;
@@ -6,6 +7,7 @@ using JL.Core.Utilities;
 namespace JL.Core.Network;
 public static class MpvUtils
 {
+    private static DateTime s_lastPausedByJLTime;
     private static bool s_pausedByJL; // = false
 
     public static async Task PausePlayback()
@@ -24,15 +26,22 @@ public static class MpvUtils
                 int bytesRead = await pipeClient.ReadAsync(buffer).ConfigureAwait(false);
                 string response = NetworkUtils.s_utf8NoBom.GetString(buffer, 0, bytesRead);
                 bool isPaused = JsonDocument.Parse(response).RootElement.GetProperty("data").GetBoolean();
-                s_pausedByJL = !isPaused;
-
-                if (isPaused)
+                if (!isPaused)
                 {
-                    return;
-                }
+                    byte[] pauseCommand = NetworkUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",true]}\n");
+                    await pipeClient.WriteAsync(pauseCommand).ConfigureAwait(false);
 
-                byte[] pauseCommand = NetworkUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",true]}\n");
-                await pipeClient.WriteAsync(pauseCommand).ConfigureAwait(false);
+                    s_pausedByJL = true;
+                    s_lastPausedByJLTime = new DateTime(Stopwatch.GetTimestamp());
+                }
+                else
+                {
+                    DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
+                    if ((preciseTimeNow - s_lastPausedByJLTime).TotalMilliseconds > 250)
+                    {
+                        s_pausedByJL = false;
+                    }
+                }
             }
         }
         catch (TimeoutException)
