@@ -1998,13 +1998,12 @@ internal sealed partial class MainWindow
         }
     }
 
-    private void Window_ContextMenuClosing(object sender, ContextMenuEventArgs e)
+    private async void Window_ContextMenuClosing(object sender, ContextMenuEventArgs e)
     {
         _contextMenuIsClosed = true;
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (!configManager.AutoPauseOrResumeMpvOnHoverChange
-            || WindowState is WindowState.Minimized
+        if (WindowState is WindowState.Minimized
             || IsMouseOver
             || FirstPopupWindow.IsVisible
             || ManageDictionariesWindow.IsItVisible()
@@ -2022,6 +2021,28 @@ internal sealed partial class MainWindow
             return;
         }
 
-        _ = MpvUtils.ResumePlayback();
+        if (configManager.TextOnlyVisibleOnHover)
+        {
+            MainGrid.Opacity = 0;
+        }
+
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+        {
+            Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+        }
+
+        nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
+        if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
+            && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
+            && lastActiveWindowHandle is not 0
+            && lastActiveWindowHandle != WindowHandle)
+        {
+            WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+        }
+
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+        {
+            await MpvUtils.ResumePlayback().ConfigureAwait(false);
+        }
     }
 }
