@@ -33,7 +33,7 @@ public static class WebSocketUtils
     {
         if (s_webSocketClient?.State is WebSocketState.Open)
         {
-            await s_webSocketClient.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
+            await s_webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
         }
 
         if (s_webSocketCancellationTokenSource is not null)
@@ -79,7 +79,7 @@ public static class WebSocketUtils
                             {
                                 if (webSocketClient.State is WebSocketState.Open)
                                 {
-                                    await webSocketClient.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
+                                    await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
                                     s_webSocketTask = null;
                                 }
 
@@ -102,6 +102,11 @@ public static class WebSocketUtils
                                 string text = NetworkUtils.s_utf8NoBom.GetString(memoryStream.ToArray());
                                 _ = Task.Run(() => Utils.Frontend.CopyFromWebSocket(text), CancellationToken.None).ConfigureAwait(false);
                             }
+                            else if (result.MessageType is WebSocketMessageType.Close)
+                            {
+                                Utils.Logger.Information("WebSocket server is closed");
+                                break;
+                            }
                         }
                         catch (WebSocketException webSocketException)
                         {
@@ -113,11 +118,11 @@ public static class WebSocketUtils
                             if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
                             {
                                 Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
-                                Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
+                                // Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
                             }
                             else if (webSocketClient.State is WebSocketState.Open)
                             {
-                                await webSocketClient.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
+                                await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
                             }
 
                             break;
