@@ -114,9 +114,27 @@ public static class ProfileDBUtils
         return profiles;
     }
 
-    internal static bool ProfileExists(int profileId)
+    internal static bool ProfileExists(SqliteConnection connection)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT EXISTS
+            (
+                SELECT 1
+                FROM profile
+                WHERE id != 0
+            );
+            """;
+
+        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        _ = reader.Read();
+        return reader.GetBoolean(0);
+    }
+
+    internal static bool ProfileExists(SqliteConnection connection, int profileId)
+    {
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =

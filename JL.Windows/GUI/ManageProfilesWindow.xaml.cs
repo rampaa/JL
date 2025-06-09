@@ -64,8 +64,6 @@ internal sealed partial class ManageProfilesWindow
                 Cursor = Cursors.Hand
             };
 
-            bool defaultOrCurrentProfile = profileName == ProfileUtils.DefaultProfileName || profileName == ProfileUtils.CurrentProfileName;
-
             Button removeButton = new()
             {
                 Width = 75,
@@ -76,7 +74,7 @@ internal sealed partial class ManageProfilesWindow
                 Foreground = Brushes.White,
                 Background = Brushes.Red,
                 BorderThickness = new Thickness(1),
-                Visibility = defaultOrCurrentProfile
+                Visibility = profileName == ProfileUtils.CurrentProfileName
                     ? Visibility.Collapsed
                     : Visibility.Visible,
                 Tag = profileName

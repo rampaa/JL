@@ -78,8 +78,8 @@ public static class ConfigDBManager
             """;
         _ = command.ExecuteNonQuery();
 
-        bool globalProfileExists = ProfileDBUtils.ProfileExists(ProfileUtils.GlobalProfileId);
-        bool defaultProfileExists = ProfileDBUtils.ProfileExists(ProfileUtils.DefaultProfileId);
+        bool globalProfileExists = ProfileDBUtils.ProfileExists(connection, ProfileUtils.GlobalProfileId);
+        bool defaultProfileExists = ProfileDBUtils.ProfileExists(connection, ProfileUtils.DefaultProfileId);
 
         if (!globalProfileExists)
         {
@@ -93,7 +93,7 @@ public static class ConfigDBManager
             StatsDBUtils.InsertStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
         }
 
-        if (!defaultProfileExists)
+        if (!defaultProfileExists && !ProfileDBUtils.ProfileExists(connection))
         {
             ProfileDBUtils.InsertDefaultProfile(connection);
             StatsDBUtils.InsertStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
