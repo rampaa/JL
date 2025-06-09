@@ -45,6 +45,7 @@ internal sealed partial class MainWindow
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
     public bool ContextMenuIsOpening { get; private set; } // = false;
+    private bool _contextMenuIsClosed = true;
 
     private Point _swipeStartPoint;
     private InputMethod? _input;
@@ -137,15 +138,24 @@ internal sealed partial class MainWindow
         return false;
     }
 
-    public Task CopyFromWebSocket(string text)
+    public async Task CopyFromWebSocket(string text)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        return Dispatcher.Invoke(() => CopyText(text)
-                                       && configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
-                                       && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
-                                           || WindowState is WindowState.Minimized)
-            ? FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true)
-            : Task.CompletedTask, DispatcherPriority.Send);
+        await Dispatcher.Invoke(async () =>
+        {
+            if (CopyText(text)
+                && configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
+                && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+                    || WindowState is WindowState.Minimized))
+            {
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    await MpvUtils.PausePlayback().ConfigureAwait(true);
+                }
+
+                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
+            }
+        }, DispatcherPriority.Send).ConfigureAwait(false);
     }
 
     private bool CopyText(string text)
@@ -325,6 +335,11 @@ internal sealed partial class MainWindow
             && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                 || WindowState is WindowState.Minimized))
         {
+            if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                await MpvUtils.PausePlayback().ConfigureAwait(true);
+            }
+
             await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
         }
     }
@@ -671,7 +686,6 @@ internal sealed partial class MainWindow
         else if (keyGesture.IsEqual(configManager.SearchWithBrowserKeyGesture))
         {
             WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
-            WindowsUtils.UpdateMainWindowVisibility();
         }
 
         else if (keyGesture.IsEqual(configManager.InactiveLookupModeKeyGesture))
@@ -790,6 +804,11 @@ internal sealed partial class MainWindow
                 else
                 {
                     WinApi.MinimizeWindow(WindowHandle);
+
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        _ = MpvUtils.ResumePlayback();
+                    }
                 }
             }
         }
@@ -835,11 +854,21 @@ internal sealed partial class MainWindow
             {
                 if (configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
                 {
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        _ = MpvUtils.PausePlayback();
+                    }
+
                     return FirstPopupWindow.LookupOnSelect(MainTextBox);
                 }
 
                 if (MainTextBox.Text.Length > MainTextBox.CaretIndex)
                 {
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        _ = MpvUtils.PausePlayback();
+                    }
+
                     return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true);
                 }
             }
@@ -926,13 +955,19 @@ internal sealed partial class MainWindow
         OpacitySlider.Visibility = Visibility.Collapsed;
         FontSizeSlider.Visibility = Visibility.Collapsed;
 
-        if (ConfigManager.Instance.Focusable)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.Focusable)
         {
             WindowState = WindowState.Minimized;
         }
         else
         {
             WinApi.MinimizeWindow(WindowHandle);
+        }
+
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+        {
+            _ = MpvUtils.ResumePlayback();
         }
     }
 
@@ -1008,7 +1043,6 @@ internal sealed partial class MainWindow
                 : null;
 
         WindowsUtils.SearchWithBrowser(text);
-        WindowsUtils.UpdateMainWindowVisibility();
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -1540,6 +1574,7 @@ internal sealed partial class MainWindow
         }
 
         ContextMenuIsOpening = false;
+        _contextMenuIsClosed = false;
     }
 
     public async Task ChangeVisibility()
@@ -1578,6 +1613,15 @@ internal sealed partial class MainWindow
                 Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
             }
 
+            nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
+            if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
+                && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
+                && lastActiveWindowHandle is not 0
+                && lastActiveWindowHandle != WindowHandle)
+            {
+                WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+            }
+
             if (configManager.AutoPauseOrResumeMpvOnHoverChange)
             {
                 await MpvUtils.ResumePlayback().ConfigureAwait(false);
@@ -1598,25 +1642,6 @@ internal sealed partial class MainWindow
         }
 
         FirstPopupWindow.HidePopup();
-
-        nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
-        if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
-            && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
-            && lastActiveWindowHandle is not 0
-            && lastActiveWindowHandle != WindowHandle
-            && e.LeftButton is not MouseButtonState.Pressed
-            && !MainTextBoxContextMenu.IsVisible
-            && !TitleBarContextMenu.IsVisible
-            && !ManageDictionariesWindow.IsItVisible()
-            && !ManageFrequenciesWindow.IsItVisible()
-            && !ManageAudioSourcesWindow.IsItVisible()
-            && !AddNameWindow.IsItVisible()
-            && !AddWordWindow.IsItVisible()
-            && !PreferencesWindow.IsItVisible()
-            && !StatsWindow.IsItVisible())
-        {
-            WinApi.GiveFocusToWindow(lastActiveWindowHandle);
-        }
     }
 
     private async void Window_MouseEnter(object sender, MouseEventArgs e)
@@ -1652,7 +1677,7 @@ internal sealed partial class MainWindow
             _ = Focus();
         }
 
-        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange && _contextMenuIsClosed)
         {
             await MpvUtils.PausePlayback().ConfigureAwait(false);
         }
@@ -1811,6 +1836,7 @@ internal sealed partial class MainWindow
     private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         PopupWindowUtils.HidePopups(0);
+        _contextMenuIsClosed = false;
     }
 
     public void UpdatePosition()
@@ -1970,5 +1996,32 @@ internal sealed partial class MainWindow
             Width = width;
             Height = height;
         }
+    }
+
+    private void Window_ContextMenuClosing(object sender, ContextMenuEventArgs e)
+    {
+        _contextMenuIsClosed = true;
+
+        ConfigManager configManager = ConfigManager.Instance;
+        if (!configManager.AutoPauseOrResumeMpvOnHoverChange
+            || WindowState is WindowState.Minimized
+            || IsMouseOver
+            || FirstPopupWindow.IsVisible
+            || ManageDictionariesWindow.IsItVisible()
+            || ManageFrequenciesWindow.IsItVisible()
+            || ManageAudioSourcesWindow.IsItVisible()
+            || AddNameWindow.IsItVisible()
+            || AddWordWindow.IsItVisible()
+            || PreferencesWindow.IsItVisible()
+            || StatsWindow.IsItVisible()
+            || MainTextBoxContextMenu.IsVisible
+            || TitleBarContextMenu.IsVisible
+            || Mouse.LeftButton is MouseButtonState.Pressed
+            || (!configManager.TextBoxIsReadOnly && _input?.ImeState is InputMethodState.On))
+        {
+            return;
+        }
+
+        _ = MpvUtils.ResumePlayback();
     }
 }

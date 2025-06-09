@@ -312,6 +312,11 @@ internal static class WindowsUtils
         {
             CreateNoWindow = true
         });
+
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+        {
+            _ = MpvUtils.PausePlayback();
+        }
     }
 
     public static async Task UpdateJL(Uri latestReleaseUrl)
@@ -606,11 +611,6 @@ internal static class WindowsUtils
                         mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
                     }
 
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-                    {
-                        _ = MpvUtils.ResumePlayback();
-                    }
-
                     nint lastActiveWindowHandle = LastActiveWindowHandle;
                     if (configManager.RestoreFocusToPreviouslyActiveWindow
                         && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
@@ -618,6 +618,11 @@ internal static class WindowsUtils
                         && lastActiveWindowHandle != mainWindow.WindowHandle)
                     {
                         WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+                    }
+
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        _ = MpvUtils.ResumePlayback();
                     }
                 }
             }
@@ -642,6 +647,11 @@ internal static class WindowsUtils
                 && lastActiveWindowHandle != mainWindow.WindowHandle)
             {
                 WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+            }
+
+            if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                _ = MpvUtils.ResumePlayback();
             }
 
             if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized)

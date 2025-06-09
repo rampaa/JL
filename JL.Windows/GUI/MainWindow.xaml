@@ -27,7 +27,7 @@
 
         <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top"
                    HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent"
-                   MouseEnter="TitleBar_MouseEnter" MouseLeave="TitleBar_MouseLeave" ContextMenuOpening="TitleBar_ContextMenuOpening">
+                   MouseEnter="TitleBar_MouseEnter" MouseLeave="TitleBar_MouseLeave" ContextMenuOpening="TitleBar_ContextMenuOpening" ContextMenuClosing="Window_ContextMenuClosing">
             <Rectangle.ContextMenu>
                 <ContextMenu Name="TitleBarContextMenu">
                     <MenuItem
@@ -47,7 +47,7 @@
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
                  MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" PreviewTouchDown="MainTextBox_PreviewTouchDown" PreviewTouchUp="MainTextBox_PreviewTouchUp"
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" UndoLimit="0"
-                 PreviewMouseUp="MainTextBox_PreviewMouseUp" ContextMenuOpening="MainTextBox_ContextMenuOpening" AcceptsReturn="True" AcceptsTab="True">
+                 PreviewMouseUp="MainTextBox_PreviewMouseUp" ContextMenuOpening="MainTextBox_ContextMenuOpening" ContextMenuClosing="Window_ContextMenuClosing" AcceptsReturn="True" AcceptsTab="True">
 
             <uc:TouchScreenTextBox.ContextMenu>
                 <ContextMenu Name="MainTextBoxContextMenu" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight">

@@ -9,6 +9,7 @@ using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Mining;
+using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
@@ -1947,6 +1948,11 @@ internal sealed partial class PopupWindow
                 else
                 {
                     WinApi.MinimizeWindow(mainWindow.WindowHandle);
+
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        _ = MpvUtils.ResumePlayback();
+                    }
                 }
             }
         }
@@ -2471,16 +2477,6 @@ internal sealed partial class PopupWindow
             if (configManager.HighlightLongestMatch && !mainWindow.ContextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_previousTextBox);
-            }
-
-            nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
-            if (configManager.RestoreFocusToPreviouslyActiveWindow
-                && lastActiveWindowHandle is not 0
-                && lastActiveWindowHandle != mainWindow.WindowHandle
-                && ((configManager.PopupFocusOnLookup && mainWindow.WindowState is WindowState.Minimized)
-                    || (configManager.MainWindowFocusOnHover && !mainWindow.IsMouseOver)))
-            {
-                WinApi.GiveFocusToWindow(lastActiveWindowHandle);
             }
         }
 
