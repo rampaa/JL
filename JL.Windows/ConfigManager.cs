@@ -78,9 +78,9 @@ internal sealed class ConfigManager
     public bool RepositionMainWindowOnTextChangeByRightPosition { get; private set; } // = false;
     public double MainWindowFixedRightPosition { get; private set; } // = 0;
     public Color MainTextBoxDropShadowEffectColor { get; private set; } = Colors.Black;
-    public double MainTextBoxDropShadowEffectShadowDepth { get; private set; } = 1.3;
-    public int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 4;
-    public int MainTextBoxDropShadowEffectBlurOpacity { get; private set; } = 80;
+    public double MainTextBoxDropShadowEffectShadowDepth { get; private set; } = 1.2;
+    public int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 7;
+    public int MainTextBoxDropShadowEffectBlurOpacity { get; private set; } = 100;
     public int MainTextBoxDropShadowEffectDirection { get; private set; } = 320;
     private VerticalAlignment MainWindowTextVerticalAlignment { get; set; } = VerticalAlignment.Top;
 
