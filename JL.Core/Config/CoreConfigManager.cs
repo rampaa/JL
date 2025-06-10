@@ -72,7 +72,7 @@ public sealed class CoreConfigManager
             AutoReconnectToWebSocket = ConfigDBManager.GetValueFromConfig(connection, AutoReconnectToWebSocket, nameof(AutoReconnectToWebSocket));
 
             string? webSocketUriStr = ConfigDBManager.GetSettingValue(connection, nameof(WebSocketUri));
-            bool webSocketUriChanged = true;
+            bool webSocketUriChanged = false;
             if (webSocketUriStr is null)
             {
                 ConfigDBManager.InsertSetting(connection, nameof(WebSocketUri), WebSocketUri.OriginalString);

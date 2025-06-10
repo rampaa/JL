@@ -10,7 +10,7 @@ public static class WebSocketUtils
     private static Task? s_webSocketTask;
     private static ClientWebSocket? s_webSocketClient;
     private static CancellationTokenSource? s_webSocketCancellationTokenSource;
-    public static bool Connected => !s_webSocketTask?.IsCompleted ?? false;
+    public static bool Connected => s_webSocketClient?.State is WebSocketState.Open;
 
     public static async Task Disconnect()
     {
