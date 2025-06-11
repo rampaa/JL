@@ -2262,6 +2262,12 @@ internal sealed partial class PopupWindow
 
         else
         {
+            if (PopupIndex is 0)
+            {
+                MainWindow mainWindow = MainWindow.Instance;
+                mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseOver;
+            }
+
             HidePopup();
         }
     }

@@ -46,12 +46,10 @@ internal sealed partial class MainWindow
     public double WidthBeforeResolutionChange { get; set; }
     public bool ContextMenuIsOpening { get; private set; } // = false;
     private bool _contextMenuIsClosed = true;
-
+    public bool MouseEnterDueToFirstPopupHide { get; set; } // = false;
     private Point _swipeStartPoint;
     private InputMethod? _input;
-
     private static DateTime s_lastTextCopyTime;
-
     private static DpiScale? s_previousDpi;
 
     public MainWindow()
@@ -1677,10 +1675,12 @@ internal sealed partial class MainWindow
             _ = Focus();
         }
 
-        if (configManager.AutoPauseOrResumeMpvOnHoverChange && _contextMenuIsClosed)
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange && _contextMenuIsClosed && !MouseEnterDueToFirstPopupHide)
         {
             await MpvUtils.PausePlayback().ConfigureAwait(false);
         }
+
+        MouseEnterDueToFirstPopupHide = false;
     }
 
     private void Window_StateChanged(object sender, EventArgs e)
