@@ -163,7 +163,8 @@ public static class LookupUtils
             deconjugatedTexts = deconjugatedTextsHashSet.ToArray();
         }
 
-        if (DictUtils.DBIsUsedForAtLeastOneDict)
+        bool dbIsUsedAtLeastForOneDict = DictUtils.DBIsUsedForAtLeastOneDict;
+        if (dbIsUsedAtLeastForOneDict)
         {
             parameter = DBUtils.GetParameter(textInHiraganaList.Count);
 
@@ -350,7 +351,7 @@ public static class LookupUtils
 
         _ = Parallel.ForEach(dicts, dict =>
         {
-            bool useDB = dict.Options.UseDB.Value && dict.Ready;
+            bool useDB = dbIsUsedAtLeastForOneDict && dict.Options.UseDB.Value && dict.Ready;
             switch (dict.Type)
             {
                 case DictType.JMdict:
