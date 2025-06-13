@@ -199,6 +199,7 @@ internal static class PopupWindowUtils
             Debug.Assert(popupWindow is not null);
 
             popupWindow.HidePopup();
+            MainWindow.Instance.ChangeVisibility();
         }
         else
         {

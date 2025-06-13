@@ -51,6 +51,7 @@ internal sealed partial class MainWindow
     private InputMethod? _input;
     private static DateTime s_lastTextCopyTime;
     private static DpiScale? s_previousDpi;
+    private Point _lastMouseMovePosition;
 
     public MainWindow()
     {
@@ -136,24 +137,24 @@ internal sealed partial class MainWindow
         return false;
     }
 
-    public async Task CopyFromWebSocket(string text)
+    public Task CopyFromWebSocket(string text)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        await Dispatcher.Invoke(async () =>
+        return Dispatcher.Invoke(async () =>
         {
             if (CopyText(text)
                 && configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
                 && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                     || WindowState is WindowState.Minimized))
             {
-                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
                 {
                     await MpvUtils.PausePlayback().ConfigureAwait(true);
                 }
 
                 await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
             }
-        }, DispatcherPriority.Send).ConfigureAwait(false);
+        }, DispatcherPriority.Send);
     }
 
     private bool CopyText(string text)
@@ -333,7 +334,7 @@ internal sealed partial class MainWindow
             && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                 || WindowState is WindowState.Minimized))
         {
-            if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+            if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
             {
                 await MpvUtils.PausePlayback().ConfigureAwait(true);
             }
@@ -361,9 +362,24 @@ internal sealed partial class MainWindow
     }
 
     // ReSharper disable once AsyncVoidMethod
-    private async void MainTextBox_MouseMove(object? sender, MouseEventArgs e)
+    private async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
     {
-        await HandleMouseMove(e).ConfigureAwait(false);
+        // WPF sometimes triggers MouseMove even when the mouse is outside the window.
+        // In this state, IsMouseOver still returns true, which is likely a WPF bug.
+        // During this time, e.GetPosition stops updating and always returns the same value.
+        // To work around this, we check whether the position has actually changed to ensure MouseMove is being triggered correctly.
+
+        Point position = e.GetPosition(MainTextBox);
+        if (position != _lastMouseMovePosition)
+        {
+            _lastMouseMovePosition = position;
+            await HandleMouseMove(e).ConfigureAwait(false);
+        }
+        else
+        {
+            FirstPopupWindow.HidePopup();
+            ChangeVisibility();
+        }
     }
 
     private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -586,6 +602,7 @@ internal sealed partial class MainWindow
             {
                 Background.Opacity = OpacitySlider.Value / 100;
                 _ = MainTextBox.Focus();
+                ChangeVisibility();
             }
         }
 
@@ -852,7 +869,7 @@ internal sealed partial class MainWindow
             {
                 if (configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
                 {
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
                     {
                         _ = MpvUtils.PausePlayback();
                     }
@@ -862,7 +879,7 @@ internal sealed partial class MainWindow
 
                 if (MainTextBox.Text.Length > MainTextBox.CaretIndex)
                 {
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
                     {
                         _ = MpvUtils.PausePlayback();
                     }
@@ -1336,6 +1353,17 @@ internal sealed partial class MainWindow
             FirstPopupWindow.HidePopup();
         }
 
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.TextOnlyVisibleOnHover)
+        {
+            MainGrid.Opacity = 1;
+        }
+
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        {
+            Background.Opacity = OpacitySlider.Value / 100;
+        }
+
         // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)/default(Point)
         if (e.GetPosition(this) == default)
         {
@@ -1575,15 +1603,25 @@ internal sealed partial class MainWindow
         _contextMenuIsClosed = false;
     }
 
-    public async Task ChangeVisibility()
+    private bool IsMouseWithinWindowBounds()
     {
-        // Prevents main window background flicker
-        await Task.Delay(5).ConfigureAwait(true);
+        Point mousePosition = WinApi.GetMousePosition();
+        DpiScale dpi = WindowsUtils.Dpi;
+        double physicalWidth = ActualWidth * dpi.DpiScaleX;
+        double physicalHeight = ActualHeight * dpi.DpiScaleY;
+        double physicalLeft = Left * dpi.DpiScaleX;
+        double physicalTop = Top * dpi.DpiScaleY;
+        return mousePosition.X > physicalLeft && mousePosition.X < physicalLeft + physicalWidth
+            && mousePosition.Y > physicalTop && mousePosition.Y < physicalTop + physicalHeight;
+    }
 
+    public void ChangeVisibility()
+    {
         ConfigManager configManager = ConfigManager.Instance;
         if (WindowState is WindowState.Minimized
-            || IsMouseOver
             || FirstPopupWindow.IsVisible
+            || Mouse.LeftButton is MouseButtonState.Pressed
+            || IsMouseWithinWindowBounds()
             || ManageDictionariesWindow.IsItVisible()
             || ManageFrequenciesWindow.IsItVisible()
             || ManageAudioSourcesWindow.IsItVisible()
@@ -1593,37 +1631,33 @@ internal sealed partial class MainWindow
             || StatsWindow.IsItVisible()
             || MainTextBoxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
-            || Mouse.LeftButton is MouseButtonState.Pressed
             || (!configManager.TextBoxIsReadOnly && _input?.ImeState is InputMethodState.On))
         {
             return;
         }
 
-        if (Background.Opacity is not 0)
+        if (configManager.TextOnlyVisibleOnHover)
         {
-            if (configManager.TextOnlyVisibleOnHover)
-            {
-                MainGrid.Opacity = 0;
-            }
+            MainGrid.Opacity = 0;
+        }
 
-            if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
-            {
-                Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
-            }
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        {
+            Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+        }
 
-            nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
-            if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
-                && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
-                && lastActiveWindowHandle is not 0
-                && lastActiveWindowHandle != WindowHandle)
-            {
-                WinApi.GiveFocusToWindow(lastActiveWindowHandle);
-            }
+        nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
+        if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
+            && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
+            && lastActiveWindowHandle is not 0
+            && lastActiveWindowHandle != WindowHandle)
+        {
+            WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+        }
 
-            if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-            {
-                await MpvUtils.ResumePlayback().ConfigureAwait(false);
-            }
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+        {
+            _ = MpvUtils.ResumePlayback().ConfigureAwait(false);
         }
     }
 
@@ -1640,15 +1674,11 @@ internal sealed partial class MainWindow
         }
 
         FirstPopupWindow.HidePopup();
+        ChangeVisibility();
     }
 
     private async void Window_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (FirstPopupWindow.IsVisible)
-        {
-            return;
-        }
-
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.TextOnlyVisibleOnHover)
         {
@@ -2001,7 +2031,6 @@ internal sealed partial class MainWindow
     private async void Window_ContextMenuClosing(object sender, ContextMenuEventArgs e)
     {
         _contextMenuIsClosed = true;
-
         ConfigManager configManager = ConfigManager.Instance;
         if (WindowState is WindowState.Minimized
             || IsMouseOver
@@ -2026,7 +2055,7 @@ internal sealed partial class MainWindow
             MainGrid.Opacity = 0;
         }
 
-        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
         {
             Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
         }
