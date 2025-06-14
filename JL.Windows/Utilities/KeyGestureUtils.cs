@@ -17,6 +17,7 @@ internal static class KeyGestureUtils
     public static readonly OrderedDictionary<string, KeyGesture> GlobalKeyGestureNameToKeyGestureDict = [];
 
     public static readonly KeyGesture AltF4KeyGesture = new(Key.F4, ModifierKeys.Alt);
+    public static readonly KeyGesture CtrlCKeyGesture = new(Key.C, ModifierKeys.Control);
 
     public static readonly FrozenSet<Key> ValidGlobalKeys = FrozenSet.ToFrozenSet(
     [

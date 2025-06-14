@@ -908,6 +908,19 @@ internal sealed partial class MainWindow
             MainTextBox.IsReadOnlyCaretVisible = configManager.AlwaysShowMainTextBoxCaret;
         }
 
+        else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))
+        {
+            if (MainTextBox.SelectedText.Length > 0)
+            {
+                Clipboard.SetText(MainTextBox.SelectedText, TextDataFormat.UnicodeText);
+            }
+        }
+
+        else if (keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
+        {
+            Close();
+        }
+
         return Task.CompletedTask;
     }
 

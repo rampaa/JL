@@ -2102,6 +2102,20 @@ internal sealed partial class PopupWindow
             }
         }
 
+        else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))
+        {
+            string? textToCopy = _lastInteractedTextBox?.SelectedText;
+            if (string.IsNullOrEmpty(textToCopy))
+            {
+                textToCopy = _previousTextBox?.SelectedText;
+            }
+
+            if (!string.IsNullOrEmpty(textToCopy))
+            {
+                Clipboard.SetText(textToCopy, TextDataFormat.UnicodeText);
+            }
+        }
+
         else if (keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
         {
             HidePopup();
@@ -2583,7 +2597,7 @@ internal sealed partial class PopupWindow
             && LastLookupResults.Length > 0)
         {
             _listViewItemIndex = _firstVisibleListViewItemIndex;
-            LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
+            LastSelectedText = LastLookupResults[_listViewItemIndex]?.PrimarySpelling;
         }
     }
 
