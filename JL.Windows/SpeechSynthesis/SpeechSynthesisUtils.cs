@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Speech.Synthesis;
 using System.Windows;
@@ -12,7 +13,7 @@ namespace JL.Windows.SpeechSynthesis;
 
 internal static class SpeechSynthesisUtils
 {
-    private static DateTime s_lastAudioPlayTime;
+    private static long s_lastAudioPlayTimestamp;
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
     private static SpeechSynthesizer Synthesizer { get; } = new();
 
@@ -77,14 +78,13 @@ internal static class SpeechSynthesisUtils
             WindowsUtils.AudioPlayer.Dispose();
         }
 
-        DateTime currentTime = DateTime.Now;
-        if (Synthesizer.State is SynthesizerState.Speaking && (currentTime - s_lastAudioPlayTime).TotalMilliseconds < 300)
+        if (Synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
         {
-            s_lastAudioPlayTime = currentTime;
+            s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
             return;
         }
 
-        s_lastAudioPlayTime = currentTime;
+        s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
 
         await StopTextToSpeech().ConfigureAwait(false);
 

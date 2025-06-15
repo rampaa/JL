@@ -32,7 +32,7 @@ namespace JL.Windows.Utilities;
 internal static class WindowsUtils
 {
     public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
-    private static DateTime s_lastAudioPlayTime;
+    private static long s_lastAudioPlayTimestamp;
     public static WaveOut? AudioPlayer { get; private set; }
 
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
@@ -415,14 +415,13 @@ internal static class WindowsUtils
 
     public static async Task Motivate()
     {
-        DateTime currentTime = DateTime.Now;
-        if (AudioPlayer?.PlaybackState is PlaybackState.Playing && (currentTime - s_lastAudioPlayTime).TotalMilliseconds < 300)
+        if (AudioPlayer?.PlaybackState is PlaybackState.Playing && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
         {
-            s_lastAudioPlayTime = currentTime;
+            s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
             return;
         }
 
-        s_lastAudioPlayTime = currentTime;
+        s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
 
         await SpeechSynthesisUtils.StopTextToSpeech().ConfigureAwait(false);
 
