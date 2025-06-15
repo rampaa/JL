@@ -49,7 +49,7 @@ internal sealed partial class MainWindow
     public bool MouseEnterDueToFirstPopupHide { get; set; } // = false;
     private Point _swipeStartPoint;
     private InputMethod? _input;
-    private static DateTime s_lastTextCopyTime;
+    private static long s_lastTextCopyTimestamp;
     private static DpiScale? s_previousDpi;
     private Point _lastMouseMovePosition;
 
@@ -161,7 +161,7 @@ internal sealed partial class MainWindow
     {
         if (text.Length is 0)
         {
-            MainTextBox.Text = "";
+            MainTextBox.Clear();
             return false;
         }
 
@@ -186,7 +186,7 @@ internal sealed partial class MainWindow
         {
             if (configManager.MergeSequentialTextsWhenTheyMatch)
             {
-                s_lastTextCopyTime = new DateTime(Stopwatch.GetTimestamp());
+                s_lastTextCopyTimestamp = Stopwatch.GetTimestamp();
             }
 
             return false;
@@ -194,12 +194,11 @@ internal sealed partial class MainWindow
 
         if (configManager.MergeSequentialTextsWhenTheyMatch)
         {
-            DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
             mergeTexts = (configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
-                          || (preciseTimeNow - s_lastTextCopyTime).TotalMilliseconds <= configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
+                          || Stopwatch.GetElapsedTime(s_lastTextCopyTimestamp).TotalMilliseconds <= configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds)
                             && previousText.Length > 0;
 
-            s_lastTextCopyTime = preciseTimeNow;
+            s_lastTextCopyTimestamp = Stopwatch.GetTimestamp();
 
             if (mergeTexts)
             {
@@ -1622,7 +1621,7 @@ internal sealed partial class MainWindow
         _contextMenuIsClosed = false;
     }
 
-    private bool IsMouseWithinWindowBounds()
+    public bool IsMouseWithinWindowBounds()
     {
         Point mousePosition = WinApi.GetMousePosition();
         DpiScale dpi = WindowsUtils.Dpi;
@@ -1692,6 +1691,11 @@ internal sealed partial class MainWindow
             return;
         }
 
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+        {
+            MouseEnterDueToFirstPopupHide = IsMouseWithinWindowBounds();
+        }
+
         FirstPopupWindow.HidePopup();
         ChangeVisibility();
     }
@@ -1724,9 +1728,16 @@ internal sealed partial class MainWindow
             _ = Focus();
         }
 
-        if (configManager.AutoPauseOrResumeMpvOnHoverChange && _contextMenuIsClosed && !MouseEnterDueToFirstPopupHide)
+        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
         {
-            await MpvUtils.PausePlayback().ConfigureAwait(false);
+            if (_contextMenuIsClosed)
+            {
+                await MpvUtils.PausePlayback(MouseEnterDueToFirstPopupHide).ConfigureAwait(false);
+            }
+            else
+            {
+                MpvUtils.LastPausedByJLTimestamp = Stopwatch.GetTimestamp();
+            }
         }
 
         MouseEnterDueToFirstPopupHide = false;

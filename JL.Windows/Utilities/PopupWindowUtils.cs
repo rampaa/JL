@@ -198,8 +198,14 @@ internal static class PopupWindowUtils
             PopupWindow? popupWindow = PopupWindows[rootPopupIndex];
             Debug.Assert(popupWindow is not null);
 
+            MainWindow mainWindow = MainWindow.Instance;
+            if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+            }
+
             popupWindow.HidePopup();
-            MainWindow.Instance.ChangeVisibility();
+            mainWindow.ChangeVisibility();
         }
         else
         {

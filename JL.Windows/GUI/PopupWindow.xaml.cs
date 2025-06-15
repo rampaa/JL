@@ -246,10 +246,19 @@ internal sealed partial class PopupWindow
                 ? !JapaneseUtils.ContainsJapaneseCharacters(textBoxText.AsSpan(charPosition, 2))
                 : !JapaneseUtils.ContainsJapaneseCharacters(firstChar))
             {
-                HidePopup();
                 if (isFirstPopupWindow)
                 {
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                    }
+
+                    HidePopup();
                     mainWindow.ChangeVisibility();
+                }
+                else
+                {
+                    HidePopup();
                 }
 
                 return Task.CompletedTask;
@@ -273,10 +282,19 @@ internal sealed partial class PopupWindow
 
         if (string.IsNullOrEmpty(textToLookUp) || TextUtils.StartsWithWhiteSpace(textToLookUp))
         {
-            HidePopup();
             if (isFirstPopupWindow)
             {
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
                 mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
 
             return Task.CompletedTask;
@@ -369,10 +387,19 @@ internal sealed partial class PopupWindow
         }
         else
         {
-            HidePopup();
             if (isFirstPopupWindow)
             {
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
                 mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
         }
 
@@ -384,10 +411,20 @@ internal sealed partial class PopupWindow
         int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
         if (charPosition < 0)
         {
-            HidePopup();
             if (PopupIndex is 0)
             {
-                MainWindow.Instance.ChangeVisibility();
+                MainWindow mainWindow = MainWindow.Instance;
+                if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
+                mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
 
             return Task.CompletedTask;
@@ -402,18 +439,28 @@ internal sealed partial class PopupWindow
         _currentSourceTextCharPosition = textBox.SelectionStart;
 
         string selectedText = textBox.SelectedText;
+        ConfigManager configManager = ConfigManager.Instance;
         if (string.IsNullOrEmpty(selectedText) || TextUtils.StartsWithWhiteSpace(selectedText))
         {
-            HidePopup();
             if (PopupIndex is 0)
             {
-                MainWindow.Instance.ChangeVisibility();
+                MainWindow mainWindow = MainWindow.Instance;
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
+                mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
 
             return Task.CompletedTask;
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
         if (selectedText == _lastLookedUpText && IsVisible)
         {
             UpdatePosition();
@@ -483,10 +530,20 @@ internal sealed partial class PopupWindow
         }
         else
         {
-            HidePopup();
             if (PopupIndex is 0)
             {
-                MainWindow.Instance.ChangeVisibility();
+                MainWindow mainWindow = MainWindow.Instance;
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
+                mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
         }
 
@@ -1575,13 +1632,24 @@ internal sealed partial class PopupWindow
 
             string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
 
-            HidePopup();
+            ConfigManager configManager = ConfigManager.Instance;
             if (PopupIndex is 0)
             {
-                MainWindow.Instance.ChangeVisibility();
+                MainWindow mainWindow = MainWindow.Instance;
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
+                mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
 
-            return ConfigManager.Instance.MineToFileInsteadOfAnki
+            return configManager.MineToFileInsteadOfAnki
                 ? MiningUtils.MineToFile(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling)
                 : MiningUtils.Mine(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling);
         }
@@ -1757,10 +1825,19 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
         {
-            HidePopup();
             if (PopupIndex is 0)
             {
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
                 mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
         }
 
@@ -1807,10 +1884,19 @@ internal sealed partial class PopupWindow
                         mainWindow.ShowAddNameWindow();
                     }
 
-                    HidePopup();
                     if (PopupIndex is 0)
                     {
+                        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                        {
+                            mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                        }
+
+                        HidePopup();
                         mainWindow.ChangeVisibility();
+                    }
+                    else
+                    {
+                        HidePopup();
                     }
                 }
 
@@ -1841,8 +1927,20 @@ internal sealed partial class PopupWindow
                         mainWindow.ShowAddWordWindow();
                     }
 
-                    HidePopup();
-                    mainWindow.ChangeVisibility();
+                    if (PopupIndex is 0)
+                    {
+                        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                        {
+                            mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                        }
+
+                        HidePopup();
+                        mainWindow.ChangeVisibility();
+                    }
+                    else
+                    {
+                        HidePopup();
+                    }
                 }
 
                 else
@@ -1870,10 +1968,19 @@ internal sealed partial class PopupWindow
                     mainWindow.SearchWithBrowser();
                 }
 
-                HidePopup();
                 if (PopupIndex is 0)
                 {
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                    }
+
+                    HidePopup();
                     mainWindow.ChangeVisibility();
+                }
+                else
+                {
+                    HidePopup();
                 }
             }
 
@@ -2118,10 +2225,19 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
         {
-            HidePopup();
             if (PopupIndex is 0)
             {
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
                 mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
         }
 
@@ -2138,6 +2254,15 @@ internal sealed partial class PopupWindow
 
         if (IsVisible && _previousTextBox is not null)
         {
+            if (PopupIndex is 0)
+            {
+                MainWindow mainWindow = MainWindow.Instance;
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+            }
+
             HidePopup();
 
             return configManager.LookupOnSelectOnly
@@ -2215,10 +2340,20 @@ internal sealed partial class PopupWindow
             return;
         }
 
-        HidePopup();
         if (PopupIndex is 0)
         {
-            MainWindow.Instance.ChangeVisibility();
+            MainWindow mainWindow = MainWindow.Instance;
+            if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+            }
+
+            HidePopup();
+            mainWindow.ChangeVisibility();
+        }
+        else
+        {
+            HidePopup();
         }
     }
 
@@ -2333,8 +2468,8 @@ internal sealed partial class PopupWindow
             if (PopupIndex is 0)
             {
                 TextBox mainTextBox = mainWindow.MainTextBox;
-                bool isMouseOver = mainTextBox.IsMouseOver;
-                if (isMouseOver)
+                bool isMouseOverMainTextBox = mainWindow.IsMouseOver;
+                if (isMouseOverMainTextBox)
                 {
                     int charPosition = mainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(mainTextBox), false);
                     if (charPosition is not -1)
@@ -2342,13 +2477,18 @@ internal sealed partial class PopupWindow
                         return;
                     }
                 }
-                mainWindow.MouseEnterDueToFirstPopupHide = isMouseOver;
-            }
 
-            HidePopup();
-            if (PopupIndex is 0)
-            {
+                if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
                 mainWindow.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
             }
         }
     }
@@ -2501,10 +2641,20 @@ internal sealed partial class PopupWindow
 
     private void HidePopup(object sender, RoutedEventArgs e)
     {
-        HidePopup();
         if (PopupIndex is 0)
         {
-            MainWindow.Instance.ChangeVisibility();
+            MainWindow mainWindow = MainWindow.Instance;
+            if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+            }
+
+            HidePopup();
+            mainWindow.ChangeVisibility();
+        }
+        else
+        {
+            HidePopup();
         }
     }
 
@@ -2613,10 +2763,20 @@ internal sealed partial class PopupWindow
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        HidePopup();
         if (PopupIndex is 0)
         {
+            MainWindow mainWindow = MainWindow.Instance;
+            if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+            }
+
+            HidePopup();
             MainWindow.Instance.ChangeVisibility();
+        }
+        else
+        {
+            HidePopup();
         }
     }
 

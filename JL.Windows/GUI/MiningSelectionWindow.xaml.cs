@@ -121,8 +121,20 @@ internal sealed partial class MiningSelectionWindow
         string? formattedDefinitions = definitionsTextBox?.Text;
         string? selectedDefinitions = PopupWindowUtils.GetSelectedDefinitions(definitionsTextBox);
 
-        popupWindow.HidePopup();
-        MainWindow.Instance.ChangeVisibility();
+        if (popupWindow.PopupIndex is 0)
+        {
+            MainWindow mainWindow = MainWindow.Instance;
+            if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
+            }
+            popupWindow.HidePopup();
+            mainWindow.ChangeVisibility();
+        }
+        else
+        {
+            popupWindow.HidePopup();
+        }
 
         return ConfigManager.Instance.MineToFileInsteadOfAnki
             ? MiningUtils.MineToFile(lookupResults, currentLookupResultIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, selectedSpelling)
