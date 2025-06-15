@@ -1734,10 +1734,6 @@ internal sealed partial class MainWindow
             {
                 await MpvUtils.PausePlayback(MouseEnterDueToFirstPopupHide).ConfigureAwait(false);
             }
-            else
-            {
-                MpvUtils.LastPausedByJLTimestamp = Stopwatch.GetTimestamp();
-            }
         }
 
         MouseEnterDueToFirstPopupHide = false;

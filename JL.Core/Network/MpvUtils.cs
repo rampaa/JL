@@ -7,7 +7,7 @@ using JL.Core.Utilities;
 namespace JL.Core.Network;
 public static class MpvUtils
 {
-    public static long LastPausedByJLTimestamp { get; set; }
+    private static long s_lastPausedByJLTimestamp;
     private static bool s_pausedByJL; // = false
 
     public static async Task PausePlayback(bool previouslyPausedByJL = false)
@@ -32,17 +32,17 @@ public static class MpvUtils
                     await pipeClient.WriteAsync(pauseCommand).ConfigureAwait(false);
 
                     s_pausedByJL = true;
-                    LastPausedByJLTimestamp = Stopwatch.GetTimestamp();
+                    s_lastPausedByJLTimestamp = Stopwatch.GetTimestamp();
                 }
                 else if (!previouslyPausedByJL)
                 {
-                    if (Stopwatch.GetElapsedTime(LastPausedByJLTimestamp).TotalMilliseconds > 300)
+                    if (Stopwatch.GetElapsedTime(s_lastPausedByJLTimestamp).TotalMilliseconds > 300)
                     {
                         s_pausedByJL = false;
                     }
                     else
                     {
-                        LastPausedByJLTimestamp = Stopwatch.GetTimestamp();
+                        s_lastPausedByJLTimestamp = Stopwatch.GetTimestamp();
                     }
                 }
             }
