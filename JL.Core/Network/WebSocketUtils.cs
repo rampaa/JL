@@ -97,9 +97,10 @@ public static class WebSocketUtils
                                     await memoryStream.WriteAsync(buffer[..result.Count], CancellationToken.None).ConfigureAwait(false);
                                 }
 
-                                _ = memoryStream.Seek(0, SeekOrigin.Begin);
+                                string text = memoryStream.TryGetBuffer(out ArraySegment<byte> messageBuffer)
+                                    ? NetworkUtils.s_utf8NoBom.GetString(messageBuffer)
+                                    : NetworkUtils.s_utf8NoBom.GetString(memoryStream.ToArray());
 
-                                string text = NetworkUtils.s_utf8NoBom.GetString(memoryStream.ToArray());
                                 _ = Task.Run(() => Utils.Frontend.CopyFromWebSocket(text), CancellationToken.None).ConfigureAwait(false);
                             }
                             else if (result.MessageType is WebSocketMessageType.Close)
