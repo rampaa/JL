@@ -89,7 +89,7 @@ public static class StatsDBUtils
 
         _ = command.Parameters.AddWithValue("@profileId", profileId);
 
-        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
 
         Debug.Assert(reader.HasRows);
 
@@ -113,7 +113,7 @@ public static class StatsDBUtils
 
         _ = command.Parameters.AddWithValue("@profileId", profileId);
 
-        SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
             return null;

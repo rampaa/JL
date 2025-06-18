@@ -63,7 +63,7 @@ public static class ProfileDBUtils
             """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -81,7 +81,7 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@name", profileName);
 
-        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -128,7 +128,7 @@ public static class ProfileDBUtils
             );
             """;
 
-        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
         _ = reader.Read();
         return reader.GetBoolean(0);
     }
@@ -149,7 +149,7 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@profileId", profileId);
 
-        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
         _ = reader.Read();
         return reader.GetBoolean(0);
     }
@@ -171,7 +171,7 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@name", profileName);
 
-        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
         _ = reader.Read();
         return reader.GetBoolean(0);
     }
@@ -189,7 +189,7 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@id", profileId);
 
-        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
         _ = reader.Read();
         return reader.GetString(0);
     }

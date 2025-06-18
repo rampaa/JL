@@ -46,7 +46,7 @@ public static class NetworkUtils
                 Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 await using (githubApiResultStream.ConfigureAwait(false))
                 {
-                    JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
+                    using JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
                     JsonElement rootElement = jsonDocument.RootElement;
                     string? tagName = rootElement.GetProperty("tag_name").GetString();
                     Debug.Assert(tagName is not null);

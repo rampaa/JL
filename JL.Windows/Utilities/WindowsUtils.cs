@@ -307,7 +307,7 @@ internal static class WindowsUtils
             ? selectedText
             : configManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.OrdinalIgnoreCase);
 
-        _ = Process.Start(new ProcessStartInfo("cmd",
+        using Process? process = Process.Start(new ProcessStartInfo("cmd",
             $"/c start \"\" {browserPath} \"{urlToBeSearched}\"")
         {
             CreateNoWindow = true
@@ -343,7 +343,7 @@ internal static class WindowsUtils
 
             await Application.Current.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
 
-            _ = Process.Start(
+            using Process? process = Process.Start(
                 new ProcessStartInfo("cmd",
                     string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}"))
                 {

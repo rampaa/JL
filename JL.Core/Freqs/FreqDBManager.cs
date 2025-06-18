@@ -203,7 +203,7 @@ internal static class FreqDBManager
             FROM record
             """;
 
-        SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
         _ = reader.Read();
         freq.MaxValue = !reader.IsDBNull(0)
             ? reader.GetInt32(0)
