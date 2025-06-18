@@ -2747,7 +2747,7 @@ internal sealed partial class PopupWindow
             && LastLookupResults.Length > 0)
         {
             _listViewItemIndex = _firstVisibleListViewItemIndex;
-            LastSelectedText = LastLookupResults[_listViewItemIndex]?.PrimarySpelling;
+            LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
         }
     }
 
@@ -2880,7 +2880,7 @@ internal sealed partial class PopupWindow
         DictTabButtonsItemsControl.ItemsSource = null;
         PopupListView.ItemsSource = null;
         _lastInteractedTextBox = null;
-        LastLookupResults.AsSpan().Clear();
+        LastLookupResults = [];
         _dictsWithResults.Clear();
         AllDictionaryTabButton.Click -= DictTypeButtonOnClick;
     }
