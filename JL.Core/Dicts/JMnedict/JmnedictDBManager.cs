@@ -1,15 +1,15 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using MessagePack;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictDBManager
 {
-    public const int Version = 2;
+    public const int Version = 3;
 
     public static void CreateDB(string dbName)
     {
@@ -24,10 +24,10 @@ internal static class JmnedictDBManager
                 jmnedict_id INTEGER NOT NULL,
                 primary_spelling TEXT NOT NULL,
                 primary_spelling_in_hiragana TEXT NOT NULL,
-                readings TEXT,
-                alternative_spellings TEXT,
-                glossary TEXT NOT NULL,
-                name_types TEXT NOT NULL
+                readings BLOB,
+                alternative_spellings BLOB,
+                glossary BLOB NOT NULL,
+                name_types BLOB NOT NULL
             ) STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -74,10 +74,10 @@ internal static class JmnedictDBManager
         _ = insertRecordCommand.Parameters.Add("@jmnedict_id", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling_in_hiragana", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@readings", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@name_types", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@readings", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@name_types", SqliteType.Blob);
         insertRecordCommand.Prepare();
 
         foreach (JmnedictRecord record in jmnedictRecords)
@@ -86,10 +86,10 @@ internal static class JmnedictDBManager
             _ = insertRecordCommand.Parameters["@jmnedict_id"].Value = record.Id;
             _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             _ = insertRecordCommand.Parameters["@primary_spelling_in_hiragana"].Value = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
-            _ = insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jso) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jso) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jso);
-            _ = insertRecordCommand.Parameters["@name_types"].Value = JsonSerializer.Serialize(record.NameTypes, Utils.s_jso);
+            _ = insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
+            _ = insertRecordCommand.Parameters["@name_types"].Value = MessagePackSerializer.Serialize(record.NameTypes);
             _ = insertRecordCommand.ExecuteNonQuery();
 
             ++id;
@@ -205,17 +205,17 @@ internal static class JmnedictDBManager
         string primarySpelling = dataReader.GetString(1);
 
         string[]? readings = !dataReader.IsDBNull(2)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
             : null;
 
         string[]? alternativeSpellings = !dataReader.IsDBNull(3)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3))
             : null;
 
-        string[][]? definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(4), Utils.s_jso);
+        string[][]? definitions = MessagePackSerializer.Deserialize<string[][]>(dataReader.GetFieldValue<byte[]>(4));
         Debug.Assert(definitions is not null);
 
-        string[][]? nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(5), Utils.s_jso);
+        string[][]? nameTypes = MessagePackSerializer.Deserialize<string[][]>(dataReader.GetFieldValue<byte[]>(5));
         Debug.Assert(nameTypes is not null);
 
         return new JmnedictRecord(id, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);

@@ -5,13 +5,14 @@ using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using MessagePack;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaDBManager
 {
-    public const int Version = 8;
+    public const int Version = 9;
 
     private const int SearchKeyIndex = 4;
 
@@ -75,8 +76,8 @@ internal static class EpwingNazekaDBManager
                 id INTEGER NOT NULL PRIMARY KEY,
                 primary_spelling TEXT NOT NULL,
                 reading TEXT,
-                alternative_spellings TEXT,
-                glossary TEXT NOT NULL
+                alternative_spellings BLOB,
+                glossary BLOB NOT NULL
             ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key
@@ -130,8 +131,8 @@ internal static class EpwingNazekaDBManager
         _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -150,8 +151,8 @@ internal static class EpwingNazekaDBManager
             _ = insertRecordCommand.Parameters["@id"].Value = id;
             _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jso) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jso);
+            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
             _ = insertRecordCommand.ExecuteNonQuery();
 
             _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
@@ -297,10 +298,10 @@ internal static class EpwingNazekaDBManager
             : null;
 
         string[]? alternativeSpellings = !dataReader.IsDBNull(2)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
             : null;
 
-        string[]? definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso);
+        string[]? definitions = MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3));
         Debug.Assert(definitions is not null);
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);

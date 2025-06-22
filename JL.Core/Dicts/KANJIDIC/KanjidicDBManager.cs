@@ -1,15 +1,15 @@
 using System.Collections.Frozen;
 using System.Globalization;
-using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using MessagePack;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.KANJIDIC;
 
 internal static class KanjidicDBManager
 {
-    public const int Version = 2;
+    public const int Version = 3;
 
     private const string SingleTermQuery =
         """
@@ -35,11 +35,11 @@ internal static class KanjidicDBManager
             CREATE TABLE IF NOT EXISTS record
             (
                 kanji TEXT NOT NULL PRIMARY KEY,
-                on_readings TEXT,
-                kun_readings TEXT,
-                nanori_readings TEXT,
-                radical_names TEXT,
-                glossary TEXT,
+                on_readings BLOB,
+                kun_readings BLOB,
+                nanori_readings BLOB,
+                radical_names BLOB,
+                glossary BLOB,
                 stroke_count INTEGER NOT NULL,
                 grade INTEGER NOT NULL,
                 frequency INTEGER NOT NULL
@@ -67,11 +67,11 @@ internal static class KanjidicDBManager
             """;
 
         _ = insertRecordCommand.Parameters.Add("@kanji", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@on_readings", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@kun_readings", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@nanori_readings", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@radical_names", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@on_readings", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@kun_readings", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@nanori_readings", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@radical_names", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
         _ = insertRecordCommand.Parameters.Add("@stroke_count", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@grade", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@frequency", SqliteType.Integer);
@@ -84,11 +84,11 @@ internal static class KanjidicDBManager
             {
                 KanjidicRecord kanjidicRecord = (KanjidicRecord)records[i];
                 _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
-                _ = insertRecordCommand.Parameters["@on_readings"].Value = kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jso) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@kun_readings"].Value = kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_jso) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@nanori_readings"].Value = kanjidicRecord.NanoriReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.NanoriReadings, Utils.s_jso) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@radical_names"].Value = kanjidicRecord.RadicalNames is not null ? JsonSerializer.Serialize(kanjidicRecord.RadicalNames, Utils.s_jso) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@glossary"].Value = kanjidicRecord.Definitions is not null ? JsonSerializer.Serialize(kanjidicRecord.Definitions, Utils.s_jso) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@on_readings"].Value = kanjidicRecord.OnReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.OnReadings) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@kun_readings"].Value = kanjidicRecord.KunReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.KunReadings) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@nanori_readings"].Value = kanjidicRecord.NanoriReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.NanoriReadings) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@radical_names"].Value = kanjidicRecord.RadicalNames is not null ? MessagePackSerializer.Serialize(kanjidicRecord.RadicalNames) : DBNull.Value;
+                _ = insertRecordCommand.Parameters["@glossary"].Value = kanjidicRecord.Definitions is not null ? MessagePackSerializer.Serialize(kanjidicRecord.Definitions) : DBNull.Value;
                 _ = insertRecordCommand.Parameters["@stroke_count"].Value = kanjidicRecord.StrokeCount;
                 _ = insertRecordCommand.Parameters["@grade"].Value = kanjidicRecord.Grade;
                 _ = insertRecordCommand.Parameters["@frequency"].Value = kanjidicRecord.Frequency;
@@ -163,23 +163,23 @@ internal static class KanjidicDBManager
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)
     {
         string[]? onReadings = !dataReader.IsDBNull(0)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(0), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(0))
             : null;
 
         string[]? kunReadings = !dataReader.IsDBNull(1)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(1), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(1))
             : null;
 
         string[]? nanoriReadings = !dataReader.IsDBNull(2)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
             : null;
 
         string[]? radicalNames = !dataReader.IsDBNull(3)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3))
             : null;
 
         string[]? definitions = !dataReader.IsDBNull(4)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(4), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(4))
             : null;
 
         byte strokeCount = dataReader.GetByte(5);

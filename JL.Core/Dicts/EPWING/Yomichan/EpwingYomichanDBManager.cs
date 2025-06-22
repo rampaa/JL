@@ -5,13 +5,14 @@ using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using MessagePack;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 17;
+    public const int Version = 18;
 
     private const int SearchKeyIndex = 5;
 
@@ -78,9 +79,9 @@ internal static class EpwingYomichanDBManager
                 id INTEGER NOT NULL PRIMARY KEY,
                 primary_spelling TEXT NOT NULL,
                 reading TEXT,
-                glossary TEXT NOT NULL,
-                part_of_speech TEXT,
-                glossary_tags TEXT
+                glossary BLOB NOT NULL,
+                part_of_speech BLOB,
+                glossary_tags BLOB
             ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key
@@ -134,9 +135,9 @@ internal static class EpwingYomichanDBManager
         _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@part_of_speech", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@glossary_tags", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@part_of_speech", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@glossary_tags", SqliteType.Blob);
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -155,9 +156,9 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.Parameters["@id"].Value = id;
             _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jso);
-            _ = insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jso) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary_tags"].Value = record.DefinitionTags is not null ? JsonSerializer.Serialize(record.DefinitionTags, Utils.s_jso) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
+            _ = insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
+            _ = insertRecordCommand.Parameters["@glossary_tags"].Value = record.DefinitionTags is not null ? MessagePackSerializer.Serialize(record.DefinitionTags) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
             _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
@@ -302,15 +303,15 @@ internal static class EpwingYomichanDBManager
             ? dataReader.GetString(1)
             : null;
 
-        string[]? definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso);
+        string[]? definitions = MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2));
         Debug.Assert(definitions is not null);
 
         string[]? wordClasses = !dataReader.IsDBNull(3)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(3), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3))
             : null;
 
         string[]? definitionTags = !dataReader.IsDBNull(4)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(4), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(4))
             : null;
 
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);

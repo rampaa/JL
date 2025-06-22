@@ -4,13 +4,14 @@ using System.Globalization;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using MessagePack;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 8;
+    public const int Version = 9;
 
     private const int SearchKeyIndex = 22;
 
@@ -26,26 +27,26 @@ internal static class JmdictDBManager
                 id INTEGER NOT NULL PRIMARY KEY,
                 edict_id INTEGER NOT NULL,
                 primary_spelling TEXT NOT NULL,
-                primary_spelling_orthography_info TEXT,
-                readings TEXT,
-                alternative_spellings TEXT,
-                alternative_spellings_orthography_info TEXT,
-                readings_orthography_info TEXT,
-                reading_restrictions TEXT,
-                glossary TEXT NOT NULL,
-                glossary_info TEXT,
-                part_of_speech_shared_by_all_senses TEXT,
-                part_of_speech TEXT,
-                spelling_restrictions TEXT,
-                fields_shared_by_all_senses TEXT,
-                fields TEXT,
-                misc_shared_by_all_senses TEXT,
-                misc TEXT,
-                dialects_shared_by_all_senses TEXT,
-                dialects TEXT,
-                loanword_etymology TEXT,
-                cross_references TEXT,
-                antonyms TEXT
+                primary_spelling_orthography_info BLOB,
+                readings BLOB,
+                alternative_spellings BLOB,
+                alternative_spellings_orthography_info BLOB,
+                readings_orthography_info BLOB,
+                reading_restrictions BLOB,
+                glossary BLOB NOT NULL,
+                glossary_info BLOB,
+                part_of_speech_shared_by_all_senses BLOB,
+                part_of_speech BLOB,
+                spelling_restrictions BLOB,
+                fields_shared_by_all_senses BLOB,
+                fields BLOB,
+                misc_shared_by_all_senses BLOB,
+                misc BLOB,
+                dialects_shared_by_all_senses BLOB,
+                dialects BLOB,
+                loanword_etymology BLOB,
+                cross_references BLOB,
+                antonyms BLOB
             ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key
@@ -100,26 +101,26 @@ internal static class JmdictDBManager
         _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@edict_id", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@primary_spelling_orthography_info", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@alternative_spellings_orthography_info", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@readings", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@readings_orthography_info", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@reading_restrictions", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@glossary_info", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@part_of_speech_shared_by_all_senses", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@part_of_speech", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@spelling_restrictions", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@fields_shared_by_all_senses", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@fields", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@misc_shared_by_all_senses", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@misc", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@dialects_shared_by_all_senses", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@dialects", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@loanword_etymology", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@cross_references", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@antonyms", SqliteType.Text);
+        _ = insertRecordCommand.Parameters.Add("@primary_spelling_orthography_info", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@alternative_spellings_orthography_info", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@readings", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@readings_orthography_info", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@reading_restrictions", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@glossary_info", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@part_of_speech_shared_by_all_senses", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@part_of_speech", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@spelling_restrictions", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@fields_shared_by_all_senses", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@fields", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@misc_shared_by_all_senses", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@misc", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@dialects_shared_by_all_senses", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@dialects", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@loanword_etymology", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@cross_references", SqliteType.Blob);
+        _ = insertRecordCommand.Parameters.Add("@antonyms", SqliteType.Blob);
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -138,26 +139,26 @@ internal static class JmdictDBManager
             insertRecordCommand.Parameters["@id"].Value = id;
             insertRecordCommand.Parameters["@edict_id"].Value = record.Id;
             insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
-            insertRecordCommand.Parameters["@primary_spelling_orthography_info"].Value = record.PrimarySpellingOrthographyInfo is not null ? JsonSerializer.Serialize(record.PrimarySpellingOrthographyInfo, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@alternative_spellings_orthography_info"].Value = record.AlternativeSpellingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@readings_orthography_info"].Value = record.ReadingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.ReadingsOrthographyInfo, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@reading_restrictions"].Value = record.ReadingRestrictions is not null ? JsonSerializer.Serialize(record.ReadingRestrictions, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@glossary"].Value = JsonSerializer.Serialize(record.Definitions, Utils.s_jso);
-            insertRecordCommand.Parameters["@glossary_info"].Value = record.DefinitionInfo is not null ? JsonSerializer.Serialize(record.DefinitionInfo, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@part_of_speech_shared_by_all_senses"].Value = record.WordClassesSharedByAllSenses is not null ? JsonSerializer.Serialize(record.WordClassesSharedByAllSenses, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@spelling_restrictions"].Value = record.SpellingRestrictions is not null ? JsonSerializer.Serialize(record.SpellingRestrictions, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@fields_shared_by_all_senses"].Value = record.FieldsSharedByAllSenses is not null ? JsonSerializer.Serialize(record.FieldsSharedByAllSenses, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@fields"].Value = record.Fields is not null ? JsonSerializer.Serialize(record.Fields, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@misc_shared_by_all_senses"].Value = record.MiscSharedByAllSenses is not null ? JsonSerializer.Serialize(record.MiscSharedByAllSenses, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@misc"].Value = record.Misc is not null ? JsonSerializer.Serialize(record.Misc, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@dialects_shared_by_all_senses"].Value = record.DialectsSharedByAllSenses is not null ? JsonSerializer.Serialize(record.DialectsSharedByAllSenses, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@dialects"].Value = record.Dialects is not null ? JsonSerializer.Serialize(record.Dialects, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@loanword_etymology"].Value = record.LoanwordEtymology is not null ? JsonSerializer.Serialize(record.LoanwordEtymology, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@cross_references"].Value = record.RelatedTerms is not null ? JsonSerializer.Serialize(record.RelatedTerms, Utils.s_jso) : DBNull.Value;
-            insertRecordCommand.Parameters["@antonyms"].Value = record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jso) : DBNull.Value;
+            insertRecordCommand.Parameters["@primary_spelling_orthography_info"].Value = record.PrimarySpellingOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.PrimarySpellingOrthographyInfo) : DBNull.Value;
+            insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
+            insertRecordCommand.Parameters["@alternative_spellings_orthography_info"].Value = record.AlternativeSpellingsOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo) : DBNull.Value;
+            insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : DBNull.Value;
+            insertRecordCommand.Parameters["@readings_orthography_info"].Value = record.ReadingsOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.ReadingsOrthographyInfo) : DBNull.Value;
+            insertRecordCommand.Parameters["@reading_restrictions"].Value = record.ReadingRestrictions is not null ? MessagePackSerializer.Serialize(record.ReadingRestrictions) : DBNull.Value;
+            insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
+            insertRecordCommand.Parameters["@glossary_info"].Value = record.DefinitionInfo is not null ? MessagePackSerializer.Serialize(record.DefinitionInfo) : DBNull.Value;
+            insertRecordCommand.Parameters["@part_of_speech_shared_by_all_senses"].Value = record.WordClassesSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.WordClassesSharedByAllSenses) : DBNull.Value;
+            insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
+            insertRecordCommand.Parameters["@spelling_restrictions"].Value = record.SpellingRestrictions is not null ? MessagePackSerializer.Serialize(record.SpellingRestrictions) : DBNull.Value;
+            insertRecordCommand.Parameters["@fields_shared_by_all_senses"].Value = record.FieldsSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.FieldsSharedByAllSenses) : DBNull.Value;
+            insertRecordCommand.Parameters["@fields"].Value = record.Fields is not null ? MessagePackSerializer.Serialize(record.Fields) : DBNull.Value;
+            insertRecordCommand.Parameters["@misc_shared_by_all_senses"].Value = record.MiscSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.MiscSharedByAllSenses) : DBNull.Value;
+            insertRecordCommand.Parameters["@misc"].Value = record.Misc is not null ? MessagePackSerializer.Serialize(record.Misc) : DBNull.Value;
+            insertRecordCommand.Parameters["@dialects_shared_by_all_senses"].Value = record.DialectsSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.DialectsSharedByAllSenses) : DBNull.Value;
+            insertRecordCommand.Parameters["@dialects"].Value = record.Dialects is not null ? MessagePackSerializer.Serialize(record.Dialects) : DBNull.Value;
+            insertRecordCommand.Parameters["@loanword_etymology"].Value = record.LoanwordEtymology is not null ? MessagePackSerializer.Serialize(record.LoanwordEtymology) : DBNull.Value;
+            insertRecordCommand.Parameters["@cross_references"].Value = record.RelatedTerms is not null ? MessagePackSerializer.Serialize(record.RelatedTerms) : DBNull.Value;
+            insertRecordCommand.Parameters["@antonyms"].Value = record.Antonyms is not null ? MessagePackSerializer.Serialize(record.Antonyms) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
             insertSearchKeyCommand.Parameters["@record_id"].Value = id;
@@ -314,83 +315,83 @@ internal static class JmdictDBManager
         string primarySpelling = dataReader.GetString(1);
 
         string[]? primarySpellingOrthographyInfo = !dataReader.IsDBNull(2)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(2), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
             : null;
 
         string[]?[]? spellingRestrictions = !dataReader.IsDBNull(3)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(3), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(3))
             : null;
 
         string[]? alternativeSpellings = !dataReader.IsDBNull(4)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(4), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(4))
             : null;
 
 
         string[]?[]? alternativeSpellingsOrthographyInfo = !dataReader.IsDBNull(5)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(5), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(5))
             : null;
 
         string[]? readings = !dataReader.IsDBNull(6)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(6), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(6))
             : null;
 
         string[]?[]? readingsOrthographyInfo = !dataReader.IsDBNull(7)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(7), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(7))
             : null;
 
         string[]?[]? readingRestrictions = !dataReader.IsDBNull(8)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(8), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(8))
             : null;
 
-        string[][]? definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(9), Utils.s_jso);
+        string[][]? definitions = MessagePackSerializer.Deserialize<string[][]>(dataReader.GetFieldValue<byte[]>(9));
         Debug.Assert(definitions is not null);
 
         string?[]? definitionInfo = !dataReader.IsDBNull(10)
-            ? JsonSerializer.Deserialize<string?[]>(dataReader.GetString(10), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string?[]>(dataReader.GetFieldValue<byte[]>(10))
             : null;
 
         string[]? wordClassesSharedByAllSenses = !dataReader.IsDBNull(11)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(11), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(11))
             : null;
 
         string[]?[]? wordClasses = !dataReader.IsDBNull(12)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(12), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(12))
             : null;
 
         string[]? fieldsSharedByAllSenses = !dataReader.IsDBNull(13)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(13), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(13))
             : null;
 
         string[]?[]? fields = !dataReader.IsDBNull(14)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(14), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(14))
             : null;
 
         string[]? miscSharedByAllSenses = !dataReader.IsDBNull(15)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(15), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(15))
             : null;
 
         string[]?[]? misc = !dataReader.IsDBNull(16)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(16), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(16))
             : null;
 
         string[]? dialectsSharedByAllSenses = !dataReader.IsDBNull(17)
-            ? JsonSerializer.Deserialize<string[]>(dataReader.GetString(17), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(17))
             : null;
 
         string[]?[]? dialects = !dataReader.IsDBNull(18)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(18), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(18))
             : null;
 
         LoanwordSource[]?[]? loanwordEtymology = !dataReader.IsDBNull(19)
-            ? JsonSerializer.Deserialize<LoanwordSource[]?[]>(dataReader.GetString(19), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<LoanwordSource[]?[]>(dataReader.GetFieldValue<byte[]>(19))
             : null;
 
         string[]?[]? relatedTerms = !dataReader.IsDBNull(20)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(20), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(20))
             : null;
 
         string[]?[]? antonyms = !dataReader.IsDBNull(21)
-            ? JsonSerializer.Deserialize<string[]?[]>(dataReader.GetString(21), Utils.s_jso)
+            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(21))
             : null;
 
         return new JmdictRecord(id, primarySpelling, definitions, wordClasses, wordClassesSharedByAllSenses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, fieldsSharedByAllSenses, misc, miscSharedByAllSenses, definitionInfo, dialects, dialectsSharedByAllSenses, loanwordEtymology, relatedTerms, antonyms);
