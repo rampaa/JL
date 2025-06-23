@@ -1,3 +1,5 @@
+using System.Buffers;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using JL.Core.Config;
@@ -8,6 +10,8 @@ public static class TextUtils
 {
     private const char HighSurrogateStart = '\uD800';
     private const char Noncharacter = '\uFFFE';
+    private static readonly SearchValues<char> s_digits = SearchValues.Create('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+    private static readonly SearchValues<char> s_digitsAndGroupSeparator = SearchValues.Create('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ',');
 
     // See https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Globalization/Normalization.Icu.cs
     // Modified from private static bool HasInvalidUnicodeSequence(ReadOnlySpan<char> s)
@@ -120,5 +124,25 @@ public static class TextUtils
         return !char.IsHighSurrogate(firstChar)
             ? firstChar.ToString()
             : char.ConvertFromUtf32(char.ConvertToUtf32(firstChar, text[1]));
+    }
+
+    internal static int ExtractFirstInt(ReadOnlySpan<char> text)
+    {
+        int startIndex = text.IndexOfAny(s_digits);
+        if (startIndex < 0)
+        {
+            return -1;
+        }
+
+        ReadOnlySpan<char> remainingSpan = text[startIndex..];
+        int nonDigitIndex = remainingSpan.IndexOfAnyExcept(s_digitsAndGroupSeparator);
+
+        ReadOnlySpan<char> numberSlice = nonDigitIndex < 0
+            ? remainingSpan
+            : remainingSpan[..nonDigitIndex];
+
+        return int.TryParse(numberSlice, NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out int result)
+            ? result
+            : -1;
     }
 }

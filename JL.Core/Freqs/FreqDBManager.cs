@@ -10,7 +10,7 @@ namespace JL.Core.Freqs;
 
 internal static class FreqDBManager
 {
-    public const int Version = 5;
+    public const int Version = 6;
 
     private const int SearchKeyIndex = 2;
 

@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using CommunityToolkit.HighPerformance.Buffers;
 using JL.Core.Audio;
 using JL.Core.Config;
@@ -27,10 +26,6 @@ public static partial class Utils
     public static readonly string ResourcesPath = Path.Join(ApplicationPath, "Resources");
     public static readonly string ConfigPath = Path.Join(ApplicationPath, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
-
-    [GeneratedRegex(@"\d+", RegexOptions.CultureInvariant)]
-    internal static partial Regex NumberRegex { get; }
-
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
 
     internal static readonly LoggingLevelSwitch s_loggingLevelSwitch = new()
@@ -210,7 +205,7 @@ public static partial class Utils
     {
         string fullPath = Path.GetFullPath(path, ApplicationPath);
         string relativePath = Path.GetRelativePath(ApplicationPath, fullPath);
-        return relativePath.StartsWith('.') ? fullPath : relativePath;
+        return relativePath[0] is '.' ? fullPath : relativePath;
     }
 
     internal static T[]? ConcatNullableArrays<T>(params ReadOnlySpan<T[]?> arrays)

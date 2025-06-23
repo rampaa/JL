@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
@@ -20,32 +19,19 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
 
     public PitchAccentRecord(ReadOnlySpan<JsonElement> jsonElements)
     {
+        Position = byte.MaxValue;
         Spelling = jsonElements[0].GetString()!.GetPooledString();
 
         JsonElement thirdJsonElement = jsonElements[2];
-        if (thirdJsonElement.ValueKind is JsonValueKind.Object)
-        {
-            Reading = thirdJsonElement.GetProperty("reading").GetString();
-            Position = thirdJsonElement.GetProperty("pitches")[0].GetProperty("position").TryGetByte(out byte position)
-                ? position
-                : byte.MaxValue;
-        }
+        Reading = thirdJsonElement.GetProperty("reading").GetString();
 
-        else
+        JsonElement pitchesArray = thirdJsonElement.GetProperty("pitches");
+        foreach (JsonElement pitchElement in pitchesArray.EnumerateArray())
         {
-            Reading = jsonElements[1].GetString();
-
-            string? positionStr = jsonElements[5][0].GetString();
-            if (positionStr is not null)
+            if (pitchElement.GetProperty("position").TryGetByte(out byte position))
             {
-                Match match = Utils.NumberRegex.Match(positionStr);
-                Position = match.Success && byte.TryParse(match.ValueSpan, out byte position)
-                    ? position
-                    : byte.MaxValue;
-            }
-            else
-            {
-                Position = byte.MaxValue;
+                Position = position;
+                break;
             }
         }
 
