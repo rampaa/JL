@@ -83,7 +83,7 @@ internal sealed partial class PreferencesWindow
             $"""• {JLField.PitchAccentCategoryForFirstReading.GetDescription()}: Pitch accent category for the 'Selected Reading' of the mined word, e.g., "にほんご: Heiban". There are currently four pitch accent categories: Heiban, Atamadaka, Odaka and Nakadaka.""",
             $"""• {JLField.EdictId.GetDescription()}: JMDict entry ID.""",
             $"""• {JLField.LocalTime.GetDescription()}: Mining date and time expressed in local timezone."""
-        ;
+        ];
 
     private static readonly string[] s_kanjiJLFieldsInfo =
         [
