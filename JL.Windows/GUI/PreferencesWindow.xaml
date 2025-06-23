@@ -1617,6 +1617,11 @@
                         <hc:TextBox x:Name="HotkeysPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
                                         hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="HotkeysPreferencesSearchTextBox_TextChanged" />
 
+                        <TextBlock Margin="15,5,15,5" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap"
+                                   Text="Only hotkeys with modifiers (e.g. Alt+T), function keys (except for F12) and numpad keys can be used as global hotkeys.
+                                   &#10;Hotkeys without modifiers will not work if a window that has a higher integrity level than JL has the focus.
+                                   &#10;To mitigate this you can give JL the UI Access privilege."/>
+
                         <ListBox x:Name="HotkeysPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                             <ListBox.Template>
                                 <ControlTemplate>
