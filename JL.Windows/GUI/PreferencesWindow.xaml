@@ -33,7 +33,10 @@
             <TabItem Header="General">
                 <ScrollViewer PanningMode="Both">
                     <StackPanel>
-                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
+                        <hc:TextBox x:Name="GeneralPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="GeneralPreferencesSearchTextBox_TextChanged" />
+                        
+                        <ListBox x:Name="GeneralPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                             <ListBox.Template>
                                 <ControlTemplate>
                                     <ItemsPresenter></ItemsPresenter>

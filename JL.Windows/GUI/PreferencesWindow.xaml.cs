@@ -708,19 +708,31 @@ internal sealed partial class PreferencesWindow
         }
     }
 
+    private void GeneralPreferencesSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        GeneralPreferencesListBox.Items.Filter = GeneralPreferencesFilter;
+    }
+
     private void MainWindowPreferencesSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        MainWindowPreferencesListBox.Items.Filter += MainWindowPreferencesFilter;
+        MainWindowPreferencesListBox.Items.Filter = MainWindowPreferencesFilter;
     }
 
     private void PopupPreferencesSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        PopupPreferencesListBox.Items.Filter += PopupPreferencesFilter;
+        PopupPreferencesListBox.Items.Filter = PopupPreferencesFilter;
     }
 
     private void HotkeysPreferencesSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        HotkeysPreferencesListBox.Items.Filter += HotkeysPreferencesFilter;
+        HotkeysPreferencesListBox.Items.Filter = HotkeysPreferencesFilter;
+    }
+
+    private bool GeneralPreferencesFilter(object item)
+    {
+        ListBoxItem listBoxItem = (ListBoxItem)item;
+        string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
+        return preferenceName.AsSpan().Contains(GeneralPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.AsSpan().Contains(GeneralPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
     }
 
     private bool MainWindowPreferencesFilter(object item)
