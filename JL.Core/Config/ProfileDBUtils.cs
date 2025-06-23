@@ -100,7 +100,8 @@ public static class ProfileDBUtils
             """
             SELECT name
             FROM profile
-            WHERE id != 0;
+            WHERE id != 0
+            ORDER BY name ASC;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
