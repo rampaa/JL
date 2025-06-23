@@ -727,6 +727,11 @@ internal sealed partial class PreferencesWindow
         HotkeysPreferencesListBox.Items.Filter = HotkeysPreferencesFilter;
     }
 
+    private void AdvancedPreferencesSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        AdvancedPreferencesListBox.Items.Filter = AdvancedPreferencesFilter;
+    }
+
     private bool GeneralPreferencesFilter(object item)
     {
         ListBoxItem listBoxItem = (ListBoxItem)item;
@@ -753,5 +758,12 @@ internal sealed partial class PreferencesWindow
         ListBoxItem listBoxItem = (ListBoxItem)item;
         string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[2]).Text;
         return preferenceName.AsSpan().Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.AsSpan().Contains(HotkeysPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
+    }
+
+    private bool AdvancedPreferencesFilter(object item)
+    {
+        ListBoxItem listBoxItem = (ListBoxItem)item;
+        string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
+        return preferenceName.AsSpan().Contains(AdvancedPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.AsSpan().Contains(AdvancedPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
     }
 }

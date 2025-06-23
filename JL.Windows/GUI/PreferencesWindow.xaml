@@ -2265,7 +2265,10 @@
             <TabItem Header="Advanced">
                 <ScrollViewer PanningMode="Both">
                     <StackPanel>
-                        <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
+                        <hc:TextBox x:Name="AdvancedPreferencesSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="AdvancedPreferencesSearchTextBox_TextChanged" />
+
+                        <ListBox x:Name="AdvancedPreferencesListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                             <ListBox.Template>
                                 <ControlTemplate>
                                     <ItemsPresenter></ItemsPresenter>
