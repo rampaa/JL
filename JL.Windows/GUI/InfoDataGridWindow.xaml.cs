@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Windows.Interop;
+using JL.Core.Utilities;
 
 namespace JL.Windows.GUI;
 
@@ -37,5 +39,20 @@ internal sealed partial class InfoDataGridWindow
     private void Window_Closed(object sender, EventArgs e)
     {
         InfoDataGrid.ItemsSource = null;
+    }
+
+    private void InfoDataGridSearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        InfoDataGrid.Items.Filter = InfoDataGridFilter;
+    }
+
+    private bool InfoDataGridFilter(object item)
+    {
+        (string term, int count) = (KeyValuePair<string, int>)item;
+        string termInHiragana = JapaneseUtils.KatakanaToHiragana(term);
+        string textInHiragana = JapaneseUtils.KatakanaToHiragana(InfoDataGridSearchTextBox.Text);
+
+        return termInHiragana.AsSpan().Contains(textInHiragana, StringComparison.Ordinal)
+            || count.ToString(CultureInfo.InvariantCulture).AsSpan().Contains(textInHiragana, StringComparison.Ordinal);
     }
 }

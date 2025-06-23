@@ -3,11 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d" Topmost="True"
         Title="" MaxHeight="600" MaxWidth="800" ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="WidthAndHeight" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal" Closed="Window_Closed">
     <Grid>
-        <DataGrid Name="InfoDataGrid" IsReadOnly="True" Width="Auto" Height="Auto" AutoGenerateColumns="False"
+        <ScrollViewer PanningMode="Both">
+            <StackPanel>
+                <hc:TextBox x:Name="InfoDataGridSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoDataGridSearchTextBox_TextChanged" />
+
+                <DataGrid Name="InfoDataGrid" IsReadOnly="True" Width="Auto" Height="Auto" AutoGenerateColumns="False"
                   CanUserSortColumns="True" CanUserAddRows="False" CanUserDeleteRows="False" />
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

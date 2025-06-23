@@ -189,7 +189,7 @@ public static partial class JapaneseUtils
         return -1;
     }
 
-    internal static string KatakanaToHiragana(string text)
+    public static string KatakanaToHiragana(string text)
     {
         string normalizedText = text;
         if (!normalizedText.IsNormalized(NormalizationForm.FormKC))
