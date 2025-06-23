@@ -138,10 +138,10 @@ internal static class YomichanPitchAccentDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT r.spelling AS spelling,
-                   r.reading AS reading,
-                   r.position AS position,
-                   rsk.search_key AS searchKey
+            SELECT r.spelling,
+                   r.reading,
+                   r.position,
+                   rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -197,10 +197,10 @@ internal static class YomichanPitchAccentDBManager
 
         command.CommandText =
             """
-            SELECT r.spelling AS spelling,
-                   r.reading AS reading,
-                   r.position AS position,
-                   json_group_array(rsk.search_key) AS searchKeys
+            SELECT r.spelling,
+                   r.reading,
+                   r.position,
+                   json_group_array(rsk.search_key)
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;

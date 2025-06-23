@@ -112,9 +112,9 @@ internal static class FreqDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT r.spelling as spelling,
-                   r.frequency AS frequency,
-                   rsk.search_key AS searchKey
+            SELECT r.spelling,
+                   r.frequency,
+                   rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -170,7 +170,7 @@ internal static class FreqDBManager
 
         command.CommandText =
             """
-            SELECT r.spelling as spelling, r.frequency AS frequency
+            SELECT r.spelling, r.frequency
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term;
@@ -219,7 +219,7 @@ internal static class FreqDBManager
 
         command.CommandText =
             """
-            SELECT r.spelling as spelling, r.frequency AS frequency, json_group_array(rsk.search_key) AS searchKeys
+            SELECT r.spelling, r.frequency, json_group_array(rsk.search_key)
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;

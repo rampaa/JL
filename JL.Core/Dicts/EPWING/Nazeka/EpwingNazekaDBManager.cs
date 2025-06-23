@@ -18,10 +18,10 @@ internal static class EpwingNazekaDBManager
 
     private const string SingleTermQuery =
         """
-        SELECT r.primary_spelling AS primarySpelling,
-               r.reading AS reading,
-               r.alternative_spellings AS alternativeSpellings,
-               r.glossary AS definitions
+        SELECT r.primary_spelling,
+               r.reading,
+               r.alternative_spellings,
+               r.glossary
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term;
@@ -31,11 +31,11 @@ internal static class EpwingNazekaDBManager
     {
         return
             $"""
-            SELECT r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.alternative_spellings AS alternativeSpellings,
-                   r.glossary AS definitions,
-                   rsk.search_key AS searchKey
+            SELECT r.primary_spelling,
+                   r.reading,
+                   r.alternative_spellings,
+                   r.glossary,
+                   rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN {parameter}
@@ -46,11 +46,11 @@ internal static class EpwingNazekaDBManager
     {
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.alternative_spellings AS alternativeSpellings,
-                   r.glossary AS definitions,
-                   rsk.search_key AS searchKey
+            SELECT r.primary_spelling,
+                   r.reading,
+                   r.alternative_spellings,
+                   r.glossary,
+                   rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -253,11 +253,11 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.alternative_spellings AS alternativeSpellings,
-                   r.glossary AS definitions,
-                   json_group_array(rsk.search_key) AS searchKeys
+            SELECT r.primary_spelling,
+                   r.reading,
+                   r.alternative_spellings,
+                   r.glossary,
+                   json_group_array(rsk.search_key)
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;

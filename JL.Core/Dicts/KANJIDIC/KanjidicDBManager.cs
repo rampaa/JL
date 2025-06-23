@@ -13,14 +13,14 @@ internal static class KanjidicDBManager
 
     private const string SingleTermQuery =
         """
-        SELECT r.on_readings AS onReadings,
-               r.kun_readings AS kunReadings,
-               r.nanori_readings AS nanoriReadings,
-               r.radical_names AS radicalNames,
-               r.glossary AS definitions,
-               r.stroke_count AS strokeCount,
-               r.grade AS grade,
-               r.frequency AS frequency
+        SELECT r.on_readings,
+               r.kun_readings,
+               r.nanori_readings,
+               r.radical_names,
+               r.glossary,
+               r.stroke_count,
+               r.grade,
+               r.frequency
         FROM record r
         WHERE r.kanji = @term;
         """;
@@ -138,15 +138,15 @@ internal static class KanjidicDBManager
 
         command.CommandText =
             """
-            SELECT r.on_readings AS onReadings,
-                   r.kun_readings AS kunReadings,
-                   r.nanori_readings AS nanoriReadings,
-                   r.radical_names AS radicalNames,
-                   r.glossary AS definitions,
-                   r.stroke_count AS strokeCount,
-                   r.grade AS grade,
-                   r.frequency AS frequency,
-                   r.kanji AS kanji
+            SELECT r.on_readings,
+                   r.kun_readings,
+                   r.nanori_readings,
+                   r.radical_names,
+                   r.glossary,
+                   r.stroke_count,
+                   r.grade,
+                   r.frequency,
+                   r.kanji
             FROM record r;
             """;
 

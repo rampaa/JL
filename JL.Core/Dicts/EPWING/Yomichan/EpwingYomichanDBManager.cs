@@ -18,11 +18,11 @@ internal static class EpwingYomichanDBManager
 
     private const string SingleTermQuery =
         """
-        SELECT r.primary_spelling AS primarySpelling,
-               r.reading AS reading,
-               r.glossary AS definitions,
-               r.part_of_speech AS wordClasses,
-               r.glossary_tags AS definitionTags
+        SELECT r.primary_spelling,
+               r.reading,
+               r.glossary,
+               r.part_of_speech,
+               r.glossary_tags
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term;
@@ -32,12 +32,12 @@ internal static class EpwingYomichanDBManager
     {
         return
             $"""
-            SELECT r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.glossary AS definitions,
-                   r.part_of_speech AS wordClasses,
-                   r.glossary_tags AS definitionTags,
-                   rsk.search_key AS searchKey
+            SELECT r.primary_spelling,
+                   r.reading,
+                   r.glossary,
+                   r.part_of_speech,
+                   r.glossary_tags,
+                   rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN {parameter}
@@ -48,12 +48,12 @@ internal static class EpwingYomichanDBManager
     {
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.glossary AS definitions,
-                   r.part_of_speech AS wordClasses,
-                   r.glossary_tags AS definitionTags,
-                   rsk.search_key AS searchKey
+            SELECT r.primary_spelling,
+                   r.reading,
+                   r.glossary,
+                   r.part_of_speech,
+                   r.glossary_tags,
+                   rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -258,12 +258,12 @@ internal static class EpwingYomichanDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.glossary AS definitions,
-                   r.part_of_speech AS wordClasses,
-                   r.glossary_tags AS definitionTags,
-                   json_group_array(rsk.search_key) AS searchKeys
+            SELECT r.primary_spelling,
+                   r.reading,
+                   r.glossary,
+                   r.part_of_speech,
+                   r.glossary_tags,
+                   json_group_array(rsk.search_key)
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;
