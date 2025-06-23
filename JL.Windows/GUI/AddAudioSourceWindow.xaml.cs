@@ -158,14 +158,10 @@ internal sealed partial class AddAudioSourceWindow
                                            e.g. Microsoft Haruka
                                            """;
 
-        InfoWindow infoWindow = new()
+        InfoWindow infoWindow = new(audioSourceTypeInfo)
         {
             Owner = this,
             Title = "Audio Source Types",
-            InfoTextBox =
-            {
-                Text = audioSourceTypeInfo
-            },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
 

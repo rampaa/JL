@@ -3,11 +3,42 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d"
-        Title="" MaxHeight="600" MaxWidth="800" ShowInTaskbar="False" SizeToContent="WidthAndHeight" Background="{DynamicResource RegionBrush}"
+        Title="" MaxHeight="600" MaxWidth="800" MinWidth="450" ShowInTaskbar="False" SizeToContent="WidthAndHeight" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal">
     <Grid>
-        <TextBox Name="InfoTextBox" Padding="20" FontSize="20" IsReadOnly="true" IsUndoEnabled="False" UndoLimit="0" VerticalScrollBarVisibility="Auto"
+        <Grid.Resources>
+            <Style x:Key="AlternatingWithTriggers" TargetType="{x:Type ListBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="ListBox.AlternationIndex" Value="0">
+                        <Setter Property="Background" Value="{StaticResource SecondaryRegionBrush}"/>
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="Height" Value="35" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+            </Style>
+        </Grid.Resources>
+
+        <ScrollViewer PanningMode="Both">
+            <StackPanel>
+                <hc:TextBox x:Name="InfoSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoSearchTextBox_TextChanged" />
+
+                <ListBox x:Name="InfoListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}" Foreground="{StaticResource PrimaryTextBrush}" FontSize="20">
+                    <ListBox.Template>
+                        <ControlTemplate>
+                            <ItemsPresenter></ItemsPresenter>
+                        </ControlTemplate>
+                    </ListBox.Template>
+                </ListBox>
+
+                <TextBox Name="InfoTextBox" Padding="20" FontSize="20" IsReadOnly="true" IsUndoEnabled="False" UndoLimit="0" VerticalScrollBarVisibility="Auto"
                  TextWrapping="Wrap" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Cursor="Arrow" BorderThickness="0"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

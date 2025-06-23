@@ -1,3 +1,5 @@
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 
 namespace JL.Windows.GUI;
@@ -9,9 +11,19 @@ internal sealed partial class InfoWindow
 {
     private nint _windowHandle;
 
-    public InfoWindow()
+    public InfoWindow(string[] items)
     {
         InitializeComponent();
+        InfoTextBox.Visibility = Visibility.Collapsed;
+        InfoListBox.ItemsSource = items;
+    }
+
+    public InfoWindow(string text)
+    {
+        InitializeComponent();
+        InfoSearchTextBox.Visibility = Visibility.Collapsed;
+        InfoListBox.Visibility = Visibility.Collapsed;
+        InfoTextBox.Text = text;
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -32,5 +44,16 @@ internal sealed partial class InfoWindow
         {
             WinApi.PreventActivation(_windowHandle);
         }
+    }
+
+    private void InfoSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        InfoListBox.Items.Filter = InfoFilter;
+    }
+
+    private bool InfoFilter(object item)
+    {
+        string preferenceName = (string)item;
+        return preferenceName.AsSpan().Contains(InfoSearchTextBox.Text, StringComparison.OrdinalIgnoreCase);
     }
 }

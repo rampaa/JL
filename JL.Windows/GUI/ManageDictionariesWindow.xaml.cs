@@ -1,8 +1,6 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -479,33 +477,31 @@ internal sealed partial class ManageDictionariesWindow
         Close();
     }
 
-    private static string EntityDictToString(Dictionary<string, string> entityDict)
+    private static string[] EntityDictToArray(Dictionary<string, string> entityDict)
     {
         if (entityDict.Count is 0)
         {
-            return "";
+            return [""];
         }
 
-        StringBuilder sb = new();
         IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(static e => e.Key, StringComparer.InvariantCulture);
+        string[] itemArray = new string[entityDict.Count];
+        int index = 0;
         foreach ((string name, string description) in sortedJmdictEntities)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{name}: {description}\n");
+            itemArray[index] = $"{name}: {description}";
+            ++index;
         }
 
-        return sb.ToString(0, sb.Length - 1);
+        return itemArray;
     }
 
     private void ShowInfoWindow(Dictionary<string, string> entityDict, string title)
     {
-        InfoWindow infoWindow = new()
+        InfoWindow infoWindow = new(EntityDictToArray(entityDict))
         {
             Owner = this,
             Title = title,
-            InfoTextBox =
-            {
-                Text = EntityDictToString(entityDict)
-            },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
 

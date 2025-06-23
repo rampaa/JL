@@ -1,7 +1,5 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -242,23 +240,20 @@ internal sealed partial class AddWordWindow
             .First(static r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString() is "Verb";
 
         string[] keys = showAllowedVerbTypeInfo ? s_allVerbTypes : s_allAdjectiveTypes;
-        StringBuilder sb = new(keys.Length);
-        foreach (string key in keys)
+        string[] supportedWordClasses = new string[keys.Length];
+
+        for (int i = 0; i < keys.Length; i++)
         {
-            if (DictUtils.JmdictEntities.TryGetValue(key, out string? value))
-            {
-                _ = sb.Append(CultureInfo.InvariantCulture, $"{key}: {value}\n");
-            }
+            string key = keys[i];
+            supportedWordClasses[i] = DictUtils.JmdictEntities.TryGetValue(key, out string? value)
+                ? $"{key}: {value}"
+                : keys[i];
         }
 
-        InfoWindow infoWindow = new()
+        InfoWindow infoWindow = new(supportedWordClasses)
         {
             Owner = this,
             Title = "Supported Word Classes",
-            InfoTextBox =
-            {
-                Text = sb.ToString(0, sb.Length - 1)
-            },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
 
