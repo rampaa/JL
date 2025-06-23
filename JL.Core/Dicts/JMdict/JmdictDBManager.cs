@@ -326,7 +326,6 @@ internal static class JmdictDBManager
             ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(4))
             : null;
 
-
         string[]?[]? alternativeSpellingsOrthographyInfo = !dataReader.IsDBNull(5)
             ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(5))
             : null;
