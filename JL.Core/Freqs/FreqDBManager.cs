@@ -112,9 +112,7 @@ internal static class FreqDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT r.spelling,
-                   r.frequency,
-                   rsk.search_key
+            SELECT r.spelling, r.frequency, rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1

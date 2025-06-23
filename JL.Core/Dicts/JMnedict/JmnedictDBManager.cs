@@ -118,13 +118,7 @@ internal static class JmnedictDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
             $"""
-            SELECT r.jmnedict_id,
-                   r.primary_spelling,
-                   r.readings,
-                   r.alternative_spellings,
-                   r.glossary,
-                   r.name_types,
-                   r.primary_spelling_in_hiragana
+            SELECT r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
             FROM record r
             WHERE r.primary_spelling_in_hiragana IN {parameter}
             """;
@@ -166,13 +160,7 @@ internal static class JmnedictDBManager
     //
     //     command.CommandText =
     //         """
-    //         SELECT r.jmnedict_id,
-    //                r.primary_spelling,
-    //                r.readings,
-    //                r.alternative_spellings,
-    //                r.glossary,
-    //                r.name_types,
-    //                r.primary_spelling_in_hiragana
+    //         SELECT r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
     //         FROM record r;
     //         """;
     //

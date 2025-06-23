@@ -18,11 +18,7 @@ internal static class EpwingYomichanDBManager
 
     private const string SingleTermQuery =
         """
-        SELECT r.primary_spelling,
-               r.reading,
-               r.glossary,
-               r.part_of_speech,
-               r.glossary_tags
+        SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term;
@@ -32,12 +28,7 @@ internal static class EpwingYomichanDBManager
     {
         return
             $"""
-            SELECT r.primary_spelling,
-                   r.reading,
-                   r.glossary,
-                   r.part_of_speech,
-                   r.glossary_tags,
-                   rsk.search_key
+            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN {parameter}
@@ -48,12 +39,7 @@ internal static class EpwingYomichanDBManager
     {
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling,
-                   r.reading,
-                   r.glossary,
-                   r.part_of_speech,
-                   r.glossary_tags,
-                   rsk.search_key
+            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -258,12 +244,7 @@ internal static class EpwingYomichanDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling,
-                   r.reading,
-                   r.glossary,
-                   r.part_of_speech,
-                   r.glossary_tags,
-                   json_group_array(rsk.search_key)
+            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, json_group_array(rsk.search_key)
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;

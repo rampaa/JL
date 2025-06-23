@@ -13,10 +13,7 @@ internal static class YomichanKanjiDBManager
 
     private const string SingleTermQuery =
         """
-        SELECT r.on_readings,
-               r.kun_readings,
-               r.glossary,
-               r.stats
+        SELECT r.on_readings, r.kun_readings, r.glossary, r.stats
         FROM record r
         WHERE r.kanji = @term;
         """;
@@ -133,11 +130,7 @@ internal static class YomichanKanjiDBManager
 
         command.CommandText =
             """
-            SELECT r.on_readings,
-                   r.kun_readings,
-                   r.glossary,
-                   r.stats,
-                   r.kanji
+            SELECT r.on_readings, r.kun_readings, r.glossary, r.stats, r.kanji
             FROM record r;
             """;
 
