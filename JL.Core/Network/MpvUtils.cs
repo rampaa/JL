@@ -21,7 +21,7 @@ public static class MpvUtils
             NamedPipeClientStream pipeClient = new(".", CoreConfigManager.Instance.MpvNamedPipePath, PipeDirection.InOut, PipeOptions.Asynchronous);
             await using (pipeClient.ConfigureAwait(false))
             {
-                await pipeClient.ConnectAsync(1500).ConfigureAwait(false);
+                await pipeClient.ConnectAsync(500).ConfigureAwait(false);
                 await pipeClient.WriteAsync(s_getPausePropertyCommand).ConfigureAwait(false);
 
                 using StreamReader reader = new(pipeClient);
@@ -77,7 +77,7 @@ public static class MpvUtils
             NamedPipeClientStream pipeClient = new(".", CoreConfigManager.Instance.MpvNamedPipePath, PipeDirection.Out, PipeOptions.Asynchronous);
             await using (pipeClient.ConfigureAwait(false))
             {
-                await pipeClient.ConnectAsync(1500).ConfigureAwait(false);
+                await pipeClient.ConnectAsync(500).ConfigureAwait(false);
                 await pipeClient.WriteAsync(s_unpauseCommand).ConfigureAwait(false);
             }
         }
