@@ -287,7 +287,7 @@ internal sealed partial class WinApi
 
     public static void AllowActivation(nint windowHandle)
     {
-        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, 0);
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) & ~WS_EX_NOACTIVATE);
     }
 
     public static void ActivateWindow(nint windowHandle)
@@ -410,7 +410,11 @@ internal sealed partial class WinApi
                 MagpieUtils.MagpieWindowRightEdgePosition = MagpieUtils.GetMagpieWindowRightEdgePositionFromMagpie(lParam);
                 // MagpieUtils.SourceWindowHandle = MagpieUtils.GetSourceWindowHande(lParam);
                 MagpieUtils.DpiAwareMagpieWindowWidth = (MagpieUtils.MagpieWindowRightEdgePosition - MagpieUtils.MagpieWindowLeftEdgePosition) / WindowsUtils.Dpi.DpiScaleX;
-                MainWindow.Instance.BringToFront();
+
+                if (ConfigManager.Instance.AlwaysOnTop)
+                {
+                    MainWindow.Instance.BringToFront();
+                }
             }
 
             handled = true;

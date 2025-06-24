@@ -257,7 +257,7 @@ internal sealed partial class MainWindow
         TitleBarContextMenu.IsOpen = false;
         MainTextBoxContextMenu.IsOpen = false;
 
-        if (configManager.HidePopupsOnTextChange)
+        if (configManager.HidePopupsOnTextChange && notMinimized && FirstPopupWindow.IsVisible)
         {
             PopupWindowUtils.HidePopups(0);
         }
