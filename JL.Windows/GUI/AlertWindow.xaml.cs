@@ -17,7 +17,7 @@ internal sealed partial class AlertWindow
     {
         base.OnSourceInitialized(e);
         WindowHandle = new WindowInteropHelper(this).Handle;
-        WinApi.SetNoRedirectionBitmap(WindowHandle);
+        WinApi.SetNoRedirectionBitmapStyle(WindowHandle);
         WinApi.BringToFront(WindowHandle);
     }
 

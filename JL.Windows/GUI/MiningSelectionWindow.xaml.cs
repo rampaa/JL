@@ -81,7 +81,7 @@ internal sealed partial class MiningSelectionWindow
     {
         base.OnSourceInitialized(e);
         _windowHandle = new WindowInteropHelper(this).Handle;
-        WinApi.SetNoRedirectionBitmap(_windowHandle);
+        WinApi.SetNoRedirectionBitmapStyle(_windowHandle);
     }
 
     protected override void OnActivated(EventArgs e)

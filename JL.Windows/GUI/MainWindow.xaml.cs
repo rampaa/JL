@@ -68,7 +68,7 @@ internal sealed partial class MainWindow
         base.OnSourceInitialized(e);
 
         WindowHandle = new WindowInteropHelper(this).Handle;
-        WinApi.SetNoRedirectionBitmap(WindowHandle);
+        WinApi.SetCompositedAndNoRedirectionBitmapStyle(WindowHandle);
 
         _winApi = new WinApi();
         _winApi.ClipboardChanged += ClipboardChanged;

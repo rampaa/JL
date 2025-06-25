@@ -17,7 +17,8 @@ internal sealed partial class WinApi
         // ReSharper disable InconsistentNaming
 
         internal const int GWL_EXSTYLE = -20;
-        internal const int WS_EX_NOREDIRECTIONBITMAP = 0x00200000;
+        internal const nint WS_EX_NOREDIRECTIONBITMAP = 0x00200000;
+        internal const nint WS_EX_COMPOSITED = 0x02000000;
         internal const nint HWND_TOPMOST = -1;
         // internal const nint HWND_TOP = 0;
         // internal const nint HWND_NOTOPMOST = -2;
@@ -25,7 +26,6 @@ internal sealed partial class WinApi
         internal const int SWP_NOMOVE = 0x0002;
         internal const int SWP_NOSIZE = 0x0001;
         internal const int SWP_NOZORDER = 0x0004;
-        internal const int SWP_SHOWWINDOW = 0x0040;
         internal const int SW_SHOWNOACTIVATE = 4;
         internal const int SW_SHOWMINNOACTIVE = 7;
         internal const int WM_CLIPBOARDUPDATE = 0x031D;
@@ -33,7 +33,6 @@ internal sealed partial class WinApi
         internal const int WM_HOTKEY = 0x0312;
         internal const int WM_SYSCOMMAND = 0x0112;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
-        internal const int WS_EX_APPWINDOW = 0x00040000;
         internal const int MOD_NOREPEAT = 0x4000;
 
         [StructLayout(LayoutKind.Sequential)]
@@ -268,7 +267,7 @@ internal sealed partial class WinApi
 
     public static void BringToFront(nint windowHandle)
     {
-        _ = SetWindowPos(windowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+        _ = SetWindowPos(windowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
     }
 
     public static void MinimizeWindow(nint windowHandle)
@@ -281,14 +280,19 @@ internal sealed partial class WinApi
         _ = ShowWindow(windowHandle, SW_SHOWNOACTIVATE);
     }
 
-    public static void SetNoRedirectionBitmap(nint windowHandle)
+    public static void SetNoRedirectionBitmapStyle(nint windowHandle)
     {
         _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOREDIRECTIONBITMAP);
     }
 
+    public static void SetCompositedAndNoRedirectionBitmapStyle(nint windowHandle)
+    {
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOREDIRECTIONBITMAP | WS_EX_COMPOSITED);
+    }
+
     public static void PreventActivation(nint windowHandle)
     {
-        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOACTIVATE | WS_EX_APPWINDOW);
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
     }
 
     public static void AllowActivation(nint windowHandle)
