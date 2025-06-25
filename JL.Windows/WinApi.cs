@@ -17,6 +17,7 @@ internal sealed partial class WinApi
         // ReSharper disable InconsistentNaming
 
         internal const int GWL_EXSTYLE = -20;
+        internal const int WS_EX_NOREDIRECTIONBITMAP = 0x00200000;
         internal const nint HWND_TOPMOST = -1;
         // internal const nint HWND_TOP = 0;
         // internal const nint HWND_NOTOPMOST = -2;
@@ -278,6 +279,11 @@ internal sealed partial class WinApi
     public static void RestoreWindow(nint windowHandle)
     {
         _ = ShowWindow(windowHandle, SW_SHOWNOACTIVATE);
+    }
+
+    public static void SetNoRedirectionBitmap(nint windowHandle)
+    {
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOREDIRECTIONBITMAP);
     }
 
     public static void PreventActivation(nint windowHandle)

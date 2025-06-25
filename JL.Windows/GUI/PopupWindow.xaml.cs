@@ -90,6 +90,7 @@ internal sealed partial class PopupWindow
     {
         base.OnSourceInitialized(e);
         WindowHandle = new WindowInteropHelper(this).Handle;
+        WinApi.SetNoRedirectionBitmap(WindowHandle);
         _popupListViewScrollViewer = PopupListView.GetChildOfType<ScrollViewer>();
         Debug.Assert(_popupListViewScrollViewer is not null);
     }

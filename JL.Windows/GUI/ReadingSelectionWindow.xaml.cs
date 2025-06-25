@@ -54,6 +54,7 @@ internal sealed partial class ReadingSelectionWindow
     {
         base.OnSourceInitialized(e);
         _windowHandle = new WindowInteropHelper(this).Handle;
+        WinApi.SetNoRedirectionBitmap(_windowHandle);
     }
 
     protected override void OnActivated(EventArgs e)

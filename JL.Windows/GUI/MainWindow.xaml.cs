@@ -67,14 +67,16 @@ internal sealed partial class MainWindow
     {
         base.OnSourceInitialized(e);
 
-        _input = InputMethod.Current;
-
-        SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
-
         WindowHandle = new WindowInteropHelper(this).Handle;
+        WinApi.SetNoRedirectionBitmap(WindowHandle);
+
         _winApi = new WinApi();
         _winApi.ClipboardChanged += ClipboardChanged;
         _winApi.SubscribeToWndProc(this);
+
+        _input = InputMethod.Current;
+        SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
+
         MagpieUtils.RegisterToMagpieScalingChangedMessage(WindowHandle);
         MagpieUtils.MarkWindowAsMagpieToolWindow(WindowHandle);
 
