@@ -98,6 +98,9 @@
                     <TextBlock.Background>
                         <SolidColorBrush Color="Black" Opacity="0.002"/>
                     </TextBlock.Background>
+                    <TextBlock.CacheMode>
+                        <BitmapCache EnableClearType="True" SnapsToDevicePixels="True"/>
+                    </TextBlock.CacheMode>
                     <TextBlock.Effect>
                         <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
                     </TextBlock.Effect>
@@ -135,6 +138,9 @@
             <TextBlock x:Name="MinimizeButton"
                    Text="−" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" MouseLeftButtonUp="MinimizeWindow" FontFamily="Meiryo UI"
                    MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" ToolTip="Minimize" FontSize="18" Margin="0,0,10,0" HorizontalAlignment="Center">
+                <TextBlock.CacheMode>
+                    <BitmapCache EnableClearType="True" SnapsToDevicePixels="True"/>
+                </TextBlock.CacheMode>
                 <TextBlock.Effect>
                     <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
                 </TextBlock.Effect>
