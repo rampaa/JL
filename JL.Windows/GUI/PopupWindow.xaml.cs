@@ -336,6 +336,8 @@ internal sealed partial class PopupWindow
 
             LastLookupResults = lookupResults;
 
+            Show();
+
             if (enableMiningMode)
             {
                 EnableMiningMode();
@@ -352,12 +354,12 @@ internal sealed partial class PopupWindow
                 DisplayResults();
             }
 
-            Show();
-
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
             UpdatePosition();
+
+            Opacity = 1d;
 
             if (configManager.Focusable
                 && (enableMiningMode || configManager.PopupFocusOnLookup))
@@ -485,6 +487,8 @@ internal sealed partial class PopupWindow
                 StatsUtils.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText ?? firstLookupResult.MatchedText);
             }
 
+            Show();
+
             EnableMiningMode();
             DisplayResults();
 
@@ -493,12 +497,12 @@ internal sealed partial class PopupWindow
                 PopupWindowUtils.SetPopupAutoHideTimer();
             }
 
-            Show();
-
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
             UpdatePosition();
+
+            Opacity = 1d;
 
             _ = textBox.Focus();
 
@@ -2696,6 +2700,7 @@ internal sealed partial class PopupWindow
 
         PopupWindowUtils.PopupAutoHideTimer.Stop();
 
+        Opacity = 0d;
         UpdateLayout();
         Hide();
 
