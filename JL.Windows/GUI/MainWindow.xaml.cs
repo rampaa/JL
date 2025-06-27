@@ -164,6 +164,7 @@ internal sealed partial class MainWindow
         if (text.Length is 0)
         {
             MainTextBox.Clear();
+            UpdatePosition();
             return false;
         }
 
@@ -1903,27 +1904,34 @@ internal sealed partial class MainWindow
         if (configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true }
             or { RepositionMainWindowOnTextChangeByRightPosition: true, MainWindowDynamicWidth: true })
         {
+            Opacity = 0;
             UpdateLayout();
+            Opacity = 1;
 
             DpiScale dpi = WindowsUtils.Dpi;
-            double newTop = Top * dpi.DpiScaleY;
+            double currentTop = Top * dpi.DpiScaleY;
+            double newTop = currentTop;
             if (configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true })
             {
                 newTop = GetDynamicYPosition(configManager.MainWindowFixedBottomPosition);
             }
 
-            double newLeft = Left * dpi.DpiScaleX;
+            double currentLeft = Left * dpi.DpiScaleX;
+            double newLeft = currentLeft;
             if (configManager is { RepositionMainWindowOnTextChangeByRightPosition: true, MainWindowDynamicWidth: true })
             {
                 newLeft = GetDynamicXPosition(configManager.MainWindowFixedRightPosition);
             }
 
-            WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
+            if (currentLeft != newLeft || currentTop != newTop)
+            {
+                WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
 
-            LeftPositionBeforeResolutionChange = Left;
-            TopPositionBeforeResolutionChange = Top;
-            HeightBeforeResolutionChange = Height;
-            WidthBeforeResolutionChange = Width;
+                LeftPositionBeforeResolutionChange = Left;
+                TopPositionBeforeResolutionChange = Top;
+                HeightBeforeResolutionChange = Height;
+                WidthBeforeResolutionChange = Width;
+            }
         }
     }
 
