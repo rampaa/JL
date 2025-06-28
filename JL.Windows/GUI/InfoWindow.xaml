@@ -15,7 +15,7 @@
                         <Setter Property="Background" Value="{StaticResource SecondaryRegionBrush}"/>
                     </Trigger>
                 </Style.Triggers>
-                <Setter Property="Height" Value="35" />
+                <Setter Property="MinHeight" Value="35" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -26,9 +26,14 @@
         <ScrollViewer PanningMode="Both">
             <StackPanel>
                 <hc:TextBox x:Name="InfoSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
-                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoSearchTextBox_TextChanged" />
+                            hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoSearchTextBox_TextChanged" />
 
                 <ListBox x:Name="InfoListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}" Foreground="{StaticResource PrimaryTextBrush}" FontSize="20">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="5,0,5,0" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                     <ListBox.Template>
                         <ControlTemplate>
                             <ItemsPresenter></ItemsPresenter>
