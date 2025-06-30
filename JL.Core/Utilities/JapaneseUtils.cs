@@ -553,7 +553,7 @@ public static partial class JapaneseUtils
                 return null;
             }
 
-            if (indexes.Length == 1)
+            if (indexes.Length is 1)
             {
                 index = indexes[0];
             }
@@ -663,7 +663,7 @@ public static partial class JapaneseUtils
                 return false;
             }
 
-            if (indexes.Length == 1)
+            if (indexes.Length is 1)
             {
                 index = indexes[0];
             }
