@@ -215,7 +215,7 @@ internal sealed class ConfigManager
 
     private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
     private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneComboBoxItems(s_japaneseFonts);
-    public static string[] MainWindowFontWeights { get; set; } = [];
+    public static ComboBoxItem[] MainWindowFontWeights { get; set; } = [];
 
     private SkinType Theme { get; set; } = SkinType.Dark;
 
@@ -985,10 +985,10 @@ internal sealed class ConfigManager
         }
 
         preferenceWindow.MainWindowFontWeightComboBox.ItemsSource = MainWindowFontWeights;
-        int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => fw == mainWindow.MainTextBox.FontWeight.ToString());
+        int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => (string)fw.Content == mainWindow.MainTextBox.FontWeight.ToString());
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
-            mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => fw is "Normal");
+            mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => fw.Content is "Normal");
             if (mainWindowFontWeightIndex < 0)
             {
                 mainWindowFontWeightIndex = 0;

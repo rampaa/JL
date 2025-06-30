@@ -770,13 +770,14 @@ internal sealed partial class PreferencesWindow
     private void MainWindowFontComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         string selectedFont = (string)((ComboBox)sender).SelectedValue;
-        string[] fontWeightNames = WindowsUtils.GetFontWeightNames(selectedFont);
+        string selectedFontWeight = (string)MainWindowFontWeightComboBox.SelectedValue;
+
+        ComboBoxItem[] fontWeightNames = WindowsUtils.GetFontWeightNames(selectedFont);
 
         ConfigManager.MainWindowFontWeights = fontWeightNames;
         MainWindowFontWeightComboBox.ItemsSource = fontWeightNames;
 
-        string selectedFontWeight = (string)MainWindowFontWeightComboBox.SelectedItem;
-        int index = Array.FindIndex(fontWeightNames, fw => fw == selectedFontWeight);
+        int index = Array.FindIndex(fontWeightNames, fw => (string)fw.Content == selectedFontWeight);
         if (index < 0)
         {
             ReadOnlySpan<string> fallbackOrder = [ "Normal", "Regular", "Medium", "DemiBold", "SemiBold", "Bold", "ExtraBold", "UltraBold",
@@ -784,7 +785,7 @@ internal sealed partial class PreferencesWindow
 
             foreach (string name in fallbackOrder)
             {
-                index = Array.FindIndex(fontWeightNames, fw => fw == name);
+                index = Array.FindIndex(fontWeightNames, fw => (string)fw.Content == name);
                 if (index >= 0)
                 {
                     break;

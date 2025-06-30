@@ -802,11 +802,11 @@ internal static class WindowsUtils
         listView.ScrollIntoView(listView.Items.GetItemAt(nextItemIndex));
     }
 
-    public static string[] GetFontWeightNames(string fontName)
+    public static ComboBoxItem[] GetFontWeightNames(string fontName)
     {
-        FamilyTypefaceCollection familyTypefaces = new FontFamily(fontName).FamilyTypefaces;
-        List<FontWeight> fontWeights = new(familyTypefaces.Count);
-        foreach (FamilyTypeface familyTypeface in familyTypefaces)
+        FontFamily fontFamily = new(fontName);
+        List<FontWeight> fontWeights = new(fontFamily.FamilyTypefaces.Count);
+        foreach (FamilyTypeface familyTypeface in fontFamily.FamilyTypefaces)
         {
             if (!fontWeights.Contains(familyTypeface.Weight))
             {
@@ -814,7 +814,15 @@ internal static class WindowsUtils
             }
         }
 
-        return fontWeights.OrderBy(static fw => fw.ToOpenTypeWeight()).Select(static fw => fw.ToString()).ToArray();
+        return fontWeights.OrderBy(static fontWeight => fontWeight.ToOpenTypeWeight()).Select(fontWeight =>
+        {
+            return new ComboBoxItem
+            {
+                Content = fontWeight.ToString(),
+                FontFamily = fontFamily,
+                FontWeight = fontWeight
+            };
+        }).ToArray();
     }
 
     public static FontWeight GetFontWeightFromName(string fontWeightName)
