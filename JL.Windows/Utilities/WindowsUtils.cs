@@ -602,7 +602,7 @@ internal static class WindowsUtils
                 {
                     if (configManager.TextOnlyVisibleOnHover)
                     {
-                        mainWindow.MainGrid.Opacity = 0;
+                        mainWindow.MainGrid.Opacity = 0d;
                     }
 
                     if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
@@ -800,5 +800,44 @@ internal static class WindowsUtils
         listView.SelectedIndex = nextItemIndex;
 
         listView.ScrollIntoView(listView.Items.GetItemAt(nextItemIndex));
+    }
+
+    public static string[] GetFontWeightNames(string fontName)
+    {
+        FamilyTypefaceCollection familyTypefaces = new FontFamily(fontName).FamilyTypefaces;
+        List<FontWeight> fontWeights = new(familyTypefaces.Count);
+        foreach (FamilyTypeface familyTypeface in familyTypefaces)
+        {
+            if (!fontWeights.Contains(familyTypeface.Weight))
+            {
+                fontWeights.Add(familyTypeface.Weight);
+            }
+        }
+
+        return fontWeights.OrderBy(static fw => fw.ToOpenTypeWeight()).Select(static fw => fw.ToString()).ToArray();
+    }
+
+    public static FontWeight GetFontWeightFromName(string fontWeightName)
+    {
+        return fontWeightName switch
+        {
+            nameof(FontWeights.Black) => FontWeights.Black,
+            nameof(FontWeights.Bold) => FontWeights.Bold,
+            nameof(FontWeights.DemiBold) => FontWeights.DemiBold,
+            nameof(FontWeights.ExtraBlack) => FontWeights.ExtraBlack,
+            nameof(FontWeights.ExtraBold) => FontWeights.ExtraBold,
+            nameof(FontWeights.ExtraLight) => FontWeights.ExtraLight,
+            nameof(FontWeights.Heavy) => FontWeights.Heavy,
+            nameof(FontWeights.Light) => FontWeights.Light,
+            nameof(FontWeights.Medium) => FontWeights.Medium,
+            nameof(FontWeights.Normal) => FontWeights.Normal,
+            nameof(FontWeights.Regular) => FontWeights.Regular,
+            nameof(FontWeights.SemiBold) => FontWeights.SemiBold,
+            nameof(FontWeights.Thin) => FontWeights.Thin,
+            nameof(FontWeights.UltraBlack) => FontWeights.UltraBlack,
+            nameof(FontWeights.UltraBold) => FontWeights.UltraBold,
+            nameof(FontWeights.UltraLight) => FontWeights.UltraLight,
+            _ => FontWeights.Normal,
+        };
     }
 }

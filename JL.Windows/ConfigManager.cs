@@ -78,10 +78,10 @@ internal sealed class ConfigManager
     public bool RepositionMainWindowOnTextChangeByRightPosition { get; private set; } // = false;
     public double MainWindowFixedRightPosition { get; private set; } // = 0;
     public Color MainTextBoxDropShadowEffectColor { get; private set; } = Colors.Black;
-    public double MainTextBoxDropShadowEffectShadowDepth { get; private set; } = 1.2;
-    public int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 7;
+    public double MainTextBoxDropShadowEffectShadowDepth { get; private set; } = 2;
+    public int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 8;
     public int MainTextBoxDropShadowEffectBlurOpacity { get; private set; } = 100;
-    public int MainTextBoxDropShadowEffectDirection { get; private set; } = 320;
+    public int MainTextBoxDropShadowEffectDirection { get; private set; } = 315;
     private VerticalAlignment MainWindowTextVerticalAlignment { get; set; } = VerticalAlignment.Top;
 
     #endregion
@@ -215,6 +215,8 @@ internal sealed class ConfigManager
 
     private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
     private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneComboBoxItems(s_japaneseFonts);
+    public static string[] MainWindowFontWeights { get; set; } = [];
+
     private SkinType Theme { get; set; } = SkinType.Dark;
 
     private ConfigManager()
@@ -484,7 +486,7 @@ internal sealed class ConfigManager
         MainWindowFixedRightPosition = ConfigDBManager.GetValueFromConfig(connection, MainWindowFixedRightPosition, nameof(MainWindowFixedRightPosition));
         mainWindow.UpdatePosition();
 
-        mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0 : 1;
+        mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0d : 1d;
 
         // MAKE SURE YOU FREEZE ANY NEW FREEZABLE OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
@@ -667,6 +669,9 @@ internal sealed class ConfigManager
         {
             string mainWindowFontStr = ConfigDBManager.GetValueFromConfig(connection, "Meiryo", "MainWindowFont");
             mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
+
+            string mainWindowFontWeightStr = ConfigDBManager.GetValueFromConfig(connection, "Normal", "MainWindowFontWeight");
+            mainWindow.MainTextBox.FontWeight = WindowsUtils.GetFontWeightFromName(mainWindowFontWeightStr);
         }
 
         {
@@ -965,14 +970,32 @@ internal sealed class ConfigManager
         preferenceWindow.TextBoxUseCustomLineHeightCheckBox.IsChecked = TextBoxUseCustomLineHeight;
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
-        preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f =>
-            f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
 
+        preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f => f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
             preferenceWindow.MainWindowFontComboBox.SelectedIndex = 0;
         }
+
+        if (MainWindowFontWeights.Length is 0)
+        {
+            string mainWindowFont = (string)preferenceWindow.MainWindowFontComboBox.SelectedValue;
+            MainWindowFontWeights = WindowsUtils.GetFontWeightNames(mainWindowFont);
+        }
+
+        preferenceWindow.MainWindowFontWeightComboBox.ItemsSource = MainWindowFontWeights;
+        int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => fw == mainWindow.MainTextBox.FontWeight.ToString());
+        if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
+        {
+            mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => fw == "Normal");
+            if (mainWindowFontWeightIndex < 0)
+            {
+                mainWindowFontWeightIndex = 0;
+            }
+        }
+
+        preferenceWindow.MainWindowFontWeightComboBox.SelectedIndex = mainWindowFontWeightIndex;
 
         preferenceWindow.PopupFontComboBox.ItemsSource = s_popupJapaneseFonts;
         preferenceWindow.PopupFontComboBox.SelectedIndex =
@@ -1284,6 +1307,8 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, "MinimumLogLevel", preferenceWindow.MinimumLogLevelComboBox.SelectedValue.ToString());
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowFont", preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, "MainWindowFontWeight", preferenceWindow.MainWindowFontWeightComboBox.SelectedValue.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupFont), preferenceWindow.PopupFontComboBox.SelectedValue.ToString());
 

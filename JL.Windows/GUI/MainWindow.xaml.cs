@@ -469,7 +469,10 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            PopupWindowUtils.HidePopups(0);
+            if (FirstPopupWindow.IsVisible)
+            {
+                PopupWindowUtils.HidePopups(0);
+            }
         }
     }
 
@@ -492,7 +495,10 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            PopupWindowUtils.HidePopups(0);
+            if (FirstPopupWindow.IsVisible)
+            {
+                PopupWindowUtils.HidePopups(0);
+            }
         }
     }
 
@@ -594,7 +600,7 @@ internal sealed partial class MainWindow
         {
             if (Background.Opacity is not 0)
             {
-                Background.Opacity = 0;
+                Background.Opacity = 0d;
                 FontSizeSlider.Visibility = Visibility.Collapsed;
                 OpacitySlider.Visibility = Visibility.Collapsed;
 
@@ -804,7 +810,10 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
-            PopupWindowUtils.HidePopups(0);
+            if (FirstPopupWindow.IsVisible)
+            {
+                PopupWindowUtils.HidePopups(0);
+            }
 
             if (configManager.Focusable)
             {
@@ -1195,7 +1204,10 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is not MouseButton.Right)
         {
-            PopupWindowUtils.HidePopups(0);
+            if (FirstPopupWindow.IsVisible)
+            {
+                PopupWindowUtils.HidePopups(0);
+            }
         }
     }
 
@@ -1377,7 +1389,7 @@ internal sealed partial class MainWindow
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.TextOnlyVisibleOnHover)
         {
-            MainGrid.Opacity = 1;
+            MainGrid.Opacity = 1d;
         }
 
         if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
@@ -1474,7 +1486,10 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            PopupWindowUtils.HidePopups(0);
+            if (FirstPopupWindow.IsVisible)
+            {
+                PopupWindowUtils.HidePopups(0);
+            }
         }
     }
 
@@ -1613,7 +1628,10 @@ internal sealed partial class MainWindow
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;
 
-        PopupWindowUtils.HidePopups(0);
+        if (FirstPopupWindow.IsVisible)
+        {
+            PopupWindowUtils.HidePopups(0);
+        }
 
         if (!ContextMenuIsOpening && MainTextBox.SelectionLength > 0)
         {
@@ -1659,10 +1677,10 @@ internal sealed partial class MainWindow
 
         if (configManager.TextOnlyVisibleOnHover)
         {
-            MainGrid.Opacity = 0;
+            MainGrid.Opacity = 0d;
         }
 
-        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0d)
         {
             Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
         }
@@ -1708,10 +1726,10 @@ internal sealed partial class MainWindow
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.TextOnlyVisibleOnHover)
         {
-            MainGrid.Opacity = 1;
+            MainGrid.Opacity = 1d;
         }
 
-        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0d)
         {
             Background.Opacity = OpacitySlider.Value / 100;
         }
@@ -1894,7 +1912,10 @@ internal sealed partial class MainWindow
 
     private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        PopupWindowUtils.HidePopups(0);
+        if (FirstPopupWindow.IsVisible)
+        {
+            PopupWindowUtils.HidePopups(0);
+        }
         _contextMenuIsClosed = false;
     }
 
@@ -1904,9 +1925,9 @@ internal sealed partial class MainWindow
         if (configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true }
             or { RepositionMainWindowOnTextChangeByRightPosition: true, MainWindowDynamicWidth: true })
         {
-            Opacity = 0;
+            Opacity = 0d;
             UpdateLayout();
-            Opacity = 1;
+            Opacity = 1d;
 
             DpiScale dpi = WindowsUtils.Dpi;
             double currentTop = Top * dpi.DpiScaleY;
@@ -2088,10 +2109,10 @@ internal sealed partial class MainWindow
 
         if (configManager.TextOnlyVisibleOnHover)
         {
-            MainGrid.Opacity = 0;
+            MainGrid.Opacity = 0d;
         }
 
-        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0d)
         {
             Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
         }

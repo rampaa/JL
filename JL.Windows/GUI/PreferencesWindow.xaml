@@ -243,7 +243,19 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                                     <ComboBox x:Name="MainWindowFontComboBox" HorizontalAlignment="Right"
-                                      Width="210" SelectedValuePath="Content"
+                                      Width="210" SelectedValuePath="Content" SelectionChanged="MainWindowFontComboBox_SelectionChanged"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Font weight"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <ComboBox x:Name="MainWindowFontWeightComboBox" HorizontalAlignment="Right"
+                                      Width="210"
                                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" />
                                 </DockPanel>

@@ -766,4 +766,32 @@ internal sealed partial class PreferencesWindow
         string preferenceName = ((TextBlock)((DockPanel)listBoxItem.Content).Children[0]).Text;
         return preferenceName.AsSpan().Contains(AdvancedPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) || (listBoxItem.ToolTip?.ToString()?.AsSpan().Contains(AdvancedPreferencesSearchTextBox.Text, StringComparison.OrdinalIgnoreCase) ?? false);
     }
+
+    private void MainWindowFontComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        string selectedFont = (string)((ComboBox)sender).SelectedValue;
+        string[] fontWeightNames = WindowsUtils.GetFontWeightNames(selectedFont);
+
+        ConfigManager.MainWindowFontWeights = fontWeightNames;
+        MainWindowFontWeightComboBox.ItemsSource = fontWeightNames;
+
+        string selectedFontWeight = (string)MainWindowFontWeightComboBox.SelectedItem;
+        int index = Array.FindIndex(fontWeightNames, fw => fw == selectedFontWeight);
+        if (index < 0)
+        {
+            ReadOnlySpan<string> fallbackOrder = [ "Normal", "Regular", "Medium", "DemiBold", "SemiBold", "Bold", "ExtraBold", "UltraBold",
+                "Light", "Black", "Heavy", "ExtraLight", "UltraLight", "Thin", "ExtraBlack", "UltraBlack"];
+
+            foreach (string name in fallbackOrder)
+            {
+                index = Array.FindIndex(fontWeightNames, fw => fw == name);
+                if (index >= 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        MainWindowFontWeightComboBox.SelectedIndex = index < 0 ? 0 : index;
+    }
 }
