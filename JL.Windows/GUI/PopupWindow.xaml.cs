@@ -1663,10 +1663,10 @@ internal sealed partial class PopupWindow
         if (useSelectedListViewItemIfItExists)
         {
             Debug.Assert(popupListViewItem is not null);
-            Button? audioButton = popupListViewItem.GetChildByName<Button>("MiningButton");
-            if (audioButton is not null)
+            Button? miningButton = popupListViewItem.GetChildByName<Button>("MiningButton");
+            if (miningButton is not null)
             {
-                position = audioButton.PointToScreen(default);
+                position = miningButton.PointToScreen(default);
                 position.Y += 5;
                 position.X += 7;
             }
@@ -2504,7 +2504,6 @@ internal sealed partial class PopupWindow
         AllDictionaryTabButton.Background = Brushes.DodgerBlue;
         buttons.Add(AllDictionaryTabButton);
 
-
         double buttonFontSize = ConfigManager.Instance.PopupDictionaryTabFontSize;
         IOrderedEnumerable<Dict> dicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority);
         foreach (Dict dict in dicts)
@@ -2571,6 +2570,7 @@ internal sealed partial class PopupWindow
 
         Debug.Assert(_popupListViewScrollViewer is not null);
         _popupListViewScrollViewer.ScrollToTop();
+        UpdateLayout();
         _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
         _listViewItemIndex = _firstVisibleListViewItemIndex;
         LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;

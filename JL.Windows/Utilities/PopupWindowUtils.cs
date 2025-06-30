@@ -187,7 +187,11 @@ internal static class PopupWindowUtils
                 currentPopupWindow = PopupWindows[currentPopupWindow.PopupIndex + 1];
             }
 
-            HidePopups(hoveredPopup?.PopupIndex + 1 ?? 0);
+            int index = hoveredPopup?.PopupIndex + 1 ?? 0;
+            if (PopupWindows[index]!.IsVisible)
+            {
+                HidePopups(index);
+            }
         });
     }
 
