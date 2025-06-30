@@ -837,7 +837,7 @@ internal static class WindowsUtils
             nameof(FontWeights.UltraBlack) => FontWeights.UltraBlack,
             nameof(FontWeights.UltraBold) => FontWeights.UltraBold,
             nameof(FontWeights.UltraLight) => FontWeights.UltraLight,
-            _ => FontWeights.Normal,
+            _ => int.TryParse(fontWeightName, out int fontWeight) ? FontWeight.FromOpenTypeWeight(fontWeight) : FontWeights.Normal
         };
     }
 }
