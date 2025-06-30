@@ -265,7 +265,7 @@ public static class DictUpdater
 
     internal static Task AutoUpdateBuiltInDicts()
     {
-        DictType[] dictTypes =
+        ReadOnlySpan<DictType> dictTypes =
         [
             DictType.JMdict,
             DictType.JMnedict,
