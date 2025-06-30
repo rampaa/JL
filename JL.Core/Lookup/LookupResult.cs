@@ -11,9 +11,9 @@ public sealed class LookupResult
         string matchedText,
         Dict dict,
         string[]? readings,
+        string? formattedDefinitions,
         List<LookupFrequencyResult>? frequencies = null,
         string[]? alternativeSpellings = null,
-        string? formattedDefinitions = null,
         string? deconjugatedMatchedText = null,
         string? deconjugationProcess = null,
         int entryId = 0,
@@ -244,10 +244,10 @@ public sealed class LookupResult
                 return 0;
             }
 
-            string[]?[]? miscLista = jmdictLookupResult.MiscList;
-            if (miscLista is not null)
+            string[]?[]? miscList = jmdictLookupResult.MiscList;
+            if (miscList is not null)
             {
-                foreach (string[]? misc in miscLista)
+                foreach (string[]? misc in miscList)
                 {
                     if (misc is not null && misc.AsReadOnlySpan().Contains("uk"))
                     {

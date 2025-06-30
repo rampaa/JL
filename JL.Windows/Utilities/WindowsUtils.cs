@@ -814,14 +814,11 @@ internal static class WindowsUtils
             }
         }
 
-        return fontWeights.OrderBy(static fontWeight => fontWeight.ToOpenTypeWeight()).Select(fontWeight =>
+        return fontWeights.OrderBy(static fontWeight => fontWeight.ToOpenTypeWeight()).Select(fontWeight => new ComboBoxItem
         {
-            return new ComboBoxItem
-            {
-                Content = fontWeight.ToString(),
-                FontFamily = fontFamily,
-                FontWeight = fontWeight
-            };
+            Content = fontWeight.ToString(),
+            FontFamily = fontFamily,
+            FontWeight = fontWeight
         }).ToArray();
     }
 

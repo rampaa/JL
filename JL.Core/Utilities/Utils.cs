@@ -19,7 +19,7 @@ using Serilog.Events;
 
 namespace JL.Core.Utilities;
 
-public static partial class Utils
+public static class Utils
 {
     public static readonly Version JLVersion = new(3, 6, 2);
     public static readonly string ApplicationPath = AppContext.BaseDirectory;

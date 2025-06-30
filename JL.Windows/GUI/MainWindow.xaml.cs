@@ -1721,6 +1721,7 @@ internal sealed partial class MainWindow
         ChangeVisibility();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_MouseEnter(object sender, MouseEventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
@@ -1944,7 +1945,7 @@ internal sealed partial class MainWindow
                 newLeft = GetDynamicXPosition(configManager.MainWindowFixedRightPosition);
             }
 
-            if (currentLeft != newLeft || currentTop != newTop)
+            if (Math.Abs(currentLeft - newLeft) >= 1 || Math.Abs(currentTop - newTop) >= 1)
             {
                 WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
 
@@ -2085,6 +2086,7 @@ internal sealed partial class MainWindow
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_ContextMenuClosing(object sender, ContextMenuEventArgs e)
     {
         _contextMenuIsClosed = true;
