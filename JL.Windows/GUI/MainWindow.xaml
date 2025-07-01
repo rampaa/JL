@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:uc="clr-namespace:JL.Windows.GUI.UserControls"
         Title="JL"
         AllowsTransparency="True"
         mc:Ignorable="d" MinWidth="125" MinHeight="50" Width="800" Height="200" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
@@ -41,7 +40,7 @@
             </Rectangle.ContextMenu>
         </Rectangle>
 
-        <uc:TouchScreenTextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        <TextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                  Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
@@ -49,7 +48,7 @@
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" UndoLimit="0"
                  PreviewMouseUp="MainTextBox_PreviewMouseUp" ContextMenuOpening="MainTextBox_ContextMenuOpening" ContextMenuClosing="Window_ContextMenuClosing" AcceptsReturn="True" AcceptsTab="True">
 
-            <uc:TouchScreenTextBox.ContextMenu>
+            <TextBox.ContextMenu>
                 <ContextMenu Name="MainTextBoxContextMenu" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight">
                     <MenuItem
                         Name="AddNameMenuItem"
@@ -87,8 +86,8 @@
                         Header="Preferences"
                         Click="ShowPreferences" />
                 </ContextMenu>
-            </uc:TouchScreenTextBox.ContextMenu>
-        </uc:TouchScreenTextBox>
+            </TextBox.ContextMenu>
+        </TextBox>
 
         <DockPanel Margin="10,0,0,0" HorizontalAlignment="Left">
             <StackPanel Width="20">

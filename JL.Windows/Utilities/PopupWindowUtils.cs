@@ -11,7 +11,6 @@ using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
-using JL.Windows.GUI.UserControls;
 using NAudio.Wave;
 using Timer = System.Timers.Timer;
 
@@ -52,9 +51,9 @@ internal static class PopupWindowUtils
         };
     }
 
-    public static TouchScreenTextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin, ContextMenu contextMenu)
+    public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin, ContextMenu contextMenu)
     {
-        TouchScreenTextBox textBox = new()
+        TextBox textBox = new()
         {
             Name = name,
             Text = text,

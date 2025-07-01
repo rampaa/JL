@@ -25,6 +25,8 @@ internal sealed partial class App
 
         if (IsSingleInstance())
         {
+            AppContext.SetSwitch("Switch.System.Windows.Input.Stylus.DisableImplicitTouchKeyboardInvocation", true);
+
             StartupUri = new Uri("GUI/MainWindow.xaml", UriKind.Relative);
             ShutdownMode = ShutdownMode.OnMainWindowClose;
         }
