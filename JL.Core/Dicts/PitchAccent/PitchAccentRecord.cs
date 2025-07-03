@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -28,9 +29,41 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
         JsonElement pitchesArray = thirdJsonElement.GetProperty("pitches");
         foreach (JsonElement pitchElement in pitchesArray.EnumerateArray())
         {
-            if (pitchElement.GetProperty("position").TryGetByte(out byte position))
+            JsonElement positionProperty = pitchElement.GetProperty("position");
+            if (positionProperty.ValueKind is JsonValueKind.Number)
             {
-                Position = position;
+                if (positionProperty.TryGetByte(out byte position))
+                {
+                    Position = position;
+                    break;
+                }
+            }
+            else if (positionProperty.ValueKind is JsonValueKind.String)
+            {
+                Position = 0;
+
+                string? positionStr = positionProperty.GetString();
+                Debug.Assert(positionStr is not null);
+                Debug.Assert(positionStr.Length <= byte.MaxValue);
+
+                bool foundHighPitch = false;
+                byte pitchStringLength = (byte)positionStr.Length;
+                for (byte i = 0; i < pitchStringLength; i++)
+                {
+                    if (foundHighPitch)
+                    {
+                        if (positionStr[i] is 'L')
+                        {
+                            Position = i;
+                            break;
+                        }
+                    }
+                    else if (positionStr[i] is 'H')
+                    {
+                        foundHighPitch = true;
+                    }
+                }
+
                 break;
             }
         }
