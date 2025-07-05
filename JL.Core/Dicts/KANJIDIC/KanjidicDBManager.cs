@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Data;
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -109,19 +110,14 @@ internal static class KanjidicDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SingleRow);
         if (!dataReader.HasRows)
         {
             return null;
         }
 
-        List<IDictRecord> results = [];
-        while (dataReader.Read())
-        {
-            results.Add(GetRecord(dataReader));
-        }
-
-        return results;
+        _ = dataReader.Read();
+        return [GetRecord(dataReader)];
     }
 
     public static void LoadFromDB(Dict dict)
