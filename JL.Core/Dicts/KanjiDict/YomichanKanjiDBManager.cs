@@ -25,7 +25,8 @@ internal static class YomichanKanjiDBManager
         OnReadings,
         KunReadings,
         Glossary,
-        Stats
+        Stats,
+        Kanji
     }
 
     public static void CreateDB(string dbName)
@@ -148,7 +149,7 @@ internal static class YomichanKanjiDBManager
         while (dataReader.Read())
         {
             YomichanKanjiRecord record = GetRecord(dataReader);
-            string kanji = dataReader.GetString(4);
+            string kanji = dataReader.GetString((int)ColumnIndex.Kanji);
             if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
             {
                 result.Add(record);
