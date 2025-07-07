@@ -86,7 +86,7 @@ public static class DBUtils
 
     private static void SendOptimizePragmaToAllDicts()
     {
-        foreach (Dict dict in DictUtils.Dicts.Values)
+        foreach (Dict dict in DictUtils.Dicts.Values.ToArray().AsSpan())
         {
             if (dict is { Active: true, Ready: true, Options.UseDB.Value: true })
             {
@@ -97,7 +97,7 @@ public static class DBUtils
 
     private static void SendOptimizePragmaToAllFreqDicts()
     {
-        foreach (Freq freq in FreqUtils.FreqDicts.Values)
+        foreach (Freq freq in FreqUtils.FreqDicts.Values.ToArray().AsSpan())
         {
             if (freq is { Active: true, Ready: true, Options.UseDB.Value: true })
             {

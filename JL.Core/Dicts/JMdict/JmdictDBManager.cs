@@ -362,7 +362,6 @@ internal static class JmdictDBManager
         string[]?[]? relatedTerms = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.CrossReferences);
         string[]?[]? antonyms = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Antonyms);
 
-
         return new JmdictRecord(edictId, primarySpelling, definitions, wordClasses, wordClassesSharedByAllSenses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, fieldsSharedByAllSenses, misc, miscSharedByAllSenses, definitionInfo, dialects, dialectsSharedByAllSenses, loanwordEtymology, relatedTerms, antonyms);
     }
 }
