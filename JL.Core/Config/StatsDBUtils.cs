@@ -1,4 +1,3 @@
-using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Statistics;
@@ -89,7 +88,7 @@ public static class StatsDBUtils
 
         _ = command.Parameters.AddWithValue("@profileId", profileId);
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
+        using SqliteDataReader reader = command.ExecuteReader();
 
         Debug.Assert(reader.HasRows);
 
@@ -113,7 +112,7 @@ public static class StatsDBUtils
 
         _ = command.Parameters.AddWithValue("@profileId", profileId);
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
             return null;

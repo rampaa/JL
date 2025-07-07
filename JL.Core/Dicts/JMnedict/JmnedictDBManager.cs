@@ -1,4 +1,3 @@
-using System.Data;
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -141,7 +140,7 @@ internal static class JmnedictDBManager
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
             return null;
@@ -176,7 +175,7 @@ internal static class JmnedictDBManager
     //         FROM record r;
     //         """;
     //
-    //     using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+    //     using SqliteDataReader dataReader = command.ExecuteReader();
     //     while (dataReader.Read())
     //     {
     //         JmnedictRecord record = GetRecord(dataReader);

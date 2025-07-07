@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Data;
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -119,7 +118,7 @@ internal static class YomichanKanjiDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
             return null;
@@ -145,7 +144,7 @@ internal static class YomichanKanjiDBManager
             FROM record r;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
             YomichanKanjiRecord record = GetRecord(dataReader);

@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Timers;
@@ -112,7 +111,7 @@ public static class DBUtils
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
+        using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -174,7 +173,7 @@ public static class DBUtils
             );
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
+        using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
         return reader.GetBoolean(0);
     }
@@ -186,7 +185,7 @@ public static class DBUtils
     //    using SqliteCommand command = connection.CreateCommand();
     //    command.CommandText = "SELECT SQLITE_VERSION();";
 
-    //    SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+    //    SqliteDataReader reader = command.ExecuteReader();
     //    _ = reader.Read();
     //    return reader.GetString(0);
     //}

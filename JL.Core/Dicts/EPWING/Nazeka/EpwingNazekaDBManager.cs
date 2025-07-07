@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -195,7 +194,7 @@ internal static class EpwingNazekaDBManager
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
             return null;
@@ -228,7 +227,7 @@ internal static class EpwingNazekaDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
             return null;
@@ -256,7 +255,7 @@ internal static class EpwingNazekaDBManager
             GROUP BY r.rowid;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
             EpwingNazekaRecord record = GetRecord(dataReader);

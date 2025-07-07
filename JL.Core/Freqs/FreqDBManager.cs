@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -142,7 +141,7 @@ internal static class FreqDBManager
             ++index;
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
             return null;
@@ -181,7 +180,7 @@ internal static class FreqDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
             return null;
@@ -206,7 +205,7 @@ internal static class FreqDBManager
             FROM record
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
+        using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
         freq.MaxValue = !reader.IsDBNull(0)
             ? reader.GetInt32(0)
@@ -228,7 +227,7 @@ internal static class FreqDBManager
             GROUP BY r.rowid;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+        using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
             FrequencyRecord record = GetRecord(dataReader);

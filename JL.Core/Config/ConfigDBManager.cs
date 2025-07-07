@@ -1,4 +1,3 @@
-using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using JL.Core.Statistics;
@@ -184,7 +183,7 @@ public static class ConfigDBManager
         _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
         _ = command.Parameters.AddWithValue("@name", settingName);
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
+        using SqliteDataReader reader = command.ExecuteReader();
         return reader.Read()
             ? reader.GetString(0)
             : null;
