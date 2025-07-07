@@ -110,7 +110,7 @@ internal static class KanjidicDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -131,11 +131,12 @@ internal static class KanjidicDBManager
             FROM record r;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
+            IDictRecord[] record = [GetRecord(dataReader)];
             string kanji = dataReader.GetString(8);
-            dict.Contents[kanji] = [GetRecord(dataReader)];
+            dict.Contents[kanji] = record;
         }
 
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);

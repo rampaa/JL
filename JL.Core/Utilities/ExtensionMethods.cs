@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using MessagePack;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Utilities;
 
@@ -258,4 +260,21 @@ public static class ExtensionMethods
     //{
     //    return new ReadOnlyMemory<T>(array, start, length);
     //}
+
+    internal static T? GetNullableValueFromBlobStream<T>(this SqliteDataReader dataReader, int index) where T : class
+    {
+        if (dataReader.IsDBNull(index))
+        {
+            return null;
+        }
+
+        using Stream stream = dataReader.GetStream(index);
+        return MessagePackSerializer.Deserialize<T>(stream);
+    }
+
+    internal static T GetValueFromBlobStream<T>(this SqliteDataReader dataReader, int index) where T : notnull
+    {
+        using Stream stream = dataReader.GetStream(index);
+        return MessagePackSerializer.Deserialize<T>(stream);
+    }
 }

@@ -112,7 +112,7 @@ public static class DBUtils
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -174,7 +174,7 @@ public static class DBUtils
             );
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         return reader.GetBoolean(0);
     }

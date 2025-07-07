@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Data;
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -13,7 +14,7 @@ internal static class YomichanKanjiDBManager
 
     private const string SingleTermQuery =
         """
-        SELECT r.on_readings, r.kun_readings, r.glossary, r.stats
+        SELECT r.on_readings, r.kun_readings, r.glossary, r.stats, r.id
         FROM record r
         WHERE r.kanji = @term;
         """;
@@ -108,7 +109,7 @@ internal static class YomichanKanjiDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -130,11 +131,11 @@ internal static class YomichanKanjiDBManager
 
         command.CommandText =
             """
-            SELECT r.on_readings, r.kun_readings, r.glossary, r.stats, r.kanji
+            SELECT r.on_readings, r.kun_readings, r.glossary, r.stats, r.kanji, r.id
             FROM record r;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             YomichanKanjiRecord record = GetRecord(dataReader);
@@ -159,21 +160,10 @@ internal static class YomichanKanjiDBManager
 
     private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)
     {
-        string[]? onReadings = !dataReader.IsDBNull(0)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(0))
-            : null;
-
-        string[]? kunReadings = !dataReader.IsDBNull(1)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(1))
-            : null;
-
-        string[]? definitions = !dataReader.IsDBNull(2)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
-            : null;
-
-        string[]? stats = !dataReader.IsDBNull(3)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3))
-            : null;
+        string[]? onReadings = dataReader.GetNullableValueFromBlobStream<string[]>(0);
+        string[]? kunReadings = dataReader.GetNullableValueFromBlobStream<string[]>(1);
+        string[]? definitions = dataReader.GetNullableValueFromBlobStream<string[]>(2);
+        string[]? stats = dataReader.GetNullableValueFromBlobStream<string[]>(3);
 
         return new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats);
     }

@@ -1,5 +1,5 @@
 using System.Collections.Frozen;
-using System.Diagnostics;
+using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -18,7 +18,7 @@ internal static class EpwingNazekaDBManager
 
     private const string SingleTermQuery =
         """
-        SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary
+        SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.id
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term;
@@ -28,7 +28,7 @@ internal static class EpwingNazekaDBManager
     {
         return
             $"""
-            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key
+            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key, r.id
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN {parameter}
@@ -39,7 +39,7 @@ internal static class EpwingNazekaDBManager
     {
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key
+            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key, r.id
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -187,7 +187,7 @@ internal static class EpwingNazekaDBManager
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -220,7 +220,7 @@ internal static class EpwingNazekaDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -242,13 +242,13 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, json_group_array(rsk.search_key)
+            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, json_group_array(rsk.search_key), r.id
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             EpwingNazekaRecord record = GetRecord(dataReader);
@@ -277,17 +277,9 @@ internal static class EpwingNazekaDBManager
     private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader)
     {
         string primarySpelling = dataReader.GetString(0);
-
-        string? reading = !dataReader.IsDBNull(1)
-            ? dataReader.GetString(1)
-            : null;
-
-        string[]? alternativeSpellings = !dataReader.IsDBNull(2)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
-            : null;
-
-        string[]? definitions = MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3));
-        Debug.Assert(definitions is not null);
+        string? reading = !dataReader.IsDBNull(1) ? dataReader.GetString(1) : null;
+        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>(2);
+        string[] definitions = dataReader.GetValueFromBlobStream<string[]>(3);
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
     }

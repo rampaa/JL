@@ -184,7 +184,7 @@ public static class ConfigDBManager
         _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
         _ = command.Parameters.AddWithValue("@name", settingName);
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         return reader.Read()
             ? reader.GetString(0)
             : null;

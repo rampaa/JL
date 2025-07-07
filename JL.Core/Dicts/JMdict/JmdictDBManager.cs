@@ -1,5 +1,5 @@
 using System.Collections.Frozen;
-using System.Diagnostics;
+using System.Data;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
@@ -212,7 +212,8 @@ internal static class JmdictDBManager
                    r.loanword_etymology,
                    r.cross_references,
                    r.antonyms,
-                   rsk.search_key
+                   rsk.search_key,
+                   r.id
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN {parameter}
@@ -224,7 +225,7 @@ internal static class JmdictDBManager
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -277,13 +278,14 @@ internal static class JmdictDBManager
                    r.loanword_etymology,
                    r.cross_references,
                    r.antonyms,
-                   json_group_array(rsk.search_key)
+                   json_group_array(rsk.search_key),
+                   r.id
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
@@ -311,88 +313,29 @@ internal static class JmdictDBManager
 
     private static JmdictRecord GetRecord(SqliteDataReader dataReader)
     {
-        int id = dataReader.GetInt32(0);
+        int edictId = dataReader.GetInt32(0);
         string primarySpelling = dataReader.GetString(1);
+        string[]? primarySpellingOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]>(2);
+        string[]?[]? spellingRestrictions = dataReader.GetNullableValueFromBlobStream<string[]?[]>(3);
+        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>(4);
+        string[]?[]? alternativeSpellingsOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]?[]>(5);
+        string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>(6);
+        string[]?[]? readingsOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]?[]>(7);
+        string[]?[]? readingRestrictions = dataReader.GetNullableValueFromBlobStream<string[]?[]>(8);
+        string[][] definitions = dataReader.GetValueFromBlobStream<string[][]>(9);
+        string?[]? definitionInfo = dataReader.GetNullableValueFromBlobStream<string?[]>(10);
+        string[]? wordClassesSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(11);
+        string[]?[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]?[]>(12);
+        string[]? fieldsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(13);
+        string[]?[]? fields = dataReader.GetNullableValueFromBlobStream<string[]?[]>(14);
+        string[]? miscSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(15);
+        string[]?[]? misc = dataReader.GetNullableValueFromBlobStream<string[]?[]>(16);
+        string[]? dialectsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(17);
+        string[]?[]? dialects = dataReader.GetNullableValueFromBlobStream<string[]?[]>(18);
+        LoanwordSource[]?[]? loanwordEtymology = dataReader.GetNullableValueFromBlobStream<LoanwordSource[]?[]>(19);
+        string[]?[]? relatedTerms = dataReader.GetNullableValueFromBlobStream<string[]?[]>(20);
+        string[]?[]? antonyms = dataReader.GetNullableValueFromBlobStream<string[]?[]>(21);
 
-        string[]? primarySpellingOrthographyInfo = !dataReader.IsDBNull(2)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
-            : null;
-
-        string[]?[]? spellingRestrictions = !dataReader.IsDBNull(3)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(3))
-            : null;
-
-        string[]? alternativeSpellings = !dataReader.IsDBNull(4)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(4))
-            : null;
-
-        string[]?[]? alternativeSpellingsOrthographyInfo = !dataReader.IsDBNull(5)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(5))
-            : null;
-
-        string[]? readings = !dataReader.IsDBNull(6)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(6))
-            : null;
-
-        string[]?[]? readingsOrthographyInfo = !dataReader.IsDBNull(7)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(7))
-            : null;
-
-        string[]?[]? readingRestrictions = !dataReader.IsDBNull(8)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(8))
-            : null;
-
-        string[][]? definitions = MessagePackSerializer.Deserialize<string[][]>(dataReader.GetFieldValue<byte[]>(9));
-        Debug.Assert(definitions is not null);
-
-        string?[]? definitionInfo = !dataReader.IsDBNull(10)
-            ? MessagePackSerializer.Deserialize<string?[]>(dataReader.GetFieldValue<byte[]>(10))
-            : null;
-
-        string[]? wordClassesSharedByAllSenses = !dataReader.IsDBNull(11)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(11))
-            : null;
-
-        string[]?[]? wordClasses = !dataReader.IsDBNull(12)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(12))
-            : null;
-
-        string[]? fieldsSharedByAllSenses = !dataReader.IsDBNull(13)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(13))
-            : null;
-
-        string[]?[]? fields = !dataReader.IsDBNull(14)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(14))
-            : null;
-
-        string[]? miscSharedByAllSenses = !dataReader.IsDBNull(15)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(15))
-            : null;
-
-        string[]?[]? misc = !dataReader.IsDBNull(16)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(16))
-            : null;
-
-        string[]? dialectsSharedByAllSenses = !dataReader.IsDBNull(17)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(17))
-            : null;
-
-        string[]?[]? dialects = !dataReader.IsDBNull(18)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(18))
-            : null;
-
-        LoanwordSource[]?[]? loanwordEtymology = !dataReader.IsDBNull(19)
-            ? MessagePackSerializer.Deserialize<LoanwordSource[]?[]>(dataReader.GetFieldValue<byte[]>(19))
-            : null;
-
-        string[]?[]? relatedTerms = !dataReader.IsDBNull(20)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(20))
-            : null;
-
-        string[]?[]? antonyms = !dataReader.IsDBNull(21)
-            ? MessagePackSerializer.Deserialize<string[]?[]>(dataReader.GetFieldValue<byte[]>(21))
-            : null;
-
-        return new JmdictRecord(id, primarySpelling, definitions, wordClasses, wordClassesSharedByAllSenses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, fieldsSharedByAllSenses, misc, miscSharedByAllSenses, definitionInfo, dialects, dialectsSharedByAllSenses, loanwordEtymology, relatedTerms, antonyms);
+        return new JmdictRecord(edictId, primarySpelling, definitions, wordClasses, wordClassesSharedByAllSenses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, fieldsSharedByAllSenses, misc, miscSharedByAllSenses, definitionInfo, dialects, dialectsSharedByAllSenses, loanwordEtymology, relatedTerms, antonyms);
     }
 }

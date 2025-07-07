@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using System.Data;
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -118,7 +118,7 @@ internal static class JmnedictDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
             $"""
-            SELECT r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
+            SELECT r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana, r.id
             FROM record r
             WHERE r.primary_spelling_in_hiragana IN {parameter}
             """;
@@ -129,7 +129,7 @@ internal static class JmnedictDBManager
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -160,11 +160,11 @@ internal static class JmnedictDBManager
     //
     //     command.CommandText =
     //         """
-    //         SELECT r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
+    //         SELECT r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana, r.id
     //         FROM record r;
     //         """;
     //
-    //     using SqliteDataReader dataReader = command.ExecuteReader();
+    //     using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
     //     while (dataReader.Read())
     //     {
     //         JmnedictRecord record = GetRecord(dataReader);
@@ -191,20 +191,10 @@ internal static class JmnedictDBManager
     {
         int id = dataReader.GetInt32(0);
         string primarySpelling = dataReader.GetString(1);
-
-        string[]? readings = !dataReader.IsDBNull(2)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
-            : null;
-
-        string[]? alternativeSpellings = !dataReader.IsDBNull(3)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3))
-            : null;
-
-        string[][]? definitions = MessagePackSerializer.Deserialize<string[][]>(dataReader.GetFieldValue<byte[]>(4));
-        Debug.Assert(definitions is not null);
-
-        string[][]? nameTypes = MessagePackSerializer.Deserialize<string[][]>(dataReader.GetFieldValue<byte[]>(5));
-        Debug.Assert(nameTypes is not null);
+        string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>(2);
+        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>(3);
+        string[][] definitions = dataReader.GetValueFromBlobStream<string[][]>(4);
+        string[][] nameTypes = dataReader.GetValueFromBlobStream<string[][]>(5);
 
         return new JmnedictRecord(id, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);
     }

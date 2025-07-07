@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -163,7 +164,7 @@ internal static class YomichanPitchAccentDBManager
             ++index;
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -200,7 +201,7 @@ internal static class YomichanPitchAccentDBManager
             GROUP BY r.id;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             PitchAccentRecord record = GetRecord(dataReader);

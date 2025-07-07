@@ -137,7 +137,7 @@ internal static class FreqDBManager
             ++index;
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -176,7 +176,7 @@ internal static class FreqDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -201,7 +201,7 @@ internal static class FreqDBManager
             FROM record
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         freq.MaxValue = !reader.IsDBNull(0)
             ? reader.GetInt32(0)
@@ -223,7 +223,7 @@ internal static class FreqDBManager
             GROUP BY r.id;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             FrequencyRecord record = GetRecord(dataReader);

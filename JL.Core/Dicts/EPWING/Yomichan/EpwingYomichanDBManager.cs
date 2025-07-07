@@ -1,5 +1,5 @@
 using System.Collections.Frozen;
-using System.Diagnostics;
+using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -18,7 +18,7 @@ internal static class EpwingYomichanDBManager
 
     private const string SingleTermQuery =
         """
-        SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags
+        SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.id
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term;
@@ -28,7 +28,7 @@ internal static class EpwingYomichanDBManager
     {
         return
             $"""
-            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key
+            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key, r.id
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN {parameter}
@@ -39,7 +39,7 @@ internal static class EpwingYomichanDBManager
     {
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key
+            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key, r.id
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -190,7 +190,7 @@ internal static class EpwingYomichanDBManager
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -223,7 +223,7 @@ internal static class EpwingYomichanDBManager
 
         _ = command.Parameters.AddWithValue("@term", term);
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         if (!dataReader.HasRows)
         {
             return null;
@@ -250,7 +250,7 @@ internal static class EpwingYomichanDBManager
             GROUP BY r.id;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             EpwingYomichanRecord record = GetRecord(dataReader);
@@ -279,21 +279,10 @@ internal static class EpwingYomichanDBManager
     private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader)
     {
         string primarySpelling = dataReader.GetString(0);
-
-        string? reading = !dataReader.IsDBNull(1)
-            ? dataReader.GetString(1)
-            : null;
-
-        string[]? definitions = MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2));
-        Debug.Assert(definitions is not null);
-
-        string[]? wordClasses = !dataReader.IsDBNull(3)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3))
-            : null;
-
-        string[]? definitionTags = !dataReader.IsDBNull(4)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(4))
-            : null;
+        string? reading = !dataReader.IsDBNull(1) ? dataReader.GetString(1) : null;
+        string[] definitions = dataReader.GetValueFromBlobStream<string[]>(2);
+        string[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]>(3);
+        string[]? definitionTags = dataReader.GetNullableValueFromBlobStream<string[]>(4);
 
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
     }

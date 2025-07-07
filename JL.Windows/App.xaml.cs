@@ -35,7 +35,7 @@ internal sealed partial class App
     private bool IsSingleInstance()
     {
         Process currentProcess = Process.GetCurrentProcess();
-        Process[] processes = Process.GetProcessesByName(currentProcess.ProcessName);
+        ReadOnlySpan<Process> processes = Process.GetProcessesByName(currentProcess.ProcessName);
 
         if (processes.Length > 1)
         {

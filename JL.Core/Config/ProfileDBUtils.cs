@@ -63,7 +63,7 @@ public static class ProfileDBUtils
             """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -81,7 +81,7 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@name", profileName);
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -104,7 +104,7 @@ public static class ProfileDBUtils
             ORDER BY name ASC;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
+        using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
 
         List<string> profiles = [];
         while (dataReader.Read())
@@ -129,7 +129,7 @@ public static class ProfileDBUtils
             );
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         return reader.GetBoolean(0);
     }
@@ -150,7 +150,7 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@profileId", profileId);
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         return reader.GetBoolean(0);
     }
@@ -172,7 +172,7 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@name", profileName);
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         return reader.GetBoolean(0);
     }
@@ -190,7 +190,7 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@id", profileId);
 
-        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow);
+        using SqliteDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess);
         _ = reader.Read();
         return reader.GetString(0);
     }
