@@ -12,15 +12,13 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 18;
-
-    private const int SearchKeyIndex = 5;
+    public const int Version = 20;
 
     private const string SingleTermQuery =
         """
-        SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.id
+        SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags
         FROM record r
-        JOIN record_search_key rsk ON r.id = rsk.record_id
+        JOIN record_search_key rsk ON r.rowid = rsk.record_id
         WHERE rsk.search_key = @term;
         """;
 
@@ -28,9 +26,9 @@ internal static class EpwingYomichanDBManager
     {
         return
             $"""
-            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key, r.id
+            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN {parameter}
             """;
     }
@@ -39,9 +37,9 @@ internal static class EpwingYomichanDBManager
     {
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key, r.id
+            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN (@1
             """);
 
@@ -53,6 +51,17 @@ internal static class EpwingYomichanDBManager
         return queryBuilder.Append(");").ToString();
     }
 
+    private enum ColumnIndex
+    {
+        RowId = 0,
+        PrimarySpelling,
+        Reading,
+        Glossary,
+        PartOfSpeech,
+        GlossaryTags,
+        SearchKey
+    }
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
@@ -62,7 +71,7 @@ internal static class EpwingYomichanDBManager
             """
             CREATE TABLE IF NOT EXISTS record
             (
-                id INTEGER NOT NULL PRIMARY KEY,
+                rowid INTEGER NOT NULL PRIMARY KEY,
                 primary_spelling TEXT NOT NULL,
                 reading TEXT,
                 glossary BLOB NOT NULL,
@@ -75,7 +84,7 @@ internal static class EpwingYomichanDBManager
                 search_key TEXT NOT NULL,
                 record_id INTEGER NOT NULL,
                 PRIMARY KEY (search_key, record_id),
-                FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
+                FOREIGN KEY (record_id) REFERENCES record (rowid) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -106,7 +115,7 @@ internal static class EpwingYomichanDBManager
             }
         }
 
-        ulong id = 1;
+        ulong rowid = 1;
 
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -114,11 +123,11 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (id, primary_spelling, reading, glossary, part_of_speech, glossary_tags)
-            VALUES (@id, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags);
+            INSERT INTO record (rowid, primary_spelling, reading, glossary, part_of_speech, glossary_tags)
+            VALUES (@rowid, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
@@ -139,7 +148,7 @@ internal static class EpwingYomichanDBManager
 
         foreach (EpwingYomichanRecord record in yomichanWordRecords)
         {
-            _ = insertRecordCommand.Parameters["@id"].Value = id;
+            _ = insertRecordCommand.Parameters["@rowid"].Value = rowid;
             _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
             _ = insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
@@ -147,7 +156,7 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.Parameters["@glossary_tags"].Value = record.DefinitionTags is not null ? MessagePackSerializer.Serialize(record.DefinitionTags) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
+            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = rowid;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
             _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
             _ = insertSearchKeyCommand.ExecuteNonQuery();
@@ -162,7 +171,7 @@ internal static class EpwingYomichanDBManager
                 }
             }
 
-            ++id;
+            ++rowid;
         }
 
         transaction.Commit();
@@ -200,7 +209,7 @@ internal static class EpwingYomichanDBManager
         while (dataReader.Read())
         {
             EpwingYomichanRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString(SearchKeyIndex);
+            string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -244,17 +253,17 @@ internal static class EpwingYomichanDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, json_group_array(rsk.search_key)
+            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, json_group_array(rsk.search_key)
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            GROUP BY r.id;
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
+            GROUP BY r.rowid;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             EpwingYomichanRecord record = GetRecord(dataReader);
-            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), Utils.s_jso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
@@ -278,11 +287,16 @@ internal static class EpwingYomichanDBManager
 
     private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader)
     {
-        string primarySpelling = dataReader.GetString(0);
-        string? reading = !dataReader.IsDBNull(1) ? dataReader.GetString(1) : null;
-        string[] definitions = dataReader.GetValueFromBlobStream<string[]>(2);
-        string[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]>(3);
-        string[]? definitionTags = dataReader.GetNullableValueFromBlobStream<string[]>(4);
+        string primarySpelling = dataReader.GetString((int)ColumnIndex.PrimarySpelling);
+
+        int readingIndex = (int)ColumnIndex.Reading;
+        string? reading = !dataReader.IsDBNull(readingIndex)
+            ? dataReader.GetString(readingIndex)
+            : null;
+
+        string[] definitions = dataReader.GetValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
+        string[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.PartOfSpeech);
+        string[]? definitionTags = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.GlossaryTags);
 
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
     }

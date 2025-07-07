@@ -10,9 +10,14 @@ namespace JL.Core.Freqs;
 
 internal static class FreqDBManager
 {
-    public const int Version = 6;
+    public const int Version = 7;
 
-    private const int SearchKeyIndex = 2;
+    private enum ColumnIndex
+    {
+        Spelling = 0,
+        Frequency,
+        SearchKey
+    }
 
     public static void CreateDB(string dbName)
     {
@@ -23,7 +28,7 @@ internal static class FreqDBManager
             """
             CREATE TABLE IF NOT EXISTS record
             (
-                id INTEGER NOT NULL PRIMARY KEY,
+                rowid INTEGER NOT NULL PRIMARY KEY,
                 spelling TEXT NOT NULL,
                 frequency INTEGER NOT NULL
             ) STRICT;
@@ -33,7 +38,7 @@ internal static class FreqDBManager
                 search_key TEXT NOT NULL,
                 record_id INTEGER NOT NULL,
                 PRIMARY KEY (search_key, record_id),
-                FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
+                FOREIGN KEY (record_id) REFERENCES record (rowid) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -47,7 +52,7 @@ internal static class FreqDBManager
 
     public static void InsertRecordsToDB(Freq freq)
     {
-        ulong id = 1;
+        ulong rowId = 1;
 
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetFreqDBPath(freq.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -55,11 +60,11 @@ internal static class FreqDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (id, spelling, frequency)
-            VALUES (@id, @spelling, @frequency);
+            INSERT INTO record (rowid, spelling, frequency)
+            VALUES (@rowid, @spelling, @frequency);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@spelling", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@frequency", SqliteType.Integer);
         insertRecordCommand.Prepare();
@@ -81,16 +86,16 @@ internal static class FreqDBManager
             for (int i = 0; i < recordsCount; i++)
             {
                 FrequencyRecord record = records[i];
-                _ = insertRecordCommand.Parameters["@id"].Value = id;
+                _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
                 _ = insertRecordCommand.Parameters["@spelling"].Value = record.Spelling;
                 _ = insertRecordCommand.Parameters["@frequency"].Value = record.Frequency;
                 _ = insertRecordCommand.ExecuteNonQuery();
 
-                _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
+                _ = insertSearchKeyCommand.Parameters["@record_id"].Value = rowId;
                 _ = insertSearchKeyCommand.Parameters["@search_key"].Value = key;
                 _ = insertSearchKeyCommand.ExecuteNonQuery();
 
-                ++id;
+                ++rowId;
             }
         }
 
@@ -114,7 +119,7 @@ internal static class FreqDBManager
             """
             SELECT r.spelling, r.frequency, rsk.search_key
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN (@1
             """);
 
@@ -147,7 +152,7 @@ internal static class FreqDBManager
         while (dataReader.Read())
         {
             FrequencyRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString(SearchKeyIndex);
+            string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
             if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
             {
                 result.Add(record);
@@ -170,7 +175,7 @@ internal static class FreqDBManager
             """
             SELECT r.spelling, r.frequency
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key = @term;
             """;
 
@@ -219,15 +224,15 @@ internal static class FreqDBManager
             """
             SELECT r.spelling, r.frequency, json_group_array(rsk.search_key)
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            GROUP BY r.id;
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
+            GROUP BY r.rowid;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             FrequencyRecord record = GetRecord(dataReader);
-            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), Utils.s_jso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
                 if (freq.Contents.TryGetValue(searchKey, out IList<FrequencyRecord>? result))
@@ -251,8 +256,8 @@ internal static class FreqDBManager
 
     private static FrequencyRecord GetRecord(SqliteDataReader dataReader)
     {
-        string spelling = dataReader.GetString(0);
-        int frequency = dataReader.GetInt32(1);
+        string spelling = dataReader.GetString((int)ColumnIndex.Spelling);
+        int frequency = dataReader.GetInt32((int)ColumnIndex.Frequency);
 
         return new FrequencyRecord(spelling, frequency);
     }

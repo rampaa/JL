@@ -11,9 +11,35 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 9;
+    public const int Version = 10;
 
-    private const int SearchKeyIndex = 22;
+    private enum ColumnIndex
+    {
+        RowId = 0,
+        EdictId,
+        PrimarySpelling,
+        PrimarySpellingOrthographyInfo,
+        SpellingRestrictions,
+        AlternativeSpellings,
+        AlternativeSpellingsOrthographyInfo,
+        Readings,
+        ReadingsOrthographyInfo,
+        ReadingRestrictions,
+        Glossary,
+        GlossaryInfo,
+        WordClassesSharedByAllSenses,
+        WordClasses,
+        FieldsSharedByAllSenses,
+        Fields,
+        MiscSharedByAllSenses,
+        Misc,
+        DialectsSharedByAllSenses,
+        Dialects,
+        LoanwordEtymology,
+        CrossReferences,
+        Antonyms,
+        SearchKey
+    }
 
     public static void CreateDB(string dbName)
     {
@@ -24,7 +50,7 @@ internal static class JmdictDBManager
             """
             CREATE TABLE IF NOT EXISTS record
             (
-                id INTEGER NOT NULL PRIMARY KEY,
+                rowid INTEGER NOT NULL PRIMARY KEY,
                 edict_id INTEGER NOT NULL,
                 primary_spelling TEXT NOT NULL,
                 primary_spelling_orthography_info BLOB,
@@ -54,7 +80,7 @@ internal static class JmdictDBManager
                 search_key TEXT NOT NULL,
                 record_id INTEGER NOT NULL,
                 PRIMARY KEY (search_key, record_id),
-                FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
+                FOREIGN KEY (record_id) REFERENCES record (rowid) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -86,7 +112,7 @@ internal static class JmdictDBManager
             }
         }
 
-        ulong id = 1;
+        ulong rowId = 1;
 
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -94,11 +120,11 @@ internal static class JmdictDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (id, edict_id, primary_spelling, primary_spelling_orthography_info, alternative_spellings, alternative_spellings_orthography_info, readings, readings_orthography_info, reading_restrictions, glossary, glossary_info, part_of_speech_shared_by_all_senses, part_of_speech, spelling_restrictions, fields_shared_by_all_senses, fields, misc_shared_by_all_senses, misc, dialects_shared_by_all_senses, dialects, loanword_etymology, cross_references, antonyms)
-            VALUES (@id, @edict_id, @primary_spelling, @primary_spelling_orthography_info, @alternative_spellings, @alternative_spellings_orthography_info, @readings, @readings_orthography_info, @reading_restrictions, @glossary, @glossary_info, @part_of_speech_shared_by_all_senses, @part_of_speech, @spelling_restrictions, @fields_shared_by_all_senses, @fields, @misc_shared_by_all_senses, @misc, @dialects_shared_by_all_senses, @dialects, @loanword_etymology, @cross_references, @antonyms);
+            INSERT INTO record (rowid, edict_id, primary_spelling, primary_spelling_orthography_info, alternative_spellings, alternative_spellings_orthography_info, readings, readings_orthography_info, reading_restrictions, glossary, glossary_info, part_of_speech_shared_by_all_senses, part_of_speech, spelling_restrictions, fields_shared_by_all_senses, fields, misc_shared_by_all_senses, misc, dialects_shared_by_all_senses, dialects, loanword_etymology, cross_references, antonyms)
+            VALUES (@rowid, @edict_id, @primary_spelling, @primary_spelling_orthography_info, @alternative_spellings, @alternative_spellings_orthography_info, @readings, @readings_orthography_info, @reading_restrictions, @glossary, @glossary_info, @part_of_speech_shared_by_all_senses, @part_of_speech, @spelling_restrictions, @fields_shared_by_all_senses, @fields, @misc_shared_by_all_senses, @misc, @dialects_shared_by_all_senses, @dialects, @loanword_etymology, @cross_references, @antonyms);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@edict_id", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling_orthography_info", SqliteType.Blob);
@@ -136,7 +162,7 @@ internal static class JmdictDBManager
 
         foreach ((JmdictRecord record, List<string> keys) in recordToKeysDict)
         {
-            insertRecordCommand.Parameters["@id"].Value = id;
+            insertRecordCommand.Parameters["@rowid"].Value = rowId;
             insertRecordCommand.Parameters["@edict_id"].Value = record.Id;
             insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             insertRecordCommand.Parameters["@primary_spelling_orthography_info"].Value = record.PrimarySpellingOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.PrimarySpellingOrthographyInfo) : DBNull.Value;
@@ -161,14 +187,14 @@ internal static class JmdictDBManager
             insertRecordCommand.Parameters["@antonyms"].Value = record.Antonyms is not null ? MessagePackSerializer.Serialize(record.Antonyms) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            insertSearchKeyCommand.Parameters["@record_id"].Value = id;
+            insertSearchKeyCommand.Parameters["@record_id"].Value = rowId;
             foreach (ref readonly string key in keys.AsReadOnlySpan())
             {
                 insertSearchKeyCommand.Parameters["@search_key"].Value = key;
                 _ = insertSearchKeyCommand.ExecuteNonQuery();
             }
 
-            ++id;
+            ++rowId;
         }
 
         transaction.Commit();
@@ -190,7 +216,8 @@ internal static class JmdictDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
             $"""
-            SELECT r.edict_id,
+            SELECT r.rowid,
+                   r.edict_id,
                    r.primary_spelling,
                    r.primary_spelling_orthography_info,
                    r.spelling_restrictions,
@@ -212,10 +239,9 @@ internal static class JmdictDBManager
                    r.loanword_etymology,
                    r.cross_references,
                    r.antonyms,
-                   rsk.search_key,
-                   r.id
+                   rsk.search_key
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN {parameter}
             """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
@@ -235,7 +261,7 @@ internal static class JmdictDBManager
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString(SearchKeyIndex);
+            string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -256,7 +282,8 @@ internal static class JmdictDBManager
 
         command.CommandText =
             """
-            SELECT r.edict_id,
+            SELECT r.rowid,
+                   r.edict_id,
                    r.primary_spelling,
                    r.primary_spelling_orthography_info,
                    r.spelling_restrictions,
@@ -278,18 +305,17 @@ internal static class JmdictDBManager
                    r.loanword_etymology,
                    r.cross_references,
                    r.antonyms,
-                   json_group_array(rsk.search_key),
-                   r.id
+                   json_group_array(rsk.search_key)
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            GROUP BY r.id;
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
+            GROUP BY r.rowid;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
-            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), Utils.s_jso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
@@ -313,28 +339,29 @@ internal static class JmdictDBManager
 
     private static JmdictRecord GetRecord(SqliteDataReader dataReader)
     {
-        int edictId = dataReader.GetInt32(0);
-        string primarySpelling = dataReader.GetString(1);
-        string[]? primarySpellingOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]>(2);
-        string[]?[]? spellingRestrictions = dataReader.GetNullableValueFromBlobStream<string[]?[]>(3);
-        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>(4);
-        string[]?[]? alternativeSpellingsOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]?[]>(5);
-        string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>(6);
-        string[]?[]? readingsOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]?[]>(7);
-        string[]?[]? readingRestrictions = dataReader.GetNullableValueFromBlobStream<string[]?[]>(8);
-        string[][] definitions = dataReader.GetValueFromBlobStream<string[][]>(9);
-        string?[]? definitionInfo = dataReader.GetNullableValueFromBlobStream<string?[]>(10);
-        string[]? wordClassesSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(11);
-        string[]?[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]?[]>(12);
-        string[]? fieldsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(13);
-        string[]?[]? fields = dataReader.GetNullableValueFromBlobStream<string[]?[]>(14);
-        string[]? miscSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(15);
-        string[]?[]? misc = dataReader.GetNullableValueFromBlobStream<string[]?[]>(16);
-        string[]? dialectsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(17);
-        string[]?[]? dialects = dataReader.GetNullableValueFromBlobStream<string[]?[]>(18);
-        LoanwordSource[]?[]? loanwordEtymology = dataReader.GetNullableValueFromBlobStream<LoanwordSource[]?[]>(19);
-        string[]?[]? relatedTerms = dataReader.GetNullableValueFromBlobStream<string[]?[]>(20);
-        string[]?[]? antonyms = dataReader.GetNullableValueFromBlobStream<string[]?[]>(21);
+        int edictId = dataReader.GetInt32((int)ColumnIndex.EdictId);
+        string primarySpelling = dataReader.GetString((int)ColumnIndex.PrimarySpelling);
+        string[]? primarySpellingOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.PrimarySpellingOrthographyInfo);
+        string[]?[]? spellingRestrictions = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.SpellingRestrictions);
+        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.AlternativeSpellings);
+        string[]?[]? alternativeSpellingsOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.AlternativeSpellingsOrthographyInfo);
+        string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Readings);
+        string[]?[]? readingsOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.ReadingsOrthographyInfo);
+        string[]?[]? readingRestrictions = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.ReadingRestrictions);
+        string[][] definitions = dataReader.GetValueFromBlobStream<string[][]>((int)ColumnIndex.Glossary);
+        string?[]? definitionInfo = dataReader.GetNullableValueFromBlobStream<string?[]>((int)ColumnIndex.GlossaryInfo);
+        string[]? wordClassesSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.WordClassesSharedByAllSenses);
+        string[]?[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.WordClasses);
+        string[]? fieldsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.FieldsSharedByAllSenses);
+        string[]?[]? fields = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Fields);
+        string[]? miscSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.MiscSharedByAllSenses);
+        string[]?[]? misc = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Misc);
+        string[]? dialectsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.DialectsSharedByAllSenses);
+        string[]?[]? dialects = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Dialects);
+        LoanwordSource[]?[]? loanwordEtymology = dataReader.GetNullableValueFromBlobStream<LoanwordSource[]?[]>((int)ColumnIndex.LoanwordEtymology);
+        string[]?[]? relatedTerms = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.CrossReferences);
+        string[]?[]? antonyms = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Antonyms);
+
 
         return new JmdictRecord(edictId, primarySpelling, definitions, wordClasses, wordClassesSharedByAllSenses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, fieldsSharedByAllSenses, misc, miscSharedByAllSenses, definitionInfo, dialects, dialectsSharedByAllSenses, loanwordEtymology, relatedTerms, antonyms);
     }

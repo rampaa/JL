@@ -10,14 +10,23 @@ namespace JL.Core.Dicts.KanjiDict;
 
 internal static class YomichanKanjiDBManager
 {
-    public const int Version = 3;
+    public const int Version = 4;
 
     private const string SingleTermQuery =
         """
-        SELECT r.on_readings, r.kun_readings, r.glossary, r.stats, r.id
+        SELECT r.rowid, r.on_readings, r.kun_readings, r.glossary, r.stats
         FROM record r
         WHERE r.kanji = @term;
         """;
+
+    private enum ColumnIndex
+    {
+        RowId = 0,
+        OnReadings,
+        KunReadings,
+        Glossary,
+        Stats
+    }
 
     public static void CreateDB(string dbName)
     {
@@ -28,7 +37,7 @@ internal static class YomichanKanjiDBManager
             """
             CREATE TABLE IF NOT EXISTS record
             (
-                id INTEGER NOT NULL PRIMARY KEY,
+                rowid INTEGER NOT NULL PRIMARY KEY,
                 kanji TEXT NOT NULL,
                 on_readings BLOB,
                 kun_readings BLOB,
@@ -47,7 +56,7 @@ internal static class YomichanKanjiDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        ulong id = 1;
+        ulong rowId = 1;
 
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -55,11 +64,11 @@ internal static class YomichanKanjiDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (id, kanji, on_readings, kun_readings, glossary, stats)
-            VALUES (@id, @kanji, @on_readings, @kun_readings, @glossary, @stats);
+            INSERT INTO record (rowid, kanji, on_readings, kun_readings, glossary, stats)
+            VALUES (@rowid, @kanji, @on_readings, @kun_readings, @glossary, @stats);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@kanji", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@on_readings", SqliteType.Blob);
         _ = insertRecordCommand.Parameters.Add("@kun_readings", SqliteType.Blob);
@@ -73,7 +82,7 @@ internal static class YomichanKanjiDBManager
             for (int i = 0; i < recordsCount; i++)
             {
                 YomichanKanjiRecord yomichanKanjiRecord = (YomichanKanjiRecord)records[i];
-                _ = insertRecordCommand.Parameters["@id"].Value = id;
+                _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
                 _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
                 _ = insertRecordCommand.Parameters["@on_readings"].Value = yomichanKanjiRecord.OnReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.OnReadings) : DBNull.Value;
                 _ = insertRecordCommand.Parameters["@kun_readings"].Value = yomichanKanjiRecord.KunReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.KunReadings) : DBNull.Value;
@@ -81,7 +90,7 @@ internal static class YomichanKanjiDBManager
                 _ = insertRecordCommand.Parameters["@stats"].Value = yomichanKanjiRecord.Stats is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Stats) : DBNull.Value;
                 _ = insertRecordCommand.ExecuteNonQuery();
 
-                ++id;
+                ++rowId;
             }
         }
 
@@ -131,7 +140,7 @@ internal static class YomichanKanjiDBManager
 
         command.CommandText =
             """
-            SELECT r.on_readings, r.kun_readings, r.glossary, r.stats, r.kanji, r.id
+            SELECT r.rowid, r.on_readings, r.kun_readings, r.glossary, r.stats, r.kanji
             FROM record r;
             """;
 
@@ -160,10 +169,10 @@ internal static class YomichanKanjiDBManager
 
     private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)
     {
-        string[]? onReadings = dataReader.GetNullableValueFromBlobStream<string[]>(0);
-        string[]? kunReadings = dataReader.GetNullableValueFromBlobStream<string[]>(1);
-        string[]? definitions = dataReader.GetNullableValueFromBlobStream<string[]>(2);
-        string[]? stats = dataReader.GetNullableValueFromBlobStream<string[]>(3);
+        string[]? onReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.OnReadings);
+        string[]? kunReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.KunReadings);
+        string[]? definitions = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
+        string[]? stats = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Stats);
 
         return new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats);
     }

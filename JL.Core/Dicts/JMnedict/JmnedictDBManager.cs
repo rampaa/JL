@@ -9,7 +9,19 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictDBManager
 {
-    public const int Version = 3;
+    public const int Version = 4;
+
+    private enum ColumnIndex
+    {
+        RowId = 0,
+        JmnedictId,
+        PrimarySpelling,
+        Readings,
+        AlternativeSpellings,
+        Glossary,
+        NameTypes,
+        PrimarySpellingInHiragana
+    }
 
     public static void CreateDB(string dbName)
     {
@@ -20,7 +32,7 @@ internal static class JmnedictDBManager
             """
             CREATE TABLE IF NOT EXISTS record
             (
-                id INTEGER NOT NULL PRIMARY KEY,
+                rowid INTEGER NOT NULL PRIMARY KEY,
                 jmnedict_id INTEGER NOT NULL,
                 primary_spelling TEXT NOT NULL,
                 primary_spelling_in_hiragana TEXT NOT NULL,
@@ -58,7 +70,7 @@ internal static class JmnedictDBManager
             }
         }
 
-        ulong id = 1;
+        ulong rowId = 1;
 
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -66,11 +78,11 @@ internal static class JmnedictDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (id, jmnedict_id, primary_spelling, primary_spelling_in_hiragana, readings, alternative_spellings, glossary, name_types)
-            VALUES (@id, @jmnedict_id, @primary_spelling, @primary_spelling_in_hiragana, @readings, @alternative_spellings, @glossary, @name_types);
+            INSERT INTO record (rowid, jmnedict_id, primary_spelling, primary_spelling_in_hiragana, readings, alternative_spellings, glossary, name_types)
+            VALUES (@rowid, @jmnedict_id, @primary_spelling, @primary_spelling_in_hiragana, @readings, @alternative_spellings, @glossary, @name_types);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@jmnedict_id", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling_in_hiragana", SqliteType.Text);
@@ -82,7 +94,7 @@ internal static class JmnedictDBManager
 
         foreach (JmnedictRecord record in jmnedictRecords)
         {
-            _ = insertRecordCommand.Parameters["@id"].Value = id;
+            _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
             _ = insertRecordCommand.Parameters["@jmnedict_id"].Value = record.Id;
             _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             _ = insertRecordCommand.Parameters["@primary_spelling_in_hiragana"].Value = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
@@ -92,7 +104,7 @@ internal static class JmnedictDBManager
             _ = insertRecordCommand.Parameters["@name_types"].Value = MessagePackSerializer.Serialize(record.NameTypes);
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            ++id;
+            ++rowId;
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
@@ -118,7 +130,7 @@ internal static class JmnedictDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
             $"""
-            SELECT r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana, r.id
+            SELECT r.rowid, r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
             FROM record r
             WHERE r.primary_spelling_in_hiragana IN {parameter}
             """;
@@ -139,7 +151,7 @@ internal static class JmnedictDBManager
         while (dataReader.Read())
         {
             JmnedictRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString(6);
+            string searchKey = dataReader.GetString((int)ColumnIndex.PrimarySpellingInHiragana);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(record);
@@ -160,7 +172,7 @@ internal static class JmnedictDBManager
     //
     //     command.CommandText =
     //         """
-    //         SELECT r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana, r.id
+    //         SELECT r.rowid, r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
     //         FROM record r;
     //         """;
     //
@@ -168,7 +180,7 @@ internal static class JmnedictDBManager
     //     while (dataReader.Read())
     //     {
     //         JmnedictRecord record = GetRecord(dataReader);
-    //         string searchKey = dataReader.GetString(6);
+    //         string searchKey = dataReader.GetString((int)ColumnIndex.PrimarySpellingInHiragana);
     //         if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
     //         {
     //             result.Add(record);
@@ -189,13 +201,13 @@ internal static class JmnedictDBManager
 
     private static JmnedictRecord GetRecord(SqliteDataReader dataReader)
     {
-        int id = dataReader.GetInt32(0);
-        string primarySpelling = dataReader.GetString(1);
-        string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>(2);
-        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>(3);
-        string[][] definitions = dataReader.GetValueFromBlobStream<string[][]>(4);
-        string[][] nameTypes = dataReader.GetValueFromBlobStream<string[][]>(5);
+        int jmnedictId = dataReader.GetInt32((int)ColumnIndex.JmnedictId);
+        string primarySpelling = dataReader.GetString((int)ColumnIndex.PrimarySpelling);
+        string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Readings);
+        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.AlternativeSpellings);
+        string[][] definitions = dataReader.GetValueFromBlobStream<string[][]>((int)ColumnIndex.Glossary);
+        string[][] nameTypes = dataReader.GetValueFromBlobStream<string[][]>((int)ColumnIndex.NameTypes);
 
-        return new JmnedictRecord(id, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);
+        return new JmnedictRecord(jmnedictId, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);
     }
 }

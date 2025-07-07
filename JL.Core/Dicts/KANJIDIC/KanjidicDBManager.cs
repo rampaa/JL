@@ -19,6 +19,19 @@ internal static class KanjidicDBManager
         WHERE r.kanji = @term;
         """;
 
+    private enum ColumnIndex
+    {
+        OnReadings = 0,
+        KunReadings,
+        NanoriReadings,
+        RadicalNames,
+        Glossary,
+        StrokeCount,
+        Grade,
+        Frequency,
+        Kanji
+    }
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
@@ -135,7 +148,7 @@ internal static class KanjidicDBManager
         while (dataReader.Read())
         {
             IDictRecord[] record = [GetRecord(dataReader)];
-            string kanji = dataReader.GetString(8);
+            string kanji = dataReader.GetString((int)ColumnIndex.Kanji);
             dict.Contents[kanji] = record;
         }
 
@@ -144,29 +157,34 @@ internal static class KanjidicDBManager
 
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)
     {
-        string[]? onReadings = !dataReader.IsDBNull(0)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(0))
+        int onReadingsIndex = (int)ColumnIndex.OnReadings;
+        string[]? onReadings = !dataReader.IsDBNull(onReadingsIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(onReadingsIndex))
             : null;
 
-        string[]? kunReadings = !dataReader.IsDBNull(1)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(1))
+        int kunReadingsIndex = (int)ColumnIndex.KunReadings;
+        string[]? kunReadings = !dataReader.IsDBNull(kunReadingsIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(kunReadingsIndex))
             : null;
 
-        string[]? nanoriReadings = !dataReader.IsDBNull(2)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(2))
+        int nanoriReadingsIndex = (int)ColumnIndex.NanoriReadings;
+        string[]? nanoriReadings = !dataReader.IsDBNull(nanoriReadingsIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(nanoriReadingsIndex))
             : null;
 
-        string[]? radicalNames = !dataReader.IsDBNull(3)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(3))
+        int radicalNamesIndex = (int)ColumnIndex.RadicalNames;
+        string[]? radicalNames = !dataReader.IsDBNull(radicalNamesIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(radicalNamesIndex))
             : null;
 
-        string[]? definitions = !dataReader.IsDBNull(4)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(4))
+        int glossaryIndex = (int)ColumnIndex.Glossary;
+        string[]? definitions = !dataReader.IsDBNull(glossaryIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(glossaryIndex))
             : null;
 
-        byte strokeCount = dataReader.GetByte(5);
-        byte grade = dataReader.GetByte(6);
-        int frequency = dataReader.GetInt32(7);
+        byte strokeCount = dataReader.GetByte((int)ColumnIndex.StrokeCount);
+        byte grade = dataReader.GetByte((int)ColumnIndex.Grade);
+        int frequency = dataReader.GetInt32((int)ColumnIndex.Frequency);
         return new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
     }
 }

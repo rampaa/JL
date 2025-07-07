@@ -12,15 +12,13 @@ namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaDBManager
 {
-    public const int Version = 9;
-
-    private const int SearchKeyIndex = 4;
+    public const int Version = 10;
 
     private const string SingleTermQuery =
         """
-        SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.id
+        SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary
         FROM record r
-        JOIN record_search_key rsk ON r.id = rsk.record_id
+        JOIN record_search_key rsk ON r.rowid = rsk.record_id
         WHERE rsk.search_key = @term;
         """;
 
@@ -28,9 +26,9 @@ internal static class EpwingNazekaDBManager
     {
         return
             $"""
-            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key, r.id
+            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN {parameter}
             """;
     }
@@ -39,9 +37,9 @@ internal static class EpwingNazekaDBManager
     {
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key, r.id
+            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN (@1
             """);
 
@@ -53,6 +51,16 @@ internal static class EpwingNazekaDBManager
         return queryBuilder.Append(");").ToString();
     }
 
+    private enum ColumnIndex
+    {
+        RowId = 0,
+        PrimarySpelling,
+        Reading,
+        AlternativeSpellings,
+        Glossary,
+        SearchKey
+    }
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
@@ -62,7 +70,7 @@ internal static class EpwingNazekaDBManager
             """
             CREATE TABLE IF NOT EXISTS record
             (
-                id INTEGER NOT NULL PRIMARY KEY,
+                rowid INTEGER NOT NULL PRIMARY KEY,
                 primary_spelling TEXT NOT NULL,
                 reading TEXT,
                 alternative_spellings BLOB,
@@ -74,7 +82,7 @@ internal static class EpwingNazekaDBManager
                 search_key TEXT NOT NULL,
                 record_id INTEGER NOT NULL,
                 PRIMARY KEY (search_key, record_id),
-                FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
+                FOREIGN KEY (record_id) REFERENCES record (rowid) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -105,7 +113,7 @@ internal static class EpwingNazekaDBManager
             }
         }
 
-        ulong id = 1;
+        ulong rowId = 1;
 
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -113,11 +121,11 @@ internal static class EpwingNazekaDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (id, primary_spelling, reading, alternative_spellings, glossary)
-            VALUES (@id, @primary_spelling, @reading, @alternative_spellings, @glossary);
+            INSERT INTO record (rowid, primary_spelling, reading, alternative_spellings, glossary)
+            VALUES (@rowid, @primary_spelling, @reading, @alternative_spellings, @glossary);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@id", SqliteType.Integer);
+        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
         _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
         _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Blob);
@@ -137,14 +145,14 @@ internal static class EpwingNazekaDBManager
 
         foreach (EpwingNazekaRecord record in nazekaWordRecords)
         {
-            _ = insertRecordCommand.Parameters["@id"].Value = id;
+            _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
             _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
             _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
             _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
             _ = insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = id;
+            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = rowId;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
             _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
             _ = insertSearchKeyCommand.ExecuteNonQuery();
@@ -159,7 +167,7 @@ internal static class EpwingNazekaDBManager
                 }
             }
 
-            ++id;
+            ++rowId;
         }
 
         transaction.Commit();
@@ -197,7 +205,7 @@ internal static class EpwingNazekaDBManager
         while (dataReader.Read())
         {
             EpwingNazekaRecord epwingNazekaRecord = GetRecord(dataReader);
-            string searchKey = dataReader.GetString(SearchKeyIndex);
+            string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(epwingNazekaRecord);
@@ -242,17 +250,17 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, json_group_array(rsk.search_key), r.id
+            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, json_group_array(rsk.search_key)
             FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            GROUP BY r.id;
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
+            GROUP BY r.rowid;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
         while (dataReader.Read())
         {
             EpwingNazekaRecord record = GetRecord(dataReader);
-            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString(SearchKeyIndex), Utils.s_jso).Span;
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), Utils.s_jso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
@@ -276,10 +284,15 @@ internal static class EpwingNazekaDBManager
 
     private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader)
     {
-        string primarySpelling = dataReader.GetString(0);
-        string? reading = !dataReader.IsDBNull(1) ? dataReader.GetString(1) : null;
-        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>(2);
-        string[] definitions = dataReader.GetValueFromBlobStream<string[]>(3);
+        string primarySpelling = dataReader.GetString((int)ColumnIndex.PrimarySpelling);
+
+        int readingIndex = (int)ColumnIndex.Reading;
+        string? reading = !dataReader.IsDBNull(readingIndex)
+            ? dataReader.GetString(readingIndex)
+            : null;
+
+        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.AlternativeSpellings);
+        string[] definitions = dataReader.GetValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
     }
