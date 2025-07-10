@@ -124,36 +124,44 @@ internal static class EpwingNazekaDBManager
             VALUES (@rowid, @primary_spelling, @reading, @alternative_spellings, @glossary);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
+        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
+        SqliteParameter primarySpellingParam = new("@primary_spelling", SqliteType.Text);
+        SqliteParameter readingParam = new("@reading", SqliteType.Text);
+        SqliteParameter alternativeSpellingsParam = new("@alternative_spellings", SqliteType.Blob);
+        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
+        insertRecordCommand.Parameters.AddRange([
+            rowidParam,
+            primarySpellingParam,
+            readingParam,
+            alternativeSpellingsParam,
+            glossaryParam
+        ]);
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
         insertSearchKeyCommand.CommandText =
             """
-                INSERT INTO record_search_key(record_id, search_key)
-                VALUES (@record_id, @search_key);
-                """;
+            INSERT INTO record_search_key(record_id, search_key)
+            VALUES (@record_id, @search_key);
+            """;
 
-        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
-        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
         foreach (EpwingNazekaRecord record in nazekaWordRecords)
         {
-            _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
-            _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
-            _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
+            rowidParam.Value = rowId;
+            primarySpellingParam.Value = record.PrimarySpelling;
+            readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
+            alternativeSpellingsParam.Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
+            glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = rowId;
+            recordIdParam.Value = rowId;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
-            _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
+            searchKeyParam.Value = primarySpellingInHiragana;
             _ = insertSearchKeyCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
@@ -161,7 +169,7 @@ internal static class EpwingNazekaDBManager
                 string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
-                    _ = insertSearchKeyCommand.Parameters["@search_key"].Value = readingInHiragana;
+                    searchKeyParam.Value = readingInHiragana;
                     _ = insertSearchKeyCommand.ExecuteNonQuery();
                 }
             }

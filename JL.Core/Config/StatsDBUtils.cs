@@ -61,14 +61,16 @@ public static class StatsDBUtils
             """;
 
         _ = insertOrUpdateLookupStatsCommand.Parameters.AddWithValue("@profile_id", profileId);
-        _ = insertOrUpdateLookupStatsCommand.Parameters.Add("@term", SqliteType.Text);
-        _ = insertOrUpdateLookupStatsCommand.Parameters.Add("@count", SqliteType.Integer);
+
+        SqliteParameter termParam = new("@term", SqliteType.Text);
+        SqliteParameter countParam = new("@count", SqliteType.Integer);
+        insertOrUpdateLookupStatsCommand.Parameters.AddRange([termParam, countParam]);
         insertOrUpdateLookupStatsCommand.Prepare();
 
         foreach ((string term, int value) in lookupStats)
         {
-            insertOrUpdateLookupStatsCommand.Parameters["@term"].Value = term;
-            insertOrUpdateLookupStatsCommand.Parameters["@count"].Value = value;
+            termParam.Value = term;
+            countParam.Value = value;
             _ = insertOrUpdateLookupStatsCommand.ExecuteNonQuery();
         }
 

@@ -126,12 +126,22 @@ internal static class EpwingYomichanDBManager
             VALUES (@rowid, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@part_of_speech", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@glossary_tags", SqliteType.Blob);
+        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
+        SqliteParameter primarySpellingParam = new("@primary_spelling", SqliteType.Text);
+        SqliteParameter readingParam = new("@reading", SqliteType.Text);
+        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
+        SqliteParameter partOfSpeechParam = new("@part_of_speech", SqliteType.Blob);
+        SqliteParameter glossaryTagsParam = new("@glossary_tags", SqliteType.Blob);
+
+        insertRecordCommand.Parameters.AddRange([
+            rowidParam,
+            primarySpellingParam,
+            readingParam,
+            glossaryParam,
+            partOfSpeechParam,
+            glossaryTagsParam
+        ]);
+
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -141,23 +151,24 @@ internal static class EpwingYomichanDBManager
             VALUES (@record_id, @search_key);
             """;
 
-        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
-        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        SqliteParameter sqliteParameter = new("@record_id", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Parameters.AddRange([sqliteParameter, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
         foreach (EpwingYomichanRecord record in yomichanWordRecords)
         {
-            _ = insertRecordCommand.Parameters["@rowid"].Value = rowid;
-            _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
-            _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
-            _ = insertRecordCommand.Parameters["@part_of_speech"].Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary_tags"].Value = record.DefinitionTags is not null ? MessagePackSerializer.Serialize(record.DefinitionTags) : DBNull.Value;
+            rowidParam.Value = rowid;
+            primarySpellingParam.Value = record.PrimarySpelling;
+            readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
+            glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
+            partOfSpeechParam.Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
+            glossaryTagsParam.Value = record.DefinitionTags is not null ? MessagePackSerializer.Serialize(record.DefinitionTags) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = rowid;
+            sqliteParameter.Value = rowid;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
-            _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
+            searchKeyParam.Value = primarySpellingInHiragana;
             _ = insertSearchKeyCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
@@ -165,7 +176,7 @@ internal static class EpwingYomichanDBManager
                 string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
-                    _ = insertSearchKeyCommand.Parameters["@search_key"].Value = readingInHiragana;
+                    searchKeyParam.Value = readingInHiragana;
                     _ = insertSearchKeyCommand.ExecuteNonQuery();
                 }
             }

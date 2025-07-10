@@ -83,10 +83,16 @@ internal static class YomichanPitchAccentDBManager
             VALUES (@rowid, @spelling, @reading, @position)
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@spelling", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@reading", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@position", SqliteType.Integer);
+        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
+        SqliteParameter spellingParam = new("@spelling", SqliteType.Text);
+        SqliteParameter readingParam = new("@reading", SqliteType.Text);
+        SqliteParameter positionParam = new("@position", SqliteType.Integer);
+        insertRecordCommand.Parameters.AddRange([
+            rowidParam,
+            spellingParam,
+            readingParam,
+            positionParam
+        ]);
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -96,21 +102,25 @@ internal static class YomichanPitchAccentDBManager
             VALUES (@record_id, @search_key)
             """;
 
-        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
-        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Parameters.AddRange([
+            recordIdParam,
+            searchKeyParam
+        ]);
         insertSearchKeyCommand.Prepare();
 
         foreach (PitchAccentRecord record in yomichanPitchAccentRecord)
         {
-            _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
-            _ = insertRecordCommand.Parameters["@spelling"].Value = record.Spelling;
-            _ = insertRecordCommand.Parameters["@reading"].Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@position"].Value = record.Position;
+            rowidParam.Value = rowId;
+            spellingParam.Value = record.Spelling;
+            readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
+            positionParam.Value = record.Position;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            _ = insertSearchKeyCommand.Parameters["@record_id"].Value = rowId;
+            recordIdParam.Value = rowId;
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Spelling);
-            _ = insertSearchKeyCommand.Parameters["@search_key"].Value = primarySpellingInHiragana;
+            searchKeyParam.Value = primarySpellingInHiragana;
             _ = insertSearchKeyCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
@@ -118,7 +128,7 @@ internal static class YomichanPitchAccentDBManager
                 string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
-                    _ = insertSearchKeyCommand.Parameters["@search_key"].Value = readingInHiragana;
+                    searchKeyParam.Value = readingInHiragana;
                     _ = insertSearchKeyCommand.ExecuteNonQuery();
                 }
             }

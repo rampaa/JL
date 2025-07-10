@@ -72,15 +72,26 @@ internal static class KanjidicDBManager
             VALUES (@kanji, @on_readings, @kun_readings, @nanori_readings, @radical_names, @glossary, @stroke_count, @grade, @frequency);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@kanji", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@on_readings", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@kun_readings", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@nanori_readings", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@radical_names", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@stroke_count", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@grade", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@frequency", SqliteType.Integer);
+        SqliteParameter kanjiParam = new("@kanji", SqliteType.Text);
+        SqliteParameter onReadingsParam = new("@on_readings", SqliteType.Blob);
+        SqliteParameter kunReadingsParam = new("@kun_readings", SqliteType.Blob);
+        SqliteParameter nanoriReadingsParam = new("@nanori_readings", SqliteType.Blob);
+        SqliteParameter radicalNamesParam = new("@radical_names", SqliteType.Blob);
+        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
+        SqliteParameter strokeCountParam = new("@stroke_count", SqliteType.Integer);
+        SqliteParameter gradeParam = new("@grade", SqliteType.Integer);
+        SqliteParameter frequencyParam = new("@frequency", SqliteType.Integer);
+        insertRecordCommand.Parameters.AddRange([
+            kanjiParam,
+            onReadingsParam,
+            kunReadingsParam,
+            nanoriReadingsParam,
+            radicalNamesParam,
+            glossaryParam,
+            strokeCountParam,
+            gradeParam,
+            frequencyParam
+        ]);
         insertRecordCommand.Prepare();
 
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
@@ -89,15 +100,15 @@ internal static class KanjidicDBManager
             for (int i = 0; i < recordsCount; i++)
             {
                 KanjidicRecord kanjidicRecord = (KanjidicRecord)records[i];
-                _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
-                _ = insertRecordCommand.Parameters["@on_readings"].Value = kanjidicRecord.OnReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.OnReadings) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@kun_readings"].Value = kanjidicRecord.KunReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.KunReadings) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@nanori_readings"].Value = kanjidicRecord.NanoriReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.NanoriReadings) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@radical_names"].Value = kanjidicRecord.RadicalNames is not null ? MessagePackSerializer.Serialize(kanjidicRecord.RadicalNames) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@glossary"].Value = kanjidicRecord.Definitions is not null ? MessagePackSerializer.Serialize(kanjidicRecord.Definitions) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@stroke_count"].Value = kanjidicRecord.StrokeCount;
-                _ = insertRecordCommand.Parameters["@grade"].Value = kanjidicRecord.Grade;
-                _ = insertRecordCommand.Parameters["@frequency"].Value = kanjidicRecord.Frequency;
+                kanjiParam.Value = kanji;
+                onReadingsParam.Value = kanjidicRecord.OnReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.OnReadings) : DBNull.Value;
+                kunReadingsParam.Value = kanjidicRecord.KunReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.KunReadings) : DBNull.Value;
+                nanoriReadingsParam.Value = kanjidicRecord.NanoriReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.NanoriReadings) : DBNull.Value;
+                radicalNamesParam.Value = kanjidicRecord.RadicalNames is not null ? MessagePackSerializer.Serialize(kanjidicRecord.RadicalNames) : DBNull.Value;
+                glossaryParam.Value = kanjidicRecord.Definitions is not null ? MessagePackSerializer.Serialize(kanjidicRecord.Definitions) : DBNull.Value;
+                strokeCountParam.Value = kanjidicRecord.StrokeCount;
+                gradeParam.Value = kanjidicRecord.Grade;
+                frequencyParam.Value = kanjidicRecord.Frequency;
                 _ = insertRecordCommand.ExecuteNonQuery();
             }
         }

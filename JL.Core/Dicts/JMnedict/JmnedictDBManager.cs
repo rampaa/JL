@@ -81,26 +81,36 @@ internal static class JmnedictDBManager
             VALUES (@rowid, @jmnedict_id, @primary_spelling, @primary_spelling_in_hiragana, @readings, @alternative_spellings, @glossary, @name_types);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@jmnedict_id", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@primary_spelling", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@primary_spelling_in_hiragana", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@readings", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@alternative_spellings", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@name_types", SqliteType.Blob);
+        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
+        SqliteParameter jmnedictIdParam = new("@jmnedict_id", SqliteType.Integer);
+        SqliteParameter primarySpellingParam = new("@primary_spelling", SqliteType.Text);
+        SqliteParameter primarySpellingInHiraganaParam = new("@primary_spelling_in_hiragana", SqliteType.Text);
+        SqliteParameter readingsParam = new("@readings", SqliteType.Blob);
+        SqliteParameter alternativeSpellingsParam = new("@alternative_spellings", SqliteType.Blob);
+        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
+        SqliteParameter nameTypesParam = new("@name_types", SqliteType.Blob);
+        insertRecordCommand.Parameters.AddRange([
+            rowidParam,
+            jmnedictIdParam,
+            primarySpellingParam,
+            primarySpellingInHiraganaParam,
+            readingsParam,
+            alternativeSpellingsParam,
+            glossaryParam,
+            nameTypesParam
+        ]);
         insertRecordCommand.Prepare();
 
         foreach (JmnedictRecord record in jmnedictRecords)
         {
-            _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
-            _ = insertRecordCommand.Parameters["@jmnedict_id"].Value = record.Id;
-            _ = insertRecordCommand.Parameters["@primary_spelling"].Value = record.PrimarySpelling;
-            _ = insertRecordCommand.Parameters["@primary_spelling_in_hiragana"].Value = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
-            _ = insertRecordCommand.Parameters["@readings"].Value = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@alternative_spellings"].Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
-            _ = insertRecordCommand.Parameters["@glossary"].Value = MessagePackSerializer.Serialize(record.Definitions);
-            _ = insertRecordCommand.Parameters["@name_types"].Value = MessagePackSerializer.Serialize(record.NameTypes);
+            rowidParam.Value = rowId;
+            jmnedictIdParam.Value = record.Id;
+            primarySpellingParam.Value = record.PrimarySpelling;
+            primarySpellingInHiraganaParam.Value = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
+            readingsParam.Value = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : DBNull.Value;
+            alternativeSpellingsParam.Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
+            glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
+            nameTypesParam.Value = MessagePackSerializer.Serialize(record.NameTypes);
             _ = insertRecordCommand.ExecuteNonQuery();
 
             ++rowId;

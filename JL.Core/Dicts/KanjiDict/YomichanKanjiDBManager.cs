@@ -68,12 +68,20 @@ internal static class YomichanKanjiDBManager
             VALUES (@rowid, @kanji, @on_readings, @kun_readings, @glossary, @stats);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@kanji", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@on_readings", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@kun_readings", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@glossary", SqliteType.Blob);
-        _ = insertRecordCommand.Parameters.Add("@stats", SqliteType.Blob);
+        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
+        SqliteParameter kanjiParam = new("@kanji", SqliteType.Text);
+        SqliteParameter onReadingsParam = new("@on_readings", SqliteType.Blob);
+        SqliteParameter kunReadingsParam = new("@kun_readings", SqliteType.Blob);
+        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
+        SqliteParameter statsParam = new("@stats", SqliteType.Blob);
+        insertRecordCommand.Parameters.AddRange([
+            rowidParam,
+            kanjiParam,
+            onReadingsParam,
+            kunReadingsParam,
+            glossaryParam,
+            statsParam
+        ]);
         insertRecordCommand.Prepare();
 
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
@@ -82,12 +90,12 @@ internal static class YomichanKanjiDBManager
             for (int i = 0; i < recordsCount; i++)
             {
                 YomichanKanjiRecord yomichanKanjiRecord = (YomichanKanjiRecord)records[i];
-                _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
-                _ = insertRecordCommand.Parameters["@kanji"].Value = kanji;
-                _ = insertRecordCommand.Parameters["@on_readings"].Value = yomichanKanjiRecord.OnReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.OnReadings) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@kun_readings"].Value = yomichanKanjiRecord.KunReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.KunReadings) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@glossary"].Value = yomichanKanjiRecord.Definitions is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Definitions) : DBNull.Value;
-                _ = insertRecordCommand.Parameters["@stats"].Value = yomichanKanjiRecord.Stats is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Stats) : DBNull.Value;
+                rowidParam.Value = rowId;
+                kanjiParam.Value = kanji;
+                onReadingsParam.Value = yomichanKanjiRecord.OnReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.OnReadings) : DBNull.Value;
+                kunReadingsParam.Value = yomichanKanjiRecord.KunReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.KunReadings) : DBNull.Value;
+                glossaryParam.Value = yomichanKanjiRecord.Definitions is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Definitions) : DBNull.Value;
+                statsParam.Value = yomichanKanjiRecord.Stats is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Stats) : DBNull.Value;
                 _ = insertRecordCommand.ExecuteNonQuery();
 
                 ++rowId;

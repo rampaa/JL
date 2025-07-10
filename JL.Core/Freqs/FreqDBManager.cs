@@ -63,9 +63,14 @@ internal static class FreqDBManager
             VALUES (@rowid, @spelling, @frequency);
             """;
 
-        _ = insertRecordCommand.Parameters.Add("@rowid", SqliteType.Integer);
-        _ = insertRecordCommand.Parameters.Add("@spelling", SqliteType.Text);
-        _ = insertRecordCommand.Parameters.Add("@frequency", SqliteType.Integer);
+        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
+        SqliteParameter spellingParam = new("@spelling", SqliteType.Text);
+        SqliteParameter frequencyParam = new("@frequency", SqliteType.Integer);
+        insertRecordCommand.Parameters.AddRange([
+            rowidParam,
+            spellingParam,
+            frequencyParam
+        ]);
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -75,8 +80,12 @@ internal static class FreqDBManager
             VALUES (@record_id, @search_key);
             """;
 
-        _ = insertSearchKeyCommand.Parameters.Add("@record_id", SqliteType.Integer);
-        _ = insertSearchKeyCommand.Parameters.Add("@search_key", SqliteType.Text);
+        SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Parameters.AddRange([
+            recordIdParam,
+            searchKeyParam
+        ]);
         insertSearchKeyCommand.Prepare();
 
         foreach ((string key, IList<FrequencyRecord> records) in freq.Contents)
@@ -85,13 +94,13 @@ internal static class FreqDBManager
             for (int i = 0; i < recordsCount; i++)
             {
                 FrequencyRecord record = records[i];
-                _ = insertRecordCommand.Parameters["@rowid"].Value = rowId;
-                _ = insertRecordCommand.Parameters["@spelling"].Value = record.Spelling;
-                _ = insertRecordCommand.Parameters["@frequency"].Value = record.Frequency;
+                rowidParam.Value = rowId;
+                spellingParam.Value = record.Spelling;
+                frequencyParam.Value = record.Frequency;
                 _ = insertRecordCommand.ExecuteNonQuery();
 
-                _ = insertSearchKeyCommand.Parameters["@record_id"].Value = rowId;
-                _ = insertSearchKeyCommand.Parameters["@search_key"].Value = key;
+                recordIdParam.Value = rowId;
+                searchKeyParam.Value = key;
                 _ = insertSearchKeyCommand.ExecuteNonQuery();
 
                 ++rowId;
