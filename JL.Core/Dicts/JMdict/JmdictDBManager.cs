@@ -171,6 +171,7 @@ internal static class JmdictDBManager
             crossReferencesParam,
             antonymsParam
         ]);
+
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -182,6 +183,7 @@ internal static class JmdictDBManager
 
         SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
         SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
         foreach ((JmdictRecord record, List<string> keys) in recordToKeysDict)

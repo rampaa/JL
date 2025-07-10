@@ -99,6 +99,7 @@ internal static class JmnedictDBManager
             glossaryParam,
             nameTypesParam
         ]);
+
         insertRecordCommand.Prepare();
 
         foreach (JmnedictRecord record in jmnedictRecords)

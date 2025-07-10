@@ -93,6 +93,7 @@ internal static class YomichanPitchAccentDBManager
             readingParam,
             positionParam
         ]);
+
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -104,10 +105,7 @@ internal static class YomichanPitchAccentDBManager
 
         SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
         SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
-        insertSearchKeyCommand.Parameters.AddRange([
-            recordIdParam,
-            searchKeyParam
-        ]);
+        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
         foreach (PitchAccentRecord record in yomichanPitchAccentRecord)

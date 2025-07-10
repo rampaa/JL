@@ -92,6 +92,7 @@ internal static class KanjidicDBManager
             gradeParam,
             frequencyParam
         ]);
+
         insertRecordCommand.Prepare();
 
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)

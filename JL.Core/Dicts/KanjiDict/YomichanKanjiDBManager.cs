@@ -82,6 +82,7 @@ internal static class YomichanKanjiDBManager
             glossaryParam,
             statsParam
         ]);
+
         insertRecordCommand.Prepare();
 
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)

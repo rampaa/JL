@@ -71,6 +71,7 @@ internal static class FreqDBManager
             spellingParam,
             frequencyParam
         ]);
+
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
@@ -82,10 +83,7 @@ internal static class FreqDBManager
 
         SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
         SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
-        insertSearchKeyCommand.Parameters.AddRange([
-            recordIdParam,
-            searchKeyParam
-        ]);
+        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
         foreach ((string key, IList<FrequencyRecord> records) in freq.Contents)

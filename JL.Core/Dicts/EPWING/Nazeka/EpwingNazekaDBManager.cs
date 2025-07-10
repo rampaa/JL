@@ -136,6 +136,7 @@ internal static class EpwingNazekaDBManager
             alternativeSpellingsParam,
             glossaryParam
         ]);
+
         insertRecordCommand.Prepare();
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
