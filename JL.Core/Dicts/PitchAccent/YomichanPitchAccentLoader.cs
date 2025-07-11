@@ -73,11 +73,6 @@ internal static class YomichanPitchAccentLoader
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in pitchDict)
-        {
-            pitchDict[key] = recordList.ToArray();
-        }
-
-        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
+        dict.Contents = dict.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<IDictRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
     }
 }

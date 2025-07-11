@@ -118,12 +118,7 @@ internal static class EpwingNazekaLoader
             }
         }
 
-        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
-        {
-            dict.Contents[key] = recordList.ToArray();
-        }
-
-        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
+        dict.Contents = dict.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<IDictRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static void AddRecordToDictionary(string keyInHiragana, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)

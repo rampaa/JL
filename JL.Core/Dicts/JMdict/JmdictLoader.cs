@@ -113,12 +113,7 @@ internal static class JmdictLoader
                 }
             }
 
-            foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
-            {
-                dict.Contents[key] = recordList.ToArray();
-            }
-
-            dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
+            dict.Contents = dict.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<IDictRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
         }
 
         else

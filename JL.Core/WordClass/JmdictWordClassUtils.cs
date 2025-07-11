@@ -55,12 +55,7 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        foreach ((string key, IList<JmdictWordClass> recordList) in DictUtils.WordClassDictionary)
-        {
-            DictUtils.WordClassDictionary[key] = recordList.ToArray();
-        }
-
-        DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(StringComparer.Ordinal);
+        DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(entry => entry.Key, kvp => (IList<JmdictWordClass>)kvp.Value.ToArray(), StringComparer.Ordinal);
     }
 
     internal static Task Serialize()

@@ -90,11 +90,6 @@ internal static class FrequencyNazekaLoader
             }
         }
 
-        foreach ((string key, IList<FrequencyRecord> recordList) in freq.Contents)
-        {
-            freq.Contents[key] = recordList.ToArray();
-        }
-
-        freq.Contents = freq.Contents.ToFrozenDictionary(StringComparer.Ordinal);
+        freq.Contents = freq.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<FrequencyRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
     }
 }
