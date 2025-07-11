@@ -53,17 +53,17 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             string[] nameTypes = NameTypes[i];
             if (nameTypes.Length > 1 || nameTypes[0] is not "unclass")
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", nameTypes)}] ");
+                _ = defResult.Append('[').AppendJoin(", ", nameTypes).Append("] ");
             }
 
-            _ = defResult.Append(string.Join("; ", definitions[i]));
+            _ = defResult.AppendJoin("; ", definitions[i]);
 
             // if (showRelatedTerms)
             // {
             //     string[]? relatedTerms = RelatedTerms?[i];
             //     if (relatedTerms?.Length > 0)
             //     {
-            //         _ = defResult.Append("(related terms: {string.Join(", ", relatedTerms)}) ");
+            //         _ = defResult.Append("(related terms: ").AppendJoin(", ", relatedTerms).Append(") ");
             //     }
             // }
 

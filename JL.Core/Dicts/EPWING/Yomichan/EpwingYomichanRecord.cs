@@ -46,7 +46,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         StringBuilder defResult = new();
         if (DefinitionTags is not null)
         {
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"[{string.Join(", ", DefinitionTags)}]{(newline ? '\n' : ' ')}");
+            _ = defResult.Append('[').AppendJoin(", ", DefinitionTags).Append(']').Append(newline ? '\n' : ' ');
         }
 
         string[] definitions = Definitions;
