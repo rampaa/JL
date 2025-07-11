@@ -984,9 +984,11 @@ public static class MiningUtils
                 return string.Join(", ", lookupResult.WordClasses);
             }
 
-            StringBuilder sb = lookupResult.WordClasses is not null
-                ? new StringBuilder(string.Join(", ", lookupResult.WordClasses))
-                : new StringBuilder();
+            StringBuilder sb = new();
+            if (lookupResult.WordClasses is not null)
+            {
+                _ = sb.AppendJoin(", ", lookupResult.WordClasses);
+            }
 
             Debug.Assert(lookupResult.JmdictLookupResult is not null);
             Debug.Assert(lookupResult.JmdictLookupResult.WordClassesForSenses is not null);
@@ -1000,7 +1002,7 @@ public static class MiningUtils
                         _ = sb.Append(", ");
                     }
 
-                    _ = sb.Append(string.Join(", ", wordClassesForSense));
+                    _ = sb.AppendJoin(", ", wordClassesForSense);
                 }
             }
 
