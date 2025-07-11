@@ -60,6 +60,13 @@ internal sealed partial class ManageAudioSourcesWindow
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
 
+        IOrderedEnumerable<KeyValuePair<string, AudioSource>> orderedAudioSources = AudioUtils.AudioSources.OrderBy(static a => a.Value.Priority);
+        AudioUtils.AudioSources.Clear();
+        foreach (KeyValuePair<string, AudioSource> audioSource in orderedAudioSources)
+        {
+            AudioUtils.AudioSources.Add(audioSource.Key, audioSource.Value);
+        }
+
         await AudioUtils.SerializeAudioSources().ConfigureAwait(false);
         SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
     }

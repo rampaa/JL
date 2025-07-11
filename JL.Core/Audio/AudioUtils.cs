@@ -12,9 +12,9 @@ public static class AudioUtils
 {
     private static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
 
-    public static readonly Dictionary<string, AudioSource> AudioSources = new(StringComparer.Ordinal);
+    public static readonly OrderedDictionary<string, AudioSource> AudioSources = new(StringComparer.Ordinal);
 
-    private static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new(1, StringComparer.Ordinal)
+    private static readonly OrderedDictionary<string, AudioSource> s_builtInAudioSources = new(1, StringComparer.Ordinal)
     {
         {
             "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}", new AudioSource(AudioSourceType.Url, true, 1)
@@ -124,9 +124,7 @@ public static class AudioUtils
     internal static async ValueTask<AudioResponse?> GetPrioritizedAudio(string spelling, string reading)
     {
         AudioResponse? audioResponse = null;
-
-        IOrderedEnumerable<KeyValuePair<string, AudioSource>> orderedAudioSources = AudioSources.OrderBy(static a => a.Value.Priority);
-        foreach ((string uri, AudioSource audioSource) in orderedAudioSources)
+        foreach ((string uri, AudioSource audioSource) in AudioSources)
         {
             if (audioSource.Active)
             {
