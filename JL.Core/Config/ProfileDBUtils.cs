@@ -53,14 +53,15 @@ public static class ProfileDBUtils
     {
         using SqliteCommand command = connection.CreateCommand();
 
-#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
-            $"""
+            """
             SELECT value
             FROM setting
-            WHERE profile_id = {profileId} AND name = '{nameof(ProfileUtils.CurrentProfileId)}';
+            WHERE profile_id = @profileId AND name = @name;
             """;
-#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
+        _ = command.Parameters.AddWithValue("@profileId", profileId);
+        _ = command.Parameters.AddWithValue("@name", nameof(ProfileUtils.CurrentProfileId));
 
         using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
