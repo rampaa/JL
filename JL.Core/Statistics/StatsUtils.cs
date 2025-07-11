@@ -210,7 +210,7 @@ public static class StatsUtils
         }
     }
 
-    public static void ResetStats(StatsMode statsMode)
+    public static void ResetStats(SqliteConnection connection, StatsMode statsMode)
     {
         Stats stats = statsMode switch
         {
@@ -224,7 +224,7 @@ public static class StatsUtils
 
         if (statsMode is StatsMode.Profile or StatsMode.Lifetime)
         {
-            StatsDBUtils.ResetAllTermLookupCounts(statsMode is StatsMode.Profile ? ProfileUtils.CurrentProfileId : ProfileUtils.GlobalProfileId);
+            StatsDBUtils.ResetAllTermLookupCounts(connection, statsMode is StatsMode.Profile ? ProfileUtils.CurrentProfileId : ProfileUtils.GlobalProfileId);
         }
     }
 

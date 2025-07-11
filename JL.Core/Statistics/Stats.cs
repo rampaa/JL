@@ -34,6 +34,7 @@ public sealed class Stats
         CardsMined = 0;
         TimesPlayedAudio = 0;
         Imoutos = 0;
+        NumberOfLookups = 0;
         TermLookupCountDict.Clear();
     }
 }
