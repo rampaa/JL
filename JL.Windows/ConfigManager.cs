@@ -227,7 +227,7 @@ internal sealed class ConfigManager
     {
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         Instance.SaveBeforeClosing(connection);
-        ConfigDBManager.DeleteAllSettingsFromProfile("MainWindowTopPosition", "MainWindowLeftPosition");
+        ConfigDBManager.DeleteAllSettingsFromProfile(connection, "MainWindowTopPosition", "MainWindowLeftPosition");
 
         ConfigManager newInstance = new();
         ConfigDBManager.InsertSetting(connection, nameof(Theme), newInstance.Theme.ToString());
@@ -246,6 +246,8 @@ internal sealed class ConfigManager
     public void ApplyPreferences(SqliteConnection connection)
     {
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+
+        using SqliteTransaction transaction = connection.BeginTransaction();
         coreConfigManager.ApplyPreferences(connection);
 
         MainWindow mainWindow = MainWindow.Instance;
@@ -788,6 +790,8 @@ internal sealed class ConfigManager
 
             currentPopupWindow = PopupWindowUtils.PopupWindows[currentPopupWindow.PopupIndex + 1];
         }
+
+        transaction.Commit();
     }
 
     public void LoadPreferenceWindow(PreferencesWindow preferenceWindow)
@@ -1089,6 +1093,10 @@ internal sealed class ConfigManager
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(true))
         {
+#pragma warning disable CA1849 // Call async methods when in an async method
+            using SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(MiningModeKeyGesture), preferenceWindow.MiningModeKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(PlayAudioKeyGesture), preferenceWindow.PlayAudioKeyGestureTextBox.Text);
@@ -1546,6 +1554,10 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition",
                 (mainWindow.Left * dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
 
+#pragma warning disable CA1849 // Call async methods when in an async method
+            transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
             ApplyPreferences(connection);
         }
 
@@ -1558,6 +1570,9 @@ internal sealed class ConfigManager
     public void SaveBeforeClosing(SqliteConnection connection)
     {
         MainWindow mainWindow = MainWindow.Instance;
+
+        using SqliteTransaction transaction = connection.BeginTransaction();
+
         ConfigDBManager.UpdateSetting(connection, "MainWindowFontSize",
             mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));
 
@@ -1593,6 +1608,8 @@ internal sealed class ConfigManager
                 : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - mainWindow.Width) * dpi.DpiScaleX
             : bounds.X;
         ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));
+
+        transaction.Commit();
 
         ConfigDBManager.AnalyzeAndVacuum(connection);
     }

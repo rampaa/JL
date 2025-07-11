@@ -56,18 +56,21 @@ internal sealed partial class StatsWindow
         return s_instance?.IsVisible ?? false;
     }
 
+    private void LoadTermLookupCounts(SqliteConnection connection)
+    {
+        _sessionLookupCountsForCurrentProfile = StatsUtils.SessionStats.TermLookupCountDict.ToArray();
+        _termLookupCountsForCurrentProfile = StatsDBUtils.GetTermLookupCountsFromDB(connection, ProfileUtils.CurrentProfileId);
+        _termLookupCountsForLifetime = StatsDBUtils.GetTermLookupCountsFromDB(connection, ProfileUtils.GlobalProfileId);
+    }
+
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateStatsDisplay(StatsMode.Session);
 
-        _sessionLookupCountsForCurrentProfile = StatsUtils.SessionStats.TermLookupCountDict.ToArray();
-
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         StatsDBUtils.UpdateProfileLifetimeStats(connection);
         StatsDBUtils.UpdateLifetimeStats(connection);
-
-        _termLookupCountsForCurrentProfile = StatsDBUtils.GetTermLookupCountsFromDB(connection, ProfileUtils.CurrentProfileId);
-        _termLookupCountsForLifetime = StatsDBUtils.GetTermLookupCountsFromDB(connection, ProfileUtils.GlobalProfileId);
+        LoadTermLookupCounts(connection);
     }
 
     private void UpdateStatsDisplay(StatsMode mode)
@@ -80,20 +83,20 @@ internal sealed partial class StatsWindow
             _ => StatsUtils.SessionStats
         };
 
-        TextBlockCharacters.Text = stats.Characters.ToString("N0", CultureInfo.InvariantCulture);
-        TextBlockLines.Text = stats.Lines.ToString("N0", CultureInfo.InvariantCulture);
-        TextBlockTime.Text = stats.Time.ToString(@"d\.hh\:mm\:ss", CultureInfo.InvariantCulture);
+        CharactersTextBlock.Text = stats.Characters.ToString("N0", CultureInfo.InvariantCulture);
+        LinesTextBlock.Text = stats.Lines.ToString("N0", CultureInfo.InvariantCulture);
+        TimeTextBlock.Text = stats.Time.ToString(@"d\.hh\:mm\:ss", CultureInfo.InvariantCulture);
 
-        TextBlockCharactersPerMinute.Text = stats.Time.TotalMinutes > 0
+        CharactersPerMinuteTextBlock.Text = stats.Time.TotalMinutes > 0
             ? Math.Round(stats.Characters / stats.Time.TotalMinutes).ToString("N0", CultureInfo.InvariantCulture)
             : stats.Characters is 0
                 ? "0"
                 : "∞";
 
-        TextBlockCardsMined.Text = stats.CardsMined.ToString("N0", CultureInfo.InvariantCulture);
-        TextBlockTimesPlayedAudio.Text = stats.TimesPlayedAudio.ToString("N0", CultureInfo.InvariantCulture);
-        TextBlockNumberOfLookups.Text = stats.NumberOfLookups.ToString(CultureInfo.InvariantCulture);
-        TextBlockImoutos.Text = stats.Imoutos.ToString("N0", CultureInfo.InvariantCulture);
+        CardsMinedTextBlock.Text = stats.CardsMined.ToString("N0", CultureInfo.InvariantCulture);
+        TimesPlayedAudioTextBlock.Text = stats.TimesPlayedAudio.ToString("N0", CultureInfo.InvariantCulture);
+        NumberOfLookupsTextBlock.Text = stats.NumberOfLookups.ToString(CultureInfo.InvariantCulture);
+        ImoutosTextBlock.Text = stats.Imoutos.ToString("N0", CultureInfo.InvariantCulture);
         ShowTermLookupCountsButton.IsEnabled = CoreConfigManager.Instance.TrackTermLookupCounts;
     }
 
@@ -150,17 +153,20 @@ internal sealed partial class StatsWindow
 
         if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode statsMode))
         {
-            StatsUtils.ResetStats(statsMode);
+            using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
 
+            StatsUtils.ResetStats(connection, statsMode);
             if (statsMode is StatsMode.Lifetime)
             {
-                StatsDBUtils.UpdateLifetimeStats();
+                StatsDBUtils.UpdateLifetimeStats(connection);
             }
 
             else if (statsMode is StatsMode.Profile)
             {
-                StatsDBUtils.UpdateProfileLifetimeStats();
+                StatsDBUtils.UpdateProfileLifetimeStats(connection);
             }
+
+            LoadTermLookupCounts(connection);
 
             UpdateStatsDisplay(statsMode);
         }

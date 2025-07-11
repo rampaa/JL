@@ -12,14 +12,14 @@ public static class ConfigDBManager
         """
         SELECT value
         FROM setting
-        WHERE profile_id = @profileId AND name = @name;
+        WHERE name = @name AND profile_id = @profileId;
         """;
 
     private const string UpdateSettingQuery =
         """
         UPDATE setting
         SET value = @value
-        WHERE profile_id = @profileId AND name = @name;
+        WHERE name = @name AND profile_id = @profileId;
         """;
 
     private static readonly string s_configsPath = Path.Join(Utils.ConfigPath, "Configs.sqlite");
@@ -148,9 +148,8 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void DeleteAllSettingsFromProfile(params ReadOnlySpan<string> excludedSettings)
+    public static void DeleteAllSettingsFromProfile(SqliteConnection connection, params ReadOnlySpan<string> excludedSettings)
     {
-        using SqliteConnection connection = CreateReadWriteDBConnection();
         using SqliteCommand command = connection.CreateCommand();
 
         string parameter = DBUtils.GetParameter(excludedSettings.Length + 1);

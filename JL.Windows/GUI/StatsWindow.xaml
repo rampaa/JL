@@ -15,42 +15,42 @@
                             VerticalAlignment="Top" Margin="0,0,0,20" Content="Session"/>
                 <DockPanel>
                     <TextBlock Text="Characters: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <TextBlock Name="TextBlockCharacters" TextWrapping="Wrap"
+                    <TextBlock Name="CharactersTextBlock" TextWrapping="Wrap"
                                        Margin="0,0,20,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
                     <TextBlock Text="Lines: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <TextBlock Name="TextBlockLines" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="LinesTextBlock" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel ToolTip="Days.Hours:Minutes:Seconds" Cursor="Help">
                     <TextBlock Text="Time: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <TextBlock Name="TextBlockTime" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TimeTextBlock" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
                     <TextBlock Text="Characters per minute: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <TextBlock Name="TextBlockCharactersPerMinute" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="CharactersPerMinuteTextBlock" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
                     <TextBlock Text="Cards mined: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <TextBlock Name="TextBlockCardsMined" TextWrapping="Wrap"
+                    <TextBlock Name="CardsMinedTextBlock" TextWrapping="Wrap"
                                        Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
                     <TextBlock Text="Times played audio: " TextWrapping="Wrap"
                                        Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <TextBlock Name="TextBlockTimesPlayedAudio" TextWrapping="Wrap"
+                    <TextBlock Name="TimesPlayedAudioTextBlock" TextWrapping="Wrap"
                                        Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
                     <TextBlock Text="Number of lookups: " TextWrapping="Wrap"
                                        Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <TextBlock Name="TextBlockNumberOfLookups" TextWrapping="Wrap"
+                    <TextBlock Name="NumberOfLookupsTextBlock" TextWrapping="Wrap"
                                        Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                     <Button Name="ShowTermLookupCountsButton" Padding="5" Margin="10,0,0,10" HorizontalAlignment="Left" Content="📜" FontSize="9"
                             ToolTip="Shows the lookup count for each term.
@@ -61,7 +61,7 @@
 
                 <DockPanel>
                     <TextBlock Text="???: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                    <TextBlock Name="TextBlockImoutos" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="ImoutosTextBlock" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <Button Click="ButtonResetStats_OnClick" HorizontalAlignment="Left" Background="DarkRed" Foreground="White"

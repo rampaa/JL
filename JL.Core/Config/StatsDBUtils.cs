@@ -57,7 +57,7 @@ public static class StatsDBUtils
             INSERT INTO term_lookup_count (profile_id, term, count)
             VALUES (@profile_id, @term, @count)
             ON CONFLICT (profile_id, term)
-            DO UPDATE SET count = term_lookup_count.count + 1;
+            DO UPDATE SET count = term_lookup_count.count + excluded.count;
             """;
 
         _ = insertOrUpdateLookupStatsCommand.Parameters.AddWithValue("@profile_id", profileId);
@@ -170,9 +170,8 @@ public static class StatsDBUtils
         StatsUtils.ProfileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId);
     }
 
-    internal static void ResetAllTermLookupCounts(int profileId)
+    internal static void ResetAllTermLookupCounts(SqliteConnection connection, int profileId)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
