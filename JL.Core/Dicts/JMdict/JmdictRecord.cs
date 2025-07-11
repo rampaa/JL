@@ -218,7 +218,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 }
             }
 
-            _ = defResult.AppendJoin(", ", definitions[i]).Append(' ');
+            _ = defResult.AppendJoin("; ", definitions[i]).Append(' ');
 
             if (showExtraDefinitionInfo)
             {
