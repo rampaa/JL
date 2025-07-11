@@ -272,6 +272,7 @@ public static class DictUpdater
             DictType.Kanjidic
         ];
 
+        List<Task> tasks = [];
         foreach (DictType dictType in dictTypes)
         {
             Dict dict = DictUtils.SingleDictTypeDicts[dictType];
@@ -295,14 +296,14 @@ public static class DictUpdater
             }
 
             Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
-            return dict.Type is DictType.JMdict
+            tasks.Add(dict.Type is DictType.JMdict
                 ? UpdateJmdict(pathExists, true)
                 : dict.Type is DictType.JMnedict
                     ? UpdateJmnedict(pathExists, true)
-                    : UpdateKanjidic(pathExists, true);
+                    : UpdateKanjidic(pathExists, true));
         }
 
-        return Task.CompletedTask;
+        return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
     }
 
     private static string GetTempFilePath(string filePath)
