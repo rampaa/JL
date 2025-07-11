@@ -109,7 +109,7 @@ public static class LookupResultUtils
                 string[]? orthographyInfo = orthographyInfoList[index];
                 if (orthographyInfo is not null)
                 {
-                    _ = sb.Append(CultureInfo.InvariantCulture, $" [{string.Join(", ", orthographyInfo)}]");
+                    _ = sb.Append(" [").AppendJoin(", ", orthographyInfo).Append(']');
                 }
             }
 
@@ -137,7 +137,7 @@ public static class LookupResultUtils
                 string[]? aOrthographyInfo = aOrthographyInfoList[index];
                 if (aOrthographyInfo is not null)
                 {
-                    _ = sb.Append(CultureInfo.InvariantCulture, $" [{string.Join(", ", aOrthographyInfo)}]");
+                    _ = sb.Append(" [").AppendJoin(", ", aOrthographyInfo).Append(']');
                 }
             }
 
