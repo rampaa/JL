@@ -10,7 +10,7 @@ public readonly struct FrequencyRecord(string spelling, int frequency) : IEquata
 
     public override int GetHashCode()
     {
-        return Spelling.GetHashCode(StringComparison.InvariantCulture);
+        return Spelling.GetHashCode(StringComparison.Ordinal);
     }
 
     public override bool Equals(object? obj)
