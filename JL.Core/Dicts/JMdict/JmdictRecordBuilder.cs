@@ -338,149 +338,127 @@ internal static class JmdictRecordBuilder
 
     private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNonNullableSenseField(List<string[]> senseField)
     {
-        if (senseField.Count is 0)
+        int senseCount = senseField.Count;
+        if (senseCount is 0)
         {
             return (null, null);
         }
 
-        if (senseField.Count is 1)
+        if (senseCount is 1)
         {
             return (null, senseField[0]);
         }
 
-        ReadOnlySpan<string[]> senseFieldSpan = senseField.AsReadOnlySpan();
-        List<string>?[] exclusiveSenseFieldListArray = new List<string>?[senseFieldSpan.Length];
-        List<string> senseFieldValuesSharedByAllSenses = [];
+        List<string> sharedSenseCandidates = senseField[0].ToList();
 
+        ReadOnlySpan<string[]> senseFieldSpan = senseField.AsReadOnlySpan();
+        for (int i = 1; i < senseFieldSpan.Length; i++)
+        {
+            ReadOnlySpan<string> sensesSpan = senseFieldSpan[i].AsSpan();
+            for (int j = sharedSenseCandidates.Count - 1; j >= 0; j--)
+            {
+                string sharedSenseCandidate = sharedSenseCandidates[j];
+                if (!sensesSpan.Contains(sharedSenseCandidate))
+                {
+                    if (sharedSenseCandidates.Count is 1)
+                    {
+                        return (senseField.ToArray(), null);
+                    }
+
+                    sharedSenseCandidates.RemoveAt(j);
+                }
+            }
+        }
+
+        string[]?[]? exclusiveSenseFieldValues = null;
         for (int i = 0; i < senseFieldSpan.Length; i++)
         {
-            foreach (string senseFieldValue in senseFieldSpan[i])
+            List<string>? currentExclusiveList = null;
+            ReadOnlySpan<string> senseSpan = senseFieldSpan[i].AsReadOnlySpan();
+            foreach (string sense in senseSpan)
             {
-                bool containsAll = true;
-                foreach (ref readonly string[] senseItem in senseFieldSpan)
+                if (!sharedSenseCandidates.Contains(sense))
                 {
-                    if (!senseItem.AsReadOnlySpan().Contains(senseFieldValue))
-                    {
-                        exclusiveSenseFieldListArray[i] ??= [];
-
-                        List<string>? exclusiveSenseFieldList = exclusiveSenseFieldListArray[i];
-                        Debug.Assert(exclusiveSenseFieldList is not null);
-
-                        exclusiveSenseFieldList.Add(senseFieldValue);
-                        containsAll = false;
-                        break;
-                    }
+                    currentExclusiveList ??= [];
+                    currentExclusiveList.Add(sense);
                 }
+            }
 
-                if (containsAll && !senseFieldValuesSharedByAllSenses.AsReadOnlySpan().Contains(senseFieldValue))
-                {
-                    senseFieldValuesSharedByAllSenses.Add(senseFieldValue);
-                }
+            if (currentExclusiveList is not null)
+            {
+                exclusiveSenseFieldValues ??= new string[senseFieldSpan.Length][];
+                exclusiveSenseFieldValues[i] = currentExclusiveList.ToArray();
             }
         }
 
-        if (senseFieldValuesSharedByAllSenses.Count is 0)
-        {
-            return (senseField.TrimToArray(), null);
-        }
-
-        bool allElementsAreNull = true;
-        foreach (List<string>? item in exclusiveSenseFieldListArray)
-        {
-            if (item is not null)
-            {
-                allElementsAreNull = false;
-                break;
-            }
-        }
-
-        if (allElementsAreNull)
-        {
-            return (null, senseFieldValuesSharedByAllSenses.TrimToArray());
-        }
-
-        string[]?[] exclusiveSenseFieldValuesArray = new string[exclusiveSenseFieldListArray.Length][];
-        for (int i = 0; i < exclusiveSenseFieldListArray.Length; i++)
-        {
-            exclusiveSenseFieldValuesArray[i] = exclusiveSenseFieldListArray[i]?.TrimToArray();
-        }
-
-        return (exclusiveSenseFieldValuesArray, senseFieldValuesSharedByAllSenses.TrimToArray());
+        return (exclusiveSenseFieldValues, sharedSenseCandidates.ToArray());
     }
 
     private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNullableSenseField(List<string[]?> senseField)
     {
-        if (senseField.Count is 0)
+        int senseCount = senseField.Count;
+        if (senseCount is 0)
         {
             return (null, null);
         }
 
-        if (senseField.Count is 1)
+        if (senseCount is 1)
         {
             return (null, senseField[0]);
         }
 
         ReadOnlySpan<string[]?> senseFieldSpan = senseField.AsReadOnlySpan();
-        List<string>?[] exclusiveSenseFieldListArray = new List<string>?[senseFieldSpan.Length];
-        List<string> senseFieldValuesSharedByAllSenses = [];
-
-        for (int i = 0; i < senseFieldSpan.Length; i++)
+        foreach (ref readonly string[]? senses in senseFieldSpan)
         {
-            ref readonly string[]? senseFieldValue = ref senseFieldSpan[i];
-            if (senseFieldValue is not null)
+            if (senses is null)
             {
-                foreach (string value in senseFieldValue)
+                return (senseField.TrimListOfNullableElementsToArray(), null);
+            }
+        }
+
+        string[]? firstSensesArray = senseFieldSpan[0];
+        Debug.Assert(firstSensesArray is not null);
+        List<string> sharedSenseCandidates = firstSensesArray.ToList();
+
+        for (int i = 1; i < senseFieldSpan.Length; i++)
+        {
+            ReadOnlySpan<string> sensesSpan = senseFieldSpan[i].AsReadOnlySpan();
+            for (int j = sharedSenseCandidates.Count - 1; j >= 0; j--)
+            {
+                string sharedSenseCandidate = sharedSenseCandidates[j];
+                if (!sensesSpan.Contains(sharedSenseCandidate))
                 {
-                    bool containsAll = true;
-                    foreach (ref readonly string[]? senseItem in senseFieldSpan)
+                    if (sharedSenseCandidates.Count is 1)
                     {
-                        if (!senseItem?.AsReadOnlySpan().Contains(value) ?? true)
-                        {
-                            exclusiveSenseFieldListArray[i] ??= [];
-
-                            List<string>? exclusiveSenseFieldList = exclusiveSenseFieldListArray[i];
-                            Debug.Assert(exclusiveSenseFieldList is not null);
-
-                            exclusiveSenseFieldList.Add(value);
-                            containsAll = false;
-                            break;
-                        }
+                        return (senseField.ToArray(), null);
                     }
 
-                    if (containsAll && !senseFieldValuesSharedByAllSenses.AsReadOnlySpan().Contains(value))
-                    {
-                        senseFieldValuesSharedByAllSenses.Add(value);
-                    }
+                    sharedSenseCandidates.RemoveAt(j);
                 }
             }
         }
 
-        if (senseFieldValuesSharedByAllSenses.Count is 0)
+        string[]?[]? exclusiveSenseFieldValues = null;
+        for (int i = 0; i < senseFieldSpan.Length; i++)
         {
-            return (senseField.TrimListOfNullableElementsToArray(), null);
-        }
-
-        bool allElementsAreNull = true;
-        foreach (List<string>? item in exclusiveSenseFieldListArray)
-        {
-            if (item is not null)
+            ReadOnlySpan<string> senseSpan = senseFieldSpan[i].AsReadOnlySpan();
+            List<string>? currentExclusiveList = null;
+            foreach (string sense in senseSpan)
             {
-                allElementsAreNull = false;
-                break;
+                if (!sharedSenseCandidates.Contains(sense))
+                {
+                    currentExclusiveList ??= [];
+                    currentExclusiveList.Add(sense);
+                }
+            }
+
+            if (currentExclusiveList is not null)
+            {
+                exclusiveSenseFieldValues ??= new string[senseFieldSpan.Length][];
+                exclusiveSenseFieldValues[i] = currentExclusiveList.ToArray();
             }
         }
 
-        if (allElementsAreNull)
-        {
-            return (null, senseFieldValuesSharedByAllSenses.TrimToArray());
-        }
-
-        string[]?[] exclusiveSenseFieldValuesArray = new string[exclusiveSenseFieldListArray.Length][];
-        for (int i = 0; i < exclusiveSenseFieldListArray.Length; i++)
-        {
-            exclusiveSenseFieldValuesArray[i] = exclusiveSenseFieldListArray[i]?.TrimToArray();
-        }
-
-        return (exclusiveSenseFieldValuesArray, senseFieldValuesSharedByAllSenses.TrimToArray());
+        return (exclusiveSenseFieldValues, sharedSenseCandidates.ToArray());
     }
 }
