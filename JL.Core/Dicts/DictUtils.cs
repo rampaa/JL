@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Runtime.Serialization;
 using System.Text.Json;
@@ -504,8 +505,8 @@ public static class DictUtils
         ProfileCustomNamesCancellationTokenSource = new CancellationTokenSource();
 
         bool dictCleared = false;
-        bool dictRemoved = false;
         bool rebuildingAnyDB = false;
+        ConcurrentBag<Dict>? dictsToBeRemoved = null;
 
         Dictionary<string, string> dictDBPaths = new(StringComparer.Ordinal);
 
@@ -870,13 +871,6 @@ public static class DictUtils
                                 string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                _ = Dicts.Remove(dict.Name);
-                                dictRemoved = true;
-
-                                if (File.Exists(dbPath))
-                                {
-                                    DBUtils.DeleteDB(dbPath);
-                                }
                             }
                         }));
                     }
@@ -956,13 +950,8 @@ public static class DictUtils
                                 string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                _ = Dicts.Remove(dict.Name);
-                                dictRemoved = true;
-
-                                if (File.Exists(dbPath))
-                                {
-                                    DBUtils.DeleteDB(dbPath);
-                                }
+                                dictsToBeRemoved ??= [];
+                                dictsToBeRemoved.Add(dict);
                             }
                         }));
                     }
@@ -1131,13 +1120,8 @@ public static class DictUtils
                                 string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                _ = Dicts.Remove(dict.Name);
-                                dictRemoved = true;
-
-                                if (File.Exists(dbPath))
-                                {
-                                    DBUtils.DeleteDB(dbPath);
-                                }
+                                dictsToBeRemoved ??= [];
+                                dictsToBeRemoved.Add(dict);
                             }
                         }));
                     }
@@ -1217,14 +1201,8 @@ public static class DictUtils
                                 string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                _ = Dicts.Remove(dict.Name);
-                                _ = SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
-                                dictRemoved = true;
-
-                                if (File.Exists(dbPath))
-                                {
-                                    DBUtils.DeleteDB(dbPath);
-                                }
+                                dictsToBeRemoved ??= [];
+                                dictsToBeRemoved.Add(dict);
                             }
                         }));
                     }
@@ -1298,8 +1276,20 @@ public static class DictUtils
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
-                if (dictRemoved)
+                if (dictsToBeRemoved is not null)
                 {
+                    foreach (Dict dict in dictsToBeRemoved)
+                    {
+                        _ = Dicts.Remove(dict.Name);
+                        _ = SingleDictTypeDicts.Remove(dict.Type);
+
+                        string dbPath = DBUtils.GetFreqDBPath(dict.Name);
+                        if (File.Exists(dbPath))
+                        {
+                            DBUtils.DeleteDB(dbPath);
+                        }
+                    }
+
                     IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
                     int priority = 1;
 

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Runtime.Serialization;
 using System.Text.Json;
@@ -52,8 +53,8 @@ public static class FreqUtils
         FreqsReady = false;
 
         bool freqCleared = false;
-        bool freqRemoved = false;
         bool rebuildingDBs = false;
+        ConcurrentBag<string>? freqNamesToBeRemoved = null;
 
         Dictionary<string, string> freqDBPathDict = new(StringComparer.Ordinal);
 
@@ -148,13 +149,8 @@ public static class FreqUtils
                                 string fullFreqPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                                _ = FreqDicts.Remove(freq.Name);
-                                freqRemoved = true;
-
-                                if (File.Exists(dbPath))
-                                {
-                                    DBUtils.DeleteDB(dbPath);
-                                }
+                                freqNamesToBeRemoved ??= [];
+                                freqNamesToBeRemoved.Add(freq.Name);
                             }
                         }));
                     }
@@ -242,13 +238,8 @@ public static class FreqUtils
                                 string fullFreqPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                                _ = FreqDicts.Remove(freq.Name);
-                                freqRemoved = true;
-
-                                if (File.Exists(dbPath))
-                                {
-                                    DBUtils.DeleteDB(dbPath);
-                                }
+                                freqNamesToBeRemoved ??= [];
+                                freqNamesToBeRemoved.Add(freq.Name);
                             }
                         }));
                     }
@@ -325,8 +316,18 @@ public static class FreqUtils
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
-                if (freqRemoved)
+                if (freqNamesToBeRemoved is not null)
                 {
+                    foreach (string freqName in freqNamesToBeRemoved)
+                    {
+                        _ = FreqDicts.Remove(freqName);
+                        string dbPath = DBUtils.GetFreqDBPath(freqName);
+                        if (File.Exists(dbPath))
+                        {
+                            DBUtils.DeleteDB(dbPath);
+                        }
+                    }
+
                     IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
                     int priority = 1;
 
