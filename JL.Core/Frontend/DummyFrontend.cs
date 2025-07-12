@@ -26,13 +26,13 @@ internal sealed class DummyFrontend : IFrontend
 
     public Task CopyFromWebSocket(string text) => Task.CompletedTask;
 
-    public Task<byte[]?> GetImageFromClipboardAsByteArray() => new(static () => null);
+    public Task<byte[]?> GetImageFromClipboardAsByteArray() => Task.FromResult<byte[]?>(null);
 
     public Task TextToSpeech(string voiceName, string text) => Task.CompletedTask;
 
     public Task StopTextToSpeech() => Task.CompletedTask;
 
-    public ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text) => new();
+    public ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text) => ValueTask.FromResult<byte[]?>(null);
 
     public void SetInstalledVoiceWithHighestPriority()
     {
