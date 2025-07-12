@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 
@@ -13,6 +14,21 @@ internal static class JmnedictRecordBuilder
         int kebListSpanLength = kebListSpan.Length;
         int translationListSpanLength = translationListSpan.Length;
 
+        Debug.Assert(translationListSpanLength > 0);
+
+        string[][] definitionsArray = new string[translationListSpanLength][];
+        string[][] nameTypesArray = new string[translationListSpanLength][];
+        // string[]?[] relatedTermsArray = new string[translationListCount][];
+
+        for (int j = 0; j < translationListSpanLength; j++)
+        {
+            ref readonly Translation translation = ref translationListSpan[j];
+
+            definitionsArray[j] = translation.TransDetList.ToArray();
+            nameTypesArray[j] = translation.NameTypeList.ToArray();
+            // relatedTermsArray[j] = translation.XRefList.TrimListToArray();
+        }
+
         Dictionary<string, JmnedictRecord> recordDictionary;
         if (kebListSpanLength > 0)
         {
@@ -25,19 +41,6 @@ internal static class JmnedictRecordBuilder
                 if (recordDictionary.ContainsKey(key))
                 {
                     continue;
-                }
-
-                string[][] definitionsArray = new string[translationListSpanLength][];
-                string[][] nameTypesArray = new string[translationListSpanLength][];
-                // string[]?[] relatedTermsArray = new string[translationListCount][];
-
-                for (int j = 0; j < translationListSpan.Length; j++)
-                {
-                    ref readonly Translation translation = ref translationListSpan[j];
-
-                    definitionsArray[j] = translation.TransDetList.ToArray();
-                    nameTypesArray[j] = translation.NameTypeList.ToArray();
-                    // relatedTermsArray[j] = translation.XRefList.TrimListToArray();
                 }
 
                 JmnedictRecord record = new(entry.Id, keb, entry.KebList.RemoveAtToArray(i), entry.RebList.TrimToArray(), definitionsArray, nameTypesArray);
@@ -59,19 +62,6 @@ internal static class JmnedictRecordBuilder
                 if (recordDictionary.ContainsKey(key))
                 {
                     continue;
-                }
-
-                string[][] definitionsArray = new string[translationListSpanLength][];
-                string[][] nameTypesArray = new string[translationListSpanLength][];
-                // string[]?[] relatedTermsArray = new string[translationListCount][];
-
-                for (int j = 0; j < translationListSpan.Length; j++)
-                {
-                    ref readonly Translation translation = ref translationListSpan[j];
-
-                    definitionsArray[j] = translation.TransDetList.ToArray();
-                    nameTypesArray[j] = translation.NameTypeList.ToArray();
-                    // relatedTermsArray[j] = translation.XRefList.TrimListToArray();
                 }
 
                 JmnedictRecord record = new(entry.Id, reb, entry.RebList.RemoveAtToArray(i), null, definitionsArray, nameTypesArray);
