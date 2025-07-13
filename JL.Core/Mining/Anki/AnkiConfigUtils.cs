@@ -46,17 +46,17 @@ public static class AnkiConfigUtils
                 }
 
                 Debug.Assert(s_ankiConfigDict is not null);
-                bool firstFieldChanged = false;
-                foreach (AnkiConfig ankiConfig in s_ankiConfigDict.Values)
+                int firstFieldChangedFlag = 0;
+                await Parallel.ForEachAsync(s_ankiConfigDict.Values, async (ankiConfig, cancellationToken) =>
                 {
                     Debug.Assert(ankiConfig.Fields.Count > 0);
-                    ReadOnlyMemory<string> fields = await AnkiUtils.GetFieldNames(ankiConfig.ModelName).ConfigureAwait(false);
-                    if (!fields.IsEmpty)
+                    string[]? fields = await AnkiUtils.GetFieldNames(ankiConfig.ModelName).ConfigureAwait(false);
+                    if (fields is not null)
                     {
-                        ReadOnlySpan<string> fieldsSpan = fields.Span;
+                        ReadOnlySpan<string> fieldsSpan = fields.AsReadOnlySpan();
                         if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
                         {
-                            firstFieldChanged = true;
+                            _ = Interlocked.CompareExchange(ref firstFieldChangedFlag, 1, 0);
 
                             OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length);
                             for (int i = 0; i < fieldsSpan.Length; i++)
@@ -75,9 +75,9 @@ public static class AnkiConfigUtils
                             ankiConfig.Fields = upToDateFields;
                         }
                     }
-                }
+                }).ConfigureAwait(false);
 
-                if (firstFieldChanged)
+                if (firstFieldChangedFlag is 1)
                 {
                     await WriteAnkiConfig(s_ankiConfigDict).ConfigureAwait(false);
                 }
