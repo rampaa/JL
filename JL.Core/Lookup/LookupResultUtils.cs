@@ -33,15 +33,23 @@ public static class LookupResultUtils
                         continue;
                     }
 
-                    info = info[1..^1];
-                }
+                    if (added)
+                    {
+                        _ = formText.Append('→');
+                    }
 
-                if (added)
+                    _ = formText.Append(info.AsSpan(1, info.Length - 2));
+                }
+                else
                 {
-                    _ = formText.Append('→');
+                    if (added)
+                    {
+                        _ = formText.Append('→');
+                    }
+
+                    _ = formText.Append(info);
                 }
 
-                _ = formText.Append(info);
                 added = true;
             }
 
@@ -99,7 +107,19 @@ public static class LookupResultUtils
     public static string ElementWithOrthographyInfoToText(string[] elements, string[]?[] orthographyInfoList)
     {
         StringBuilder sb = new();
+        return ElementWithOrthographyInfoToText(sb, elements, orthographyInfoList).ToString();
+    }
 
+    public static string ElementWithOrthographyInfoToTextWithParentheses(string[] alternativeSpellings, string[]?[] aOrthographyInfoList)
+    {
+        StringBuilder sb = new();
+        return ElementWithOrthographyInfoToText(sb.Append('('), alternativeSpellings, aOrthographyInfoList)
+            .Append(')')
+            .ToString();
+    }
+
+    private static StringBuilder ElementWithOrthographyInfoToText(StringBuilder sb, string[] elements, string[]?[] orthographyInfoList)
+    {
         for (int index = 0; index < elements.Length; index++)
         {
             _ = sb.Append(elements[index]);
@@ -119,36 +139,6 @@ public static class LookupResultUtils
             }
         }
 
-        return sb.ToString();
-    }
-
-    public static string ElementWithOrthographyInfoToTextWithParentheses(string[] alternativeSpellings, string[]?[] aOrthographyInfoList)
-    {
-        StringBuilder sb = new();
-
-        _ = sb.Append('(');
-
-        for (int index = 0; index < alternativeSpellings.Length; index++)
-        {
-            _ = sb.Append(alternativeSpellings[index]);
-
-            if (index < aOrthographyInfoList.Length)
-            {
-                string[]? aOrthographyInfo = aOrthographyInfoList[index];
-                if (aOrthographyInfo is not null)
-                {
-                    _ = sb.Append(" [").AppendJoin(", ", aOrthographyInfo).Append(']');
-                }
-            }
-
-            if (index + 1 != alternativeSpellings.Length)
-            {
-                _ = sb.Append('、');
-            }
-        }
-
-        _ = sb.Append(')');
-
-        return sb.ToString();
+        return sb;
     }
 }
