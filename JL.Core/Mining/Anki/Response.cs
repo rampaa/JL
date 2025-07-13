@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace JL.Core.Mining.Anki;
@@ -7,12 +8,15 @@ namespace JL.Core.Mining.Anki;
 internal sealed class Response
 {
     // result can be:
+    //   null
     //   a number
+    //   a boolean
+    //   a string
     //   an array of strings
     //   an array of (JSON) objects
     //   an array of booleans
     // /shrug
-    [JsonPropertyName("result")] public object? Result { get; init; }
+    [JsonPropertyName("result")] public JsonElement Result { get; init; }
 
-    [JsonPropertyName("error")] public object? Error { get; init; }
+    [JsonPropertyName("error")] public string? Error { get; init; }
 }

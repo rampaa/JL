@@ -309,11 +309,11 @@ internal sealed partial class PreferencesWindow
 
     private async Task PopulateDeckAndModelNames()
     {
-        List<string>? deckNames = await AnkiUtils.GetDeckNames().ConfigureAwait(true);
+        string[]? deckNames = await AnkiUtils.GetDeckNames().ConfigureAwait(true);
 
         if (deckNames is not null)
         {
-            List<string>? modelNames = await AnkiUtils.GetModelNames().ConfigureAwait(true);
+            string[]? modelNames = await AnkiUtils.GetModelNames().ConfigureAwait(true);
 
             if (modelNames is not null)
             {
@@ -351,13 +351,17 @@ internal sealed partial class PreferencesWindow
     private static async Task GetFields(ComboBox modelNamesComboBox, Panel miningPanel, JLField[] fieldList)
     {
         string? modelName = modelNamesComboBox.SelectionBoxItem.ToString();
-        Debug.Assert(modelName is not null);
+        if (string.IsNullOrEmpty(modelName))
+        {
+            WindowsUtils.Alert(AlertLevel.Error, "Please select a note type first");
+            return;
+        }
 
-        ReadOnlyMemory<string> fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
-        if (fieldNames.Length > 0)
+        string[]? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
+        if (fieldNames is not null)
         {
             OrderedDictionary<string, JLField> fields = new(fieldNames.Length, StringComparer.Ordinal);
-            foreach (ref readonly string fieldName in fieldNames.Span)
+            foreach (ref readonly string fieldName in fieldNames.AsReadOnlySpan())
             {
                 fields.Add(fieldName, JLField.Nothing);
             }

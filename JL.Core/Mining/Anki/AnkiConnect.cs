@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Net.Http.Json;
-using System.Text.Json;
 using JL.Core.Config;
 using JL.Core.Network;
 using JL.Core.Utilities;
@@ -73,30 +72,27 @@ internal static class AnkiConnect
         try
         {
             // AnkiConnect doesn't like null values
-            using StringContent payload = new(JsonSerializer.Serialize(req, Utils.s_jsoIgnoringWhenWritingNull));
-            Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
+            using HttpContent payload = JsonContent.Create(req, options: Utils.s_jsoIgnoringWhenWritingNull);
 
-            using HttpResponseMessage postResponse = await NetworkUtils.Client
-                .PostAsync(CoreConfigManager.Instance.AnkiConnectUri, payload).ConfigureAwait(false);
+            // AnkiConnect expects the payload to be buffered
+            await payload.LoadIntoBufferAsync().ConfigureAwait(false);
+
+            using HttpResponseMessage postResponse = await NetworkUtils.Client.PostAsync(CoreConfigManager.Instance.AnkiConnectUri, payload).ConfigureAwait(false);
 
             if (!postResponse.IsSuccessStatusCode)
             {
                 return null;
             }
 
-            Response? json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
-            Utils.Logger.Information("json result: {JsonResult}", json?.Result ?? "null");
-
-            if (json?.Error is null)
+            Response? response = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
+            Debug.Assert(response is not null);
+            if (response.Error is null)
             {
-                return json;
+                return response;
             }
 
-            string? error = json.Error.ToString();
-            Debug.Assert(error is not null);
-
-            Utils.Frontend.Alert(AlertLevel.Error, error);
-            Utils.Logger.Error("{JsonError}", error);
+            Utils.Frontend.Alert(AlertLevel.Error, response.Error);
+            Utils.Logger.Error("{JsonError}", response.Error);
 
             return null;
         }

@@ -1197,13 +1197,13 @@ public static class MiningUtils
             return null;
         }
 
-        ReadOnlyMemory<bool> canAddNoteList = await AnkiUtils.CanAddNotes(notes).ConfigureAwait(false);
-        if (canAddNoteList.IsEmpty)
+        bool[]? canAddNoteList = await AnkiUtils.CanAddNotes(notes).ConfigureAwait(false);
+        if (canAddNoteList is null)
         {
             return null;
         }
 
-        ReadOnlySpan<bool> canAddNoteSpan = canAddNoteList.Span;
+        ReadOnlySpan<bool> canAddNoteSpan = canAddNoteList.AsReadOnlySpan();
         for (int i = 0; i < canAddNoteSpan.Length; i++)
         {
             results[positions[i]] = !canAddNoteSpan[i];
