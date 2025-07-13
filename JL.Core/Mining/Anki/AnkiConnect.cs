@@ -10,7 +10,7 @@ internal static class AnkiConnect
 {
     public static ValueTask<Response?> AddNoteToDeck(Note note)
     {
-        Request req = new("addNote", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
+        RequestWithParameters<Note> req = new("addNote", 6, new Dictionary<string, Note>(1, StringComparer.Ordinal)
         {
             {
                 "note", note
@@ -33,7 +33,7 @@ internal static class AnkiConnect
 
     public static ValueTask<Response?> GetModelFieldNamesResponse(string modelName)
     {
-        Request req = new("modelFieldNames", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
+        RequestWithParameters<string> req = new("modelFieldNames", 6, new Dictionary<string, string>(1, StringComparer.Ordinal)
         {
             {
                 "modelName", modelName
@@ -44,7 +44,7 @@ internal static class AnkiConnect
 
     public static ValueTask<Response?> GetCanAddNotesResponse(List<Note> notes)
     {
-        Request req = new("canAddNotes", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
+        RequestWithParameters<List<Note>> req = new("canAddNotes", 6, new Dictionary<string, List<Note>>(1, StringComparer.Ordinal)
         {
             {
                 "notes", notes
@@ -54,12 +54,20 @@ internal static class AnkiConnect
         return Send(req);
     }
 
-    // public static ValueTask<Response> StoreMediaFile(string filename, string data)
-    // {
-    //     Request req = new("storeMediaFile", 6,
-    //         new Dictionary<string, object> { { "filename", filename }, { "data", data } });
-    //     return Send(req);
-    // }
+    //public static ValueTask<Response?> StoreMediaFile(string filename, string data)
+    //{
+    //    Request<string> req = new("storeMediaFile", 6, new Dictionary<string, string>(2, StringComparer.Ordinal)
+    //    {
+    //        {
+    //            "filename", filename
+    //        },
+    //        {
+    //            "data", data
+    //        }
+    //    });
+
+    //    return Send(req);
+    //}
 
     public static async Task Sync()
     {
@@ -67,7 +75,7 @@ internal static class AnkiConnect
         _ = await Send(req).ConfigureAwait(false);
     }
 
-    private static async ValueTask<Response?> Send(Request req)
+    private static async ValueTask<Response?> Send<T>(T req) where T : Request
     {
         try
         {
