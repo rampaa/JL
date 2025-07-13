@@ -41,40 +41,17 @@ internal static class FrequencyNazekaLoader
                 }
 
                 FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
-                AddOrUpdate(freq.Contents, reading, frequencyRecordWithExactSpelling);
+                FreqUtils.AddOrUpdate(freq.Contents, reading, frequencyRecordWithExactSpelling);
 
                 string exactSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(exactSpelling).GetPooledString();
                 if (exactSpellingInHiragana != reading)
                 {
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
-                    AddOrUpdate(freq.Contents, exactSpellingInHiragana, frequencyRecordWithReading);
+                    FreqUtils.AddOrUpdate(freq.Contents, exactSpellingInHiragana, frequencyRecordWithReading);
                 }
             }
         }
 
         freq.Contents = freq.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<FrequencyRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
-    }
-
-    private static void AddOrUpdate(IDictionary<string, IList<FrequencyRecord>> contents, string key, FrequencyRecord record)
-    {
-        if (contents.TryGetValue(key, out IList<FrequencyRecord>? freqResult))
-        {
-            int index = freqResult.IndexOf(record);
-            if (index < 0)
-            {
-                freqResult.Add(record);
-            }
-            else
-            {
-                if (freqResult[index].Frequency > record.Frequency)
-                {
-                    freqResult[index] = record;
-                }
-            }
-        }
-        else
-        {
-            contents[key] = [record];
-        }
     }
 }

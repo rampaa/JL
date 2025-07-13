@@ -410,4 +410,27 @@ public static class FreqUtils
             KanjiFreqs = null;
         }
     }
+
+    internal static void AddOrUpdate(IDictionary<string, IList<FrequencyRecord>> contents, string key, FrequencyRecord record)
+    {
+        if (contents.TryGetValue(key, out IList<FrequencyRecord>? freqResult))
+        {
+            int index = freqResult.IndexOf(record);
+            if (index < 0)
+            {
+                freqResult.Add(record);
+            }
+            else
+            {
+                if (freqResult[index].Frequency > record.Frequency)
+                {
+                    freqResult[index] = record;
+                }
+            }
+        }
+        else
+        {
+            contents[key] = [record];
+        }
+    }
 }

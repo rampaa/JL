@@ -99,74 +99,15 @@ internal static class FrequencyYomichanLoader
                 FrequencyRecord frequencyRecordWithPrimarySpelling = new(primarySpelling, frequency);
                 if (reading is null)
                 {
-                    if (freq.Contents.TryGetValue(primarySpellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
-                    {
-                        int index = spellingFreqResult.IndexOf(frequencyRecordWithPrimarySpelling);
-
-                        if (index < 0)
-                        {
-                            spellingFreqResult.Add(frequencyRecordWithPrimarySpelling);
-                        }
-                        else
-                        {
-                            FrequencyRecord record = spellingFreqResult[index];
-                            if (record.Frequency > frequency)
-                            {
-                                spellingFreqResult[index] = frequencyRecordWithPrimarySpelling;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        freq.Contents[primarySpellingInHiragana] = [frequencyRecordWithPrimarySpelling];
-                    }
+                    FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling);
                 }
-
                 else
                 {
                     string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
-                    if (freq.Contents.TryGetValue(readingInHiragana, out IList<FrequencyRecord>? readingFreqResult))
-                    {
-                        int index = readingFreqResult.IndexOf(frequencyRecordWithPrimarySpelling);
-                        if (index < 0)
-                        {
-                            readingFreqResult.Add(frequencyRecordWithPrimarySpelling);
-                        }
-                        else
-                        {
-                            FrequencyRecord record = readingFreqResult[index];
-                            if (record.Frequency > frequency)
-                            {
-                                readingFreqResult[index] = frequencyRecordWithPrimarySpelling;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        freq.Contents[readingInHiragana] = [frequencyRecordWithPrimarySpelling];
-                    }
+                    FreqUtils.AddOrUpdate(freq.Contents, readingInHiragana, frequencyRecordWithPrimarySpelling);
 
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
-                    if (freq.Contents.TryGetValue(primarySpellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
-                    {
-                        int index = spellingFreqResult.IndexOf(frequencyRecordWithReading);
-                        if (index < 0)
-                        {
-                            spellingFreqResult.Add(frequencyRecordWithReading);
-                        }
-                        else
-                        {
-                            FrequencyRecord record = spellingFreqResult[index];
-                            if (record.Frequency > frequency)
-                            {
-                                spellingFreqResult[index] = frequencyRecordWithReading;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        freq.Contents[primarySpellingInHiragana] = [frequencyRecordWithReading];
-                    }
+                    FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithReading);
                 }
             }
         }
