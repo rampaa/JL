@@ -75,17 +75,17 @@ internal static class AnkiConnect
         _ = await Send(req).ConfigureAwait(false);
     }
 
-    private static async ValueTask<Response?> Send<T>(T req) where T : Request
+    private static async ValueTask<Response?> Send<T>(T request) where T : Request
     {
         try
         {
             // AnkiConnect doesn't like null values
-            using HttpContent payload = JsonContent.Create(req, options: Utils.s_jsoIgnoringWhenWritingNull);
+            using HttpContent content = JsonContent.Create(request, options: Utils.s_jsoIgnoringWhenWritingNull);
 
-            // AnkiConnect expects the payload to be buffered
-            await payload.LoadIntoBufferAsync().ConfigureAwait(false);
+            // AnkiConnect expects the content to be buffered
+            await content.LoadIntoBufferAsync().ConfigureAwait(false);
 
-            using HttpResponseMessage postResponse = await NetworkUtils.Client.PostAsync(CoreConfigManager.Instance.AnkiConnectUri, payload).ConfigureAwait(false);
+            using HttpResponseMessage postResponse = await NetworkUtils.Client.PostAsync(CoreConfigManager.Instance.AnkiConnectUri, content).ConfigureAwait(false);
 
             if (!postResponse.IsSuccessStatusCode)
             {
