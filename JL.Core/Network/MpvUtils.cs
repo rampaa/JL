@@ -14,8 +14,11 @@ public static class MpvUtils
     private static long s_lastPausedByJLTimestamp;
     private static bool s_pausedByJL; // = false
 
+    private static readonly SemaphoreSlim s_semaphoreSlim = new(1, 1);
+
     public static async Task PausePlayback(bool previouslyPausedByJL = false)
     {
+        await s_semaphoreSlim.WaitAsync().ConfigureAwait(false);
         try
         {
             NamedPipeClientStream pipeClient = new(".", CoreConfigManager.Instance.MpvNamedPipePath, PipeDirection.InOut, PipeOptions.Asynchronous);
@@ -63,12 +66,18 @@ public static class MpvUtils
             s_pausedByJL = false;
             Utils.Logger.Error(ex, "An unexpected error occurred while attempting to pause playback in mpv");
         }
+        finally
+        {
+            _ = s_semaphoreSlim.Release();
+        }
     }
 
     public static async Task ResumePlayback()
     {
+        await s_semaphoreSlim.WaitAsync().ConfigureAwait(false);
         if (!s_pausedByJL)
         {
+            _ = s_semaphoreSlim.Release();
             return;
         }
 
@@ -90,6 +99,10 @@ public static class MpvUtils
         {
             s_pausedByJL = false;
             Utils.Logger.Error(ex, "An unexpected error occurred while attempting to resume playback in mpv");
+        }
+        finally
+        {
+            _ = s_semaphoreSlim.Release();
         }
     }
 }
