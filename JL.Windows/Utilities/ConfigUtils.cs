@@ -6,10 +6,9 @@ using Microsoft.Data.Sqlite;
 namespace JL.Windows.Utilities;
 internal static class ConfigUtils
 {
-    public static Brush GetBrushFromConfig(SqliteConnection connection, Brush solidColorBrush, string configKey)
+    public static Brush GetBrushFromConfig(SqliteConnection connection, Dictionary<string, string> configs, Brush solidColorBrush, string configKey)
     {
-        string? configValue = ConfigDBManager.GetSettingValue(connection, configKey);
-        if (configValue is not null)
+        if (configs.TryGetValue(configKey, out string? configValue))
         {
             return WindowsUtils.BrushFromHex(configValue);
         }
@@ -21,10 +20,9 @@ internal static class ConfigUtils
             : solidColorBrush;
     }
 
-    public static Color GetColorFromConfig(SqliteConnection connection, Color color, string configKey)
+    public static Color GetColorFromConfig(SqliteConnection connection, Dictionary<string, string> configs, Color color, string configKey)
     {
-        string? configValue = ConfigDBManager.GetSettingValue(connection, configKey);
-        if (configValue is not null)
+        if (configs.TryGetValue(configKey, out string? configValue))
         {
             return WindowsUtils.ColorFromHex(configValue);
         }
@@ -33,9 +31,9 @@ internal static class ConfigUtils
         return WindowsUtils.ColorFromHex(color.ToString(CultureInfo.InvariantCulture));
     }
 
-    public static Brush GetFrozenBrushFromConfig(SqliteConnection connection, Brush solidColorBrush, string configKey)
+    public static Brush GetFrozenBrushFromConfig(SqliteConnection connection, Dictionary<string, string> configs, Brush solidColorBrush, string configKey)
     {
-        Brush brush = GetBrushFromConfig(connection, solidColorBrush, configKey);
+        Brush brush = GetBrushFromConfig(connection, configs, solidColorBrush, configKey);
         brush.Freeze();
         return brush;
     }

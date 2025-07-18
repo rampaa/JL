@@ -175,11 +175,10 @@ internal static class KeyGestureUtils
             : "None";
     }
 
-    public static KeyGesture GetKeyGestureFromConfig(SqliteConnection connection, string keyGestureName, KeyGesture defaultKeyGesture)
+    public static KeyGesture GetKeyGestureFromConfig(SqliteConnection connection, Dictionary<string, string> configs, string keyGestureName, KeyGesture defaultKeyGesture)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        string? rawKeyGesture = ConfigDBManager.GetSettingValue(connection, keyGestureName);
-        if (rawKeyGesture is not null)
+        if (configs.TryGetValue(keyGestureName, out string? rawKeyGesture))
         {
             KeyGestureConverter keyGestureConverter = new();
             string keyGestureString = MemoryExtensions.ContainsAny(rawKeyGesture, s_validModifiers)

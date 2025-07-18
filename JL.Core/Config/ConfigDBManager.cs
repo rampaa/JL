@@ -8,18 +8,25 @@ namespace JL.Core.Config;
 
 public static class ConfigDBManager
 {
-    private const string GetSettingValueQuery =
+    private const string GetAllSettingsQuery =
         """
-        SELECT value
+        SELECT name, value
         FROM setting
-        WHERE name = @name AND profile_id = @profileId;
+        WHERE profile_id = @profileId;
+        """;
+
+    private const string GetAllSettingsCountQuery =
+        """
+        SELECT COUNT(*)
+        FROM setting
+        WHERE profile_id = @profileId;
         """;
 
     private const string UpdateSettingQuery =
         """
         UPDATE setting
         SET value = @value
-        WHERE name = @name AND profile_id = @profileId;
+        WHERE profile_id = @profileId AND name = @name;
         """;
 
     private static readonly string s_configsPath = Path.Join(Utils.ConfigPath, "Configs.sqlite");
@@ -55,7 +62,7 @@ public static class ConfigDBManager
                 profile_id INTEGER NOT NULL,
                 name TEXT NOT NULL,
                 value TEXT NOT NULL,
-                PRIMARY KEY (name, profile_id),
+                PRIMARY KEY (profile_id, name),
                 FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
 
@@ -77,6 +84,11 @@ public static class ConfigDBManager
             """;
         _ = command.ExecuteNonQuery();
 
+        if (dbExists && NeedToMigrate(connection))
+        {
+            Migrate(connection);
+        }
+
         bool globalProfileExists = ProfileDBUtils.ProfileExists(connection, ProfileUtils.GlobalProfileId);
         bool defaultProfileExists = ProfileDBUtils.ProfileExists(connection, ProfileUtils.DefaultProfileId);
 
@@ -97,6 +109,47 @@ public static class ConfigDBManager
             ProfileDBUtils.InsertDefaultProfile(connection);
             StatsDBUtils.InsertStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
         }
+    }
+
+    public static bool NeedToMigrate(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA table_info(setting);";
+        using SqliteDataReader reader = command.ExecuteReader();
+        _ = reader.Read();
+        return reader.GetInt32(reader.GetOrdinal("pk")) is 2;
+    }
+
+    public static void Migrate(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            """
+            PRAGMA foreign_keys = OFF;
+
+            BEGIN TRANSACTION;
+
+            CREATE TABLE setting_new (
+                profile_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                value TEXT NOT NULL,
+                PRIMARY KEY (profile_id, name),
+                FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE CASCADE
+            ) WITHOUT ROWID, STRICT;
+
+            INSERT INTO setting_new (profile_id, name, value)
+            SELECT profile_id, name, value FROM setting;
+
+            DROP TABLE setting;
+
+            ALTER TABLE setting_new RENAME TO setting;
+
+            COMMIT;
+
+            PRAGMA foreign_keys = ON;
+          """;
+
+        _ = command.ExecuteNonQuery();
     }
 
     private static void RestoreDatabase()
@@ -175,17 +228,33 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static string? GetSettingValue(SqliteConnection connection, string settingName)
+    public static Dictionary<string, string> GetSettingValues(SqliteConnection connection, params ReadOnlySpan<string> settingNames)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = GetSettingValueQuery;
+
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+        command.CommandText =
+        $"""
+        SELECT name, value
+        FROM setting
+        WHERE profile_id = @profileId AND name IN {DBUtils.GetParameter(settingNames.Length)}
+        """;
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
         _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
-        _ = command.Parameters.AddWithValue("@name", settingName);
+        for (int i = 0; i < settingNames.Length; i++)
+        {
+            _ = command.Parameters.AddWithValue($"@{i + 1}", settingNames[i]);
+        }
 
         using SqliteDataReader reader = command.ExecuteReader();
-        return reader.Read()
-            ? reader.GetString(0)
-            : null;
+        Dictionary<string, string> settings = new(settingNames.Length, StringComparer.Ordinal);
+        while (reader.Read())
+        {
+            settings.Add(reader.GetString(0), reader.GetString(1));
+        }
+
+        return settings;
     }
 
     public static void CopyProfileSettings(SqliteConnection connection, int sourceProfileId, int targetProfileId)
@@ -204,10 +273,9 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static T GetValueFromConfig<T>(SqliteConnection connection, T defaultValue, string configKey) where T : struct, IConvertible, IParsable<T>
+    public static T GetValueFromConfig<T>(SqliteConnection connection, Dictionary<string, string> configs, T defaultValue, string configKey) where T : struct, IConvertible, IParsable<T>
     {
-        string? configValue = GetSettingValue(connection, configKey);
-        if (configValue is not null && T.TryParse(configValue, CultureInfo.InvariantCulture, out T value))
+        if (configs.TryGetValue(configKey, out string? configValue) && T.TryParse(configValue, CultureInfo.InvariantCulture, out T value))
         {
             return value;
         }
@@ -224,10 +292,43 @@ public static class ConfigDBManager
         return defaultValue;
     }
 
-    public static T GetValueEnumValueFromConfig<T>(SqliteConnection connection, T defaultValue, string configKey) where T : struct, Enum
+    public static Dictionary<string, string> GetAllConfigs(SqliteConnection connection)
     {
-        string? configValue = GetSettingValue(connection, configKey);
-        if (configValue is not null && Enum.TryParse(configValue, out T value))
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = GetAllSettingsQuery;
+        _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        if (!reader.HasRows)
+        {
+            return [];
+        }
+
+        Dictionary<string, string> settings = GetAllSettingDictWithCapacity(connection);
+        while (reader.Read())
+        {
+            settings.Add(reader.GetString(0), reader.GetString(1));
+        }
+
+        return settings;
+    }
+
+    private static Dictionary<string, string> GetAllSettingDictWithCapacity(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = GetAllSettingsCountQuery;
+        _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
+
+        using SqliteDataReader countReader = command.ExecuteReader();
+        _ = countReader.Read();
+        int count = countReader.GetInt32(0);
+
+        return new Dictionary<string, string>(count, StringComparer.Ordinal);
+    }
+
+    public static T GetValueEnumValueFromConfig<T>(SqliteConnection connection, Dictionary<string, string> configs, T defaultValue, string configKey) where T : struct, Enum
+    {
+        if (configs.TryGetValue(configKey, out string? configValue) && Enum.TryParse(configValue, out T value))
         {
             return value;
         }
@@ -244,10 +345,9 @@ public static class ConfigDBManager
         return defaultValue;
     }
 
-    public static string GetValueFromConfig(SqliteConnection connection, string defaultValue, string configKey)
+    public static string GetValueFromConfig(SqliteConnection connection, Dictionary<string, string> configs, string defaultValue, string configKey)
     {
-        string? configValue = GetSettingValue(connection, configKey);
-        if (configValue is not null)
+        if (configs.TryGetValue(configKey, out string? configValue))
         {
             return configValue;
         }
