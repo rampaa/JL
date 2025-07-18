@@ -128,9 +128,38 @@ public static class DBUtils
         File.Delete(dbPath);
     }
 
+    private static int CalculateParameterStringCapacity(int parameterCount)
+    {
+        // Total non-digit characters:
+        // '(', ')', ';' = 3 chars
+        // '@' symbol per parameter = parameterCount chars
+        // ", " separator for N-1 parameters = 2 * (parameterCount - 1) chars
+        // Simplified formula: 3 * parameterCount + 1
+        int nonDigitChars = (3 * parameterCount) + 1;
+
+        int digitChars;
+        if (parameterCount < 10)
+        {
+            digitChars = parameterCount;
+        }
+        else if (parameterCount < 100)
+        {
+            digitChars = 9 + ((parameterCount - 9) * 2);
+        }
+        else // if (parameterCount < 1000)
+        {
+            digitChars = 189 + ((parameterCount - 99) * 3);
+        }
+
+        return nonDigitChars + digitChars;
+    }
+
+
     internal static string GetParameter(int parameterCount)
     {
-        StringBuilder parameterBuilder = new("(@1");
+        StringBuilder parameterBuilder = new(CalculateParameterStringCapacity(parameterCount));
+
+        _ = parameterBuilder.Append("(@1");
         for (int i = 1; i < parameterCount; i++)
         {
             _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
