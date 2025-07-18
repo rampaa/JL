@@ -45,9 +45,10 @@ public static class TextUtils
         return -1;
     }
 
-    private static string RemoveInvalidUnicodeSequences(string text, int index)
+    private static string RemoveInvalidUnicodeSequences(ReadOnlySpan<char> text, int index)
     {
-        StringBuilder sb = new(text[..index], text.Length - 1);
+        StringBuilder sb = new(text.Length - 1);
+        _ = sb.Append(text[..index]);
 
         for (int i = index + 1; i < text.Length; i++)
         {
