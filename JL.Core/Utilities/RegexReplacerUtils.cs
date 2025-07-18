@@ -54,7 +54,7 @@ public static partial class RegexReplacerUtils
                 {
                     string regexPattern = match.Groups["regex"].Value;
 
-                    char[] modifiers = match.Groups["modifiers"].Value.ToCharArray();
+                    ReadOnlySpan<char> modifiers = match.Groups["modifiers"].Value.AsSpan();
                     RegexOptions regexOptions = RegexOptions.Compiled;
                     foreach (char modifier in modifiers)
                     {
