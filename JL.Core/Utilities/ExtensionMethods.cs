@@ -62,7 +62,7 @@ public static class ExtensionMethods
         return textBlocks.AsReadOnlySpan();
     }
 
-    internal static void AddRange<T>(this ConcurrentBag<T> source, List<T> items)
+    internal static void AddRange<T>(this ConcurrentBag<T> source, List<T> items) where T : notnull
     {
         foreach (T item in items.AsReadOnlySpan())
         {
@@ -70,7 +70,30 @@ public static class ExtensionMethods
         }
     }
 
-    internal static T[]? RemoveAt<T>(this T[] source, int index)
+    internal static T[]? RemoveAt<T>(this T[] source, int index) where T : notnull
+    {
+        Debug.Assert(source.Length > index);
+
+        if (source.Length is 1)
+        {
+            return null;
+        }
+
+        T[] destination = new T[source.Length - 1];
+        if (index > 0)
+        {
+            source.AsReadOnlySpan(0, index).CopyTo(destination.AsSpan());
+        }
+
+        if (index < source.Length - 1)
+        {
+            source.AsReadOnlySpan(index + 1, source.Length - index - 1).CopyTo(destination.AsSpan(index));
+        }
+
+        return destination;
+    }
+
+    internal static T?[]? RemoveAtNullable<T>(this T[] source, int index) where T : class?
     {
         Debug.Assert(source.Length > index);
 
@@ -108,42 +131,23 @@ public static class ExtensionMethods
         return destination;
     }
 
-    internal static T[]? RemoveAtToArray<T>(this List<T> list, int index)
+    internal static T[]? RemoveAtToArray<T>(this List<T> list, int index) where T : notnull
     {
         Debug.Assert(list.Count > index);
-
         if (list.Count is 1)
         {
             return null;
         }
 
         ReadOnlySpan<T> listSpan = list.AsReadOnlySpan();
-
-        bool allElementsAreNull = true;
-        for (int i = 0; i < listSpan.Length; i++)
-        {
-            if (i != index && listSpan[i] is not null)
-            {
-                allElementsAreNull = false;
-                break;
-            }
-        }
-
-        if (allElementsAreNull)
-        {
-            return null;
-        }
-
         T[] array = new T[listSpan.Length - 1];
-
-        int arrayIndex = 0;
-        for (int i = 0; i < listSpan.Length; i++)
+        if (index > 0)
         {
-            if (i != index)
-            {
-                array[arrayIndex] = listSpan[i];
-                ++arrayIndex;
-            }
+            listSpan[..index].CopyTo(array.AsSpan());
+        }
+        if (index < listSpan.Length - 1)
+        {
+            listSpan[(index + 1)..].CopyTo(array.AsSpan(index));
         }
 
         return array;
@@ -157,7 +161,7 @@ public static class ExtensionMethods
             : list.ToArray();
     }
 
-    internal static T?[]? TrimListOfNullableElementsToArray<T>(this List<T?> list) where T : class
+    internal static T?[]? TrimListOfNullableElementsToArray<T>(this List<T> list) where T : class?
     {
         if (list.Count is 0)
         {
@@ -261,7 +265,7 @@ public static class ExtensionMethods
     //    return new ReadOnlyMemory<T>(array, start, length);
     //}
 
-    internal static T? GetNullableValueFromBlobStream<T>(this SqliteDataReader dataReader, int index) where T : class
+    internal static T? GetNullableValueFromBlobStream<T>(this SqliteDataReader dataReader, int index) where T : class?
     {
         if (dataReader.IsDBNull(index))
         {

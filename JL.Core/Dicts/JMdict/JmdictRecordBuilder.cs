@@ -138,7 +138,7 @@ internal static class JmdictRecordBuilder
                     wordClassesSharedByAllSenses,
                     allKanjiOrthographyInfoWithoutSearchOnlyForms[index],
                     allSpellingsWithoutSearchOnlyForms.RemoveAt(index),
-                    allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAt(index),
+                    allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAtNullable(index),
                     readingList.TrimToArray(),
                     readingsOrthographyInfoList.TrimListOfNullableElementsToArray(),
                     spellingRestrictionList.TrimListOfNullableElementsToArray(),
@@ -239,7 +239,7 @@ internal static class JmdictRecordBuilder
                     primarySpellingOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms[index];
 
                     alternativeSpellings = allReadingsWithoutSearchOnlyForms.RemoveAt(index);
-                    alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAt(index);
+                    alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAtNullable(index);
                 }
 
                 List<string[]> definitionList = new(senseListSpanLength);
