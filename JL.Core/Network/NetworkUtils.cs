@@ -24,16 +24,15 @@ public static class NetworkUtils
     internal const string Jpod101NoAudioMd5Hash = "7E2C2F954EF6051373BA916F000168DC";
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
     private static readonly Timer s_updaterTimer = new();
-    private static bool s_updatingJL; // false
+    private static int s_updatingJL; // 0
 
     public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
-        if (s_updatingJL)
+        if (Interlocked.CompareExchange(ref s_updatingJL, 1, 0) is not 0)
         {
             return;
         }
 
-        s_updatingJL = true;
         try
         {
             using HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, s_gitHubApiUrlForLatestJLRelease);
@@ -113,8 +112,10 @@ public static class NetworkUtils
             Utils.Logger.Error(ex, "Couldn't check for JL updates");
             Utils.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
         }
-
-        s_updatingJL = false;
+        finally
+        {
+            Volatile.Write(ref s_updatingJL, 0);
+        }
     }
 
     internal static void InitializeUpdaterTimer()
