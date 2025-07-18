@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 
 namespace JL.Core.Statistics;
@@ -16,14 +17,8 @@ public sealed class Stats
 
     internal void IncrementLookupStat(string deconjugatedMatchedText)
     {
-        if (TermLookupCountDict.TryGetValue(deconjugatedMatchedText, out int count))
-        {
-            TermLookupCountDict[deconjugatedMatchedText] = count + 1;
-        }
-        else
-        {
-            TermLookupCountDict[deconjugatedMatchedText] = 1;
-        }
+        ref int count = ref CollectionsMarshal.GetValueRefOrAddDefault(TermLookupCountDict, deconjugatedMatchedText, out _);
+        ++count;
     }
 
     internal void ResetStats()
