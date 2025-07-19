@@ -34,7 +34,7 @@ public static class LookupUtils
         List<LookupFrequencyResult>? kanjiFrequencyResults = null;
         Freq[]? kanjiFreqs = FreqUtils.KanjiFreqs;
         string kanji = "";
-        string[]? kanjiComposition = null;
+        string[]? kanjiCompositions = null;
         if (DictUtils.AtLeastOneKanjiDictIsActive)
         {
             kanji = TextUtils.GetFirstCharacter(text);
@@ -137,15 +137,16 @@ public static class LookupUtils
             }
         }
 
+        List<string>? allTextWithoutLongVowelMark = null;
         string? parameter = null;
         string? verbParameter = null;
         string? yomichanWordQuery = null;
         string? yomichanVerbQuery = null;
         string? nazekaWordQuery = null;
         string? nazekaVerbQuery = null;
-        List<string?>? nazekaTextWithoutLongVowelMarkQueries = null;
-        List<string?>? yomichanTextWithoutLongVowelMarkQueries = null;
-        List<string?>? jmdictTextWithoutLongVowelMarkParameters = null;
+        string? nazekaTextWithoutLongVowelMarkQueries = null;
+        string? yomichanTextWithoutLongVowelMarkQueries = null;
+        string? jmdictTextWithoutLongVowelMarkParameters = null;
 
         bool dbIsUsedForAtLeastOneWordFreqDict = wordFreqs is not null;
         string[]? deconjugatedTexts = null;
@@ -175,49 +176,26 @@ public static class LookupUtils
 
             if (textWithoutLongVowelMarksList is not null)
             {
-                ReadOnlySpan<List<string>?> textWithoutLongVowelMarkListSpan = textWithoutLongVowelMarksList.AsReadOnlySpan();
-                int textWithoutLongVowelMarkListSpanLength = textWithoutLongVowelMarkListSpan.Length;
-
-                if (DictUtils.DBIsUsedForJmdict)
-                {
-                    jmdictTextWithoutLongVowelMarkParameters = new List<string?>(textWithoutLongVowelMarkListSpanLength);
-                }
-                if (DictUtils.DBIsUsedForAtLeastOneYomichanDict)
-                {
-                    yomichanTextWithoutLongVowelMarkQueries = new List<string?>(textWithoutLongVowelMarkListSpanLength);
-                }
-                if (DictUtils.DBIsUsedForAtLeastOneNazekaDict)
-                {
-                    nazekaTextWithoutLongVowelMarkQueries = new List<string?>(textWithoutLongVowelMarkListSpanLength);
-                }
-
-                foreach (ref readonly List<string>? textWithoutLongVowelMark in textWithoutLongVowelMarkListSpan)
+                allTextWithoutLongVowelMark = new List<string>(textWithoutLongVowelMarksCount);
+                foreach (ref readonly List<string>? textWithoutLongVowelMark in textWithoutLongVowelMarksList.AsReadOnlySpan())
                 {
                     if (textWithoutLongVowelMark is not null)
                     {
-                        int textWithoutLongVowelMarkCount = textWithoutLongVowelMark.Count;
-                        if (DictUtils.DBIsUsedForJmdict)
-                        {
-                            Debug.Assert(jmdictTextWithoutLongVowelMarkParameters is not null);
-                            jmdictTextWithoutLongVowelMarkParameters.Add(DBUtils.GetParameter(textWithoutLongVowelMarkCount));
-                        }
-                        if (DictUtils.DBIsUsedForAtLeastOneYomichanDict)
-                        {
-                            Debug.Assert(yomichanTextWithoutLongVowelMarkQueries is not null);
-                            yomichanTextWithoutLongVowelMarkQueries.Add(EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarkCount));
-                        }
-                        if (DictUtils.DBIsUsedForAtLeastOneNazekaDict)
-                        {
-                            Debug.Assert(nazekaTextWithoutLongVowelMarkQueries is not null);
-                            nazekaTextWithoutLongVowelMarkQueries.Add(EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarkCount));
-                        }
+                        allTextWithoutLongVowelMark.AddRange(textWithoutLongVowelMark.AsReadOnlySpan());
                     }
-                    else
-                    {
-                        jmdictTextWithoutLongVowelMarkParameters?.Add(null);
-                        yomichanTextWithoutLongVowelMarkQueries?.Add(null);
-                        nazekaTextWithoutLongVowelMarkQueries?.Add(null);
-                    }
+                }
+
+                if (DictUtils.DBIsUsedForJmdict)
+                {
+                    jmdictTextWithoutLongVowelMarkParameters = DBUtils.GetParameter(textWithoutLongVowelMarksCount);
+                }
+                if (DictUtils.DBIsUsedForAtLeastOneYomichanDict)
+                {
+                    yomichanTextWithoutLongVowelMarkQueries = EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarksCount);
+                }
+                if (DictUtils.DBIsUsedForAtLeastOneNazekaDict)
+                {
+                    nazekaTextWithoutLongVowelMarkQueries = EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarksCount);
                 }
             }
 
@@ -355,7 +333,7 @@ public static class LookupUtils
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    Dictionary<string, IntermediaryResult> jmdictResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, JmdictDBManager.GetRecordsFromDB, parameter, verbParameter, jmdictTextWithoutLongVowelMarkParameters);
+                    Dictionary<string, IntermediaryResult> jmdictResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, allTextWithoutLongVowelMark, dict, useDB, JmdictDBManager.GetRecordsFromDB, parameter, verbParameter, jmdictTextWithoutLongVowelMarkParameters);
                     if (jmdictResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildJmdictResult(jmdictResults, wordFreqs, dbWordFreqs, dbIsUsedForPitchDict, pitchDict));
@@ -378,7 +356,7 @@ public static class LookupUtils
 
                     if (kanjidicResult is not null)
                     {
-                        lookupResults.Add(BuildKanjidicResult(kanji, kanjiComposition, kanjidicResult, kanjiFrequencyResults, pitchAccentDict));
+                        lookupResults.Add(BuildKanjidicResult(kanji, kanjiCompositions, kanjidicResult, kanjiFrequencyResults, pitchAccentDict));
                     }
 
                     break;
@@ -392,13 +370,13 @@ public static class LookupUtils
 
                     if (epwingYomichanKanjiWithWordSchemaResults is not null)
                     {
-                        lookupResults.AddRange(BuildEpwingYomichanResultForKanjiWithWordSchema(kanjiComposition, epwingYomichanKanjiWithWordSchemaResults, kanjiFrequencyResults, pitchAccentDict));
+                        lookupResults.AddRange(BuildEpwingYomichanResultForKanjiWithWordSchema(kanjiCompositions, epwingYomichanKanjiWithWordSchemaResults, kanjiFrequencyResults, pitchAccentDict));
                     }
                     break;
 
                 case DictType.CustomWordDictionary:
                 case DictType.ProfileCustomWordDictionary:
-                    Dictionary<string, IntermediaryResult> customWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, false, null, parameter, verbParameter, null);
+                    Dictionary<string, IntermediaryResult> customWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, allTextWithoutLongVowelMark, dict, false, null, parameter, verbParameter, null);
                     if (customWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildCustomWordResult(customWordResults, wordFreqs, dbWordFreqs, dbIsUsedForPitchDict, pitchDict));
@@ -421,7 +399,7 @@ public static class LookupUtils
 
                     if (epwingYomichanKanjiResults is not null)
                     {
-                        lookupResults.AddRange(BuildYomichanKanjiResult(kanji, kanjiComposition, epwingYomichanKanjiResults, kanjiFrequencyResults, pitchAccentDict));
+                        lookupResults.AddRange(BuildYomichanKanjiResult(kanji, kanjiCompositions, epwingYomichanKanjiResults, kanjiFrequencyResults, pitchAccentDict));
                     }
                     break;
 
@@ -436,7 +414,7 @@ public static class LookupUtils
 
                 case DictType.NonspecificWordYomichan:
                 case DictType.NonspecificYomichan:
-                    Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, yomichanTextWithoutLongVowelMarkQueries);
+                    Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, allTextWithoutLongVowelMark, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, yomichanWordQuery, yomichanVerbQuery, yomichanTextWithoutLongVowelMarkQueries);
                     if (epwingYomichanWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResults, wordFreqs, frequencyDicts, pitchAccentDict));
@@ -451,7 +429,7 @@ public static class LookupUtils
 
                     if (epwingNazekaKanjiResults is not null)
                     {
-                        lookupResults.AddRange(BuildEpwingNazekaResultForKanji(kanjiComposition, epwingNazekaKanjiResults, kanjiFrequencyResults, pitchAccentDict));
+                        lookupResults.AddRange(BuildEpwingNazekaResultForKanji(kanjiCompositions, epwingNazekaKanjiResults, kanjiFrequencyResults, pitchAccentDict));
                     }
 
                     break;
@@ -467,7 +445,7 @@ public static class LookupUtils
 
                 case DictType.NonspecificWordNazeka:
                 case DictType.NonspecificNazeka:
-                    Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQueries);
+                    Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, allTextWithoutLongVowelMark, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQueries);
                     if (epwingNazekaWordResults.Count > 0)
                     {
                         lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResults, wordFreqs, frequencyDicts, pitchAccentDict));
@@ -572,11 +550,12 @@ public static class LookupUtils
     }
 
     private static Dictionary<string, IntermediaryResult> GetWordResults(ReadOnlySpan<string> textList, List<string> textInHiraganaList,
-        List<List<Form>> deconjugationResultsList, string[]? deconjugatedTexts, List<List<string>?>? textWithoutLongVowelMarkList, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB,
-        string? queryOrParameter, string? verbQueryOrParameter, List<string?>? longVowelQueryOrParameters)
+        List<List<Form>> deconjugationResultsList, string[]? deconjugatedTexts, List<List<string>?>? textWithoutLongVowelMarkList, List<string>? allTextWithoutLongVowelMark, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB,
+        string? queryOrParameter, string? verbQueryOrParameter, string? longVowelQueryOrParameter)
     {
         Dictionary<string, IList<IDictRecord>>? dbWordDict = null;
         Dictionary<string, IList<IDictRecord>>? dbVerbDict = null;
+        Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = null;
 
         if (useDB)
         {
@@ -593,6 +572,14 @@ public static class LookupUtils
                 () =>
                 {
                     dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts.AsReadOnlySpan(), verbQueryOrParameter);
+                },
+                () =>
+                {
+                    if (allTextWithoutLongVowelMark is not null)
+                    {
+                        Debug.Assert(longVowelQueryOrParameter is not null);
+                        dbWordDictForLongVowelConversion = getRecordsFromDB(dict.Name, allTextWithoutLongVowelMark.AsReadOnlySpan(), longVowelQueryOrParameter);
+                    }
                 });
         }
 
@@ -613,18 +600,6 @@ public static class LookupUtils
             if (textsWithoutLongVowelMark is not null)
             {
                 ReadOnlySpan<string> textsWithoutLongVowelMarkSpan = textsWithoutLongVowelMark.AsReadOnlySpan();
-                Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = null;
-                if (useDB)
-                {
-                    Debug.Assert(getRecordsFromDB is not null);
-                    Debug.Assert(longVowelQueryOrParameters is not null);
-
-                    string? longVowelQueryOrParameter = longVowelQueryOrParameters[i];
-                    Debug.Assert(longVowelQueryOrParameter is not null);
-
-                    dbWordDictForLongVowelConversion = getRecordsFromDB(dict.Name, textsWithoutLongVowelMarkSpan, longVowelQueryOrParameter);
-                }
-
                 foreach (ref readonly string textWithoutLongVowelMark in textsWithoutLongVowelMarkSpan)
                 {
                     GetWordResultsHelper(dict, results, null, text, textWithoutLongVowelMark, dbWordDictForLongVowelConversion, null);
@@ -958,7 +933,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static LookupResult BuildKanjidicResult(string kanji, string[]? kanjiComposition, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+    private static LookupResult BuildKanjidicResult(string kanji, string[]? kanjiCompositions, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         KanjidicRecord kanjiRecord = (KanjidicRecord)intermediaryResult.Results[0][0];
 
@@ -969,7 +944,7 @@ public static class LookupUtils
         (
             primarySpelling: kanji,
             readings: allReadings,
-            kanjiLookupResult: new KanjiLookupResult(kanjiComposition, kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings, kanjiRecord.RadicalNames, kanjiRecord.StrokeCount, kanjiRecord.Grade),
+            kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings, kanjiRecord.RadicalNames, kanjiRecord.StrokeCount, kanjiRecord.Grade),
             frequencies: GetKanjidicFrequencies(kanjiRecord.Frequency, kanjiFrequencyResults),
             matchedText: intermediaryResult.MatchedText,
             dict: intermediaryResult.Dict,
@@ -981,7 +956,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildYomichanKanjiResult(
-        string kanji, string[]? kanjiComposition, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        string kanji, string[]? kanjiCompositions, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
@@ -998,7 +973,7 @@ public static class LookupUtils
                 (
                     primarySpelling: kanji,
                     readings: allReadings,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiComposition, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats()),
+                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats()),
                     frequencies: kanjiFrequencyResults,
                     matchedText: intermediaryResult.MatchedText,
                     dict: intermediaryResult.Dict,
@@ -1058,7 +1033,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static List<LookupResult> BuildEpwingYomichanResultForKanjiWithWordSchema(string[]? kanjiComposition, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+    private static List<LookupResult> BuildEpwingYomichanResultForKanjiWithWordSchema(string[]? kanjiCompositions, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
@@ -1077,7 +1052,7 @@ public static class LookupUtils
                     frequencies: kanjiFrequencyResults,
                     dict: intermediaryResult.Dict,
                     readings: readings,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiComposition),
+                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions),
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
                 );
@@ -1158,7 +1133,7 @@ public static class LookupUtils
         return false;
     }
 
-    private static List<LookupResult> BuildEpwingNazekaResultForKanji(string[]? kanjiComposition, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+    private static List<LookupResult> BuildEpwingNazekaResultForKanji(string[]? kanjiCompositions, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
@@ -1178,7 +1153,7 @@ public static class LookupUtils
                     frequencies: kanjiFrequencyResults,
                     dict: intermediaryResult.Dict,
                     readings: readings,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiComposition),
+                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions),
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
                 );
