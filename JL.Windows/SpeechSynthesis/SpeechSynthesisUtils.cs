@@ -88,7 +88,18 @@ internal static class SpeechSynthesisUtils
 
         await StopTextToSpeech().ConfigureAwait(false);
 
-        Synthesizer.SelectVoice(voiceName);
+        try
+        {
+            Synthesizer.SelectVoice(voiceName);
+        }
+        catch (ArgumentException ex)
+        {
+            Utils.Logger.Error(ex, "Failed to select voice {VoiceName}", voiceName);
+            WindowsUtils.Alert(AlertLevel.Error, $"{voiceName} is not available on your system. Deactivating it.");
+            AudioUtils.AudioSources[voiceName].Active = false;
+            SetInstalledVoiceWithHighestPriority();
+            return;
+        }
 
         Synthesizer.SetOutputToDefaultAudioDevice();
         _ = Synthesizer.SpeakAsync(text);
