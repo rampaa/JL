@@ -246,12 +246,11 @@ internal sealed class ConfigManager
     public void ApplyPreferences(SqliteConnection connection)
     {
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-
-        using SqliteTransaction transaction = connection.BeginTransaction();
         Dictionary<string, string> configs = ConfigDBManager.GetAllConfigs(connection);
         coreConfigManager.ApplyPreferences(connection, configs);
 
         MainWindow mainWindow = MainWindow.Instance;
+        using SqliteTransaction transaction = connection.BeginTransaction();
 
         SkinType theme = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, Theme, nameof(Theme));
         if (theme != Theme)
