@@ -142,7 +142,7 @@ internal sealed partial class MainWindow
     public Task CopyFromWebSocket(string text)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        return Dispatcher.Invoke(async () =>
+        return Dispatcher.BeginInvoke(async () =>
         {
             if (CopyText(text)
                 && configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
@@ -156,7 +156,7 @@ internal sealed partial class MainWindow
 
                 await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
             }
-        }, DispatcherPriority.Send);
+        }, DispatcherPriority.Send).Task;
     }
 
     private bool CopyText(string text)

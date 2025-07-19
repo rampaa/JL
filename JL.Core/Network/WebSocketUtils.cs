@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Net.WebSockets;
 using JL.Core.Config;
 using JL.Core.Statistics;
@@ -68,66 +69,77 @@ public static class WebSocketUtils
                     s_webSocketClient = webSocketClient;
 
                     // 256-4096
-                    Memory<byte> buffer = new byte[1024 * 4];
-
-                    while (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
+                    byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(1024 * 4);
+                    try
                     {
-                        try
+                        Memory<byte> buffer = rentedBuffer;
+                        while (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
                         {
-                            ValueWebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
-                            if (!coreConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
+                            try
                             {
-                                if (webSocketClient.State is WebSocketState.Open)
+                                ValueWebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
+                                if (!coreConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
+                                {
+                                    if (webSocketClient.State is WebSocketState.Open)
+                                    {
+                                        await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
+                                        s_webSocketTask = null;
+                                    }
+
+                                    return;
+                                }
+
+                                if (result.MessageType is WebSocketMessageType.Text)
+                                {
+                                    int totalBytesReceived = result.Count;
+                                    while (!result.EndOfMessage)
+                                    {
+                                        if (totalBytesReceived == buffer.Length)
+                                        {
+                                            byte[] newBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length * 2);
+                                            buffer.CopyTo(newBuffer);
+                                            ArrayPool<byte>.Shared.Return(rentedBuffer);
+                                            rentedBuffer = newBuffer;
+                                            buffer = rentedBuffer;
+                                        }
+
+                                        result = await webSocketClient.ReceiveAsync(buffer[totalBytesReceived..], CancellationToken.None).ConfigureAwait(false);
+                                        totalBytesReceived += result.Count;
+                                    }
+
+                                    string text = NetworkUtils.s_utf8NoBom.GetString(buffer.Span[..totalBytesReceived]);
+                                    _ = Utils.Frontend.CopyFromWebSocket(text);
+                                }
+                                else if (result.MessageType is WebSocketMessageType.Close)
+                                {
+                                    Utils.Logger.Information("WebSocket server is closed");
+                                    break;
+                                }
+                            }
+                            catch (WebSocketException webSocketException)
+                            {
+                                if (coreConfigManager is { AutoReconnectToWebSocket: false, CaptureTextFromClipboard: false })
+                                {
+                                    StatsUtils.StopTimeStatStopWatch();
+                                }
+
+                                if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
+                                {
+                                    Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
+                                    // Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
+                                }
+                                else if (webSocketClient.State is WebSocketState.Open)
                                 {
                                     await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
-                                    s_webSocketTask = null;
                                 }
 
-                                return;
-                            }
-
-                            if (result.MessageType is WebSocketMessageType.Text)
-                            {
-                                using MemoryStream memoryStream = new();
-                                await memoryStream.WriteAsync(buffer[..result.Count], CancellationToken.None).ConfigureAwait(false);
-
-                                while (!result.EndOfMessage)
-                                {
-                                    result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
-                                    await memoryStream.WriteAsync(buffer[..result.Count], CancellationToken.None).ConfigureAwait(false);
-                                }
-
-                                string text = memoryStream.TryGetBuffer(out ArraySegment<byte> messageBuffer)
-                                    ? NetworkUtils.s_utf8NoBom.GetString(messageBuffer)
-                                    : NetworkUtils.s_utf8NoBom.GetString(memoryStream.ToArray());
-
-                                _ = Task.Run(() => Utils.Frontend.CopyFromWebSocket(text), CancellationToken.None).ConfigureAwait(false);
-                            }
-                            else if (result.MessageType is WebSocketMessageType.Close)
-                            {
-                                Utils.Logger.Information("WebSocket server is closed");
                                 break;
                             }
                         }
-                        catch (WebSocketException webSocketException)
-                        {
-                            if (coreConfigManager is { AutoReconnectToWebSocket: false, CaptureTextFromClipboard: false })
-                            {
-                                StatsUtils.StopTimeStatStopWatch();
-                            }
-
-                            if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
-                            {
-                                Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
-                                // Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
-                            }
-                            else if (webSocketClient.State is WebSocketState.Open)
-                            {
-                                await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
-                            }
-
-                            break;
-                        }
+                    }
+                    finally
+                    {
+                        ArrayPool<byte>.Shared.Return(rentedBuffer);
                     }
                 }
 
