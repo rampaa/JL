@@ -38,7 +38,7 @@ public static class LookupUtils
         if (DictUtils.AtLeastOneKanjiDictIsActive)
         {
             kanji = TextUtils.GetFirstCharacter(text);
-            _ = KanjiCompositionUtils.KanjiCompositionDict.TryGetValue(kanji, out kanjiComposition);
+            _ = KanjiCompositionUtils.KanjiCompositionDict.TryGetValue(kanji, out kanjiCompositions);
 
             kanjiFrequencyResults = kanjiFreqs is not null
                 ? GetKanjiFrequencies(kanji, kanjiFreqs)
