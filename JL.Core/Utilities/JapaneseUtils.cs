@@ -258,7 +258,7 @@ public static partial class JapaneseUtils
                     int stringBuildersCount = stringBuilders.Count;
                     for (int j = 0; j < stringBuildersCount; j++)
                     {
-                        stringBuilders.Add(new StringBuilder(stringBuilders[j].ToString(), unicodeTextListLength));
+                        stringBuilders.Add(new StringBuilder(unicodeTextListLength).Append(stringBuilders[j]));
                     }
 
                     stringBuildersCount = stringBuilders.Count;
