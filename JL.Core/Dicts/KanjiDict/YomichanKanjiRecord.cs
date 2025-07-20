@@ -106,17 +106,19 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
             return stats[0];
         }
 
-        StringBuilder statResult = new();
+        StringBuilder statBuilder = Utils.StringBuilderPool.Get();
         for (int i = 0; i < stats.Length; i++)
         {
-            _ = statResult.Append(stats[i]);
+            _ = statBuilder.Append(stats[i]);
             if (i + 1 != stats.Length)
             {
-                _ = statResult.Append('\n');
+                _ = statBuilder.Append('\n');
             }
         }
 
-        return statResult.ToString();
+        string stat = statBuilder.ToString();
+        Utils.StringBuilderPool.Return(statBuilder);
+        return stat;
     }
 
     public override bool Equals(object? obj)

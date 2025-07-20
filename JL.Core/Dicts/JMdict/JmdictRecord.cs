@@ -126,36 +126,36 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         Debug.Assert(options.Antonym is not null);
         bool showAntonyms = options.Antonym.Value && Antonyms is not null;
 
-        StringBuilder defResult = new();
+        StringBuilder defBuilder = Utils.StringBuilderPool.Get();
         if (showWordClassesSharedByAllSenses || showMiscSharedByAllSenses || showDialectsSharedByAllSenses || showFieldsSharedByAllSenses)
         {
             if (showWordClassesSharedByAllSenses)
             {
                 Debug.Assert(WordClassesSharedByAllSenses is not null);
-                _ = defResult.Append('[').AppendJoin(", ", WordClassesSharedByAllSenses).Append("] ");
+                _ = defBuilder.Append('[').AppendJoin(", ", WordClassesSharedByAllSenses).Append("] ");
             }
 
             if (showMiscSharedByAllSenses)
             {
                 Debug.Assert(MiscSharedByAllSenses is not null);
-                _ = defResult.Append('[').AppendJoin(", ", MiscSharedByAllSenses).Append("] ");
+                _ = defBuilder.Append('[').AppendJoin(", ", MiscSharedByAllSenses).Append("] ");
             }
 
             if (showDialectsSharedByAllSenses)
             {
                 Debug.Assert(DialectsSharedByAllSenses is not null);
-                _ = defResult.Append('[').AppendJoin(", ", DialectsSharedByAllSenses).Append("] ");
+                _ = defBuilder.Append('[').AppendJoin(", ", DialectsSharedByAllSenses).Append("] ");
             }
 
             if (showFieldsSharedByAllSenses)
             {
                 Debug.Assert(FieldsSharedByAllSenses is not null);
-                _ = defResult.Append('[').AppendJoin(", ", FieldsSharedByAllSenses).Append("] ");
+                _ = defBuilder.Append('[').AppendJoin(", ", FieldsSharedByAllSenses).Append("] ");
             }
 
             if (multipleDefinitions && newlines)
             {
-                _ = defResult.Replace(" ", "\n", defResult.Length - 1, 1);
+                _ = defBuilder.Replace(" ", "\n", defBuilder.Length - 1, 1);
             }
         }
 
@@ -175,7 +175,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         {
             if (multipleDefinitions)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
+                _ = defBuilder.Append(CultureInfo.InvariantCulture, $"{i + 1}. ");
 
                 if (showWordClassInfo)
                 {
@@ -183,7 +183,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                     string[]? wordClassesElement = wordClasses[i];
                     if (wordClassesElement is not null)
                     {
-                        _ = defResult.Append('[').AppendJoin(", ", wordClassesElement).Append("] ");
+                        _ = defBuilder.Append('[').AppendJoin(", ", wordClassesElement).Append("] ");
                     }
                 }
 
@@ -193,7 +193,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                     string[]? miscElement = misc[i];
                     if (miscElement is not null)
                     {
-                        _ = defResult.Append('[').AppendJoin(", ", miscElement).Append("] ");
+                        _ = defBuilder.Append('[').AppendJoin(", ", miscElement).Append("] ");
                     }
                 }
 
@@ -203,7 +203,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                     string[]? dialectsElement = dialects[i];
                     if (dialectsElement is not null)
                     {
-                        _ = defResult.Append('[').AppendJoin(", ", dialectsElement).Append("] ");
+                        _ = defBuilder.Append('[').AppendJoin(", ", dialectsElement).Append("] ");
                     }
                 }
 
@@ -213,12 +213,12 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                     string[]? fieldsElement = fields[i];
                     if (fieldsElement is not null)
                     {
-                        _ = defResult.Append('[').AppendJoin(", ", fieldsElement).Append("] ");
+                        _ = defBuilder.Append('[').AppendJoin(", ", fieldsElement).Append("] ");
                     }
                 }
             }
 
-            _ = defResult.AppendJoin("; ", definitions[i]).Append(' ');
+            _ = defBuilder.AppendJoin("; ", definitions[i]).Append(' ');
 
             if (showExtraDefinitionInfo)
             {
@@ -226,7 +226,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 string? definitionInfoElement = definitionInfo[i];
                 if (definitionInfoElement is not null)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({definitionInfoElement}) ");
+                    _ = defBuilder.Append(CultureInfo.InvariantCulture, $"({definitionInfoElement}) ");
                 }
             }
 
@@ -250,26 +250,26 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 bool readingRestrictionsExist = readingRestrictionsElement is not null;
                 if (spellingRestrictionsExist || readingRestrictionsExist)
                 {
-                    _ = defResult.Append("(only applies to ");
+                    _ = defBuilder.Append("(only applies to ");
 
                     if (spellingRestrictionsExist)
                     {
                         Debug.Assert(spellingRestrictionsElement is not null);
-                        _ = defResult.AppendJoin("; ", spellingRestrictionsElement);
+                        _ = defBuilder.AppendJoin("; ", spellingRestrictionsElement);
                     }
 
                     if (readingRestrictionsExist)
                     {
                         if (spellingRestrictionsExist)
                         {
-                            _ = defResult.Append("; ");
+                            _ = defBuilder.Append("; ");
                         }
 
                         Debug.Assert(readingRestrictionsElement is not null);
-                        _ = defResult.AppendJoin("; ", readingRestrictionsElement);
+                        _ = defBuilder.AppendJoin("; ", readingRestrictionsElement);
                     }
 
-                    _ = defResult.Append(") ");
+                    _ = defBuilder.Append(") ");
                 }
             }
 
@@ -279,34 +279,34 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 ref readonly LoanwordSource[]? lSources = ref loanwordEtymology[i];
                 if (lSources is not null)
                 {
-                    _ = defResult.Append('(');
+                    _ = defBuilder.Append('(');
 
                     for (int j = 0; j < lSources.Length; j++)
                     {
                         ref readonly LoanwordSource lSource = ref lSources[j];
                         if (lSource.IsWasei)
                         {
-                            _ = defResult.Append("wasei ");
+                            _ = defBuilder.Append("wasei ");
                         }
                         else if (j is 0)
                         {
-                            _ = defResult.Append("from ");
+                            _ = defBuilder.Append("from ");
                         }
 
-                        _ = defResult.Append(lSource.Language);
+                        _ = defBuilder.Append(lSource.Language);
 
                         if (lSource.OriginalWord is not null)
                         {
-                            _ = defResult.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
+                            _ = defBuilder.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
                         }
 
                         if (j + 1 < lSources.Length)
                         {
-                            _ = defResult.Append(lSource.IsPart ? " + " : ", ");
+                            _ = defBuilder.Append(lSource.IsPart ? " + " : ", ");
                         }
                     }
 
-                    _ = defResult.Append(") ");
+                    _ = defBuilder.Append(") ");
                 }
             }
 
@@ -318,11 +318,11 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 {
                     if (relatedTermsElement.Length is 1)
                     {
-                        _ = defResult.Append(CultureInfo.InvariantCulture, $"(related term: {relatedTermsElement[0]}) ");
+                        _ = defBuilder.Append(CultureInfo.InvariantCulture, $"(related term: {relatedTermsElement[0]}) ");
                     }
                     else
                     {
-                        _ = defResult.Append("(related terms: ").AppendJoin(", ", relatedTermsElement).Append(") ");
+                        _ = defBuilder.Append("(related terms: ").AppendJoin(", ", relatedTermsElement).Append(") ");
                     }
                 }
             }
@@ -335,22 +335,24 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 {
                     if (antonymsElement.Length is 1)
                     {
-                        _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonym: {antonymsElement[0]}) ");
+                        _ = defBuilder.Append(CultureInfo.InvariantCulture, $"(antonym: {antonymsElement[0]}) ");
                     }
                     else
                     {
-                        _ = defResult.Append("(antonyms: ").AppendJoin(", ", antonymsElement).Append(") ");
+                        _ = defBuilder.Append("(antonyms: ").AppendJoin(", ", antonymsElement).Append(") ");
                     }
                 }
             }
 
             if (i + 1 != definitions.Length)
             {
-                _ = defResult.Replace(' ', separator, defResult.Length - 1, 1);
+                _ = defBuilder.Replace(' ', separator, defBuilder.Length - 1, 1);
             }
         }
 
-        return defResult.ToString(0, defResult.Length - 1);
+        string def = defBuilder.ToString(0, defBuilder.Length - 1);
+        Utils.StringBuilderPool.Return(defBuilder);
+        return def;
     }
 
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)

@@ -1447,12 +1447,64 @@ public static class DictUtils
 
     private static void CheckDBUsageForDicts(Dict[] dicts)
     {
-        DBIsUsedForAtLeastOneDict = dicts.Any(static dict => dict is { Active: true, Options.UseDB.Value: true });
-        DBIsUsedForAtLeastOneWordDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict is { Type: DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificWordNazeka, Active: true, Options.UseDB.Value: true });
-        DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict.Active && s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
-        DBIsUsedForAtLeastOneNazekaDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict.Active && s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && dict.Options.UseDB.Value);
-        DBIsUsedAtLeastOneYomichanOrNazekaWordDict = (DBIsUsedForAtLeastOneYomichanDict || DBIsUsedForAtLeastOneNazekaDict) && DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict is { Type: DictType.NonspecificWordYomichan or DictType.NonspecificYomichan or DictType.NonspecificWordNazeka or DictType.NonspecificNazeka, Active: true, Options.UseDB.Value: true });
-        AtLeastOneKanjiDictIsActive = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => dict is { Type: DictType.Kanjidic or DictType.NonspecificKanjiYomichan or DictType.NonspecificKanjiNazeka or DictType.NonspecificKanjiWithWordSchemaYomichan, Active: true });
-        DBIsUsedForJmdict = SingleDictTypeDicts[DictType.JMdict] is { Active: true, Options.UseDB.Value: true };
+        DBIsUsedForAtLeastOneDict = false;
+        DBIsUsedForAtLeastOneWordDict = false;
+        DBIsUsedForAtLeastOneYomichanDict = false;
+        DBIsUsedForAtLeastOneNazekaDict = false;
+        DBIsUsedAtLeastOneYomichanOrNazekaWordDict = false;
+        AtLeastOneKanjiDictIsActive = false;
+        DBIsUsedForJmdict = false;
+
+        foreach (Dict dict in dicts)
+        {
+            if (dict.Active)
+            {
+                if (KanjiDictTypes.Contains(dict.Type))
+                {
+                    AtLeastOneKanjiDictIsActive = true;
+                }
+
+                if (dict.Options.UseDB.Value)
+                {
+                    DBIsUsedForAtLeastOneDict = true;
+
+                    if (dict.Type is DictType.JMdict)
+                    {
+                        DBIsUsedForJmdict = true;
+                    }
+
+                    if (dict.Type is DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificWordNazeka)
+                    {
+                        DBIsUsedForAtLeastOneWordDict = true;
+                    }
+
+                    if (s_yomichanWordAndNameDictTypeSet.Contains(dict.Type))
+                    {
+                        DBIsUsedForAtLeastOneYomichanDict = true;
+                    }
+
+                    if (s_nazekaWordAndNameDictTypeSet.Contains(dict.Type))
+                    {
+                        DBIsUsedForAtLeastOneNazekaDict = true;
+                    }
+
+                    if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificYomichan or DictType.NonspecificWordNazeka or DictType.NonspecificNazeka)
+                    {
+                        DBIsUsedAtLeastOneYomichanOrNazekaWordDict = true;
+                    }
+                }
+
+                if (DBIsUsedForAtLeastOneDict
+                    && DBIsUsedForAtLeastOneWordDict
+                    && DBIsUsedForAtLeastOneYomichanDict
+                    && DBIsUsedForAtLeastOneNazekaDict
+                    && DBIsUsedAtLeastOneYomichanOrNazekaWordDict
+                    && AtLeastOneKanjiDictIsActive
+                    && DBIsUsedForJmdict)
+                {
+                    return;
+                }
+            }
+        }
     }
 }

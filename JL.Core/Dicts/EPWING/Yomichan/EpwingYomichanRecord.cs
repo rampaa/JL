@@ -43,24 +43,26 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             ? '\n'
             : '；';
 
-        StringBuilder defResult = new();
+        StringBuilder defBuilder = Utils.StringBuilderPool.Get();
         if (DefinitionTags is not null)
         {
-            _ = defResult.Append('[').AppendJoin(", ", DefinitionTags).Append(']').Append(newline ? '\n' : ' ');
+            _ = defBuilder.Append('[').AppendJoin(", ", DefinitionTags).Append(']').Append(newline ? '\n' : ' ');
         }
 
         string[] definitions = Definitions;
         for (int i = 0; i < definitions.Length; i++)
         {
             int sequence = i + 1;
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{sequence}. {definitions[i]}");
+            _ = defBuilder.Append(CultureInfo.InvariantCulture, $"{sequence}. {definitions[i]}");
             if (sequence != definitions.Length)
             {
-                _ = defResult.Append(separator);
+                _ = defBuilder.Append(separator);
             }
         }
 
-        return defResult.ToString();
+        string def = defBuilder.ToString();
+        Utils.StringBuilderPool.Return(defBuilder);
+        return def;
     }
 
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)

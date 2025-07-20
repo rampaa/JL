@@ -33,19 +33,21 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
             ? '；'
             : '\n';
 
-        StringBuilder defResult = new();
+        StringBuilder defBuilder = Utils.StringBuilderPool.Get();
         string[] definitions = Definitions;
         for (int i = 0; i < definitions.Length; i++)
         {
             int sequence = i + 1;
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{sequence}. {definitions[i]}");
+            _ = defBuilder.Append(CultureInfo.InvariantCulture, $"{sequence}. {definitions[i]}");
             if (sequence != definitions.Length)
             {
-                _ = defResult.Append(separator);
+                _ = defBuilder.Append(separator);
             }
         }
 
-        return defResult.ToString();
+        string def = defBuilder.ToString();
+        Utils.StringBuilderPool.Return(defBuilder);
+        return def;
     }
 
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)

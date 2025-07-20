@@ -12,18 +12,45 @@ internal static class EpwingYomichanUtils
         List<string> definitions = new(jsonElement.GetArrayLength());
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
         {
-            string? definition = definitionElement.ValueKind switch
+            string? definition = null;
+            switch (definitionElement.ValueKind)
             {
-                JsonValueKind.String => definitionElement.GetString(),
-                JsonValueKind.Array => GetDefinitionsFromJsonArray(definitionElement)?.Trim(),
-                JsonValueKind.Object => GetDefinitionsFromJsonObject(definitionElement).Content?.Trim(),
-                JsonValueKind.Number => definitionElement.GetString(),
-                JsonValueKind.True => null,
-                JsonValueKind.False => null,
-                JsonValueKind.Undefined => null,
-                JsonValueKind.Null => null,
-                _ => null
-            };
+                case JsonValueKind.String:
+                {
+                    definition = definitionElement.GetString();
+                    break;
+                }
+
+                case JsonValueKind.Array:
+                {
+                    StringBuilder sb = Utils.StringBuilderPool.Get();
+
+                    AppendDefinitionsFromJsonArray(sb, definitionElement);
+                    if (sb.Length > 0)
+                    {
+                        definition = sb.ToString();
+                    }
+
+                    Utils.StringBuilderPool.Return(sb);
+
+                    break;
+                }
+
+                case JsonValueKind.Object:
+                {
+                    YomichanContent objContent = GetDefinitionsFromJsonObject(definitionElement);
+                    definition = objContent.Content;
+                    break;
+                }
+
+                case JsonValueKind.Number:
+                case JsonValueKind.Undefined:
+                case JsonValueKind.True:
+                case JsonValueKind.False:
+                case JsonValueKind.Null:
+                default:
+                    break;
+            }
 
             if (definition is not null)
             {
@@ -38,10 +65,8 @@ internal static class EpwingYomichanUtils
         return definitions.TrimToArray();
     }
 
-    private static string? GetDefinitionsFromJsonArray(JsonElement jsonElement, string? parentTag = null)
+    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, string? parentTag = null)
     {
-        StringBuilder stringBuilder = new();
-
         bool first = true;
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
         {
@@ -49,16 +74,10 @@ internal static class EpwingYomichanUtils
             {
                 _ = stringBuilder.Append(definitionElement.GetString());
             }
-
             else if (definitionElement.ValueKind is JsonValueKind.Array)
             {
-                string? content = GetDefinitionsFromJsonArray(definitionElement);
-                if (content is not null)
-                {
-                    _ = stringBuilder.Append(content);
-                }
+                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement);
             }
-
             else if (definitionElement.ValueKind is JsonValueKind.Object)
             {
                 if (first)
@@ -123,7 +142,6 @@ internal static class EpwingYomichanUtils
                             break;
                         }
 
-                        // "div" or "tr" or "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot" or "img"
                         default:
                         {
                             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart()}");
@@ -133,10 +151,6 @@ internal static class EpwingYomichanUtils
                 }
             }
         }
-
-        return stringBuilder.Length > 0
-            ? stringBuilder.ToString()
-            : null;
     }
 
     private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, string? parentTag = null)
@@ -175,7 +189,17 @@ internal static class EpwingYomichanUtils
 
                 if (contentElement.ValueKind is JsonValueKind.Array)
                 {
-                    return new YomichanContent(parentTag ?? tag, GetDefinitionsFromJsonArray(contentElement, tag), false);
+                    StringBuilder sb = Utils.StringBuilderPool.Get();
+
+                    AppendDefinitionsFromJsonArray(sb, contentElement, tag);
+                    string? content = null;
+                    if (sb.Length > 0)
+                    {
+                        content = sb.ToString();
+                    }
+
+                    Utils.StringBuilderPool.Return(sb);
+                    return new YomichanContent(parentTag ?? tag, content, false);
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Object)

@@ -150,7 +150,7 @@ internal static class YomichanPitchAccentDBManager
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
 
-        StringBuilder queryBuilder = new(
+        StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
             """
             SELECT r.spelling, r.reading, r.position, rsk.search_key
             FROM record r
@@ -169,6 +169,8 @@ internal static class YomichanPitchAccentDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = queryBuilder.ToString();
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
+        Utils.StringBuilderPool.Return(queryBuilder);
 
         int index = 1;
         foreach (string term in terms)

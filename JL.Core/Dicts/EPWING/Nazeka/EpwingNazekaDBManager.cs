@@ -34,7 +34,7 @@ internal static class EpwingNazekaDBManager
 
     public static string GetQuery(int termCount)
     {
-        StringBuilder queryBuilder = new(
+        StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
             """
             SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key
             FROM record r
@@ -47,7 +47,9 @@ internal static class EpwingNazekaDBManager
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
 
-        return queryBuilder.Append(");").ToString();
+        string query = queryBuilder.Append(");").ToString();
+        Utils.StringBuilderPool.Return(queryBuilder);
+        return query;
     }
 
     private enum ColumnIndex

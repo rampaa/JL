@@ -8,12 +8,12 @@ public static class LookupResultUtils
 {
     internal static string? DeconjugationProcessesToText(ReadOnlySpan<List<string>> processList)
     {
-        StringBuilder deconjugation = new();
+        StringBuilder deconjugationProcessBuilder = Utils.StringBuilderPool.Get();
         for (int i = 0; i < processList.Length; i++)
         {
             ref readonly List<string> form = ref processList[i];
 
-            StringBuilder formText = new();
+            StringBuilder formTextBuilder = Utils.StringBuilderPool.Get();
             bool added = false;
 
             ReadOnlySpan<string> formSpan = form.AsReadOnlySpan();
@@ -35,40 +35,46 @@ public static class LookupResultUtils
 
                     if (added)
                     {
-                        _ = formText.Append('→');
+                        _ = formTextBuilder.Append('→');
                     }
 
-                    _ = formText.Append(info.AsSpan(1, info.Length - 2));
+                    _ = formTextBuilder.Append(info.AsSpan(1, info.Length - 2));
                 }
                 else
                 {
                     if (added)
                     {
-                        _ = formText.Append('→');
+                        _ = formTextBuilder.Append('→');
                     }
 
-                    _ = formText.Append(info);
+                    _ = formTextBuilder.Append(info);
                 }
 
                 added = true;
             }
 
-            if (formText.Length is not 0)
+            if (formTextBuilder.Length is not 0)
             {
                 if (i is 0)
                 {
-                    _ = deconjugation.Append(CultureInfo.InvariantCulture, $"～{formText}");
+                    _ = deconjugationProcessBuilder.Append(CultureInfo.InvariantCulture, $"～{formTextBuilder}");
                 }
                 else
                 {
-                    _ = deconjugation.Append(CultureInfo.InvariantCulture, $"; {formText}");
+                    _ = deconjugationProcessBuilder.Append(CultureInfo.InvariantCulture, $"; {formTextBuilder}");
                 }
             }
+
+            Utils.StringBuilderPool.Return(formTextBuilder);
         }
 
-        return deconjugation.Length is 0
+        string? deconjugationProcess = deconjugationProcessBuilder.Length is 0
             ? null
-            : deconjugation.ToString();
+            : deconjugationProcessBuilder.ToString();
+
+        Utils.StringBuilderPool.Return(deconjugationProcessBuilder);
+
+        return deconjugationProcess;
     }
 
     public static string GradeToText(int grade)
@@ -91,7 +97,7 @@ public static class LookupResultUtils
             return string.Create(CultureInfo.InvariantCulture, $"#{frequencies[0].Freq}");
         }
 
-        StringBuilder sb = new();
+        StringBuilder sb = Utils.StringBuilderPool.Get();
         for (int i = 0; i < frequencies.Length; i++)
         {
             ref readonly LookupFrequencyResult lookupFreqResult = ref frequencies[i];
@@ -101,21 +107,30 @@ public static class LookupResultUtils
                 _ = sb.Append(", ");
             }
         }
-        return sb.ToString();
+
+        string text = sb.ToString();
+        Utils.StringBuilderPool.Return(sb);
+        return text;
     }
 
     public static string ElementWithOrthographyInfoToText(string[] elements, string[]?[] orthographyInfoList)
     {
-        StringBuilder sb = new();
-        return ElementWithOrthographyInfoToText(sb, elements, orthographyInfoList).ToString();
+        StringBuilder sb = Utils.StringBuilderPool.Get();
+        string text = ElementWithOrthographyInfoToText(sb, elements, orthographyInfoList).ToString();
+        Utils.StringBuilderPool.Return(sb);
+        return text;
     }
 
     public static string ElementWithOrthographyInfoToTextWithParentheses(string[] alternativeSpellings, string[]?[] aOrthographyInfoList)
     {
-        StringBuilder sb = new();
-        return ElementWithOrthographyInfoToText(sb.Append('('), alternativeSpellings, aOrthographyInfoList)
+        StringBuilder sb = Utils.StringBuilderPool.Get().Append('(');
+
+        string text = ElementWithOrthographyInfoToText(sb, alternativeSpellings, aOrthographyInfoList)
             .Append(')')
             .ToString();
+
+        Utils.StringBuilderPool.Return(sb);
+        return text;
     }
 
     private static StringBuilder ElementWithOrthographyInfoToText(StringBuilder sb, string[] elements, string[]?[] orthographyInfoList)

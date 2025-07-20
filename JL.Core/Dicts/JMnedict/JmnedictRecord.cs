@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMnedict;
 
@@ -42,21 +43,21 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             ? '\n'
             : '；';
 
-        StringBuilder defResult = new();
+        StringBuilder defBuilder = Utils.StringBuilderPool.Get();
 
         string[][] definitions = Definitions;
         for (int i = 0; i < definitions.Length; i++)
         {
             int sequence = i + 1;
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{sequence}. ");
+            _ = defBuilder.Append(CultureInfo.InvariantCulture, $"{sequence}. ");
 
             string[] nameTypes = NameTypes[i];
             if (nameTypes.Length > 1 || nameTypes[0] is not "unclass")
             {
-                _ = defResult.Append('[').AppendJoin(", ", nameTypes).Append("] ");
+                _ = defBuilder.Append('[').AppendJoin(", ", nameTypes).Append("] ");
             }
 
-            _ = defResult.AppendJoin("; ", definitions[i]);
+            _ = defBuilder.AppendJoin("; ", definitions[i]);
 
             // if (showRelatedTerms)
             // {
@@ -69,11 +70,13 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
 
             if (sequence != definitions.Length)
             {
-                _ = defResult.Append(separator);
+                _ = defBuilder.Append(separator);
             }
         }
 
-        return defResult.ToString();
+        string def = defBuilder.ToString();
+        Utils.StringBuilderPool.Return(defBuilder);
+        return def;
     }
 
     public override int GetHashCode()

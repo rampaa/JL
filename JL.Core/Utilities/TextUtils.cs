@@ -47,9 +47,7 @@ public static class TextUtils
 
     private static string RemoveInvalidUnicodeSequences(ReadOnlySpan<char> text, int index)
     {
-        StringBuilder sb = new(text.Length - 1);
-        _ = sb.Append(text[..index]);
-
+        StringBuilder sb = Utils.StringBuilderPool.Get().Append(text[..index]);
         for (int i = index + 1; i < text.Length; i++)
         {
             char c = text[i];
@@ -77,7 +75,9 @@ public static class TextUtils
             }
         }
 
-        return sb.ToString();
+        string validString = sb.ToString();
+        Utils.StringBuilderPool.Return(sb);
+        return validString;
     }
 
     public static string SanitizeText(string text)

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -13,6 +14,7 @@ using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.WordClass;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -26,6 +28,7 @@ public static class Utils
     public static readonly string ResourcesPath = Path.Join(ApplicationPath, "Resources");
     public static readonly string ConfigPath = Path.Join(ApplicationPath, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
+    public static readonly ObjectPool<StringBuilder> StringBuilderPool = new DefaultObjectPoolProvider().CreateStringBuilderPool(1024, 1024 * 4);
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
 
     internal static readonly LoggingLevelSwitch s_loggingLevelSwitch = new()

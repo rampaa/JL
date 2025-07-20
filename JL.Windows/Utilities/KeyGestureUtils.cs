@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
 using JL.Core.Config;
+using JL.Core.Utilities;
 using JL.Windows.GUI;
 using Microsoft.Data.Sqlite;
 
@@ -148,7 +149,7 @@ internal static class KeyGestureUtils
             return keyGesture.Key.ToString();
         }
 
-        StringBuilder sb = new();
+        StringBuilder sb = Utils.StringBuilderPool.Get();
 
         if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
         {
@@ -170,9 +171,13 @@ internal static class KeyGestureUtils
             _ = sb.Append(keyGesture.Key.ToString());
         }
 
-        return sb.Length > 0
+        string formattedText = sb.Length > 0
             ? sb.ToString()
             : "None";
+
+        Utils.StringBuilderPool.Return(sb);
+
+        return formattedText;
     }
 
     public static KeyGesture GetKeyGestureFromConfig(SqliteConnection connection, Dictionary<string, string> configs, string keyGestureName, KeyGesture defaultKeyGesture)

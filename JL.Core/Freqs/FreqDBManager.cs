@@ -121,7 +121,7 @@ internal static class FreqDBManager
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
 
-        StringBuilder queryBuilder = new(
+        StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
             """
             SELECT r.spelling, r.frequency, rsk.search_key
             FROM record r
@@ -140,6 +140,8 @@ internal static class FreqDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = queryBuilder.ToString();
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
+        Utils.StringBuilderPool.Return(queryBuilder);
 
         int index = 1;
         foreach (string term in terms)

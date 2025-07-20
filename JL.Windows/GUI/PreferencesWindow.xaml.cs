@@ -549,7 +549,7 @@ internal sealed partial class PreferencesWindow
         }
         else
         {
-            StringBuilder sb = new();
+            StringBuilder sb = Utils.StringBuilderPool.Get();
 
             if ((Keyboard.Modifiers & ModifierKeys.Control) is not 0)
             {
@@ -567,6 +567,8 @@ internal sealed partial class PreferencesWindow
             }
 
             hotKeyText = sb.Append(key.ToString()).ToString();
+
+            Utils.StringBuilderPool.Return(sb);
         }
 
         TextBox currentTextBox = (TextBox)sender;
