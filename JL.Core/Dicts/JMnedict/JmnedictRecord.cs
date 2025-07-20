@@ -52,7 +52,13 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             int sequence = i + 1;
             _ = defBuilder.Append(CultureInfo.InvariantCulture, $"{sequence}. ");
 
-            string[]? nameTypes = nameTypesExist ? NameTypes![i] : null;
+            string[]? nameTypes = null;
+            if (nameTypesExist)
+            {
+                Debug.Assert(NameTypes is not null);
+                nameTypes = NameTypes[i];
+            }
+
             if (nameTypes is not null && (nameTypes.Length > 1 || nameTypes[0] is not "unclass"))
             {
                 _ = defBuilder.Append('[').AppendJoin(", ", nameTypes).Append("] ");
