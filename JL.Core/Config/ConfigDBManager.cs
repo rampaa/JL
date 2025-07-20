@@ -129,7 +129,8 @@ public static class ConfigDBManager
 
             BEGIN TRANSACTION;
 
-            CREATE TABLE setting_new (
+            CREATE TABLE setting_new
+            (
                 profile_id INTEGER NOT NULL,
                 name TEXT NOT NULL,
                 value TEXT NOT NULL,
