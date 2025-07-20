@@ -14,10 +14,10 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
     public string[]? AlternativeSpellings { get; }
     public string[]? Readings { get; }
     public string[][] Definitions { get; }
-    public string[][] NameTypes { get; }
+    public string[]?[]? NameTypes { get; }
     //public string[]?[]? RelatedTerms { get; }
 
-    public JmnedictRecord(int id, string primarySpelling, string[]? alternativeSpellings, string[]? readings, string[][] definitions, string[][] nameTypes)
+    public JmnedictRecord(int id, string primarySpelling, string[]? alternativeSpellings, string[]? readings, string[][] definitions, string[]?[]? nameTypes)
     {
         Id = id;
         PrimarySpelling = primarySpelling;
@@ -32,8 +32,8 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
     {
         if (Definitions.Length is 1)
         {
-            string[] nameTypes = NameTypes[0];
-            return nameTypes.Length > 1 || nameTypes[0] is not "unclass"
+            string[]? nameTypes = NameTypes?[0];
+            return nameTypes is not null && (nameTypes.Length > 1 || nameTypes[0] is not "unclass")
                 ? $"[{string.Join(", ", nameTypes)}] {string.Join("; ", Definitions[0])}"
                 : string.Join("; ", Definitions[0]);
         }
@@ -45,14 +45,15 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
 
         StringBuilder defBuilder = Utils.StringBuilderPool.Get();
 
+        bool nameTypesExist = NameTypes is not null;
         string[][] definitions = Definitions;
         for (int i = 0; i < definitions.Length; i++)
         {
             int sequence = i + 1;
             _ = defBuilder.Append(CultureInfo.InvariantCulture, $"{sequence}. ");
 
-            string[] nameTypes = NameTypes[i];
-            if (nameTypes.Length > 1 || nameTypes[0] is not "unclass")
+            string[]? nameTypes = nameTypesExist ? NameTypes![i] : null;
+            if (nameTypes is not null && (nameTypes.Length > 1 || nameTypes[0] is not "unclass"))
             {
                 _ = defBuilder.Append('[').AppendJoin(", ", nameTypes).Append("] ");
             }

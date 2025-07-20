@@ -168,19 +168,28 @@ public static class ExtensionMethods
             return null;
         }
 
-        bool allElementsAreNull = true;
         foreach (T? item in list.AsReadOnlySpan())
         {
             if (item is not null)
             {
-                allElementsAreNull = false;
-                break;
+                return list.ToArray();
             }
         }
 
-        return allElementsAreNull
-            ? null
-            : list.ToArray();
+        return null;
+    }
+
+    internal static T?[]? TrimNullableArray<T>(this T[] array) where T : class?
+    {
+        foreach (T? item in array)
+        {
+            if (item is not null)
+            {
+                return array;
+            }
+        }
+
+        return null;
     }
 
     internal static string GetPooledString(this string str)

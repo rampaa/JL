@@ -8,7 +8,7 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictDBManager
 {
-    public const int Version = 4;
+    public const int Version = 5;
 
     private enum ColumnIndex
     {
