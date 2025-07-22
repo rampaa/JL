@@ -144,10 +144,10 @@ public sealed class LookupResult
             return cmpResult;
         }
 
-        // 4. ThenByDescending: Results with no deconjugation process, after that, the length of the primary spelling
-        int deconjugationScore = DeconjugationProcess is null ? int.MaxValue : PrimarySpelling.Length;
-        int otherDeconjugationScore = other.DeconjugationProcess is null ? int.MaxValue : otherPrimarySpelling.Length;
-        cmpResult = otherDeconjugationScore.CompareTo(deconjugationScore);
+        // 4. ThenBy the length of the deconjugation process
+        int deconjugationScore = DeconjugationProcess?.Length ?? 0;
+        int otherDeconjugationScore = other.DeconjugationProcess?.Length ?? 0;
+        cmpResult = deconjugationScore.CompareTo(otherDeconjugationScore);
         if (cmpResult is not 0)
         {
             return cmpResult;
