@@ -17,7 +17,7 @@
       "く",
       "る",
       "る",
-      "",
+      "す",
       "する",
       "する",
       "る",
@@ -41,7 +41,7 @@
       "け",
       "れ",
       "れ",
-      "れ",
+      "すれ",
       "すれ",
       "せ",
       "れ",
@@ -106,7 +106,6 @@
       "ぬ",
       "む",
       "る",
-      "る",
       "れる",
       "う",
       "く",
@@ -117,6 +116,7 @@
       "する",
       "する",
       "る",
+      "ずる",
       "ずる",
       "す",
       "する",
@@ -136,7 +136,6 @@
       "ね",
       "め",
       "ろ",
-      "よ",
       "れ",
       "え",
       "け",
@@ -148,6 +147,7 @@
       "せ",
       "い",
       "ぜよ",
+      "じろ",
       "せよ",
       "しろ",
       "せよ",
@@ -166,7 +166,6 @@
       "v5n",
       "v5m",
       "v1",
-      "v1",
       "v1-s",
       "v5u-s",
       "v5k-s",
@@ -178,14 +177,23 @@
       "vs-i",
       "v5aru",
       "vz",
+      "vz",
       "vs-c",
       "vs-s",
       "vs-s",
       "vs-s",
       "v4r"
     ],
-    "con_tag": [ "uninflectable" ],
+    "con_tag": [ "form-imperative" ],
     "detail": "imperative"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "る", "る" ],
+    "con_end": [ "い", "い" ],
+    "dec_tag": [ "v1", "v1-s" ],
+    "con_tag": [ "v1", "v1-s" ],
+    "detail": "imperative (ksb)"
   },
   {
     "type": "neverfinalrule",
@@ -206,7 +214,9 @@
       "る",
       "する",
       "する",
-      "する"
+      "する",
+      "ずる",
+      "す"
     ],
     "con_end": [
       "か",
@@ -225,6 +235,8 @@
       "ら",
       "しさ",
       "さ",
+      "さ",
+      "じさ",
       "さ"
     ],
     "dec_tag": [
@@ -244,7 +256,9 @@
       "v5aru",
       "vs-s",
       "vs-s",
-      "vs-i"
+      "vs-i",
+      "vz",
+      "vs-c"
     ],
     "con_tag": [ "stem-a" ],
     "detail": "('a' stem)"
@@ -267,8 +281,11 @@
       "來る",
       "する",
       "る",
+      "す",
       "する",
-      "る"
+      "る",
+      "ずる",
+      "ずる"
     ],
     "con_end": [
       "い",
@@ -279,7 +296,7 @@
       "っ",
       "",
       "",
-      "う",
+      "っ",
       "っ",
       "き",
       "来",
@@ -287,7 +304,10 @@
       "し",
       "っ",
       "し",
-      "っ"
+      "し",
+      "っ",
+      "じ",
+      "ぜ"
     ],
     "dec_tag": [
       "v5k",
@@ -305,8 +325,11 @@
       "vk",
       "vs-i",
       "v5aru",
+      "vs-c",
       "vs-s",
-      "v4r"
+      "v4r",
+      "vz",
+      "vz"
     ],
     "con_tag": [ "stem-ren-less" ],
     "detail": "(unstressed infinitive)"
@@ -342,6 +365,7 @@
       "う",
       "る",
       "る",
+      "る",
       "ぐ",
       "ぶ",
       "ぬ",
@@ -352,12 +376,18 @@
       "来る",
       "來る",
       "する",
+      "する",
+      "する",
       "す",
       "る",
       "る",
       "る",
       "る",
       "ずる",
+      "ずる",
+      "す",
+      "する",
+      "する",
       "する",
       "る",
       "る"
@@ -367,6 +397,7 @@
       "ち",
       "い",
       "り",
+      "い",
       "り",
       "ぎ",
       "び",
@@ -378,13 +409,19 @@
       "来",
       "來",
       "し",
+      "せ",
+      "さ",
       "し",
       "",
       "",
       "い",
       "り",
       "ぜ",
+      "じ",
       "し",
+      "し",
+      "さ",
+      "せ",
       "り",
       "い"
     ],
@@ -392,6 +429,7 @@
       "v5k",
       "v5t",
       "v5u",
+      "v5r",
       "v5r",
       "v5r-i",
       "v5g",
@@ -404,12 +442,18 @@
       "vk",
       "vk",
       "vs-i",
+      "vs-i",
+      "vs-i",
       "v5s",
       "v1",
       "v1-s",
       "v5aru",
       "v5aru",
       "vz",
+      "vz",
+      "vs-c",
+      "vs-s",
+      "vs-s",
       "vs-s",
       "v4r",
       "v4r"
@@ -423,10 +467,13 @@
       "",
       "る",
       "る",
+      "る",
       "くる",
       "来る",
       "來る",
       "する",
+      "する",
+      "ずる",
       "ずる",
       "す",
       "する",
@@ -436,11 +483,14 @@
       "",
       "",
       "",
+      "い",
       "こ",
       "来",
       "來",
       "し",
+      "せ",
       "ぜ",
+      "じ",
       "せ",
       "し",
       "せ"
@@ -449,10 +499,13 @@
       "stem-a",
       "v1",
       "v1-s",
+      "v5aru",
       "vk",
       "vk",
       "vk",
       "vs-i",
+      "vs-i",
+      "vz",
       "vz",
       "vs-c",
       "vs-s",
@@ -487,7 +540,8 @@
       "す",
       "する",
       "する",
-      "る"
+      "る",
+      "ずる"
     ],
     "con_end": [
       "こう",
@@ -513,7 +567,8 @@
       "せむ",
       "しよう",
       "そう",
-      "ろう"
+      "ろう",
+      "じよう"
     ],
     "dec_tag": [
       "v5k",
@@ -539,10 +594,19 @@
       "vs-c",
       "vs-s",
       "vs-s",
-      "v4r"
+      "v4r",
+      "vz"
     ],
     "con_tag": [ "form-volition" ],
     "detail": "volitional"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "よう", "ろう", "ぼう", "ごう", "こう", "もう", "のう", "そう", "とう", "おう" ],
+    "con_end": [ "よ", "ろ", "ぼ", "ご", "こ", "も", "の", "そ", "と", "お", "お" ],
+    "dec_tag": [ "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition" ],
+    "con_tag": [ "v1", "v5aru", "v5b", "v5g", "v5k", "v5m", "v5n", "v5s", "v5t", "v5u" ],
+    "detail": "ksb"
   },
   {
     "type": "stdrule",
@@ -558,11 +622,19 @@
     "con_end": [ "て" ],
     "dec_tag": [ "stem-ku" ],
     "con_tag": [ "stem-te-adverbial" ],
-    "detail": "(te form)"
+    "detail": "(te)"
   },
   {
     "type": "stdrule",
     "dec_end": [ "い" ],
+    "con_end": [ "か" ],
+    "dec_tag": [ "adj-i" ],
+    "con_tag": [ "stem-ka" ],
+    "detail": "(ka stem)"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
     "con_end": [ "か" ],
     "dec_tag": [ "adj-i" ],
     "con_tag": [ "stem-ka" ],
@@ -595,13 +667,21 @@
   {
     "type": "stdrule",
     "dec_end": [ "" ],
+    "con_end": [ "すぎる" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "v1" ],
+    "detail": "too much"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
     "con_end": [ "そう" ],
     "dec_tag": [ "stem-adj-base" ],
     "con_tag": [ "adj-na" ],
     "detail": "seemingness"
   },
   {
-    "type": "stdrule",
+    "type": "onlyfinalrule",
     "dec_end": [ "" ],
     "con_end": [ "そう" ],
     "dec_tag": [ "stem-ren" ],
@@ -626,8 +706,8 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "", "" ],
-    "con_end": [ "た", "った" ],
+    "dec_end": [ "" ],
+    "con_end": [ "た" ],
     "dec_tag": [ "stem-ren-less" ],
     "con_tag": [ "stem-past" ],
     "detail": "past"
@@ -654,7 +734,7 @@
     "con_end": [ "て" ],
     "dec_tag": [ "stem-ren-less" ],
     "con_tag": [ "stem-te-verbal" ],
-    "detail": "(te form)"
+    "detail": "(te)"
   },
   {
     "type": "stdrule",
@@ -662,10 +742,10 @@
     "con_end": [ "で" ],
     "dec_tag": [ "stem-ren-less-v" ],
     "con_tag": [ "stem-te-verbal" ],
-    "detail": "(te form)"
+    "detail": "(te)"
   },
   {
-    "type": "stdrule",
+    "type": "neverfinalrule",
     "dec_end": [ "て", "で", "って" ],
     "con_end": [ "て", "で", "って" ],
     "dec_tag": [ "stem-te-verbal" ],
@@ -678,7 +758,7 @@
     "con_end": [ "で" ],
     "dec_tag": [ "adj-i" ],
     "con_tag": [ "stem-te" ],
-    "detail": "(te form)"
+    "detail": "(te)"
   },
   {
     "type": "stdrule",
@@ -686,23 +766,71 @@
     "con_end": [ "で" ],
     "dec_tag": [ "stem-ku" ],
     "con_tag": [ "stem-te-defective" ],
-    "detail": "(te form)"
+    "detail": "(te)"
   },
   {
     "type": "rewriterule",
     "dec_end": [ "です" ],
     "con_end": [ "でした" ],
-    "dec_tag": [ "exp" ],
+    "dec_tag": [ "cop" ],
     "con_tag": [ "stem-past" ],
     "detail": "past"
   },
   {
     "type": "rewriterule",
     "dec_end": [ "です" ],
+    "con_end": [ "でしたら" ],
+    "dec_tag": [ "cop" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "conditional"
+  },
+  {
+    "type": "rewriterule",
+    "dec_end": [ "です" ],
+    "con_end": [ "でしょう" ],
+    "dec_tag": [ "cop" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "conjectural"
+  },
+  {
+    "type": "rewriterule",
+    "dec_end": [ "です" ],
     "con_end": [ "でして" ],
-    "dec_tag": [ "exp" ],
+    "dec_tag": [ "cop" ],
     "con_tag": [ "stem-te-verbal" ],
-    "detail": "(te form)"
+    "detail": "(te)"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "ない" ],
+    "con_end": [ "へん" ],
+    "dec_tag": [ "adj-i" ],
+    "con_tag": [ "adj-i" ],
+    "detail": "ksb"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "しない" ],
+    "con_end": [ "せえへん" ],
+    "dec_tag": [ "adj-i" ],
+    "con_tag": [ "adj-i" ],
+    "detail": "ksb"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "ない" ],
+    "con_end": [ "ひん" ],
+    "dec_tag": [ "adj-i" ],
+    "con_tag": [ "adj-i" ],
+    "detail": "ksb"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "有る", "在る" ],
+    "con_end": [ "ない", "ない" ],
+    "dec_tag": [ "v5r-i", "v5r-i" ],
+    "con_tag": [ "adj-i" ],
+    "detail": "negative"
   },
   {
     "type": "stdrule",
@@ -745,6 +873,14 @@
     "detail": "archaic negative"
   },
   {
+    "type": "onlyfinalrule",
+    "dec_end": [ "る", "る", "", "", "", "", "", "", "", "", "", "", "", "", "来る", "來る", "くる", "", "る", "る", "", "", "", "", "す" ],
+    "con_end": [ "まい", "まい", "まい", "まい", "まい", "まい", "まい", "まい", "まい", "まい", "まい", "まい", "まい", "まい", "来まい", "來まい", "こまい", "まい", "まい", "まい", "まい", "まい", "まい", "まい", "せまい" ],
+    "dec_tag": [ "v1", "v1-s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5s", "v5t", "v5u", "v5u-s", "vk", "vk", "vk", "vs-i", "vs-i", "vs-s", "vz", "v4r", "v5r-i", "vs-c", "vs-c" ],
+    "con_tag": [ "v1", "v1-s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5s", "v5t", "v5u", "v5u-s", "vk", "vk", "vk", "vs-i", "vs-i", "vs-s", "vz", "v4r", "v5r-i", "vs-c", "vs-c" ],
+    "detail": "negative conjectural"
+  },
+  {
     "type": "stdrule",
     "dec_end": [ "" ],
     "con_end": [ "ない" ],
@@ -758,46 +894,14 @@
     "con_end": [ "ざる" ],
     "dec_tag": [ "stem-mizenkei" ],
     "con_tag": [ "adj-pn" ],
-    "detail": "negative"
-  },
-  {
-    "type": "rewriterule",
-    "dec_end": [ "する" ],
-    "con_end": [ "せざる" ],
-    "dec_tag": [ "vs-i" ],
-    "con_tag": [ "adj-pn" ],
-    "detail": "negative"
-  },
-  {
-    "type": "rewriterule",
-    "dec_end": [ "する" ],
-    "con_end": [ "せず" ],
-    "dec_tag": [ "vs-i" ],
-    "con_tag": [ "uninflectable" ],
-    "detail": "adverbial negative"
-  },
-  {
-    "type": "rewriterule",
-    "dec_end": [ "する" ],
-    "con_end": [ "せずに" ],
-    "dec_tag": [ "vs-i" ],
-    "con_tag": [ "uninflectable" ],
-    "detail": "without doing so"
-  },
-  {
-    "type": "rewriterule",
-    "dec_end": [ "する" ],
-    "con_end": [ "せぬ" ],
-    "dec_tag": [ "vs-i" ],
-    "con_tag": [ "uninflectable" ],
-    "detail": "archaic negative"
+    "detail": "archaic attributive negative"
   },
   {
     "type": "stdrule",
     "dec_end": [ "する", "する", "する", "する" ],
     "con_end": [ "できる", "出来る", "出きる", "出來る" ],
-    "dec_tag": [ "vs-i" ],
-    "con_tag": [ "uninflectable" ],
+    "dec_tag": [ "vs-i", "vs-i", "vs-i", "vs-i" ],
+    "con_tag": [ "v1", "v1", "v1", "v1" ],
     "detail": "potential"
   },
   {
@@ -807,6 +911,22 @@
     "dec_tag": [ "stem-ku" ],
     "con_tag": [ "uninflectable" ],
     "detail": "formal negative"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "いらっしゃる" ],
+    "dec_tag": [ "stem-te-verbal" ],
+    "con_tag": [ "v5aru" ],
+    "detail": "honorific teiru"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "くれる" ],
+    "dec_tag": [ "stem-te-verbal" ],
+    "con_tag": [ "v1-s" ],
+    "detail": "statement/request"
   },
   {
     "type": "stdrule",
@@ -826,11 +946,19 @@
   },
   {
     "type": "onlyfinalrule",
+    "dec_end": [ "", "" ],
+    "con_end": [ "つつ", "つつ" ],
+    "dec_tag": [ "stem-ren", "stem-adj-base" ],
+    "con_tag": [ "uninflectable", "uninflectable" ],
+    "detail": "while/although"
+  },
+  {
+    "type": "onlyfinalrule",
     "dec_end": [ "" ],
     "con_end": [ "ません" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
-    "detail": "negative polite"
+    "detail": "polite negative"
   },
   {
     "type": "onlyfinalrule",
@@ -838,7 +966,7 @@
     "con_end": [ "ました" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
-    "detail": "past polite"
+    "detail": "polite past"
   },
   {
     "type": "onlyfinalrule",
@@ -846,7 +974,7 @@
     "con_end": [ "まして" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
-    "detail": "te polite"
+    "detail": "polite te"
   },
   {
     "type": "onlyfinalrule",
@@ -854,7 +982,7 @@
     "con_end": [ "ませんでした" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
-    "detail": "past negative polite"
+    "detail": "polite past negative"
   },
   {
     "type": "onlyfinalrule",
@@ -871,6 +999,62 @@
     "dec_tag": [ "stem-ren-less" ],
     "con_tag": [ "uninflectable" ],
     "detail": "conditional"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
+    "con_end": [ "ましたら" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "polite conditional"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "になる" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "v5r" ],
+    "detail": "honorific"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "になる" ],
+    "dec_tag": [ "v5aru" ],
+    "con_tag": [ "v5aru" ],
+    "detail": "honorific"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "なさる" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "v5r" ],
+    "detail": "honorific"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "する" ],
+    "con_end": [ "なさる" ],
+    "dec_tag": [ "vs-i" ],
+    "con_tag": [ "v5r" ],
+    "detail": "honorific"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "はる" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "v5r" ],
+    "detail": "honorific (ksb)"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" ],
+    "con_end": [ "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な", "な" ],
+    "dec_tag": [ "v1", "v1-s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-i", "vs-s", "vz", "v4r", "v5r-i", "vs-c" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "imperative negative"
   },
   {
     "type": "onlyfinalrule",
@@ -917,7 +1101,7 @@
     "dec_end": [ "" ],
     "con_end": [ "ば" ],
     "dec_tag": [ "stem-e" ],
-    "con_tag": [ "uninflectable" ],
+    "con_tag": [ "form-provisional-conditional" ],
     "detail": "provisional conditional"
   },
   {
@@ -925,8 +1109,16 @@
     "dec_end": [ "" ],
     "con_end": [ "れば" ],
     "dec_tag": [ "stem-ke" ],
-    "con_tag": [ "uninflectable" ],
+    "con_tag": [ "form-provisional-conditional" ],
     "detail": "provisional conditional"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "れば" ],
+    "con_end": [ "りゃ" ],
+    "dec_tag": [ "form-provisional-conditional" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "contracted"
   },
   {
     "type": "stdrule",
@@ -948,8 +1140,8 @@
     "type": "stdrule",
     "dec_end": [ "くる", "来る", "來る" ],
     "con_end": [ "これる", "来れる", "來れる" ],
-    "dec_tag": [ "vk" ],
-    "con_tag": [ "v1" ],
+    "dec_tag": [ "vk", "vk", "vk" ],
+    "con_tag": [ "v1", "v1", "v1" ],
     "detail": "potential"
   },
   {
@@ -962,11 +1154,11 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "る", "る", "ずる", "ずる", "する", "する" ],
-    "con_end": [ "られる", "られる", "ぜられる", "ざれる", "せられる", "しられる" ],
-    "dec_tag": [ "v1", "v1-s", "vz", "vz", "vs-s", "vs-s" ],
-    "con_tag": [ "v1", "v1-s", "vz", "vz", "vs-s", "vs-s" ],
-    "detail": "passive/potential"
+    "dec_end": [ "る", "る", "す" ],
+    "con_end": [ "られる", "られる", "される" ],
+    "dec_tag": [ "v1", "v1-s", "vs-c" ],
+    "con_tag": [ "v1", "v1-s", "v1" ],
+    "detail": "passive/potential/honorific"
   },
   {
     "type": "stdrule",
@@ -974,22 +1166,37 @@
     "con_end": [ "こられる", "来られる", "來られる" ],
     "dec_tag": [ "vk" ],
     "con_tag": [ "v1" ],
+    "detail": "passive/potential/honorific"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "される" ],
+    "dec_tag": [ "stem-a" ],
+    "con_tag": [ "v1" ],
+    "detail": "causative passive"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "ずる", "ずる", "する", "する" ],
+    "con_end": [ "ぜられる", "じられる", "せられる", "しられる" ],
+    "dec_tag": [ "vz", "vz", "vs-s", "vs-s" ],
+    "con_tag": [ "v1" ],
     "detail": "passive/potential"
   },
   {
     "type": "stdrule",
-    "dec_end": [ "る", "る", "する", "する", "する", "る", "す" ],
-    "con_end": [ "さす", "さす", "さす", "しさす", "さす", "さす", "さす" ],
-    "dec_tag": [ "v1", "v1-s", "vs-s", "vs-s", "vs-i", "vk", "v5s" ],
-    "con_tag": [ "v1", "v1-s", "vs-s", "vs-s", "vs-i", "vk", "v5s" ],
+    "dec_end": [ "る", "る", "する", "する", "る", "す", "る", "ぶ", "ぐ", "く", "く", "む", "ぬ", "る", "つ", "う", "う", "ずる", "る", "る", "す" ],
+    "con_end": [ "さす", "さす", "さす", "しさす", "さす", "さす", "らす", "ばす", "がす", "かす", "かす", "ます", "なす", "らす", "たす", "わす", "わす", "じさす", "らす", "らす", "せす" ],
+    "dec_tag": [ "v1", "v1-s", "vs-s", "vs-s", "vk", "v5s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5t", "v5u", "v5u-s", "vz", "v4r", "v5r-i", "vs-c" ],
+    "con_tag": [ "v1", "v1-s", "vs-s", "vs-s", "vk", "v5s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5t", "v5u", "v5u-s", "vz", "v4r", "v5r-i", "vs-c" ],
     "detail": "short causative"
   },
   {
-    "type": "contextrule",
-    "contextrule": "saspecial",
-    "dec_end": [ "" ],
-    "con_end": [ "す" ],
-    "dec_tag": [ "stem-a" ],
+    "type": "stdrule",
+    "dec_end": [ "する" ],
+    "con_end": [ "さす" ],
+    "dec_tag": [ "vs-i" ],
     "con_tag": [ "v5s" ],
     "detail": "short causative"
   },
@@ -1003,11 +1210,27 @@
   },
   {
     "type": "stdrule",
+    "dec_end": [ "す" ],
+    "con_end": [ "せさす" ],
+    "dec_tag": [ "vs-c" ],
+    "con_tag": [ "vs-c" ],
+    "detail": "causative"
+  },
+  {
+    "type": "stdrule",
     "dec_end": [ "る", "る" ],
     "con_end": [ "させる", "させる" ],
     "dec_tag": [ "v1", "v1-s" ],
     "con_tag": [ "v1", "v1-s" ],
     "detail": "causative"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "ささる" ],
+    "dec_tag": [ "stem-mizenkei" ],
+    "con_tag": [ "v1" ],
+    "detail": "colloquial causative"
   },
   {
     "type": "stdrule",
@@ -1024,6 +1247,14 @@
     "dec_tag": [ "stem-te" ],
     "con_tag": [ "v5u" ],
     "detail": "finish/completely/end up"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "しまう" ],
+    "con_end": [ "もう" ],
+    "dec_tag": [ "v5u" ],
+    "con_tag": [ "v5u" ],
+    "detail": "ksb"
   },
   {
     "type": "stdrule",
@@ -1056,7 +1287,7 @@
     "con_end": [ "る" ],
     "dec_tag": [ "stem-te" ],
     "con_tag": [ "v1" ],
-    "detail": "teru (teiru)"
+    "detail": "teru"
   },
   {
     "type": "stdrule",
@@ -1072,7 +1303,7 @@
     "con_end": [ "とる", "どる" ],
     "dec_tag": [ "stem-te" ],
     "con_tag": [ "v5r" ],
-    "detail": "toru (teoru)"
+    "detail": "toru"
   },
   {
     "type": "stdrule",
@@ -1096,7 +1327,7 @@
     "con_end": [ "く" ],
     "dec_tag": [ "stem-te" ],
     "con_tag": [ "v5k-s" ],
-    "detail": "teku (teiku)"
+    "detail": "teku"
   },
   {
     "type": "stdrule",
@@ -1144,7 +1375,7 @@
     "con_end": [ "なさい" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
-    "detail": "kind request"
+    "detail": "polite imperative"
   },
   {
     "type": "onlyfinalrule",
@@ -1152,7 +1383,7 @@
     "con_end": [ "な" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
-    "detail": "casual kind request"
+    "detail": "casual polite imperative"
   },
   {
     "type": "onlyfinalrule",
@@ -1193,14 +1424,6 @@
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "adj-i" ],
     "detail": "want"
-  },
-  {
-    "type": "stdrule",
-    "dec_end": [ "" ],
-    "con_end": [ "すぎる" ],
-    "dec_tag": [ "stem-ren" ],
-    "con_tag": [ "v1" ],
-    "detail": "too much"
   },
   {
     "type": "stdrule",
@@ -1253,16 +1476,8 @@
   {
     "type": "onlyfinalrule",
     "dec_end": [ "ければ" ],
-    "con_end": [ "けりゃ" ],
-    "dec_tag": [ "uninflectable" ],
-    "con_tag": [ "uninflectable" ],
-    "detail": "contracted"
-  },
-  {
-    "type": "onlyfinalrule",
-    "dec_end": [ "ければ" ],
     "con_end": [ "きゃ" ],
-    "dec_tag": [ "uninflectable" ],
+    "dec_tag": [ "form-provisional-conditional" ],
     "con_tag": [ "uninflectable" ],
     "detail": "contracted"
   },
