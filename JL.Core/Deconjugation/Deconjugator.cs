@@ -3,7 +3,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
 
-// translated from https://github.com/wareya/nazeka/blob/master/background-script.js
+// Modified from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
     public static Rule[] Rules { get; set; } = [];
@@ -203,7 +203,53 @@ internal static class Deconjugator
 
                 if (addFormToProcess)
                 {
-                    processed.Add(form);
+                    bool add = true;
+                    int formProcessCount = -1;
+                    string formTag = form.Tags[^1];
+
+                    for (int i = processed.Count - 1; i >= 0; i--)
+                    {
+                        Form existingForm = processed[i];
+                        if (existingForm.Text == form.Text && existingForm.Tags[^1] == formTag)
+                        {
+                            int existingFormProcessCount = 1;
+                            for (int j = existingForm.Process.Count - 1; j > 0; j--)
+                            {
+                                if (!existingForm.Process[j].StartsWith('('))
+                                {
+                                    ++existingFormProcessCount;
+                                }
+                            }
+
+                            if (formProcessCount is -1)
+                            {
+                                formProcessCount = 1;
+                                for (int j = form.Process.Count - 1; j > 0; j--)
+                                {
+                                    if (!form.Process[j].StartsWith('('))
+                                    {
+                                        ++formProcessCount;
+                                    }
+                                }
+                            }
+
+                            if (existingFormProcessCount < formProcessCount)
+                            {
+                                add = false;
+                                break;
+                            }
+
+                            if (existingFormProcessCount > formProcessCount)
+                            {
+                                processed.RemoveAt(i);
+                            }
+                        }
+                    }
+
+                    if (add)
+                    {
+                        processed.Add(form);
+                    }
                 }
                 else
                 {
