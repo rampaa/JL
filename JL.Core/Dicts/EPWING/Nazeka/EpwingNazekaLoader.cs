@@ -118,7 +118,7 @@ internal static class EpwingNazekaLoader
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<IDictRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
+        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static void AddRecordToDictionary(string keyInHiragana, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)

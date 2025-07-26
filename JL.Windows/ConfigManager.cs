@@ -1096,6 +1096,7 @@ internal sealed class ConfigManager
         await using (connection.ConfigureAwait(true))
         {
 #pragma warning disable CA1849 // Call async methods when in an async method
+            // ReSharper disable once UseAwaitUsing
             using SqliteTransaction transaction = connection.BeginTransaction();
 #pragma warning restore CA1849 // Call async methods when in an async method
 

@@ -54,6 +54,7 @@ internal static class EpwingNazekaDBManager
 
     private enum ColumnIndex
     {
+        // ReSharper disable once UnusedMember.Local
         RowId = 0,
         PrimarySpelling,
         Reading,
@@ -284,14 +285,14 @@ internal static class EpwingNazekaDBManager
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<IDictRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
+        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader)
     {
         string primarySpelling = dataReader.GetString((int)ColumnIndex.PrimarySpelling);
 
-        int readingIndex = (int)ColumnIndex.Reading;
+        const int readingIndex = (int)ColumnIndex.Reading;
         string? reading = !dataReader.IsDBNull(readingIndex)
             ? dataReader.GetString(readingIndex)
             : null;

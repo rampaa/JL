@@ -20,6 +20,7 @@ internal static class YomichanKanjiDBManager
 
     private enum ColumnIndex
     {
+        // ReSharper disable once UnusedMember.Local
         RowId = 0,
         OnReadings,
         KunReadings,
@@ -168,7 +169,7 @@ internal static class YomichanKanjiDBManager
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<IDictRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
+        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)

@@ -17,7 +17,7 @@ internal static class JmnedictRecordBuilder
         Debug.Assert(translationListSpanLength > 0);
 
         string[][] definitionsArray = new string[translationListSpanLength][];
-        string[]?[]? nameTypesArray = new string[translationListSpanLength][];
+        string[]?[] nameTypesArray = new string[translationListSpanLength][];
         // string[]?[] relatedTermsArray = new string[translationListCount][];
 
         for (int j = 0; j < translationListSpanLength; j++)
@@ -64,7 +64,7 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                JmnedictRecord record = new(entry.Id, reb, entry.RebList.RemoveAtToArray(i), null, definitionsArray, nameTypesArray);
+                JmnedictRecord record = new(entry.Id, reb, entry.RebList.RemoveAtToArray(i), null, definitionsArray, nameTypesArray.TrimNullableArray());
                 // record.RelatedTerms = relatedTermsArray;
 
                 recordDictionary.Add(key, record);

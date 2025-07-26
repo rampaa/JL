@@ -168,27 +168,27 @@ internal static class KanjidicDBManager
 
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)
     {
-        int onReadingsIndex = (int)ColumnIndex.OnReadings;
+        const int onReadingsIndex = (int)ColumnIndex.OnReadings;
         string[]? onReadings = !dataReader.IsDBNull(onReadingsIndex)
             ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(onReadingsIndex))
             : null;
 
-        int kunReadingsIndex = (int)ColumnIndex.KunReadings;
+        const int kunReadingsIndex = (int)ColumnIndex.KunReadings;
         string[]? kunReadings = !dataReader.IsDBNull(kunReadingsIndex)
             ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(kunReadingsIndex))
             : null;
 
-        int nanoriReadingsIndex = (int)ColumnIndex.NanoriReadings;
+        const int nanoriReadingsIndex = (int)ColumnIndex.NanoriReadings;
         string[]? nanoriReadings = !dataReader.IsDBNull(nanoriReadingsIndex)
             ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(nanoriReadingsIndex))
             : null;
 
-        int radicalNamesIndex = (int)ColumnIndex.RadicalNames;
+        const int radicalNamesIndex = (int)ColumnIndex.RadicalNames;
         string[]? radicalNames = !dataReader.IsDBNull(radicalNamesIndex)
             ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(radicalNamesIndex))
             : null;
 
-        int glossaryIndex = (int)ColumnIndex.Glossary;
+        const int glossaryIndex = (int)ColumnIndex.Glossary;
         string[]? definitions = !dataReader.IsDBNull(glossaryIndex)
             ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(glossaryIndex))
             : null;

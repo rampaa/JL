@@ -234,14 +234,14 @@ internal static class YomichanPitchAccentDBManager
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(entry => entry.Key, entry => (IList<IDictRecord>)entry.Value.ToArray(), StringComparer.Ordinal);
+        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static PitchAccentRecord GetRecord(SqliteDataReader dataReader)
     {
         string spelling = dataReader.GetString((int)ColumnIndex.Spelling);
 
-        int readingIndex = (int)ColumnIndex.Reading;
+        const int readingIndex = (int)ColumnIndex.Reading;
         string? reading = !dataReader.IsDBNull(readingIndex)
             ? dataReader.GetString(readingIndex)
             : null;

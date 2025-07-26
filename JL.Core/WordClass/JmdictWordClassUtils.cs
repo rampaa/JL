@@ -55,7 +55,7 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(entry => entry.Key, kvp => (IList<JmdictWordClass>)kvp.Value.ToArray(), StringComparer.Ordinal);
+        DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(static entry => entry.Key, static IList<JmdictWordClass> (kvp) => kvp.Value.ToArray(), StringComparer.Ordinal);
     }
 
     internal static Task Serialize()

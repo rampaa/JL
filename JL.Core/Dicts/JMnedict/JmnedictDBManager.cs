@@ -12,6 +12,7 @@ internal static class JmnedictDBManager
 
     private enum ColumnIndex
     {
+        // ReSharper disable once UnusedMember.Local
         RowId = 0,
         JmnedictId,
         PrimarySpelling,
@@ -201,12 +202,7 @@ internal static class JmnedictDBManager
     //         }
     //     }
     //
-    //     foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
-    //     {
-    //         dict.Contents[key] = recordList.ToArray();
-    //     }
-    //
-    //     dict.Contents.TrimExcess();
+    // dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord>(entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     // }
 
     private static JmnedictRecord GetRecord(SqliteDataReader dataReader)
