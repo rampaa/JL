@@ -161,7 +161,7 @@ public static class ExtensionMethods
             : list.ToArray();
     }
 
-    internal static T?[]? TrimListOfNullableElementsToArray<T>(this List<T> list) where T : class?
+    internal static T?[]? TrimListOfNullableElementsToArray<T>(this List<T?> list) where T : class
     {
         if (list.Count is 0)
         {
@@ -179,7 +179,7 @@ public static class ExtensionMethods
         return null;
     }
 
-    internal static T?[]? TrimNullableArray<T>(this T[] array) where T : class?
+    internal static T?[]? TrimNullableArray<T>(this T?[] array) where T : class
     {
         foreach (T? item in array)
         {
@@ -274,7 +274,7 @@ public static class ExtensionMethods
     //    return new ReadOnlyMemory<T>(array, start, length);
     //}
 
-    internal static T? GetNullableValueFromBlobStream<T>(this SqliteDataReader dataReader, int index) where T : class?
+    internal static T? GetNullableValueFromBlobStream<T>(this SqliteDataReader dataReader, int index) where T : class
     {
         if (dataReader.IsDBNull(index))
         {
