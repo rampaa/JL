@@ -1380,11 +1380,11 @@ internal sealed partial class PopupWindow
                     BitmapFrame frame = BitmapFrame.Create(bitmap.UriSource, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
                     if (frame.PixelWidth > frame.PixelHeight)
                     {
-                        bitmap.DecodePixelWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth);
+                        bitmap.DecodePixelWidth = double.ConvertToIntegerNative<int>(MaxWidth);
                     }
                     else
                     {
-                        bitmap.DecodePixelHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight);
+                        bitmap.DecodePixelHeight = double.ConvertToIntegerNative<int>(MaxHeight);
                     }
 
                     bitmap.EndInit();
