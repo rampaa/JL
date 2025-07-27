@@ -1397,7 +1397,6 @@ internal sealed partial class PopupWindow
                     {
                         Name = $"Image{i}",
                         Source = bitmap,
-                        Tag = imagePath,
                         Stretch = Stretch.Uniform,
                         StretchDirection = StretchDirection.DownOnly,
                         VerticalAlignment = VerticalAlignment.Center,
