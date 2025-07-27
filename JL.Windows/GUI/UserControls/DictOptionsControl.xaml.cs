@@ -171,6 +171,13 @@ internal sealed partial class DictOptionsControl
             autoUpdateAfterNDaysOption = new AutoUpdateAfterNDaysOption(double.ConvertToIntegerNative<int>(AutoUpdateAfterNDaysNumericUpDown.Value));
         }
 
+        ShowImagesOption? showImagesOption = null;
+        if (ShowImagesOption.ValidDictTypes.Contains(type))
+        {
+            Debug.Assert(ShowImagesCheckBox.IsChecked is not null);
+            showImagesOption = new ShowImagesOption(ShowImagesCheckBox.IsChecked.Value);
+        }
+
         DictOptions options = new(
             useDBOption,
             noAllOption,
@@ -191,7 +198,8 @@ internal sealed partial class DictOptionsControl
             relatedTermOption,
             antonymOption,
             showPitchAccentWithDottedLines,
-            autoUpdateAfterNDaysOption);
+            autoUpdateAfterNDaysOption,
+            showImagesOption);
 
         return options;
     }
@@ -336,6 +344,13 @@ internal sealed partial class DictOptionsControl
         {
             AutoUpdateAfterNDaysNumericUpDown.Value = 0;
             AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
+            showDictOptions = true;
+        }
+
+        if (ShowImagesOption.ValidDictTypes.Contains(dictType))
+        {
+            ShowImagesCheckBox.IsChecked = true;
+            ShowImagesCheckBox.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
 
@@ -502,6 +517,14 @@ internal sealed partial class DictOptionsControl
             Debug.Assert(dict.Options.AutoUpdateAfterNDays is not null);
             AutoUpdateAfterNDaysNumericUpDown.Value = dict.Options.AutoUpdateAfterNDays.Value;
             AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
+            showDictOptions = true;
+        }
+
+        if (ShowImagesOption.ValidDictTypes.Contains(dict.Type))
+        {
+            Debug.Assert(dict.Options.ShowImagesOption is not null);
+            ShowImagesCheckBox.IsChecked = dict.Options.ShowImagesOption.Value;
+            ShowImagesCheckBox.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
 

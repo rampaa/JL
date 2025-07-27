@@ -4,5 +4,5 @@ namespace JL.Core.Dicts.EPWING;
 
 internal interface IEpwingRecord : IDictRecordWithSingleReading
 {
-    public string[] Definitions { get; }
+    public string[]? Definitions { get; }
 }

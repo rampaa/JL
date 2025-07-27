@@ -19,6 +19,7 @@ public sealed class LookupResult
         int entryId = 0,
         byte[]? pitchPositions = null,
         string[]? wordClasses = null,
+        string[]? imagePaths = null,
         JmdictLookupResult? jmdictLookupResult = null,
         KanjiLookupResult? kanjiLookupResult = null
     ) : IEquatable<LookupResult>, IComparable<LookupResult>
@@ -38,6 +39,9 @@ public sealed class LookupResult
     public string? DeconjugatedMatchedText { get; } = deconjugatedMatchedText;
     public string? DeconjugationProcess { get; } = deconjugationProcess;
     internal string[]? WordClasses { get; } = wordClasses;
+
+    // Yomichan dictionaries
+    public string[]? ImagePaths { get; } = imagePaths;
 
     // JMdict, Nazeka EPWING
     public string[]? AlternativeSpellings { get; } = alternativeSpellings;

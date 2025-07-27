@@ -1022,7 +1022,8 @@ public static class LookupUtils
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                        wordClasses: epwingResult.WordClasses
+                        wordClasses: epwingResult.WordClasses,
+                        imagePaths: epwingResult.ImagePaths
                     );
 
                     results.Add(result);
@@ -1054,7 +1055,8 @@ public static class LookupUtils
                     readings: readings,
                     kanjiLookupResult: new KanjiLookupResult(kanjiCompositions),
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
-                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
+                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                    imagePaths: epwingResult.ImagePaths
                 );
 
                 results.Add(result);

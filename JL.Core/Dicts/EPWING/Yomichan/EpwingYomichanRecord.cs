@@ -12,24 +12,31 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
-    public string[] Definitions { get; }
+    public string[]? Definitions { get; }
     public string[]? WordClasses { get; }
     public string[]? DefinitionTags { get; }
+    public string[]? ImagePaths { get; }
     //public int Score { get; }
     //public int Sequence { get; }
     //public string[]? TermTags { get; }
 
-    public EpwingYomichanRecord(string primarySpelling, string? reading, string[] definitions, string[]? wordClasses, string[]? definitionTags)
+    public EpwingYomichanRecord(string primarySpelling, string? reading, string[]? definitions, string[]? wordClasses, string[]? definitionTags, string[]? imagePaths)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
         Definitions = definitions;
         WordClasses = wordClasses;
         DefinitionTags = definitionTags;
+        ImagePaths = imagePaths;
     }
 
-    public string BuildFormattedDefinition(DictOptions options)
+    public string? BuildFormattedDefinition(DictOptions options)
     {
+        if (Definitions is null)
+        {
+            return null;
+        }
+
         if (Definitions.Length is 1)
         {
             return DefinitionTags is not null
@@ -135,7 +142,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         return obj is EpwingYomichanRecord epwingYomichanRecord
                && PrimarySpelling == epwingYomichanRecord.PrimarySpelling
                && Reading == epwingYomichanRecord.Reading
-               && epwingYomichanRecord.Definitions.AsReadOnlySpan().SequenceEqual(Definitions);
+               && epwingYomichanRecord.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)
+               && epwingYomichanRecord.ImagePaths.AsReadOnlySpan().SequenceEqual(ImagePaths);
     }
 
     public bool Equals(EpwingYomichanRecord? other)
@@ -143,7 +151,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         return other is not null
                && PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
-               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions);
+               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)
+               && other.ImagePaths.AsReadOnlySpan().SequenceEqual(ImagePaths);
     }
 
     public override int GetHashCode()
@@ -153,9 +162,28 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
 
-            foreach (string definition in Definitions)
+            if (Definitions is not null)
             {
-                hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
+                foreach (string definition in Definitions)
+                {
+                    hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            if (ImagePaths is not null)
+            {
+                foreach (string imagePath in ImagePaths)
+                {
+                    hash = (hash * 37) + imagePath.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
             }
 
             return hash;

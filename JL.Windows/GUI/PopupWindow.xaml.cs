@@ -1359,6 +1359,54 @@ internal sealed partial class PopupWindow
             }
         }
 
+        if (result.ImagePaths is not null)
+        {
+            ShowImagesOption? showImagesOption = result.Dict.Options.ShowImagesOption;
+            Debug.Assert(showImagesOption is not null);
+            bool showImages = showImagesOption.Value;
+
+            if (showImages)
+            {
+                for (int i = 0; i < result.ImagePaths.Length; i++)
+                {
+                    string imagePath = result.ImagePaths[i];
+
+                    BitmapImage bitmap = new();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri(imagePath, UriKind.RelativeOrAbsolute);
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+
+                    BitmapFrame frame = BitmapFrame.Create(bitmap.UriSource, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+                    if (frame.PixelWidth > frame.PixelHeight)
+                    {
+                        bitmap.DecodePixelWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth);
+                    }
+                    else
+                    {
+                        bitmap.DecodePixelHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight);
+                    }
+
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+
+                    Image image = new()
+                    {
+                        Name = $"Image{i}",
+                        Source = bitmap,
+                        Tag = imagePath,
+                        Stretch = Stretch.Uniform,
+                        StretchDirection = StretchDirection.DownOnly,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Thickness(2, 2, 2, 4)
+                    };
+
+                    _ = bottom.Children.Add(image);
+                }
+            }
+        }
+
         if (index != resultCount - 1)
         {
             _ = bottom.Children.Add(new Separator

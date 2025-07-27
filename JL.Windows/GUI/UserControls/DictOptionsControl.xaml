@@ -122,6 +122,10 @@
                     <TextBlock Text="Show antonyms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
+                <CheckBox Name="ShowImagesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show images" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
                 <CheckBox Name="ShowPitchAccentWithDottedLinesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show pitch accent with dotted lines"
                                ToolTip="If unchecked, pitch accent will be shown with solid lines"

@@ -88,11 +88,13 @@ internal static class EpwingYomichanLoader
             return null;
         }
 
-        string[]? definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5]);
+        List<string> imagePaths = [];
+        string[]? definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5], dict, imagePaths);
         definitions?.DeduplicateStringsInArray();
 
         if (definitions is null
-            || !EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
+            ? imagePaths.Count is 0
+            : !EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
         {
             return null;
         }
@@ -113,7 +115,7 @@ internal static class EpwingYomichanLoader
         //jsonElements[6].TryGetInt32(out int sequence);
         //string[] termTags = jsonElements[7].ToString();
 
-        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
+        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imagePaths.TrimToArray());
     }
 
     private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict, bool nonKanjiDict, bool nonNameDict)

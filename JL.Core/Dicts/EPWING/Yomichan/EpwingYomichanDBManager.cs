@@ -11,11 +11,11 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 20;
+    public const int Version = 21;
 
     private const string SingleTermQuery =
         """
-        SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags
+        SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_paths
         FROM record r
         JOIN record_search_key rsk ON r.rowid = rsk.record_id
         WHERE rsk.search_key = @term;
@@ -25,7 +25,7 @@ internal static class EpwingYomichanDBManager
     {
         return
             $"""
-            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key
+            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_paths, rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN {parameter}
@@ -36,7 +36,7 @@ internal static class EpwingYomichanDBManager
     {
         StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
             """
-            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, rsk.search_key
+            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_paths, rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -61,6 +61,7 @@ internal static class EpwingYomichanDBManager
         Glossary,
         PartOfSpeech,
         GlossaryTags,
+        ImagePaths,
         SearchKey
     }
 
@@ -78,7 +79,8 @@ internal static class EpwingYomichanDBManager
                 reading TEXT,
                 glossary BLOB NOT NULL,
                 part_of_speech BLOB,
-                glossary_tags BLOB
+                glossary_tags BLOB,
+                image_paths BLOB
             ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key
@@ -125,8 +127,8 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (rowid, primary_spelling, reading, glossary, part_of_speech, glossary_tags)
-            VALUES (@rowid, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags);
+            INSERT INTO record (rowid, primary_spelling, reading, glossary, part_of_speech, glossary_tags, image_paths)
+            VALUES (@rowid, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags, @image_paths);
             """;
 
         SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
@@ -135,13 +137,15 @@ internal static class EpwingYomichanDBManager
         SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
         SqliteParameter partOfSpeechParam = new("@part_of_speech", SqliteType.Blob);
         SqliteParameter glossaryTagsParam = new("@glossary_tags", SqliteType.Blob);
+        SqliteParameter imagePathsParam = new("@image_paths", SqliteType.Blob);
         insertRecordCommand.Parameters.AddRange([
             rowidParam,
             primarySpellingParam,
             readingParam,
             glossaryParam,
             partOfSpeechParam,
-            glossaryTagsParam
+            glossaryTagsParam,
+            imagePathsParam
         ]);
 
         insertRecordCommand.Prepare();
@@ -166,6 +170,7 @@ internal static class EpwingYomichanDBManager
             glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
             partOfSpeechParam.Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
             glossaryTagsParam.Value = record.DefinitionTags is not null ? MessagePackSerializer.Serialize(record.DefinitionTags) : DBNull.Value;
+            imagePathsParam.Value = record.ImagePaths is not null ? MessagePackSerializer.Serialize(record.ImagePaths) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
             recordIdParam.Value = rowid;
@@ -265,7 +270,7 @@ internal static class EpwingYomichanDBManager
 
         command.CommandText =
             """
-            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, json_group_array(rsk.search_key)
+            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_paths, json_group_array(rsk.search_key)
             FROM record r
             JOIN record_search_key rsk ON r.rowid = rsk.record_id
             GROUP BY r.rowid;
@@ -304,7 +309,8 @@ internal static class EpwingYomichanDBManager
         string[] definitions = dataReader.GetValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
         string[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.PartOfSpeech);
         string[]? definitionTags = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.GlossaryTags);
+        string[]? imagePaths = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.ImagePaths);
 
-        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
+        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imagePaths);
     }
 }
