@@ -129,3 +129,13 @@ public sealed class AutoUpdateAfterNDaysOption(int value)
     public int Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict, DictType.JMnedict, DictType.Kanjidic];
 }
+
+public sealed class ShowImagesOption(bool value)
+{
+    public bool Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.NonspecificWordYomichan, DictType.NonspecificNameYomichan, DictType.NonspecificKanjiWithWordSchemaYomichan, DictType.NonspecificYomichan, DictType.NonspecificKanjiYomichan];
+}
+

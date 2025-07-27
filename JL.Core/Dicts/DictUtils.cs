@@ -1430,6 +1430,10 @@ public static class DictUtils
         }
         else
         {
+            if (ShowImagesOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.ShowImagesOption ??= new ShowImagesOption(true);
+            }
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
             {
                 dict.Options.NewlineBetweenDefinitions ??= new NewlineBetweenDefinitionsOption(true);

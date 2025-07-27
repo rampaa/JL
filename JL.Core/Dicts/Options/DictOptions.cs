@@ -20,7 +20,8 @@ public sealed class DictOptions(
     RelatedTermOption? relatedTerm = null,
     AntonymOption? antonym = null,
     ShowPitchAccentWithDottedLinesOption? showPitchAccentWithDottedLines = null,
-    AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null)
+    AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null,
+    ShowImagesOption? showImagesOption = null)
 {
     public UseDBOption UseDB { get; } = useDB;
     public NoAllOption NoAll { get; } = noAll;
@@ -42,4 +43,5 @@ public sealed class DictOptions(
     public LoanwordEtymologyOption? LoanwordEtymology { get; internal set; } = loanwordEtymology;
     public ShowPitchAccentWithDottedLinesOption? ShowPitchAccentWithDottedLines { get; internal set; } = showPitchAccentWithDottedLines;
     public AutoUpdateAfterNDaysOption? AutoUpdateAfterNDays { get; internal set; } = autoUpdateAfterNDays;
+    public ShowImagesOption? ShowImagesOption { get; internal set; } = showImagesOption;
 }
