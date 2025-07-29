@@ -188,8 +188,7 @@ internal static class PopupWindowUtils
 
             int index = hoveredPopup?.PopupIndex + 1 ?? 0;
             PopupWindow? popupWindow = PopupWindows[index];
-            Debug.Assert(popupWindow is not null);
-            if (popupWindow.IsVisible)
+            if (popupWindow?.IsVisible ?? false)
             {
                 HidePopups(index);
             }

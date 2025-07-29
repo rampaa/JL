@@ -37,16 +37,19 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             return null;
         }
 
+        Debug.Assert(options.NewlineBetweenDefinitions is not null);
+        bool newline = options.NewlineBetweenDefinitions.Value;
+
         if (Definitions.Length is 1)
         {
             return DefinitionTags is not null
-                ? $"[{DefinitionTags[0]}] {Definitions[0]}"
+                ? DefinitionTags.Length is 1
+                    ? $"[{DefinitionTags[0]}] {Definitions[0]}"
+                    : $"[{string.Join(", ", DefinitionTags)}]{(newline ? '\n' : ' ')}{Definitions[0]}"
                 : Definitions[0];
         }
 
-        Debug.Assert(options.NewlineBetweenDefinitions is not null);
-        bool newline = options.NewlineBetweenDefinitions.Value;
-        char separator = newline
+        char defSeparator = newline
             ? '\n'
             : '；';
 
@@ -63,7 +66,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             _ = defBuilder.Append(CultureInfo.InvariantCulture, $"{sequence}. {definitions[i]}");
             if (sequence != definitions.Length)
             {
-                _ = defBuilder.Append(separator);
+                _ = defBuilder.Append(defSeparator);
             }
         }
 
