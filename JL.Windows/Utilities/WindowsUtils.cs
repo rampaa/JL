@@ -493,6 +493,13 @@ internal static class WindowsUtils
         });
     }
 
+    public static double GetMaxHeight(Typeface typeface, double fontSize)
+    {
+        return typeface.TryGetGlyphTypeface(out GlyphTypeface glyphTypeface)
+            ? glyphTypeface.Height * fontSize
+            : double.NaN;
+    }
+
     public static Size MeasureTextSize(string text, double fontSize)
     {
         FormattedText formattedText = new(

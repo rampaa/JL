@@ -26,7 +26,7 @@ internal static class DictOptionManager
             PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorString);
 
             Debug.Assert(pitchAccentDict.Options.ShowPitchAccentWithDottedLines is not null);
-            MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetStrokeDashArray(pitchAccentDict.Options.ShowPitchAccentWithDottedLines.Value));
+            MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetPitchAccentMarkerPen(pitchAccentDict.Options.ShowPitchAccentWithDottedLines.Value, PitchAccentMarkerColor));
         }
         else
         {

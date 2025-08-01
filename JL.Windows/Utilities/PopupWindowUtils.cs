@@ -4,12 +4,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
-using JL.Core.Utilities;
 using JL.Windows.GUI;
 using NAudio.Wave;
 using Timer = System.Timers.Timer;
@@ -22,7 +20,7 @@ internal static class PopupWindowUtils
     public static PopupWindow?[] PopupWindows { get; } = new PopupWindow?[MaxPopupWindowsIndex + 2];
     private static string? s_primarySpellingOfLastPlayedAudio;
     private static string? s_readingOfLastPlayedAudio;
-    private static DoubleCollection StrokeDashArray { get; set; } = [1, 1];
+    public static Pen PitchAccentMarkerPen { get; set; } = new();
     public static readonly Timer PopupAutoHideTimer = new()
     {
         AutoReset = false
@@ -83,84 +81,6 @@ internal static class PopupWindowUtils
         textBox.SetValue(ScrollViewer.PanningModeProperty, PanningMode.None);
 
         return textBox;
-    }
-
-    public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? readings, string[]? splitReadingsWithRInfo, double leftMargin, ReadOnlySpan<byte> pitchPositions)
-    {
-        Grid pitchAccentGrid = new();
-
-        bool hasReading = readings is not null;
-
-        ConfigManager configManager = ConfigManager.Instance;
-        double fontSize = hasReading
-            ? configManager.ReadingsFontSize
-            : configManager.PrimarySpellingFontSize;
-
-        ReadOnlySpan<string> expressions = hasReading ? readings : [primarySpelling];
-
-        double horizontalOffsetForReading = leftMargin;
-
-        for (int i = 0; i < expressions.Length; i++)
-        {
-            if (i > 0)
-            {
-                Debug.Assert(splitReadingsWithRInfo is not null);
-                horizontalOffsetForReading += WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo[i - 1]}、", fontSize).Width;
-            }
-
-            byte pitchPosition = pitchPositions[i];
-            if (pitchPosition is byte.MaxValue)
-            {
-                continue;
-            }
-
-            Polyline polyline = new()
-            {
-                StrokeThickness = 2,
-                Stroke = DictOptionManager.PitchAccentMarkerColor,
-                StrokeDashArray = StrokeDashArray
-            };
-
-            bool lowPitch = false;
-            double horizontalOffsetForChar = horizontalOffsetForReading;
-            ReadOnlySpan<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
-            for (int j = 0; j < combinedFormList.Length; j++)
-            {
-                Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
-
-                if (pitchPosition - 1 == j)
-                {
-                    polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
-                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
-
-                    lowPitch = true;
-                }
-
-                else if (j is 0)
-                {
-                    polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
-                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
-                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                }
-
-                else
-                {
-                    double charHeight = lowPitch ? charSize.Height : 0;
-                    polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
-                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charHeight));
-                }
-
-                horizontalOffsetForChar += charSize.Width;
-            }
-
-            _ = pitchAccentGrid.Children.Add(polyline);
-        }
-
-        pitchAccentGrid.VerticalAlignment = VerticalAlignment.Center;
-        pitchAccentGrid.HorizontalAlignment = HorizontalAlignment.Left;
-
-        return pitchAccentGrid;
     }
 
     public static void SetPopupAutoHideTimer()
@@ -237,9 +157,10 @@ internal static class PopupWindowUtils
         return AudioUtils.GetAndPlayAudio(primarySpelling, reading);
     }
 
-    public static void SetStrokeDashArray(bool showPitchAccentWithDottedLines)
+    public static void SetPitchAccentMarkerPen(bool showPitchAccentWithDottedLines, Brush pitchAccentMarkerColor)
     {
-        StrokeDashArray = showPitchAccentWithDottedLines ? [1, 1] : [1, 0];
+        PitchAccentMarkerPen = new Pen(pitchAccentMarkerColor, 1.5) { DashStyle = new DashStyle(showPitchAccentWithDottedLines ? [0.5, 1.5] : [1, 1], 0) };
+        PitchAccentMarkerPen.Freeze();
     }
 
     public static int GetIndexOfListViewItemFromStackPanel(StackPanel stackPanel)

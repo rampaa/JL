@@ -125,9 +125,14 @@ internal sealed partial class EditDictionaryWindow
             bool oldDottedLinesOption = _dict.Options.ShowPitchAccentWithDottedLines.Value;
             bool newDottedLinesOption = options.ShowPitchAccentWithDottedLines.Value;
 
-            if (oldDottedLinesOption != newDottedLinesOption)
+            Debug.Assert(_dict.Options.PitchAccentMarkerColor is not null);
+            Debug.Assert(options.PitchAccentMarkerColor is not null);
+            string oldPitchAccentMarkerColor = _dict.Options.PitchAccentMarkerColor.Value;
+            string newPitchAccentMarkerColor = options.PitchAccentMarkerColor.Value;
+
+            if (oldDottedLinesOption != newDottedLinesOption || oldPitchAccentMarkerColor != newPitchAccentMarkerColor)
             {
-                PopupWindowUtils.SetStrokeDashArray(newDottedLinesOption);
+                PopupWindowUtils.SetPitchAccentMarkerPen(newDottedLinesOption, WindowsUtils.FrozenBrushFromHex(newPitchAccentMarkerColor));
             }
         }
 

@@ -810,22 +810,11 @@ internal sealed partial class PopupWindow
 
         if (result.Readings is null && pitchPositionsExist)
         {
-            Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                null,
-                null,
-                primarySpellingFrameworkElement.Margin.Left,
-                result.PitchPositions);
-
-            if (pitchAccentGrid.Children.Count is 0)
-            {
-                _ = top.Children.Add(primarySpellingFrameworkElement);
-            }
-
-            else
-            {
-                _ = pitchAccentGrid.Children.Add(primarySpellingFrameworkElement);
-                _ = top.Children.Add(pitchAccentGrid);
-            }
+            PitchAccentDecorator pitchAccentDecorator = new(primarySpellingFrameworkElement, [result.PrimarySpelling],
+                        [result.PrimarySpelling],
+                        result.PitchPositions!,
+                        PopupWindowUtils.PitchAccentMarkerPen);
+            _ = top.Children.Add(pitchAccentDecorator);
         }
         else
         {
@@ -868,21 +857,11 @@ internal sealed partial class PopupWindow
 
                 if (pitchPositionsExist)
                 {
-                    Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                        result.Readings,
+                    PitchAccentDecorator pitchAccentDecorator = new(readingTextBox, result.Readings,
                         readingTextBox.Text.Split('、'),
-                        readingTextBox.Margin.Left,
-                        result.PitchPositions);
-
-                    if (pitchAccentGrid.Children.Count is 0)
-                    {
-                        _ = top.Children.Add(readingTextBox);
-                    }
-                    else
-                    {
-                        _ = pitchAccentGrid.Children.Add(readingTextBox);
-                        _ = top.Children.Add(pitchAccentGrid);
-                    }
+                        result.PitchPositions!,
+                        PopupWindowUtils.PitchAccentMarkerPen);
+                    _ = top.Children.Add(pitchAccentDecorator);
                 }
 
                 else
