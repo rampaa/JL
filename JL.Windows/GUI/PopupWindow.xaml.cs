@@ -810,10 +810,13 @@ internal sealed partial class PopupWindow
 
         if (result.Readings is null && pitchPositionsExist)
         {
+            Debug.Assert(result.PitchPositions is not null);
+
             PitchAccentDecorator pitchAccentDecorator = new(primarySpellingFrameworkElement, [result.PrimarySpelling],
                         [result.PrimarySpelling],
-                        result.PitchPositions!,
+                        result.PitchPositions,
                         PopupWindowUtils.PitchAccentMarkerPen);
+
             _ = top.Children.Add(pitchAccentDecorator);
         }
         else
@@ -857,10 +860,13 @@ internal sealed partial class PopupWindow
 
                 if (pitchPositionsExist)
                 {
+                    Debug.Assert(result.PitchPositions is not null);
+
                     PitchAccentDecorator pitchAccentDecorator = new(readingTextBox, result.Readings,
                         readingTextBox.Text.Split('、'),
-                        result.PitchPositions!,
+                        result.PitchPositions,
                         PopupWindowUtils.PitchAccentMarkerPen);
+
                     _ = top.Children.Add(pitchAccentDecorator);
                 }
 
@@ -883,10 +889,13 @@ internal sealed partial class PopupWindow
 
                 if (pitchPositionsExist)
                 {
+                    Debug.Assert(result.PitchPositions is not null);
+
                     PitchAccentDecorator pitchAccentDecorator = new(readingTextBlock, result.Readings,
                         readingTextBlock.Text.Split('、'),
-                        result.PitchPositions!,
+                        result.PitchPositions,
                         PopupWindowUtils.PitchAccentMarkerPen);
+
                     _ = top.Children.Add(pitchAccentDecorator);
                 }
 
