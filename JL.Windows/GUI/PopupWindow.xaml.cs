@@ -883,22 +883,11 @@ internal sealed partial class PopupWindow
 
                 if (pitchPositionsExist)
                 {
-                    Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                        result.Readings,
+                    PitchAccentDecorator pitchAccentDecorator = new(readingTextBlock, result.Readings,
                         readingTextBlock.Text.Split('、'),
-                        readingTextBlock.Margin.Left,
-                        result.PitchPositions);
-
-                    if (pitchAccentGrid.Children.Count is 0)
-                    {
-                        _ = top.Children.Add(readingTextBlock);
-                    }
-
-                    else
-                    {
-                        _ = pitchAccentGrid.Children.Add(readingTextBlock);
-                        _ = top.Children.Add(pitchAccentGrid);
-                    }
+                        result.PitchPositions!,
+                        PopupWindowUtils.PitchAccentMarkerPen);
+                    _ = top.Children.Add(pitchAccentDecorator);
                 }
 
                 else
