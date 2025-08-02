@@ -176,7 +176,7 @@ internal static class PopupWindowUtils
             return true;
         }
 
-        Dict dict = (Dict)((StackPanel)item).Tag;
+        Dict dict = ((LookupDisplayResult)item).LookupResult.Dict;
         return !dict.Options.NoAll.Value;
     }
 

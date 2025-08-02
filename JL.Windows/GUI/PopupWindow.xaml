@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JL.Windows.GUI.UserControls"
         mc:Ignorable="d"
         Title="PopupWindow" PreviewMouseDown="Window_PreviewMouseDown"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520" ResizeMode="NoResize" ShowActivated="False"
@@ -75,6 +76,11 @@
                   HorizontalContentAlignment="Stretch" MouseLeave="PopupListView_MouseLeave" ScrollViewer.PanningMode="VerticalFirst"
                   Background="Transparent" PreviewMouseWheel="PopupListView_PreviewMouseWheel"
                   x:Name="PopupListView">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <local:PopupContentGenerator />
+                </DataTemplate>
+            </ListView.ItemTemplate>
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="Focusable" Value="False" />
