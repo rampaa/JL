@@ -801,6 +801,30 @@
     "detail": "(te)"
   },
   {
+    "type": "rewriterule",
+    "dec_end": [ "だ" ],
+    "con_end": [ "だった" ],
+    "dec_tag": [ "cop" ],
+    "con_tag": [ "stem-past" ],
+    "detail": "past"
+  },
+  {
+    "type": "rewriterule",
+    "dec_end": [ "だ" ],
+    "con_end": [ "だったら" ],
+    "dec_tag": [ "cop" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "conditional"
+  },
+  {
+    "type": "rewriterule",
+    "dec_end": [ "だ" ],
+    "con_end": [ "だろう" ],
+    "dec_tag": [ "cop" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "conjectural"
+  },
+  {
     "type": "stdrule",
     "dec_end": [ "ない" ],
     "con_end": [ "へん" ],
