@@ -375,6 +375,10 @@ internal static class WindowsUtils
             Application.Current.Dispatcher.Invoke(static () =>
             {
                 PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
+                if (!PreferencesWindow.Instance.IsVisible)
+                {
+                    PreferencesWindow.Instance.Close();
+                }
             });
         }
     }
