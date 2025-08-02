@@ -825,6 +825,30 @@
     "detail": "conjectural"
   },
   {
+    "type": "rewriterule",
+    "dec_end": [ "じゃ" ],
+    "con_end": [ "じゃった" ],
+    "dec_tag": [ "cop" ],
+    "con_tag": [ "stem-past" ],
+    "detail": "past"
+  },
+  {
+    "type": "rewriterule",
+    "dec_end": [ "じゃ" ],
+    "con_end": [ "じゃったら" ],
+    "dec_tag": [ "cop" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "conditional"
+  },
+  {
+    "type": "rewriterule",
+    "dec_end": [ "じゃ" ],
+    "con_end": [ "じゃろう" ],
+    "dec_tag": [ "cop" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "conjectural"
+  },
+  {
     "type": "stdrule",
     "dec_end": [ "ない" ],
     "con_end": [ "へん" ],

@@ -78,4 +78,31 @@ internal sealed class DeconjugatorTestsForCop
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "だ" && form.Tags[^1] is "cop").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void Deconjugate_Past_じゃ()
+    {
+        const string termToDeconjugate = "じゃった";
+        const string expected = "～past";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "じゃ" && form.Tags[^1] is "cop").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Conditional_じゃ()
+    {
+        const string termToDeconjugate = "じゃったら";
+        const string expected = "～conditional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "じゃ" && form.Tags[^1] is "cop").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Conjectural_じゃ()
+    {
+        const string termToDeconjugate = "じゃろう";
+        const string expected = "～conjectural";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "じゃ" && form.Tags[^1] is "cop").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }
