@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Mining.Anki;
 
-public sealed class AnkiConfig(string deckName, string modelName, OrderedDictionary<string, JLField> fields, string[]? tags)
+public sealed class AnkiConfig(string deckName, string modelName, OrderedDictionary<string, JLField> fields, string[]? tags = null)
 {
     [JsonPropertyName("deckName")] public string DeckName { get; } = deckName;
     [JsonPropertyName("modelName")] public string ModelName { get; } = modelName;
