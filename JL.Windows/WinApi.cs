@@ -196,6 +196,14 @@ internal sealed partial class WinApi
         source.AddHook(WndProc);
     }
 
+    public void UnsubscribeFromWndProc(Window windowSource)
+    {
+        if (PresentationSource.FromVisual(windowSource) is HwndSource source)
+        {
+            source.RemoveHook(WndProc);
+        }
+    }
+
     public static void SubscribeToClipboardChanged(nint windowHandle)
     {
         s_clipboardSequenceNo = GetClipboardSequenceNumber();

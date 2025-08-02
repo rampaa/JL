@@ -512,6 +512,10 @@ internal sealed partial class MainWindow
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
+
+        Debug.Assert(_winApi is not null);
+        _winApi.UnsubscribeFromWndProc(this);
+
         await WebSocketUtils.Disconnect().ConfigureAwait(true);
 
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
