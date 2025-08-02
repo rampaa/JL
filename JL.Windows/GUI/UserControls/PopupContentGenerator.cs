@@ -13,7 +13,10 @@ using JL.Core.Utilities;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI.UserControls;
+
+#pragma warning disable CA1812 // Internal class that is apparently never instantiated
 internal sealed class PopupContentGenerator : Decorator
+#pragma warning restore CA1812 // Internal class that is apparently never instantiated
 {
     static PopupContentGenerator()
     {
