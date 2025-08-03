@@ -161,14 +161,20 @@ internal sealed partial class MainWindow
 
     private bool CopyText(string text)
     {
+        ConfigManager configManager = ConfigManager.Instance;
+
         if (text.Length is 0)
         {
             MainTextBox.Clear();
             UpdatePosition();
+            if (configManager.AlwaysOnTop)
+            {
+                WinApi.BringToFront(WindowHandle);
+            }
+
             return false;
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
         if (configManager.OnlyCaptureTextWithJapaneseChars && !JapaneseUtils.ContainsJapaneseCharacters(text))
         {
             return false;
@@ -271,7 +277,10 @@ internal sealed partial class MainWindow
         if (notMinimized)
         {
             UpdatePosition();
-            BringToFront();
+            if (configManager.AlwaysOnTop)
+            {
+                WinApi.BringToFront(WindowHandle);
+            }
         }
 
         if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || notMinimized)
