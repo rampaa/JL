@@ -70,15 +70,13 @@ internal sealed class PitchAccentDecorator : Decorator
         double horizontalOffsetForChar = horizontalOffsetForReading;
         ReadOnlySpan<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expression);
 
-        double highY = 0;
-
         for (int i = 0; i < combinedFormList.Length; i++)
         {
             double charWidth = WindowsUtils.MeasureTextSize(combinedFormList[i], fontSize).Width;
 
             if (pitchPosition - 1 == i)
             {
-                Point point = new(horizontalOffsetForChar, highY);
+                Point point = new(horizontalOffsetForChar, 0);
                 if (i is 0)
                 {
                     streamGeometryContext.BeginFigure(point, false, false);
@@ -88,7 +86,7 @@ internal sealed class PitchAccentDecorator : Decorator
                     streamGeometryContext.LineTo(point, true, false);
                 }
 
-                streamGeometryContext.LineTo(new Point(horizontalOffsetForChar + charWidth, highY), true, false);
+                streamGeometryContext.LineTo(new Point(horizontalOffsetForChar + charWidth, 0), true, false);
                 streamGeometryContext.LineTo(new Point(horizontalOffsetForChar + charWidth, uniformCharHeight), true, false);
                 lowPitch = true;
             }
@@ -96,11 +94,11 @@ internal sealed class PitchAccentDecorator : Decorator
             {
                 streamGeometryContext.BeginFigure(new Point(horizontalOffsetForChar, uniformCharHeight), false, false);
                 streamGeometryContext.LineTo(new Point(horizontalOffsetForChar + charWidth, uniformCharHeight), true, false);
-                streamGeometryContext.LineTo(new Point(horizontalOffsetForChar + charWidth, highY), true, false);
+                streamGeometryContext.LineTo(new Point(horizontalOffsetForChar + charWidth, 0), true, false);
             }
             else
             {
-                double yPosition = lowPitch ? uniformCharHeight : highY;
+                double yPosition = lowPitch ? uniformCharHeight : 0;
                 streamGeometryContext.LineTo(new Point(horizontalOffsetForChar, yPosition), true, false);
                 streamGeometryContext.LineTo(new Point(horizontalOffsetForChar + charWidth, yPosition), true, false);
             }
