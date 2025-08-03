@@ -303,6 +303,7 @@ internal sealed partial class PopupWindow
         if (textToLookUp == _lastLookedUpText && IsVisible)
         {
             UpdatePosition();
+            WinApi.BringToFront(WindowHandle);
             return Task.CompletedTask;
         }
 
@@ -466,6 +467,7 @@ internal sealed partial class PopupWindow
         if (selectedText == _lastLookedUpText && IsVisible)
         {
             UpdatePosition();
+            WinApi.BringToFront(WindowHandle);
             return Task.CompletedTask;
         }
 

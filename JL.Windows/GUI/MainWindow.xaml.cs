@@ -185,7 +185,8 @@ internal sealed partial class MainWindow
         string? mergedText = null;
 
         string previousText = MainTextBox.Text;
-        if (configManager.DiscardIdenticalText && sanitizedNewText == previousText)
+        bool sameText = sanitizedNewText == previousText;
+        if (configManager.DiscardIdenticalText && sameText)
         {
             if (configManager.MergeSequentialTextsWhenTheyMatch)
             {
@@ -205,7 +206,7 @@ internal sealed partial class MainWindow
 
             if (mergeTexts)
             {
-                if (!configManager.DiscardIdenticalText && previousText == sanitizedNewText)
+                if (!configManager.DiscardIdenticalText && sameText)
                 {
                     return false;
                 }
@@ -260,7 +261,9 @@ internal sealed partial class MainWindow
         TitleBarContextMenu.IsOpen = false;
         MainTextBoxContextMenu.IsOpen = false;
 
-        if (configManager.HidePopupsOnTextChange && notMinimized && FirstPopupWindow.IsVisible)
+        if (configManager.HidePopupsOnTextChange
+            && FirstPopupWindow.IsVisible
+            && (!sameText || ((PopupWindowUtils.PopupWindows[1]?.IsVisible) ?? false)))
         {
             PopupWindowUtils.HidePopups(0);
         }
