@@ -269,7 +269,7 @@ internal sealed partial class MainWindow
 
         if (configManager.HidePopupsOnTextChange
             && FirstPopupWindow.IsVisible
-            && (!sameText || ((PopupWindowUtils.PopupWindows[1]?.IsVisible) ?? false)))
+            && (!sameText || (PopupWindowUtils.PopupWindows[1]?.IsVisible ?? false)))
         {
             PopupWindowUtils.HidePopups(0);
         }

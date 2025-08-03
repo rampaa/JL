@@ -217,7 +217,8 @@ internal static class EpwingYomichanUtils
                 {
                     return new YomichanContent("th", "×", false);
                 }
-                else if (tag is "img" && jsonElement.TryGetProperty("path", out JsonElement imagePathJsonElement))
+
+                if (tag is "img" && jsonElement.TryGetProperty("path", out JsonElement imagePathJsonElement))
                 {
                     if (jsonElement.TryGetProperty("height", out JsonElement heightProperty))
                     {

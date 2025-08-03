@@ -38,7 +38,7 @@ internal static class JmdictRecordBuilder
         ReadOnlySpan<ReadingElement> readingElementsSpan = entry.ReadingElements.AsReadOnlySpan();
         ReadOnlySpan<Sense> senseListSpan = entry.SenseList.AsReadOnlySpan();
 
-        int kanjiElemensSpanLength = kanjiElementsSpan.Length;
+        int kanjiElementsSpanLength = kanjiElementsSpan.Length;
         int readingElementsLength = readingElementsSpan.Length;
         int senseListSpanLength = senseListSpan.Length;
 
@@ -46,7 +46,7 @@ internal static class JmdictRecordBuilder
             ? JapaneseUtils.KatakanaToHiragana(firstPrimarySpelling)
             : null;
 
-        Dictionary<string, JmdictRecord> recordDictionary = new(kanjiElemensSpanLength + readingElementsLength, StringComparer.Ordinal);
+        Dictionary<string, JmdictRecord> recordDictionary = new(kanjiElementsSpanLength + readingElementsLength, StringComparer.Ordinal);
         if (spellingsWithoutSearchOnlyFormsExist)
         {
             foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)

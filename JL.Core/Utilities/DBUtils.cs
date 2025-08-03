@@ -165,9 +165,9 @@ public static class DBUtils
             _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
 
-        string paramter = parameterBuilder.Append(");").ToString();
+        string parameter = parameterBuilder.Append(");").ToString();
         Utils.StringBuilderPool.Return(parameterBuilder);
-        return paramter;
+        return parameter;
     }
 
     internal static SqliteConnection CreateDBConnection(string path)
