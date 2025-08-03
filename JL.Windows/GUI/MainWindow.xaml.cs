@@ -199,7 +199,7 @@ internal sealed partial class MainWindow
                 s_lastTextCopyTimestamp = Stopwatch.GetTimestamp();
             }
 
-            return false;
+            return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard;
         }
 
         if (configManager.MergeSequentialTextsWhenTheyMatch)
@@ -214,7 +214,7 @@ internal sealed partial class MainWindow
             {
                 if (!configManager.DiscardIdenticalText && sameText)
                 {
-                    return false;
+                    return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard;
                 }
 
                 if (!configManager.AllowPartialMatchingForTextMerge)
