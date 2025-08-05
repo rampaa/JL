@@ -404,6 +404,42 @@ internal sealed class DeconjugatorTestsForV5RI
     }
 
     [Test]
+    public void Deconjugate_PlainCausativePassiveAffirmative_v5ri()
+    {
+        const string termToDeconjugate = "有らされる";
+        const string expected = "～causative passive";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "有る" && form.Tags[^1] is "v5r-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PoliteCausativePassiveAffirmative_v5ri()
+    {
+        const string termToDeconjugate = "有らされます";
+        const string expected = "～causative passive→polite";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "有る" && form.Tags[^1] is "v5r-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PlainCausativePassiveNegative_v5ri()
+    {
+        const string termToDeconjugate = "有らされない";
+        const string expected = "～causative passive→negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "有る" && form.Tags[^1] is "v5r-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PoliteCausativePassiveNegative_v5ri()
+    {
+        const string termToDeconjugate = "有らされません";
+        const string expected = "～causative passive→polite negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "有る" && form.Tags[^1] is "v5r-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainCausativeNegative_v5ri()
     {
         const string termToDeconjugate = "有らせない";

@@ -26,6 +26,15 @@ internal sealed class DeconjugatorTestsForV5R
     }
 
     [Test]
+    public void Deconjugate_MasuStem2_v5r()
+    {
+        const string termToDeconjugate = "御座い";
+        const string expected = "～masu stem";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座る" && form.Tags[^1] is "v5r").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastNegative_v5r()
     {
         const string termToDeconjugate = "終わらない";
@@ -40,6 +49,15 @@ internal sealed class DeconjugatorTestsForV5R
         const string termToDeconjugate = "終わります";
         const string expected = "～polite";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "終わる" && form.Tags[^1] is "v5r").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PoliteNonPastAffirmative2_v5r()
+    {
+        const string termToDeconjugate = "御座います";
+        const string expected = "～polite";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座る" && form.Tags[^1] is "v5r").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
