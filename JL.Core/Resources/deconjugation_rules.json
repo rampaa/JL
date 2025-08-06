@@ -1418,6 +1418,14 @@
     "detail": "topic/condition"
   },
   {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "は" ],
+    "dec_tag": [ "stem-te-adverbial" ],
+    "con_tag": [ "topic-condition" ],
+    "detail": "topic/condition"
+  },
+  {
     "type": "onlyfinalrule",
     "dec_end": [ "" ],
     "con_end": [ "なさい" ],
