@@ -994,10 +994,10 @@
   },
   {
     "type": "onlyfinalrule",
-    "dec_end": [ "", "" ],
-    "con_end": [ "つつ", "つつ" ],
-    "dec_tag": [ "stem-ren", "stem-adj-base" ],
-    "con_tag": [ "uninflectable", "uninflectable" ],
+    "dec_end": [ "" ],
+    "con_end": [ "つつ" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
     "detail": "while/although"
   },
   {

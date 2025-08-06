@@ -1845,15 +1845,6 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TsutsuNegative_v1s()
-    {
-        const string termToDeconjugate = "呉れなつつ";
-        const string expected = "～negative→while/although";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "呉れる" && form.Tags[^1] is "v1-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
     public void Deconjugate_PlainNonPastStatementRequestAffirmative_v1s()
     {
         const string termToDeconjugate = "呉れてくれる";

@@ -1801,15 +1801,6 @@ internal sealed class DeconjugatorTestsForV5Aru
     }
 
     [Test]
-    public void Deconjugate_TsutsuNegative_v5aru()
-    {
-        const string termToDeconjugate = "仰いなつつ";
-        const string expected = "～negative→while/although";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
     public void Deconjugate_PlainNonPastStatementRequestAffirmative_v5aru()
     {
         const string termToDeconjugate = "仰ってくれる";

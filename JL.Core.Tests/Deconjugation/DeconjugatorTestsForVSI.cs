@@ -1945,15 +1945,6 @@ internal sealed class DeconjugatorTestsForVSI
     }
 
     [Test]
-    public void Deconjugate_TsutsuNegative_vsi()
-    {
-        const string termToDeconjugate = "しなつつ";
-        const string expected = "～negative→while/although";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "する" && form.Tags[^1] is "vs-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
     public void Deconjugate_PlainNonPastStatementRequestAffirmative_vsi()
     {
         const string termToDeconjugate = "してくれる";
