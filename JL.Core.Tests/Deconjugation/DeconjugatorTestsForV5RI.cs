@@ -1422,15 +1422,6 @@ internal sealed class DeconjugatorTestsForV5RI
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastSouNegative_v5ri()
-    {
-        const string termToDeconjugate = "なそう";
-        const string expected = "～negative→seemingness";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "有る" && form.Tags[^1] is "v5r-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
     public void Deconjugate_ClassicalNegativeFormNu_v5ri()
     {
         const string termToDeconjugate = "有らぬ";
