@@ -33,8 +33,7 @@ public static class CustomWordLoader
 
     private static readonly string[] s_adjectives =
     [
-        "adj-i",
-        "adj-na"
+        "adj-i"
     ];
 
     private static readonly string[] s_noun =
