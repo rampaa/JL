@@ -215,7 +215,8 @@ internal static class Deconjugator
                             int existingFormProcessCount = 1;
                             for (int j = existingForm.Process.Count - 1; j > 0; j--)
                             {
-                                if (!existingForm.Process[j].StartsWith('('))
+                                string existingFormProcess = existingForm.Process[j];
+                                if (existingFormProcess.Length > 0 && existingFormProcess[0] is not '(')
                                 {
                                     ++existingFormProcessCount;
                                 }
@@ -226,7 +227,8 @@ internal static class Deconjugator
                                 formProcessCount = 1;
                                 for (int j = form.Process.Count - 1; j > 0; j--)
                                 {
-                                    if (!form.Process[j].StartsWith('('))
+                                    string formProcess = form.Process[j];
+                                    if (formProcess.Length > 0 && formProcess[0] is not '(')
                                     {
                                         ++formProcessCount;
                                     }
