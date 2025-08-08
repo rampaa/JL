@@ -258,7 +258,7 @@ internal sealed partial class ManageDictionariesWindow
         DictionariesDisplay.ItemsSource = resultDockPanels;
     }
 
-    private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private static void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
         if (Path.Exists(fullPath))

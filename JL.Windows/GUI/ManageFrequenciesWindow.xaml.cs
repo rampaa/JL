@@ -196,7 +196,7 @@ internal sealed partial class ManageFrequenciesWindow
         FrequenciesDisplay.ItemsSource = resultDockPanels;
     }
 
-    private void PathTextBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private static void PathTextBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
         if (Path.Exists(fullPath))
