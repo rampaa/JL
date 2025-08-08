@@ -10,6 +10,7 @@ using JL.Core.Dicts.EPWING.Yomichan;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.JMnedict;
+using JL.Core.Dicts.KanjiComposition;
 using JL.Core.Dicts.KANJIDIC;
 using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.PitchAccent;
@@ -38,7 +39,7 @@ public static class LookupUtils
         if (DictUtils.AtLeastOneKanjiDictIsActive)
         {
             kanji = TextUtils.GetFirstCharacter(text);
-            _ = KanjiCompositionUtils.KanjiCompositionDict.TryGetValue(kanji, out kanjiCompositions);
+            kanjiCompositions = KanjiCompositionDBManager.GetRecordsFromDB(kanji);
 
             kanjiFrequencyResults = kanjiFreqs is not null
                 ? GetKanjiFrequencies(kanji, kanjiFreqs)

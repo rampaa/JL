@@ -185,8 +185,7 @@ public static class Utils
                 await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
                 Frontend.SetInstalledVoiceWithHighestPriority();
             }),
-            Task.Run(static () => DeconjugatorUtils.DeserializeRules()),
-            Task.Run(static () => KanjiCompositionUtils.InitializeKanjiCompositionDict()))
+            Task.Run(static () => DeconjugatorUtils.DeserializeRules()))
             .ConfigureAwait(false);
 
         StringPoolInstance.Reset();
