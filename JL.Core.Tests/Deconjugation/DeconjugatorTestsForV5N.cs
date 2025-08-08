@@ -2006,4 +2006,22 @@ internal sealed class DeconjugatorTestsForV5N
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "死ぬ" && form.Tags[^1] is "v5n").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void Deconjugate_PlainNonPastClassicalHypotheticalConditional_v5n()
+    {
+        const string termToDeconjugate = "死なば";
+        const string expected = "～classical hypothetical conditional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "死ぬ" && form.Tags[^1] is "v5n").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PlainNonPastNegativeConditional_v5n()
+    {
+        const string termToDeconjugate = "死なねば";
+        const string expected = "～negative conditional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "死ぬ" && form.Tags[^1] is "v5n").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }

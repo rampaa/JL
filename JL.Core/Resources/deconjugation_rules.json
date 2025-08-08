@@ -1544,5 +1544,37 @@
     "dec_tag": [ "v1", "v1-s", "v5r", "v5aru", "vk" ],
     "con_tag": [ "uninflectable" ],
     "detail": "slurred"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
+    "con_end": [ "ねば" ],
+    "dec_tag": [ "stem-mizenkei" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "negative conditional"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "す" ],
+    "con_end": [ "せば" ],
+    "dec_tag": [ "vs-c" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "classical hypothetical conditional"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "ずる" ],
+    "con_end": [ "ぜば" ],
+    "dec_tag": [ "vz" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "classical hypothetical conditional"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
+    "con_end": [ "ば" ],
+    "dec_tag": [ "stem-a" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "classical hypothetical conditional"
   }
 ]
