@@ -666,6 +666,7 @@ internal sealed class PopupContentGenerator : Decorator
                     catch (DirectoryNotFoundException ex)
                     {
                         Utils.Logger.Error(ex, "Image path not found {ImagePath}", imagePath);
+                        showImagesOption.Value = false;
                     }
                 }
             }
