@@ -138,4 +138,3 @@ public sealed class ShowImagesOption(bool value)
     public static readonly DictType[] ValidDictTypes =
         [DictType.NonspecificWordYomichan, DictType.NonspecificNameYomichan, DictType.NonspecificKanjiWithWordSchemaYomichan, DictType.NonspecificYomichan, DictType.NonspecificKanjiYomichan];
 }
-
