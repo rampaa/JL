@@ -1872,7 +1872,7 @@ internal sealed class DeconjugatorTestsForVSC
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastClassicalHypotheticalConditional_vs_c()
+    public void Deconjugate_PlainNonPastClassicalHypotheticalConditional_VSC()
     {
         const string termToDeconjugate = "御座せば";
         const string expected = "～classical hypothetical conditional";
@@ -1881,7 +1881,7 @@ internal sealed class DeconjugatorTestsForVSC
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastNegativeConditional_vs_c()
+    public void Deconjugate_PlainNonPastNegativeConditional_VSC()
     {
         const string termToDeconjugate = "御座せねば";
         const string expected = "～negative conditional";

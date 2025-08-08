@@ -17,7 +17,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_MasuStem_v1s()
+    public void Deconjugate_MasuStem_V1S()
     {
         const string termToDeconjugate = "呉れ";
         const string expected = "～imperative; masu stem";
@@ -26,7 +26,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastNegative_v1s()
+    public void Deconjugate_PlainNonPastNegative_V1S()
     {
         const string termToDeconjugate = "呉れない";
         const string expected = "～negative";
@@ -35,7 +35,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastAffirmative_v1s()
+    public void Deconjugate_PoliteNonPastAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れます";
         const string expected = "～polite";
@@ -44,7 +44,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastVolitional_v1s()
+    public void Deconjugate_PoliteNonPastVolitional_V1S()
     {
         const string termToDeconjugate = "呉れましょう";
         const string expected = "～polite volitional";
@@ -53,7 +53,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastNegative_v1s()
+    public void Deconjugate_PoliteNonPastNegative_V1S()
     {
         const string termToDeconjugate = "呉れません";
         const string expected = "～polite negative";
@@ -62,7 +62,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastAffirmative_v1s()
+    public void Deconjugate_PlainPastAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れた";
         const string expected = "～past";
@@ -71,7 +71,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastNegative_v1s()
+    public void Deconjugate_PlainPastNegative_V1S()
     {
         const string termToDeconjugate = "呉れなかった";
         const string expected = "～negative→past";
@@ -80,7 +80,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastAffirmative_v1s()
+    public void Deconjugate_PolitePastAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れました";
         const string expected = "～polite past";
@@ -89,7 +89,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastNegative_v1s()
+    public void Deconjugate_PolitePastNegative_V1S()
     {
         const string termToDeconjugate = "呉れませんでした";
         const string expected = "～polite past negative";
@@ -98,7 +98,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTeFormAffirmative_v1s()
+    public void Deconjugate_PlainTeFormAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れて";
         const string expected = "～te";
@@ -107,7 +107,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTeFormNegative_v1s()
+    public void Deconjugate_PlainTeFormNegative_V1S()
     {
         const string termToDeconjugate = "呉れなくて";
         const string expected = "～negative→te";
@@ -116,7 +116,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTeFormNegative2_v1s()
+    public void Deconjugate_PlainTeFormNegative2_V1S()
     {
         const string termToDeconjugate = "呉れないで";
         const string expected = "～negative→te";
@@ -125,7 +125,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteTeFormAffirmative_v1s()
+    public void Deconjugate_PoliteTeFormAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れまして";
         const string expected = "～polite te";
@@ -134,7 +134,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastPassivePotentialHonorificAffirmative_v1s()
+    public void Deconjugate_PlainNonPastPassivePotentialHonorificAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れられる";
         const string expected = "～passive/potential/honorific";
@@ -143,7 +143,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastPassivePotentialHonorificNegative_v1s()
+    public void Deconjugate_PlainNonPastPassivePotentialHonorificNegative_V1S()
     {
         const string termToDeconjugate = "呉れられない";
         const string expected = "～passive/potential/honorific→negative";
@@ -152,7 +152,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastPassivePotentialHonorificAffirmative_v1s()
+    public void Deconjugate_PlainPastPassivePotentialHonorificAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れられた";
         const string expected = "～passive/potential/honorific→past";
@@ -161,7 +161,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastPassivePotentialHonorificAffirmative_v1s()
+    public void Deconjugate_PolitePastPassivePotentialHonorificAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れられました";
         const string expected = "～passive/potential/honorific→polite past";
@@ -170,7 +170,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastPassivePotentialHonorificNegative_v1s()
+    public void Deconjugate_PlainPastPassivePotentialHonorificNegative_V1S()
     {
         const string termToDeconjugate = "呉れられなかった";
         const string expected = "～passive/potential/honorific→negative→past";
@@ -179,7 +179,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastPassivePotentialHonorificNegative_v1s()
+    public void Deconjugate_PolitePastPassivePotentialHonorificNegative_V1S()
     {
         const string termToDeconjugate = "呉れられませんでした";
         const string expected = "～passive/potential/honorific→polite past negative";
@@ -188,7 +188,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePassivePotentialHonorificAffirmative_v1s()
+    public void Deconjugate_PolitePassivePotentialHonorificAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れられます";
         const string expected = "～passive/potential/honorific→polite";
@@ -197,7 +197,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePassivePotentialHonorificNegative_v1s()
+    public void Deconjugate_PolitePassivePotentialHonorificNegative_V1S()
     {
         const string termToDeconjugate = "呉れられません";
         const string expected = "～passive/potential/honorific→polite negative";
@@ -206,7 +206,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainImperativeNegative_v1s()
+    public void Deconjugate_PlainImperativeNegative_V1S()
     {
         const string termToDeconjugate = "呉れるな";
         const string expected = "～imperative negative";
@@ -215,7 +215,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteImperativeAffirmative_v1s()
+    public void Deconjugate_PoliteImperativeAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れなさい";
         const string expected = "～polite imperative";
@@ -224,7 +224,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteRequestAffirmative_v1s()
+    public void Deconjugate_PoliteRequestAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてください";
         const string expected = "～polite request";
@@ -233,7 +233,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteRequestNegative_v1s()
+    public void Deconjugate_PoliteRequestNegative_V1S()
     {
         const string termToDeconjugate = "呉れないでください";
         const string expected = "～negative→polite request";
@@ -242,7 +242,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainVolitionalAffirmative_v1s()
+    public void Deconjugate_PlainVolitionalAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れよう";
         const string expected = "～volitional";
@@ -251,7 +251,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainKansaibenVolitionalAffirmative_v1s()
+    public void Deconjugate_PlainKansaibenVolitionalAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れよ";
         const string expected = "～volitional→ksb";
@@ -260,7 +260,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteVolitionalAffirmative_v1s()
+    public void Deconjugate_PoliteVolitionalAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れましょう";
         const string expected = "～polite volitional";
@@ -269,7 +269,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_ProvisionalConditionalAffirmative_v1s()
+    public void Deconjugate_ProvisionalConditionalAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れれば";
         const string expected = "～provisional conditional";
@@ -278,7 +278,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_ProvisionalConditionalNegative_v1s()
+    public void Deconjugate_ProvisionalConditionalNegative_V1S()
     {
         const string termToDeconjugate = "呉れなければ";
         const string expected = "～negative→provisional conditional";
@@ -287,7 +287,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TemporalConditionalAffirmative_v1s()
+    public void Deconjugate_TemporalConditionalAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れたら";
         const string expected = "～conditional";
@@ -296,7 +296,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_FormalConditionalAffirmative_v1s()
+    public void Deconjugate_FormalConditionalAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れたらば";
         const string expected = "～formal conditional";
@@ -305,7 +305,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TemporalConditionalNegative_v1s()
+    public void Deconjugate_TemporalConditionalNegative_V1S()
     {
         const string termToDeconjugate = "呉れなかったら";
         const string expected = "～negative→conditional";
@@ -314,7 +314,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainCausativeAffirmative_v1s()
+    public void Deconjugate_PlainCausativeAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れさせる";
         const string expected = "～causative";
@@ -323,7 +323,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainCausativeNegative_v1s()
+    public void Deconjugate_PlainCausativeNegative_V1S()
     {
         const string termToDeconjugate = "呉れさせない";
         const string expected = "～causative→negative";
@@ -332,7 +332,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainCausativeSlurred_v1s()
+    public void Deconjugate_PlainCausativeSlurred_V1S()
     {
         const string termToDeconjugate = "呉れさせん";
         const string expected = "～causative→slurred; causative→slurred negative";
@@ -341,7 +341,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteCausativeAffirmative_v1s()
+    public void Deconjugate_PoliteCausativeAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れさせます";
         const string expected = "～causative→polite";
@@ -350,7 +350,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteCausativeNegative_v1s()
+    public void Deconjugate_PoliteCausativeNegative_V1S()
     {
         const string termToDeconjugate = "呉れさせません";
         const string expected = "～causative→polite negative";
@@ -359,7 +359,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainCausativePast_v1s()
+    public void Deconjugate_PlainCausativePast_V1S()
     {
         const string termToDeconjugate = "呉れさせた";
         const string expected = "～causative→past";
@@ -368,7 +368,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainCausativePastNegative_v1s()
+    public void Deconjugate_PlainCausativePastNegative_V1S()
     {
         const string termToDeconjugate = "呉れさせなかった";
         const string expected = "～causative→negative→past";
@@ -377,7 +377,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteCausativePast_v1s()
+    public void Deconjugate_PoliteCausativePast_V1S()
     {
         const string termToDeconjugate = "呉れさせました";
         const string expected = "～causative→polite past";
@@ -386,7 +386,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteCausativePastNegative_v1s()
+    public void Deconjugate_PoliteCausativePastNegative_V1S()
     {
         const string termToDeconjugate = "呉れさせませんでした";
         const string expected = "～causative→polite past negative";
@@ -395,7 +395,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_CausativePassivePotentialHonorificPlainAffirmative_v1s()
+    public void Deconjugate_CausativePassivePotentialHonorificPlainAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れさせられる";
         const string expected = "～causative→passive/potential/honorific";
@@ -404,7 +404,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_CausativePassivePotentialHonorificPlainNegative_v1s()
+    public void Deconjugate_CausativePassivePotentialHonorificPlainNegative_V1S()
     {
         const string termToDeconjugate = "呉れさせられない";
         const string expected = "～causative→passive/potential/honorific→negative";
@@ -413,7 +413,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_CausativePassivePotentialHonorificPoliteAffirmative_v1s()
+    public void Deconjugate_CausativePassivePotentialHonorificPoliteAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れさせられます";
         const string expected = "～causative→passive/potential/honorific→polite";
@@ -422,7 +422,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_CausativePassivePotentialHonorificPoliteNegative_v1s()
+    public void Deconjugate_CausativePassivePotentialHonorificPoliteNegative_V1S()
     {
         const string termToDeconjugate = "呉れさせられません";
         const string expected = "～causative→passive/potential/honorific→polite negative";
@@ -431,7 +431,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastDesiderative_v1s()
+    public void Deconjugate_PlainNonPastDesiderative_V1S()
     {
         const string termToDeconjugate = "呉れたい";
         const string expected = "～want";
@@ -440,7 +440,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastDesiderativeFormalNegative_v1s()
+    public void Deconjugate_PlainNonPastDesiderativeFormalNegative_V1S()
     {
         const string termToDeconjugate = "呉れたくありません";
         const string expected = "～want→formal negative";
@@ -449,7 +449,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastDesiderativeFormalNegative_v1s()
+    public void Deconjugate_PlainPastDesiderativeFormalNegative_V1S()
     {
         const string termToDeconjugate = "呉れたくありませんでした";
         const string expected = "～want→formal negative past";
@@ -458,7 +458,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastDesiderativeNegative_v1s()
+    public void Deconjugate_PlainNonPastDesiderativeNegative_V1S()
     {
         const string termToDeconjugate = "呉れたくない";
         const string expected = "～want→negative";
@@ -467,7 +467,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastDesiderative_v1s()
+    public void Deconjugate_PlainPastDesiderative_V1S()
     {
         const string termToDeconjugate = "呉れたかった";
         const string expected = "～want→past";
@@ -476,7 +476,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastDesiderativeNegative_v1s()
+    public void Deconjugate_PlainPastDesiderativeNegative_V1S()
     {
         const string termToDeconjugate = "呉れたくなかった";
         const string expected = "～want→negative→past";
@@ -485,7 +485,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeiru_v1s()
+    public void Deconjugate_PlainNonPastTeiru_V1S()
     {
         const string termToDeconjugate = "呉れている";
         const string expected = "～teiru";
@@ -494,7 +494,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeiruNegative_v1s()
+    public void Deconjugate_PlainNonPastTeiruNegative_V1S()
     {
         const string termToDeconjugate = "呉れていない";
         const string expected = "～teiru→negative";
@@ -503,7 +503,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTeiruAffirmative_v1s()
+    public void Deconjugate_PlainPastTeiruAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れていた";
         const string expected = "～teiru→past";
@@ -512,7 +512,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTeiruNegative_v1s()
+    public void Deconjugate_PlainPastTeiruNegative_V1S()
     {
         const string termToDeconjugate = "呉れていなかった";
         const string expected = "～teiru→negative→past";
@@ -521,7 +521,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastTeiru_v1s()
+    public void Deconjugate_PoliteNonPastTeiru_V1S()
     {
         const string termToDeconjugate = "呉れています";
         const string expected = "～teiru→polite";
@@ -530,7 +530,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastTeiruNegative_v1s()
+    public void Deconjugate_PoliteNonPastTeiruNegative_V1S()
     {
         const string termToDeconjugate = "呉れていません";
         const string expected = "～teiru→polite negative";
@@ -539,7 +539,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeiru_v1s()
+    public void Deconjugate_PolitePastTeiru_V1S()
     {
         const string termToDeconjugate = "呉れていました";
         const string expected = "～teiru→polite past";
@@ -548,7 +548,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeiruNegative_v1s()
+    public void Deconjugate_PolitePastTeiruNegative_V1S()
     {
         const string termToDeconjugate = "呉れていませんでした";
         const string expected = "～teiru→polite past negative";
@@ -557,7 +557,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeru_v1s()
+    public void Deconjugate_PlainNonPastTeru_V1S()
     {
         const string termToDeconjugate = "呉れてる";
         const string expected = "～teru";
@@ -566,7 +566,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeruNegative_v1s()
+    public void Deconjugate_PlainNonPastTeruNegative_V1S()
     {
         const string termToDeconjugate = "呉れてない";
         const string expected = "～teru→negative";
@@ -575,7 +575,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTeru_v1s()
+    public void Deconjugate_PlainPastTeru_V1S()
     {
         const string termToDeconjugate = "呉れてた";
         const string expected = "～teru→past";
@@ -584,7 +584,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTeruNegative_v1s()
+    public void Deconjugate_PlainPastTeruNegative_V1S()
     {
         const string termToDeconjugate = "呉れてなかった";
         const string expected = "～teru→negative→past";
@@ -593,7 +593,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastTeru_v1s()
+    public void Deconjugate_PoliteNonPastTeru_V1S()
     {
         const string termToDeconjugate = "呉れてます";
         const string expected = "～teru→polite";
@@ -602,7 +602,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastTeruNegative_v1s()
+    public void Deconjugate_PoliteNonPastTeruNegative_V1S()
     {
         const string termToDeconjugate = "呉れてません";
         const string expected = "～teru→polite negative";
@@ -611,7 +611,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeru_v1s()
+    public void Deconjugate_PolitePastTeru_V1S()
     {
         const string termToDeconjugate = "呉れてました";
         const string expected = "～teru→polite past";
@@ -620,7 +620,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeruNegative_v1s()
+    public void Deconjugate_PolitePastTeruNegative_V1S()
     {
         const string termToDeconjugate = "呉れてません";
         const string expected = "～teru→polite negative";
@@ -629,7 +629,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeruNegative2_v1s()
+    public void Deconjugate_PolitePastTeruNegative2_V1S()
     {
         const string termToDeconjugate = "呉れてませんでした";
         const string expected = "～teru→polite past negative";
@@ -638,7 +638,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastShimauAffirmative_v1s()
+    public void Deconjugate_PlainNonPastShimauAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてしまう";
         const string expected = "～finish/completely/end up";
@@ -647,7 +647,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastShimauKansaibenAffirmative_v1s()
+    public void Deconjugate_PlainNonPastShimauKansaibenAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてもう";
         const string expected = "～finish/completely/end up→ksb";
@@ -656,7 +656,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastShimauNegative_v1s()
+    public void Deconjugate_PlainNonPastShimauNegative_V1S()
     {
         const string termToDeconjugate = "呉れてしまわない";
         const string expected = "～finish/completely/end up→negative";
@@ -665,7 +665,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastShimauAffirmative_v1s()
+    public void Deconjugate_PlainPastShimauAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてしまった";
         const string expected = "～finish/completely/end up→past";
@@ -674,7 +674,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastShimauNegative_v1s()
+    public void Deconjugate_PlainPastShimauNegative_V1S()
     {
         const string termToDeconjugate = "呉れてしまわなかった";
         const string expected = "～finish/completely/end up→negative→past";
@@ -683,7 +683,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauTeForm_v1s()
+    public void Deconjugate_PlainShimauTeForm_V1S()
     {
         const string termToDeconjugate = "呉れてしまって";
         const string expected = "～finish/completely/end up→te";
@@ -692,7 +692,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauProvisionalConditional_v1s()
+    public void Deconjugate_PlainShimauProvisionalConditional_V1S()
     {
         const string termToDeconjugate = "呉れてしまえば";
         const string expected = "～finish/completely/end up→provisional conditional";
@@ -701,7 +701,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauProvisionalConditionalNegative_v1s()
+    public void Deconjugate_PlainShimauProvisionalConditionalNegative_V1S()
     {
         const string termToDeconjugate = "呉れてしまわなければ";
         const string expected = "～finish/completely/end up→negative→provisional conditional";
@@ -710,7 +710,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauTemporalConditionalNegative_v1s()
+    public void Deconjugate_PlainShimauTemporalConditionalNegative_V1S()
     {
         const string termToDeconjugate = "呉れてしまわなかったら";
         const string expected = "～finish/completely/end up→negative→conditional";
@@ -719,7 +719,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauTemporalConditional_v1s()
+    public void Deconjugate_PlainShimauTemporalConditional_V1S()
     {
         const string termToDeconjugate = "呉れてしまったら";
         const string expected = "～finish/completely/end up→conditional";
@@ -728,7 +728,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauVolitional_v1s()
+    public void Deconjugate_PlainShimauVolitional_V1S()
     {
         const string termToDeconjugate = "呉れてしまおう";
         const string expected = "～finish/completely/end up→volitional";
@@ -737,7 +737,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastShimauAffirmative_v1s()
+    public void Deconjugate_PoliteNonPastShimauAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてしまいます";
         const string expected = "～finish/completely/end up→polite";
@@ -746,7 +746,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastShimauNegative_v1s()
+    public void Deconjugate_PoliteNonPastShimauNegative_V1S()
     {
         const string termToDeconjugate = "呉れてしまいません";
         const string expected = "～finish/completely/end up→polite negative";
@@ -755,7 +755,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastShimauAffirmative_v1s()
+    public void Deconjugate_PolitePastShimauAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてしまいました";
         const string expected = "～finish/completely/end up→polite past";
@@ -764,7 +764,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastShimauNegative_v1s()
+    public void Deconjugate_PolitePastShimauNegative_V1S()
     {
         const string termToDeconjugate = "呉れてしまいませんでした";
         const string expected = "～finish/completely/end up→polite past negative";
@@ -773,7 +773,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauPotential_v1s()
+    public void Deconjugate_PlainShimauPotential_V1S()
     {
         const string termToDeconjugate = "呉れてしまえる";
         const string expected = "～finish/completely/end up→potential";
@@ -782,7 +782,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauPassive_v1s()
+    public void Deconjugate_PlainShimauPassive_V1S()
     {
         const string termToDeconjugate = "呉れてしまわれる";
         const string expected = "～finish/completely/end up→passive";
@@ -791,7 +791,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShimauCausative_v1s()
+    public void Deconjugate_PlainShimauCausative_V1S()
     {
         const string termToDeconjugate = "呉れてしまわせる";
         const string expected = "～finish/completely/end up→causative";
@@ -800,7 +800,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastContractedShimauAffirmative_v1s()
+    public void Deconjugate_PlainNonPastContractedShimauAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れちゃう";
         const string expected = "～finish/completely/end up→contracted";
@@ -809,7 +809,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastContractedShimauNegative_v1s()
+    public void Deconjugate_PlainNonPastContractedShimauNegative_V1S()
     {
         const string termToDeconjugate = "呉れちゃわない";
         const string expected = "～finish/completely/end up→contracted→negative";
@@ -818,7 +818,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastContractedShimauAffirmative_v1s()
+    public void Deconjugate_PlainPastContractedShimauAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れちゃった";
         const string expected = "～finish/completely/end up→contracted→past";
@@ -827,7 +827,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastContractedShimauNegative_v1s()
+    public void Deconjugate_PlainPastContractedShimauNegative_V1S()
     {
         const string termToDeconjugate = "呉れちゃわなかった";
         const string expected = "～finish/completely/end up→contracted→negative→past";
@@ -836,7 +836,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainContractedShimauTeForm_v1s()
+    public void Deconjugate_PlainContractedShimauTeForm_V1S()
     {
         const string termToDeconjugate = "呉れちゃって";
         const string expected = "～finish/completely/end up→contracted→te";
@@ -845,7 +845,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainContractedShimauProvisionalConditional_v1s()
+    public void Deconjugate_PlainContractedShimauProvisionalConditional_V1S()
     {
         const string termToDeconjugate = "呉れちゃえば";
         const string expected = "～finish/completely/end up→contracted→provisional conditional";
@@ -854,7 +854,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainContractedShimauProvisionalConditionalNegative_v1s()
+    public void Deconjugate_PlainContractedShimauProvisionalConditionalNegative_V1S()
     {
         const string termToDeconjugate = "呉れちゃわなければ";
         const string expected = "～finish/completely/end up→contracted→negative→provisional conditional";
@@ -863,7 +863,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainContractedShimauTemporalConditionalNegative_v1s()
+    public void Deconjugate_PlainContractedShimauTemporalConditionalNegative_V1S()
     {
         const string termToDeconjugate = "呉れちゃわなかったら";
         const string expected = "～finish/completely/end up→contracted→negative→conditional";
@@ -872,7 +872,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainContractedShimauVolitional_v1s()
+    public void Deconjugate_PlainContractedShimauVolitional_V1S()
     {
         const string termToDeconjugate = "呉れちゃおう";
         const string expected = "～finish/completely/end up→contracted→volitional";
@@ -881,7 +881,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainContractedShimauPotential_v1s()
+    public void Deconjugate_PlainContractedShimauPotential_V1S()
     {
         const string termToDeconjugate = "呉れちゃえる";
         const string expected = "～finish/completely/end up→contracted→potential";
@@ -891,7 +891,7 @@ internal sealed class DeconjugatorTestsForV1S
 
 
     [Test]
-    public void Deconjugate_PlainNonPastOkuAffirmative_v1s()
+    public void Deconjugate_PlainNonPastOkuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れておく";
         const string expected = "～for now";
@@ -900,7 +900,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastOkuNegative_v1s()
+    public void Deconjugate_PlainNonPastOkuNegative_V1S()
     {
         const string termToDeconjugate = "呉れておかない";
         const string expected = "～for now→negative";
@@ -909,7 +909,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastOkuAffirmative_v1s()
+    public void Deconjugate_PlainPastOkuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れておいた";
         const string expected = "～for now→past";
@@ -918,7 +918,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastOkuNegative_v1s()
+    public void Deconjugate_PlainPastOkuNegative_V1S()
     {
         const string termToDeconjugate = "呉れておかなかった";
         const string expected = "～for now→negative→past";
@@ -927,7 +927,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainOkuTeForm_v1s()
+    public void Deconjugate_PlainOkuTeForm_V1S()
     {
         const string termToDeconjugate = "呉れておいて";
         const string expected = "～for now→te";
@@ -936,7 +936,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainOkuProvisionalConditional_v1s()
+    public void Deconjugate_PlainOkuProvisionalConditional_V1S()
     {
         const string termToDeconjugate = "呉れておけば";
         const string expected = "～for now→provisional conditional";
@@ -945,7 +945,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainOkuTemporalConditional_v1s()
+    public void Deconjugate_PlainOkuTemporalConditional_V1S()
     {
         const string termToDeconjugate = "呉れておいたら";
         const string expected = "～for now→conditional";
@@ -954,7 +954,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainOkuVolitional_v1s()
+    public void Deconjugate_PlainOkuVolitional_V1S()
     {
         const string termToDeconjugate = "呉れておこう";
         const string expected = "～for now→volitional";
@@ -963,7 +963,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainOkuPotential_v1s()
+    public void Deconjugate_PlainOkuPotential_V1S()
     {
         const string termToDeconjugate = "呉れておける";
         const string expected = "～for now→potential";
@@ -972,7 +972,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainOkuPassive_v1s()
+    public void Deconjugate_PlainOkuPassive_V1S()
     {
         const string termToDeconjugate = "呉れておかれる";
         const string expected = "～for now→passive";
@@ -981,7 +981,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTokuAffirmative_v1s()
+    public void Deconjugate_PlainNonPastTokuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れとく";
         const string expected = "～toku (for now)";
@@ -990,7 +990,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTokuNegative_v1s()
+    public void Deconjugate_PlainNonPastTokuNegative_V1S()
     {
         const string termToDeconjugate = "呉れとかない";
         const string expected = "～toku (for now)→negative";
@@ -999,7 +999,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTokuAffirmative_v1s()
+    public void Deconjugate_PlainPastTokuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れといた";
         const string expected = "～toku (for now)→past";
@@ -1008,7 +1008,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTokuNegative_v1s()
+    public void Deconjugate_PlainPastTokuNegative_V1S()
     {
         const string termToDeconjugate = "呉れとかなかった";
         const string expected = "～toku (for now)→negative→past";
@@ -1017,7 +1017,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTokuTeForm_v1s()
+    public void Deconjugate_PlainTokuTeForm_V1S()
     {
         const string termToDeconjugate = "呉れといて";
         const string expected = "～toku (for now)→te";
@@ -1026,7 +1026,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTokuProvisionalConditional_v1s()
+    public void Deconjugate_PlainTokuProvisionalConditional_V1S()
     {
         const string termToDeconjugate = "呉れとけば";
         const string expected = "～toku (for now)→provisional conditional";
@@ -1035,7 +1035,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTokuTemporalConditional_v1s()
+    public void Deconjugate_PlainTokuTemporalConditional_V1S()
     {
         const string termToDeconjugate = "呉れといたら";
         const string expected = "～toku (for now)→conditional";
@@ -1044,7 +1044,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTokuVolitional_v1s()
+    public void Deconjugate_PlainTokuVolitional_V1S()
     {
         const string termToDeconjugate = "呉れとこう";
         const string expected = "～toku (for now)→volitional";
@@ -1053,7 +1053,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTokuPotential_v1s()
+    public void Deconjugate_PlainTokuPotential_V1S()
     {
         const string termToDeconjugate = "呉れとける";
         const string expected = "～toku (for now)→potential";
@@ -1062,7 +1062,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTokuPassive_v1s()
+    public void Deconjugate_PlainTokuPassive_V1S()
     {
         const string termToDeconjugate = "呉れとかれる";
         const string expected = "～toku (for now)→passive";
@@ -1071,7 +1071,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTearuAffirmative_v1s()
+    public void Deconjugate_PlainNonPastTearuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてある";
         const string expected = "～tearu";
@@ -1080,7 +1080,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTearuAffirmative_v1s()
+    public void Deconjugate_PlainPastTearuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてあった";
         const string expected = "～tearu→past";
@@ -1089,7 +1089,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTearuTeForm_v1s()
+    public void Deconjugate_PlainTearuTeForm_V1S()
     {
         const string termToDeconjugate = "呉れてあって";
         const string expected = "～tearu→te";
@@ -1098,7 +1098,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTearuTemporalConditional_v1s()
+    public void Deconjugate_PlainTearuTemporalConditional_V1S()
     {
         const string termToDeconjugate = "呉れてあったら";
         const string expected = "～tearu→conditional";
@@ -1107,7 +1107,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTearuProvisionalConditional_v1s()
+    public void Deconjugate_PlainTearuProvisionalConditional_V1S()
     {
         const string termToDeconjugate = "呉れてあれば";
         const string expected = "～tearu→provisional conditional";
@@ -1116,7 +1116,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeikuAffirmative_v1s()
+    public void Deconjugate_PlainNonPastTeikuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れていく";
         const string expected = "～teiku";
@@ -1125,7 +1125,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeikuNegative_v1s()
+    public void Deconjugate_PlainNonPastTeikuNegative_V1S()
     {
         const string termToDeconjugate = "呉れていかない";
         const string expected = "～teiku→negative";
@@ -1134,7 +1134,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTeikuAffirmative_v1s()
+    public void Deconjugate_PlainPastTeikuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れていった";
         const string expected = "～teiku→past";
@@ -1143,7 +1143,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTeikuNegative_v1s()
+    public void Deconjugate_PlainPastTeikuNegative_V1S()
     {
         const string termToDeconjugate = "呉れていかなかった";
         const string expected = "～teiku→negative→past";
@@ -1152,7 +1152,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TeikuTeForm_v1s()
+    public void Deconjugate_TeikuTeForm_V1S()
     {
         const string termToDeconjugate = "呉れていって";
         const string expected = "～teiku→te";
@@ -1161,7 +1161,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TeikuVolitional_v1s()
+    public void Deconjugate_TeikuVolitional_V1S()
     {
         const string termToDeconjugate = "呉れていこう";
         const string expected = "～teiku→volitional";
@@ -1170,7 +1170,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TeikuPotential_v1s()
+    public void Deconjugate_TeikuPotential_V1S()
     {
         const string termToDeconjugate = "呉れていける";
         const string expected = "～teiku→potential";
@@ -1179,7 +1179,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TeikuPassive_v1s()
+    public void Deconjugate_TeikuPassive_V1S()
     {
         const string termToDeconjugate = "呉れていかれる";
         const string expected = "～teiku→passive";
@@ -1188,7 +1188,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TeikuCausative_v1s()
+    public void Deconjugate_TeikuCausative_V1S()
     {
         const string termToDeconjugate = "呉れていかせる";
         const string expected = "～teiku→causative";
@@ -1197,7 +1197,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTekuruAffirmative_v1s()
+    public void Deconjugate_PlainNonPastTekuruAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてくる";
         const string expected = "～tekuru";
@@ -1206,7 +1206,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTekuruNegative_v1s()
+    public void Deconjugate_PlainNonPastTekuruNegative_V1S()
     {
         const string termToDeconjugate = "呉れてこない";
         const string expected = "～tekuru→negative";
@@ -1215,7 +1215,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTekuruAffirmative_v1s()
+    public void Deconjugate_PlainPastTekuruAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてきた";
         const string expected = "～tekuru→past";
@@ -1224,7 +1224,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTekuruNegative_v1s()
+    public void Deconjugate_PlainPastTekuruNegative_V1S()
     {
         const string termToDeconjugate = "呉れてこなかった";
         const string expected = "～tekuru→negative→past";
@@ -1233,7 +1233,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TekuruTeForm_v1s()
+    public void Deconjugate_TekuruTeForm_V1S()
     {
         const string termToDeconjugate = "呉れてきて";
         const string expected = "～tekuru→te";
@@ -1242,7 +1242,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TekuruProvisionalConditional_v1s()
+    public void Deconjugate_TekuruProvisionalConditional_V1S()
     {
         const string termToDeconjugate = "呉れてくれば";
         const string expected = "～tekuru→provisional conditional";
@@ -1251,7 +1251,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TekuruTemporalConditional_v1s()
+    public void Deconjugate_TekuruTemporalConditional_V1S()
     {
         const string termToDeconjugate = "呉れてきたら";
         const string expected = "～tekuru→conditional";
@@ -1260,7 +1260,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTekuruPassivePotentialAffirmative_v1s()
+    public void Deconjugate_PlainTekuruPassivePotentialAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてこられる";
         const string expected = "～tekuru→passive/potential/honorific";
@@ -1269,7 +1269,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainTekuruCausativeAffirmative_v1s()
+    public void Deconjugate_PlainTekuruCausativeAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてこさせる";
         const string expected = "～tekuru→causative";
@@ -1278,7 +1278,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_Nagara_v1s()
+    public void Deconjugate_Nagara_V1S()
     {
         const string termToDeconjugate = "呉れながら";
         const string expected = "～while";
@@ -1287,7 +1287,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastSugiruAffirmative_v1s()
+    public void Deconjugate_PlainNonPastSugiruAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れすぎる";
         const string expected = "～too much";
@@ -1296,7 +1296,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastSouAffirmative_v1s()
+    public void Deconjugate_PlainNonPastSouAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れそう";
         const string expected = "～seemingness";
@@ -1305,7 +1305,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_ClassicalNegativeFormNu_v1s()
+    public void Deconjugate_ClassicalNegativeFormNu_V1S()
     {
         const string termToDeconjugate = "呉れぬ";
         const string expected = "～archaic negative";
@@ -1314,7 +1314,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_ClassicalNegativeContinuativeFormZu_v1s()
+    public void Deconjugate_ClassicalNegativeContinuativeFormZu_V1S()
     {
         const string termToDeconjugate = "呉れず";
         const string expected = "～adverbial negative";
@@ -1323,7 +1323,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_ClassicalAdverbialFormZuNi_v1s()
+    public void Deconjugate_ClassicalAdverbialFormZuNi_V1S()
     {
         const string termToDeconjugate = "呉れずに";
         const string expected = "～without doing so";
@@ -1332,7 +1332,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTariAffirmative_v1s()
+    public void Deconjugate_PlainNonPastTariAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れたり";
         const string expected = "～tari";
@@ -1341,7 +1341,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTariNegative_v1s()
+    public void Deconjugate_PlainNonPastTariNegative_V1S()
     {
         const string termToDeconjugate = "呉れなかったり";
         const string expected = "～negative→tari";
@@ -1350,7 +1350,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastSlurredAffirmative_v1s()
+    public void Deconjugate_PlainNonPastSlurredAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れん";
         const string expected = "～slurred; slurred negative";
@@ -1359,7 +1359,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastSlurredNegative_v1s()
+    public void Deconjugate_PlainPastSlurredNegative_V1S()
     {
         const string termToDeconjugate = "呉れんかった";
         const string expected = "～slurred negative→past";
@@ -1368,7 +1368,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_Zaru_v1s()
+    public void Deconjugate_Zaru_V1S()
     {
         const string termToDeconjugate = "呉れざる";
         const string expected = "～archaic attributive negative";
@@ -1377,7 +1377,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialAffirmative_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れれる";
         const string expected = "～potential";
@@ -1386,7 +1386,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastColloquialPotentialAffirmative_v1s()
+    public void Deconjugate_PoliteNonPastColloquialPotentialAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れれます";
         const string expected = "～potential→polite";
@@ -1395,7 +1395,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastColloquialPotentialAffirmative_v1s()
+    public void Deconjugate_PlainPastColloquialPotentialAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れれた";
         const string expected = "～potential→past";
@@ -1404,7 +1404,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastColloquialPotentialAffirmative_v1s()
+    public void Deconjugate_PolitePastColloquialPotentialAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れれました";
         const string expected = "～potential→polite past";
@@ -1413,7 +1413,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialNegative_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialNegative_V1S()
     {
         const string termToDeconjugate = "呉れれない";
         const string expected = "～potential→negative";
@@ -1422,7 +1422,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastColloquialPotentialNegative_v1s()
+    public void Deconjugate_PoliteNonPastColloquialPotentialNegative_V1S()
     {
         const string termToDeconjugate = "呉れれません";
         const string expected = "～potential→polite negative";
@@ -1431,7 +1431,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialVolitional_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialVolitional_V1S()
     {
         const string termToDeconjugate = "呉れれよう";
         const string expected = "～potential→volitional";
@@ -1440,7 +1440,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastKansaibenColloquialPotentialVolitional_v1s()
+    public void Deconjugate_PlainNonPastKansaibenColloquialPotentialVolitional_V1S()
     {
         const string termToDeconjugate = "呉れれよ";
         const string expected = "～potential→volitional→ksb";
@@ -1449,7 +1449,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialImperative_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialImperative_V1S()
     {
         const string termToDeconjugate = "呉れれろ";
         const string expected = "～potential→imperative";
@@ -1458,7 +1458,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialTeForm_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialTeForm_V1S()
     {
         const string termToDeconjugate = "呉れれて";
         const string expected = "～potential→te";
@@ -1467,7 +1467,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialTemporalConditional_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialTemporalConditional_V1S()
     {
         const string termToDeconjugate = "呉れれたら";
         const string expected = "～potential→conditional";
@@ -1476,7 +1476,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialProvisionalConditional_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialProvisionalConditional_V1S()
     {
         const string termToDeconjugate = "呉れれれば";
         const string expected = "～potential→provisional conditional";
@@ -1485,7 +1485,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialPassivePotential_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialPassivePotential_V1S()
     {
         const string termToDeconjugate = "呉れれられる";
         const string expected = "～potential→passive/potential/honorific";
@@ -1494,7 +1494,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialPotentialCausative_v1s()
+    public void Deconjugate_PlainNonPastColloquialPotentialCausative_V1S()
     {
         const string termToDeconjugate = "呉れれさせる";
         const string expected = "～potential→causative";
@@ -1503,7 +1503,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastAgeruAffirmative_v1s()
+    public void Deconjugate_PlainNonPastAgeruAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてあげる";
         const string expected = "～do for someone";
@@ -1512,7 +1512,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastAgeruPassive_v1s()
+    public void Deconjugate_PlainNonPastAgeruPassive_V1S()
     {
         const string termToDeconjugate = "呉れてあげられる";
         const string expected = "～do for someone→passive";
@@ -1521,7 +1521,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeoru_v1s()
+    public void Deconjugate_PlainNonPastTeoru_V1S()
     {
         const string termToDeconjugate = "呉れておる";
         const string expected = "～teoru";
@@ -1530,7 +1530,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeoruNegative_v1s()
+    public void Deconjugate_PlainNonPastTeoruNegative_V1S()
     {
         const string termToDeconjugate = "呉れておらない";
         const string expected = "～teoru→negative";
@@ -1539,7 +1539,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastTeoruSlurredNegative_v1s()
+    public void Deconjugate_PlainNonPastTeoruSlurredNegative_V1S()
     {
         const string termToDeconjugate = "呉れておらん";
         const string expected = "～teoru→slurred negative";
@@ -1548,7 +1548,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTeoruAffirmative_v1s()
+    public void Deconjugate_PlainPastTeoruAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れておった";
         const string expected = "～teoru→past";
@@ -1557,7 +1557,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastTeoruNegative_v1s()
+    public void Deconjugate_PlainPastTeoruNegative_V1S()
     {
         const string termToDeconjugate = "呉れておらなかった";
         const string expected = "～teoru→negative→past";
@@ -1566,7 +1566,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastTeoru_v1s()
+    public void Deconjugate_PoliteNonPastTeoru_V1S()
     {
         const string termToDeconjugate = "呉れております";
         const string expected = "～teoru→polite";
@@ -1575,7 +1575,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastTeoruNegative_v1s()
+    public void Deconjugate_PoliteNonPastTeoruNegative_V1S()
     {
         const string termToDeconjugate = "呉れておりません";
         const string expected = "～teoru→polite negative";
@@ -1584,7 +1584,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeoru_v1s()
+    public void Deconjugate_PolitePastTeoru_V1S()
     {
         const string termToDeconjugate = "呉れておりました";
         const string expected = "～teoru→polite past";
@@ -1593,7 +1593,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeoruNegative_v1s()
+    public void Deconjugate_PolitePastTeoruNegative_V1S()
     {
         const string termToDeconjugate = "呉れておりませんでした";
         const string expected = "～teoru→polite past negative";
@@ -1602,7 +1602,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeoruTeForm_v1s()
+    public void Deconjugate_PolitePastTeoruTeForm_V1S()
     {
         const string termToDeconjugate = "呉れておって";
         const string expected = "～teoru→te";
@@ -1611,7 +1611,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeoruVolitional_v1s()
+    public void Deconjugate_PolitePastTeoruVolitional_V1S()
     {
         const string termToDeconjugate = "呉れておろう";
         const string expected = "～teoru→volitional";
@@ -1620,7 +1620,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeoruPotential_v1s()
+    public void Deconjugate_PolitePastTeoruPotential_V1S()
     {
         const string termToDeconjugate = "呉れておれる";
         const string expected = "～teoru→potential";
@@ -1629,7 +1629,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastTeoruPassive_v1s()
+    public void Deconjugate_PolitePastTeoruPassive_V1S()
     {
         const string termToDeconjugate = "呉れておられる";
         const string expected = "～teoru→passive";
@@ -1638,7 +1638,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastToru_v1s()
+    public void Deconjugate_PlainNonPastToru_V1S()
     {
         const string termToDeconjugate = "呉れとる";
         const string expected = "～toru";
@@ -1647,7 +1647,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastToruNegative_v1s()
+    public void Deconjugate_PlainNonPastToruNegative_V1S()
     {
         const string termToDeconjugate = "呉れとらない";
         const string expected = "～toru→negative";
@@ -1656,7 +1656,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastToruSlurredNegative_v1s()
+    public void Deconjugate_PlainNonPastToruSlurredNegative_V1S()
     {
         const string termToDeconjugate = "呉れとらん";
         const string expected = "～toru→slurred negative";
@@ -1665,7 +1665,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastToruAffirmative_v1s()
+    public void Deconjugate_PlainPastToruAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れとった";
         const string expected = "～toru→past";
@@ -1674,7 +1674,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastToruNegative_v1s()
+    public void Deconjugate_PlainPastToruNegative_V1S()
     {
         const string termToDeconjugate = "呉れとらなかった";
         const string expected = "～toru→negative→past";
@@ -1683,7 +1683,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastToru_v1s()
+    public void Deconjugate_PoliteNonPastToru_V1S()
     {
         const string termToDeconjugate = "呉れとります";
         const string expected = "～toru→polite";
@@ -1692,7 +1692,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastToruNegative_v1s()
+    public void Deconjugate_PoliteNonPastToruNegative_V1S()
     {
         const string termToDeconjugate = "呉れとりません";
         const string expected = "～toru→polite negative";
@@ -1701,7 +1701,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastToru_v1s()
+    public void Deconjugate_PolitePastToru_V1S()
     {
         const string termToDeconjugate = "呉れとりました";
         const string expected = "～toru→polite past";
@@ -1710,7 +1710,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastToruNegative_v1s()
+    public void Deconjugate_PolitePastToruNegative_V1S()
     {
         const string termToDeconjugate = "呉れとりませんでした";
         const string expected = "～toru→polite past negative";
@@ -1719,7 +1719,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastToruTeForm_v1s()
+    public void Deconjugate_PolitePastToruTeForm_V1S()
     {
         const string termToDeconjugate = "呉れとって";
         const string expected = "～toru→te";
@@ -1728,7 +1728,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastToruVolitional_v1s()
+    public void Deconjugate_PolitePastToruVolitional_V1S()
     {
         const string termToDeconjugate = "呉れとろう";
         const string expected = "～toru→volitional";
@@ -1737,7 +1737,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastToruPotential_v1s()
+    public void Deconjugate_PolitePastToruPotential_V1S()
     {
         const string termToDeconjugate = "呉れとれる";
         const string expected = "～toru→potential";
@@ -1746,7 +1746,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PolitePastToruPassive_v1s()
+    public void Deconjugate_PolitePastToruPassive_V1S()
     {
         const string termToDeconjugate = "呉れとられる";
         const string expected = "～toru→passive";
@@ -1755,7 +1755,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainShortCausativeAffirmative_v1s()
+    public void Deconjugate_PlainShortCausativeAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れさす";
         const string expected = "～short causative";
@@ -1764,7 +1764,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastNa_v1s()
+    public void Deconjugate_PlainNonPastNa_V1S()
     {
         const string termToDeconjugate = "呉れな";
         const string expected = "～casual polite imperative";
@@ -1773,7 +1773,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_TopicOrCondition_v1s()
+    public void Deconjugate_TopicOrCondition_V1S()
     {
         const string termToDeconjugate = "呉れては";
         const string expected = "～topic/condition";
@@ -1782,7 +1782,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_ContractedTopicOrConditionCha_v1s()
+    public void Deconjugate_ContractedTopicOrConditionCha_V1S()
     {
         const string termToDeconjugate = "呉れちゃ";
         const string expected = "～topic/condition→contracted";
@@ -1791,7 +1791,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastContractedProvisionalConditionalNegativeKya_v1s()
+    public void Deconjugate_PlainNonPastContractedProvisionalConditionalNegativeKya_V1S()
     {
         const string termToDeconjugate = "呉れなきゃ";
         const string expected = "～negative→provisional conditional→contracted";
@@ -1800,7 +1800,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastContractedShimauChimau_v1s()
+    public void Deconjugate_PlainNonPastContractedShimauChimau_V1S()
     {
         const string termToDeconjugate = "呉れちまう";
         const string expected = "～finish/completely/end up→contracted";
@@ -1809,7 +1809,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastContractedShimauChau_v1s()
+    public void Deconjugate_PlainNonPastContractedShimauChau_V1S()
     {
         const string termToDeconjugate = "呉れちゃう";
         const string expected = "～finish/completely/end up→contracted";
@@ -1818,7 +1818,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastIrassharuAffirmative_v1s()
+    public void Deconjugate_PlainNonPastIrassharuAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れていらっしゃる";
         const string expected = "～honorific teiru";
@@ -1827,7 +1827,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastIrassharuNegative_v1s()
+    public void Deconjugate_PlainNonPastIrassharuNegative_V1S()
     {
         const string termToDeconjugate = "呉れていらっしゃらない";
         const string expected = "～honorific teiru→negative";
@@ -1836,7 +1836,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_Tsutsu_v1s()
+    public void Deconjugate_Tsutsu_V1S()
     {
         const string termToDeconjugate = "呉れつつ";
         const string expected = "～while/although";
@@ -1845,7 +1845,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastStatementRequestAffirmative_v1s()
+    public void Deconjugate_PlainNonPastStatementRequestAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてくれる";
         const string expected = "～statement/request";
@@ -1854,7 +1854,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastStatementRequestNegative_v1s()
+    public void Deconjugate_PlainNonPastStatementRequestNegative_V1S()
     {
         const string termToDeconjugate = "呉れてくれない";
         const string expected = "～statement/request→negative";
@@ -1863,7 +1863,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastStatementRequestAffirmative_v1s()
+    public void Deconjugate_PoliteNonPastStatementRequestAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れてくれます";
         const string expected = "～statement/request→polite";
@@ -1872,7 +1872,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastStatementRequestNegative_v1s()
+    public void Deconjugate_PoliteNonPastStatementRequestNegative_V1S()
     {
         const string termToDeconjugate = "呉れてくれません";
         const string expected = "～statement/request→polite negative";
@@ -1881,7 +1881,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastStatementImperative_v1s()
+    public void Deconjugate_PoliteNonPastStatementImperative_V1S()
     {
         const string termToDeconjugate = "呉れてくれ";
         const string expected = "～statement/request→imperative; statement/request→masu stem";
@@ -1890,7 +1890,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastKansaibenNegative_v1s()
+    public void Deconjugate_PlainNonPastKansaibenNegative_V1S()
     {
         const string termToDeconjugate = "呉れへん";
         const string expected = "～negative→ksb";
@@ -1899,7 +1899,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastKansaibenNegative_v1s()
+    public void Deconjugate_PlainPastKansaibenNegative_V1S()
     {
         const string termToDeconjugate = "呉れへんかった";
         const string expected = "～negative→ksb→past";
@@ -1908,7 +1908,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastKansaibenSubDialectNegative_v1s()
+    public void Deconjugate_PlainNonPastKansaibenSubDialectNegative_V1S()
     {
         const string termToDeconjugate = "呉れひん";
         const string expected = "～negative→ksb";
@@ -1917,7 +1917,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainPastKansaibenSubDialectNegative_v1s()
+    public void Deconjugate_PlainPastKansaibenSubDialectNegative_V1S()
     {
         const string termToDeconjugate = "呉れひんかった";
         const string expected = "～negative→ksb→past";
@@ -1926,7 +1926,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_KansaibenImperative_v1s()
+    public void Deconjugate_KansaibenImperative_V1S()
     {
         const string termToDeconjugate = "呉れい";
         const string expected = "～imperative (ksb)";
@@ -1935,7 +1935,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_ContractedProvisionalConditionalRya_v1s()
+    public void Deconjugate_ContractedProvisionalConditionalRya_V1S()
     {
         const string termToDeconjugate = "呉れりゃ";
         const string expected = "～provisional conditional→contracted";
@@ -1944,7 +1944,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastColloquialCausativeNegative_v1s()
+    public void Deconjugate_PlainNonPastColloquialCausativeNegative_V1S()
     {
         const string termToDeconjugate = "呉れささない";
         const string expected = "～colloquial causative→negative";
@@ -1953,7 +1953,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastTemporalConditional_v1s()
+    public void Deconjugate_PoliteNonPastTemporalConditional_V1S()
     {
         const string termToDeconjugate = "呉れましたら";
         const string expected = "～polite conditional";
@@ -1962,7 +1962,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastHonorificNinaru_v1s()
+    public void Deconjugate_PoliteNonPastHonorificNinaru_V1S()
     {
         const string termToDeconjugate = "呉れになる";
         const string expected = "～honorific";
@@ -1971,7 +1971,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastHonorificNasaru_v1s()
+    public void Deconjugate_PoliteNonPastHonorificNasaru_V1S()
     {
         const string termToDeconjugate = "呉れなさる";
         const string expected = "～honorific";
@@ -1980,7 +1980,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PoliteNonPastHonorificHaruKsbAffirmative_v1s()
+    public void Deconjugate_PoliteNonPastHonorificHaruKsbAffirmative_V1S()
     {
         const string termToDeconjugate = "呉れはる";
         const string expected = "～honorific (ksb)";
@@ -1989,7 +1989,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastHonorificNegativeNasaruna_v1s()
+    public void Deconjugate_PlainNonPastHonorificNegativeNasaruna_V1S()
     {
         const string termToDeconjugate = "呉れなさるな";
         const string expected = "～honorific→imperative negative";
@@ -1998,7 +1998,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastNegativeConjectural_v1s()
+    public void Deconjugate_PlainNonPastNegativeConjectural_V1S()
     {
         const string termToDeconjugate = "呉れまい";
         const string expected = "～negative conjectural";
@@ -2007,7 +2007,7 @@ internal sealed class DeconjugatorTestsForV1S
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastNegativeConditional_v1_s()
+    public void Deconjugate_PlainNonPastNegativeConditional_V1S()
     {
         const string termToDeconjugate = "呉れねば";
         const string expected = "～negative conditional";
