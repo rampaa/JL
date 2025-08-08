@@ -228,7 +228,7 @@ internal sealed partial class AddDictionaryWindow
         if (!string.IsNullOrEmpty(typeString))
         {
             DictType type = typeString.GetEnum<DictType>();
-            _dictOptionsControl.GenerateDictOptionsElements(type);
+            _dictOptionsControl.GenerateDictOptionsElements(type, null);
         }
 
         else

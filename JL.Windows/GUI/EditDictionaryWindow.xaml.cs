@@ -219,7 +219,7 @@ internal sealed partial class EditDictionaryWindow
         FolderBrowseButton.IsEnabled = isNotCustomDict;
 
         NameTextBox.Text = _dict.Name;
-        _dictOptionsControl.GenerateDictOptionsElements(_dict);
+        _dictOptionsControl.GenerateDictOptionsElements(_dict.Type, _dict.Options);
     }
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
