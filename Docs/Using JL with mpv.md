@@ -19,6 +19,9 @@
 - Enable `Center text horizontally`.
 - Enable `Hide all buttons when mouse is not over the title bar`.
 - Disable `Text only visible on hover`.
+- Try experimenting with the `Shadow depth`, `Shadow blur radius`, `Shadow opacity`, and `Shadow direction` settings to improve the readability of the text when the main text box background is transparent.  
+  - A good starting point might be: `Shadow depth: 2.0`, `Blur radius: 7`, `Opacity: 100`, `Direction: 340`.
+- Try changing the `Font weight` option and see if it improves the text readability of the main text box text for you.
 
 ---
 
