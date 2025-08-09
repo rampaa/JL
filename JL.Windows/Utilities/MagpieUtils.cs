@@ -6,15 +6,15 @@ internal static class MagpieUtils
 {
     public static int MagpieScalingChangedWindowMessage { get; private set; } = -1;
     public static bool IsMagpieScaling { get; set; }  // = false;
-    public static double MagpieWindowLeftEdgePosition { get; set; }
-    public static double MagpieWindowRightEdgePosition { get; set; }
-    public static double MagpieWindowTopEdgePosition { get; set; }
-    public static double MagpieWindowBottomEdgePosition { get; set; }
-    public static double DpiAwareMagpieWindowWidth { get; set; }
+    public static double MagpieWindowLeftEdgePosition { get; private set; }
+    public static double MagpieWindowRightEdgePosition { get; private set; }
+    public static double MagpieWindowTopEdgePosition { get; private set; }
+    public static double MagpieWindowBottomEdgePosition { get; private set; }
+    public static double DpiAwareMagpieWindowWidth { get; private set; }
     // public static nint SourceWindowHandle { get; set; }
-    public static Rect SourceWindowRect { get; set; }
-    public static double ScaleFactorX { get; set; }
-    public static double ScaleFactorY { get; set; }
+    public static Rect SourceWindowRect { get; private set; }
+    public static double ScaleFactorX { get; private set; }
+    public static double ScaleFactorY { get; private set; }
 
     public static void RegisterToMagpieScalingChangedMessage(nint windowHandle)
     {

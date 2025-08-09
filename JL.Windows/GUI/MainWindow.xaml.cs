@@ -1541,7 +1541,7 @@ internal sealed partial class MainWindow
             double width;
             double maxDynamicHeight = configManager.MainWindowMaxDynamicHeight * dpi.DpiScaleY;
             MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieScaling && MagpieUtils.IsMagpieReallyScaling();
-            if (!MagpieUtils.IsMagpieScaling)
+            if (!MagpieUtils.IsMagpieScaling || !MagpieUtils.SourceWindowRect.Contains(WinApi.GetMousePosition()))
             {
                 Rectangle workingArea = WindowsUtils.ActiveScreen.WorkingArea;
                 if (configManager.PositionPopupAboveCursor)
@@ -2174,10 +2174,13 @@ internal sealed partial class MainWindow
         if (!WindowsUtils.ActiveScreen.Bounds.Contains(x, y))
         {
             Rectangle workingArea = Screen.FromPoint(new System.Drawing.Point(x, y)).WorkingArea;
+
+            Opacity = 0d;
+            UpdateLayout();
+
             bool isMinimized = WindowState is WindowState.Minimized;
             if (isMinimized)
             {
-                Opacity = 0d;
 
                 if (ConfigManager.Instance.Focusable)
                 {
@@ -2194,6 +2197,7 @@ internal sealed partial class MainWindow
 
             WinApi.MoveWindowToPosition(WindowHandle, workingArea.X, workingArea.Y);
             HandleDisplaySettingsChange();
+            UpdatePosition();
 
             if (isMinimized)
             {
@@ -2205,9 +2209,9 @@ internal sealed partial class MainWindow
                 {
                     WinApi.MinimizeWindow(WindowHandle);
                 }
-
-                Opacity = 1d;
             }
+
+            Opacity = 1d;
         }
     }
 }
