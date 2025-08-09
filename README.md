@@ -69,7 +69,7 @@ Disable the "Preferences>Popup>Focus on lookup" option.
 Optional if you use the "Mouse move" look up mode, required otherwise: Disable the "Preferences>General>Focusable" option. When this option is disabled, JL won't steal the focus away from other windows, even in case of a mouse click. This allows you to open popups within popups without Magpie exiting the fullscreen mode. Note that if this option is disabled, you won't be able to use hotkeys unless you enable the global hotkeys option and assign valid global hotkeys, because JL won't have the keyboard focus. You can also use the middle mouse button to activate the mining mode.
 
 ### How can I use JL with mpv?
-See [Using JL with mpv to watch anime with Japanese subtitles](https://github.com/rampaa/JL/blob/master/Docs/Using%20JL%20with%20mpv.md)
+See: [Using JL with mpv to watch anime with Japanese subtitles](https://github.com/rampaa/JL/blob/master/Docs/Using%20JL%20with%20mpv.md)
 
 ### How do I add new dictionaries?
 
