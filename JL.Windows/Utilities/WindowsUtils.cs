@@ -310,6 +310,7 @@ internal static class WindowsUtils
         using Process? process = Process.Start(new ProcessStartInfo("cmd",
             $"/c start \"\" {browserPath} \"{urlToBeSearched}\"")
         {
+            UseShellExecute = false,
             CreateNoWindow = true
         });
 
@@ -345,7 +346,7 @@ internal static class WindowsUtils
 
             using Process? process = Process.Start(
                 new ProcessStartInfo("cmd",
-                    string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}"))
+                    string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Updater\" \"\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}"))
                 {
                     UseShellExecute = true,
                     Verb = "runas"
