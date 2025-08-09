@@ -111,7 +111,7 @@ internal static class BacklogUtils
             StatsUtils.IncrementStat(StatType.Characters, -textLength);
         }
 
-        LinkedListNode<string>? newCurrentNode = s_currentNode.Previous ?? s_backlog.Last;
+        LinkedListNode<string>? newCurrentNode = s_currentNode.Previous ?? s_currentNode.Next;
         s_backlog.Remove(s_currentNode);
         s_currentNode = newCurrentNode;
 
