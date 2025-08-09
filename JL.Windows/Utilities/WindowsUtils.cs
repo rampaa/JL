@@ -856,4 +856,28 @@ internal static class WindowsUtils
             _ => int.TryParse(fontWeightName, out int fontWeight) ? FontWeight.FromOpenTypeWeight(fontWeight) : FontWeights.Normal
         };
     }
+
+    public static Point GetMousePosition(bool mayNeedCoordinateConversion)
+    {
+        return GetMousePosition(WinApi.GetMousePosition(), mayNeedCoordinateConversion);
+    }
+
+    public static Point GetMousePosition(Point mousePosition, bool mayNeedCoordinateConversion)
+    {
+        if (!mayNeedCoordinateConversion)
+        {
+            return mousePosition;
+        }
+
+        if (MagpieUtils.IsMagpieScaling)
+        {
+            MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
+            if (MagpieUtils.IsMagpieScaling)
+            {
+                return MagpieUtils.GetMousePosition(mousePosition);
+            }
+        }
+
+        return mousePosition;
+    }
 }

@@ -154,7 +154,7 @@ internal sealed partial class MainWindow
                     await MpvUtils.PausePlayback().ConfigureAwait(true);
                 }
 
-                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
+                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true).ConfigureAwait(false);
             }
         }, DispatcherPriority.Send).Task;
     }
@@ -359,7 +359,7 @@ internal sealed partial class MainWindow
                 await MpvUtils.PausePlayback().ConfigureAwait(true);
             }
 
-            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true).ConfigureAwait(false);
+            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true).ConfigureAwait(false);
         }
     }
 
@@ -917,7 +917,7 @@ internal sealed partial class MainWindow
                         _ = MpvUtils.PausePlayback();
                     }
 
-                    return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true);
+                    return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true, true);
                 }
             }
         }
@@ -926,7 +926,7 @@ internal sealed partial class MainWindow
         {
             if (MainTextBox.Text.Length > 0)
             {
-                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true);
+                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true);
             }
         }
 
