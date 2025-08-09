@@ -118,6 +118,13 @@ internal sealed partial class MainWindow
         // Makes caret/highlight visible without any mouse click
         MoveCaret(Key.Left);
 
+        nint magpieWindowHandle = MagpieUtils.GetMagpieWindowHandle();
+        MagpieUtils.IsMagpieScaling = magpieWindowHandle is not 0;
+        if (MagpieUtils.IsMagpieScaling)
+        {
+            MagpieUtils.SetMagpieInfo(magpieWindowHandle);
+        }
+
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
 
@@ -154,6 +161,7 @@ internal sealed partial class MainWindow
                     await MpvUtils.PausePlayback().ConfigureAwait(true);
                 }
 
+                MoveWindowToScreen();
                 await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true).ConfigureAwait(false);
             }
         }, DispatcherPriority.Send).Task;
@@ -359,6 +367,7 @@ internal sealed partial class MainWindow
                 await MpvUtils.PausePlayback().ConfigureAwait(true);
             }
 
+            MoveWindowToScreen();
             await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true).ConfigureAwait(false);
         }
     }
@@ -917,6 +926,7 @@ internal sealed partial class MainWindow
                         _ = MpvUtils.PausePlayback();
                     }
 
+                    MoveWindowToScreen();
                     return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true, true);
                 }
             }
@@ -926,6 +936,7 @@ internal sealed partial class MainWindow
         {
             if (MainTextBox.Text.Length > 0)
             {
+                MoveWindowToScreen();
                 return FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true);
             }
         }
@@ -1345,6 +1356,11 @@ internal sealed partial class MainWindow
 
     private void DisplaySettingsChanged(object? sender, EventArgs e)
     {
+        HandleDisplaySettingsChange();
+    }
+
+    private void HandleDisplaySettingsChange()
+    {
         ConfigManager configManager = ConfigManager.Instance;
 
         _ = Dispatcher.Invoke(DispatcherPriority.Background, () =>
@@ -1666,8 +1682,8 @@ internal sealed partial class MainWindow
         double physicalHeight = ActualHeight * dpi.DpiScaleY;
         double physicalLeft = Left * dpi.DpiScaleX;
         double physicalTop = Top * dpi.DpiScaleY;
-        return mousePosition.X > physicalLeft && mousePosition.X < physicalLeft + physicalWidth
-            && mousePosition.Y > physicalTop && mousePosition.Y < physicalTop + physicalHeight;
+        return mousePosition.X > physicalLeft && mousePosition.X - physicalWidth < physicalLeft
+            && mousePosition.Y > physicalTop && mousePosition.Y - physicalHeight < physicalTop;
     }
 
     public void ChangeVisibility()
@@ -2147,6 +2163,51 @@ internal sealed partial class MainWindow
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
         {
             await MpvUtils.ResumePlayback().ConfigureAwait(false);
+        }
+    }
+
+    public void MoveWindowToScreen()
+    {
+        Point mousePosition = WinApi.GetMousePosition();
+        int x = double.ConvertToIntegerNative<int>(mousePosition.X);
+        int y = double.ConvertToIntegerNative<int>(mousePosition.Y);
+        if (!WindowsUtils.ActiveScreen.Bounds.Contains(x, y))
+        {
+            Rectangle workingArea = Screen.FromPoint(new System.Drawing.Point(x, y)).WorkingArea;
+            bool isMinimized = WindowState is WindowState.Minimized;
+            if (isMinimized)
+            {
+                Opacity = 0d;
+
+                if (ConfigManager.Instance.Focusable)
+                {
+                    WindowState = WindowState.Normal;
+                }
+                else
+                {
+                    // If another window is not set as active window
+                    // Main Window gets activated on restore
+                    WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
+                    WinApi.RestoreWindow(WindowHandle);
+                }
+            }
+
+            WinApi.MoveWindowToPosition(WindowHandle, workingArea.X, workingArea.Y);
+            HandleDisplaySettingsChange();
+
+            if (isMinimized)
+            {
+                if (ConfigManager.Instance.Focusable)
+                {
+                    WindowState = WindowState.Minimized;
+                }
+                else
+                {
+                    WinApi.MinimizeWindow(WindowHandle);
+                }
+
+                Opacity = 1d;
+            }
         }
     }
 }

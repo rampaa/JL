@@ -561,31 +561,33 @@ internal sealed partial class PopupWindow
         double mouseX = cursorPosition.X;
         double mouseY = cursorPosition.Y;
 
+        ConfigManager configManager = ConfigManager.Instance;
+
         DpiScale dpi = WindowsUtils.Dpi;
+        double dpiAwareXOffset = WindowsUtils.DpiAwareXOffset;
+        double dpiAwareYOffset = WindowsUtils.DpiAwareYOffset;
+        Rectangle screenBounds = WindowsUtils.ActiveScreen.Bounds;
+
         double currentWidth = ActualWidth * dpi.DpiScaleX;
         double currentHeight = ActualHeight * dpi.DpiScaleY;
 
-        ConfigManager configManager = ConfigManager.Instance;
-
         double newLeft = configManager.PositionPopupLeftOfCursor
-            ? mouseX - (currentWidth + WindowsUtils.DpiAwareXOffset)
-            : mouseX + WindowsUtils.DpiAwareXOffset;
+            ? mouseX - (currentWidth + dpiAwareXOffset)
+            : mouseX + dpiAwareXOffset;
 
         double newTop = configManager.PositionPopupAboveCursor
-            ? mouseY - (currentHeight + WindowsUtils.DpiAwareYOffset)
-            : mouseY + WindowsUtils.DpiAwareYOffset;
-
-        Rectangle screenBounds = WindowsUtils.ActiveScreen.Bounds;
+            ? mouseY - (currentHeight + dpiAwareYOffset)
+            : mouseY + dpiAwareYOffset;
 
         if (configManager.PopupFlipX)
         {
             if (configManager.PositionPopupLeftOfCursor && newLeft < screenBounds.Left)
             {
-                newLeft = mouseX + WindowsUtils.DpiAwareXOffset;
+                newLeft = mouseX + dpiAwareXOffset;
             }
             else if (!configManager.PositionPopupLeftOfCursor && newLeft + currentWidth > screenBounds.Right)
             {
-                newLeft = mouseX - (currentWidth + WindowsUtils.DpiAwareXOffset);
+                newLeft = mouseX - (currentWidth + dpiAwareXOffset);
             }
         }
 
@@ -595,11 +597,11 @@ internal sealed partial class PopupWindow
         {
             if (configManager.PositionPopupAboveCursor && newTop < screenBounds.Top)
             {
-                newTop = mouseY + WindowsUtils.DpiAwareYOffset;
+                newTop = mouseY + dpiAwareYOffset;
             }
             else if (!configManager.PositionPopupAboveCursor && newTop + currentHeight > screenBounds.Bottom)
             {
-                newTop = mouseY - (currentHeight + WindowsUtils.DpiAwareYOffset);
+                newTop = mouseY - (currentHeight + dpiAwareYOffset);
             }
         }
 

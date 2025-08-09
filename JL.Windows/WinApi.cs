@@ -422,26 +422,7 @@ internal sealed partial class WinApi
             MagpieUtils.IsMagpieScaling = wParam is 1;
             if (MagpieUtils.IsMagpieScaling)
             {
-                MagpieUtils.MagpieWindowTopEdgePosition = MagpieUtils.GetMagpieWindowTopEdgePositionFromMagpie(lParam);
-                MagpieUtils.MagpieWindowBottomEdgePosition = MagpieUtils.GetMagpieWindowBottomEdgePositionFromMagpie(lParam);
-                MagpieUtils.MagpieWindowLeftEdgePosition = MagpieUtils.GetMagpieWindowLeftEdgePositionFromMagpie(lParam);
-                MagpieUtils.MagpieWindowRightEdgePosition = MagpieUtils.GetMagpieWindowRightEdgePositionFromMagpie(lParam);
-
-                MagpieUtils.SourceWindowLeftEdgePosition = MagpieUtils.GetSourceWindowLeftEdgePositionFromMagpie(lParam);
-                MagpieUtils.SourceWindowTopEdgePosition = MagpieUtils.GetSourceWindowTopEdgePositionFromMagpie(lParam);
-
-                // MagpieUtils.SourceWindowHandle = MagpieUtils.GetSourceWindowHande(lParam);
-
-                double magpieWindowWidth = MagpieUtils.MagpieWindowRightEdgePosition - MagpieUtils.MagpieWindowLeftEdgePosition;
-                MagpieUtils.DpiAwareMagpieWindowWidth = magpieWindowWidth / WindowsUtils.Dpi.DpiScaleX;
-
-                double sourceWindowWidth = MagpieUtils.GetSourceWindowRightEdgePositionFromMagpie(lParam) - MagpieUtils.SourceWindowLeftEdgePosition;
-                double sourceWindowHeight = MagpieUtils.GetSourceWindowBottomEdgePositionFromMagpie(lParam) - MagpieUtils.SourceWindowTopEdgePosition;
-                double magpieWindowHeight = MagpieUtils.MagpieWindowBottomEdgePosition - MagpieUtils.MagpieWindowTopEdgePosition;
-
-                MagpieUtils.ScaleFactorX = magpieWindowWidth / sourceWindowWidth;
-                MagpieUtils.ScaleFactorY = magpieWindowHeight / sourceWindowHeight;
-
+                MagpieUtils.SetMagpieInfo(lParam);
                 if (ConfigManager.Instance.AlwaysOnTop)
                 {
                     MainWindow.Instance.BringToFront();

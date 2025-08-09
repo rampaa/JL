@@ -5,15 +5,14 @@ namespace JL.Windows.Utilities;
 internal static class MagpieUtils
 {
     public static int MagpieScalingChangedWindowMessage { get; private set; } = -1;
-    public static bool IsMagpieScaling { get; set; }
+    public static bool IsMagpieScaling { get; set; }  // = false;
     public static double MagpieWindowLeftEdgePosition { get; set; }
     public static double MagpieWindowRightEdgePosition { get; set; }
     public static double MagpieWindowTopEdgePosition { get; set; }
     public static double MagpieWindowBottomEdgePosition { get; set; }
     public static double DpiAwareMagpieWindowWidth { get; set; }
     // public static nint SourceWindowHandle { get; set; }
-    public static double SourceWindowLeftEdgePosition { get; set; }
-    public static double SourceWindowTopEdgePosition { get; set; }
+    public static Rect SourceWindowRect { get; set; }
     public static double ScaleFactorX { get; set; }
     public static double ScaleFactorY { get; set; }
 
@@ -85,13 +84,45 @@ internal static class MagpieUtils
     /// </summary>
     public static bool IsMagpieReallyScaling()
     {
-        return WinApi.FindWindow("Window_Magpie_967EB565-6F73-4E94-AE53-00CC42592A22") is not 0;
+        return GetMagpieWindowHandle() is not 0;
+    }
+
+    public static nint GetMagpieWindowHandle()
+    {
+        return WinApi.FindWindow("Window_Magpie_967EB565-6F73-4E94-AE53-00CC42592A22");
     }
 
     public static Point GetMousePosition(Point mousePosition)
     {
-        return new Point(
-            MagpieWindowLeftEdgePosition + ((mousePosition.X - SourceWindowLeftEdgePosition) * ScaleFactorX),
-            MagpieWindowTopEdgePosition + ((mousePosition.Y - SourceWindowTopEdgePosition) * ScaleFactorY));
+        return SourceWindowRect.Contains(mousePosition)
+            ? new Point(MagpieWindowLeftEdgePosition + ((mousePosition.X - SourceWindowRect.X) * ScaleFactorX),
+                MagpieWindowTopEdgePosition + ((mousePosition.Y - SourceWindowRect.Y) * ScaleFactorY))
+            : mousePosition;
+    }
+
+    public static void SetMagpieInfo(nint magpieWindowHandle)
+    {
+        MagpieWindowTopEdgePosition = GetMagpieWindowTopEdgePositionFromMagpie(magpieWindowHandle);
+        MagpieWindowBottomEdgePosition = GetMagpieWindowBottomEdgePositionFromMagpie(magpieWindowHandle);
+        MagpieWindowLeftEdgePosition = GetMagpieWindowLeftEdgePositionFromMagpie(magpieWindowHandle);
+        MagpieWindowRightEdgePosition = GetMagpieWindowRightEdgePositionFromMagpie(magpieWindowHandle);
+
+        double sourceWindowLeftEdgePosition = GetSourceWindowLeftEdgePositionFromMagpie(magpieWindowHandle);
+        double sourceWindowTopEdgePosition = GetSourceWindowTopEdgePositionFromMagpie(magpieWindowHandle);
+        double sourceWindowRightEdgePosition = GetSourceWindowRightEdgePositionFromMagpie(magpieWindowHandle);
+        double sourceWindowBottomEdgePosition = GetSourceWindowBottomEdgePositionFromMagpie(magpieWindowHandle);
+        double sourceWindowWidth = sourceWindowRightEdgePosition - sourceWindowLeftEdgePosition;
+        double sourceWindowHeight = sourceWindowBottomEdgePosition - sourceWindowTopEdgePosition;
+
+        SourceWindowRect = new Rect(sourceWindowLeftEdgePosition, sourceWindowTopEdgePosition, sourceWindowWidth, sourceWindowHeight);
+
+        // MagpieUtils.SourceWindowHandle = MagpieUtils.GetSourceWindowHande(lParam);
+
+        double magpieWindowWidth = MagpieWindowRightEdgePosition - MagpieWindowLeftEdgePosition;
+        DpiAwareMagpieWindowWidth = magpieWindowWidth / WindowsUtils.Dpi.DpiScaleX;
+        double magpieWindowHeight = MagpieWindowBottomEdgePosition - MagpieWindowTopEdgePosition;
+
+        ScaleFactorX = magpieWindowWidth / sourceWindowWidth;
+        ScaleFactorY = magpieWindowHeight / sourceWindowHeight;
     }
 }
