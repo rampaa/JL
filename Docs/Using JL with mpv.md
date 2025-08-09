@@ -3,7 +3,7 @@
 ## Setup instructions
 
 1. Install [mpv](https://mpv.io/).
-2. Install [mpv_websocket](https://github.com/kuroahna/mpv_websocket) to automatically copy subtitles to a WebSocket.
+2. Install [mpv_websocket](https://github.com/kuroahna/mpv_websocket) to automatically copy subtitles to a WebSocket. Unlike mpvacious, it [correctly sends an empty string when no subtitle is shown](https://github.com/kuroahna/mpv_websocket/issues/21), allowing JL to detect when subtitles disappear.
 3. Add `input-ipc-server=/tmp/mpv-socket` to your `mpv.conf` file.
 4. Enable the `Automatically pause the video playing in mpv on hover and resume on mouse leave` option via the `Preferences -> Main Window` menu in JL.
 5. Hide the mpv subtitles by pressing `v`. To make them hidden by default, add `sub-visibility=no` to your `mpv.conf` file.
