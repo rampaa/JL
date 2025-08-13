@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Freqs.Options;
 namespace JL.Core.Freqs;
@@ -28,12 +29,12 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
         return Name.GetHashCode(StringComparison.Ordinal);
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is Freq freq && Name == freq.Name;
     }
 
-    public bool Equals(Freq? other)
+    public bool Equals([NotNullWhen(true)] Freq? other)
     {
         return other is not null && Name == other.Name;
     }

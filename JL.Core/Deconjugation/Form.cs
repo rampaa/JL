@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
@@ -13,7 +14,7 @@ internal sealed class Form(
     public List<string> Tags { get; } = tags;
     public List<string> Process { get; } = process;
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is Form form
                && Text == form.Text
@@ -22,7 +23,7 @@ internal sealed class Form(
                && Process.AsReadOnlySpan().SequenceEqual(form.Process.AsReadOnlySpan());
     }
 
-    public bool Equals(Form? other)
+    public bool Equals([NotNullWhen(true)] Form? other)
     {
         return other is not null
                && Text == other.Text

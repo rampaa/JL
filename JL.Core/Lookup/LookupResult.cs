@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using JL.Core.Dicts;
 using JL.Core.Utilities;
@@ -81,7 +82,7 @@ public sealed class LookupResult
         }
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is LookupResult other
             && PrimarySpelling == other.PrimarySpelling
@@ -93,7 +94,7 @@ public sealed class LookupResult
                 : Readings is null;
     }
 
-    public bool Equals(LookupResult? other)
+    public bool Equals([NotNullWhen(true)] LookupResult? other)
     {
         return other is not null
             && PrimarySpelling == other.PrimarySpelling

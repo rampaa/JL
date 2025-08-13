@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -117,24 +118,24 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
         }
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is JmnedictRecord jmnedictObj
             && Id == jmnedictObj.Id
             && PrimarySpelling == jmnedictObj.PrimarySpelling
             && (jmnedictObj.Readings is not null
-                ? Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(jmnedictObj.Readings)
+                ? Readings?.AsReadOnlySpan().SequenceEqual(jmnedictObj.Readings) ?? false
                 : Readings is null)
             && Definitions.SequenceEqual(jmnedictObj.Definitions, ArrayComparer<string>.Instance);
     }
 
-    public bool Equals(JmnedictRecord? other)
+    public bool Equals([NotNullWhen(true)] JmnedictRecord? other)
     {
         return other is not null
             && Id == other.Id
             && PrimarySpelling == other.PrimarySpelling
             && (other.Readings is not null
-                ? Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(other.Readings)
+                ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
                 : Readings is null)
             && Definitions.SequenceEqual(other.Definitions, ArrayComparer<string>.Instance);
     }

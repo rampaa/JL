@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -29,7 +30,7 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
         }
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is Translation translation && Equals(translation);
     }

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -24,7 +25,7 @@ internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEqu
         }
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is KanjiElement kanjiElement && Equals(kanjiElement);
     }

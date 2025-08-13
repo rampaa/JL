@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -9,7 +10,7 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
     [JsonPropertyName("C")] public string[] WordClasses { get; } = wordClasses;
     [JsonPropertyName("R")] public string[]? Readings { get; } = readings;
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is JmdictWordClass jmdictWordClass
                && Spelling == jmdictWordClass.Spelling
@@ -18,7 +19,7 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
                && WordClasses.AsReadOnlySpan().SequenceEqual(jmdictWordClass.WordClasses);
     }
 
-    public bool Equals(JmdictWordClass? other)
+    public bool Equals([NotNullWhen(true)] JmdictWordClass? other)
     {
         return other is not null
                && Spelling == other.Spelling

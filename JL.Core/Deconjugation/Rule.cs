@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -64,7 +65,7 @@ internal readonly struct Rule(string type, string[] decEnds, string[] conEnds, s
         }
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is Rule rule && Equals(rule);
     }

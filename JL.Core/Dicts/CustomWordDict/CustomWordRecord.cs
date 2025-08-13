@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -158,7 +159,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
         return int.MaxValue;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is CustomWordRecord customWordRecord
                && PrimarySpelling == customWordRecord.PrimarySpelling
@@ -170,7 +171,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
                && customWordRecord.WordClasses.AsReadOnlySpan().SequenceEqual(WordClasses);
     }
 
-    public bool Equals(CustomWordRecord? other)
+    public bool Equals([NotNullWhen(true)] CustomWordRecord? other)
     {
         return other is not null
                && PrimarySpelling == other.PrimarySpelling

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -84,14 +85,14 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
         return HashCode.Combine(Spelling.GetHashCode(StringComparison.Ordinal), Reading?.GetHashCode(StringComparison.Ordinal) ?? 0);
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is PitchAccentRecord pitchAccentRecord
             && Spelling == pitchAccentRecord.Spelling
             && Reading == pitchAccentRecord.Reading;
     }
 
-    public bool Equals(PitchAccentRecord? other)
+    public bool Equals([NotNullWhen(true)] PitchAccentRecord? other)
     {
         return other is not null
             && Spelling == other.Spelling

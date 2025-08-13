@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -31,7 +32,7 @@ internal readonly struct ReadingElement(string reb, List<string> reRestrList, Li
         }
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is ReadingElement readingElement && Equals(readingElement);
     }

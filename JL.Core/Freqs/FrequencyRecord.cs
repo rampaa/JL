@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace JL.Core.Freqs;
@@ -13,7 +14,7 @@ public readonly struct FrequencyRecord(string spelling, int frequency) : IEquata
         return Spelling.GetHashCode(StringComparison.Ordinal);
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is FrequencyRecord frequencyRecord && Equals(frequencyRecord);
     }

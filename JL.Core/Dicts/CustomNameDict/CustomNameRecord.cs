@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using JL.Core.Dicts.Interfaces;
 
 namespace JL.Core.Dicts.CustomNameDict;
@@ -22,7 +23,7 @@ internal sealed class CustomNameRecord : IDictRecordWithSingleReading, IEquatabl
         return $"[{NameType}] {Reading ?? PrimarySpelling}{(ExtraInfo is not null ? $"\n{ExtraInfo}" : "")}";
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is CustomNameRecord customNameRecord
                && PrimarySpelling == customNameRecord.PrimarySpelling
@@ -31,7 +32,7 @@ internal sealed class CustomNameRecord : IDictRecordWithSingleReading, IEquatabl
                && ExtraInfo == customNameRecord.ExtraInfo;
     }
 
-    public bool Equals(CustomNameRecord? other)
+    public bool Equals([NotNullWhen(true)] CustomNameRecord? other)
     {
         return other is not null
                && PrimarySpelling == other.PrimarySpelling

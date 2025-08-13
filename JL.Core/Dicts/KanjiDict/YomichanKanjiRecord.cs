@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -121,7 +122,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
         return stat;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is YomichanKanjiRecord yomichanKanjiRecord
                && ((OnReadings is null && yomichanKanjiRecord.OnReadings is null)
@@ -132,7 +133,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
                 || (Definitions is not null && yomichanKanjiRecord.Definitions is not null && Definitions.AsReadOnlySpan().SequenceEqual(yomichanKanjiRecord.Definitions)));
     }
 
-    public bool Equals(YomichanKanjiRecord? other)
+    public bool Equals([NotNullWhen(true)] YomichanKanjiRecord? other)
     {
         return other is not null
                && ((OnReadings is null && other.OnReadings is null)

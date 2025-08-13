@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -140,7 +141,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         return int.MaxValue;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is EpwingYomichanRecord epwingYomichanRecord
                && PrimarySpelling == epwingYomichanRecord.PrimarySpelling
@@ -149,7 +150,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
                && epwingYomichanRecord.ImagePaths.AsReadOnlySpan().SequenceEqual(ImagePaths);
     }
 
-    public bool Equals(EpwingYomichanRecord? other)
+    public bool Equals([NotNullWhen(true)] EpwingYomichanRecord? other)
     {
         return other is not null
                && PrimarySpelling == other.PrimarySpelling

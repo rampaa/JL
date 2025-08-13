@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -468,24 +469,24 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         }
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is JmdictRecord jmdictRecord
             && Id == jmdictRecord.Id
             && PrimarySpelling == jmdictRecord.PrimarySpelling
             && (jmdictRecord.Readings is not null
-                ? Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(jmdictRecord.Readings)
+                ? Readings?.AsReadOnlySpan().SequenceEqual(jmdictRecord.Readings) ?? false
                 : Readings is null)
             && Definitions.AsReadOnlySpan().SequenceEqual(jmdictRecord.Definitions, ArrayComparer<string>.Instance);
     }
 
-    public bool Equals(JmdictRecord? other)
+    public bool Equals([NotNullWhen(true)] JmdictRecord? other)
     {
         return other is not null
             && Id == other.Id
             && PrimarySpelling == other.PrimarySpelling
             && (other.Readings is not null
-                ? Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(other.Readings)
+                ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
                 : Readings is null)
             && Definitions.AsReadOnlySpan().SequenceEqual(Definitions, ArrayComparer<string>.Instance);
     }

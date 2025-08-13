@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
@@ -116,7 +117,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         return int.MaxValue;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is EpwingNazekaRecord epwingNazekaRecord
                && PrimarySpelling == epwingNazekaRecord.PrimarySpelling
@@ -124,7 +125,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
                && epwingNazekaRecord.Definitions.AsReadOnlySpan().SequenceEqual(Definitions);
     }
 
-    public bool Equals(EpwingNazekaRecord? other)
+    public bool Equals([NotNullWhen(true)] EpwingNazekaRecord? other)
     {
         return other is not null
                && PrimarySpelling == other.PrimarySpelling

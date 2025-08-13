@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
@@ -27,12 +28,12 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
         return Name.GetHashCode(StringComparison.Ordinal);
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is Dict dict && Name == dict.Name;
     }
 
-    public bool Equals(Dict? other)
+    public bool Equals([NotNullWhen(true)] Dict? other)
     {
         return other is not null && Name == other.Name;
     }
