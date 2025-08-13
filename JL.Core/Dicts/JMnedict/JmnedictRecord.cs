@@ -88,21 +88,55 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, PrimarySpelling.GetHashCode(StringComparison.Ordinal));
+        unchecked
+        {
+            int hash = (17 * 37) + Id;
+            hash = (hash * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
+
+            if (Readings is not null)
+            {
+                foreach (string reading in Readings)
+                {
+                    hash = (hash * 37) + reading.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            foreach (string[] defs in Definitions)
+            {
+                foreach (string def in defs)
+                {
+                    hash = (hash * 37) + def.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+
+            return hash;
+        }
     }
 
     public override bool Equals(object? obj)
     {
         return obj is JmnedictRecord jmnedictObj
-               && Id == jmnedictObj.Id
-               && PrimarySpelling == jmnedictObj.PrimarySpelling;
+            && Id == jmnedictObj.Id
+            && PrimarySpelling == jmnedictObj.PrimarySpelling
+            && (jmnedictObj.Readings is not null
+                ? Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(jmnedictObj.Readings)
+                : Readings is null)
+            && Definitions.SequenceEqual(jmnedictObj.Definitions, ArrayComparer<string>.Instance);
     }
 
     public bool Equals(JmnedictRecord? other)
     {
         return other is not null
-               && Id == other.Id
-               && PrimarySpelling == other.PrimarySpelling;
+            && Id == other.Id
+            && PrimarySpelling == other.PrimarySpelling
+            && (other.Readings is not null
+                ? Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(other.Readings)
+                : Readings is null)
+            && Definitions.SequenceEqual(other.Definitions, ArrayComparer<string>.Instance);
     }
 
     public static bool operator ==(JmnedictRecord? left, JmnedictRecord? right) => left?.Equals(right) ?? right is null;
