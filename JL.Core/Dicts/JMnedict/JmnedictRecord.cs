@@ -126,7 +126,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             && (jmnedictObj.Readings is not null
                 ? Readings?.AsReadOnlySpan().SequenceEqual(jmnedictObj.Readings) ?? false
                 : Readings is null)
-            && Definitions.SequenceEqual(jmnedictObj.Definitions, ArrayComparer<string>.Instance);
+            && Definitions.AsReadOnlySpan().SequenceEqual(jmnedictObj.Definitions, ArrayComparer<string>.Instance);
     }
 
     public bool Equals([NotNullWhen(true)] JmnedictRecord? other)
@@ -137,7 +137,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             && (other.Readings is not null
                 ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
                 : Readings is null)
-            && Definitions.SequenceEqual(other.Definitions, ArrayComparer<string>.Instance);
+            && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance);
     }
 
     public static bool operator ==(JmnedictRecord? left, JmnedictRecord? right) => left?.Equals(right) ?? right is null;
