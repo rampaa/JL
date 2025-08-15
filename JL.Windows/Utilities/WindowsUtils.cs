@@ -296,23 +296,23 @@ internal static class WindowsUtils
             return;
         }
 
-        string browserPath = "";
         ConfigManager configManager = ConfigManager.Instance;
-        if (!string.IsNullOrWhiteSpace(configManager.BrowserPath))
-        {
-            browserPath = $"\"{configManager.BrowserPath}\"";
-        }
-
         string urlToBeSearched = Uri.IsWellFormedUriString(selectedText, UriKind.Absolute)
             ? selectedText
             : configManager.SearchUrl.Replace("{SearchTerm}", HttpUtility.UrlEncode(selectedText), StringComparison.OrdinalIgnoreCase);
 
-        using Process? process = Process.Start(new ProcessStartInfo("cmd",
-            $"/c start \"\" {browserPath} \"{urlToBeSearched}\"")
-        {
-            UseShellExecute = false,
-            CreateNoWindow = true
-        });
+        using Process? process = string.IsNullOrWhiteSpace(configManager.BrowserPath) || !File.Exists(configManager.BrowserPath)
+            ? Process.Start(new ProcessStartInfo(urlToBeSearched)
+            {
+                UseShellExecute = true
+            })
+            : Process.Start(new ProcessStartInfo()
+            {
+                FileName = configManager.BrowserPath,
+                Arguments = urlToBeSearched,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
 
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
         {
@@ -343,14 +343,14 @@ internal static class WindowsUtils
             }
 
             await Application.Current.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
-
-            using Process? process = Process.Start(
-                new ProcessStartInfo("cmd",
-                    string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Updater\" \"\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}"))
-                {
-                    UseShellExecute = true,
-                    Verb = "runas"
-                });
+            using Process? process = Process.Start(new ProcessStartInfo()
+            {
+                WorkingDirectory = Utils.ApplicationPath,
+                FileName = "update-helper.cmd",
+                Arguments = Environment.ProcessId.ToString(CultureInfo.InvariantCulture),
+                UseShellExecute = true,
+                Verb = "runas"
+            });
         }
 
         else
