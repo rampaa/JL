@@ -731,7 +731,7 @@ internal static class WindowsUtils
 
     public static void ShowOkDialog(string text, string caption, Window owner)
     {
-        _ = MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+        _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     public static void UpdatePositionForSelectionWindows(Window window, nint windowHandle, Point cursorPosition)
