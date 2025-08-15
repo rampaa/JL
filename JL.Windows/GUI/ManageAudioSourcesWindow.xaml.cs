@@ -224,7 +224,7 @@ internal sealed partial class ManageAudioSourcesWindow
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this audio source?", "Confirmation"))
+        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this audio source?", "Confirmation", this))
         {
             return;
         }

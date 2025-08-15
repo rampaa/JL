@@ -92,7 +92,7 @@ internal sealed partial class ManageProfilesWindow
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this profile?", "Confirmation"))
+        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this profile?", "Confirmation", this))
         {
             return;
         }

@@ -239,7 +239,7 @@ internal sealed partial class PreferencesWindow
     private void ResetPreferencesButton_Click(object sender, RoutedEventArgs e)
     {
         ResetPreferencesButton.IsEnabled = false;
-        if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile?", "Reset preferences for the current profile?"))
+        if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile?", "Reset preferences for the current profile?", this))
         {
             IsEnabled = false;
             ConfigManager.ResetConfigs();

@@ -145,7 +145,7 @@ internal sealed partial class StatsWindow
 
         if (!WindowsUtils.ShowYesNoDialog(
                 $"Are you really sure that you want to reset the {statType} stats?",
-                string.Create(CultureInfo.InvariantCulture, $"Reset {ButtonSwapStats.Content} Stats?")))
+                string.Create(CultureInfo.InvariantCulture, $"Reset {ButtonSwapStats.Content} Stats?"), this))
         {
             return;
         }

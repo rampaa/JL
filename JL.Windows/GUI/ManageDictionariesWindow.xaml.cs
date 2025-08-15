@@ -330,7 +330,7 @@ internal sealed partial class ManageDictionariesWindow
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
+        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation", this))
         {
             return;
         }

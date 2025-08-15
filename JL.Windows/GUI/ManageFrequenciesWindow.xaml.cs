@@ -267,7 +267,7 @@ internal sealed partial class ManageFrequenciesWindow
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
+        if (!WindowsUtils.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation", this))
         {
             return;
         }
