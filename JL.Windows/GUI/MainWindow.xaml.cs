@@ -404,7 +404,7 @@ internal sealed partial class MainWindow
             _lastMouseMovePosition = position;
             await HandleMouseMove(e).ConfigureAwait(false);
         }
-        else
+        else if (FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             FirstPopupWindow.HidePopup();
             ChangeVisibility();
