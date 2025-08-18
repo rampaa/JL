@@ -120,24 +120,24 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        return obj is JmnedictRecord jmnedictObj
-            && Id == jmnedictObj.Id
-            && PrimarySpelling == jmnedictObj.PrimarySpelling
-            && (jmnedictObj.Readings is not null
-                ? Readings?.AsReadOnlySpan().SequenceEqual(jmnedictObj.Readings) ?? false
+        return obj is JmnedictRecord other
+            && (ReferenceEquals(this, other) || (Id == other.Id
+            && PrimarySpelling == other.PrimarySpelling
+            && (other.Readings is not null
+                ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
                 : Readings is null)
-            && Definitions.AsReadOnlySpan().SequenceEqual(jmnedictObj.Definitions, ArrayComparer<string>.Instance);
+            && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
     }
 
     public bool Equals([NotNullWhen(true)] JmnedictRecord? other)
     {
-        return other is not null
+        return ReferenceEquals(this, other) || (other is not null
             && Id == other.Id
             && PrimarySpelling == other.PrimarySpelling
             && (other.Readings is not null
                 ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
                 : Readings is null)
-            && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance);
+            && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance));
     }
 
     public static bool operator ==(JmnedictRecord? left, JmnedictRecord? right) => left?.Equals(right) ?? right is null;
