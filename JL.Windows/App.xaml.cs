@@ -45,7 +45,7 @@ internal sealed partial class App
                 {
                     try
                     {
-                        if (process.MainModule?.FileName == Environment.ProcessPath)
+                        if (Environment.ProcessPath?.Equals(process.MainModule?.FileName, StringComparison.OrdinalIgnoreCase) ?? false)
                         {
                             WinApi.RestoreWindow(process.MainWindowHandle);
                             Shutdown();
