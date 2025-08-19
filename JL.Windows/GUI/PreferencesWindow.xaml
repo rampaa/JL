@@ -22,7 +22,7 @@
                             <Setter Property="Background" Value="{StaticResource SecondaryRegionBrush}"/>
                         </Trigger>
                     </Style.Triggers>
-                    <Setter Property="Height" Value="35" />
+                    <Setter Property="MinHeight" Value="35" />
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="VerticalAlignment" Value="Center" />
@@ -528,10 +528,11 @@
                                 </DockPanel>
                             </ListBoxItem>
 
-                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         ToolTip="Addresses must be separated by newlines. Press Enter to add a new line.">
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="WebSocket server address" VerticalAlignment="Center" TextWrapping="Wrap" Style="{StaticResource TextBlockDefault}" />
-                                    <TextBox x:Name="WebSocketUriTextBox" HorizontalAlignment="Right" Width="200" MaxHeight="60" TextWrapping="Wrap" />
+                                    <TextBlock HorizontalAlignment="Left" Text="WebSocket server addresses" VerticalAlignment="Center" TextWrapping="Wrap" Style="{StaticResource TextBlockDefault}" />
+                                    <TextBox x:Name="WebSocketUrisTextBox" HorizontalAlignment="Right" Width="200" MaxHeight="60" TextWrapping="Wrap" AcceptsReturn="True" />
                                 </DockPanel>
                             </ListBoxItem>
 
@@ -2429,7 +2430,7 @@
                                        VerticalAlignment="Center"
                                        TextWrapping="Wrap"
                                        Style="{StaticResource TextBlockDefault}" />
-                                    <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="NoWrap" />
+                                    <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap" />
                                 </DockPanel>
                             </ListBoxItem>
 

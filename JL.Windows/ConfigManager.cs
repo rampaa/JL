@@ -908,7 +908,7 @@ internal sealed class ConfigManager
         preferenceWindow.MpvNamedPipePathTextBox.Text = coreConfigManager.MpvNamedPipePath;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = coreConfigManager.AnkiConnectUri.OriginalString;
-        preferenceWindow.WebSocketUriTextBox.Text = coreConfigManager.WebSocketUri.OriginalString;
+        preferenceWindow.WebSocketUrisTextBox.Text = string.Join('\n', coreConfigManager.WebSocketUris.Select(ws => ws.OriginalString));
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
         preferenceWindow.NotifyWhenMiningSucceedsCheckBox.IsChecked = coreConfigManager.NotifyWhenMiningSucceeds;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;
@@ -1194,7 +1194,7 @@ internal sealed class ConfigManager
                 preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiConnectUri), preferenceWindow.AnkiUriTextBox.Text);
-            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.WebSocketUri), preferenceWindow.WebSocketUriTextBox.Text);
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.WebSocketUris), preferenceWindow.WebSocketUrisTextBox.Text);
 
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowDynamicWidth),
                 preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked.ToString());

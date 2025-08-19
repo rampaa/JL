@@ -22,7 +22,7 @@ public sealed class CoreConfigManager
     public bool AutoReconnectToWebSocket { get; private set; } // = false;
     public bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public bool TextBoxRemoveNewlines { get; private set; } // = false;
-    public Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
+    public List<Uri> WebSocketUris { get; private set; } = [new("ws://127.0.0.1:6677")];
     public string MpvNamedPipePath { get; private set; } = "/tmp/mpv-socket";
     public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public bool TrackTermLookupCounts { get; private set; } // = false;
@@ -50,19 +50,20 @@ public sealed class CoreConfigManager
             {
                 ConfigDBManager.InsertSetting(connection, nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
             }
-
             else
             {
                 ankiConnectUriStr = ankiConnectUriStr
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
                     .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase);
 
-                if (Uri.TryCreate(ankiConnectUriStr, UriKind.Absolute, out Uri? ankiConnectUri))
+                if (Uri.TryCreate(ankiConnectUriStr, UriKind.Absolute, out Uri? ankiConnectUri)
+                    && (ankiConnectUri.Scheme == Uri.UriSchemeHttp || ankiConnectUri.Scheme == Uri.UriSchemeHttps))
                 {
                     AnkiConnectUri = ankiConnectUri;
                 }
                 else
                 {
+                    ConfigDBManager.UpdateSetting(connection, nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
                     Utils.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
                     Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
                 }
@@ -73,37 +74,55 @@ public sealed class CoreConfigManager
             CaptureTextFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket));
             AutoReconnectToWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, AutoReconnectToWebSocket, nameof(AutoReconnectToWebSocket));
 
-            string? webSocketUriStr = configs.GetValueOrDefault(nameof(WebSocketUri));
-            bool webSocketUriChanged = false;
-            if (webSocketUriStr is null)
+            string? webSocketUriStrs = configs.GetValueOrDefault(nameof(WebSocketUris));
+            if (webSocketUriStrs is null)
             {
-                ConfigDBManager.InsertSetting(connection, nameof(WebSocketUri), WebSocketUri.OriginalString);
-                webSocketUriChanged = true;
+                ConfigDBManager.InsertSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(ws => ws.OriginalString)));
+                foreach (Uri webSocketUri in WebSocketUris)
+                {
+                    WebSocketUtils.ConnectToWebSocket(webSocketUri);
+                }
             }
             else
             {
-                webSocketUriStr = webSocketUriStr
+                string[] uriStrs = webSocketUriStrs
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
-                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase);
+                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase)
+                    .ReplaceLineEndings("\n")
+                    .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-                if (Uri.TryCreate(webSocketUriStr, UriKind.Absolute, out Uri? webSocketUri))
+                List<Uri> newWebSocketUris = new(uriStrs.Length);
+                foreach (string uriStr in uriStrs)
                 {
-                    if (WebSocketUri.OriginalString != webSocketUri.OriginalString)
+                    if (Uri.TryCreate(uriStr, UriKind.Absolute, out Uri? webSocketUri)
+                        && (webSocketUri.Scheme == Uri.UriSchemeWs || webSocketUri.Scheme == Uri.UriSchemeWss))
                     {
-                        WebSocketUri = webSocketUri;
-                        webSocketUriChanged = true;
+                        newWebSocketUris.Add(webSocketUri);
+                        WebSocketUtils.ConnectToWebSocket(webSocketUri);
                     }
+                    else
+                    {
+                        Utils.Logger.Warning("Couldn't save WebSocket address, invalid URL");
+                        Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
+                    }
+                }
+
+                foreach (Uri uri in WebSocketUris)
+                {
+                    if (!newWebSocketUris.Contains(uri))
+                    {
+                        _ = WebSocketUtils.DisconnectFromWebSocket(uri);
+                    }
+                }
+
+                if (newWebSocketUris.Count > 0)
+                {
+                    WebSocketUris = newWebSocketUris;
                 }
                 else
                 {
-                    Utils.Logger.Warning("Couldn't save WebSocket address, invalid URL");
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
+                    ConfigDBManager.UpdateSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(ws => ws.OriginalString)));
                 }
-            }
-
-            if (!WebSocketUtils.Connected || webSocketUriChanged)
-            {
-                _ = WebSocketUtils.HandleWebSocket();
             }
         }
 

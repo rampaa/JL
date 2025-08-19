@@ -397,7 +397,6 @@ internal sealed partial class MainWindow
         // In this state, IsMouseOver still returns true, which is likely a WPF bug.
         // During this time, e.GetPosition stops updating and always returns the same value.
         // To work around this, we check whether the position has actually changed to ensure MouseMove is being triggered correctly.
-
         Point position = e.GetPosition(MainTextBox);
         if (position != _lastMouseMovePosition)
         {
@@ -537,7 +536,7 @@ internal sealed partial class MainWindow
         Debug.Assert(_winApi is not null);
         _winApi.UnsubscribeFromWndProc(this);
 
-        await WebSocketUtils.Disconnect().ConfigureAwait(true);
+        await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(true);
 
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(false))
@@ -803,20 +802,27 @@ internal sealed partial class MainWindow
                 StatsUtils.StartTimeStatStopWatch();
             }
 
-            return WebSocketUtils.HandleWebSocket();
+            if (coreConfigManager.CaptureTextFromWebSocket)
+            {
+                WebSocketUtils.ConnectToAllWebSockets();
+            }
+            else
+            {
+                return WebSocketUtils.DisconnectFromAllWebSocketConnections();
+            }
         }
 
         else if (keyGesture.IsEqual(configManager.ReconnectToWebSocketServerKeyGesture))
         {
-            if (!WebSocketUtils.Connected)
+            coreConfigManager.CaptureTextFromWebSocket = true;
+
+            WebSocketUtils.ConnectToAllWebSockets();
+            if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
             {
-                coreConfigManager.CaptureTextFromWebSocket = true;
-                if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
+                if (!StatsUtils.TimeStatStopWatch.IsRunning)
                 {
                     StatsUtils.StartTimeStatStopWatch();
                 }
-
-                return WebSocketUtils.HandleWebSocket();
             }
         }
 
