@@ -1,6 +1,9 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Windows;
 using JL.Core.Utilities;
 
@@ -22,6 +25,25 @@ internal sealed partial class App
 
         ProfileOptimization.SetProfileRoot(AppContext.BaseDirectory);
         ProfileOptimization.StartProfile("Startup.Profile");
+
+        if (!HasModifyPermission(AppContext.BaseDirectory))
+        {
+            Utils.Logger.Information(
+                """
+                JL is installed in a secure location that requires admin rights to modify files.
+                If you'd rather not give admin rights to JL, consider installing it in a location where they're not needed (e.g., the desktop).
+                """);
+
+            using Process? process = Process.Start(new ProcessStartInfo
+            {
+                FileName = Environment.ProcessPath,
+                UseShellExecute = true,
+                Verb = "runas"
+            });
+
+            Shutdown();
+            return;
+        }
 
         if (IsSingleInstance())
         {
@@ -78,4 +100,50 @@ internal sealed partial class App
     {
         await GUI.MainWindow.Instance.HandleAppClosing().ConfigureAwait(false);
     }
+
+    private static bool HasModifyPermission(string folderPath)
+    {
+        try
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new(identity);
+            if (principal.IsInRole(WindowsBuiltInRole.Administrator))
+            {
+                return true;
+            }
+
+            DirectoryInfo directoryInfo = new(folderPath);
+            DirectorySecurity acl = directoryInfo.GetAccessControl();
+            AuthorizationRuleCollection rules = acl.GetAccessRules(true, true, typeof(SecurityIdentifier));
+
+            bool allowModify = false;
+            foreach (FileSystemAccessRule rule in rules.Cast<FileSystemAccessRule>())
+            {
+                if ((identity.User is not null && identity.User.Value == rule.IdentityReference.Value)
+                    || principal.IsInRole((SecurityIdentifier)rule.IdentityReference))
+                {
+                    if (rule.FileSystemRights.HasFlag(FileSystemRights.Modify))
+                    {
+                        if (rule.AccessControlType is AccessControlType.Deny)
+                        {
+                            return false;
+                        }
+
+                        if (rule.AccessControlType is AccessControlType.Allow)
+                        {
+                            allowModify = true;
+                        }
+                    }
+                }
+            }
+
+            return allowModify;
+        }
+        catch (Exception ex)
+        {
+            Utils.Logger.Error(ex, "Error checking modify permission for folder: {FolderPath}", folderPath);
+            return false;
+        }
+    }
+
 }

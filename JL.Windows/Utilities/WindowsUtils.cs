@@ -348,8 +348,7 @@ internal static class WindowsUtils
                 WorkingDirectory = Utils.ApplicationPath,
                 FileName = "update-helper.cmd",
                 Arguments = Environment.ProcessId.ToString(CultureInfo.InvariantCulture),
-                UseShellExecute = true,
-                Verb = "runas"
+                UseShellExecute = true
             });
         }
 
