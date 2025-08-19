@@ -112,6 +112,12 @@ internal sealed partial class App
                 return true;
             }
 
+            if (identity.User is null)
+            {
+                Utils.Logger.Error("Current WindowsIdentity is null, cannot check modify permission for folder: {FolderPath}", folderPath);
+                return false;
+            }
+
             DirectoryInfo directoryInfo = new(folderPath);
             DirectorySecurity acl = directoryInfo.GetAccessControl();
             AuthorizationRuleCollection rules = acl.GetAccessRules(true, true, typeof(SecurityIdentifier));
@@ -119,7 +125,7 @@ internal sealed partial class App
             bool allowModify = false;
             foreach (FileSystemAccessRule rule in rules.Cast<FileSystemAccessRule>())
             {
-                if ((identity.User is not null && identity.User.Value == rule.IdentityReference.Value)
+                if (rule.IdentityReference.Value == identity.User.Value
                     || principal.IsInRole((SecurityIdentifier)rule.IdentityReference))
                 {
                     if (rule.FileSystemRights.HasFlag(FileSystemRights.Modify))
