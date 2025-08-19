@@ -16,20 +16,20 @@ internal sealed class Form(
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        return obj is Form form
-               && Text == form.Text
-               && OriginalText == form.OriginalText
-               && Tags.AsReadOnlySpan().SequenceEqual(form.Tags.AsReadOnlySpan())
-               && Process.AsReadOnlySpan().SequenceEqual(form.Process.AsReadOnlySpan());
+        return obj is Form other
+               && (ReferenceEquals(this, other) || (Text == other.Text
+               && OriginalText == other.OriginalText
+               && Tags.AsReadOnlySpan().SequenceEqual(other.Tags.AsReadOnlySpan())
+               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan())));
     }
 
     public bool Equals([NotNullWhen(true)] Form? other)
     {
         return other is not null
-               && Text == other.Text
+               && (ReferenceEquals(this, other) || (Text == other.Text
                && OriginalText == other.OriginalText
                && Tags.AsReadOnlySpan().SequenceEqual(other.Tags.AsReadOnlySpan())
-               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan());
+               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan())));
     }
 
     public override int GetHashCode()
@@ -54,5 +54,5 @@ internal sealed class Form(
     }
 
     public static bool operator ==(Form? left, Form? right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(Form? left, Form? right) => !left?.Equals(right) ?? right is not null;
+    public static bool operator !=(Form? left, Form? right) => !(left == right);
 }

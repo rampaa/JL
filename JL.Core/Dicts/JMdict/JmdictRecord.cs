@@ -482,15 +482,15 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
     public bool Equals(JmdictRecord? other)
     {
-        return ReferenceEquals(this, other) || (other is not null
-            && Id == other.Id
+        return other is not null
+            && (ReferenceEquals(this, other) || (Id == other.Id
             && PrimarySpelling == other.PrimarySpelling
             && (other.Readings is not null
                 ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
                 : Readings is null)
-            && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance));
+            && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
     }
 
     public static bool operator ==(JmdictRecord? left, JmdictRecord? right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(JmdictRecord? left, JmdictRecord? right) => !left?.Equals(right) ?? right is not null;
+    public static bool operator !=(JmdictRecord? left, JmdictRecord? right) => !(left == right);
 }

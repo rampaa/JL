@@ -40,5 +40,5 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
     }
 
     public static bool operator ==(Freq? left, Freq? right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(Freq? left, Freq? right) => !left?.Equals(right) ?? right is not null;
+    public static bool operator !=(Freq? left, Freq? right) => !(left == right);
 }

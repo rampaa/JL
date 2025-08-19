@@ -12,20 +12,20 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        return obj is JmdictWordClass jmdictWordClass
-               && Spelling == jmdictWordClass.Spelling
-               && ((Readings is null && jmdictWordClass.Readings is null)
-                    || (Readings is not null && jmdictWordClass.Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(jmdictWordClass.Readings)))
-               && WordClasses.AsReadOnlySpan().SequenceEqual(jmdictWordClass.WordClasses);
+        return obj is JmdictWordClass other
+               && (ReferenceEquals(this, other) || (Spelling == other.Spelling
+               && ((Readings is null && other.Readings is null)
+                    || (Readings is not null && other.Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(other.Readings)))
+               && WordClasses.AsReadOnlySpan().SequenceEqual(other.WordClasses)));
     }
 
     public bool Equals([NotNullWhen(true)] JmdictWordClass? other)
     {
         return other is not null
-               && Spelling == other.Spelling
+               && (ReferenceEquals(this, other) || (Spelling == other.Spelling
                && ((Readings is null && other.Readings is null)
                     || (Readings is not null && other.Readings is not null && Readings.AsReadOnlySpan().SequenceEqual(other.Readings)))
-               && WordClasses.AsReadOnlySpan().SequenceEqual(other.WordClasses);
+               && WordClasses.AsReadOnlySpan().SequenceEqual(other.WordClasses)));
     }
 
     public override int GetHashCode()
@@ -56,5 +56,5 @@ internal sealed class JmdictWordClass(string spelling, string[] wordClasses, str
     }
 
     public static bool operator ==(JmdictWordClass? left, JmdictWordClass? right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(JmdictWordClass? left, JmdictWordClass? right) => !left?.Equals(right) ?? right is not null;
+    public static bool operator !=(JmdictWordClass? left, JmdictWordClass? right) => !(left == right);
 }

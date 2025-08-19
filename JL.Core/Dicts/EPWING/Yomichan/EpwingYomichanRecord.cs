@@ -143,20 +143,20 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        return obj is EpwingYomichanRecord epwingYomichanRecord
-               && PrimarySpelling == epwingYomichanRecord.PrimarySpelling
-               && Reading == epwingYomichanRecord.Reading
-               && epwingYomichanRecord.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)
-               && epwingYomichanRecord.ImagePaths.AsReadOnlySpan().SequenceEqual(ImagePaths);
+        return obj is EpwingYomichanRecord other
+               && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
+               && Reading == other.Reading
+               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)
+               && other.ImagePaths.AsReadOnlySpan().SequenceEqual(ImagePaths)));
     }
 
     public bool Equals([NotNullWhen(true)] EpwingYomichanRecord? other)
     {
         return other is not null
-               && PrimarySpelling == other.PrimarySpelling
+               && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
                && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)
-               && other.ImagePaths.AsReadOnlySpan().SequenceEqual(ImagePaths);
+               && other.ImagePaths.AsReadOnlySpan().SequenceEqual(ImagePaths)));
     }
 
     public override int GetHashCode()
@@ -195,5 +195,5 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
     }
 
     public static bool operator ==(EpwingYomichanRecord? left, EpwingYomichanRecord? right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(EpwingYomichanRecord? left, EpwingYomichanRecord? right) => !left?.Equals(right) ?? right is not null;
+    public static bool operator !=(EpwingYomichanRecord? left, EpwingYomichanRecord? right) => !(left == right);
 }

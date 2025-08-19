@@ -124,24 +124,24 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        return obj is YomichanKanjiRecord yomichanKanjiRecord
-               && ((OnReadings is null && yomichanKanjiRecord.OnReadings is null)
-                || (OnReadings is not null && yomichanKanjiRecord.OnReadings is not null && OnReadings.AsReadOnlySpan().SequenceEqual(yomichanKanjiRecord.OnReadings)))
-               && ((KunReadings is null && yomichanKanjiRecord.KunReadings is null)
-                || (KunReadings is not null && yomichanKanjiRecord.KunReadings is not null && KunReadings.AsReadOnlySpan().SequenceEqual(yomichanKanjiRecord.KunReadings)))
-               && ((Definitions is null && yomichanKanjiRecord.Definitions is null)
-                || (Definitions is not null && yomichanKanjiRecord.Definitions is not null && Definitions.AsReadOnlySpan().SequenceEqual(yomichanKanjiRecord.Definitions)));
+        return obj is YomichanKanjiRecord other
+               && (ReferenceEquals(this, other) || (((OnReadings is null && other.OnReadings is null)
+                || (OnReadings is not null && other.OnReadings is not null && OnReadings.AsReadOnlySpan().SequenceEqual(other.OnReadings)))
+               && ((KunReadings is null && other.KunReadings is null)
+                || (KunReadings is not null && other.KunReadings is not null && KunReadings.AsReadOnlySpan().SequenceEqual(other.KunReadings)))
+               && ((Definitions is null && other.Definitions is null)
+                || (Definitions is not null && other.Definitions is not null && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions)))));
     }
 
     public bool Equals([NotNullWhen(true)] YomichanKanjiRecord? other)
     {
         return other is not null
-               && ((OnReadings is null && other.OnReadings is null)
+               && (ReferenceEquals(this, other) || (((OnReadings is null && other.OnReadings is null)
                 || (OnReadings is not null && other.OnReadings is not null && OnReadings.AsReadOnlySpan().SequenceEqual(other.OnReadings)))
                && ((KunReadings is null && other.KunReadings is null)
                 || (KunReadings is not null && other.KunReadings is not null && KunReadings.AsReadOnlySpan().SequenceEqual(other.KunReadings)))
                && ((Definitions is null && other.Definitions is null)
-                || (Definitions is not null && other.Definitions is not null && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions)));
+                || (Definitions is not null && other.Definitions is not null && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions)))));
     }
 
     public override int GetHashCode()

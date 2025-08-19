@@ -119,18 +119,18 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        return obj is EpwingNazekaRecord epwingNazekaRecord
-               && PrimarySpelling == epwingNazekaRecord.PrimarySpelling
-               && Reading == epwingNazekaRecord.Reading
-               && epwingNazekaRecord.Definitions.AsReadOnlySpan().SequenceEqual(Definitions);
+        return obj is EpwingNazekaRecord other
+               && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
+               && Reading == other.Reading
+               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)));
     }
 
     public bool Equals([NotNullWhen(true)] EpwingNazekaRecord? other)
     {
         return other is not null
-               && PrimarySpelling == other.PrimarySpelling
+               && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
-               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions);
+               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)));
     }
 
     public override int GetHashCode()
@@ -150,5 +150,5 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
     }
 
     public static bool operator ==(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => !left?.Equals(right) ?? right is not null;
+    public static bool operator !=(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => !(left == right);
 }

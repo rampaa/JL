@@ -50,5 +50,5 @@ internal sealed class CustomNameRecord : IDictRecordWithSingleReading, IEquatabl
     }
 
     public static bool operator ==(CustomNameRecord? left, CustomNameRecord? right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(CustomNameRecord? left, CustomNameRecord? right) => !left?.Equals(right) ?? right is not null;
+    public static bool operator !=(CustomNameRecord? left, CustomNameRecord? right) => !(left == right);
 }
