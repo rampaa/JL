@@ -127,7 +127,12 @@ public sealed class ShowPitchAccentWithDottedLinesOption(bool value)
 public sealed class AutoUpdateAfterNDaysOption(int value)
 {
     public int Value { get; } = value;
-    [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict, DictType.JMnedict, DictType.Kanjidic];
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.JMdict, DictType.JMnedict, DictType.Kanjidic,
+        DictType.NonspecificWordYomichan, DictType.NonspecificNameYomichan, DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificKanjiWithWordSchemaYomichan, DictType.NonspecificYomichan, DictType.PitchAccentYomichan];
 }
 
 public sealed class ShowImagesOption(bool value)

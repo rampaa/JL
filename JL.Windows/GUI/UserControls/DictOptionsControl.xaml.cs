@@ -21,7 +21,7 @@ internal sealed partial class DictOptionsControl
         WindowsUtils.ShowColorPicker((Button)sender);
     }
 
-    public DictOptions GetDictOptions(DictType type)
+    public DictOptions GetDictOptions(DictType type, bool autoUpdatable)
     {
         NewlineBetweenDefinitionsOption? newlineOption = null;
         if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
@@ -167,7 +167,7 @@ internal sealed partial class DictOptionsControl
         }
 
         AutoUpdateAfterNDaysOption? autoUpdateAfterNDaysOption = null;
-        if (AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(type))
+        if (autoUpdatable && AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(type))
         {
             autoUpdateAfterNDaysOption = new AutoUpdateAfterNDaysOption(double.ConvertToIntegerNative<int>(AutoUpdateAfterNDaysNumericUpDown.Value));
         }

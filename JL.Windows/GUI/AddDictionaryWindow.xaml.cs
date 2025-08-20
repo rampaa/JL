@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -105,8 +106,11 @@ internal sealed partial class AddDictionaryWindow
             }
         }
 
-        DictOptions options = _dictOptionsControl.GetDictOptions(type);
-        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+        bool autoUpdatable = _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
+        Uri? indexUrl = (Uri?)_dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag;
+
+        DictOptions options = _dictOptionsControl.GetDictOptions(type, autoUpdatable);
+        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options, autoUpdatable: autoUpdatable, url: indexUrl, revision: (string?)NameTextBox.Tag);
         DictUtils.Dicts.Add(name, dict);
 
         if (dict.Type is DictType.PitchAccentYomichan)
@@ -141,6 +145,36 @@ internal sealed partial class AddDictionaryWindow
         if (openFolderDialog.ShowDialog() is true)
         {
             PathTextBlock.Text = Utils.GetPath(openFolderDialog.FolderName);
+
+            string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
+            if (File.Exists(indexJsonPath))
+            {
+                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+
+                string? dictionaryTitle = jsonElement.GetProperty("title").GetString();
+                Debug.Assert(dictionaryTitle is not null);
+                NameTextBox.Text = dictionaryTitle;
+
+                NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
+
+                bool isUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+                if (isUpdatable)
+                {
+                    _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
+
+                    string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                    Debug.Assert(indexUrl is not null);
+                    _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag = new Uri(indexUrl);
+                }
+                else
+                {
+                    _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
+            }
         }
     }
 

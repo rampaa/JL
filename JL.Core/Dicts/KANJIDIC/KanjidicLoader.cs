@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -32,18 +33,21 @@ internal static class KanjidicLoader
 
         else
         {
-            if (DictUtils.UpdatingKanjidic)
+            if (dict.Updating)
             {
                 return;
             }
 
-            DictUtils.UpdatingKanjidic = true;
+            dict.Updating = true;
             if (Utils.Frontend.ShowYesNoDialog(
                 "Couldn't find kanjidic2.xml. Would you like to download it now?",
                 "Download KANJIDIC2?"))
             {
-                bool downloaded = await DictUpdater.DownloadDict(fullPath,
-                    DictUtils.s_kanjidicUrl,
+                Uri? uri = dict.Url;
+                Debug.Assert(uri is not null);
+
+                bool downloaded = await DictUpdater.DownloadBuiltInDict(fullPath,
+                    uri,
                     nameof(DictType.Kanjidic), false, false).ConfigureAwait(false);
 
                 if (downloaded)
@@ -56,7 +60,7 @@ internal static class KanjidicLoader
                 dict.Active = false;
             }
 
-            DictUtils.UpdatingKanjidic = false;
+            dict.Updating = false;
         }
     }
 

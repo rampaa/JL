@@ -21,7 +21,7 @@ internal static class JmdictWordClassUtils
         FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "PoS.json"));
         await using (fileStream.ConfigureAwait(false))
         {
-            Dictionary<string, IList<JmdictWordClass>>? wordClassDictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, Utils.s_jso).ConfigureAwait(false);
+            Dictionary<string, IList<JmdictWordClass>>? wordClassDictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, Utils.Jso).ConfigureAwait(false);
             Debug.Assert(wordClassDictionary is not null);
             DictUtils.WordClassDictionary = wordClassDictionary;
         }
@@ -188,8 +188,12 @@ internal static class JmdictWordClassUtils
                 if (!File.Exists(jmdictPath))
                 {
                     deleteJmdictFile = true;
-                    bool downloaded = await DictUpdater.DownloadDict(jmdictPath,
-                        DictUtils.s_jmdictUrl,
+
+                    Uri? uri = jmdictDict.Url;
+                    Debug.Assert(uri is not null);
+
+                    bool downloaded = await DictUpdater.DownloadBuiltInDict(jmdictPath,
+                        uri,
                         jmdictDict.Type.ToString(), false, true).ConfigureAwait(false);
 
                     if (!downloaded)

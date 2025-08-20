@@ -2,10 +2,15 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using JL.Core.Dicts.EPWING.Yomichan;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.JMnedict;
 using JL.Core.Dicts.KANJIDIC;
+using JL.Core.Dicts.KanjiDict;
+using JL.Core.Dicts.PitchAccent;
 using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
@@ -14,7 +19,7 @@ namespace JL.Core.Dicts;
 
 public static class DictUpdater
 {
-    internal static async Task<bool> DownloadDict(string dictPath, Uri dictDownloadUri, string dictName,
+    internal static async Task<bool> DownloadBuiltInDict(string dictPath, Uri dictDownloadUri, string dictName,
         bool isUpdate, bool noPrompt)
     {
         try
@@ -39,7 +44,7 @@ public static class DictUpdater
                 if (response.IsSuccessStatusCode)
                 {
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    string tempDictPath = GetTempFilePath(fullDictPath);
+                    string tempDictPath = GetTempPath(fullDictPath);
                     await using (responseStream.ConfigureAwait(false))
                     {
                         await DecompressGzipStream(responseStream, tempDictPath).ConfigureAwait(false);
@@ -78,7 +83,7 @@ public static class DictUpdater
             Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
             Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
 
-            string tempDictPath = GetTempFilePath(Path.GetFullPath(dictPath, Utils.ApplicationPath));
+            string tempDictPath = GetTempPath(Path.GetFullPath(dictPath, Utils.ApplicationPath));
             if (File.Exists(tempDictPath))
             {
                 File.Delete(tempDictPath);
@@ -101,18 +106,157 @@ public static class DictUpdater
         }
     }
 
+    internal static async Task<bool> DownloadYomichanDict(Dict dict, bool noPrompt)
+    {
+        try
+        {
+            if (noPrompt || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dict.Name}?", "Update dictionary?"))
+            {
+                using HttpRequestMessage indexRequest = new(HttpMethod.Get, dict.Url);
+
+                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                if (Directory.Exists(fullDictPath))
+                {
+                    indexRequest.Headers.IfModifiedSince = File.GetLastWriteTime(Path.Join(fullDictPath, "index.json"));
+                }
+
+                using HttpResponseMessage indexResponse = await NetworkUtils.Client.SendAsync(indexRequest, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                if (indexResponse.StatusCode is HttpStatusCode.NotModified && !noPrompt)
+                {
+                    Utils.Frontend.ShowOkDialog($"{dict.Name} is up to date.", "Info");
+                    return false;
+                }
+
+                if (!indexResponse.IsSuccessStatusCode)
+                {
+                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}",
+                        dict.Name, indexResponse.StatusCode);
+
+                    if (!noPrompt)
+                    {
+                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dict.Name}.", "Info");
+                    }
+
+                    return false;
+                }
+
+                if (!noPrompt)
+                {
+                    Utils.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {dict.Name} is downloaded.", "Info");
+                }
+
+                JsonElement indexJsonElement = await indexResponse.Content.ReadFromJsonAsync<JsonElement>().ConfigureAwait(false);
+                string? newRevision = indexJsonElement.GetProperty("revision").GetString();
+                Debug.Assert(newRevision is not null);
+                if (dict.Revision == newRevision)
+                {
+                    Utils.Frontend.ShowOkDialog($"{dict.Name} is up to date.", "Info");
+                    return false;
+                }
+
+                string? downloadUrl = indexJsonElement.GetProperty("downloadUrl").GetString();
+                Debug.Assert(downloadUrl is not null);
+                using HttpRequestMessage request = new(HttpMethod.Get, downloadUrl);
+                request.Headers.IfModifiedSince = indexRequest.Headers.IfModifiedSince;
+
+                using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
+                {
+                    Utils.Frontend.ShowOkDialog($"{dict.Name} is up to date.", "Info");
+                    return false;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", dict.Name, response.StatusCode);
+
+                    if (!noPrompt)
+                    {
+                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dict.Name}.", "Info");
+                    }
+
+                    return false;
+                }
+
+                Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                string tempDictPath = GetTempPath(fullDictPath);
+                await using (responseStream.ConfigureAwait(false))
+                {
+                    await DecompressZipStream(responseStream, tempDictPath).ConfigureAwait(false);
+                }
+
+                Directory.Delete(fullDictPath, true);
+                Directory.Move(tempDictPath, fullDictPath);
+
+                if (!noPrompt)
+                {
+                    Utils.Frontend.ShowOkDialog($"{dict.Name} has been downloaded successfully.", "Info");
+                }
+
+                return true;
+            }
+        }
+
+        catch (Exception ex)
+        {
+            Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dict.Name}.", "Info");
+            Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dict.Name);
+
+            string tempDictPath = GetTempPath(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+            if (Directory.Exists(tempDictPath))
+            {
+                Directory.Delete(tempDictPath, true);
+            }
+        }
+
+        return false;
+    }
+
+    private static async Task DecompressZipStream(Stream stream, string destinationDirectory)
+    {
+        using ZipArchive archive = new(stream, ZipArchiveMode.Read, false);
+        foreach (ZipArchiveEntry entry in archive.Entries)
+        {
+            string fullPath = Path.Join(destinationDirectory, entry.FullName);
+            if (string.IsNullOrEmpty(entry.Name))
+            {
+                _ = Directory.CreateDirectory(fullPath);
+            }
+            else
+            {
+                string? directoryName = Path.GetDirectoryName(fullPath);
+                Debug.Assert(directoryName is not null);
+                _ = Directory.CreateDirectory(directoryName);
+
+                Stream entryStream = entry.Open();
+                await using (entryStream.ConfigureAwait(false))
+                {
+                    FileStream outputFileStream = File.Create(fullPath);
+                    await using (outputFileStream.ConfigureAwait(false))
+                    {
+                        await entryStream.CopyToAsync(outputFileStream).ConfigureAwait(false);
+                    }
+                }
+            }
+        }
+    }
+
     public static async Task UpdateJmdict(bool isUpdate, bool noPrompt)
     {
-        if (DictUtils.UpdatingJmdict)
+        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+
+        if (dict.Updating)
         {
             return;
         }
 
-        DictUtils.UpdatingJmdict = true;
+        dict.Updating = true;
 
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        bool downloaded = await DownloadDict(dict.Path,
-                DictUtils.s_jmdictUrl,
+        Uri? uri = dict.Url;
+        Debug.Assert(uri is not null);
+
+        bool downloaded = await DownloadBuiltInDict(dict.Path,
+                uri,
                 nameof(DictType.JMdict), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
@@ -153,22 +297,26 @@ public static class DictUpdater
             Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMdict");
         }
 
-        DictUtils.UpdatingJmdict = false;
+        dict.Updating = false;
         Utils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateJmnedict(bool isUpdate, bool noPrompt)
     {
-        if (DictUtils.UpdatingJmnedict)
+        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
+
+        if (dict.Updating)
         {
             return;
         }
 
-        DictUtils.UpdatingJmnedict = true;
+        dict.Updating = true;
 
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
-        bool downloaded = await DownloadDict(dict.Path,
-                DictUtils.s_jmnedictUrl,
+        Uri? uri = dict.Url;
+        Debug.Assert(uri is not null);
+
+        bool downloaded = await DownloadBuiltInDict(dict.Path,
+                uri,
                 nameof(DictType.JMnedict), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
@@ -206,22 +354,26 @@ public static class DictUpdater
             Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMnedict");
         }
 
-        DictUtils.UpdatingJmnedict = false;
+        dict.Updating = false;
         Utils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateKanjidic(bool isUpdate, bool noPrompt)
     {
-        if (DictUtils.UpdatingKanjidic)
+        Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
+
+        if (dict.Updating)
         {
             return;
         }
 
-        DictUtils.UpdatingKanjidic = true;
+        dict.Updating = true;
 
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
-        bool downloaded = await DownloadDict(dict.Path,
-                DictUtils.s_kanjidicUrl,
+        Uri? uri = dict.Url;
+        Debug.Assert(uri is not null);
+
+        bool downloaded = await DownloadBuiltInDict(dict.Path,
+                uri,
                 nameof(DictType.Kanjidic), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
@@ -259,24 +411,95 @@ public static class DictUpdater
             Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
         }
 
-        DictUtils.UpdatingKanjidic = false;
+        dict.Updating = false;
         Utils.ClearStringPoolIfDictsAreReady();
     }
 
-    internal static Task AutoUpdateBuiltInDicts()
+    public static async Task UpdateYomichanDict(Dict dict, bool noPrompt)
     {
-        ReadOnlySpan<DictType> dictTypes =
-        [
-            DictType.JMdict,
-            DictType.JMnedict,
-            DictType.Kanjidic
-        ];
-
-        List<Task> tasks = [];
-        foreach (DictType dictType in dictTypes)
+        if (dict.Updating)
         {
-            Dict dict = DictUtils.SingleDictTypeDicts[dictType];
-            if (!dict.Active)
+            return;
+        }
+
+        dict.Updating = true;
+
+        Uri? uri = dict.Url;
+        Debug.Assert(uri is not null);
+
+        bool downloaded = await DownloadYomichanDict(dict, noPrompt).ConfigureAwait(false);
+
+        if (downloaded)
+        {
+            dict.Ready = false;
+            dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
+
+            await Task.Run(async () =>
+            {
+                if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificNameYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificYomichan)
+                {
+                    await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
+                }
+                else if (dict.Type is DictType.NonspecificKanjiYomichan)
+                {
+                    await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
+                }
+                else if (dict.Type is DictType.PitchAccentYomichan)
+                {
+                    await YomichanPitchAccentLoader.Load(dict).ConfigureAwait(false);
+                }
+            }).ConfigureAwait(false);
+
+            string dbPath = DBUtils.GetDictDBPath(dict.Name);
+            bool useDB = dict.Options.UseDB.Value;
+            bool dbExists = File.Exists(dbPath);
+
+            if (dbExists)
+            {
+                DBUtils.DeleteDB(dbPath);
+            }
+
+            if (useDB || dbExists)
+            {
+                await Task.Run(() =>
+                {
+                    if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificNameYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificYomichan)
+                    {
+                        EpwingYomichanDBManager.CreateDB(dict.Name);
+                        EpwingYomichanDBManager.InsertRecordsToDB(dict);
+                    }
+                    else if (dict.Type is DictType.NonspecificKanjiYomichan)
+                    {
+                        YomichanKanjiDBManager.CreateDB(dict.Name);
+                        YomichanKanjiDBManager.InsertRecordsToDB(dict);
+                    }
+                    else if (dict.Type is DictType.PitchAccentYomichan)
+                    {
+                        YomichanPitchAccentDBManager.CreateDB(dict.Name);
+                        YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
+                    }
+                }).ConfigureAwait(false);
+            }
+
+            if (!dict.Active || useDB)
+            {
+                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+            }
+
+            dict.Ready = true;
+            Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
+        }
+
+        dict.Updating = false;
+        Utils.ClearStringPoolIfDictsAreReady();
+    }
+
+    internal static Task AutoUpdateDicts()
+    {
+        List<Task> tasks = [];
+        foreach (Dict dict in DictUtils.Dicts.Values.ToArray())
+        {
+            if (!dict.Active || !dict.AutoUpdatable)
             {
                 continue;
             }
@@ -289,6 +512,11 @@ public static class DictUpdater
             }
 
             string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+            if (DictUtils.YomichanDictTypes.Contains(dict.Type))
+            {
+                fullPath = Path.Join(fullPath, "index.json");
+            }
+
             bool pathExists = File.Exists(fullPath);
             if (pathExists && (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
             {
@@ -300,15 +528,17 @@ public static class DictUpdater
                 ? UpdateJmdict(pathExists, true)
                 : dict.Type is DictType.JMnedict
                     ? UpdateJmnedict(pathExists, true)
-                    : UpdateKanjidic(pathExists, true));
+                    : dict.Type is DictType.Kanjidic
+                        ? UpdateKanjidic(pathExists, true)
+                        : UpdateYomichanDict(dict, true));
         }
 
         return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
     }
 
-    private static string GetTempFilePath(string filePath)
+    private static string GetTempPath(string path)
     {
-        return $"{filePath}.tmp";
+        return $"{path}.tmp";
     }
 
 }

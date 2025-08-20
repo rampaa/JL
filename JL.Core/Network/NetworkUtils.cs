@@ -129,7 +129,7 @@ public static class NetworkUtils
     // ReSharper disable once AsyncVoidMethod
     private static async void CheckForUpdates(object? sender, ElapsedEventArgs e)
     {
-        await DictUpdater.AutoUpdateBuiltInDicts().ConfigureAwait(false);
+        await DictUpdater.AutoUpdateDicts().ConfigureAwait(false);
 
         if (CoreConfigManager.Instance.CheckForJLUpdatesOnStartUp)
         {

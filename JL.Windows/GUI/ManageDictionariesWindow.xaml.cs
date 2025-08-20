@@ -161,6 +161,7 @@ internal sealed partial class ManageDictionariesWindow
                 Width = 45,
                 Height = 30,
                 Content = "Edit",
+                IsEnabled = !dict.Updating,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
                 Foreground = Brushes.White,
@@ -181,11 +182,9 @@ internal sealed partial class ManageDictionariesWindow
                 Foreground = Brushes.White,
                 Background = Brushes.DarkGreen,
                 BorderThickness = new Thickness(1),
-                Visibility = dict.Type is not DictType.JMdict
-                    and not DictType.JMnedict
-                    and not DictType.Kanjidic
-                    ? Visibility.Collapsed
-                    : Visibility.Visible,
+                Margin = new Thickness(0, 0, 5, 0),
+                Visibility = dict.AutoUpdatable ? Visibility.Visible : Visibility.Collapsed,
+                IsEnabled = dict.Ready && !dict.Updating,
                 Tag = dict
             };
             updateButton.Click += UpdateButton_Click;
@@ -217,7 +216,6 @@ internal sealed partial class ManageDictionariesWindow
                 Foreground = Brushes.White,
                 Background = Brushes.LightSlateGray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(5, 0, 0, 0),
                 Visibility = dict.Type is DictType.JMdict or DictType.JMnedict
                     ? Visibility.Visible
                     : Visibility.Collapsed
@@ -225,20 +223,11 @@ internal sealed partial class ManageDictionariesWindow
 
             if (dict.Type is DictType.JMdict)
             {
-                updateButton.IsEnabled = !DictUtils.UpdatingJmdict;
-                editButton.IsEnabled = !DictUtils.UpdatingJmdict;
                 infoButton.Click += JmdictInfoButton_Click;
             }
             else if (dict.Type is DictType.JMnedict)
             {
-                updateButton.IsEnabled = !DictUtils.UpdatingJmnedict;
-                editButton.IsEnabled = !DictUtils.UpdatingJmnedict;
                 infoButton.Click += JmnedictInfoButton_Click;
-            }
-            else if (dict.Type is DictType.Kanjidic)
-            {
-                updateButton.IsEnabled = !DictUtils.UpdatingKanjidic;
-                editButton.IsEnabled = !DictUtils.UpdatingKanjidic;
             }
 
             _ = dockPanel.Children.Add(checkBox);
@@ -398,6 +387,10 @@ internal sealed partial class ManageDictionariesWindow
         else if (dict.Type is DictType.Kanjidic)
         {
             await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
+        }
+        else if (DictUtils.YomichanDictTypes.Contains(dict.Type))
+        {
+            await DictUpdater.UpdateYomichanDict(dict, false).ConfigureAwait(true);
         }
 
         UpdateDictionariesDisplay();

@@ -6,7 +6,7 @@ using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts;
 
-public sealed class Dict(DictType type, string name, string path, bool active, int priority, int size, DictOptions options) : IEquatable<Dict>
+public sealed class Dict(DictType type, string name, string path, bool active, int priority, int size, DictOptions options, bool autoUpdatable = false, Uri? url = null, string? revision = null) : IEquatable<Dict>
 {
     public DictType Type { get; } = type;
     public string Name { get; } = name;
@@ -16,8 +16,14 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
 
     // ReSharper disable once MemberCanBeInternal
     public int Size { get; internal set; } = size;
+
     public DictOptions Options { get; set; } = options;
+    public bool AutoUpdatable { get; internal set; } = autoUpdatable;
+    public Uri? Url { get; internal set; } = url;
+    public string? Revision { get; internal set; } = revision;
+
     [JsonIgnore] public bool Ready { get; set; } // = false;
+    [JsonIgnore] public bool Updating { get; set; } // = false;
 
 #pragma warning disable CA2227 // Collection properties should be read only
     [JsonIgnore] public IDictionary<string, IList<IDictRecord>> Contents { get; set; } = FrozenDictionary<string, IList<IDictRecord>>.Empty;

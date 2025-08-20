@@ -720,9 +720,7 @@ internal sealed partial class MainWindow
         else if (keyGesture.IsEqual(configManager.ShowManageDictionariesWindowKeyGesture))
         {
             if (DictUtils.DictsReady
-                && !DictUtils.UpdatingJmdict
-                && !DictUtils.UpdatingJmnedict
-                && !DictUtils.UpdatingKanjidic)
+                && DictUtils.Dicts.Values.ToArray().All(static dict => dict.Ready))
             {
                 return WindowsUtils.ShowManageDictionariesWindow();
             }
@@ -1628,10 +1626,7 @@ internal sealed partial class MainWindow
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady
-                                               && !DictUtils.UpdatingJmdict
-                                               && !DictUtils.UpdatingJmnedict
-                                               && !DictUtils.UpdatingKanjidic;
+        ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
 
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady;
 

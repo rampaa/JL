@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
@@ -118,18 +119,21 @@ internal static class JmdictLoader
 
         else
         {
-            if (DictUtils.UpdatingJmdict)
+            if (dict.Updating)
             {
                 return;
             }
 
-            DictUtils.UpdatingJmdict = true;
+            dict.Updating = true;
             if (Utils.Frontend.ShowYesNoDialog(
                 "Couldn't find JMdict.xml. Would you like to download it now?",
                 "Download JMdict?"))
             {
-                bool downloaded = await DictUpdater.DownloadDict(fullPath,
-                    DictUtils.s_jmdictUrl,
+                Uri? uri = dict.Url;
+                Debug.Assert(uri is not null);
+
+                bool downloaded = await DictUpdater.DownloadBuiltInDict(fullPath,
+                    uri,
                     nameof(DictType.JMdict), false, false).ConfigureAwait(false);
 
                 if (downloaded)
@@ -145,7 +149,7 @@ internal static class JmdictLoader
                 dict.Active = false;
             }
 
-            DictUtils.UpdatingJmdict = false;
+            dict.Updating = false;
         }
     }
 

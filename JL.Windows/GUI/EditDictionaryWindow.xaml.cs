@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -117,7 +118,7 @@ internal sealed partial class EditDictionaryWindow
             }
         }
 
-        DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
+        DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type, _dict.AutoUpdatable);
         if (_dict.Type is DictType.PitchAccentYomichan)
         {
             Debug.Assert(_dict.Options.ShowPitchAccentWithDottedLines is not null);
@@ -158,7 +159,7 @@ internal sealed partial class EditDictionaryWindow
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);
-            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, _dict.Options));
+            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, _dict.Options, _dict.AutoUpdatable, _dict.Url, _dict.Revision));
         }
 
         Close();
@@ -200,6 +201,35 @@ internal sealed partial class EditDictionaryWindow
         if (openFolderDialog.ShowDialog() is true)
         {
             PathTextBlock.Text = Utils.GetPath(openFolderDialog.FolderName);
+            string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
+            if (File.Exists(indexJsonPath))
+            {
+                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+
+                string? dictionaryTitle = jsonElement.GetProperty("title").GetString();
+                Debug.Assert(dictionaryTitle is not null);
+                NameTextBox.Text = dictionaryTitle;
+
+                NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
+
+                bool isUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+                if (isUpdatable)
+                {
+                    _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
+
+                    string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                    Debug.Assert(indexUrl is not null);
+                    _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag = new Uri(indexUrl);
+                }
+                else
+                {
+                    _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
+            }
         }
     }
 
@@ -220,6 +250,9 @@ internal sealed partial class EditDictionaryWindow
 
         NameTextBox.Text = _dict.Name;
         _dictOptionsControl.GenerateDictOptionsElements(_dict.Type, _dict.Options);
+        _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = _dict.AutoUpdatable
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)

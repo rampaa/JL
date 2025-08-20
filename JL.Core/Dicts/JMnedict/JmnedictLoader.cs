@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -36,17 +37,20 @@ internal static class JmnedictLoader
 
         else
         {
-            if (DictUtils.UpdatingJmnedict)
+            if (dict.Updating)
             {
                 return;
             }
 
-            DictUtils.UpdatingJmnedict = true;
+            dict.Updating = true;
             if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
                 "Download JMnedict?"))
             {
-                bool downloaded = await DictUpdater.DownloadDict(fullPath,
-                    DictUtils.s_jmnedictUrl,
+                Uri? uri = dict.Url;
+                Debug.Assert(uri is not null);
+
+                bool downloaded = await DictUpdater.DownloadBuiltInDict(fullPath,
+                    uri,
                     nameof(DictType.JMnedict), false, false).ConfigureAwait(false);
 
                 if (downloaded)
@@ -59,7 +63,7 @@ internal static class JmnedictLoader
                 dict.Active = false;
             }
 
-            DictUtils.UpdatingJmnedict = false;
+            dict.Updating = false;
         }
     }
 

@@ -45,7 +45,7 @@ public static class Utils
             shared: true)
         .CreateLogger();
 
-    internal static readonly JsonSerializerOptions s_jso = new()
+    public static readonly JsonSerializerOptions Jso = new()
     {
         RespectNullableAnnotations = true,
         RespectRequiredConstructorParameters = true,
@@ -172,7 +172,7 @@ public static class Utils
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
                 await DictUtils.SerializeDicts().ConfigureAwait(false);
                 await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
-                await DictUpdater.AutoUpdateBuiltInDicts().ConfigureAwait(false);
+                await DictUpdater.AutoUpdateDicts().ConfigureAwait(false);
             }),
             Task.Run(static async () =>
             {
@@ -195,9 +195,7 @@ public static class Utils
     {
         if (DictUtils.DictsReady
             && FreqUtils.FreqsReady
-            && !DictUtils.UpdatingJmdict
-            && !DictUtils.UpdatingJmnedict
-            && !DictUtils.UpdatingKanjidic)
+            && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating))
         {
             StringPoolInstance.Reset();
         }

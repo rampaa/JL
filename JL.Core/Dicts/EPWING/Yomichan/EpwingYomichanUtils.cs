@@ -269,4 +269,22 @@ internal static class EpwingYomichanUtils
             return default;
         }
     }
+
+    public static void UpdateRevisionInfo(Dict dict)
+    {
+        string indexJsonPath = Path.Join(dict.Path, "index.json");
+        if (File.Exists(indexJsonPath))
+        {
+            JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+
+            dict.Revision = jsonElement.GetProperty("revision").GetString();
+            dict.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+            if (dict.AutoUpdatable)
+            {
+                string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                Debug.Assert(indexUrl is not null);
+                dict.Url = new Uri(indexUrl);
+            }
+        }
+    }
 }

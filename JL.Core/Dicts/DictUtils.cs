@@ -23,14 +23,11 @@ namespace JL.Core.Dicts;
 public static class DictUtils
 {
     public static bool DictsReady { get; private set; } // = false;
-    public static bool UpdatingJmdict { get; internal set; } // = false;
-    public static bool UpdatingJmnedict { get; internal set; } // = false;
-    public static bool UpdatingKanjidic { get; internal set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
-    internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
-    internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
-    internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
+    private static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
+    private static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
+    private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
     internal static bool DBIsUsedForAtLeastOneDict { get; private set; }
     internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; }
@@ -53,7 +50,10 @@ public static class DictUtils
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
-                    new NewlineBetweenDefinitionsOption(true)))
+                    new NewlineBetweenDefinitionsOption(true)),
+                autoUpdatable: false,
+                url: null,
+                revision: null)
         },
         {
             nameof(DictType.ProfileCustomNameDictionary), new Dict(DictType.ProfileCustomNameDictionary,
@@ -62,7 +62,10 @@ public static class DictUtils
                 true, 0, 128,
                 new DictOptions(
                     new UseDBOption(false),
-                    new NoAllOption(false)))
+                    new NoAllOption(false)),
+                autoUpdatable: false,
+                url: null,
+                revision: null)
         },
         {
             nameof(DictType.CustomWordDictionary), new Dict(DictType.CustomWordDictionary,
@@ -72,7 +75,10 @@ public static class DictUtils
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
-                    new NewlineBetweenDefinitionsOption(true)))
+                    new NewlineBetweenDefinitionsOption(true)),
+                autoUpdatable: false,
+                url: null,
+                revision: null)
         },
         {
             nameof(DictType.CustomNameDictionary), new Dict(DictType.CustomNameDictionary,
@@ -81,7 +87,10 @@ public static class DictUtils
                 true, 2, 128,
                 new DictOptions(
                     new UseDBOption(false),
-                    new NoAllOption(false)))
+                    new NoAllOption(false)),
+                autoUpdatable: false,
+                url: null,
+                revision: null)
         },
         {
             nameof(DictType.JMdict), new Dict(DictType.JMdict, nameof(DictType.JMdict),
@@ -106,7 +115,10 @@ public static class DictUtils
                     relatedTerm: new RelatedTermOption(true),
                     antonym: new AntonymOption(true),
                     autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)
-                ))
+                ),
+                autoUpdatable: true,
+                url: s_jmdictUrl,
+                revision: null)
         },
         {
             nameof(DictType.Kanjidic), new Dict(DictType.Kanjidic, nameof(DictType.Kanjidic),
@@ -115,7 +127,10 @@ public static class DictUtils
                 new DictOptions(
                     new UseDBOption(true),
                     new NoAllOption(false),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)),
+                autoUpdatable: true,
+                url: s_kanjidicUrl,
+                revision: null)
         },
         {
             nameof(DictType.JMnedict), new Dict(DictType.JMnedict, nameof(DictType.JMnedict),
@@ -125,7 +140,10 @@ public static class DictUtils
                     new UseDBOption(true),
                     new NoAllOption(false),
                     new NewlineBetweenDefinitionsOption(true),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)),
+                autoUpdatable: true,
+                url: s_jmnedictUrl,
+                revision: null)
         }
     };
 
@@ -528,9 +546,7 @@ public static class DictUtils
             bool dbExisted = dbExists;
             bool dbJournalExists = File.Exists(dbJournalPath);
 
-            if ((dict.Type is not DictType.JMdict || !UpdatingJmdict)
-                && (dict.Type is not DictType.JMnedict || !UpdatingJmnedict)
-                && (dict.Type is not DictType.Kanjidic || !UpdatingKanjidic))
+            if (!dict.Updating)
             {
                 if (dbJournalExists)
                 {
@@ -560,7 +576,7 @@ public static class DictUtils
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    if (UpdatingJmdict)
+                    if (dict.Updating)
                     {
                         break;
                     }
@@ -649,7 +665,7 @@ public static class DictUtils
                     break;
 
                 case DictType.JMnedict:
-                    if (UpdatingJmnedict)
+                    if (dict.Updating)
                     {
                         break;
                     }
@@ -731,7 +747,7 @@ public static class DictUtils
                     break;
 
                 case DictType.Kanjidic:
-                    if (UpdatingKanjidic)
+                    if (dict.Updating)
                     {
                         break;
                     }
@@ -821,6 +837,11 @@ public static class DictUtils
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
+                    if (dict.Updating)
+                    {
+                        break;
+                    }
+
                     if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(EpwingYomichanDBManager.Version, dbPath))
                     {
                         DBUtils.DeleteDB(dbPath);
@@ -904,6 +925,11 @@ public static class DictUtils
                     break;
 
                 case DictType.NonspecificKanjiYomichan:
+                    if (dict.Updating)
+                    {
+                        break;
+                    }
+
                     if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(YomichanKanjiDBManager.Version, dbPath))
                     {
                         DBUtils.DeleteDB(dbPath);
@@ -1155,6 +1181,11 @@ public static class DictUtils
                     break;
 
                 case DictType.PitchAccentYomichan:
+                    if (dict.Updating)
+                    {
+                        break;
+                    }
+
                     if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(YomichanPitchAccentDBManager.Version, dbPath))
                     {
                         DBUtils.DeleteDB(dbPath);
@@ -1301,11 +1332,10 @@ public static class DictUtils
                 }
             }
 
-            CheckDBUsageForDicts(Dicts.Values.ToArray());
+            Dict[] dictsSnapshot = Dicts.Values.ToArray();
+            CheckDBUsageForDicts(dictsSnapshot);
 
-            if (!UpdatingJmdict
-                && !UpdatingJmnedict
-                && !UpdatingKanjidic
+            if (dictsSnapshot.All(static d => !d.Updating)
                 && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed))
             {
                 Utils.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
@@ -1372,6 +1402,28 @@ public static class DictUtils
                              or DictType.PitchAccentYomichan)
                     {
                         SingleDictTypeDicts[dict.Type] = dict;
+                    }
+
+                    if (dict.Type is DictType.JMdict or DictType.Kanjidic or DictType.JMnedict)
+                    {
+                        dict.AutoUpdatable = true;
+                        if (dict.Type is DictType.JMdict)
+                        {
+                            dict.Url = s_jmdictUrl;
+                        }
+                        else if (dict.Type is DictType.Kanjidic)
+                        {
+                            dict.Url = s_kanjidicUrl;
+                        }
+                        else if (dict.Type is DictType.JMnedict)
+                        {
+                            dict.Url = s_jmnedictUrl;
+                        }
+                    }
+
+                    if (dict.Revision is null && YomichanDictTypes.Contains(dict.Type))
+                    {
+                        EpwingYomichanUtils.UpdateRevisionInfo(dict);
                     }
 
                     InitDictOptions(dict);
