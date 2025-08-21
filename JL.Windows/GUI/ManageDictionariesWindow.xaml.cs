@@ -184,7 +184,7 @@ internal sealed partial class ManageDictionariesWindow
                 BorderThickness = new Thickness(1),
                 Margin = new Thickness(0, 0, 5, 0),
                 Visibility = dict.AutoUpdatable ? Visibility.Visible : Visibility.Collapsed,
-                IsEnabled = dict.Ready && !dict.Updating,
+                IsEnabled = dict is { Ready: true, Updating: false },
                 Tag = dict
             };
             updateButton.Click += UpdateButton_Click;

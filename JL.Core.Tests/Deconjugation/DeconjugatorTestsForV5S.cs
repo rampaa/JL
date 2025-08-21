@@ -584,7 +584,6 @@ internal sealed class DeconjugatorTestsForV5S
     }
 
     [Test]
-    // TOOD
     public void Deconjugate_PlainPastTeiruAffirmative_V5S()
     {
         const string termToDeconjugate = "壊していた";

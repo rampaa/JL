@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using JL.Core.Utilities;
 
@@ -41,7 +42,7 @@ internal sealed partial class InfoDataGridWindow
         InfoDataGrid.ItemsSource = null;
     }
 
-    private void InfoDataGridSearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    private void InfoDataGridSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         InfoDataGrid.Items.Filter = InfoDataGridFilter;
     }

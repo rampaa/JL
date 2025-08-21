@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Freqs.Options;
+
 namespace JL.Core.Freqs;
 
 public sealed class Freq(FreqType type, string name, string path, bool active, int priority, int size, int maxValue, FreqOptions options, bool autoUpdatable = false, Uri? url = null, string? revision = null) : IEquatable<Freq>
@@ -24,7 +25,7 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
     public string? Revision { get; set; } = revision;
 
     [JsonIgnore] public bool Ready { get; set; } // = false;
-    [JsonIgnore] public bool Updating { get; set; } // = false;
+    [JsonIgnore] public bool Updating { get; internal set; } // = false;
 
 #pragma warning disable CA2227 // Collection properties should be read only
     [JsonIgnore] public IDictionary<string, IList<FrequencyRecord>> Contents { get; set; } = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;

@@ -74,10 +74,10 @@ public sealed class CoreConfigManager
             CaptureTextFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket));
             AutoReconnectToWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, AutoReconnectToWebSocket, nameof(AutoReconnectToWebSocket));
 
-            string? webSocketUriStrs = configs.GetValueOrDefault(nameof(WebSocketUris));
-            if (webSocketUriStrs is null)
+            string? webSocketUrisStr = configs.GetValueOrDefault(nameof(WebSocketUris));
+            if (webSocketUrisStr is null)
             {
-                ConfigDBManager.InsertSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(ws => ws.OriginalString)));
+                ConfigDBManager.InsertSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(static ws => ws.OriginalString)));
                 foreach (Uri webSocketUri in WebSocketUris)
                 {
                     WebSocketUtils.ConnectToWebSocket(webSocketUri);
@@ -85,7 +85,7 @@ public sealed class CoreConfigManager
             }
             else
             {
-                string[] uriStrs = webSocketUriStrs
+                string[] uriStrs = webSocketUrisStr
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
                     .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase)
                     .ReplaceLineEndings("\n")
@@ -121,7 +121,7 @@ public sealed class CoreConfigManager
                 }
                 else
                 {
-                    ConfigDBManager.UpdateSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(ws => ws.OriginalString)));
+                    ConfigDBManager.UpdateSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(static ws => ws.OriginalString)));
                 }
             }
         }

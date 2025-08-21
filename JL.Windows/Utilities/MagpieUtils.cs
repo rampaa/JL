@@ -13,8 +13,8 @@ internal static class MagpieUtils
     public static double DpiAwareMagpieWindowWidth { get; private set; }
     // public static nint SourceWindowHandle { get; set; }
     public static Rect SourceWindowRect { get; private set; }
-    public static double ScaleFactorX { get; private set; }
-    public static double ScaleFactorY { get; private set; }
+    private static double ScaleFactorX { get; set; }
+    private static double ScaleFactorY { get; set; }
 
     public static void RegisterToMagpieScalingChangedMessage(nint windowHandle)
     {
@@ -32,42 +32,42 @@ internal static class MagpieUtils
         WinApi.RemoveProp(windowHandle, "Magpie.ToolWindow");
     }
 
-    public static double GetMagpieWindowLeftEdgePositionFromMagpie(nint windowHandle)
+    private static double GetMagpieWindowLeftEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestLeft");
     }
 
-    public static double GetMagpieWindowRightEdgePositionFromMagpie(nint windowHandle)
+    private static double GetMagpieWindowRightEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestRight");
     }
 
-    public static double GetMagpieWindowTopEdgePositionFromMagpie(nint windowHandle)
+    private static double GetMagpieWindowTopEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestTop");
     }
 
-    public static double GetMagpieWindowBottomEdgePositionFromMagpie(nint windowHandle)
+    private static double GetMagpieWindowBottomEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.DestBottom");
     }
 
-    public static double GetSourceWindowLeftEdgePositionFromMagpie(nint windowHandle)
+    private static double GetSourceWindowLeftEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.SrcLeft");
     }
 
-    public static double GetSourceWindowTopEdgePositionFromMagpie(nint windowHandle)
+    private static double GetSourceWindowTopEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.SrcTop");
     }
 
-    public static double GetSourceWindowRightEdgePositionFromMagpie(nint windowHandle)
+    private static double GetSourceWindowRightEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.SrcRight");
     }
 
-    public static double GetSourceWindowBottomEdgePositionFromMagpie(nint windowHandle)
+    private static double GetSourceWindowBottomEdgePositionFromMagpie(nint windowHandle)
     {
         return WinApi.GetProp(windowHandle, "Magpie.SrcBottom");
     }

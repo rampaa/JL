@@ -23,7 +23,7 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
     public string? Revision { get; set; } = revision;
 
     [JsonIgnore] public bool Ready { get; set; } // = false;
-    [JsonIgnore] public bool Updating { get; set; } // = false;
+    [JsonIgnore] public bool Updating { get; internal set; } // = false;
 
 #pragma warning disable CA2227 // Collection properties should be read only
     [JsonIgnore] public IDictionary<string, IList<IDictRecord>> Contents { get; set; } = FrozenDictionary<string, IList<IDictRecord>>.Empty;

@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace JL.Core.Utilities;
 
-public class ArrayComparer<T> : IEqualityComparer<T[]?> where T : IEquatable<T>
+internal sealed class ArrayComparer<T> : IEqualityComparer<T[]?> where T : IEquatable<T>
 {
     public static readonly ArrayComparer<T> Instance = new();
 

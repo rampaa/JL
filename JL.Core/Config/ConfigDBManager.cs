@@ -111,7 +111,7 @@ public static class ConfigDBManager
         }
     }
 
-    public static bool NeedToMigrate(SqliteConnection connection)
+    private static bool NeedToMigrate(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA table_info(setting);";
@@ -120,7 +120,7 @@ public static class ConfigDBManager
         return reader.GetInt32(reader.GetOrdinal("pk")) is 2;
     }
 
-    public static void Migrate(SqliteConnection connection)
+    private static void Migrate(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =

@@ -2166,7 +2166,7 @@ internal sealed partial class MainWindow
         }
     }
 
-    public void MoveWindowToScreen()
+    private void MoveWindowToScreen()
     {
         Point mousePosition = WinApi.GetMousePosition();
         int x = double.ConvertToIntegerNative<int>(mousePosition.X);

@@ -181,7 +181,7 @@ internal sealed partial class ManageFrequenciesWindow
                 BorderThickness = new Thickness(1),
                 Margin = new Thickness(0, 0, 5, 0),
                 Visibility = freq.AutoUpdatable ? Visibility.Visible : Visibility.Collapsed,
-                IsEnabled = freq.Ready && !freq.Updating,
+                IsEnabled = freq is { Ready: true, Updating: false },
                 Tag = freq
             };
             updateButton.Click += UpdateButton_Click;

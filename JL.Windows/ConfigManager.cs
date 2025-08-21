@@ -908,7 +908,7 @@ internal sealed class ConfigManager
         preferenceWindow.MpvNamedPipePathTextBox.Text = coreConfigManager.MpvNamedPipePath;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = coreConfigManager.AnkiConnectUri.OriginalString;
-        preferenceWindow.WebSocketUrisTextBox.Text = string.Join('\n', coreConfigManager.WebSocketUris.Select(ws => ws.OriginalString));
+        preferenceWindow.WebSocketUrisTextBox.Text = string.Join('\n', coreConfigManager.WebSocketUris.Select(static ws => ws.OriginalString));
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
         preferenceWindow.NotifyWhenMiningSucceedsCheckBox.IsChecked = coreConfigManager.NotifyWhenMiningSucceeds;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;

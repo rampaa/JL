@@ -306,7 +306,7 @@ internal static class WindowsUtils
             {
                 UseShellExecute = true
             })
-            : Process.Start(new ProcessStartInfo()
+            : Process.Start(new ProcessStartInfo
             {
                 FileName = configManager.BrowserPath,
                 Arguments = urlToBeSearched,
@@ -343,7 +343,7 @@ internal static class WindowsUtils
             }
 
             await Application.Current.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
-            using Process? process = Process.Start(new ProcessStartInfo()
+            using Process? process = Process.Start(new ProcessStartInfo
             {
                 WorkingDirectory = Utils.ApplicationPath,
                 FileName = "update-helper.cmd",
