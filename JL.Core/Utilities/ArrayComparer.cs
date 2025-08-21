@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace JL.Core.Utilities;
 
 internal sealed class ArrayComparer<T> : IEqualityComparer<T[]?> where T : IEquatable<T>
@@ -15,7 +13,7 @@ internal sealed class ArrayComparer<T> : IEqualityComparer<T[]?> where T : IEqua
         return x.AsReadOnlySpan().SequenceEqual(y);
     }
 
-    public int GetHashCode([DisallowNull] T[]? obj)
+    public int GetHashCode(T[] obj)
     {
         HashCode hash = new();
         foreach (T element in obj)
