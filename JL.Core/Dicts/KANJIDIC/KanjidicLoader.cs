@@ -46,7 +46,7 @@ internal static class KanjidicLoader
                 Uri? uri = dict.Url;
                 Debug.Assert(uri is not null);
 
-                bool downloaded = await DictUpdater.DownloadBuiltInDict(fullPath,
+                bool downloaded = await ResourceUpdater.DownloadBuiltInDict(fullPath,
                     uri,
                     nameof(DictType.Kanjidic), false, false).ConfigureAwait(false);
 

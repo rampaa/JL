@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.Json;
 using System.Timers;
 using JL.Core.Config;
-using JL.Core.Dicts;
 using JL.Core.Utilities;
 using Timer = System.Timers.Timer;
 
@@ -129,7 +128,8 @@ public static class NetworkUtils
     // ReSharper disable once AsyncVoidMethod
     private static async void CheckForUpdates(object? sender, ElapsedEventArgs e)
     {
-        await DictUpdater.AutoUpdateDicts().ConfigureAwait(false);
+        await ResourceUpdater.AutoUpdateDicts().ConfigureAwait(false);
+        await ResourceUpdater.AutoUpdateFreqDicts().ConfigureAwait(false);
 
         if (CoreConfigManager.Instance.CheckForJLUpdatesOnStartUp)
         {

@@ -12,7 +12,7 @@ internal sealed partial class FreqOptionsControl
         InitializeComponent();
     }
 
-    public FreqOptions GetFreqOptions(FreqType type)
+    public FreqOptions GetFreqOptions(FreqType type, bool autoUpdatable)
     {
         UseDBOption useDBOption;
         if (UseDBOption.ValidFreqTypes.Contains(type))
@@ -36,50 +36,51 @@ internal sealed partial class FreqOptionsControl
             higherValueMeansHigherFrequencyOption = new HigherValueMeansHigherFrequencyOption(false);
         }
 
-        FreqOptions options = new(useDBOption, higherValueMeansHigherFrequencyOption);
+        AutoUpdateAfterNDaysOption? autoUpdateAfterNDaysOption = null;
+        if (autoUpdatable && AutoUpdateAfterNDaysOption.ValidFreqTypes.Contains(type))
+        {
+            autoUpdateAfterNDaysOption = new AutoUpdateAfterNDaysOption(double.ConvertToIntegerNative<int>(AutoUpdateAfterNDaysNumericUpDown.Value));
+        }
+
+        FreqOptions options = new(useDBOption, higherValueMeansHigherFrequencyOption, autoUpdateAfterNDaysOption);
 
         return options;
     }
 
-    public void GenerateFreqOptionsElements(FreqType freqType)
+    public void GenerateFreqOptionsElements(FreqType freqType, FreqOptions? freqOptions)
     {
         bool showFreqOptions = false;
         if (UseDBOption.ValidFreqTypes.Contains(freqType))
         {
-            UseDBCheckBox.IsChecked = true;
+            UseDBCheckBox.IsChecked = freqOptions?.UseDB.Value ?? true;
             UseDBCheckBox.Visibility = Visibility.Visible;
             showFreqOptions = true;
+        }
+        else
+        {
+            UseDBCheckBox.Visibility = Visibility.Collapsed;
         }
 
         if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freqType))
         {
-            HigherValueMeansHigherFrequencyCheckBox.IsChecked = false;
+            HigherValueMeansHigherFrequencyCheckBox.IsChecked = freqOptions?.HigherValueMeansHigherFrequency.Value ?? false;
             HigherValueMeansHigherFrequencyCheckBox.Visibility = Visibility.Visible;
             showFreqOptions = true;
         }
-
-        if (showFreqOptions)
+        else
         {
-            OptionsTextBlock.Visibility = Visibility.Visible;
-            OptionsStackPanel.Visibility = Visibility.Visible;
-        }
-    }
-
-    public void GenerateFreqOptionsElements(Freq freq)
-    {
-        bool showFreqOptions = false;
-        if (UseDBOption.ValidFreqTypes.Contains(freq.Type))
-        {
-            UseDBCheckBox.IsChecked = freq.Options.UseDB.Value;
-            UseDBCheckBox.Visibility = Visibility.Visible;
-            showFreqOptions = true;
+            HigherValueMeansHigherFrequencyCheckBox.Visibility = Visibility.Collapsed;
         }
 
-        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freq.Type))
+        if (AutoUpdateAfterNDaysOption.ValidFreqTypes.Contains(freqType))
         {
-            HigherValueMeansHigherFrequencyCheckBox.IsChecked = freq.Options.HigherValueMeansHigherFrequency.Value;
-            HigherValueMeansHigherFrequencyCheckBox.Visibility = Visibility.Visible;
+            AutoUpdateAfterNDaysNumericUpDown.Value = freqOptions?.AutoUpdateAfterNDays?.Value ?? 0;
+            AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
             showFreqOptions = true;
+        }
+        else
+        {
+            AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
         }
 
         if (showFreqOptions)

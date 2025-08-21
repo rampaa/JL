@@ -108,9 +108,10 @@ internal sealed partial class AddDictionaryWindow
 
         bool autoUpdatable = _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
         Uri? indexUrl = (Uri?)_dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag;
+        string? revision = (string?)NameTextBox.Tag;
 
         DictOptions options = _dictOptionsControl.GetDictOptions(type, autoUpdatable);
-        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options, autoUpdatable: autoUpdatable, url: indexUrl, revision: (string?)NameTextBox.Tag);
+        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options, autoUpdatable: autoUpdatable, indexUrl, revision);
         DictUtils.Dicts.Add(name, dict);
 
         if (dict.Type is DictType.PitchAccentYomichan)

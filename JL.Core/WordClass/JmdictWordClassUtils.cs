@@ -192,7 +192,7 @@ internal static class JmdictWordClassUtils
                     Uri? uri = jmdictDict.Url;
                     Debug.Assert(uri is not null);
 
-                    bool downloaded = await DictUpdater.DownloadBuiltInDict(jmdictPath,
+                    bool downloaded = await ResourceUpdater.DownloadBuiltInDict(jmdictPath,
                         uri,
                         jmdictDict.Type.ToString(), false, true).ConfigureAwait(false);
 

@@ -378,19 +378,19 @@ internal sealed partial class ManageDictionariesWindow
         Dict dict = (Dict)updateButton.Tag;
         if (dict.Type is DictType.JMdict)
         {
-            await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
+            await ResourceUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
         }
         else if (dict.Type is DictType.JMnedict)
         {
-            await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
+            await ResourceUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
         }
         else if (dict.Type is DictType.Kanjidic)
         {
-            await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
+            await ResourceUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
         }
         else if (DictUtils.YomichanDictTypes.Contains(dict.Type))
         {
-            await DictUpdater.UpdateYomichanDict(dict, true, false).ConfigureAwait(true);
+            await ResourceUpdater.UpdateYomichanDict(dict, true, false).ConfigureAwait(true);
         }
 
         UpdateDictionariesDisplay();

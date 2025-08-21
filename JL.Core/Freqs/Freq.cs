@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using JL.Core.Freqs.Options;
 namespace JL.Core.Freqs;
 
-public sealed class Freq(FreqType type, string name, string path, bool active, int priority, int size, int maxValue, FreqOptions options) : IEquatable<Freq>
+public sealed class Freq(FreqType type, string name, string path, bool active, int priority, int size, int maxValue, FreqOptions options, bool autoUpdatable = false, Uri? url = null, string? revision = null) : IEquatable<Freq>
 {
     public FreqType Type { get; } = type;
     public string Name { get; } = name;
@@ -17,8 +17,14 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
 
     // ReSharper disable once MemberCanBeInternal
     public int MaxValue { get; internal set; } = maxValue;
-    [JsonIgnore] public bool Ready { get; set; } // = false;
+
     public FreqOptions Options { get; set; } = options;
+    public bool AutoUpdatable { get; set; } = autoUpdatable;
+    public Uri? Url { get; set; } = url;
+    public string? Revision { get; set; } = revision;
+
+    [JsonIgnore] public bool Ready { get; set; } // = false;
+    [JsonIgnore] public bool Updating { get; set; } // = false;
 
 #pragma warning disable CA2227 // Collection properties should be read only
     [JsonIgnore] public IDictionary<string, IList<FrequencyRecord>> Contents { get; set; } = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;

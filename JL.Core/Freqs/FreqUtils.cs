@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Freqs.FrequencyNazeka;
@@ -25,19 +26,19 @@ public static class FreqUtils
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
-                true, 1, 57273, 35893, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                true, 1, 57273, 35893, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)), false, null, null)
         },
         {
             "Narou (Nazeka)",
             new Freq(FreqType.Nazeka, "Narou (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_narou.json"),
-                false, 2, 75588, 48528, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 2, 75588, 48528, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)), false, null, null)
         },
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_novels.json"),
-                false, 3, 114348, 74633, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 3, 114348, 74633, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)), false, null, null)
         }
     };
 
@@ -72,20 +73,23 @@ public static class FreqUtils
             bool dbExisted = dbExists;
             bool dbJournalExists = File.Exists(dbJournalPath);
 
-            if (dbJournalExists)
+            if (!freq.Updating)
             {
-                if (dbExists)
+                if (dbJournalExists)
+                {
+                    if (dbExists)
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                    }
+
+                    File.Delete(dbJournalPath);
+                }
+                else if (dbExists && !DBUtils.RecordExists(dbPath))
                 {
                     DBUtils.DeleteDB(dbPath);
                     dbExists = false;
                 }
-
-                File.Delete(dbJournalPath);
-            }
-            else if (dbExists && !DBUtils.RecordExists(dbPath))
-            {
-                DBUtils.DeleteDB(dbPath);
-                dbExists = false;
             }
 
             bool loadFromDB;
@@ -186,6 +190,11 @@ public static class FreqUtils
 
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
+                    if (freq.Updating)
+                    {
+                        break;
+                    }
+
                     if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(FreqDBManager.Version, dbPath))
                     {
                         DBUtils.DeleteDB(dbPath);
@@ -339,8 +348,13 @@ public static class FreqUtils
                 }
             }
 
-            CheckFreqDicts(FreqDicts.Values.ToArray());
-            Utils.Frontend.Alert(AlertLevel.Success, "Finished loading frequency dictionaries");
+            Freq[] freqSnapshot = FreqDicts.Values.ToArray();
+            CheckFreqDicts(freqSnapshot);
+
+            if (freqSnapshot.All(static f => !f.Updating))
+            {
+                Utils.Frontend.Alert(AlertLevel.Success, "Finished loading frequency dictionaries");
+            }
         }
 
         FreqsReady = true;
@@ -378,6 +392,12 @@ public static class FreqUtils
                     ++priority;
 
                     freq.Path = Utils.GetPath(freq.Path);
+                    if (freq.Type is FreqType.Yomichan or FreqType.YomichanKanji && freq.Revision is null)
+                    {
+                        UpdateRevisionInfo(freq);
+                    }
+
+                    InitFreqOptions(freq);
 
                     FreqDicts.Add(freq.Name, freq);
                 }
@@ -387,6 +407,19 @@ public static class FreqUtils
                 Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
                 throw new SerializationException("Couldn't load Config/freqs.json");
             }
+        }
+    }
+
+    private static void InitFreqOptions(Freq freq)
+    {
+        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.HigherValueMeansHigherFrequency ??= new HigherValueMeansHigherFrequencyOption(false);
+        }
+
+        if (AutoUpdateAfterNDaysOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.AutoUpdateAfterNDays ??= new AutoUpdateAfterNDaysOption(0);
         }
     }
 
@@ -431,6 +464,24 @@ public static class FreqUtils
         else
         {
             contents[key] = [record];
+        }
+    }
+
+    private static void UpdateRevisionInfo(Freq freq)
+    {
+        string indexJsonPath = Path.Join(freq.Path, "index.json");
+        if (File.Exists(indexJsonPath))
+        {
+            JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+
+            freq.Revision = jsonElement.GetProperty("revision").GetString();
+            freq.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+            if (freq.AutoUpdatable)
+            {
+                string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                Debug.Assert(indexUrl is not null);
+                freq.Url = new Uri(indexUrl);
+            }
         }
     }
 }

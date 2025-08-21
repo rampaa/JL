@@ -172,13 +172,14 @@ public static class Utils
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
                 await DictUtils.SerializeDicts().ConfigureAwait(false);
                 await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
-                await DictUpdater.AutoUpdateDicts().ConfigureAwait(false);
+                await ResourceUpdater.AutoUpdateDicts().ConfigureAwait(false);
             }),
             Task.Run(static async () =>
             {
                 await FreqUtils.DeserializeFreqs().ConfigureAwait(false);
                 await FreqUtils.LoadFrequencies().ConfigureAwait(false);
                 await FreqUtils.SerializeFreqs().ConfigureAwait(false);
+                await ResourceUpdater.AutoUpdateFreqDicts().ConfigureAwait(false);
             }),
             Task.Run(static async () =>
             {
@@ -195,7 +196,8 @@ public static class Utils
     {
         if (DictUtils.DictsReady
             && FreqUtils.FreqsReady
-            && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating))
+            && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating)
+            && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating))
         {
             StringPoolInstance.Reset();
         }

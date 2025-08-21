@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -96,10 +97,14 @@ internal sealed partial class AddFrequencyWindow
             }
         }
 
-        FreqOptions options = _freqOptionsControl.GetFreqOptions(type);
+        bool autoUpdatable = _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
+        Uri? indexUrl = (Uri?)_freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag;
+        string? revision = (string?)NameTextBox.Tag;
+
+        FreqOptions options = _freqOptionsControl.GetFreqOptions(type, autoUpdatable);
 
         FreqUtils.FreqDicts.Add(name,
-            new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0, 0, options));
+            new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0, 0, options, autoUpdatable, indexUrl, revision));
 
         Close();
     }
@@ -128,6 +133,46 @@ internal sealed partial class AddFrequencyWindow
         if (openFolderDialog.ShowDialog() is true)
         {
             PathTextBlock.Text = Utils.GetPath(openFolderDialog.FolderName);
+
+            string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
+            if (File.Exists(indexJsonPath))
+            {
+                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+
+                string? dictionaryTitle = jsonElement.GetProperty("title").GetString();
+                Debug.Assert(dictionaryTitle is not null);
+                NameTextBox.Text = dictionaryTitle;
+
+                NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
+
+                if (jsonElement.TryGetProperty("frequencyMode", out JsonElement frequencyModeJsonElement))
+                {
+                    _freqOptionsControl.HigherValueMeansHigherFrequencyCheckBox.IsChecked = frequencyModeJsonElement.GetString() is "occurrence-based";
+                }
+                else
+                {
+                    _freqOptionsControl.HigherValueMeansHigherFrequencyCheckBox.IsChecked = false;
+                }
+
+                bool isUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+                if (isUpdatable)
+                {
+                    _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
+
+                    string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                    Debug.Assert(indexUrl is not null);
+                    _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag = new Uri(indexUrl);
+                }
+                else
+                {
+                    _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
+                _freqOptionsControl.HigherValueMeansHigherFrequencyCheckBox.IsChecked = false;
+            }
         }
     }
 
@@ -168,7 +213,7 @@ internal sealed partial class AddFrequencyWindow
         if (!string.IsNullOrEmpty(typeString))
         {
             FreqType type = typeString.GetEnum<FreqType>();
-            _freqOptionsControl.GenerateFreqOptionsElements(type);
+            _freqOptionsControl.GenerateFreqOptionsElements(type, null);
         }
 
         else

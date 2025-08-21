@@ -631,7 +631,7 @@ public static class DictUtils
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 File.Delete(fullDictPath);
-                                await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(false);
+                                await ResourceUpdater.UpdateJmdict(true, false).ConfigureAwait(false);
                             }
                         }));
                     }
@@ -713,7 +713,7 @@ public static class DictUtils
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 File.Delete(fullDictPath);
-                                await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(false);
+                                await ResourceUpdater.UpdateJmnedict(true, false).ConfigureAwait(false);
                             }
                         }));
                     }
@@ -802,7 +802,7 @@ public static class DictUtils
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 File.Delete(fullDictPath);
-                                await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(false);
+                                await ResourceUpdater.UpdateKanjidic(true, false).ConfigureAwait(false);
                             }
                         }));
                     }

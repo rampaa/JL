@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using JL.Core.Dicts;
 using JL.Core.Dicts.EPWING.Yomichan;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
@@ -11,13 +12,14 @@ using JL.Core.Dicts.JMnedict;
 using JL.Core.Dicts.KANJIDIC;
 using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.PitchAccent;
+using JL.Core.Freqs;
+using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.Network;
-using JL.Core.Utilities;
 using JL.Core.WordClass;
 
-namespace JL.Core.Dicts;
+namespace JL.Core.Utilities;
 
-public static class DictUpdater
+public static class ResourceUpdater
 {
     internal static async Task<bool> DownloadBuiltInDict(string dictPath, Uri dictDownloadUri, string dictName,
         bool isUpdate, bool noPrompt)
@@ -106,16 +108,16 @@ public static class DictUpdater
         }
     }
 
-    internal static async Task<bool> DownloadYomichanDict(Dict dict, bool isUpdate, bool noPrompt)
+    internal static async Task<bool> DownloadYomichanDict(Uri url, string revision, string name, string path, bool isUpdate, bool noPrompt)
     {
         try
         {
-            if (!isUpdate || noPrompt || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dict.Name}?",
+            if (!isUpdate || noPrompt || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {name}?",
                 isUpdate ? "Update dictionary?" : "Download dictionary?"))
             {
-                using HttpRequestMessage indexRequest = new(HttpMethod.Get, dict.Url);
+                using HttpRequestMessage indexRequest = new(HttpMethod.Get, url);
 
-                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                string fullDictPath = Path.GetFullPath(path, Utils.ApplicationPath);
                 if (Directory.Exists(fullDictPath))
                 {
                     indexRequest.Headers.IfModifiedSince = File.GetLastWriteTime(Path.Join(fullDictPath, "index.json"));
@@ -124,18 +126,18 @@ public static class DictUpdater
                 using HttpResponseMessage indexResponse = await NetworkUtils.Client.SendAsync(indexRequest, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 if (indexResponse.StatusCode is HttpStatusCode.NotModified && !noPrompt)
                 {
-                    Utils.Frontend.ShowOkDialog($"{dict.Name} is up to date.", "Info");
+                    Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
                     return false;
                 }
 
                 if (!indexResponse.IsSuccessStatusCode)
                 {
                     Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}",
-                        dict.Name, indexResponse.StatusCode);
+                        name, indexResponse.StatusCode);
 
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dict.Name}.", "Info");
+                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
                     }
 
                     return false;
@@ -143,15 +145,15 @@ public static class DictUpdater
 
                 if (!noPrompt)
                 {
-                    Utils.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {dict.Name} is downloaded.", "Info");
+                    Utils.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {name} is downloaded.", "Info");
                 }
 
                 JsonElement indexJsonElement = await indexResponse.Content.ReadFromJsonAsync<JsonElement>().ConfigureAwait(false);
                 string? newRevision = indexJsonElement.GetProperty("revision").GetString();
                 Debug.Assert(newRevision is not null);
-                if (dict.Revision == newRevision)
+                if (revision == newRevision)
                 {
-                    Utils.Frontend.ShowOkDialog($"{dict.Name} is up to date.", "Info");
+                    Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
                     return false;
                 }
 
@@ -163,17 +165,17 @@ public static class DictUpdater
                 using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
                 {
-                    Utils.Frontend.ShowOkDialog($"{dict.Name} is up to date.", "Info");
+                    Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
                     return false;
                 }
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", dict.Name, response.StatusCode);
+                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, response.StatusCode);
 
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dict.Name}.", "Info");
+                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
                     }
 
                     return false;
@@ -195,7 +197,7 @@ public static class DictUpdater
 
                 if (!noPrompt)
                 {
-                    Utils.Frontend.ShowOkDialog($"{dict.Name} has been downloaded successfully.", "Info");
+                    Utils.Frontend.ShowOkDialog($"{name} has been downloaded successfully.", "Info");
                 }
 
                 return true;
@@ -204,10 +206,10 @@ public static class DictUpdater
 
         catch (Exception ex)
         {
-            Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dict.Name}.", "Info");
-            Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dict.Name);
+            Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+            Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", name);
 
-            string tempDictPath = GetTempPath(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+            string tempDictPath = GetTempPath(Path.GetFullPath(path, Utils.ApplicationPath));
             if (Directory.Exists(tempDictPath))
             {
                 Directory.Delete(tempDictPath, true);
@@ -431,8 +433,9 @@ public static class DictUpdater
 
         Uri? uri = dict.Url;
         Debug.Assert(uri is not null);
+        Debug.Assert(dict.Revision is not null);
 
-        bool downloaded = await DownloadYomichanDict(dict, isUpdate, noPrompt).ConfigureAwait(false);
+        bool downloaded = await DownloadYomichanDict(uri, dict.Revision, dict.Name, dict.Path, isUpdate, noPrompt).ConfigureAwait(false);
 
         if (downloaded)
         {
@@ -499,6 +502,59 @@ public static class DictUpdater
         Utils.ClearStringPoolIfDictsAreReady();
     }
 
+    public static async Task UpdateYomichanFreqDict(Freq freq, bool isUpdate, bool noPrompt)
+    {
+        if (freq.Updating)
+        {
+            return;
+        }
+
+        freq.Updating = true;
+
+        Uri? uri = freq.Url;
+        Debug.Assert(uri is not null);
+        Debug.Assert(freq.Revision is not null);
+
+        bool downloaded = await DownloadYomichanDict(uri, freq.Revision, freq.Name, freq.Path, isUpdate, noPrompt).ConfigureAwait(false);
+
+        if (downloaded)
+        {
+            freq.Ready = false;
+            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(13108, StringComparer.Ordinal);
+
+            await Task.Run(() => FrequencyYomichanLoader.Load(freq)).ConfigureAwait(false);
+
+            string dbPath = DBUtils.GetFreqDBPath(freq.Name);
+            bool useDB = freq.Options.UseDB.Value;
+            bool dbExists = File.Exists(dbPath);
+
+            if (dbExists)
+            {
+                DBUtils.DeleteDB(dbPath);
+            }
+
+            if (useDB || dbExists)
+            {
+                await Task.Run(() =>
+                {
+                    FreqDBManager.CreateDB(freq.Name);
+                    FreqDBManager.InsertRecordsToDB(freq);
+                }).ConfigureAwait(false);
+            }
+
+            if (!freq.Active || useDB)
+            {
+                freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+            }
+
+            freq.Ready = true;
+            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {freq.Name}");
+        }
+
+        freq.Updating = false;
+        Utils.ClearStringPoolIfDictsAreReady();
+    }
+
     internal static Task AutoUpdateDicts()
     {
         List<Task> tasks = [];
@@ -541,9 +597,41 @@ public static class DictUpdater
         return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
     }
 
+    internal static Task AutoUpdateFreqDicts()
+    {
+        List<Task> tasks = [];
+        foreach (Freq freq in FreqUtils.FreqDicts.Values.ToArray())
+        {
+            if (!freq.Active || !freq.AutoUpdatable)
+            {
+                continue;
+            }
+
+            Debug.Assert(freq.Options.AutoUpdateAfterNDays is not null);
+            int dueDate = freq.Options.AutoUpdateAfterNDays.Value;
+            if (dueDate is 0)
+            {
+                continue;
+            }
+
+            string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
+            fullPath = Path.Join(fullPath, "index.json");
+
+            bool pathExists = File.Exists(fullPath);
+            if (pathExists && (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
+            {
+                continue;
+            }
+
+            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {freq.Type}...");
+            tasks.Add(UpdateYomichanFreqDict(freq, pathExists, true));
+        }
+
+        return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
+    }
+
     private static string GetTempPath(string path)
     {
         return $"{path}.tmp";
     }
-
 }

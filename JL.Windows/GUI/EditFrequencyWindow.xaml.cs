@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -82,9 +83,11 @@ internal sealed partial class EditFrequencyWindow
         string dbPath = DBUtils.GetFreqDBPath(_freq.Name);
         bool dbExists = File.Exists(dbPath);
 
-        if (_freq.Path != path)
+        string? revision = (string?)NameTextBox.Tag;
+        bool pathChanged = _freq.Path != path;
+        if (pathChanged || _freq.Revision == revision)
         {
-            if (_freq.Type is FreqType.Yomichan or FreqType.YomichanKanji)
+            if (pathChanged && _freq.Type is FreqType.Yomichan or FreqType.YomichanKanji)
             {
                 bool hasValidFiles = Directory.EnumerateFiles(fullPath, "*_meta_bank_*.json", SearchOption.TopDirectoryOnly).Any();
                 if (!hasValidFiles)
@@ -97,6 +100,7 @@ internal sealed partial class EditFrequencyWindow
             }
 
             _freq.Path = path;
+            _freq.Revision = revision;
             _freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
             _freq.Ready = false;
 
@@ -107,7 +111,7 @@ internal sealed partial class EditFrequencyWindow
             }
         }
 
-        FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
+        FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type, _freq.AutoUpdatable);
 
         if (_freq.Options.UseDB.Value != options.UseDB.Value)
         {
@@ -117,6 +121,20 @@ internal sealed partial class EditFrequencyWindow
             //    DBUtils.DeleteDB(dbPath);
             //    dbExists = false;
             //}
+        }
+
+        _freq.AutoUpdatable = _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
+        if (!_freq.AutoUpdatable)
+        {
+            _freq.Url = null;
+        }
+        else
+        {
+            string? url = (string?)_freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag;
+            if (url is not null)
+            {
+                _freq.Url = new Uri(url);
+            }
         }
 
         _freq.Options = options;
@@ -130,7 +148,7 @@ internal sealed partial class EditFrequencyWindow
             }
 
             _ = FreqUtils.FreqDicts.Remove(_freq.Name);
-            FreqUtils.FreqDicts.Add(name, new Freq(_freq.Type, name, _freq.Path, _freq.Active, _freq.Priority, _freq.Size, _freq.MaxValue, _freq.Options));
+            FreqUtils.FreqDicts.Add(name, new Freq(_freq.Type, name, _freq.Path, _freq.Active, _freq.Priority, _freq.Size, _freq.MaxValue, _freq.Options, _freq.AutoUpdatable, _freq.Url, _freq.Revision));
         }
 
         Close();
@@ -172,6 +190,35 @@ internal sealed partial class EditFrequencyWindow
         if (openFolderDialog.ShowDialog() is true)
         {
             PathTextBlock.Text = Utils.GetPath(openFolderDialog.FolderName);
+            string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
+            if (File.Exists(indexJsonPath))
+            {
+                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+                NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
+
+                if (jsonElement.TryGetProperty("frequencyMode", out JsonElement frequencyModeJsonElement))
+                {
+                    _freqOptionsControl.HigherValueMeansHigherFrequencyCheckBox.IsChecked = frequencyModeJsonElement.GetString() is "occurrence-based";
+                }
+
+                bool isUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+                if (isUpdatable)
+                {
+                    _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
+
+                    string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                    Debug.Assert(indexUrl is not null);
+                    _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag = new Uri(indexUrl);
+                }
+                else
+                {
+                    _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
+            }
         }
     }
 
@@ -183,7 +230,10 @@ internal sealed partial class EditFrequencyWindow
         PathTextBlock.Text = _freq.Path;
         NameTextBox.Text = _freq.Name;
 
-        _freqOptionsControl.GenerateFreqOptionsElements(_freq);
+        _freqOptionsControl.GenerateFreqOptionsElements(_freq.Type, _freq.Options);
+        _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = _freq.AutoUpdatable
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)

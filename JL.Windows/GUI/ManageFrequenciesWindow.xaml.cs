@@ -154,9 +154,11 @@ internal sealed partial class ManageFrequenciesWindow
 
             Button editButton = new()
             {
+                Name = nameof(editButton),
                 Width = 45,
                 Height = 30,
                 Content = "Edit",
+                IsEnabled = !freq.Updating,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Foreground = Brushes.White,
@@ -166,6 +168,23 @@ internal sealed partial class ManageFrequenciesWindow
                 Tag = freq
             };
             editButton.Click += EditButton_Click;
+
+            Button updateButton = new()
+            {
+                Width = 75,
+                Height = 30,
+                Content = invalidPath ? "Download" : "Update",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = Brushes.White,
+                Background = Brushes.DarkGreen,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(0, 0, 5, 0),
+                Visibility = freq.AutoUpdatable ? Visibility.Visible : Visibility.Collapsed,
+                IsEnabled = freq.Ready && !freq.Updating,
+                Tag = freq
+            };
+            updateButton.Click += UpdateButton_Click;
 
             Button removeButton = new()
             {
@@ -188,6 +207,7 @@ internal sealed partial class ManageFrequenciesWindow
             _ = dockPanel.Children.Add(freqPathValidityTextBlock);
             _ = dockPanel.Children.Add(freqPathTextBlock);
             _ = dockPanel.Children.Add(editButton);
+            _ = dockPanel.Children.Add(updateButton);
             _ = dockPanel.Children.Add(removeButton);
 
             resultDockPanels[i] = dockPanel;
@@ -372,6 +392,23 @@ internal sealed partial class ManageFrequenciesWindow
             Owner = this,
             WindowStartupLocation = WindowStartupLocation.CenterOwner
         }.ShowDialog();
+
+        UpdateFreqsDisplay();
+    }
+
+    // ReSharper disable once AsyncVoidMethod
+    private async void UpdateButton_Click(object sender, RoutedEventArgs e)
+    {
+        Button updateButton = (Button)sender;
+        updateButton.IsEnabled = false;
+
+        Button? editButton = ((DockPanel)updateButton.Parent).GetChildByName<Button>("editButton");
+        Debug.Assert(editButton is not null);
+
+        editButton.IsEnabled = false;
+
+        Freq freq = (Freq)updateButton.Tag;
+        await ResourceUpdater.UpdateYomichanFreqDict(freq, true, false).ConfigureAwait(true);
 
         UpdateFreqsDisplay();
     }
