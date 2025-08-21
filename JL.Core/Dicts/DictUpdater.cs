@@ -106,11 +106,12 @@ public static class DictUpdater
         }
     }
 
-    internal static async Task<bool> DownloadYomichanDict(Dict dict, bool noPrompt)
+    internal static async Task<bool> DownloadYomichanDict(Dict dict, bool isUpdate, bool noPrompt)
     {
         try
         {
-            if (noPrompt || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dict.Name}?", "Update dictionary?"))
+            if (!isUpdate || noPrompt || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dict.Name}?",
+                isUpdate ? "Update dictionary?" : "Download dictionary?"))
             {
                 using HttpRequestMessage indexRequest = new(HttpMethod.Get, dict.Url);
 
@@ -185,7 +186,11 @@ public static class DictUpdater
                     await DecompressZipStream(responseStream, tempDictPath).ConfigureAwait(false);
                 }
 
-                Directory.Delete(fullDictPath, true);
+                if (Directory.Exists(fullDictPath))
+                {
+                    Directory.Delete(fullDictPath, true);
+                }
+
                 Directory.Move(tempDictPath, fullDictPath);
 
                 if (!noPrompt)
@@ -294,7 +299,7 @@ public static class DictUpdater
             }
 
             dict.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMdict");
+            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
         }
 
         dict.Updating = false;
@@ -351,7 +356,7 @@ public static class DictUpdater
             }
 
             dict.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMnedict");
+            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
         }
 
         dict.Updating = false;
@@ -408,14 +413,14 @@ public static class DictUpdater
             }
 
             dict.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
+            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
         }
 
         dict.Updating = false;
         Utils.ClearStringPoolIfDictsAreReady();
     }
 
-    public static async Task UpdateYomichanDict(Dict dict, bool noPrompt)
+    public static async Task UpdateYomichanDict(Dict dict, bool isUpdate, bool noPrompt)
     {
         if (dict.Updating)
         {
@@ -427,7 +432,7 @@ public static class DictUpdater
         Uri? uri = dict.Url;
         Debug.Assert(uri is not null);
 
-        bool downloaded = await DownloadYomichanDict(dict, noPrompt).ConfigureAwait(false);
+        bool downloaded = await DownloadYomichanDict(dict, isUpdate, noPrompt).ConfigureAwait(false);
 
         if (downloaded)
         {
@@ -487,7 +492,7 @@ public static class DictUpdater
             }
 
             dict.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
+            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
         }
 
         dict.Updating = false;
@@ -530,7 +535,7 @@ public static class DictUpdater
                     ? UpdateJmnedict(pathExists, true)
                     : dict.Type is DictType.Kanjidic
                         ? UpdateKanjidic(pathExists, true)
-                        : UpdateYomichanDict(dict, true));
+                        : UpdateYomichanDict(dict, pathExists, true));
         }
 
         return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;

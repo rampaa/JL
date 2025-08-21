@@ -86,9 +86,11 @@ internal sealed partial class EditDictionaryWindow
         string dbPath = DBUtils.GetDictDBPath(_dict.Name);
         bool dbExists = File.Exists(dbPath);
 
-        if (_dict.Path != path)
+        string? revision = (string?)NameTextBox.Tag;
+        bool pathChanged = _dict.Path != path;
+        if (pathChanged || _dict.Revision == revision)
         {
-            if (DictUtils.YomichanDictTypes.Contains(_dict.Type))
+            if (pathChanged && DictUtils.YomichanDictTypes.Contains(_dict.Type))
             {
                 bool validPath = Directory.EnumerateFiles(fullPath,
                     _dict.Type is DictType.NonspecificKanjiYomichan
@@ -108,6 +110,7 @@ internal sealed partial class EditDictionaryWindow
             }
 
             _dict.Path = path;
+            _dict.Revision = revision;
             _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             _dict.Ready = false;
 
@@ -115,6 +118,20 @@ internal sealed partial class EditDictionaryWindow
             {
                 DBUtils.DeleteDB(dbPath);
                 dbExists = false;
+            }
+        }
+
+        _dict.AutoUpdatable = _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
+        if (!_dict.AutoUpdatable)
+        {
+            _dict.Url = null;
+        }
+        else
+        {
+            string? url = (string?)_dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag;
+            if (url is not null)
+            {
+                _dict.Url = new Uri(url);
             }
         }
 
@@ -205,11 +222,6 @@ internal sealed partial class EditDictionaryWindow
             if (File.Exists(indexJsonPath))
             {
                 JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
-
-                string? dictionaryTitle = jsonElement.GetProperty("title").GetString();
-                Debug.Assert(dictionaryTitle is not null);
-                NameTextBox.Text = dictionaryTitle;
-
                 NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
 
                 bool isUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();

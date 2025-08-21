@@ -1498,6 +1498,10 @@ public static class DictUtils
             {
                 dict.Options.ShowPitchAccentWithDottedLines ??= new ShowPitchAccentWithDottedLinesOption(true);
             }
+            if (AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.AutoUpdateAfterNDays ??= new AutoUpdateAfterNDaysOption(0);
+            }
         }
     }
 

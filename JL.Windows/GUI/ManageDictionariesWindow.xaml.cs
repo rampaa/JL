@@ -390,7 +390,7 @@ internal sealed partial class ManageDictionariesWindow
         }
         else if (DictUtils.YomichanDictTypes.Contains(dict.Type))
         {
-            await DictUpdater.UpdateYomichanDict(dict, false).ConfigureAwait(true);
+            await DictUpdater.UpdateYomichanDict(dict, true, false).ConfigureAwait(true);
         }
 
         UpdateDictionariesDisplay();

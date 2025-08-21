@@ -18,9 +18,9 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
     public int Size { get; internal set; } = size;
 
     public DictOptions Options { get; set; } = options;
-    public bool AutoUpdatable { get; internal set; } = autoUpdatable;
-    public Uri? Url { get; internal set; } = url;
-    public string? Revision { get; internal set; } = revision;
+    public bool AutoUpdatable { get; set; } = autoUpdatable;
+    public Uri? Url { get; set; } = url;
+    public string? Revision { get; set; } = revision;
 
     [JsonIgnore] public bool Ready { get; set; } // = false;
     [JsonIgnore] public bool Updating { get; set; } // = false;
