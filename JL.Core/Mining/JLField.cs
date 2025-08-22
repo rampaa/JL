@@ -17,6 +17,8 @@ public enum JLField
     [Description("Selected Definitions")] SelectedDefinitions,
     [Description("Dictionary Name")] DictionaryName,
     Audio,
+    [Description("Sentence Audio")] SentenceAudio,
+    [Description("Source Text Audio")] SourceTextAudio,
     Image,
     [Description("Source Text")] SourceText,
     [Description("Leading Source Text Part")] LeadingSourceTextPart,

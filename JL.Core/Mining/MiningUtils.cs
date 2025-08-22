@@ -452,6 +452,8 @@ public static class MiningUtils
 
             case JLField.Nothing:
             case JLField.Audio:
+            case JLField.SentenceAudio:
+            case JLField.SourceTextAudio:
             case JLField.Image:
             case JLField.LocalTime:
                 return null;
@@ -465,7 +467,7 @@ public static class MiningUtils
         }
     }
 
-    private static Dictionary<JLField, string> GetMiningParameters(LookupResult[] lookupResults, int currentLookupResultIndex, ReadOnlySpan<char> currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling, bool useHtmlTags, OrderedDictionary<string, JLField>? userFields)
+    private static Dictionary<JLField, string> GetMiningParameters(LookupResult[] lookupResults, int currentLookupResultIndex, string currentText, string sentence, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling, bool useHtmlTags, OrderedDictionary<string, JLField>? userFields)
     {
         LookupResult lookupResult = lookupResults[currentLookupResultIndex];
         Dictionary<JLField, string> miningParams = new()
@@ -481,8 +483,9 @@ public static class MiningUtils
             [JLField.SelectedSpelling] = selectedSpelling
         };
 
-        string leadingSourcePart = currentText[..currentCharPosition].ToString();
-        string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString();
+        ReadOnlySpan<char> currentTextSpan = currentText.AsSpan();
+        string leadingSourcePart = currentTextSpan[..currentCharPosition].ToString();
+        string trailingSourcePart = currentTextSpan[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString();
         if (useHtmlTags)
         {
             leadingSourcePart = leadingSourcePart.ReplaceLineEndings("<br/>");
@@ -494,19 +497,18 @@ public static class MiningUtils
 
         miningParams[JLField.SourceText] = useHtmlTags
                 ? $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}"
-                : currentText.ToString();
+                : currentText;
 
-        string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
         int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
         if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
         {
             searchStartIndex = 0;
         }
 
-        int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex);
-        ReadOnlySpan<char> leadingSentencePart = currentText[sentenceStartIndex..currentCharPosition];
+        int sentenceStartIndex = currentTextSpan.IndexOf(sentence, searchStartIndex);
+        ReadOnlySpan<char> leadingSentencePart = currentTextSpan[sentenceStartIndex..currentCharPosition];
         miningParams[JLField.LeadingSentencePart] = leadingSentencePart.ToString();
-        ReadOnlySpan<char> trailingSentencePart = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
+        ReadOnlySpan<char> trailingSentencePart = currentTextSpan[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
         miningParams[JLField.TrailingSentencePart] = trailingSentencePart.ToString();
 
         miningParams[JLField.Sentence] = useHtmlTags
@@ -1138,13 +1140,14 @@ public static class MiningUtils
             jlFields = JLFieldUtils.JLFieldsForWordDicts;
         }
 
-        Dictionary<JLField, string> miningParameters = GetMiningParameters(lookupResults, currentLookupResultIndex, currentText, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, false, null);
+        string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+        Dictionary<JLField, string> miningParameters = GetMiningParameters(lookupResults, currentLookupResultIndex, currentText, sentence, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, false, null);
 
         StringBuilder lineToMine = Utils.StringBuilderPool.Get();
         for (int i = 1; i < jlFields.Length; i++)
         {
             JLField jlField = jlFields[i];
-            if (jlField is JLField.Audio or JLField.Image or JLField.PitchAccents or JLField.PitchAccentForFirstReading)
+            if (jlField is JLField.Audio or JLField.SentenceAudio or JLField.SourceTextAudio or JLField.Image or JLField.PitchAccents or JLField.PitchAccentForFirstReading)
             {
                 continue;
             }
@@ -1289,7 +1292,9 @@ public static class MiningUtils
         }
 
         OrderedDictionary<string, JLField> userFields = ankiConfig.Fields;
-        Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResults, currentLookupResultIndex, currentText, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, true, userFields);
+
+        string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+        Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResults, currentLookupResultIndex, currentText, sentence, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, true, userFields);
         Dictionary<string, string> fields = ConvertFields(userFields, miningParams);
 
         // Audio/Picture/Video shouldn't be set here
@@ -1334,12 +1339,47 @@ public static class MiningUtils
             audioData = await Utils.Frontend.GetAudioResponseFromTextToSpeech(selectedReading).ConfigureAwait(false);
         }
 
+        List<string> sentenceAudioFields = FindFields(JLField.SentenceAudio, userFields);
+        bool needsSentenceAudio = sentenceAudioFields.Count > 0;
+        bool sentenceAudioIsSameAsAudio = needsSentenceAudio && audioData is not null && sentence == lookupResult.PrimarySpelling;
+        byte[]? sentenceAudioData = needsSentenceAudio
+            ? sentenceAudioIsSameAsAudio
+                ? audioData
+                : await Utils.Frontend.GetAudioResponseFromTextToSpeech(sentence).ConfigureAwait(false)
+            : null;
+
+        List<string> sourceTextAudioFields = FindFields(JLField.SourceTextAudio, userFields);
+        bool needsSourceTextAudio = sourceTextAudioFields.Count > 0;
+        bool sourceTextAudioIsSameAsSentenceAudio = needsSourceTextAudio && sentenceAudioData is not null && currentText == sentence;
+        byte[]? sourceTextAudioData = needsSourceTextAudio
+            ? sourceTextAudioIsSameAsSentenceAudio
+                ? sentenceAudioData
+                : await Utils.Frontend.GetAudioResponseFromTextToSpeech(currentText).ConfigureAwait(false)
+            : null;
+
+        int totalAudioCount = 0;
         if (audioData is not null)
         {
-            Debug.Assert(audioResponse is not null);
-            note.Audios =
-                [
-                    new Dictionary<string, object>(4, StringComparer.Ordinal)
+            ++totalAudioCount;
+        }
+        if (sentenceAudioData is not null)
+        {
+            ++totalAudioCount;
+        }
+        if (sourceTextAudioData is not null)
+        {
+            ++totalAudioCount;
+        }
+
+        if (totalAudioCount > 0)
+        {
+            note.Audios = new Dictionary<string, object>[totalAudioCount];
+
+            int audioIndex = 0;
+            if (audioData is not null)
+            {
+                Debug.Assert(audioResponse is not null);
+                note.Audios[audioIndex] = new Dictionary<string, object>(4, StringComparer.Ordinal)
                     {
                         {
                             "data", audioData
@@ -1353,8 +1393,55 @@ public static class MiningUtils
                         {
                             "fields", audioFields
                         }
-                    }
-                ];
+                    };
+
+                ++audioIndex;
+            }
+
+            string? sentenceAudioFormat = null;
+            if (sentenceAudioData is not null)
+            {
+                Debug.Assert(!sentenceAudioIsSameAsAudio || audioResponse is not null);
+                sentenceAudioFormat = sentenceAudioIsSameAsAudio
+                    ? audioResponse!.AudioFormat
+                    : AudioUtils.s_textToSpeechAudioResponse.AudioFormat;
+
+                note.Audios[audioIndex] = new Dictionary<string, object>(3, StringComparer.Ordinal)
+                    {
+                        {
+                            "data", sentenceAudioData
+                        },
+                        {
+                            "filename", $"JL_sentence_audio_{selectedReading}_{lookupResult.PrimarySpelling}.{sentenceAudioFormat}"
+                        },
+                        {
+                            "fields", sentenceAudioFields
+                        }
+                    };
+
+                ++audioIndex;
+            }
+
+            if (sourceTextAudioData is not null)
+            {
+                Debug.Assert(!sourceTextAudioIsSameAsSentenceAudio || sentenceAudioFormat is not null);
+                string sourceTextAudioFormat = sourceTextAudioIsSameAsSentenceAudio
+                    ? sentenceAudioFormat!
+                    : AudioUtils.s_textToSpeechAudioResponse.AudioFormat;
+
+                note.Audios[audioIndex] = new Dictionary<string, object>(3, StringComparer.Ordinal)
+                    {
+                        {
+                            "data", sourceTextAudioData
+                        },
+                        {
+                            "filename", $"JL_source_text_audio_{selectedReading}_{lookupResult.PrimarySpelling}.{sourceTextAudioFormat}"
+                        },
+                        {
+                            "fields", sourceTextAudioFields
+                        }
+                    };
+            }
         }
 
         List<string> imageFields = FindFields(JLField.Image, userFields);

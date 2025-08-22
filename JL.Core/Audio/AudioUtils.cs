@@ -10,7 +10,7 @@ namespace JL.Core.Audio;
 
 public static class AudioUtils
 {
-    private static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
+    internal static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
 
     public static readonly OrderedDictionary<string, AudioSource> AudioSources = new(StringComparer.Ordinal);
 
