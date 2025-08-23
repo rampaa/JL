@@ -1483,7 +1483,7 @@ public static class MiningUtils
             return;
         }
 
-        bool showNoAudioMessage = needsAudio && (audioData is null || Utils.GetMd5String(audioData) is NetworkUtils.Jpod101NoAudioMd5Hash);
+        bool showNoAudioMessage = needsAudio && audioData is null;
         bool showDuplicateCardMessage = !canAddNote.Value;
         string message = $"Mined {selectedSpelling}{(showNoAudioMessage ? " (No Audio)" : "")}{(showDuplicateCardMessage ? " (Duplicate)" : "")}";
 
