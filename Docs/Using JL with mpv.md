@@ -25,6 +25,12 @@
 
 ---
 
+## Recommended mpv configs
+
+- To make sub-texts hidden by default, add `sub-visibility=no` to your `mpv.conf` file.
+- To make OSC show up only when you hover over it, add `deadzonesize=1.0` to your `script-opts/osc.conf` file.
+---
+
 Here’s what the end result looks like:
 
 https://github.com/user-attachments/assets/bf17d0d3-e89d-4d67-80d9-ea5bc5c84d58
