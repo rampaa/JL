@@ -894,6 +894,9 @@ internal static class WindowsUtils
         {
             try
             {
+                // Clipboard.SetText(text) and Clipboard.SetDataObject(text, true) often fail with CLIPBRD_E_CANT_OPEN.
+                // Clipboard.SetDataObject(text, false) almost never fails, but we still keep it in a try-catch block to be safe.
+                // See: https://github.com/dotnet/wpf/issues/9901
                 Clipboard.SetDataObject(text, false);
                 copied = true;
             }
