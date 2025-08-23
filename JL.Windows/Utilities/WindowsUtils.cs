@@ -889,20 +889,20 @@ internal static class WindowsUtils
 
     public static async Task CopyTextToClipboard(string text)
     {
-        bool copied = false;
+        bool retry = false;
         do
         {
             try
             {
                 Clipboard.SetText(text, TextDataFormat.UnicodeText);
-                copied = true;
             }
             catch (ExternalException ex)
             {
+                retry = true;
                 Utils.Logger.Warning(ex, "CopyTextToClipboard failed");
                 await Task.Delay(5).ConfigureAwait(true);
             }
         }
-        while (!copied);
+        while (retry);
     }
 }
