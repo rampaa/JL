@@ -1406,13 +1406,16 @@ public static class MiningUtils
                     ? audioResponse!.AudioFormat
                     : AudioUtils.s_textToSpeechAudioResponse.AudioFormat;
 
-                note.Audios[audioIndex] = new Dictionary<string, object>(3, StringComparer.Ordinal)
+                note.Audios[audioIndex] = new Dictionary<string, object>(4, StringComparer.Ordinal)
                     {
                         {
                             "data", sentenceAudioData
                         },
                         {
                             "filename", $"JL_sentence_audio_{selectedReading}_{lookupResult.PrimarySpelling}.{sentenceAudioFormat}"
+                        },
+                        {
+                            "skipHash", NetworkUtils.Jpod101NoAudioMd5Hash
                         },
                         {
                             "fields", sentenceAudioFields
@@ -1429,13 +1432,16 @@ public static class MiningUtils
                     ? sentenceAudioFormat!
                     : AudioUtils.s_textToSpeechAudioResponse.AudioFormat;
 
-                note.Audios[audioIndex] = new Dictionary<string, object>(3, StringComparer.Ordinal)
+                note.Audios[audioIndex] = new Dictionary<string, object>(4, StringComparer.Ordinal)
                     {
                         {
                             "data", sourceTextAudioData
                         },
                         {
                             "filename", $"JL_source_text_audio_{selectedReading}_{lookupResult.PrimarySpelling}.{sourceTextAudioFormat}"
+                        },
+                        {
+                            "skipHash", NetworkUtils.Jpod101NoAudioMd5Hash
                         },
                         {
                             "fields", sourceTextAudioFields
