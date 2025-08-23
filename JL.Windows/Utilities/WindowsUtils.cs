@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Web;
 using System.Windows;
@@ -884,5 +885,24 @@ internal static class WindowsUtils
         }
 
         return mousePosition;
+    }
+
+    public static async Task CopyTextToClipboard(string text)
+    {
+        bool copied = false;
+        do
+        {
+            try
+            {
+                Clipboard.SetText(text, TextDataFormat.UnicodeText);
+                copied = true;
+            }
+            catch (ExternalException ex)
+            {
+                Utils.Logger.Warning(ex, "CopyTextToClipboard failed");
+                await Task.Delay(5).ConfigureAwait(true);
+            }
+        }
+        while (!copied);
     }
 }

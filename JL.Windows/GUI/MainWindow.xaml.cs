@@ -960,7 +960,7 @@ internal sealed partial class MainWindow
         {
             if (MainTextBox.SelectedText.Length > 0)
             {
-                Clipboard.SetText(MainTextBox.SelectedText, TextDataFormat.UnicodeText);
+                return WindowsUtils.CopyTextToClipboard(MainTextBox.SelectedText);
             }
         }
 

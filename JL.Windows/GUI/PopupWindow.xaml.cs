@@ -1623,7 +1623,7 @@ internal sealed partial class PopupWindow
 
             if (!string.IsNullOrEmpty(textToCopy))
             {
-                Clipboard.SetText(textToCopy, TextDataFormat.UnicodeText);
+                return WindowsUtils.CopyTextToClipboard(textToCopy);
             }
         }
 
