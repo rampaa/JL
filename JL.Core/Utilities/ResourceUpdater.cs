@@ -68,6 +68,10 @@ public static class ResourceUpdater
                     {
                         Utils.Frontend.ShowOkDialog($"{dictName} is up to date.", "Info");
                     }
+                    else
+                    {
+                        Utils.Frontend.Alert(AlertLevel.Information, $"{dictName} is up to date.");
+                    }
                 }
 
                 else
@@ -142,6 +146,10 @@ public static class ResourceUpdater
                     {
                         Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
                     }
+                    else
+                    {
+                        Utils.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
+                    }
 
                     return false;
                 }
@@ -175,6 +183,10 @@ public static class ResourceUpdater
                     {
                         Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
                     }
+                    else
+                    {
+                        Utils.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
+                    }
 
                     return false;
                 }
@@ -190,6 +202,10 @@ public static class ResourceUpdater
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                    }
+                    else
+                    {
+                        Utils.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
                     }
 
                     return false;
@@ -620,7 +636,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
+            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Name}...");
             tasks.Add(dict.Type is DictType.JMdict
                 ? UpdateJmdict(pathExists, true)
                 : dict.Type is DictType.JMnedict
@@ -659,7 +675,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {freq.Type}...");
+            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {freq.Name}...");
             tasks.Add(UpdateYomichanFreqDict(freq, pathExists, true));
         }
 
