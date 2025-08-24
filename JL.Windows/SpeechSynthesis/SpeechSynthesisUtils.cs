@@ -15,16 +15,16 @@ internal static class SpeechSynthesisUtils
 {
     private static long s_lastAudioPlayTimestamp;
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
-    private static SpeechSynthesizer Synthesizer { get; } = new();
+    private static readonly SpeechSynthesizer s_synthesizer = new();
 
     public static ComboBoxItem[]? InstalledVoices { get; } = GetInstalledVoiceNames();
 
     private static ComboBoxItem[]? GetInstalledVoiceNames()
     {
-        Synthesizer.InjectOneCoreVoices();
+        s_synthesizer.InjectOneCoreVoices();
 
 #pragma warning disable CA1304 // Specify CultureInfo
-        List<InstalledVoice> installedVoices = Synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled && iv.VoiceInfo.Name is not null && iv.VoiceInfo.Culture is not null).ToList();
+        List<InstalledVoice> installedVoices = s_synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled && iv.VoiceInfo.Name is not null && iv.VoiceInfo.Culture is not null).ToList();
 #pragma warning restore CA1304 // Specify CultureInfo
 
         return installedVoices.Count is 0
@@ -60,11 +60,11 @@ internal static class SpeechSynthesisUtils
 
     public static async Task StopTextToSpeech()
     {
-        if (Synthesizer.State is SynthesizerState.Speaking)
+        if (s_synthesizer.State is SynthesizerState.Speaking)
         {
-            Synthesizer.SpeakAsyncCancelAll();
+            s_synthesizer.SpeakAsyncCancelAll();
 
-            while (Synthesizer.State is SynthesizerState.Speaking)
+            while (s_synthesizer.State is SynthesizerState.Speaking)
             {
                 await Task.Delay(100).ConfigureAwait(false);
             }
@@ -78,7 +78,7 @@ internal static class SpeechSynthesisUtils
             WindowsUtils.AudioPlayer.Dispose();
         }
 
-        if (Synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
+        if (s_synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
         {
             s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
             return;
@@ -90,7 +90,7 @@ internal static class SpeechSynthesisUtils
 
         try
         {
-            Synthesizer.SelectVoice(voiceName);
+            s_synthesizer.SelectVoice(voiceName);
         }
         catch (ArgumentException ex)
         {
@@ -101,8 +101,8 @@ internal static class SpeechSynthesisUtils
             return;
         }
 
-        Synthesizer.SetOutputToDefaultAudioDevice();
-        _ = Synthesizer.SpeakAsync(text);
+        s_synthesizer.SetOutputToDefaultAudioDevice();
+        _ = s_synthesizer.SpeakAsync(text);
     }
 
     public static async ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text)
@@ -114,10 +114,10 @@ internal static class SpeechSynthesisUtils
 
         await StopTextToSpeech().ConfigureAwait(false);
 
-        Synthesizer.SelectVoice(InstalledVoiceWithHighestPriority);
+        s_synthesizer.SelectVoice(InstalledVoiceWithHighestPriority);
         using MemoryStream audioDataStream = new();
-        Synthesizer.SetOutputToWaveStream(audioDataStream);
-        Synthesizer.Speak(text);
+        s_synthesizer.SetOutputToWaveStream(audioDataStream);
+        s_synthesizer.Speak(text);
         return audioDataStream.ToArray();
     }
 

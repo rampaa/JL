@@ -2,11 +2,11 @@ namespace JL.Core.Network;
 
 public static class WebSocketUtils
 {
-    private static Dictionary<Uri, WebSocketConnection> WebSocketConnectionsDict { get; } = [];
+    private static readonly Dictionary<Uri, WebSocketConnection> s_webSocketConnectionsDict = [];
 
     public static async Task DisconnectFromAllWebSocketConnections()
     {
-        foreach (WebSocketConnection connection in WebSocketConnectionsDict.Values)
+        foreach (WebSocketConnection connection in s_webSocketConnectionsDict.Values)
         {
             await connection.Disconnect().ConfigureAwait(false);
         }
@@ -14,16 +14,16 @@ public static class WebSocketUtils
 
     internal static async Task DisconnectFromWebSocket(Uri webSocketUri)
     {
-        if (WebSocketConnectionsDict.TryGetValue(webSocketUri, out WebSocketConnection? existingConnection))
+        if (s_webSocketConnectionsDict.TryGetValue(webSocketUri, out WebSocketConnection? existingConnection))
         {
             await existingConnection.Disconnect().ConfigureAwait(false);
-            _ = WebSocketConnectionsDict.Remove(webSocketUri);
+            _ = s_webSocketConnectionsDict.Remove(webSocketUri);
         }
     }
 
     public static void ConnectToAllWebSockets()
     {
-        foreach (WebSocketConnection connection in WebSocketConnectionsDict.Values)
+        foreach (WebSocketConnection connection in s_webSocketConnectionsDict.Values)
         {
             connection.Connect();
         }
@@ -31,21 +31,21 @@ public static class WebSocketUtils
 
     internal static void ConnectToWebSocket(Uri webSocketUri)
     {
-        if (WebSocketConnectionsDict.TryGetValue(webSocketUri, out WebSocketConnection? existingConnection))
+        if (s_webSocketConnectionsDict.TryGetValue(webSocketUri, out WebSocketConnection? existingConnection))
         {
             existingConnection.Connect();
         }
         else
         {
             WebSocketConnection webSocketConnection = new(webSocketUri);
-            WebSocketConnectionsDict[webSocketUri] = webSocketConnection;
+            s_webSocketConnectionsDict[webSocketUri] = webSocketConnection;
             webSocketConnection.Connect();
         }
     }
 
     internal static bool AllConnectionsAreDisconnected()
     {
-        foreach (WebSocketConnection connection in WebSocketConnectionsDict.Values)
+        foreach (WebSocketConnection connection in s_webSocketConnectionsDict.Values)
         {
             if (connection.Connected)
             {

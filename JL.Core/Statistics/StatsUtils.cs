@@ -14,8 +14,8 @@ public static class StatsUtils
     public static Stats LifetimeStats { get; internal set; } = new();
 
     public static Stopwatch TimeStatStopWatch { get; } = new();
-    private static Timer StatsTimer { get; } = new();
-    private static Timer IdleTimeTimer { get; } = new()
+    private static readonly Timer s_statsTimer = new();
+    private static readonly Timer s_idleTimeTimer = new()
     {
         AutoReset = false
     };
@@ -24,15 +24,15 @@ public static class StatsUtils
 
     static StatsUtils()
     {
-        IdleTimeTimer.Elapsed += IdleTimeTimer_OnTimedEvent;
-        StatsTimer.Elapsed += StatsTimer_OnTimedEvent;
+        s_idleTimeTimer.Elapsed += IdleTimeTimer_OnTimedEvent;
+        s_statsTimer.Elapsed += StatsTimer_OnTimedEvent;
     }
 
     internal static void InitializeStatsTimer()
     {
-        StatsTimer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
-        StatsTimer.AutoReset = true;
-        StatsTimer.Enabled = true;
+        s_statsTimer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
+        s_statsTimer.AutoReset = true;
+        s_statsTimer.Enabled = true;
     }
 
     public static void InitializeIdleTimeTimer()
@@ -46,12 +46,12 @@ public static class StatsUtils
         double minReadingSpeedThreshold = CoreConfigManager.Instance.MinCharactersPerMinuteBeforeStoppingTimeTracking;
         if (minReadingSpeedThreshold > 0 && textLength > 0 && TimeStatStopWatch.IsRunning)
         {
-            IdleTimeTimer.Interval = TimeSpan.FromMinutes(textLength / minReadingSpeedThreshold).TotalMilliseconds;
-            IdleTimeTimer.Enabled = true;
+            s_idleTimeTimer.Interval = TimeSpan.FromMinutes(textLength / minReadingSpeedThreshold).TotalMilliseconds;
+            s_idleTimeTimer.Enabled = true;
         }
         else
         {
-            IdleTimeTimer.Enabled = false;
+            s_idleTimeTimer.Enabled = false;
         }
     }
 
@@ -61,19 +61,19 @@ public static class StatsUtils
 
         // Restarts the timer
         // This is faster than setting the Enabled property to false and then true
-        IdleTimeTimer.Interval = IdleTimeTimer.Interval;
-        IdleTimeTimer.Enabled = true;
+        s_idleTimeTimer.Interval = s_idleTimeTimer.Interval;
+        s_idleTimeTimer.Enabled = true;
     }
 
     public static void StopTimeStatStopWatch()
     {
         TimeStatStopWatch.Stop();
-        IdleTimeTimer.Enabled = false;
+        s_idleTimeTimer.Enabled = false;
     }
 
     public static void StopIdleItemTimer()
     {
-        IdleTimeTimer.Enabled = false;
+        s_idleTimeTimer.Enabled = false;
     }
 
     private static void IdleTimeTimer_OnTimedEvent(object? sender, ElapsedEventArgs e)

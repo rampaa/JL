@@ -13,8 +13,8 @@ internal static class MagpieUtils
     public static double DpiAwareMagpieWindowWidth { get; private set; }
     // public static nint SourceWindowHandle { get; set; }
     public static Rect SourceWindowRect { get; private set; }
-    private static double ScaleFactorX { get; set; }
-    private static double ScaleFactorY { get; set; }
+    private static double s_scaleFactorX;
+    private static double s_scaleFactorY;
 
     public static void RegisterToMagpieScalingChangedMessage(nint windowHandle)
     {
@@ -95,8 +95,8 @@ internal static class MagpieUtils
     public static Point GetMousePosition(Point mousePosition)
     {
         return SourceWindowRect.Contains(mousePosition)
-            ? new Point(MagpieWindowLeftEdgePosition + ((mousePosition.X - SourceWindowRect.X) * ScaleFactorX),
-                MagpieWindowTopEdgePosition + ((mousePosition.Y - SourceWindowRect.Y) * ScaleFactorY))
+            ? new Point(MagpieWindowLeftEdgePosition + ((mousePosition.X - SourceWindowRect.X) * s_scaleFactorX),
+                MagpieWindowTopEdgePosition + ((mousePosition.Y - SourceWindowRect.Y) * s_scaleFactorY))
             : mousePosition;
     }
 
@@ -122,7 +122,7 @@ internal static class MagpieUtils
         DpiAwareMagpieWindowWidth = magpieWindowWidth / WindowsUtils.Dpi.DpiScaleX;
         double magpieWindowHeight = MagpieWindowBottomEdgePosition - MagpieWindowTopEdgePosition;
 
-        ScaleFactorX = magpieWindowWidth / sourceWindowWidth;
-        ScaleFactorY = magpieWindowHeight / sourceWindowHeight;
+        s_scaleFactorX = magpieWindowWidth / sourceWindowWidth;
+        s_scaleFactorY = magpieWindowHeight / sourceWindowHeight;
     }
 }
