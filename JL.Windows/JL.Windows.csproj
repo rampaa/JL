@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -6,6 +6,7 @@
     <LangVersion>latest</LangVersion>
     <RollForward>LatestMajor</RollForward>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -52,4 +53,9 @@
     <ProjectReference Include="../JL.Core/JL.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+  
 </Project>
