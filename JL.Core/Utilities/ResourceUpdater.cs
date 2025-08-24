@@ -631,7 +631,7 @@ public static class ResourceUpdater
             }
 
             bool pathExists = File.Exists(fullPath);
-            if (pathExists && (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
+            if (!pathExists || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
             {
                 continue;
             }
@@ -670,7 +670,7 @@ public static class ResourceUpdater
             fullPath = Path.Join(fullPath, "index.json");
 
             bool pathExists = File.Exists(fullPath);
-            if (pathExists && (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
+            if (!pathExists || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
             {
                 continue;
             }
