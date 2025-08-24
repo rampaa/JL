@@ -62,19 +62,24 @@ public static class ResourceUpdater
                     return true;
                 }
 
-                if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
+                if (response.StatusCode is HttpStatusCode.NotModified)
                 {
-                    Utils.Frontend.ShowOkDialog($"{dictName} is up to date.", "Info");
+                    if (!noPrompt)
+                    {
+                        Utils.Frontend.Alert(AlertLevel.Information, $"{dictName} is up to date.");
+                    }
                 }
 
                 else
                 {
-                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}",
-                        dictName, response.StatusCode);
-
+                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", dictName, response.StatusCode);
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
+                    }
+                    else
+                    {
+                        Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
                     }
                 }
             }
@@ -82,8 +87,15 @@ public static class ResourceUpdater
 
         catch (Exception ex)
         {
-            Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
             Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
+            if (!noPrompt)
+            {
+                Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
+            }
+            else
+            {
+                Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
+            }
 
             string tempDictPath = GetTempPath(Path.GetFullPath(dictPath, Utils.ApplicationPath));
             if (File.Exists(tempDictPath))
@@ -124,20 +136,26 @@ public static class ResourceUpdater
                 }
 
                 using HttpResponseMessage indexResponse = await NetworkUtils.Client.SendAsync(indexRequest, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-                if (indexResponse.StatusCode is HttpStatusCode.NotModified && !noPrompt)
+                if (indexResponse.StatusCode is HttpStatusCode.NotModified)
                 {
-                    Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                    if (!noPrompt)
+                    {
+                        Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                    }
+
                     return false;
                 }
 
                 if (!indexResponse.IsSuccessStatusCode)
                 {
-                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}",
-                        name, indexResponse.StatusCode);
-
+                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, indexResponse.StatusCode);
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+                    }
+                    else
+                    {
+                        Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
                     }
 
                     return false;
@@ -153,7 +171,11 @@ public static class ResourceUpdater
                 Debug.Assert(newRevision is not null);
                 if (revision == newRevision)
                 {
-                    Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                    if (!noPrompt)
+                    {
+                        Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                    }
+
                     return false;
                 }
 
@@ -163,19 +185,26 @@ public static class ResourceUpdater
                 request.Headers.IfModifiedSince = indexRequest.Headers.IfModifiedSince;
 
                 using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-                if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
+                if (response.StatusCode is HttpStatusCode.NotModified)
                 {
-                    Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                    if (!noPrompt)
+                    {
+                        Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                    }
+
                     return false;
                 }
 
                 if (!response.IsSuccessStatusCode)
                 {
                     Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, response.StatusCode);
-
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+                    }
+                    else
+                    {
+                        Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
                     }
 
                     return false;
@@ -206,8 +235,15 @@ public static class ResourceUpdater
 
         catch (Exception ex)
         {
-            Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
             Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", name);
+            if (!noPrompt)
+            {
+                Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+            }
+            else
+            {
+                Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
+            }
 
             string tempDictPath = GetTempPath(Path.GetFullPath(path, Utils.ApplicationPath));
             if (Directory.Exists(tempDictPath))
