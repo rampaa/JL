@@ -412,11 +412,6 @@ public static class FreqUtils
 
     private static void InitFreqOptions(Freq freq)
     {
-        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freq.Type))
-        {
-            freq.Options.HigherValueMeansHigherFrequency ??= new HigherValueMeansHigherFrequencyOption(false);
-        }
-
         if (AutoUpdateAfterNDaysOption.ValidFreqTypes.Contains(freq.Type))
         {
             freq.Options.AutoUpdateAfterNDays ??= new AutoUpdateAfterNDaysOption(0);
