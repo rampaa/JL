@@ -5,6 +5,6 @@ public sealed class FreqOptions(UseDBOption useDB,
     AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null)
 {
     public UseDBOption UseDB { get; } = useDB;
-    public HigherValueMeansHigherFrequencyOption HigherValueMeansHigherFrequency { get; internal set; } = higherValueMeansHigherFrequency;
+    public HigherValueMeansHigherFrequencyOption HigherValueMeansHigherFrequency { get; } = higherValueMeansHigherFrequency;
     public AutoUpdateAfterNDaysOption? AutoUpdateAfterNDays { get; internal set; } = autoUpdateAfterNDays;
 }

@@ -132,12 +132,6 @@ public static class StatsDBUtils
         return termLookupCounts;
     }
 
-    public static void UpdateLifetimeStats()
-    {
-        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-        UpdateLifetimeStats(connection);
-    }
-
     public static void UpdateLifetimeStats(SqliteConnection connection)
     {
         UpdateStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
@@ -146,12 +140,6 @@ public static class StatsDBUtils
             UpsertTermLookupCounts(connection, StatsUtils.LifetimeStats.TermLookupCountDict, ProfileUtils.GlobalProfileId);
             StatsUtils.LifetimeStats.TermLookupCountDict.Clear();
         }
-    }
-
-    public static void UpdateProfileLifetimeStats()
-    {
-        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-        UpdateProfileLifetimeStats(connection);
     }
 
     public static void UpdateProfileLifetimeStats(SqliteConnection connection)

@@ -5,7 +5,7 @@ using JL.Core.Statistics;
 using JL.Core.Utilities;
 
 namespace JL.Core.Network;
-public sealed class WebSocketConnection : IDisposable
+internal sealed class WebSocketConnection : IDisposable
 {
     private ClientWebSocket? _webSocketClient;
     private CancellationTokenSource? _webSocketCancellationTokenSource;

@@ -62,14 +62,7 @@ public static class AnkiConfigUtils
                             for (int i = 0; i < fieldsSpan.Length; i++)
                             {
                                 string fieldName = fieldsSpan[i];
-                                if (ankiConfig.Fields.TryGetValue(fieldName, out JLField field))
-                                {
-                                    upToDateFields.Add(fieldName, field);
-                                }
-                                else
-                                {
-                                    upToDateFields.Add(fieldName, JLField.Nothing);
-                                }
+                                upToDateFields.Add(fieldName, ankiConfig.Fields.GetValueOrDefault(fieldName, JLField.Nothing));
                             }
 
                             ankiConfig.Fields = upToDateFields;

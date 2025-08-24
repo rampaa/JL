@@ -108,7 +108,7 @@ public static class ResourceUpdater
         }
     }
 
-    internal static async Task<bool> DownloadYomichanDict(Uri url, string revision, string name, string path, bool isUpdate, bool noPrompt)
+    private static async Task<bool> DownloadYomichanDict(Uri url, string revision, string name, string path, bool isUpdate, bool noPrompt)
     {
         try
         {

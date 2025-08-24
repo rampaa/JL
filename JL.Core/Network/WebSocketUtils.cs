@@ -2,7 +2,7 @@ namespace JL.Core.Network;
 
 public static class WebSocketUtils
 {
-    public static Dictionary<Uri, WebSocketConnection> WebSocketConnectionsDict { get; } = [];
+    private static Dictionary<Uri, WebSocketConnection> WebSocketConnectionsDict { get; } = [];
 
     public static async Task DisconnectFromAllWebSocketConnections()
     {
@@ -12,7 +12,7 @@ public static class WebSocketUtils
         }
     }
 
-    public static async Task DisconnectFromWebSocket(Uri webSocketUri)
+    internal static async Task DisconnectFromWebSocket(Uri webSocketUri)
     {
         if (WebSocketConnectionsDict.TryGetValue(webSocketUri, out WebSocketConnection? existingConnection))
         {
@@ -29,7 +29,7 @@ public static class WebSocketUtils
         }
     }
 
-    public static void ConnectToWebSocket(Uri webSocketUri)
+    internal static void ConnectToWebSocket(Uri webSocketUri)
     {
         if (WebSocketConnectionsDict.TryGetValue(webSocketUri, out WebSocketConnection? existingConnection))
         {
@@ -43,7 +43,7 @@ public static class WebSocketUtils
         }
     }
 
-    public static bool AllConnectionsAreDisconnected()
+    internal static bool AllConnectionsAreDisconnected()
     {
         foreach (WebSocketConnection connection in WebSocketConnectionsDict.Values)
         {

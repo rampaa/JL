@@ -88,9 +88,11 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
 
     public string? BuildFormattedDefinition(DictOptions options)
     {
+        Debug.Assert(options.NewlineBetweenDefinitions is not null);
+
         return Definitions is null
             ? null
-            : string.Join(options.NewlineBetweenDefinitions!.Value ? '\n' : '；', Definitions);
+            : string.Join(options.NewlineBetweenDefinitions.Value ? '\n' : '；', Definitions);
     }
 
     public string? BuildFormattedStats()
