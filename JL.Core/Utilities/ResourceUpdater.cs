@@ -66,7 +66,7 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        Utils.Frontend.Alert(AlertLevel.Information, $"{dictName} is up to date.");
+                        Utils.Frontend.ShowOkDialog($"{dictName} is up to date.", "Info");
                     }
                 }
 
