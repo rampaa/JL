@@ -80,7 +80,7 @@ internal static class AnkiConnect
         try
         {
             // AnkiConnect doesn't like null values
-            using HttpContent content = JsonContent.Create(request, options: Utils.s_jsoIgnoringWhenWritingNull);
+            using JsonContent content = JsonContent.Create(request, options: Utils.s_jsoIgnoringWhenWritingNull);
 
             // AnkiConnect expects the content to be buffered
             await content.LoadIntoBufferAsync().ConfigureAwait(false);
