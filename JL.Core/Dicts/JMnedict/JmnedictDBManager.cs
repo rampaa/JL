@@ -73,7 +73,7 @@ internal static class JmnedictDBManager
         ulong rowId = 1;
 
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
-        DBUtils.SetSynchronousModeToOff(connection);
+        DBUtils.SetSynchronousModeToNormal(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();

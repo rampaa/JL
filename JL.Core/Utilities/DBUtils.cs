@@ -210,12 +210,22 @@ public static class DBUtils
         return reader.GetBoolean(0);
     }
 
-    public static void SetSynchronousModeToOff(SqliteConnection connection)
+    internal static void SetSynchronousModeToNormal(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA synchronous = 0;";
+        command.CommandText = "PRAGMA synchronous = 1;";
         _ = command.ExecuteNonQuery();
     }
+
+    //internal static bool IsDBCorrupt(SqliteConnection connection)
+    //{
+    //    using SqliteCommand command = connection.CreateCommand();
+    //    command.CommandText = "PRAGMA integrity_check;";
+
+    //    SqliteDataReader reader = command.ExecuteReader();
+    //    _ = reader.Read();
+    //    return reader.GetString(0) is not "ok";
+    //}
 
     //public static string GetSqliteVersion()
     //{

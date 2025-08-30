@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Config;
@@ -537,6 +538,7 @@ public static class DictUtils
         int customDictionaryTaskCount = 0;
         bool anyCustomDictionaryTaskIsActuallyUsed = false;
 
+        Stopwatch sw = Stopwatch.StartNew();
         foreach (Dict dict in dicts)
         {
             bool useDB = dict.Options.UseDB.Value;
@@ -1343,6 +1345,8 @@ public static class DictUtils
         }
 
         DictsReady = true;
+        sw.Stop();
+        Utils.Logger.Fatal("Loaded dictionaries in {ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
     }
 
     public static Task CreateDefaultDictsConfig()
