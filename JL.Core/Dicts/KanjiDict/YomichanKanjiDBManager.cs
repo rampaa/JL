@@ -123,6 +123,7 @@ internal static class YomichanKanjiDBManager
     public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText = SingleTermQuery;
@@ -147,6 +148,7 @@ internal static class YomichanKanjiDBManager
     public static void LoadFromDB(Dict dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =

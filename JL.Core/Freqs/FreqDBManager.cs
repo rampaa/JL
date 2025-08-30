@@ -120,6 +120,7 @@ internal static class FreqDBManager
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
@@ -178,6 +179,7 @@ internal static class FreqDBManager
     public static List<FrequencyRecord>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -207,6 +209,7 @@ internal static class FreqDBManager
     public static void SetMaxFrequencyValue(Freq freq)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -227,6 +230,7 @@ internal static class FreqDBManager
         SetMaxFrequencyValue(freq);
 
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =

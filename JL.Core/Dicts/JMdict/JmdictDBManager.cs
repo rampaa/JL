@@ -239,6 +239,7 @@ internal static class JmdictDBManager
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
@@ -306,6 +307,7 @@ internal static class JmdictDBManager
     public static void LoadFromDB(Dict dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =

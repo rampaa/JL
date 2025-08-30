@@ -64,7 +64,6 @@ public static class FreqUtils
 
         CheckFreqDicts(freqs);
 
-        Stopwatch sw = Stopwatch.StartNew();
         foreach (Freq freq in freqs)
         {
             bool useDB = freq.Options.UseDB.Value;
@@ -359,8 +358,6 @@ public static class FreqUtils
         }
 
         FreqsReady = true;
-        sw.Stop();
-        Utils.Logger.Fatal("Loaded frequency dictionaries in {ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
     }
 
     public static Task CreateDefaultFreqsConfig()

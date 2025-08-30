@@ -108,6 +108,7 @@ public static class DBUtils
     private static int GetVersionFromDB(string dbPath)
     {
         using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
+        SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
 
@@ -194,6 +195,7 @@ public static class DBUtils
     internal static bool RecordExists(string dbPath)
     {
         using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
+        SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -214,6 +216,13 @@ public static class DBUtils
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA synchronous = 1;";
+        _ = command.ExecuteNonQuery();
+    }
+
+    internal static void SetCacheSizeToZero(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA cache_size = 0;";
         _ = command.ExecuteNonQuery();
     }
 

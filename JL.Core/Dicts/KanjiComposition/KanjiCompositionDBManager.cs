@@ -11,6 +11,7 @@ internal static class KanjiCompositionDBManager
     public static string[]? GetRecordsFromDB(string kanji)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(s_dbPath);
+        DBUtils.SetCacheSizeToZero(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
