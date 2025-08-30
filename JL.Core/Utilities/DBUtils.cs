@@ -108,7 +108,7 @@ public static class DBUtils
     private static int GetVersionFromDB(string dbPath)
     {
         using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
-        SetCacheSizeToZero(connection);
+        EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
 
@@ -195,7 +195,7 @@ public static class DBUtils
     internal static bool RecordExists(string dbPath)
     {
         using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
-        SetCacheSizeToZero(connection);
+        EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -219,11 +219,20 @@ public static class DBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    internal static void SetCacheSizeToZero(SqliteConnection connection)
+    internal static void EnableMemoryMapping(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = $"PRAGMA cache_size = 0;";
+        command.CommandText = "PRAGMA cache_size = 0;";
         _ = command.ExecuteNonQuery();
+
+        if (Environment.Is64BitProcess)
+        {
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+            command.CommandText = $"PRAGMA mmap_size = {1024L * 1024L * 2000L};";
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
+            _ = command.ExecuteNonQuery();
+        }
     }
 
     //internal static bool IsDBCorrupt(SqliteConnection connection)

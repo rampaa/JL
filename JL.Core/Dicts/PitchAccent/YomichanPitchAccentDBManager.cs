@@ -149,7 +149,7 @@ internal static class YomichanPitchAccentDBManager
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
-        DBUtils.SetCacheSizeToZero(connection);
+        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
@@ -208,7 +208,7 @@ internal static class YomichanPitchAccentDBManager
     public static void LoadFromDB(Dict dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
-        DBUtils.SetCacheSizeToZero(connection);
+        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
