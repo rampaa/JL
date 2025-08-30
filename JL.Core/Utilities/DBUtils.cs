@@ -210,6 +210,13 @@ public static class DBUtils
         return reader.GetBoolean(0);
     }
 
+    public static void SetSynchronousModeToOff(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA synchronous = 0;";
+        _ = command.ExecuteNonQuery();
+    }
+
     //public static string GetSqliteVersion()
     //{
     //    using SqliteConnection connection = new();

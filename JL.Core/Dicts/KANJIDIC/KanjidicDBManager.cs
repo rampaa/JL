@@ -63,6 +63,7 @@ internal static class KanjidicDBManager
     public static void InsertRecordsToDB(Dict dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        DBUtils.SetSynchronousModeToOff(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
