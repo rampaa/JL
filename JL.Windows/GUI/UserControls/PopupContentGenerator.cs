@@ -20,10 +20,10 @@ internal sealed class PopupContentGenerator : Decorator
 {
     static PopupContentGenerator()
     {
-        DataContextProperty.OverrideMetadata(typeof(PopupContentGenerator), new FrameworkPropertyMetadata(null, OnDataContextChangedCallback));
+        DataContextProperty.OverrideMetadata(typeof(PopupContentGenerator), new FrameworkPropertyMetadata(null, OnDataContextChanged));
     }
 
-    private static void OnDataContextChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnDataContextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         PopupContentGenerator generator = (PopupContentGenerator)d;
         generator.Child = e.NewValue is LookupDisplayResult displayItem
