@@ -56,7 +56,7 @@ public static class NetworkUtils
                         bool foundRelease = false;
                         string architecture = RuntimeInformation.ProcessArchitecture is Architecture.Arm64
                             ? "arm64"
-                            : Environment.Is64BitProcess
+                            : Utils.Is64BitProcess
                                 ? "x64"
                                 : "x86";
 

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
 using static JL.Windows.WinApi.NativeMethods;
@@ -86,7 +87,7 @@ internal sealed partial class WinApi
 
         internal static nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong)
         {
-            return Environment.Is64BitProcess
+            return Utils.Is64BitProcess
                 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
                 : SetWindowLong32(hWnd, nIndex, (int)dwNewLong);
         }
@@ -101,7 +102,7 @@ internal sealed partial class WinApi
 
         internal static nint GetWindowLongPtr(nint hWnd, int nIndex)
         {
-            return Environment.Is64BitProcess
+            return Utils.Is64BitProcess
                 ? GetWindowLongPtr64(hWnd, nIndex)
                 : GetWindowLongPtr32(hWnd, nIndex);
         }

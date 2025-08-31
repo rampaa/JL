@@ -225,7 +225,7 @@ public static class DBUtils
         command.CommandText = "PRAGMA cache_size = 0;";
         _ = command.ExecuteNonQuery();
 
-        if (Environment.Is64BitProcess)
+        if (Utils.Is64BitProcess)
         {
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
             command.CommandText = $"PRAGMA mmap_size = {1024L * 1024L * 2000L};";

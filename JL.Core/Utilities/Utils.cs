@@ -27,6 +27,7 @@ public static class Utils
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(ApplicationPath, "Resources");
     public static readonly string ConfigPath = Path.Join(ApplicationPath, "Config");
+    public static readonly bool Is64BitProcess = Environment.Is64BitProcess;
     internal static StringPool StringPoolInstance => StringPool.Shared;
     public static readonly ObjectPool<StringBuilder> StringBuilderPool = new DefaultObjectPoolProvider().CreateStringBuilderPool(1024, 1024 * 4);
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
