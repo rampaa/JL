@@ -21,8 +21,6 @@
   <!--Transitive dependencies-->
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Reflection.Metadata" Version="9.0.8" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.8" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />
     <PackageReference Include="Microsoft.Testing.Extensions.VSTestBridge" Version="1.8.3" />
     <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="1.8.3" />

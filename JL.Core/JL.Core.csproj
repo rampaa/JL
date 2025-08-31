@@ -22,7 +22,6 @@
   
   <!--Transitive dependencies-->
   <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.6.3" />
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.1" />
     <PackageReference Include="sourcegear.sqlite3" Version="3.50.4.1" />
