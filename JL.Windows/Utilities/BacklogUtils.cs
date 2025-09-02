@@ -11,8 +11,8 @@ namespace JL.Windows.Utilities;
 
 internal static class BacklogUtils
 {
-    private static LinkedListNode<string>? s_currentNode;
     private static readonly LinkedList<string> s_backlog = [];
+    private static LinkedListNode<string>? s_currentNode;
     public static string? LastItem => s_backlog.Last?.Value;
 
     public static void AddToBacklog(string text)

@@ -116,7 +116,7 @@ internal static class MagpieUtils
 
         SourceWindowRect = new Rect(sourceWindowLeftEdgePosition, sourceWindowTopEdgePosition, sourceWindowWidth, sourceWindowHeight);
 
-        // MagpieUtils.SourceWindowHandle = MagpieUtils.GetSourceWindowHande(lParam);
+        // SourceWindowHandle = GetSourceWindowHande(lParam);
 
         double magpieWindowWidth = MagpieWindowRightEdgePosition - MagpieWindowLeftEdgePosition;
         DpiAwareMagpieWindowWidth = magpieWindowWidth / WindowsUtils.Dpi.DpiScaleX;

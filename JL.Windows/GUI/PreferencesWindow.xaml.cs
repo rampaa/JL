@@ -617,7 +617,6 @@ internal sealed partial class PreferencesWindow
             CoreConfigManager.Instance.AnkiConnectUri = new Uri(normalizedUrl);
             AnkiUriTextBox.Text = normalizedUrl;
         }
-
         else
         {
             WindowsUtils.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
