@@ -627,11 +627,11 @@ internal sealed class PopupContentGenerator : Decorator
             {
                 for (int i = 0; i < result.ImagePaths.Length; i++)
                 {
-                    string imagePath = result.ImagePaths[i];
+                    string imagePath = Path.GetFullPath(result.ImagePaths[i], Utils.ApplicationPath);
 
                     BitmapImage bitmap = new();
                     bitmap.BeginInit();
-                    bitmap.UriSource = new Uri(Path.GetFullPath(imagePath, Utils.ApplicationPath));
+                    bitmap.UriSource = new Uri(imagePath);
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
                     bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
 
