@@ -152,6 +152,8 @@ public static class AudioUtils
                             .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
                             .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
 
+                        normalizedUriStr = Path.GetFullPath(normalizedUriStr, Utils.ApplicationPath);
+
                         Uri normalizedUri = new(normalizedUriStr);
                         audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
 
