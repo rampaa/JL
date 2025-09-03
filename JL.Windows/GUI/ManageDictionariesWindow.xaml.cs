@@ -127,8 +127,7 @@ internal sealed partial class ManageDictionariesWindow
                 Margin = new Thickness(10)
             };
 
-            string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-            bool invalidPath = !Directory.Exists(fullPath) && !File.Exists(fullPath);
+            bool invalidPath = !Path.Exists(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
             TextBlock dictPathValidityTextBlock = new()
             {
                 Width = 13,

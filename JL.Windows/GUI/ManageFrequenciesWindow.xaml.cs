@@ -125,8 +125,7 @@ internal sealed partial class ManageFrequenciesWindow
                 Margin = new Thickness(10)
             };
 
-            string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
-            bool invalidPath = !Path.Exists(fullPath);
+            bool invalidPath = !Path.Exists(Path.GetFullPath(freq.Path, Utils.ApplicationPath));
             TextBlock freqPathValidityTextBlock = new()
             {
                 Width = 13,
