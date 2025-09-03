@@ -631,7 +631,7 @@ internal sealed class PopupContentGenerator : Decorator
 
                     BitmapImage bitmap = new();
                     bitmap.BeginInit();
-                    bitmap.UriSource = new Uri(imagePath, UriKind.RelativeOrAbsolute);
+                    bitmap.UriSource = new Uri(Path.GetFullPath(imagePath, Utils.ApplicationPath));
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
                     bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
 

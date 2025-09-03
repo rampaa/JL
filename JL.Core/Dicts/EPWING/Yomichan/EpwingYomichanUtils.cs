@@ -272,7 +272,7 @@ internal static class EpwingYomichanUtils
 
     public static void UpdateRevisionInfo(Dict dict)
     {
-        string indexJsonPath = Path.Join(dict.Path, "index.json");
+        string indexJsonPath = Path.GetFullPath(Path.Join(dict.Path, "index.json"), Utils.ApplicationPath);
         if (File.Exists(indexJsonPath))
         {
             JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
