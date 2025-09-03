@@ -391,7 +391,7 @@ public static class FreqUtils
                     freq.Priority = priority;
                     ++priority;
 
-                    freq.Path = Utils.GetPath(freq.Path);
+                    freq.Path = Utils.GetPortablePath(freq.Path);
                     if (freq.Type is FreqType.Yomichan or FreqType.YomichanKanji && freq.Revision is null)
                     {
                         UpdateRevisionInfo(freq);

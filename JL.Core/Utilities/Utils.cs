@@ -204,11 +204,12 @@ public static class Utils
         }
     }
 
-    public static string GetPath(string path)
+    public static string GetPortablePath(string path)
     {
         string fullPath = Path.GetFullPath(path, ApplicationPath);
-        string relativePath = Path.GetRelativePath(ApplicationPath, fullPath);
-        return relativePath[0] is '.' ? fullPath : relativePath;
+        return fullPath.StartsWith(ApplicationPath, StringComparison.Ordinal)
+            ? Path.GetRelativePath(ApplicationPath, fullPath)
+            : fullPath;
     }
 
     internal static T[]? ConcatNullableArrays<T>(params ReadOnlySpan<T[]?> arrays)

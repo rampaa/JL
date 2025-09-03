@@ -1428,7 +1428,7 @@ public static class DictUtils
 
                     InitDictOptions(dict);
 
-                    dict.Path = Utils.GetPath(dict.Path);
+                    dict.Path = Utils.GetPortablePath(dict.Path);
                     Dicts.Add(dict.Name, dict);
                 }
             }

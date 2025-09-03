@@ -170,7 +170,7 @@ internal sealed partial class EditFrequencyWindow
 
         if (openFileDialog.ShowDialog() is true)
         {
-            PathTextBlock.Text = Utils.GetPath(openFileDialog.FileName);
+            PathTextBlock.Text = Utils.GetPortablePath(openFileDialog.FileName);
         }
     }
 
@@ -189,7 +189,7 @@ internal sealed partial class EditFrequencyWindow
 
         if (openFolderDialog.ShowDialog() is true)
         {
-            PathTextBlock.Text = Utils.GetPath(openFolderDialog.FolderName);
+            PathTextBlock.Text = Utils.GetPortablePath(openFolderDialog.FolderName);
             string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
             if (File.Exists(indexJsonPath))
             {

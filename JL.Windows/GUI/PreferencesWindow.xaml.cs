@@ -188,8 +188,8 @@ internal sealed partial class PreferencesWindow
         }
 
         _profileName = ProfileUtils.CurrentProfileName;
-        _profileNamesDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName));
-        _profileWordsDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName));
+        _profileNamesDict.Path = Utils.GetPortablePath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName));
+        _profileWordsDict.Path = Utils.GetPortablePath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName));
 
         if (!_profileNamesDict.Active && !_profileWordsDict.Active)
         {
