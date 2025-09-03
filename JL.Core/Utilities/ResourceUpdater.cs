@@ -136,7 +136,11 @@ public static class ResourceUpdater
                 string fullDictPath = Path.GetFullPath(path, Utils.ApplicationPath);
                 if (Directory.Exists(fullDictPath))
                 {
-                    indexRequest.Headers.IfModifiedSince = File.GetLastWriteTime(Path.Join(fullDictPath, "index.json"));
+                    string indexJsonPath = Path.Join(fullDictPath, "index.json");
+                    if (File.Exists(indexJsonPath))
+                    {
+                        indexRequest.Headers.IfModifiedSince = File.GetLastWriteTime(indexJsonPath);
+                    }
                 }
 
                 using HttpResponseMessage indexResponse = await NetworkUtils.Client.SendAsync(indexRequest, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
@@ -314,11 +318,7 @@ public static class ResourceUpdater
         Uri? uri = dict.Url;
         Debug.Assert(uri is not null);
 
-        bool downloaded = await DownloadBuiltInDict(dict.Path,
-                uri,
-                nameof(DictType.JMdict), isUpdate, noPrompt)
-            .ConfigureAwait(false);
-
+        bool downloaded = await DownloadBuiltInDict(dict.Path, uri, nameof(DictType.JMdict), isUpdate, noPrompt).ConfigureAwait(false);
         if (downloaded)
         {
             dict.Ready = false;
@@ -374,11 +374,7 @@ public static class ResourceUpdater
         Uri? uri = dict.Url;
         Debug.Assert(uri is not null);
 
-        bool downloaded = await DownloadBuiltInDict(dict.Path,
-                uri,
-                nameof(DictType.JMnedict), isUpdate, noPrompt)
-            .ConfigureAwait(false);
-
+        bool downloaded = await DownloadBuiltInDict(dict.Path, uri, nameof(DictType.JMnedict), isUpdate, noPrompt).ConfigureAwait(false);
         if (downloaded)
         {
             dict.Ready = false;
@@ -431,11 +427,7 @@ public static class ResourceUpdater
         Uri? uri = dict.Url;
         Debug.Assert(uri is not null);
 
-        bool downloaded = await DownloadBuiltInDict(dict.Path,
-                uri,
-                nameof(DictType.Kanjidic), isUpdate, noPrompt)
-            .ConfigureAwait(false);
-
+        bool downloaded = await DownloadBuiltInDict(dict.Path, uri, nameof(DictType.Kanjidic), isUpdate, noPrompt).ConfigureAwait(false);
         if (downloaded)
         {
             dict.Ready = false;
@@ -488,7 +480,6 @@ public static class ResourceUpdater
         Debug.Assert(dict.Revision is not null);
 
         bool downloaded = await DownloadYomichanDict(uri, dict.Revision, dict.Name, dict.Path, isUpdate, noPrompt).ConfigureAwait(false);
-
         if (downloaded)
         {
             dict.Ready = false;
@@ -666,9 +657,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
-            fullPath = Path.Join(fullPath, "index.json");
-
+            string fullPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), Utils.ApplicationPath);
             bool pathExists = File.Exists(fullPath);
             if (!pathExists || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
             {
