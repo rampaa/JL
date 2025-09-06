@@ -17,6 +17,7 @@ using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Lookup;
 
@@ -71,6 +72,62 @@ public static class LookupUtils
                         ++currentIndex;
                     }
                 }
+            }
+        }
+
+        using DisposableItemArray<SqliteConnection> sqliteFreqConnectionsForJmdict = dbWordFreqs is not null && DictUtils.JmdictIsActive
+            ? new DisposableItemArray<SqliteConnection>(dbWordFreqs.Length)
+            : default;
+
+        using DisposableItemArray<SqliteConnection> sqliteFreqConnectionsForCustomWordDict = dbWordFreqs is not null && DictUtils.AnyCustomWordDictIsActive
+            ? new DisposableItemArray<SqliteConnection>(dbWordFreqs.Length)
+            : default;
+
+        bool sqliteFreqConnectionsForJmdictExist = sqliteFreqConnectionsForJmdict.Items is not null;
+        bool sqliteFreqConnectionsForCustomWordDictExist = sqliteFreqConnectionsForCustomWordDict.Items is not null;
+
+        SqliteConnection[]? freqConnectionsForJmdict = null;
+        SqliteConnection[]? freqConnectionsForCustomWordDict = null;
+        if (sqliteFreqConnectionsForJmdictExist || sqliteFreqConnectionsForCustomWordDictExist)
+        {
+            Debug.Assert(dbWordFreqs is not null);
+            if (sqliteFreqConnectionsForJmdictExist)
+            {
+                Debug.Assert(sqliteFreqConnectionsForJmdict.Items is not null);
+                freqConnectionsForJmdict = sqliteFreqConnectionsForJmdict.Items;
+            }
+            else
+            {
+                freqConnectionsForJmdict = null;
+            }
+
+            if (sqliteFreqConnectionsForCustomWordDictExist)
+            {
+                Debug.Assert(sqliteFreqConnectionsForCustomWordDict.Items is not null);
+                freqConnectionsForCustomWordDict = sqliteFreqConnectionsForCustomWordDict.Items;
+            }
+            else
+            {
+                freqConnectionsForCustomWordDict = null;
+            }
+
+            int index = 0;
+            foreach (Freq dbWordFreq in dbWordFreqs)
+            {
+                string freqPath = DBUtils.GetFreqDBPath(dbWordFreq.Name);
+                if (sqliteFreqConnectionsForJmdictExist)
+                {
+                    Debug.Assert(freqConnectionsForJmdict is not null);
+                    freqConnectionsForJmdict[index] = DBUtils.CreateReadOnlyDBConnection(freqPath);
+                }
+
+                if (sqliteFreqConnectionsForCustomWordDictExist)
+                {
+                    Debug.Assert(freqConnectionsForCustomWordDict is not null);
+                    freqConnectionsForCustomWordDict[index] = DBUtils.CreateReadOnlyDBConnection(freqPath);
+                }
+
+                ++index;
             }
         }
 
@@ -328,6 +385,14 @@ public static class LookupUtils
             }
         }
 
+        using SqliteConnection? sqliteConnectionForJmdictPitch = dbIsUsedForPitchDict && DictUtils.JmdictIsActive
+            ? DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(pitchDict!.Name))
+            : null;
+
+        using SqliteConnection? sqliteConnectionForCustomWordPitch = dbIsUsedForPitchDict && DictUtils.AnyCustomWordDictIsActive
+            ? DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(pitchDict!.Name))
+            : null;
+
         _ = Parallel.ForEach(dicts, dict =>
         {
             bool useDB = dbIsUsedAtLeastForOneDict && dict.Options.UseDB.Value && dict.Ready;
@@ -337,7 +402,8 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult> jmdictResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, allTextWithoutLongVowelMark, dict, useDB, JmdictDBManager.GetRecordsFromDB, parameter, verbParameter, jmdictTextWithoutLongVowelMarkParameter);
                     if (jmdictResults.Count > 0)
                     {
-                        lookupResults.AddRange(BuildJmdictResult(jmdictResults, wordFreqs, dbWordFreqs, dbIsUsedForPitchDict, pitchDict));
+                        // ReSharper disable once AccessToDisposedClosure
+                        lookupResults.AddRange(BuildJmdictResult(jmdictResults, wordFreqs, dbWordFreqs, freqConnectionsForJmdict, dbIsUsedForPitchDict, sqliteConnectionForJmdictPitch, pitchDict));
                     }
                     break;
 
@@ -380,7 +446,8 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult> customWordResults = GetWordResults(textList.AsReadOnlySpan(), textInHiraganaList, deconjugationResultsList, deconjugatedTexts, textWithoutLongVowelMarksList, allTextWithoutLongVowelMark, dict, false, null, parameter, verbParameter, null);
                     if (customWordResults.Count > 0)
                     {
-                        lookupResults.AddRange(BuildCustomWordResult(customWordResults, wordFreqs, dbWordFreqs, dbIsUsedForPitchDict, pitchDict));
+                        // ReSharper disable once AccessToDisposedClosure
+                        lookupResults.AddRange(BuildCustomWordResult(customWordResults, wordFreqs, dbWordFreqs, freqConnectionsForCustomWordDict, dbIsUsedForPitchDict, sqliteConnectionForCustomWordPitch, pitchDict));
                     }
                     break;
 
@@ -562,11 +629,12 @@ public static class LookupUtils
         {
             Debug.Assert(getRecordsFromDB is not null);
             Debug.Assert(queryOrParameter is not null);
-            Debug.Assert(deconjugatedTexts is not null);
-            Debug.Assert(verbQueryOrParameter is not null);
-
             dbWordDict = getRecordsFromDB(dict.Name, textInHiraganaList.AsReadOnlySpan(), queryOrParameter);
+
+            Debug.Assert(verbQueryOrParameter is not null);
+            Debug.Assert(deconjugatedTexts is not null);
             dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts.AsReadOnlySpan(), verbQueryOrParameter);
+
             if (allTextWithoutLongVowelMark is not null)
             {
                 Debug.Assert(longVowelQueryOrParameter is not null);
@@ -768,6 +836,24 @@ public static class LookupUtils
             : null;
     }
 
+    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, SqliteConnection[] connections, HashSet<string> searchKeys)
+    {
+        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Length, StringComparer.Ordinal);
+        _ = Parallel.For(0, dbFreqs.Length, i =>
+        {
+            Freq freq = dbFreqs[i];
+            SqliteConnection connection = connections[i];
+
+            Dictionary<string, List<FrequencyRecord>>? freqRecords = FreqDBManager.GetRecordsFromDB(connection, searchKeys);
+            if (freqRecords is not null)
+            {
+                _ = frequencyDicts.TryAdd(freq.Name, freqRecords);
+            }
+        });
+
+        return frequencyDicts;
+    }
+
     private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, HashSet<string> searchKeys)
     {
         ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Length, StringComparer.Ordinal);
@@ -784,7 +870,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildJmdictResult(
-        Dictionary<string, IntermediaryResult> jmdictResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, bool dbIsUsedForPitchDict, Dict? pitchDict)
+        Dictionary<string, IntermediaryResult> jmdictResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, SqliteConnection[]? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchDictConnection, Dict? pitchDict)
     {
         bool wordFreqsExist = wordFreqs is not null;
         bool dbWordFreqsExist = dbWordFreqs is not null;
@@ -802,8 +888,9 @@ public static class LookupUtils
             if (dbWordFreqsExist)
             {
                 Debug.Assert(dbWordFreqs is not null);
+                Debug.Assert(dbWordFreqConnections is not null);
                 Debug.Assert(searchKeys is not null);
-                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, searchKeys);
+                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, dbWordFreqConnections, searchKeys);
             }
         },
         () =>
@@ -812,7 +899,8 @@ public static class LookupUtils
             {
                 Debug.Assert(pitchDict is not null);
                 Debug.Assert(searchKeys is not null);
-                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.Name, searchKeys);
+                Debug.Assert(pitchDictConnection is not null);
+                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDictConnection, searchKeys);
             }
             else
             {
@@ -1159,7 +1247,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildCustomWordResult(
-        Dictionary<string, IntermediaryResult> customWordResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, bool dbIsUsedForPitchDict, Dict? pitchDict)
+        Dictionary<string, IntermediaryResult> customWordResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, SqliteConnection[]? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchConnection, Dict? pitchDict)
     {
         bool wordFreqsExist = wordFreqs is not null;
         bool dbWordFreqsExist = dbWordFreqs is not null;
@@ -1177,8 +1265,9 @@ public static class LookupUtils
             if (dbWordFreqsExist)
             {
                 Debug.Assert(dbWordFreqs is not null);
+                Debug.Assert(dbWordFreqConnections is not null);
                 Debug.Assert(searchKeys is not null);
-                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, searchKeys);
+                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, dbWordFreqConnections, searchKeys);
             }
         },
         () =>
@@ -1187,7 +1276,8 @@ public static class LookupUtils
             {
                 Debug.Assert(pitchDict is not null);
                 Debug.Assert(searchKeys is not null);
-                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.Name, searchKeys);
+                Debug.Assert(pitchConnection is not null);
+                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchConnection, searchKeys);
             }
             else
             {
