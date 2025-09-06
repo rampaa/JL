@@ -565,23 +565,13 @@ public static class LookupUtils
             Debug.Assert(deconjugatedTexts is not null);
             Debug.Assert(verbQueryOrParameter is not null);
 
-            Parallel.Invoke(
-                () =>
-                {
-                    dbWordDict = getRecordsFromDB(dict.Name, textInHiraganaList.AsReadOnlySpan(), queryOrParameter);
-                },
-                () =>
-                {
-                    dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts.AsReadOnlySpan(), verbQueryOrParameter);
-                },
-                () =>
-                {
-                    if (allTextWithoutLongVowelMark is not null)
-                    {
-                        Debug.Assert(longVowelQueryOrParameter is not null);
-                        dbWordDictForLongVowelConversion = getRecordsFromDB(dict.Name, allTextWithoutLongVowelMark.AsReadOnlySpan(), longVowelQueryOrParameter);
-                    }
-                });
+            dbWordDict = getRecordsFromDB(dict.Name, textInHiraganaList.AsReadOnlySpan(), queryOrParameter);
+            dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts.AsReadOnlySpan(), verbQueryOrParameter);
+            if (allTextWithoutLongVowelMark is not null)
+            {
+                Debug.Assert(longVowelQueryOrParameter is not null);
+                dbWordDictForLongVowelConversion = getRecordsFromDB(dict.Name, allTextWithoutLongVowelMark.AsReadOnlySpan(), longVowelQueryOrParameter);
+            }
         }
 
         bool textWithoutLongVowelMarkListExist = textWithoutLongVowelMarkList is not null;
