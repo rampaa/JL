@@ -1,18 +1,15 @@
 using System.Collections.Frozen;
 using System.Globalization;
 using System.Text;
-using System.Timers;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using Microsoft.Data.Sqlite;
-using Timer = System.Timers.Timer;
 
 namespace JL.Core.Utilities;
 
 public static class DBUtils
 {
-    private static readonly Timer s_optimizePragmaTimer = new();
     internal static FrozenDictionary<string, string> DictDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
     internal static FrozenDictionary<string, string> FreqDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
 
@@ -48,19 +45,6 @@ public static class DBUtils
         return FreqDBPaths.TryGetValue(dbName, out string? dbPath)
             ? dbPath
             : $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite";
-    }
-
-    internal static void InitializeOptimizePragmaTimer()
-    {
-        s_optimizePragmaTimer.Interval = TimeSpan.FromHours(1).TotalMilliseconds;
-        s_optimizePragmaTimer.Elapsed += SendOptimizePragmaToAllDBs;
-        s_optimizePragmaTimer.AutoReset = true;
-        s_optimizePragmaTimer.Enabled = true;
-    }
-
-    private static void SendOptimizePragmaToAllDBs(object? sender, ElapsedEventArgs e)
-    {
-        SendOptimizePragmaToAllDBs();
     }
 
     public static void SendOptimizePragmaToAllDBs()

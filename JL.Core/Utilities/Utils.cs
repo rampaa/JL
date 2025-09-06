@@ -120,7 +120,6 @@ public static class Utils
     {
         NetworkUtils.InitializeUpdaterTimer();
         StatsUtils.InitializeStatsTimer();
-        DBUtils.InitializeOptimizePragmaTimer();
 
         _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
         _ = Directory.CreateDirectory(DBUtils.s_dictDBFolderPath);
