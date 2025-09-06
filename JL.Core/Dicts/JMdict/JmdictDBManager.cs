@@ -242,6 +242,7 @@ internal static class JmdictDBManager
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
+
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
             $"""
@@ -345,7 +346,7 @@ internal static class JmdictDBManager
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
-            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), Utils.Jso).Span;
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))

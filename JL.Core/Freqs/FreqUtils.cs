@@ -364,13 +364,13 @@ public static class FreqUtils
     {
         _ = Directory.CreateDirectory(Utils.ConfigPath);
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-            JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(s_builtInFreqs, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     public static Task SerializeFreqs()
     {
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-            JsonSerializer.Serialize(FreqDicts, Utils.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(FreqDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeFreqs()
@@ -379,7 +379,7 @@ public static class FreqUtils
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Freq>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                .DeserializeAsync<Dictionary<string, Freq>>(fileStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
 
             if (deserializedFreqs is not null)
             {
@@ -467,7 +467,7 @@ public static class FreqUtils
         string indexJsonPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), Utils.ApplicationPath);
         if (File.Exists(indexJsonPath))
         {
-            JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+            JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), JsonOptions.DefaultJso);
 
             freq.Revision = jsonElement.GetProperty("revision").GetString();
             freq.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();

@@ -1,4 +1,4 @@
-namespace JL.Core.Network;
+namespace JL.Core.Network.WebSocket;
 
 public static class WebSocketUtils
 {

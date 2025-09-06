@@ -13,7 +13,7 @@ internal static class DeconjugatorUtils
         Rule[]? rules;
         await using (fileStream.ConfigureAwait(false))
         {
-            rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, Utils.Jso).ConfigureAwait(false);
+            rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
             Debug.Assert(rules is not null);
             Deconjugator.Rules = rules;
         }

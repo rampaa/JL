@@ -21,7 +21,7 @@ internal static class FrequencyNazekaLoader
         await using (fileStream.ConfigureAwait(false))
         {
             frequencyJson = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>>(fileStream, Utils.Jso)
+                .DeserializeAsync<Dictionary<string, ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>>(fileStream, JsonOptions.DefaultJso)
                 .ConfigureAwait(false);
         }
 

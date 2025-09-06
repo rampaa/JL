@@ -4,9 +4,9 @@ using JL.Core.Config;
 using JL.Core.Network;
 using JL.Core.Utilities;
 
-namespace JL.Core.Mining.Anki;
+namespace JL.Core.External.AnkiConnect;
 
-internal static class AnkiConnect
+internal static class AnkiConnectClient
 {
     public static ValueTask<Response?> AddNoteToDeck(Note note)
     {
@@ -80,7 +80,7 @@ internal static class AnkiConnect
         try
         {
             // AnkiConnect doesn't like null values
-            using JsonContent content = JsonContent.Create(request, options: Utils.s_jsoIgnoringWhenWritingNull);
+            using JsonContent content = JsonContent.Create(request, options: JsonOptions.s_jsoIgnoringWhenWritingNull);
 
             // AnkiConnect expects the content to be buffered
             await content.LoadIntoBufferAsync().ConfigureAwait(false);

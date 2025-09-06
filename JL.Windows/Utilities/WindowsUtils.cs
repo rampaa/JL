@@ -16,6 +16,7 @@ using HandyControl.Tools;
 using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
+using JL.Core.External;
 using JL.Core.Freqs;
 using JL.Core.Network;
 using JL.Core.Statistics;

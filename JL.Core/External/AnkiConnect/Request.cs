@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace JL.Core.Mining.Anki;
+namespace JL.Core.External.AnkiConnect;
 
 // ReSharper disable UnusedMember.Global
 internal class Request(string action, int version)

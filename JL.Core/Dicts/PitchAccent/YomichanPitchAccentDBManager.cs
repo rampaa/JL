@@ -146,9 +146,8 @@ internal static class YomichanPitchAccentDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(SqliteConnection connection, HashSet<string> terms)
     {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
@@ -205,6 +204,13 @@ internal static class YomichanPitchAccentDBManager
         return results;
     }
 
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
+    {
+        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        DBUtils.EnableMemoryMapping(connection);
+        return GetRecordsFromDB(connection, terms);
+    }
+
     public static void LoadFromDB(Dict dict)
     {
         using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
@@ -223,7 +229,7 @@ internal static class YomichanPitchAccentDBManager
         while (dataReader.Read())
         {
             PitchAccentRecord record = GetRecord(dataReader);
-            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), Utils.Jso).Span;
+            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso).Span;
             foreach (ref readonly string searchKey in searchKeys)
             {
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))

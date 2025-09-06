@@ -221,7 +221,7 @@ internal sealed partial class EditDictionaryWindow
             string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
             if (File.Exists(indexJsonPath))
             {
-                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), JsonOptions.DefaultJso);
                 NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
 
                 bool isUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();

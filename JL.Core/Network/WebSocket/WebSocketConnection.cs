@@ -4,7 +4,7 @@ using JL.Core.Config;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 
-namespace JL.Core.Network;
+namespace JL.Core.Network.WebSocket;
 internal sealed class WebSocketConnection : IDisposable
 {
     private ClientWebSocket? _webSocketClient;

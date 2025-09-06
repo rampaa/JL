@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
+using JL.Core.Mining;
 
-namespace JL.Core.Mining.Anki;
+namespace JL.Core.External.AnkiConnect;
 
 public sealed class AnkiConfig(string deckName, string modelName, OrderedDictionary<string, JLField> fields, string[]? tags = null)
 {

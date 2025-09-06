@@ -1,9 +1,6 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using CommunityToolkit.HighPerformance.Buffers;
 using JL.Core.Audio;
 using JL.Core.Config;
@@ -45,69 +42,6 @@ public static class Utils
             retainedFileTimeLimit: TimeSpan.FromDays(30),
             shared: true)
         .CreateLogger();
-
-    public static readonly JsonSerializerOptions Jso = new()
-    {
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-    };
-
-    internal static readonly JsonSerializerOptions s_jsoIgnoringWhenWritingNull = new()
-    {
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
-
-    internal static readonly JsonSerializerOptions s_jsoWithEnumConverter = new()
-    {
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        Converters =
-        {
-            new JsonStringEnumConverter()
-        }
-    };
-
-    //internal static readonly JsonSerializerOptions s_jsoIgnoringWhenWritingNullWithEnumConverter = new()
-    //{
-    //    RespectNullableAnnotations = true,
-    //    RespectRequiredConstructorParameters = true,
-    //    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    //    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-    //    Converters =
-    //    {
-    //        new JsonStringEnumConverter()
-    //    }
-    //};
-
-    internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndentation = new()
-    {
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        WriteIndented = true,
-        Converters =
-        {
-            new JsonStringEnumConverter()
-        }
-    };
-
-    internal static readonly JsonSerializerOptions s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation = new()
-    {
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = true,
-        Converters =
-        {
-            new JsonStringEnumConverter()
-        }
-    };
 
 #pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms
     internal static string GetMd5String(ReadOnlySpan<byte> bytes)

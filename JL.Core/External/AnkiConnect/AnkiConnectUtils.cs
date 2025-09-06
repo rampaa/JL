@@ -1,13 +1,13 @@
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace JL.Core.Mining.Anki;
+namespace JL.Core.External.AnkiConnect;
 
-public static class AnkiUtils
+public static class AnkiConnectUtils
 {
     public static async ValueTask<string[]?> GetDeckNames()
     {
-        Response? response = await AnkiConnect.GetDeckNamesResponse().ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.GetDeckNamesResponse().ConfigureAwait(false);
         if (response is null)
         {
             return null;
@@ -30,7 +30,7 @@ public static class AnkiUtils
 
     public static async ValueTask<string[]?> GetModelNames()
     {
-        Response? response = await AnkiConnect.GetModelNamesResponse().ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.GetModelNamesResponse().ConfigureAwait(false);
         if (response is null)
         {
             return null;
@@ -53,7 +53,7 @@ public static class AnkiUtils
 
     public static async ValueTask<string[]?> GetFieldNames(string modelName)
     {
-        Response? response = await AnkiConnect.GetModelFieldNamesResponse(modelName).ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.GetModelFieldNamesResponse(modelName).ConfigureAwait(false);
         if (response is null)
         {
             return null;
@@ -76,7 +76,7 @@ public static class AnkiUtils
 
     internal static async Task<bool?> CanAddNote(Note note)
     {
-        Response? response = await AnkiConnect.GetCanAddNotesResponse([note]).ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.GetCanAddNotesResponse([note]).ConfigureAwait(false);
         if (response is null)
         {
             return null;
@@ -93,7 +93,7 @@ public static class AnkiUtils
 
     internal static async ValueTask<bool[]?> CanAddNotes(List<Note> notes)
     {
-        Response? response = await AnkiConnect.GetCanAddNotesResponse(notes).ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.GetCanAddNotesResponse(notes).ConfigureAwait(false);
         if (response is null)
         {
             return null;

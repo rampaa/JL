@@ -8,8 +8,8 @@ using System.Windows.Input;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.External.AnkiConnect;
 using JL.Core.Mining;
-using JL.Core.Mining.Anki;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -315,11 +315,11 @@ internal sealed partial class PreferencesWindow
 
     private async Task PopulateDeckAndModelNames()
     {
-        string[]? deckNames = await AnkiUtils.GetDeckNames().ConfigureAwait(true);
+        string[]? deckNames = await AnkiConnectUtils.GetDeckNames().ConfigureAwait(true);
 
         if (deckNames is not null)
         {
-            string[]? modelNames = await AnkiUtils.GetModelNames().ConfigureAwait(true);
+            string[]? modelNames = await AnkiConnectUtils.GetModelNames().ConfigureAwait(true);
 
             if (modelNames is not null)
             {
@@ -363,7 +363,7 @@ internal sealed partial class PreferencesWindow
             return;
         }
 
-        string[]? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
+        string[]? fieldNames = await AnkiConnectUtils.GetFieldNames(modelName).ConfigureAwait(true);
         if (fieldNames is not null)
         {
             OrderedDictionary<string, JLField> fields = new(fieldNames.Length, StringComparer.Ordinal);

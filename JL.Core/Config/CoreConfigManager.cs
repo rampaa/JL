@@ -1,5 +1,5 @@
 using JL.Core.Lookup;
-using JL.Core.Network;
+using JL.Core.Network.WebSocket;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;

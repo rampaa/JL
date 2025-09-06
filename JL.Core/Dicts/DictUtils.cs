@@ -33,6 +33,8 @@ public static class DictUtils
     internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; }
     internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; }
     internal static bool DBIsUsedForJmdict { get; private set; }
+    internal static bool JmdictIsActive { get; private set; }
+    internal static bool AnyCustomWordDictIsActive { get; private set; }
     internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; }
     internal static bool AtLeastOneKanjiDictIsActive { get; private set; }
     internal static bool DBIsUsedAtLeastOneYomichanOrNazekaWordDict { get; private set; }
@@ -532,6 +534,7 @@ public static class DictUtils
 
         Dict[] dicts = Dicts.Values.ToArray();
 
+        CheckSingleDictActiveness();
         CheckDBUsageForDicts(dicts);
 
         int customDictionaryTaskCount = 0;
@@ -1333,6 +1336,7 @@ public static class DictUtils
             }
 
             Dict[] dictsSnapshot = Dicts.Values.ToArray();
+            CheckSingleDictActiveness();
             CheckDBUsageForDicts(dictsSnapshot);
 
             if (dictsSnapshot.All(static d => !d.Updating)
@@ -1349,13 +1353,13 @@ public static class DictUtils
     {
         _ = Directory.CreateDirectory(Utils.ConfigPath);
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-            JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(BuiltInDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     public static Task SerializeDicts()
     {
         return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-            JsonSerializer.Serialize(Dicts, Utils.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+            JsonSerializer.Serialize(Dicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeDicts()
@@ -1364,7 +1368,7 @@ public static class DictUtils
         await using (dictStream.ConfigureAwait(false))
         {
             Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
 
             if (deserializedDicts is not null)
             {
@@ -1503,6 +1507,13 @@ public static class DictUtils
                 dict.Options.AutoUpdateAfterNDays ??= new AutoUpdateAfterNDaysOption(0);
             }
         }
+    }
+
+    private static void CheckSingleDictActiveness()
+    {
+        JmdictIsActive = SingleDictTypeDicts.TryGetValue(DictType.JMdict, out Dict? jmdict) && jmdict.Active;
+        AnyCustomWordDictIsActive = (SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict) && customWordDict.Active)
+            || (SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict) && profileCustomWordDict.Active);
     }
 
     private static void CheckDBUsageForDicts(Dict[] dicts)

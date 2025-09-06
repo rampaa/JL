@@ -4,9 +4,9 @@ using System.Text;
 using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
+using JL.Core.External.AnkiConnect;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
-using JL.Core.Mining.Anki;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -1235,7 +1235,7 @@ public static class MiningUtils
             return null;
         }
 
-        bool[]? canAddNoteList = await AnkiUtils.CanAddNotes(notes).ConfigureAwait(false);
+        bool[]? canAddNoteList = await AnkiConnectUtils.CanAddNotes(notes).ConfigureAwait(false);
         if (canAddNoteList is null)
         {
             return null;
@@ -1300,7 +1300,7 @@ public static class MiningUtils
         // Audio/Picture/Video shouldn't be set here
         // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
         Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields);
-        bool? canAddNote = await AnkiUtils.CanAddNote(note).ConfigureAwait(false);
+        bool? canAddNote = await AnkiConnectUtils.CanAddNote(note).ConfigureAwait(false);
         if (canAddNote is null)
         {
             Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {selectedSpelling}");
@@ -1475,7 +1475,7 @@ public static class MiningUtils
                 ];
         }
 
-        Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.AddNoteToDeck(note).ConfigureAwait(false);
         if (response is null)
         {
             Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {selectedSpelling}");
@@ -1495,7 +1495,7 @@ public static class MiningUtils
 
         if (coreConfigManager.ForceSyncAnki)
         {
-            await AnkiConnect.Sync().ConfigureAwait(false);
+            await AnkiConnectClient.Sync().ConfigureAwait(false);
         }
 
         StatsUtils.IncrementStat(StatType.CardsMined);

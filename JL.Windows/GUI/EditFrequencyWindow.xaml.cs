@@ -193,7 +193,7 @@ internal sealed partial class EditFrequencyWindow
             string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
             if (File.Exists(indexJsonPath))
             {
-                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), Utils.Jso);
+                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), JsonOptions.DefaultJso);
                 NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
 
                 if (jsonElement.TryGetProperty("frequencyMode", out JsonElement frequencyModeJsonElement))
