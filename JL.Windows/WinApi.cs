@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using JL.Core.Utilities;
+using JL.Windows.External;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
 using static JL.Windows.WinApi.NativeMethods;

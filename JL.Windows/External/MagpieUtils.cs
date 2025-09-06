@@ -1,6 +1,7 @@
 using System.Windows;
+using JL.Windows.Utilities;
 
-namespace JL.Windows.Utilities;
+namespace JL.Windows.External;
 
 internal static class MagpieUtils
 {

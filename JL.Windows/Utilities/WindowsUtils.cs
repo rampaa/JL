@@ -21,6 +21,7 @@ using JL.Core.Freqs;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Windows.External;
 using JL.Windows.GUI;
 using JL.Windows.SpeechSynthesis;
 using NAudio.Vorbis;
