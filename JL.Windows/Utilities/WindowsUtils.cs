@@ -196,18 +196,18 @@ internal static class WindowsUtils
 
     public static async Task ShowManageDictionariesWindow()
     {
-        if (!File.Exists(Path.Join(Utils.ConfigPath, "dicts.json")))
+        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "dicts.json")))
         {
             await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(true);
         }
 
-        string customWordsPath = Path.Join(Utils.ResourcesPath, "custom_words.txt");
+        string customWordsPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
         if (!File.Exists(customWordsPath))
         {
             await File.Create(customWordsPath).DisposeAsync().ConfigureAwait(true);
         }
 
-        string customNamesPath = Path.Join(Utils.ResourcesPath, "custom_names.txt");
+        string customNamesPath = Path.Join(AppInfo.ResourcesPath, "custom_names.txt");
         if (!File.Exists(customNamesPath))
         {
             await File.Create(customNamesPath).DisposeAsync().ConfigureAwait(true);
@@ -230,7 +230,7 @@ internal static class WindowsUtils
 
     public static async Task ShowManageFrequenciesWindow()
     {
-        if (!File.Exists(Path.Join(Utils.ConfigPath, "freqs.json")))
+        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "freqs.json")))
         {
             await FreqUtils.CreateDefaultFreqsConfig().ConfigureAwait(true);
         }
@@ -272,7 +272,7 @@ internal static class WindowsUtils
 
     public static async Task ShowManageAudioSourcesWindow()
     {
-        if (!File.Exists(Path.Join(Utils.ConfigPath, "AudioSources.json")))
+        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "AudioSources.json")))
         {
             await AudioUtils.CreateDefaultAudioSourceConfig().ConfigureAwait(true);
         }
@@ -329,7 +329,7 @@ internal static class WindowsUtils
 
         if (downloadResponse.IsSuccessStatusCode)
         {
-            string tmpDirectory = Path.Join(Utils.ApplicationPath, "tmp");
+            string tmpDirectory = Path.Join(AppInfo.ApplicationPath, "tmp");
 
             if (Directory.Exists(tmpDirectory))
             {
@@ -348,7 +348,7 @@ internal static class WindowsUtils
             await Application.Current.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
             using Process? process = Process.Start(new ProcessStartInfo
             {
-                WorkingDirectory = Utils.ApplicationPath,
+                WorkingDirectory = AppInfo.ApplicationPath,
                 FileName = "update-helper.cmd",
                 Arguments = Environment.ProcessId.ToString(CultureInfo.InvariantCulture),
                 UseShellExecute = true
@@ -434,7 +434,7 @@ internal static class WindowsUtils
 
         try
         {
-            string[] filePaths = Directory.GetFiles(Path.Join(Utils.ResourcesPath, "Motivation"));
+            string[] filePaths = Directory.GetFiles(Path.Join(AppInfo.ResourcesPath, "Motivation"));
             if (filePaths.Length is 0)
             {
                 Utils.Logger.Warning("Motivation folder is empty!");

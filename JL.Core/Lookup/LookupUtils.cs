@@ -1016,7 +1016,7 @@ public static class LookupUtils
     {
         KanjidicRecord kanjiRecord = (KanjidicRecord)intermediaryResult.Results[0][0];
 
-        string[]? allReadings = Utils.ConcatNullableArrays(kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings);
+        string[]? allReadings = ArrayUtils.ConcatNullableArrays(kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings);
 
         bool pitchAccentDictExists = pitchAccentDict is not null;
         LookupResult result = new
@@ -1047,7 +1047,7 @@ public static class LookupUtils
             {
                 YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)dictRecords[j];
 
-                string[]? allReadings = Utils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
+                string[]? allReadings = ArrayUtils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
                 LookupResult result = new
                 (
                     primarySpelling: kanji,

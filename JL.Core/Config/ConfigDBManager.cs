@@ -29,7 +29,7 @@ public static class ConfigDBManager
         WHERE profile_id = @profileId AND name = @name;
         """;
 
-    private static readonly string s_configsPath = Path.Join(Utils.ConfigPath, "Configs.sqlite");
+    private static readonly string s_configsPath = Path.Join(AppInfo.ConfigPath, "Configs.sqlite");
 
     public static void CreateDB()
     {
@@ -43,7 +43,7 @@ public static class ConfigDBManager
         }
         else
         {
-            _ = Directory.CreateDirectory(Utils.ConfigPath);
+            _ = Directory.CreateDirectory(AppInfo.ConfigPath);
         }
 
         using SqliteConnection connection = DBUtils.CreateDBConnection(s_configsPath);

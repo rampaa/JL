@@ -6,7 +6,7 @@ namespace JL.Core.Dicts.KanjiComposition;
 
 internal static class KanjiCompositionDBManager
 {
-    private static readonly string s_dbPath = Path.Join(Utils.ResourcesPath, "Kanji Compositions.sqlite");
+    private static readonly string s_dbPath = Path.Join(AppInfo.ResourcesPath, "Kanji Compositions.sqlite");
 
     public static string[]? GetRecordsFromDB(string kanji)
     {

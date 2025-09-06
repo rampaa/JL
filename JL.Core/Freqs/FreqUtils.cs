@@ -25,19 +25,19 @@ public static class FreqUtils
         {
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
-                Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
+                Path.Join(AppInfo.ResourcesPath, "freqlist_vns.json"),
                 true, 1, 57273, 35893, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
         {
             "Narou (Nazeka)",
             new Freq(FreqType.Nazeka, "Narou (Nazeka)",
-                Path.Join(Utils.ResourcesPath, "freqlist_narou.json"),
+                Path.Join(AppInfo.ResourcesPath, "freqlist_narou.json"),
                 false, 2, 75588, 48528, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)",
-                Path.Join(Utils.ResourcesPath, "freqlist_novels.json"),
+                Path.Join(AppInfo.ResourcesPath, "freqlist_novels.json"),
                 false, 3, 114348, 74633, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         }
     };
@@ -150,7 +150,7 @@ public static class FreqUtils
 
                             catch (Exception ex)
                             {
-                                string fullFreqPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
+                                string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 freqNamesToBeRemoved ??= [];
@@ -244,7 +244,7 @@ public static class FreqUtils
 
                             catch (Exception ex)
                             {
-                                string fullFreqPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
+                                string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 freqNamesToBeRemoved ??= [];
@@ -362,20 +362,20 @@ public static class FreqUtils
 
     public static Task CreateDefaultFreqsConfig()
     {
-        _ = Directory.CreateDirectory(Utils.ConfigPath);
-        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
+        _ = Directory.CreateDirectory(AppInfo.ConfigPath);
+        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "freqs.json"),
             JsonSerializer.Serialize(s_builtInFreqs, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     public static Task SerializeFreqs()
     {
-        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
+        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "freqs.json"),
             JsonSerializer.Serialize(FreqDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeFreqs()
     {
-        FileStream fileStream = File.OpenRead(Path.Join(Utils.ConfigPath, "freqs.json"));
+        FileStream fileStream = File.OpenRead(Path.Join(AppInfo.ConfigPath, "freqs.json"));
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
@@ -464,7 +464,7 @@ public static class FreqUtils
 
     private static void UpdateRevisionInfo(Freq freq)
     {
-        string indexJsonPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), Utils.ApplicationPath);
+        string indexJsonPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), AppInfo.ApplicationPath);
         if (File.Exists(indexJsonPath))
         {
             JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), JsonOptions.DefaultJso);

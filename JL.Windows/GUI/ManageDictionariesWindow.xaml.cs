@@ -69,7 +69,7 @@ internal sealed partial class ManageDictionariesWindow
             await DictUtils.LoadDictionaries().ConfigureAwait(false);
             await DictUtils.SerializeDicts().ConfigureAwait(false);
 
-            Utils.ClearStringPoolIfDictsAreReady();
+            StringPoolUtils.ClearStringPoolIfDictsAreReady();
         }).ConfigureAwait(false);
     }
 
@@ -127,7 +127,7 @@ internal sealed partial class ManageDictionariesWindow
                 Margin = new Thickness(10)
             };
 
-            bool invalidPath = !Path.Exists(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+            bool invalidPath = !Path.Exists(Path.GetFullPath(dict.Path, AppInfo.ApplicationPath));
             TextBlock dictPathValidityTextBlock = new()
             {
                 Width = 13,
@@ -248,7 +248,7 @@ internal sealed partial class ManageDictionariesWindow
 
     private static void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
+        string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, AppInfo.ApplicationPath);
         if (Path.Exists(fullPath))
         {
             if (File.Exists(fullPath))
@@ -258,7 +258,7 @@ internal sealed partial class ManageDictionariesWindow
 
             if (string.IsNullOrEmpty(fullPath))
             {
-                fullPath = Utils.ApplicationPath;
+                fullPath = AppInfo.ApplicationPath;
             }
 
             using Process process = Process.Start("explorer.exe", fullPath);

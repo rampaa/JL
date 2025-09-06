@@ -627,7 +627,7 @@ internal sealed class PopupContentGenerator : Decorator
             {
                 for (int i = 0; i < result.ImagePaths.Length; i++)
                 {
-                    string imagePath = Path.GetFullPath(result.ImagePaths[i], Utils.ApplicationPath);
+                    string imagePath = Path.GetFullPath(result.ImagePaths[i], AppInfo.ApplicationPath);
 
                     BitmapImage bitmap = new();
                     bitmap.BeginInit();

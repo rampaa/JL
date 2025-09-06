@@ -24,7 +24,7 @@ internal sealed class LookupTests
         Dict jmdict = DictUtils.BuiltInDicts[nameof(DictType.JMdict)];
         jmdict.Options.NewlineBetweenDefinitions = new NewlineBetweenDefinitionsOption(false);
         jmdict.Options.UseDB.Value = false;
-        jmdict.Path = Path.Join(Utils.ResourcesPath, "MockJMdict.xml");
+        jmdict.Path = Path.Join(AppInfo.ResourcesPath, "MockJMdict.xml");
         jmdict.Active = true;
         jmdict.Ready = false;
 

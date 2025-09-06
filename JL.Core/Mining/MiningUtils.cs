@@ -1121,22 +1121,22 @@ public static class MiningUtils
         LookupResult lookupResult = lookupResults[currentLookupResultIndex];
         if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {
-            filePath = Path.Join(Utils.ResourcesPath, "mined_words.txt");
+            filePath = Path.Join(AppInfo.ResourcesPath, "mined_words.txt");
             jlFields = JLFieldUtils.JLFieldsForWordDicts;
         }
         else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
         {
-            filePath = Path.Join(Utils.ResourcesPath, "mined_names.txt");
+            filePath = Path.Join(AppInfo.ResourcesPath, "mined_names.txt");
             jlFields = JLFieldUtils.JLFieldsForNameDicts;
         }
         else if (DictUtils.KanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
-            filePath = Path.Join(Utils.ResourcesPath, "mined_kanjis.txt");
+            filePath = Path.Join(AppInfo.ResourcesPath, "mined_kanjis.txt");
             jlFields = JLFieldUtils.JLFieldsForKanjiDicts;
         }
         else
         {
-            filePath = Path.Join(Utils.ResourcesPath, "mined_others.txt");
+            filePath = Path.Join(AppInfo.ResourcesPath, "mined_others.txt");
             jlFields = JLFieldUtils.JLFieldsForWordDicts;
         }
 

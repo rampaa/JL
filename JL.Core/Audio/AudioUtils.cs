@@ -109,7 +109,7 @@ public static class AudioUtils
 
     private static async ValueTask<AudioResponse?> GetAudioFromPath(Uri uri)
     {
-        string fullPath = Path.GetFullPath(uri.LocalPath, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(uri.LocalPath, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
             string audioFormat = Path.GetExtension(fullPath)[1..];
@@ -152,7 +152,7 @@ public static class AudioUtils
                             .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
                             .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
 
-                        normalizedUriStr = Path.GetFullPath(normalizedUriStr, Utils.ApplicationPath);
+                        normalizedUriStr = Path.GetFullPath(normalizedUriStr, AppInfo.ApplicationPath);
 
                         Uri normalizedUri = new(normalizedUriStr);
                         audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
@@ -195,20 +195,20 @@ public static class AudioUtils
 
     public static Task SerializeAudioSources()
     {
-        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
+        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"),
             JsonSerializer.Serialize(AudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     public static Task CreateDefaultAudioSourceConfig()
     {
-        _ = Directory.CreateDirectory(Utils.ConfigPath);
-        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
+        _ = Directory.CreateDirectory(AppInfo.ConfigPath);
+        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"),
             JsonSerializer.Serialize(s_builtInAudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeAudioSources()
     {
-        FileStream fileStream = File.OpenRead(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"));
+        FileStream fileStream = File.OpenRead(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"));
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer

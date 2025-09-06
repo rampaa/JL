@@ -10,7 +10,7 @@ internal static class KanjidicLoader
 {
     public static async Task Load(Dict dict)
     {
-        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
             XmlReaderSettings xmlReaderSettings = new()

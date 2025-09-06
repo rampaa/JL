@@ -51,12 +51,12 @@ public static class NetworkUtils
 
                     Version latestJLVersion = new(tagName);
 
-                    if (latestJLVersion > Utils.JLVersion)
+                    if (latestJLVersion > AppInfo.JLVersion)
                     {
                         bool foundRelease = false;
                         string architecture = RuntimeInformation.ProcessArchitecture is Architecture.Arm64
                             ? "arm64"
-                            : Utils.Is64BitProcess
+                            : AppInfo.Is64BitProcess
                                 ? "x64"
                                 : "x86";
 

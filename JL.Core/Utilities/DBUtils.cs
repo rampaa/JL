@@ -13,8 +13,8 @@ public static class DBUtils
     internal static FrozenDictionary<string, string> DictDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
     internal static FrozenDictionary<string, string> FreqDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
 
-    internal static readonly string s_freqDBFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
-    internal static readonly string s_dictDBFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
+    internal static readonly string s_freqDBFolderPath = Path.Join(AppInfo.ResourcesPath, "Frequency Databases");
+    internal static readonly string s_dictDBFolderPath = Path.Join(AppInfo.ResourcesPath, "Dictionary Databases");
 
     internal static readonly DictType[] s_dictTypesWithDBSupport =
     [
@@ -209,7 +209,7 @@ public static class DBUtils
         command.CommandText = "PRAGMA cache_size = 0;";
         _ = command.ExecuteNonQuery();
 
-        if (Utils.Is64BitProcess)
+        if (AppInfo.Is64BitProcess)
         {
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
             command.CommandText = $"PRAGMA mmap_size = {1024L * 1024L * 2000L};";

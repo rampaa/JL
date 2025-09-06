@@ -90,7 +90,7 @@ internal sealed partial class AddNameWindow
         PopupWindowUtils.HidePopups(0);
         Close();
 
-        string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        string path = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         string line = $"{spelling}\t{reading}\t{nameType}\t{extraInfo?.ReplaceLineEndings("\\n")}\n";
         return File.AppendAllTextAsync(path, line);
     }

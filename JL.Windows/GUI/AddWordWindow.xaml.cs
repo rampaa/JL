@@ -212,7 +212,7 @@ internal sealed partial class AddWordWindow
             ? $"{rawSpellings}\t{rawReadings}\t{rawDefinitions.ReplaceLineEndings("\\n")}\t{rawPartOfSpeech}\n"
             : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions.ReplaceLineEndings("\\n")}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
 
-        string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        string path = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         return File.AppendAllTextAsync(path, line);
     }
 

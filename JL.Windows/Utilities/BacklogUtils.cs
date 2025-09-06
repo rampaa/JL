@@ -162,7 +162,7 @@ internal static class BacklogUtils
             return Task.CompletedTask;
         }
 
-        string directory = Path.Join(Utils.ApplicationPath, "Backlogs");
+        string directory = Path.Join(AppInfo.ApplicationPath, "Backlogs");
         if (!Directory.Exists(directory))
         {
             _ = Directory.CreateDirectory(directory);

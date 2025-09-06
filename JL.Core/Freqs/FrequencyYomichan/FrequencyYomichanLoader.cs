@@ -9,7 +9,7 @@ internal static class FrequencyYomichanLoader
 {
     public static async Task Load(Freq freq)
     {
-        string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
         if (!Directory.Exists(fullPath))
         {
             return;

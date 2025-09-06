@@ -72,7 +72,7 @@ public static class DictUtils
         {
             nameof(DictType.CustomWordDictionary), new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
-                Path.Join(Utils.ResourcesPath, "custom_words.txt"),
+                Path.Join(AppInfo.ResourcesPath, "custom_words.txt"),
                 true, 1, 128,
                 new DictOptions(
                     new UseDBOption(false),
@@ -85,7 +85,7 @@ public static class DictUtils
         {
             nameof(DictType.CustomNameDictionary), new Dict(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
-                Path.Join(Utils.ResourcesPath, "custom_names.txt"),
+                Path.Join(AppInfo.ResourcesPath, "custom_names.txt"),
                 true, 2, 128,
                 new DictOptions(
                     new UseDBOption(false),
@@ -96,7 +96,7 @@ public static class DictUtils
         },
         {
             nameof(DictType.JMdict), new Dict(DictType.JMdict, nameof(DictType.JMdict),
-                Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMdict)}.xml"),
+                Path.Join(AppInfo.ResourcesPath, $"{nameof(DictType.JMdict)}.xml"),
                 true, 3, 500000,
                 new DictOptions(
                     new UseDBOption(true),
@@ -124,7 +124,7 @@ public static class DictUtils
         },
         {
             nameof(DictType.Kanjidic), new Dict(DictType.Kanjidic, nameof(DictType.Kanjidic),
-                Path.Join(Utils.ResourcesPath, "kanjidic2.xml"),
+                Path.Join(AppInfo.ResourcesPath, "kanjidic2.xml"),
                 true, 4, 13108,
                 new DictOptions(
                     new UseDBOption(true),
@@ -136,7 +136,7 @@ public static class DictUtils
         },
         {
             nameof(DictType.JMnedict), new Dict(DictType.JMnedict, nameof(DictType.JMnedict),
-                Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMnedict)}.xml"),
+                Path.Join(AppInfo.ResourcesPath, $"{nameof(DictType.JMnedict)}.xml"),
                 true, 5, 700000,
                 new DictOptions(
                     new UseDBOption(true),
@@ -630,7 +630,7 @@ public static class DictUtils
                             }
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 File.Delete(fullDictPath);
@@ -712,7 +712,7 @@ public static class DictUtils
                             }
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 File.Delete(fullDictPath);
@@ -801,7 +801,7 @@ public static class DictUtils
                             }
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 File.Delete(fullDictPath);
@@ -892,7 +892,7 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                             }
@@ -976,7 +976,7 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 dictsToBeRemoved ??= [];
@@ -1146,7 +1146,7 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 dictsToBeRemoved ??= [];
@@ -1232,7 +1232,7 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
-                                string fullDictPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                                string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                                 Utils.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                                 Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 dictsToBeRemoved ??= [];
@@ -1351,20 +1351,20 @@ public static class DictUtils
 
     public static Task CreateDefaultDictsConfig()
     {
-        _ = Directory.CreateDirectory(Utils.ConfigPath);
-        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
+        _ = Directory.CreateDirectory(AppInfo.ConfigPath);
+        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "dicts.json"),
             JsonSerializer.Serialize(BuiltInDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     public static Task SerializeDicts()
     {
-        return File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
+        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "dicts.json"),
             JsonSerializer.Serialize(Dicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
     }
 
     internal static async Task DeserializeDicts()
     {
-        FileStream dictStream = File.OpenRead(Path.Join(Utils.ConfigPath, "dicts.json"));
+        FileStream dictStream = File.OpenRead(Path.Join(AppInfo.ConfigPath, "dicts.json"));
         await using (dictStream.ConfigureAwait(false))
         {
             Dictionary<string, Dict>? deserializedDicts = await JsonSerializer

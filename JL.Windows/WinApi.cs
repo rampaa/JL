@@ -88,7 +88,7 @@ internal sealed partial class WinApi
 
         internal static nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong)
         {
-            return Utils.Is64BitProcess
+            return AppInfo.Is64BitProcess
                 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
                 : SetWindowLong32(hWnd, nIndex, (int)dwNewLong);
         }
@@ -103,7 +103,7 @@ internal sealed partial class WinApi
 
         internal static nint GetWindowLongPtr(nint hWnd, int nIndex)
         {
-            return Utils.Is64BitProcess
+            return AppInfo.Is64BitProcess
                 ? GetWindowLongPtr64(hWnd, nIndex)
                 : GetWindowLongPtr32(hWnd, nIndex);
         }

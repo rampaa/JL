@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
 using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Deconjugation;
@@ -20,12 +19,6 @@ namespace JL.Core.Utilities;
 
 public static class Utils
 {
-    public static readonly Version JLVersion = new(3, 8, 3);
-    public static readonly string ApplicationPath = AppContext.BaseDirectory;
-    public static readonly string ResourcesPath = Path.Join(ApplicationPath, "Resources");
-    public static readonly string ConfigPath = Path.Join(ApplicationPath, "Config");
-    public static readonly bool Is64BitProcess = Environment.Is64BitProcess;
-    internal static StringPool StringPoolInstance => StringPool.Shared;
     public static readonly ObjectPool<StringBuilder> StringBuilderPool = new DefaultObjectPoolProvider().CreateStringBuilderPool(1024, 1024 * 4);
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
 
@@ -36,7 +29,7 @@ public static class Utils
 
     public static readonly Logger Logger = new LoggerConfiguration()
         .MinimumLevel.ControlledBy(s_loggingLevelSwitch)
-        .WriteTo.File(Path.Join(ApplicationPath, "Logs", "log.txt"),
+        .WriteTo.File(Path.Join(AppInfo.ApplicationPath, "Logs", "log.txt"),
             formatProvider: CultureInfo.InvariantCulture,
             rollingInterval: RollingInterval.Day,
             retainedFileTimeLimit: TimeSpan.FromDays(30),
@@ -59,28 +52,28 @@ public static class Utils
         _ = Directory.CreateDirectory(DBUtils.s_dictDBFolderPath);
         _ = Directory.CreateDirectory(DBUtils.s_freqDBFolderPath);
 
-        if (!File.Exists(Path.Join(ConfigPath, "dicts.json")))
+        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "dicts.json")))
         {
             await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(false);
         }
 
-        if (!File.Exists(Path.Join(ConfigPath, "freqs.json")))
+        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "freqs.json")))
         {
             await FreqUtils.CreateDefaultFreqsConfig().ConfigureAwait(false);
         }
 
-        if (!File.Exists(Path.Join(ConfigPath, "AudioSourceConfig.json")))
+        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json")))
         {
             await AudioUtils.CreateDefaultAudioSourceConfig().ConfigureAwait(false);
         }
 
-        string customWordsPath = Path.Join(ResourcesPath, "custom_words.txt");
+        string customWordsPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
         if (!File.Exists(customWordsPath))
         {
             await File.Create(customWordsPath).DisposeAsync().ConfigureAwait(false);
         }
 
-        string customNamesPath = Path.Join(ResourcesPath, "custom_names.txt");
+        string customNamesPath = Path.Join(AppInfo.ResourcesPath, "custom_names.txt");
         if (!File.Exists(customNamesPath))
         {
             await File.Create(customNamesPath).DisposeAsync().ConfigureAwait(false);
@@ -123,56 +116,14 @@ public static class Utils
             Task.Run(static () => DeconjugatorUtils.DeserializeRules()))
             .ConfigureAwait(false);
 
-        StringPoolInstance.Reset();
-    }
-
-    public static void ClearStringPoolIfDictsAreReady()
-    {
-        if (DictUtils.DictsReady
-            && FreqUtils.FreqsReady
-            && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating)
-            && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating))
-        {
-            StringPoolInstance.Reset();
-        }
+        StringPoolUtils.StringPoolInstance.Reset();
     }
 
     public static string GetPortablePath(string path)
     {
-        string fullPath = Path.GetFullPath(path, ApplicationPath);
-        return fullPath.StartsWith(ApplicationPath, StringComparison.Ordinal)
-            ? Path.GetRelativePath(ApplicationPath, fullPath)
+        string fullPath = Path.GetFullPath(path, AppInfo.ApplicationPath);
+        return fullPath.StartsWith(AppInfo.ApplicationPath, StringComparison.Ordinal)
+            ? Path.GetRelativePath(AppInfo.ApplicationPath, fullPath)
             : fullPath;
-    }
-
-    internal static T[]? ConcatNullableArrays<T>(params ReadOnlySpan<T[]?> arrays)
-    {
-        int position = 0;
-        int length = 0;
-
-        foreach (ref readonly T[]? array in arrays)
-        {
-            if (array is not null)
-            {
-                length += array.Length;
-            }
-        }
-
-        if (length is 0)
-        {
-            return null;
-        }
-
-        T[] concatArray = new T[length];
-        foreach (ref readonly T[]? array in arrays)
-        {
-            if (array is not null)
-            {
-                array.AsReadOnlySpan().CopyTo(concatArray.AsSpan(position, array.Length));
-                position += array.Length;
-            }
-        }
-
-        return concatArray;
     }
 }

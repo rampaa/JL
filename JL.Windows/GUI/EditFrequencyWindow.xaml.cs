@@ -46,7 +46,7 @@ internal sealed partial class EditFrequencyWindow
         NameTextBox.ToolTip = "Name of the frequency dictionary must be unique";
 
         string path = PathTextBlock.Text;
-        string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(path, AppInfo.ApplicationPath);
         if (string.IsNullOrWhiteSpace(path) || (_freq.Path != path && !Path.Exists(fullPath)))
         {
             PathTextBlock.BorderBrush = Brushes.Red;
@@ -159,7 +159,7 @@ internal sealed partial class EditFrequencyWindow
         string? initialDirectory = Path.GetDirectoryName(_freq.Path);
         if (!Directory.Exists(initialDirectory))
         {
-            initialDirectory = Utils.ApplicationPath;
+            initialDirectory = AppInfo.ApplicationPath;
         }
 
         OpenFileDialog openFileDialog = new()
@@ -179,7 +179,7 @@ internal sealed partial class EditFrequencyWindow
         string initialDirectory = _freq.Path;
         if (!Directory.Exists(initialDirectory))
         {
-            initialDirectory = Utils.ApplicationPath;
+            initialDirectory = AppInfo.ApplicationPath;
         }
 
         OpenFolderDialog openFolderDialog = new()

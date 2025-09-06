@@ -49,7 +49,7 @@ internal sealed partial class AddFrequencyWindow
         }
 
         string path = PathTextBlock.Text;
-        string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(path, AppInfo.ApplicationPath);
 
         if (string.IsNullOrWhiteSpace(path) || !Path.Exists(fullPath))
         {
@@ -113,7 +113,7 @@ internal sealed partial class AddFrequencyWindow
     {
         OpenFileDialog openFileDialog = new()
         {
-            InitialDirectory = Utils.ApplicationPath,
+            InitialDirectory = AppInfo.ApplicationPath,
             Filter = filter
         };
 
@@ -127,7 +127,7 @@ internal sealed partial class AddFrequencyWindow
     {
         OpenFolderDialog openFolderDialog = new()
         {
-            InitialDirectory = Utils.ApplicationPath
+            InitialDirectory = AppInfo.ApplicationPath
         };
 
         if (openFolderDialog.ShowDialog() is true)

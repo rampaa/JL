@@ -31,7 +31,7 @@ public static class ResourceUpdater
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, dictDownloadUri);
 
-                string fullDictPath = Path.GetFullPath(dictPath, Utils.ApplicationPath);
+                string fullDictPath = Path.GetFullPath(dictPath, AppInfo.ApplicationPath);
                 if (File.Exists(fullDictPath))
                 {
                     request.Headers.IfModifiedSince = File.GetLastWriteTime(fullDictPath);
@@ -101,7 +101,7 @@ public static class ResourceUpdater
                 Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
             }
 
-            string tempDictPath = GetTempPath(Path.GetFullPath(dictPath, Utils.ApplicationPath));
+            string tempDictPath = GetTempPath(Path.GetFullPath(dictPath, AppInfo.ApplicationPath));
             if (File.Exists(tempDictPath))
             {
                 File.Delete(tempDictPath);
@@ -133,7 +133,7 @@ public static class ResourceUpdater
             {
                 using HttpRequestMessage indexRequest = new(HttpMethod.Get, url);
 
-                string fullDictPath = Path.GetFullPath(path, Utils.ApplicationPath);
+                string fullDictPath = Path.GetFullPath(path, AppInfo.ApplicationPath);
                 if (Directory.Exists(fullDictPath))
                 {
                     string indexJsonPath = Path.Join(fullDictPath, "index.json");
@@ -265,7 +265,7 @@ public static class ResourceUpdater
                 Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
             }
 
-            string tempDictPath = GetTempPath(Path.GetFullPath(path, Utils.ApplicationPath));
+            string tempDictPath = GetTempPath(Path.GetFullPath(path, AppInfo.ApplicationPath));
             if (Directory.Exists(tempDictPath))
             {
                 Directory.Delete(tempDictPath, true);
@@ -357,7 +357,7 @@ public static class ResourceUpdater
         }
 
         dict.Updating = false;
-        Utils.ClearStringPoolIfDictsAreReady();
+        StringPoolUtils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateJmnedict(bool isUpdate, bool noPrompt)
@@ -410,7 +410,7 @@ public static class ResourceUpdater
         }
 
         dict.Updating = false;
-        Utils.ClearStringPoolIfDictsAreReady();
+        StringPoolUtils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateKanjidic(bool isUpdate, bool noPrompt)
@@ -463,7 +463,7 @@ public static class ResourceUpdater
         }
 
         dict.Updating = false;
-        Utils.ClearStringPoolIfDictsAreReady();
+        StringPoolUtils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateYomichanDict(Dict dict, bool isUpdate, bool noPrompt)
@@ -542,7 +542,7 @@ public static class ResourceUpdater
         }
 
         dict.Updating = false;
-        Utils.ClearStringPoolIfDictsAreReady();
+        StringPoolUtils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateYomichanFreqDict(Freq freq, bool isUpdate, bool noPrompt)
@@ -595,7 +595,7 @@ public static class ResourceUpdater
         }
 
         freq.Updating = false;
-        Utils.ClearStringPoolIfDictsAreReady();
+        StringPoolUtils.ClearStringPoolIfDictsAreReady();
     }
 
     internal static Task AutoUpdateDicts()
@@ -615,7 +615,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+            string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
             if (DictUtils.YomichanDictTypes.Contains(dict.Type))
             {
                 fullPath = Path.Join(fullPath, "index.json");
@@ -657,7 +657,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            string fullPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), Utils.ApplicationPath);
+            string fullPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), AppInfo.ApplicationPath);
             bool pathExists = File.Exists(fullPath);
             if (!pathExists || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
             {

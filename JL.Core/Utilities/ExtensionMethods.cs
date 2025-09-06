@@ -194,7 +194,7 @@ public static class ExtensionMethods
 
     internal static string GetPooledString(this string str)
     {
-        return Utils.StringPoolInstance.GetOrAdd(str);
+        return StringPoolUtils.StringPoolInstance.GetOrAdd(str);
     }
 
     internal static void DeduplicateStringsInArray(this string[] strings)

@@ -68,7 +68,7 @@ internal sealed partial class ManageFrequenciesWindow
             await FreqUtils.LoadFrequencies().ConfigureAwait(false);
             await FreqUtils.SerializeFreqs().ConfigureAwait(false);
 
-            Utils.ClearStringPoolIfDictsAreReady();
+            StringPoolUtils.ClearStringPoolIfDictsAreReady();
         }).ConfigureAwait(false);
     }
 
@@ -125,7 +125,7 @@ internal sealed partial class ManageFrequenciesWindow
                 Margin = new Thickness(10)
             };
 
-            bool invalidPath = !Path.Exists(Path.GetFullPath(freq.Path, Utils.ApplicationPath));
+            bool invalidPath = !Path.Exists(Path.GetFullPath(freq.Path, AppInfo.ApplicationPath));
             TextBlock freqPathValidityTextBlock = new()
             {
                 Width = 13,
@@ -217,7 +217,7 @@ internal sealed partial class ManageFrequenciesWindow
 
     private static void PathTextBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
+        string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, AppInfo.ApplicationPath);
         if (Path.Exists(fullPath))
         {
             if (File.Exists(fullPath))

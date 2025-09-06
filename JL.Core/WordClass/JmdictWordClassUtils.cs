@@ -18,7 +18,7 @@ internal static class JmdictWordClassUtils
 
     internal static async Task Load()
     {
-        FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "PoS.json"));
+        FileStream fileStream = File.OpenRead(Path.Join(AppInfo.ResourcesPath, "PoS.json"));
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, IList<JmdictWordClass>>? wordClassDictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
@@ -163,15 +163,15 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        return File.WriteAllTextAsync(Path.Join(Utils.ResourcesPath, "PoS.json"),
+        return File.WriteAllTextAsync(Path.Join(AppInfo.ResourcesPath, "PoS.json"),
             JsonSerializer.Serialize(jmdictWordClassDictionary, JsonOptions.s_jsoIgnoringWhenWritingNull));
     }
 
     internal static async Task Initialize()
     {
         Dict jmdictDict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        string jmdictPath = Path.GetFullPath(jmdictDict.Path, Utils.ApplicationPath);
-        string partOfSpeechFilePath = Path.Join(Utils.ResourcesPath, "PoS.json");
+        string jmdictPath = Path.GetFullPath(jmdictDict.Path, AppInfo.ApplicationPath);
+        string partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
 
         if (!File.Exists(partOfSpeechFilePath)
             || (File.Exists(jmdictPath) && File.GetLastWriteTime(jmdictPath) > File.GetLastWriteTime(partOfSpeechFilePath)))

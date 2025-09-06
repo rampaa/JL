@@ -13,8 +13,8 @@ public static class AnkiConfigUtils
     {
         try
         {
-            _ = Directory.CreateDirectory(Utils.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AnkiConfig.json"),
+            _ = Directory.CreateDirectory(AppInfo.ConfigPath);
+            await File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "AnkiConfig.json"),
                 JsonSerializer.Serialize(ankiConfig, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation)).ConfigureAwait(false);
 
             s_ankiConfigDict = ankiConfig;
@@ -34,7 +34,7 @@ public static class AnkiConfigUtils
             return s_ankiConfigDict;
         }
 
-        string filePath = Path.Join(Utils.ConfigPath, "AnkiConfig.json");
+        string filePath = Path.Join(AppInfo.ConfigPath, "AnkiConfig.json");
         if (File.Exists(filePath))
         {
             try

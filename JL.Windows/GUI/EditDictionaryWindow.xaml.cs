@@ -48,7 +48,7 @@ internal sealed partial class EditDictionaryWindow
         NameTextBox.ToolTip = "Dictionary name must be unique";
 
         string path = PathTextBlock.Text;
-        string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(path, AppInfo.ApplicationPath);
 
         if (string.IsNullOrWhiteSpace(path) || (_dict.Path != path && !Path.Exists(fullPath)))
         {
@@ -187,7 +187,7 @@ internal sealed partial class EditDictionaryWindow
         string? initialDirectory = Path.GetDirectoryName(_dict.Path);
         if (!Directory.Exists(initialDirectory))
         {
-            initialDirectory = Utils.ApplicationPath;
+            initialDirectory = AppInfo.ApplicationPath;
         }
 
         OpenFileDialog openFileDialog = new()
@@ -207,7 +207,7 @@ internal sealed partial class EditDictionaryWindow
         string initialDirectory = _dict.Path;
         if (!Directory.Exists(initialDirectory))
         {
-            initialDirectory = Utils.ApplicationPath;
+            initialDirectory = AppInfo.ApplicationPath;
         }
 
         OpenFolderDialog openFolderDialog = new()

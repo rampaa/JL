@@ -10,7 +10,7 @@ internal static class EpwingYomichanLoader
 {
     public static async Task Load(Dict dict)
     {
-        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (!Directory.Exists(fullPath))
         {
             return;

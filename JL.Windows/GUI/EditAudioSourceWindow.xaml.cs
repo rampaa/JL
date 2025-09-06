@@ -97,7 +97,7 @@ internal sealed partial class EditAudioSourceWindow
         {
             case AudioSourceType.LocalPath:
                 uri = UriTextBox.Text;
-                string fullPath = Path.GetFullPath(uri, Utils.ApplicationPath);
+                string fullPath = Path.GetFullPath(uri, AppInfo.ApplicationPath);
 
                 if (string.IsNullOrWhiteSpace(uri)
                     || !Path.IsPathFullyQualified(fullPath)
@@ -110,7 +110,7 @@ internal sealed partial class EditAudioSourceWindow
                     return;
                 }
 
-                string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
+                string relativePath = Path.GetRelativePath(AppInfo.ApplicationPath, fullPath);
                 uri = relativePath[0] is '.'
                     ? fullPath
                     : relativePath;

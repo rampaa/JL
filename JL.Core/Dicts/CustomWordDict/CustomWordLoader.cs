@@ -48,7 +48,7 @@ public static class CustomWordLoader
 
     internal static void Load(Dict dict, CancellationToken cancellationToken)
     {
-        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (!File.Exists(fullPath))
         {
             return;

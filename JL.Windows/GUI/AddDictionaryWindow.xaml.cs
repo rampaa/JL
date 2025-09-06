@@ -50,7 +50,7 @@ internal sealed partial class AddDictionaryWindow
         }
 
         string path = PathTextBlock.Text;
-        string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
+        string fullPath = Path.GetFullPath(path, AppInfo.ApplicationPath);
 
         if (string.IsNullOrWhiteSpace(path)
             || !Path.Exists(fullPath))
@@ -126,7 +126,7 @@ internal sealed partial class AddDictionaryWindow
     {
         OpenFileDialog openFileDialog = new()
         {
-            InitialDirectory = Utils.ApplicationPath,
+            InitialDirectory = AppInfo.ApplicationPath,
             Filter = filter
         };
 
@@ -140,7 +140,7 @@ internal sealed partial class AddDictionaryWindow
     {
         OpenFolderDialog openFolderDialog = new()
         {
-            InitialDirectory = Utils.ApplicationPath
+            InitialDirectory = AppInfo.ApplicationPath
         };
 
         if (openFolderDialog.ShowDialog() is true)
