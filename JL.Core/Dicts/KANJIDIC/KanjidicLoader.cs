@@ -40,7 +40,7 @@ internal static class KanjidicLoader
             }
 
             dict.Updating = true;
-            if (await FrontendManager.Frontend.ShowYesNoDialog(
+            if (await FrontendManager.Frontend.ShowYesNoDialogAsync(
                 "Couldn't find kanjidic2.xml. Would you like to download it now?",
                 "Download KANJIDIC2?").ConfigureAwait(false))
             {

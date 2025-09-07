@@ -10,11 +10,9 @@ internal sealed class DummyFrontend : IFrontend
     {
     }
 
-    public Task<bool> ShowYesNoDialog(string text, string caption) => Task.FromResult(true);
+    public Task<bool> ShowYesNoDialogAsync(string text, string caption) => Task.FromResult(true);
 
-    public void ShowOkDialog(string text, string caption)
-    {
-    }
+    public Task ShowOkDialogAsync(string text, string caption) => Task.CompletedTask;
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => Task.CompletedTask;
 

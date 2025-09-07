@@ -75,11 +75,11 @@ public static class NetworkUtils
                                 string? changelog = rootElement.GetProperty("body").GetString();
                                 changelog = string.IsNullOrWhiteSpace(changelog) ? "" : $"\n\nChangelog:\n{changelog}";
 
-                                if (await FrontendManager.Frontend.ShowYesNoDialog(
+                                if (await FrontendManager.Frontend.ShowYesNoDialogAsync(
                                         string.Create(CultureInfo.InvariantCulture, $"JL v{latestJLVersion} is available.{changelog}\n\nWould you like to download it now?"), "Update JL?").ConfigureAwait(false))
                                 {
-                                    FrontendManager.Frontend.ShowOkDialog(
-                                        "This may take a while. Please don't manually shut down the program until it's updated.", "Info");
+                                    await FrontendManager.Frontend.ShowOkDialogAsync(
+                                        "This may take a while. Please don't manually shut down the program until it's updated.", "Info").ConfigureAwait(false);
 
                                     await FrontendManager.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
                                 }
@@ -90,13 +90,13 @@ public static class NetworkUtils
 
                         if (!isAutoCheck && !foundRelease)
                         {
-                            FrontendManager.Frontend.ShowOkDialog("JL is up to date", "Info");
+                            await FrontendManager.Frontend.ShowOkDialogAsync("JL is up to date", "Info").ConfigureAwait(false);
                         }
                     }
 
                     else if (!isAutoCheck)
                     {
-                        FrontendManager.Frontend.ShowOkDialog("JL is up to date", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync("JL is up to date", "Info").ConfigureAwait(false);
                     }
                 }
             }

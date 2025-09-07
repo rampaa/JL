@@ -44,7 +44,7 @@ internal static class JmnedictLoader
             }
 
             dict.Updating = true;
-            if (await FrontendManager.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
+            if (await FrontendManager.Frontend.ShowYesNoDialogAsync("Couldn't find JMnedict.xml. Would you like to download it now?",
                 "Download JMnedict?").ConfigureAwait(false))
             {
                 Uri? uri = dict.Url;

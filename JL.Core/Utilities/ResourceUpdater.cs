@@ -27,7 +27,7 @@ public static class ResourceUpdater
     {
         try
         {
-            if (!isUpdate || noPrompt || await FrontendManager.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dictName}?",
+            if (!isUpdate || noPrompt || await FrontendManager.Frontend.ShowYesNoDialogAsync($"Do you want to download the latest version of {dictName}?",
                     isUpdate ? "Update dictionary?" : "Download dictionary?").ConfigureAwait(false))
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, dictDownloadUri);
@@ -40,7 +40,7 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    FrontendManager.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {dictName} is downloaded.", "Info");
+                    await FrontendManager.Frontend.ShowOkDialogAsync($"This may take a while. Please don't shut down the program until {dictName} is downloaded.", "Info").ConfigureAwait(false);
                 }
 
                 using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
@@ -57,7 +57,7 @@ public static class ResourceUpdater
 
                     if (!noPrompt)
                     {
-                        FrontendManager.Frontend.ShowOkDialog($"{dictName} has been downloaded successfully.", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync($"{dictName} has been downloaded successfully.", "Info").ConfigureAwait(false);
                     }
 
                     return true;
@@ -67,7 +67,7 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        FrontendManager.Frontend.ShowOkDialog($"{dictName} is up to date.", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync($"{dictName} is up to date.", "Info").ConfigureAwait(false);
                     }
                     else
                     {
@@ -80,7 +80,7 @@ public static class ResourceUpdater
                     LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", dictName, response.StatusCode);
                     if (!noPrompt)
                     {
-                        FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {dictName}.", "Info").ConfigureAwait(false);
                     }
                     else
                     {
@@ -95,7 +95,7 @@ public static class ResourceUpdater
             LoggerManager.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
             if (!noPrompt)
             {
-                FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
+                await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {dictName}.", "Info").ConfigureAwait(false);
             }
             else
             {
@@ -129,7 +129,7 @@ public static class ResourceUpdater
     {
         try
         {
-            if (!isUpdate || noPrompt || await FrontendManager.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {name}?",
+            if (!isUpdate || noPrompt || await FrontendManager.Frontend.ShowYesNoDialogAsync($"Do you want to download the latest version of {name}?",
                 isUpdate ? "Update dictionary?" : "Download dictionary?").ConfigureAwait(false))
             {
                 using HttpRequestMessage indexRequest = new(HttpMethod.Get, url);
@@ -149,7 +149,7 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        FrontendManager.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync($"{name} is up to date.", "Info").ConfigureAwait(false);
                     }
                     else
                     {
@@ -164,7 +164,7 @@ public static class ResourceUpdater
                     LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, indexResponse.StatusCode);
                     if (!noPrompt)
                     {
-                        FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {name}.", "Info").ConfigureAwait(false);
                     }
                     else
                     {
@@ -176,7 +176,7 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    FrontendManager.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {name} is downloaded.", "Info");
+                    await FrontendManager.Frontend.ShowOkDialogAsync($"This may take a while. Please don't shut down the program until {name} is downloaded.", "Info").ConfigureAwait(false);
                 }
 
                 JsonElement indexJsonElement = await indexResponse.Content.ReadFromJsonAsync<JsonElement>().ConfigureAwait(false);
@@ -186,7 +186,7 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        FrontendManager.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync($"{name} is up to date.", "Info").ConfigureAwait(false);
                     }
                     else
                     {
@@ -206,7 +206,7 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        FrontendManager.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync($"{name} is up to date.", "Info").ConfigureAwait(false);
                     }
                     else
                     {
@@ -221,7 +221,7 @@ public static class ResourceUpdater
                     LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, response.StatusCode);
                     if (!noPrompt)
                     {
-                        FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+                        await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {name}.", "Info").ConfigureAwait(false);
                     }
                     else
                     {
@@ -247,7 +247,7 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    FrontendManager.Frontend.ShowOkDialog($"{name} has been downloaded successfully.", "Info");
+                    await FrontendManager.Frontend.ShowOkDialogAsync($"{name} has been downloaded successfully.", "Info").ConfigureAwait(false);
                 }
 
                 return true;
@@ -259,7 +259,7 @@ public static class ResourceUpdater
             LoggerManager.Logger.Error(ex, "Unexpected error while downloading {DictName}", name);
             if (!noPrompt)
             {
-                FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+                await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {name}.", "Info").ConfigureAwait(false);
             }
             else
             {

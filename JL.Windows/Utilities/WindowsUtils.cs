@@ -53,7 +53,7 @@ internal static class WindowsUtils
 
     public static nint LastActiveWindowHandle { get; set; }
 
-    private static readonly SemaphoreSlim s_yesNoDialogSemaphore = new(1, 1);
+    private static readonly SemaphoreSlim s_dialogSemaphore = new(1, 1);
 
     public static ComboBoxItem[] FindJapaneseFonts()
     {
@@ -740,27 +740,43 @@ internal static class WindowsUtils
         return HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
     }
 
-    public static async Task<bool> ShowYesNoDialog(string text, string caption)
+    public static async Task<bool> ShowYesNoDialogAsync(string text, string caption, Window owner)
     {
-        await s_yesNoDialogSemaphore.WaitAsync().ConfigureAwait(false);
+        await s_dialogSemaphore.WaitAsync().ConfigureAwait(false);
 
         try
         {
-            MainWindow mainWindow = MainWindow.Instance;
-            return await mainWindow.Dispatcher.InvokeAsync(() =>
+            return await owner.Dispatcher.InvokeAsync(() =>
             {
-                return HandyControl.Controls.MessageBox.Show(mainWindow, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
+                return HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
             });
         }
         finally
         {
-            _ = s_yesNoDialogSemaphore.Release();
+            _ = s_dialogSemaphore.Release();
         }
     }
 
     public static void ShowOkDialog(string text, string caption, Window owner)
     {
         _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    public static async Task ShowOkDialogAsync(string text, string caption, Window owner)
+    {
+        await s_dialogSemaphore.WaitAsync().ConfigureAwait(false);
+
+        try
+        {
+            await owner.Dispatcher.InvokeAsync(() =>
+            {
+                _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+            });
+        }
+        finally
+        {
+            _ = s_dialogSemaphore.Release();
+        }
     }
 
     public static void UpdatePositionForSelectionWindows(Window window, nint windowHandle, Point cursorPosition)

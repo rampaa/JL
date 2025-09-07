@@ -6,9 +6,9 @@ public interface IFrontend
 
     public void Alert(AlertLevel alertLevel, string message);
 
-    public Task<bool> ShowYesNoDialog(string text, string caption);
+    public Task<bool> ShowYesNoDialogAsync(string text, string caption);
 
-    public void ShowOkDialog(string text, string caption);
+    public Task ShowOkDialogAsync(string text, string caption);
 
     public Task CopyFromWebSocket(string text);
 
