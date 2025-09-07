@@ -75,8 +75,8 @@ public static class NetworkUtils
                                 string? changelog = rootElement.GetProperty("body").GetString();
                                 changelog = string.IsNullOrWhiteSpace(changelog) ? "" : $"\n\nChangelog:\n{changelog}";
 
-                                if (FrontendManager.Frontend.ShowYesNoDialog(
-                                        string.Create(CultureInfo.InvariantCulture, $"JL v{latestJLVersion} is available.{changelog}\n\nWould you like to download it now?"), "Update JL?"))
+                                if (await FrontendManager.Frontend.ShowYesNoDialog(
+                                        string.Create(CultureInfo.InvariantCulture, $"JL v{latestJLVersion} is available.{changelog}\n\nWould you like to download it now?"), "Update JL?").ConfigureAwait(false))
                                 {
                                     FrontendManager.Frontend.ShowOkDialog(
                                         "This may take a while. Please don't manually shut down the program until it's updated.", "Info");

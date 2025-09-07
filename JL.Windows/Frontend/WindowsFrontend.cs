@@ -12,7 +12,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
 
-    public bool ShowYesNoDialog(string text, string caption) => WindowsUtils.ShowYesNoDialog(text, caption, MainWindow.Instance);
+    public Task<bool> ShowYesNoDialog(string text, string caption) => WindowsUtils.ShowYesNoDialog(text, caption);
 
     public void ShowOkDialog(string text, string caption) => WindowsUtils.ShowOkDialog(text, caption, MainWindow.Instance);
 

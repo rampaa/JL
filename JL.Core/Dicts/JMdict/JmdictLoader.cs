@@ -126,9 +126,9 @@ internal static class JmdictLoader
             }
 
             dict.Updating = true;
-            if (FrontendManager.Frontend.ShowYesNoDialog(
+            if (await FrontendManager.Frontend.ShowYesNoDialog(
                 "Couldn't find JMdict.xml. Would you like to download it now?",
-                "Download JMdict?"))
+                "Download JMdict?").ConfigureAwait(false))
             {
                 Uri? uri = dict.Url;
                 Debug.Assert(uri is not null);

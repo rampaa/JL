@@ -27,8 +27,8 @@ public static class ResourceUpdater
     {
         try
         {
-            if (!isUpdate || noPrompt || FrontendManager.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dictName}?",
-                    isUpdate ? "Update dictionary?" : "Download dictionary?"))
+            if (!isUpdate || noPrompt || await FrontendManager.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dictName}?",
+                    isUpdate ? "Update dictionary?" : "Download dictionary?").ConfigureAwait(false))
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, dictDownloadUri);
 
@@ -129,8 +129,8 @@ public static class ResourceUpdater
     {
         try
         {
-            if (!isUpdate || noPrompt || FrontendManager.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {name}?",
-                isUpdate ? "Update dictionary?" : "Download dictionary?"))
+            if (!isUpdate || noPrompt || await FrontendManager.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {name}?",
+                isUpdate ? "Update dictionary?" : "Download dictionary?").ConfigureAwait(false))
             {
                 using HttpRequestMessage indexRequest = new(HttpMethod.Get, url);
 

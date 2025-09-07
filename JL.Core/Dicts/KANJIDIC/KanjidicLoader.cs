@@ -40,9 +40,9 @@ internal static class KanjidicLoader
             }
 
             dict.Updating = true;
-            if (FrontendManager.Frontend.ShowYesNoDialog(
+            if (await FrontendManager.Frontend.ShowYesNoDialog(
                 "Couldn't find kanjidic2.xml. Would you like to download it now?",
-                "Download KANJIDIC2?"))
+                "Download KANJIDIC2?").ConfigureAwait(false))
             {
                 Uri? uri = dict.Url;
                 Debug.Assert(uri is not null);

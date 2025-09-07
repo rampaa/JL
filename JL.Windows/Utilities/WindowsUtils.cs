@@ -53,6 +53,8 @@ internal static class WindowsUtils
 
     public static nint LastActiveWindowHandle { get; set; }
 
+    private static readonly SemaphoreSlim s_yesNoDialogSemaphore = new(1, 1);
+
     public static ComboBoxItem[] FindJapaneseFonts()
     {
         XmlLanguage japaneseXmlLanguage = XmlLanguage.GetLanguage("ja-JP");
@@ -736,6 +738,24 @@ internal static class WindowsUtils
     public static bool ShowYesNoDialog(string text, string caption, Window owner)
     {
         return HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
+    }
+
+    public static async Task<bool> ShowYesNoDialog(string text, string caption)
+    {
+        await s_yesNoDialogSemaphore.WaitAsync().ConfigureAwait(false);
+
+        try
+        {
+            MainWindow mainWindow = MainWindow.Instance;
+            return await mainWindow.Dispatcher.InvokeAsync(() =>
+            {
+                return HandyControl.Controls.MessageBox.Show(mainWindow, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
+            });
+        }
+        finally
+        {
+            _ = s_yesNoDialogSemaphore.Release();
+        }
     }
 
     public static void ShowOkDialog(string text, string caption, Window owner)

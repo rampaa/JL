@@ -10,7 +10,7 @@ internal sealed class DummyFrontend : IFrontend
     {
     }
 
-    public bool ShowYesNoDialog(string text, string caption) => true;
+    public Task<bool> ShowYesNoDialog(string text, string caption) => Task.FromResult(true);
 
     public void ShowOkDialog(string text, string caption)
     {
