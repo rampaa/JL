@@ -6,7 +6,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using JL.Core.Config;
 using JL.Core.Utilities;
+using JL.Windows.Config;
 using JL.Windows.GUI;
+using JL.Windows.GUI.Popup;
+using JL.Windows.Interop;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Windows.Utilities;

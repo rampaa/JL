@@ -1,0 +1,141 @@
+<UserControl x:Class="JL.Windows.GUI.Options.DictOptionsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300" x:ClassModifier="internal">
+    <StackPanel>
+        <TextBlock Name="OptionsTextBlock" Text="Options" TextWrapping="Wrap" Margin="0,10,0,10"
+                   Visibility="Collapsed" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300" PanningMode="Both">
+            <StackPanel x:Name="OptionsStackPanel" VerticalAlignment="Center" HorizontalAlignment="Left">
+
+                <CheckBox Name="UseDBCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Store dictionary in a database instead of memory"
+                               ToolTip="Disabling this will make lookups faster but it will also considerably increase the memory usage of JL"
+                               Cursor="Help"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="NewlineCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Newline between definitions" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="NoAllCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Don't show results under All" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <DockPanel x:Name="AutoUpdateAfterNDaysDockPanel" Visibility="Collapsed">
+                    <hc:NumericUpDown x:Name="AutoUpdateAfterNDaysNumericUpDown" Minimum="0" Maximum="365"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Auto update the dictionary after the specified number of days"
+                               ToolTip="Setting it to 0 will disable it" Cursor="Help"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
+                <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
+                    <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Left"
+                            Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"
+                            VerticalAlignment="Center"
+                            BorderThickness="2" BorderBrush="#FF707070" />
+                    <TextBlock Text="Pitch Accent Marker Color"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
+                <CheckBox Name="WordClassInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show part-of-speech info" ToolTip="e.g. n, v5s" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="DialectInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show dialect info" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="POrthographyInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show orthography info for primary spelling" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <DockPanel x:Name="POrthographyInfoColorDockPanel" Visibility="Collapsed">
+                    <Button x:Name="POrthographyInfoColorButton" Content="" HorizontalAlignment="Left"
+                            Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"
+                            VerticalAlignment="Center"
+                            BorderThickness="2" BorderBrush="#FF707070" />
+                    <TextBlock Text="Orthography info color for primary spelling"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
+                <DockPanel x:Name="POrthographyInfoFontSizeDockPanel" Visibility="Collapsed">
+                    <hc:NumericUpDown x:Name="POrthographyInfoFontSizeNumericUpDown" Minimum="1"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Orthography info font size for primary spelling"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
+                <CheckBox Name="AOrthographyInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show orthography info for alternative spellings"
+                               TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="ROrthographyInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show orthography info for readings" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="WordTypeInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show field info" ToolTip="e.g. comp, sports" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="SpellingRestrictionInfoCheckBox" Margin="10" Visibility="Collapsed"
+                          HorizontalAlignment="Left" >
+                    <TextBlock Text="Show spelling restriction info"
+                               ToolTip="e.g. only applies to X" Cursor="Help"
+                               TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="ExtraDefinitionInfoCheckBox" Margin="10" Visibility="Collapsed"
+                          HorizontalAlignment="Left">
+                    <TextBlock Text="Show extra definition info" ToolTip="e.g. often derog" Cursor="Help"
+                               TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="MiscInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show misc info" ToolTip="e.g. uk, col, euph" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="LoanwordEtymologyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show the etymology of loanwords" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="RelatedTermCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show related terms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="AntonymCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show antonyms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="ShowImagesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show images" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="ShowPitchAccentWithDottedLinesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show pitch accent with dotted lines"
+                               ToolTip="If unchecked, pitch accent will be shown with solid lines"
+                               Cursor="Help"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+            </StackPanel>
+        </ScrollViewer>
+    </StackPanel>
+</UserControl>

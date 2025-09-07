@@ -8,6 +8,9 @@ using JL.Core.Config;
 using JL.Core.Frontend;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Windows.Config;
+using JL.Windows.GUI.Info;
+using JL.Windows.Interop;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 

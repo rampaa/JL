@@ -1,0 +1,26 @@
+<Window x:Class="JL.Windows.GUI.Popup.ReadingSelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" PreviewKeyDown="Window_PreviewKeyDown"
+        SizeToContent="WidthAndHeight" WindowStyle="None" LostFocus="Window_LostFocus"
+        ShowInTaskbar="False" AllowsTransparency="True" x:ClassModifier="internal">
+    <Grid>
+        <ListView x:Name="ReadingsListView" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
+                  BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
+                  HorizontalContentAlignment="Stretch"
+                  Background="{Binding Path=Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                  Opacity="70">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Focusable" Value="False" />
+                    <EventSetter Event="PreviewMouseUp" Handler="ReadingsListView_PreviewMouseUp" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
+</Window>

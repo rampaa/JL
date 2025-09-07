@@ -8,6 +8,7 @@ using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Utilities;
+using JL.Windows.GUI.Info;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;

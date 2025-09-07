@@ -1,0 +1,37 @@
+<Window x:Class="JL.Windows.GUI.Dictionary.EditDictionaryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Edit Dictionary" Height="400" Width="800" ResizeMode="NoResize" SizeToContent="WidthAndHeight"
+        Loaded="Window_Loaded" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}"
+        x:ClassModifier="internal">
+    <Grid>
+        <StackPanel Name="DictStackPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
+            <TextBlock Text="Dictionary Type" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+            <ComboBox Name="ComboBoxDictType" Width="400" Margin="10" HorizontalAlignment="Left" IsEnabled="False" />
+
+            <TextBlock Text="Path" TextWrapping="Wrap" Margin="0,10,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+            <WrapPanel>
+                <TextBox Name="PathTextBlock" Width="400"
+                         Text=""
+                         Margin="10"
+                         IsReadOnly="True" />
+                <Button Name="FolderBrowseButton" Content="..." Click="BrowsePathButton_OnClick" />
+            </WrapPanel>
+
+            <TextBlock Text="Name" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+            <TextBox Name="NameTextBox" Width="400" Margin="10" HorizontalAlignment="Left"
+                     Cursor="Help" ToolTip="Dictionary name must be unique" />
+
+        </StackPanel>
+
+        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,320,20,20">
+            <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                    Margin="0,20,20,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
+            <Button Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Margin="20,20,0,0" FontSize="16" Width="70" Height="35" Click="SaveButton_Click" />
+        </WrapPanel>
+    </Grid>
+</Window>

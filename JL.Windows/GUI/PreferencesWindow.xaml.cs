@@ -14,6 +14,9 @@ using JL.Core.Mining;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Windows.Config;
+using JL.Windows.GUI.Info;
+using JL.Windows.GUI.Profile;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 

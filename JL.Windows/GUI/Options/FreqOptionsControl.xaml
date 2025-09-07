@@ -1,0 +1,44 @@
+<UserControl x:Class="JL.Windows.GUI.Options.FreqOptionsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             d:DesignHeight="300" d:DesignWidth="300" x:ClassModifier="internal">
+    <StackPanel>
+        <TextBlock Name="OptionsTextBlock" Text="Options" TextWrapping="Wrap" Margin="0,10,0,10"
+                   Visibility="Collapsed" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300" PanningMode="Both">
+            <StackPanel x:Name="OptionsStackPanel" VerticalAlignment="Center" HorizontalAlignment="Left">
+
+                <CheckBox Name="UseDBCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Store frequency dictionary in a database instead of memory"
+                               ToolTip="Disabling this will make lookups faster but it will also increase the memory usage of JL."
+                               Cursor="Help"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="HigherValueMeansHigherFrequencyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Higher value means higher frequency"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <DockPanel x:Name="AutoUpdateAfterNDaysDockPanel" Visibility="Collapsed">
+                    <hc:NumericUpDown x:Name="AutoUpdateAfterNDaysNumericUpDown" Minimum="0" Maximum="365"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Auto update the dictionary after the specified number of days"
+                               ToolTip="Setting it to 0 will disable it" Cursor="Help"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+    </StackPanel>
+</UserControl>

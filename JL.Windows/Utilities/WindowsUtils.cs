@@ -23,8 +23,13 @@ using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Windows.Config;
 using JL.Windows.External;
 using JL.Windows.GUI;
+using JL.Windows.GUI.Audio;
+using JL.Windows.GUI.Dictionary;
+using JL.Windows.GUI.Frequency;
+using JL.Windows.Interop;
 using JL.Windows.SpeechSynthesis;
 using NAudio.Vorbis;
 using NAudio.Wave;
@@ -685,7 +690,7 @@ internal static class WindowsUtils
         ResourceDictionary resources = Application.Current.Resources;
 
         //resources.MergedDictionaries.Clear();
-        resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) });
+        resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("GUI/Styles/ResourceDictionary.xaml", UriKind.Relative) });
         resources.MergedDictionaries.Add(new ResourceDictionary
         {
             Source = new Uri(string.Create(CultureInfo.InvariantCulture, $"pack://application:,,,/HandyControl;component/Themes/Skin{skin}.xaml"))

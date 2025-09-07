@@ -8,7 +8,9 @@ using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
+using JL.Windows.Config;
 using JL.Windows.GUI;
+using JL.Windows.GUI.Popup;
 using NAudio.Wave;
 using Timer = System.Timers.Timer;
 

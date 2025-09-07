@@ -6,6 +6,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
 using JL.Core.Utilities;
+using JL.Windows.Interop;
 
 namespace JL.Windows;
 
