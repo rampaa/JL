@@ -5,6 +5,7 @@ using System.Text;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Array;
 
 namespace JL.Core.Dicts.JMnedict;
 
@@ -44,7 +45,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             ? '\n'
             : '；';
 
-        StringBuilder defBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder defBuilder = ObjectPoolManager.StringBuilderPool.Get();
 
         bool nameTypesExist = NameTypes is not null;
         string[][] definitions = Definitions;
@@ -83,7 +84,7 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
         }
 
         string def = defBuilder.ToString();
-        Utils.StringBuilderPool.Return(defBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(defBuilder);
         return def;
     }
 

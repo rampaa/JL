@@ -6,6 +6,7 @@ using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Array;
 
 namespace JL.Core.Dicts.JMdict;
 
@@ -127,7 +128,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         Debug.Assert(options.Antonym is not null);
         bool showAntonyms = options.Antonym.Value && Antonyms is not null;
 
-        StringBuilder defBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder defBuilder = ObjectPoolManager.StringBuilderPool.Get();
         if (showWordClassesSharedByAllSenses || showMiscSharedByAllSenses || showDialectsSharedByAllSenses || showFieldsSharedByAllSenses)
         {
             if (showWordClassesSharedByAllSenses)
@@ -352,7 +353,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         }
 
         string def = defBuilder.ToString(0, defBuilder.Length - 1);
-        Utils.StringBuilderPool.Return(defBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(defBuilder);
         return def;
     }
 

@@ -8,12 +8,12 @@ public static class LookupResultUtils
 {
     internal static string? DeconjugationProcessesToText(ReadOnlySpan<List<string>> processList)
     {
-        StringBuilder deconjugationProcessBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder deconjugationProcessBuilder = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 0; i < processList.Length; i++)
         {
             ref readonly List<string> form = ref processList[i];
 
-            StringBuilder formTextBuilder = Utils.StringBuilderPool.Get();
+            StringBuilder formTextBuilder = ObjectPoolManager.StringBuilderPool.Get();
             bool added = false;
 
             ReadOnlySpan<string> formSpan = form.AsReadOnlySpan();
@@ -65,14 +65,14 @@ public static class LookupResultUtils
                 }
             }
 
-            Utils.StringBuilderPool.Return(formTextBuilder);
+            ObjectPoolManager.StringBuilderPool.Return(formTextBuilder);
         }
 
         string? deconjugationProcess = deconjugationProcessBuilder.Length is 0
             ? null
             : deconjugationProcessBuilder.ToString();
 
-        Utils.StringBuilderPool.Return(deconjugationProcessBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(deconjugationProcessBuilder);
 
         return deconjugationProcess;
     }
@@ -97,7 +97,7 @@ public static class LookupResultUtils
             return string.Create(CultureInfo.InvariantCulture, $"#{frequencies[0].Freq}");
         }
 
-        StringBuilder sb = Utils.StringBuilderPool.Get();
+        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 0; i < frequencies.Length; i++)
         {
             ref readonly LookupFrequencyResult lookupFreqResult = ref frequencies[i];
@@ -109,27 +109,27 @@ public static class LookupResultUtils
         }
 
         string text = sb.ToString();
-        Utils.StringBuilderPool.Return(sb);
+        ObjectPoolManager.StringBuilderPool.Return(sb);
         return text;
     }
 
     public static string ElementWithOrthographyInfoToText(string[] elements, string[]?[] orthographyInfoList)
     {
-        StringBuilder sb = Utils.StringBuilderPool.Get();
+        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
         string text = ElementWithOrthographyInfoToText(sb, elements, orthographyInfoList).ToString();
-        Utils.StringBuilderPool.Return(sb);
+        ObjectPoolManager.StringBuilderPool.Return(sb);
         return text;
     }
 
     public static string ElementWithOrthographyInfoToTextWithParentheses(string[] alternativeSpellings, string[]?[] aOrthographyInfoList)
     {
-        StringBuilder sb = Utils.StringBuilderPool.Get().Append('(');
+        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get().Append('(');
 
         string text = ElementWithOrthographyInfoToText(sb, alternativeSpellings, aOrthographyInfoList)
             .Append(')')
             .ToString();
 
-        Utils.StringBuilderPool.Return(sb);
+        ObjectPoolManager.StringBuilderPool.Return(sb);
         return text;
     }
 

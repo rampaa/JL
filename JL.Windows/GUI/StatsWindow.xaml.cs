@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Interop;
 using JL.Core.Config;
+using JL.Core.Frontend;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -122,7 +123,7 @@ internal sealed partial class StatsWindow
                     break;
 
                 default:
-                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatsMode), nameof(StatsWindow), nameof(ButtonSwapStats_OnClick), mode);
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatsMode), nameof(StatsWindow), nameof(ButtonSwapStats_OnClick), mode);
                     WindowsUtils.Alert(AlertLevel.Error, $"Invalid stats mode: {mode}");
                     break;
             }
@@ -130,7 +131,7 @@ internal sealed partial class StatsWindow
 
         else
         {
-            Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+            LoggerManager.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
         }
     }
 
@@ -173,7 +174,7 @@ internal sealed partial class StatsWindow
 
         else
         {
-            Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+            LoggerManager.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
         }
     }
 
@@ -228,7 +229,7 @@ internal sealed partial class StatsWindow
 
         else
         {
-            Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+            LoggerManager.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
         }
     }
 }

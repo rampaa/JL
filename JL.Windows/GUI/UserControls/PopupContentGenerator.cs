@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Lookup;
@@ -665,7 +666,7 @@ internal sealed class PopupContentGenerator : Decorator
                     }
                     catch (DirectoryNotFoundException ex)
                     {
-                        Utils.Logger.Error(ex, "Image path not found {ImagePath}", imagePath);
+                        LoggerManager.Logger.Error(ex, "Image path not found {ImagePath}", imagePath);
                         showImagesOption.Value = false;
                     }
                 }

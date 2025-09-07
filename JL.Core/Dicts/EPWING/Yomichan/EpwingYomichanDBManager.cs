@@ -34,7 +34,7 @@ internal static class EpwingYomichanDBManager
 
     public static string GetQuery(int termCount)
     {
-        StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
+        StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             """
             SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_paths, rsk.search_key
             FROM record r
@@ -48,7 +48,7 @@ internal static class EpwingYomichanDBManager
         }
 
         string query = queryBuilder.Append(");").ToString();
-        Utils.StringBuilderPool.Return(queryBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
         return query;
     }
 

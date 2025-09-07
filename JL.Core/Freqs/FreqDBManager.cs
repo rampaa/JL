@@ -122,7 +122,7 @@ internal static class FreqDBManager
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
-        StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
+        StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             """
             SELECT r.spelling, r.frequency, rsk.search_key
             FROM record r
@@ -142,7 +142,7 @@ internal static class FreqDBManager
         command.CommandText = queryBuilder.ToString();
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        Utils.StringBuilderPool.Return(queryBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
 
         int index = 1;
         foreach (string term in terms)

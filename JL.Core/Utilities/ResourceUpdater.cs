@@ -14,6 +14,7 @@ using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
 using JL.Core.Freqs.FrequencyYomichan;
+using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.WordClass;
 
@@ -26,7 +27,7 @@ public static class ResourceUpdater
     {
         try
         {
-            if (!isUpdate || noPrompt || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dictName}?",
+            if (!isUpdate || noPrompt || FrontendManager.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {dictName}?",
                     isUpdate ? "Update dictionary?" : "Download dictionary?"))
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, dictDownloadUri);
@@ -39,7 +40,7 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    Utils.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {dictName} is downloaded.", "Info");
+                    FrontendManager.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {dictName} is downloaded.", "Info");
                 }
 
                 using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
@@ -56,7 +57,7 @@ public static class ResourceUpdater
 
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"{dictName} has been downloaded successfully.", "Info");
+                        FrontendManager.Frontend.ShowOkDialog($"{dictName} has been downloaded successfully.", "Info");
                     }
 
                     return true;
@@ -66,24 +67,24 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"{dictName} is up to date.", "Info");
+                        FrontendManager.Frontend.ShowOkDialog($"{dictName} is up to date.", "Info");
                     }
                     else
                     {
-                        Utils.Frontend.Alert(AlertLevel.Information, $"{dictName} is up to date.");
+                        FrontendManager.Frontend.Alert(AlertLevel.Information, $"{dictName} is up to date.");
                     }
                 }
 
                 else
                 {
-                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", dictName, response.StatusCode);
+                    LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", dictName, response.StatusCode);
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
+                        FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
                     }
                     else
                     {
-                        Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
                     }
                 }
             }
@@ -91,14 +92,14 @@ public static class ResourceUpdater
 
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
+            LoggerManager.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
             if (!noPrompt)
             {
-                Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
+                FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {dictName}.", "Info");
             }
             else
             {
-                Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
+                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
             }
 
             string tempDictPath = GetTempPath(Path.GetFullPath(dictPath, AppInfo.ApplicationPath));
@@ -128,7 +129,7 @@ public static class ResourceUpdater
     {
         try
         {
-            if (!isUpdate || noPrompt || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {name}?",
+            if (!isUpdate || noPrompt || FrontendManager.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {name}?",
                 isUpdate ? "Update dictionary?" : "Download dictionary?"))
             {
                 using HttpRequestMessage indexRequest = new(HttpMethod.Get, url);
@@ -148,11 +149,11 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                        FrontendManager.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
                     }
                     else
                     {
-                        Utils.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
+                        FrontendManager.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
                     }
 
                     return false;
@@ -160,14 +161,14 @@ public static class ResourceUpdater
 
                 if (!indexResponse.IsSuccessStatusCode)
                 {
-                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, indexResponse.StatusCode);
+                    LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, indexResponse.StatusCode);
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+                        FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
                     }
                     else
                     {
-                        Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
                     }
 
                     return false;
@@ -175,7 +176,7 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    Utils.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {name} is downloaded.", "Info");
+                    FrontendManager.Frontend.ShowOkDialog($"This may take a while. Please don't shut down the program until {name} is downloaded.", "Info");
                 }
 
                 JsonElement indexJsonElement = await indexResponse.Content.ReadFromJsonAsync<JsonElement>().ConfigureAwait(false);
@@ -185,11 +186,11 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                        FrontendManager.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
                     }
                     else
                     {
-                        Utils.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
+                        FrontendManager.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
                     }
 
                     return false;
@@ -205,11 +206,11 @@ public static class ResourceUpdater
                 {
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
+                        FrontendManager.Frontend.ShowOkDialog($"{name} is up to date.", "Info");
                     }
                     else
                     {
-                        Utils.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
+                        FrontendManager.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
                     }
 
                     return false;
@@ -217,14 +218,14 @@ public static class ResourceUpdater
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, response.StatusCode);
+                    LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, response.StatusCode);
                     if (!noPrompt)
                     {
-                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+                        FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
                     }
                     else
                     {
-                        Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
                     }
 
                     return false;
@@ -246,7 +247,7 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    Utils.Frontend.ShowOkDialog($"{name} has been downloaded successfully.", "Info");
+                    FrontendManager.Frontend.ShowOkDialog($"{name} has been downloaded successfully.", "Info");
                 }
 
                 return true;
@@ -255,14 +256,14 @@ public static class ResourceUpdater
 
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", name);
+            LoggerManager.Logger.Error(ex, "Unexpected error while downloading {DictName}", name);
             if (!noPrompt)
             {
-                Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
+                FrontendManager.Frontend.ShowOkDialog($"Unexpected error while downloading {name}.", "Info");
             }
             else
             {
-                Utils.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
+                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
             }
 
             string tempDictPath = GetTempPath(Path.GetFullPath(path, AppInfo.ApplicationPath));
@@ -353,11 +354,11 @@ public static class ResourceUpdater
             }
 
             dict.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
+            FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
         }
 
         dict.Updating = false;
-        StringPoolUtils.ClearStringPoolIfDictsAreReady();
+        ObjectPoolManager.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateJmnedict(bool isUpdate, bool noPrompt)
@@ -406,11 +407,11 @@ public static class ResourceUpdater
             }
 
             dict.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
+            FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
         }
 
         dict.Updating = false;
-        StringPoolUtils.ClearStringPoolIfDictsAreReady();
+        ObjectPoolManager.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateKanjidic(bool isUpdate, bool noPrompt)
@@ -459,11 +460,11 @@ public static class ResourceUpdater
             }
 
             dict.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
+            FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
         }
 
         dict.Updating = false;
-        StringPoolUtils.ClearStringPoolIfDictsAreReady();
+        ObjectPoolManager.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateYomichanDict(Dict dict, bool isUpdate, bool noPrompt)
@@ -538,11 +539,11 @@ public static class ResourceUpdater
             }
 
             dict.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
+            FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
         }
 
         dict.Updating = false;
-        StringPoolUtils.ClearStringPoolIfDictsAreReady();
+        ObjectPoolManager.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateYomichanFreqDict(Freq freq, bool isUpdate, bool noPrompt)
@@ -591,11 +592,11 @@ public static class ResourceUpdater
             }
 
             freq.Ready = true;
-            Utils.Frontend.Alert(AlertLevel.Success, $"Finished updating {freq.Name}");
+            FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {freq.Name}");
         }
 
         freq.Updating = false;
-        StringPoolUtils.ClearStringPoolIfDictsAreReady();
+        ObjectPoolManager.ClearStringPoolIfDictsAreReady();
     }
 
     internal static Task AutoUpdateDicts()
@@ -627,7 +628,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Name}...");
+            FrontendManager.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Name}...");
             tasks.Add(dict.Type is DictType.JMdict
                 ? UpdateJmdict(pathExists, true)
                 : dict.Type is DictType.JMnedict
@@ -664,7 +665,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            Utils.Frontend.Alert(AlertLevel.Information, $"Updating {freq.Name}...");
+            FrontendManager.Frontend.Alert(AlertLevel.Information, $"Updating {freq.Name}...");
             tasks.Add(UpdateYomichanFreqDict(freq, pathExists, true));
         }
 

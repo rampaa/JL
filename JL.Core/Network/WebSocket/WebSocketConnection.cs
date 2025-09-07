@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Net.WebSockets;
 using JL.Core.Config;
+using JL.Core.Frontend;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 
@@ -98,11 +99,11 @@ internal sealed class WebSocketConnection : IDisposable
                                     }
 
                                     string text = NetworkUtils.s_utf8NoBom.GetString(buffer.Span[..totalBytesReceived]);
-                                    _ = Utils.Frontend.CopyFromWebSocket(text);
+                                    _ = FrontendManager.Frontend.CopyFromWebSocket(text);
                                 }
                                 else if (result.MessageType is WebSocketMessageType.Close)
                                 {
-                                    Utils.Logger.Information("WebSocket server is closed");
+                                    LoggerManager.Logger.Information("WebSocket server is closed");
                                     break;
                                 }
                             }
@@ -117,8 +118,8 @@ internal sealed class WebSocketConnection : IDisposable
 
                                 if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
                                 {
-                                    Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
-                                    // Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
+                                    LoggerManager.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
+                                    // FrontendManager.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
                                 }
                                 else if (webSocketClient.State is WebSocketState.Open)
                                 {
@@ -146,13 +147,13 @@ internal sealed class WebSocketConnection : IDisposable
 
                         if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
                         {
-                            Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
-                            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
+                            LoggerManager.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
+                            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
                         }
                     }
                     else
                     {
-                        Utils.Logger.Verbose(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
+                        LoggerManager.Logger.Verbose(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
                     }
                 }
             }

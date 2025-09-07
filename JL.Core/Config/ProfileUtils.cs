@@ -1,5 +1,3 @@
-using JL.Core.Utilities;
-
 namespace JL.Core.Config;
 
 public static class ProfileUtils

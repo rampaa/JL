@@ -1,6 +1,6 @@
 using System.Windows.Interop;
 using System.Windows.Media;
-using JL.Core.Utilities;
+using JL.Core.Frontend;
 
 namespace JL.Windows.GUI;
 

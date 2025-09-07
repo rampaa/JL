@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 
@@ -125,7 +126,7 @@ internal static class JmdictLoader
             }
 
             dict.Updating = true;
-            if (Utils.Frontend.ShowYesNoDialog(
+            if (FrontendManager.Frontend.ShowYesNoDialog(
                 "Couldn't find JMdict.xml. Would you like to download it now?",
                 "Download JMdict?"))
             {
@@ -391,7 +392,7 @@ internal static class JmdictLoader
 
                             else if (s_canHandleCulture)
                             {
-                                Utils.Logger.Error("JMdict: English name of {Lang} is missing!", lang);
+                                LoggerManager.Logger.Error("JMdict: English name of {Lang} is missing!", lang);
 
                                 try
                                 {
@@ -399,7 +400,7 @@ internal static class JmdictLoader
                                 }
                                 catch (CultureNotFoundException ex)
                                 {
-                                    Utils.Logger.Error(ex, "Underlying OS cannot process the culture info for {LanguageCode}", lang);
+                                    LoggerManager.Logger.Error(ex, "Underlying OS cannot process the culture info for {LanguageCode}", lang);
                                     s_canHandleCulture = false;
                                 }
                             }

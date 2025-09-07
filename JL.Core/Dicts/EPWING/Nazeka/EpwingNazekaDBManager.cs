@@ -34,7 +34,7 @@ internal static class EpwingNazekaDBManager
 
     public static string GetQuery(int termCount)
     {
-        StringBuilder queryBuilder = Utils.StringBuilderPool.Get().Append(
+        StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             """
             SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, rsk.search_key
             FROM record r
@@ -48,7 +48,7 @@ internal static class EpwingNazekaDBManager
         }
 
         string query = queryBuilder.Append(");").ToString();
-        Utils.StringBuilderPool.Return(queryBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
         return query;
     }
 

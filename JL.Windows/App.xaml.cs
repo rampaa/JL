@@ -28,7 +28,7 @@ internal sealed partial class App
 
         if (!HasModifyPermission(AppContext.BaseDirectory))
         {
-            Utils.Logger.Information(
+            LoggerManager.Logger.Information(
                 """
                 JL is installed in a secure location that requires admin rights to modify files.
                 If you'd rather not give admin rights to JL, consider installing it in a location where they're not needed (e.g., the desktop).
@@ -76,7 +76,7 @@ internal sealed partial class App
                     }
                     catch (Win32Exception e)
                     {
-                        Utils.Logger.Information(e, "Couldn't get the path of the process, probably because it has a higher integrity level than this instance of JL");
+                        LoggerManager.Logger.Information(e, "Couldn't get the path of the process, probably because it has a higher integrity level than this instance of JL");
                     }
                 }
             }
@@ -87,12 +87,12 @@ internal sealed partial class App
 
     private static void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
     {
-        Utils.Logger.Fatal((Exception)args.ExceptionObject, "Unhandled exception");
+        LoggerManager.Logger.Fatal((Exception)args.ExceptionObject, "Unhandled exception");
     }
 
     private static void LogUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
     {
-        Utils.Logger.Fatal(args.Exception, "Unobserved task exception");
+        LoggerManager.Logger.Fatal(args.Exception, "Unobserved task exception");
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -114,7 +114,7 @@ internal sealed partial class App
 
             if (identity.User is null)
             {
-                Utils.Logger.Error("Current WindowsIdentity is null, cannot check modify permission for folder: {FolderPath}", folderPath);
+                LoggerManager.Logger.Error("Current WindowsIdentity is null, cannot check modify permission for folder: {FolderPath}", folderPath);
                 return false;
             }
 
@@ -147,7 +147,7 @@ internal sealed partial class App
         }
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Error checking modify permission for folder: {FolderPath}", folderPath);
+            LoggerManager.Logger.Error(ex, "Error checking modify permission for folder: {FolderPath}", folderPath);
             return false;
         }
     }

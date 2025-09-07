@@ -1,6 +1,3 @@
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Deconjugation;
@@ -9,40 +6,12 @@ using JL.Core.Freqs;
 using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Statistics;
+using JL.Core.Utilities;
 using JL.Core.WordClass;
-using Microsoft.Extensions.ObjectPool;
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 
-namespace JL.Core.Utilities;
-
-public static class Utils
+namespace JL.Core;
+public static class CoreInitializer
 {
-    public static readonly ObjectPool<StringBuilder> StringBuilderPool = new DefaultObjectPoolProvider().CreateStringBuilderPool(1024, 1024 * 4);
-    public static IFrontend Frontend { get; set; } = new DummyFrontend();
-
-    internal static readonly LoggingLevelSwitch s_loggingLevelSwitch = new()
-    {
-        MinimumLevel = LogEventLevel.Error
-    };
-
-    public static readonly Logger Logger = new LoggerConfiguration()
-        .MinimumLevel.ControlledBy(s_loggingLevelSwitch)
-        .WriteTo.File(Path.Join(AppInfo.ApplicationPath, "Logs", "log.txt"),
-            formatProvider: CultureInfo.InvariantCulture,
-            rollingInterval: RollingInterval.Day,
-            retainedFileTimeLimit: TimeSpan.FromDays(30),
-            shared: true)
-        .CreateLogger();
-
-#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms
-    internal static string GetMd5String(ReadOnlySpan<byte> bytes)
-    {
-        return Convert.ToHexString(MD5.HashData(bytes).AsReadOnlySpan());
-    }
-#pragma warning restore CA5351 // Do Not Use Broken Cryptographic Algorithms
-
     public static async Task CoreInitialize()
     {
         NetworkUtils.InitializeUpdaterTimer();
@@ -95,7 +64,7 @@ public static class Utils
             Task.Run(static async () =>
             {
                 await DictUtils.DeserializeDicts().ConfigureAwait(false);
-                Frontend.ApplyDictOptions();
+                FrontendManager.Frontend.ApplyDictOptions();
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
                 await DictUtils.SerializeDicts().ConfigureAwait(false);
                 await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
@@ -111,19 +80,11 @@ public static class Utils
             Task.Run(static async () =>
             {
                 await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
-                Frontend.SetInstalledVoiceWithHighestPriority();
+                FrontendManager.Frontend.SetInstalledVoiceWithHighestPriority();
             }),
             Task.Run(static () => DeconjugatorUtils.DeserializeRules()))
             .ConfigureAwait(false);
 
-        StringPoolUtils.StringPoolInstance.Reset();
-    }
-
-    public static string GetPortablePath(string path)
-    {
-        string fullPath = Path.GetFullPath(path, AppInfo.ApplicationPath);
-        return fullPath.StartsWith(AppInfo.ApplicationPath, StringComparison.Ordinal)
-            ? Path.GetRelativePath(AppInfo.ApplicationPath, fullPath)
-            : fullPath;
+        ObjectPoolManager.StringPoolInstance.Reset();
     }
 }

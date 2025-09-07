@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Net.Http.Json;
 using System.Runtime.Serialization;
 using System.Text.Json;
+using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -47,17 +48,17 @@ public static class AudioUtils
 
                 byte[] audioData = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 
-                return Utils.GetMd5String(audioData) is NetworkUtils.Jpod101NoAudioMd5Hash
+                return HashUtils.GetMd5String(audioData) is NetworkUtils.Jpod101NoAudioMd5Hash
                     ? null
                     : new AudioResponse(AudioSourceType.Url, audioFormat, audioData);
             }
 
-            Utils.Logger.Information("Error getting audio from {Url}", url.OriginalString);
+            LoggerManager.Logger.Information("Error getting audio from {Url}", url.OriginalString);
             return null;
         }
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Error getting audio from {Url}", url.OriginalString);
+            LoggerManager.Logger.Error(ex, "Error getting audio from {Url}", url.OriginalString);
             return null;
         }
     }
@@ -97,12 +98,12 @@ public static class AudioUtils
                 }
             }
 
-            Utils.Logger.Information("Error getting audio from {Url}", url.OriginalString);
+            LoggerManager.Logger.Information("Error getting audio from {Url}", url.OriginalString);
             return null;
         }
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Error getting audio from {Url}", url.OriginalString);
+            LoggerManager.Logger.Error(ex, "Error getting audio from {Url}", url.OriginalString);
             return null;
         }
     }
@@ -117,7 +118,7 @@ public static class AudioUtils
             return new AudioResponse(AudioSourceType.LocalPath, audioFormat, audioData);
         }
 
-        Utils.Logger.Information("Error getting audio from {LocalPath}", uri.LocalPath);
+        LoggerManager.Logger.Information("Error getting audio from {LocalPath}", uri.LocalPath);
         return null;
     }
 
@@ -161,12 +162,12 @@ public static class AudioUtils
                     }
 
                     case AudioSourceType.TextToSpeech:
-                        await Utils.Frontend.TextToSpeech(uri, reading).ConfigureAwait(false);
+                        await FrontendManager.Frontend.TextToSpeech(uri, reading).ConfigureAwait(false);
                         return s_textToSpeechAudioResponse;
 
                     default:
-                        Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AudioUtils), nameof(GetPrioritizedAudio), audioSource.Type);
-                        Utils.Frontend.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSource.Type}");
+                        LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AudioUtils), nameof(GetPrioritizedAudio), audioSource.Type);
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSource.Type}");
                         break;
                 }
 
@@ -187,8 +188,8 @@ public static class AudioUtils
         AudioResponse? audioResponse = await GetPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
         if (audioResponse?.AudioData is not null)
         {
-            await Utils.Frontend.StopTextToSpeech().ConfigureAwait(false);
-            Utils.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat);
+            await FrontendManager.Frontend.StopTextToSpeech().ConfigureAwait(false);
+            FrontendManager.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat);
             StatsUtils.IncrementStat(StatType.TimesPlayedAudio);
         }
     }
@@ -229,7 +230,7 @@ public static class AudioUtils
             }
             else
             {
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
+                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
                 throw new SerializationException("Couldn't load Config/AudioSourceConfig.json");
             }
         }

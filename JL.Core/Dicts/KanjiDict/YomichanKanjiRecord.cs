@@ -109,7 +109,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
             return stats[0];
         }
 
-        StringBuilder statBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder statBuilder = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 0; i < stats.Length; i++)
         {
             _ = statBuilder.Append(stats[i]);
@@ -120,7 +120,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
         }
 
         string stat = statBuilder.ToString();
-        Utils.StringBuilderPool.Return(statBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(statBuilder);
         return stat;
     }
 

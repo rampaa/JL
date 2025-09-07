@@ -207,7 +207,7 @@ public static partial class JapaneseUtils
             return normalizedText;
         }
 
-        StringBuilder textInHiraganaBuilder = Utils.StringBuilderPool.Get().Append(normalizedText[..firstKatakanaIndex]);
+        StringBuilder textInHiraganaBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(normalizedText[..firstKatakanaIndex]);
         for (int i = firstKatakanaIndex; i < normalizedText.Length; i++)
         {
             char character = normalizedText[i];
@@ -222,7 +222,7 @@ public static partial class JapaneseUtils
         }
 
         string textInHiragana = textInHiraganaBuilder.ToString();
-        Utils.StringBuilderPool.Return(textInHiraganaBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(textInHiraganaBuilder);
         return textInHiragana;
     }
 
@@ -232,7 +232,7 @@ public static partial class JapaneseUtils
 
         List<StringBuilder> stringBuilders = new(4)
         {
-            Utils.StringBuilderPool.Get().Append(unicodeTextList[0])
+            ObjectPoolManager.StringBuilderPool.Get().Append(unicodeTextList[0])
         };
 
         int unicodeTextListLength = unicodeTextList.Length;
@@ -260,7 +260,7 @@ public static partial class JapaneseUtils
                     int stringBuildersCount = stringBuilders.Count;
                     for (int j = 0; j < stringBuildersCount; j++)
                     {
-                        stringBuilders.Add(Utils.StringBuilderPool.Get().Append(stringBuilders[j]));
+                        stringBuilders.Add(ObjectPoolManager.StringBuilderPool.Get().Append(stringBuilders[j]));
                     }
 
                     stringBuildersCount = stringBuilders.Count;
@@ -285,7 +285,7 @@ public static partial class JapaneseUtils
         foreach (ref readonly StringBuilder stringBuilder in stringBuilders.AsReadOnlySpan())
         {
             longVowelMarkToKanaList.Add(stringBuilder.ToString());
-            Utils.StringBuilderPool.Return(stringBuilder);
+            ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
         }
 
         return longVowelMarkToKanaList;
@@ -483,7 +483,7 @@ public static partial class JapaneseUtils
             return text[..^1];
         }
 
-        StringBuilder sb = Utils.StringBuilderPool.Get().Append(text[..index]);
+        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get().Append(text[..index]);
         foreach (Rune rune in text.AsSpan(index + 1).EnumerateRunes())
         {
             if (Rune.IsLetterOrDigit(rune))
@@ -493,7 +493,7 @@ public static partial class JapaneseUtils
         }
 
         string textWithoutPunctuation = sb.ToString();
-        Utils.StringBuilderPool.Return(sb);
+        ObjectPoolManager.StringBuilderPool.Return(sb);
         return textWithoutPunctuation;
     }
 
@@ -526,7 +526,7 @@ public static partial class JapaneseUtils
 
     private static string? GetPrimarySpellingAndReadingMapping(ReadOnlySpan<string> primarySpellingSegments, string reading)
     {
-        StringBuilder stringBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
 
         bool firstSegmentIsKana = ContainsKana(primarySpellingSegments[0]);
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
@@ -547,13 +547,13 @@ public static partial class JapaneseUtils
                 string readingInHiragana = KatakanaToHiragana(reading);
                 if (readingInHiragana.Length != reading.Length)
                 {
-                    Utils.StringBuilderPool.Return(stringBuilder);
+                    ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                     return null;
                 }
                 string segmentInHiragana = KatakanaToHiragana(segment);
                 if (segmentInHiragana.Length != segment.Length)
                 {
-                    Utils.StringBuilderPool.Return(stringBuilder);
+                    ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                     return null;
                 }
 
@@ -563,7 +563,7 @@ public static partial class JapaneseUtils
 
             if (indexes.Length is 0)
             {
-                Utils.StringBuilderPool.Return(stringBuilder);
+                ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                 return null;
             }
 
@@ -596,7 +596,7 @@ public static partial class JapaneseUtils
                         {
                             if (index >= 0)
                             {
-                                Utils.StringBuilderPool.Return(stringBuilder);
+                                ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                                 return null;
                             }
 
@@ -605,7 +605,7 @@ public static partial class JapaneseUtils
                     }
                     else
                     {
-                        Utils.StringBuilderPool.Return(stringBuilder);
+                        ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                         return null;
                     }
                 }
@@ -613,7 +613,7 @@ public static partial class JapaneseUtils
 
             if (index < 0)
             {
-                Utils.StringBuilderPool.Return(stringBuilder);
+                ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                 return null;
             }
 
@@ -642,7 +642,7 @@ public static partial class JapaneseUtils
         }
 
         string primarySpellingAndReadingMapping = stringBuilder.ToString();
-        Utils.StringBuilderPool.Return(stringBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
         return primarySpellingAndReadingMapping;
     }
 

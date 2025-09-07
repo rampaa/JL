@@ -5,8 +5,10 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using JL.Core;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.Utilities;
@@ -170,7 +172,7 @@ internal sealed partial class EditFrequencyWindow
 
         if (openFileDialog.ShowDialog() is true)
         {
-            PathTextBlock.Text = Utils.GetPortablePath(openFileDialog.FileName);
+            PathTextBlock.Text = PathUtils.GetPortablePath(openFileDialog.FileName);
         }
     }
 
@@ -189,7 +191,7 @@ internal sealed partial class EditFrequencyWindow
 
         if (openFolderDialog.ShowDialog() is true)
         {
-            PathTextBlock.Text = Utils.GetPortablePath(openFolderDialog.FolderName);
+            PathTextBlock.Text = PathUtils.GetPortablePath(openFolderDialog.FolderName);
             string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
             if (File.Exists(indexJsonPath))
             {
@@ -256,7 +258,7 @@ internal sealed partial class EditFrequencyWindow
                 break;
 
             default:
-                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(EditFrequencyWindow), nameof(BrowsePathButton_OnClick), selectedFreqType);
+                LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(EditFrequencyWindow), nameof(BrowsePathButton_OnClick), selectedFreqType);
                 WindowsUtils.Alert(AlertLevel.Error, $"Invalid frequency type: {selectedFreqType}");
                 break;
         }

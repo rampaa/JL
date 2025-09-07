@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using JL.Core.Frontend;
 using JL.Core.Mining;
 using JL.Core.Utilities;
 
@@ -22,8 +23,8 @@ public static class AnkiConfigUtils
 
         catch (Exception ex)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
-            Utils.Logger.Error(ex, "Couldn't write AnkiConfig");
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
+            LoggerManager.Logger.Error(ex, "Couldn't write AnkiConfig");
         }
     }
 
@@ -81,14 +82,14 @@ public static class AnkiConfigUtils
 
             catch (Exception ex)
             {
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
-                Utils.Logger.Error(ex, "Couldn't read AnkiConfig");
+                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
+                LoggerManager.Logger.Error(ex, "Couldn't read AnkiConfig");
                 return null;
             }
         }
 
-        // Utils.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
-        Utils.Logger.Warning("AnkiConfig.json doesn't exist");
+        // FrontendManager.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+        LoggerManager.Logger.Warning("AnkiConfig.json doesn't exist");
         return null;
     }
 }

@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -69,7 +70,7 @@ internal sealed partial class ManageDictionariesWindow
             await DictUtils.LoadDictionaries().ConfigureAwait(false);
             await DictUtils.SerializeDicts().ConfigureAwait(false);
 
-            StringPoolUtils.ClearStringPoolIfDictsAreReady();
+            ObjectPoolManager.ClearStringPoolIfDictsAreReady();
         }).ConfigureAwait(false);
     }
 

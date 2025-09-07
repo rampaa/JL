@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.KANJIDIC;
@@ -39,7 +40,7 @@ internal static class KanjidicLoader
             }
 
             dict.Updating = true;
-            if (Utils.Frontend.ShowYesNoDialog(
+            if (FrontendManager.Frontend.ShowYesNoDialog(
                 "Couldn't find kanjidic2.xml. Would you like to download it now?",
                 "Download KANJIDIC2?"))
             {

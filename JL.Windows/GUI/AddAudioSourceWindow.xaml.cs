@@ -4,7 +4,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using JL.Core;
 using JL.Core.Audio;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
@@ -197,7 +199,7 @@ internal sealed partial class AddAudioSourceWindow
                 break;
 
             default:
-                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AddAudioSourceWindow), nameof(AudioSourceTypeComboBox_SelectionChanged), audioSourceType);
+                LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AddAudioSourceWindow), nameof(AudioSourceTypeComboBox_SelectionChanged), audioSourceType);
                 WindowsUtils.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSourceType}");
                 break;
         }

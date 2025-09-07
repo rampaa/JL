@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Timers;
 using JL.Core.Config;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using Timer = System.Timers.Timer;
 
@@ -74,13 +75,13 @@ public static class NetworkUtils
                                 string? changelog = rootElement.GetProperty("body").GetString();
                                 changelog = string.IsNullOrWhiteSpace(changelog) ? "" : $"\n\nChangelog:\n{changelog}";
 
-                                if (Utils.Frontend.ShowYesNoDialog(
+                                if (FrontendManager.Frontend.ShowYesNoDialog(
                                         string.Create(CultureInfo.InvariantCulture, $"JL v{latestJLVersion} is available.{changelog}\n\nWould you like to download it now?"), "Update JL?"))
                                 {
-                                    Utils.Frontend.ShowOkDialog(
+                                    FrontendManager.Frontend.ShowOkDialog(
                                         "This may take a while. Please don't manually shut down the program until it's updated.", "Info");
 
-                                    await Utils.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
+                                    await FrontendManager.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
                                 }
 
                                 break;
@@ -89,27 +90,27 @@ public static class NetworkUtils
 
                         if (!isAutoCheck && !foundRelease)
                         {
-                            Utils.Frontend.ShowOkDialog("JL is up to date", "Info");
+                            FrontendManager.Frontend.ShowOkDialog("JL is up to date", "Info");
                         }
                     }
 
                     else if (!isAutoCheck)
                     {
-                        Utils.Frontend.ShowOkDialog("JL is up to date", "Info");
+                        FrontendManager.Frontend.ShowOkDialog("JL is up to date", "Info");
                     }
                 }
             }
 
             else
             {
-                Utils.Logger.Error("Couldn't check for JL updates. GitHub API problem. {StatusCode} {ReasonPhrase}", gitHubApiResponse.StatusCode, gitHubApiResponse.ReasonPhrase);
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't check for JL updates. GitHub API problem.");
+                LoggerManager.Logger.Error("Couldn't check for JL updates. GitHub API problem. {StatusCode} {ReasonPhrase}", gitHubApiResponse.StatusCode, gitHubApiResponse.ReasonPhrase);
+                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't check for JL updates. GitHub API problem.");
             }
         }
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Couldn't check for JL updates");
-            Utils.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
+            LoggerManager.Logger.Error(ex, "Couldn't check for JL updates");
+            FrontendManager.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
         }
         finally
         {

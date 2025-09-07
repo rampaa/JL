@@ -6,6 +6,7 @@ using System.Text.Json;
 using JL.Core.Freqs.FrequencyNazeka;
 using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.Freqs.Options;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -151,8 +152,8 @@ public static class FreqUtils
                             catch (Exception ex)
                             {
                                 string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+                                LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
+                                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 freqNamesToBeRemoved ??= [];
                                 freqNamesToBeRemoved.Add(freq.Name);
                             }
@@ -245,8 +246,8 @@ public static class FreqUtils
                             catch (Exception ex)
                             {
                                 string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
-                                Utils.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
-                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+                                LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
+                                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 freqNamesToBeRemoved ??= [];
                                 freqNamesToBeRemoved.Add(freq.Name);
                             }
@@ -286,8 +287,8 @@ public static class FreqUtils
 
                 default:
                 {
-                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(FreqUtils), nameof(LoadFrequencies), freq.Type);
-                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid frequency type: {freq.Type}");
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(FreqUtils), nameof(LoadFrequencies), freq.Type);
+                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid frequency type: {freq.Type}");
                     break;
                 }
             }
@@ -320,7 +321,7 @@ public static class FreqUtils
             {
                 if (rebuildingDBs)
                 {
-                    Utils.Frontend.Alert(AlertLevel.Information, "Rebuilding frequency databases because their schemas are out of date...");
+                    FrontendManager.Frontend.Alert(AlertLevel.Information, "Rebuilding frequency databases because their schemas are out of date...");
                 }
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -353,7 +354,7 @@ public static class FreqUtils
 
             if (freqSnapshot.All(static f => !f.Updating))
             {
-                Utils.Frontend.Alert(AlertLevel.Success, "Finished loading frequency dictionaries");
+                FrontendManager.Frontend.Alert(AlertLevel.Success, "Finished loading frequency dictionaries");
             }
         }
 
@@ -391,7 +392,7 @@ public static class FreqUtils
                     freq.Priority = priority;
                     ++priority;
 
-                    freq.Path = Utils.GetPortablePath(freq.Path);
+                    freq.Path = PathUtils.GetPortablePath(freq.Path);
                     if (freq.Type is FreqType.Yomichan or FreqType.YomichanKanji && freq.Revision is null)
                     {
                         UpdateRevisionInfo(freq);
@@ -404,7 +405,7 @@ public static class FreqUtils
             }
             else
             {
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
+                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
                 throw new SerializationException("Couldn't load Config/freqs.json");
             }
         }

@@ -88,8 +88,8 @@ internal static class SpeechSynthesisReflectionUtils
 
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Injecting One Core voices failed");
-            // Utils.Frontend.Alert(AlertLevel.Error, "Injecting One Core voices failed");
+            LoggerManager.Logger.Error(ex, "Injecting One Core voices failed");
+            // FrontendManager.Frontend.Alert(AlertLevel.Error, "Injecting One Core voices failed");
         }
     }
 }

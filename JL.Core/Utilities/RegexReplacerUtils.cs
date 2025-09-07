@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using JL.Core.Config;
+using JL.Core.Frontend;
 
 namespace JL.Core.Utilities;
 
@@ -76,8 +77,8 @@ public static partial class RegexReplacerUtils
                     }
                     catch (ArgumentException e)
                     {
-                        Utils.Logger.Error(e, "Invalid RegEx: {RegexPattern}", regexPattern);
-                        Utils.Frontend.Alert(AlertLevel.Error, $"Invalid RegEx: {regexPattern}");
+                        LoggerManager.Logger.Error(e, "Invalid RegEx: {RegexPattern}", regexPattern);
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid RegEx: {regexPattern}");
                     }
                 }
             }

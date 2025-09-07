@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Timers;
 using JL.Core.Config;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 using Timer = System.Timers.Timer;
@@ -204,8 +205,8 @@ public static class StatsUtils
             }
 
             default:
-                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatType), nameof(StatsUtils), nameof(IncrementStat), type);
-                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid stat type: {type}");
+                LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatType), nameof(StatsUtils), nameof(IncrementStat), type);
+                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid stat type: {type}");
                 break;
         }
     }

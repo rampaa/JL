@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using JL.Core.Audio;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using NAudio.Wave;
@@ -94,7 +95,7 @@ internal static class SpeechSynthesisUtils
         }
         catch (ArgumentException ex)
         {
-            Utils.Logger.Error(ex, "Failed to select voice {VoiceName}", voiceName);
+            LoggerManager.Logger.Error(ex, "Failed to select voice {VoiceName}", voiceName);
             WindowsUtils.Alert(AlertLevel.Error, $"{voiceName} is not available on your system. Deactivating it.");
             AudioUtils.AudioSources[voiceName].Active = false;
             SetInstalledVoiceWithHighestPriority();

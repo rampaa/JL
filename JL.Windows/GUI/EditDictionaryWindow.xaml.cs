@@ -5,9 +5,11 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.Utilities;
@@ -198,7 +200,7 @@ internal sealed partial class EditDictionaryWindow
 
         if (openFileDialog.ShowDialog() is true)
         {
-            PathTextBlock.Text = Utils.GetPortablePath(openFileDialog.FileName);
+            PathTextBlock.Text = PathUtils.GetPortablePath(openFileDialog.FileName);
         }
     }
 
@@ -217,7 +219,7 @@ internal sealed partial class EditDictionaryWindow
 
         if (openFolderDialog.ShowDialog() is true)
         {
-            PathTextBlock.Text = Utils.GetPortablePath(openFolderDialog.FolderName);
+            PathTextBlock.Text = PathUtils.GetPortablePath(openFolderDialog.FolderName);
             string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
             if (File.Exists(indexJsonPath))
             {
@@ -311,7 +313,7 @@ internal sealed partial class EditDictionaryWindow
                 break;
 
             default:
-                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(EditDictionaryWindow), nameof(BrowsePathButton_OnClick), selectedDictType);
+                LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(EditDictionaryWindow), nameof(BrowsePathButton_OnClick), selectedDictType);
                 WindowsUtils.Alert(AlertLevel.Error, $"Invalid dictionary type: {selectedDictType}");
                 break;
         }

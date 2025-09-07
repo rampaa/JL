@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net.Http.Json;
 using JL.Core.Config;
+using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Utilities;
 
@@ -99,21 +100,21 @@ internal static class AnkiConnectClient
                 return response;
             }
 
-            Utils.Frontend.Alert(AlertLevel.Error, response.Error);
-            Utils.Logger.Error("{JsonError}", response.Error);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, response.Error);
+            LoggerManager.Logger.Error("{JsonError}", response.Error);
 
             return null;
         }
         catch (HttpRequestException ex)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
-            Utils.Logger.Error(ex, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
+            LoggerManager.Logger.Error(ex, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
             return null;
         }
         catch (Exception ex)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to AnkiConnect");
-            Utils.Logger.Error(ex, "Couldn't connect to AnkiConnect");
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't connect to AnkiConnect");
+            LoggerManager.Logger.Error(ex, "Couldn't connect to AnkiConnect");
             return null;
         }
     }

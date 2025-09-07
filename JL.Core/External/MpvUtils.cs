@@ -60,12 +60,12 @@ public static class MpvUtils
         catch (TimeoutException)
         {
             s_pausedByJL = false;
-            Utils.Logger.Warning("Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={MpvNamedPipePath} to your mpv.conf file.", CoreConfigManager.Instance.MpvNamedPipePath);
+            LoggerManager.Logger.Warning("Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={MpvNamedPipePath} to your mpv.conf file.", CoreConfigManager.Instance.MpvNamedPipePath);
         }
         catch (Exception ex)
         {
             s_pausedByJL = false;
-            Utils.Logger.Error(ex, "An unexpected error occurred while attempting to pause playback in mpv");
+            LoggerManager.Logger.Error(ex, "An unexpected error occurred while attempting to pause playback in mpv");
         }
         finally
         {
@@ -94,12 +94,12 @@ public static class MpvUtils
         catch (TimeoutException)
         {
             s_pausedByJL = false;
-            Utils.Logger.Warning("Connection timed out. Is mpv running?");
+            LoggerManager.Logger.Warning("Connection timed out. Is mpv running?");
         }
         catch (Exception ex)
         {
             s_pausedByJL = false;
-            Utils.Logger.Error(ex, "An unexpected error occurred while attempting to resume playback in mpv");
+            LoggerManager.Logger.Error(ex, "An unexpected error occurred while attempting to resume playback in mpv");
         }
         finally
         {

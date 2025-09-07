@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using JL.Core.Utilities;
+using JL.Core;
 using JL.Windows.External;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;

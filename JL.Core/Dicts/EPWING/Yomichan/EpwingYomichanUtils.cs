@@ -20,7 +20,7 @@ internal static class EpwingYomichanUtils
             }
             else if (definitionElement.ValueKind is JsonValueKind.Array)
             {
-                StringBuilder sb = Utils.StringBuilderPool.Get();
+                StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
 
                 AppendDefinitionsFromJsonArray(sb, definitionElement, dict, imagePaths);
                 if (sb.Length > 0)
@@ -28,7 +28,7 @@ internal static class EpwingYomichanUtils
                     definition = sb.ToString();
                 }
 
-                Utils.StringBuilderPool.Return(sb);
+                ObjectPoolManager.StringBuilderPool.Return(sb);
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
             {
@@ -190,7 +190,7 @@ internal static class EpwingYomichanUtils
 
                 if (contentElement.ValueKind is JsonValueKind.Array)
                 {
-                    StringBuilder sb = Utils.StringBuilderPool.Get();
+                    StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
 
                     AppendDefinitionsFromJsonArray(sb, contentElement, dict, imagePaths, tag);
                     string? content = null;
@@ -199,7 +199,7 @@ internal static class EpwingYomichanUtils
                         content = sb.ToString();
                     }
 
-                    Utils.StringBuilderPool.Return(sb);
+                    ObjectPoolManager.StringBuilderPool.Return(sb);
                     return new YomichanContent(parentTag ?? tag, content, false);
                 }
 
@@ -238,7 +238,7 @@ internal static class EpwingYomichanUtils
                     string? imagePath = imagePathJsonElement.GetString();
                     Debug.Assert(imagePath is not null);
 
-                    return new YomichanContent("img", Utils.GetPortablePath(Path.Join(dict.Path, imagePath)), false);
+                    return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false);
                 }
             }
             else if (jsonElement.TryGetProperty("type", out JsonElement typeJsonElement))
@@ -262,7 +262,7 @@ internal static class EpwingYomichanUtils
 
                     string? imagePath = imagePathJsonElement.GetString();
                     Debug.Assert(imagePath is not null);
-                    return new YomichanContent("img", Utils.GetPortablePath(Path.Join(dict.Path, imagePath)), false);
+                    return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false);
                 }
             }
 

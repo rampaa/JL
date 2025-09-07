@@ -6,6 +6,7 @@ using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External.AnkiConnect;
 using JL.Core.Freqs;
+using JL.Core.Frontend;
 using JL.Core.Lookup;
 using JL.Core.Network;
 using JL.Core.Statistics;
@@ -147,7 +148,7 @@ public static class MiningUtils
             {
                 if (lookupResult.Readings is not null)
                 {
-                    StringBuilder stringBuilder = Utils.StringBuilderPool.Get();
+                    StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
                     for (int i = 0; i < lookupResult.Readings.Length; i++)
                     {
                         _ = stringBuilder.Append(JapaneseUtils.GetPrimarySpellingAndReadingMapping(lookupResult.PrimarySpelling, lookupResult.Readings[i]));
@@ -158,7 +159,7 @@ public static class MiningUtils
                     }
 
                     string str = stringBuilder.ToString();
-                    Utils.StringBuilderPool.Return(stringBuilder);
+                    ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                     return str;
                 }
 
@@ -327,7 +328,7 @@ public static class MiningUtils
                 }
 
                 string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
-                StringBuilder expressionsWithPitchAccentBuilder = Utils.StringBuilderPool.Get();
+                StringBuilder expressionsWithPitchAccentBuilder = ObjectPoolManager.StringBuilderPool.Get();
                 _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
 
                 for (int i = 0; i < expressions.Length; i++)
@@ -335,14 +336,14 @@ public static class MiningUtils
                     byte pitchPosition = lookupResult.PitchPositions[i];
                     if (pitchPosition is not byte.MaxValue)
                     {
-                        StringBuilder sb = Utils.StringBuilderPool.Get();
+                        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
                         _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expressions[i], sb, pitchPosition)).Append('、');
-                        Utils.StringBuilderPool.Return(sb);
+                        ObjectPoolManager.StringBuilderPool.Return(sb);
                     }
                 }
 
                 string expressionsWithPitchAccent = expressionsWithPitchAccentBuilder.ToString(0, expressionsWithPitchAccentBuilder.Length - 1);
-                Utils.StringBuilderPool.Return(expressionsWithPitchAccentBuilder);
+                ObjectPoolManager.StringBuilderPool.Return(expressionsWithPitchAccentBuilder);
                 return expressionsWithPitchAccent;
             }
 
@@ -354,7 +355,7 @@ public static class MiningUtils
                 }
 
                 string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
-                StringBuilder numericPitchAccentBuilder = Utils.StringBuilderPool.Get();
+                StringBuilder numericPitchAccentBuilder = ObjectPoolManager.StringBuilderPool.Get();
                 for (int i = 0; i < expressions.Length; i++)
                 {
                     byte pitchPosition = lookupResult.PitchPositions[i];
@@ -365,7 +366,7 @@ public static class MiningUtils
                 }
 
                 string numericPitchAccent = numericPitchAccentBuilder.ToString(0, numericPitchAccentBuilder.Length - 2);
-                Utils.StringBuilderPool.Return(numericPitchAccentBuilder);
+                ObjectPoolManager.StringBuilderPool.Return(numericPitchAccentBuilder);
                 return numericPitchAccent;
             }
 
@@ -380,9 +381,9 @@ public static class MiningUtils
                             ? lookupResult.Readings[0]
                             : lookupResult.PrimarySpelling;
 
-                        StringBuilder sb = Utils.StringBuilderPool.Get();
+                        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
                         string pitchAccentForFirstReading = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(expression, sb, firstPitchPosition)}");
-                        Utils.StringBuilderPool.Return(sb);
+                        ObjectPoolManager.StringBuilderPool.Return(sb);
                         return pitchAccentForFirstReading;
                     }
                 }
@@ -416,7 +417,7 @@ public static class MiningUtils
                 }
 
                 string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
-                StringBuilder pitchAccentCategoriesBuilder = Utils.StringBuilderPool.Get();
+                StringBuilder pitchAccentCategoriesBuilder = ObjectPoolManager.StringBuilderPool.Get();
                 for (int i = 0; i < expressions.Length; i++)
                 {
                     byte pitchPosition = lookupResult.PitchPositions[i];
@@ -428,7 +429,7 @@ public static class MiningUtils
                 }
 
                 string pitchAccentCategories = pitchAccentCategoriesBuilder.ToString(0, pitchAccentCategoriesBuilder.Length - 2);
-                Utils.StringBuilderPool.Return(pitchAccentCategoriesBuilder);
+                ObjectPoolManager.StringBuilderPool.Return(pitchAccentCategoriesBuilder);
                 return pitchAccentCategories;
             }
 
@@ -460,8 +461,8 @@ public static class MiningUtils
 
             default:
             {
-                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(JLField), nameof(MiningUtils), nameof(GetMiningParameter), field);
-                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid JLField: {field}");
+                LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(JLField), nameof(MiningUtils), nameof(GetMiningParameter), field);
+                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid JLField: {field}");
                 return null;
             }
         }
@@ -540,7 +541,7 @@ public static class MiningUtils
             miningParams[JLField.FirstReading] = firstReading;
             miningParams[JLField.PrimarySpellingAndFirstReading] = JapaneseUtils.GetPrimarySpellingAndReadingMapping(lookupResult.PrimarySpelling, firstReading);
 
-            StringBuilder primarySpellingAndReadingStringBuilder = Utils.StringBuilderPool.Get();
+            StringBuilder primarySpellingAndReadingStringBuilder = ObjectPoolManager.StringBuilderPool.Get();
             for (int i = 0; i < lookupResult.Readings.Length; i++)
             {
                 _ = primarySpellingAndReadingStringBuilder.Append(JapaneseUtils.GetPrimarySpellingAndReadingMapping(lookupResult.PrimarySpelling, lookupResult.Readings[i]));
@@ -550,7 +551,7 @@ public static class MiningUtils
                 }
             }
             miningParams[JLField.PrimarySpellingAndReadings] = primarySpellingAndReadingStringBuilder.ToString();
-            Utils.StringBuilderPool.Return(primarySpellingAndReadingStringBuilder);
+            ObjectPoolManager.StringBuilderPool.Return(primarySpellingAndReadingStringBuilder);
         }
 
         if (lookupResult.AlternativeSpellings is not null)
@@ -669,9 +670,9 @@ public static class MiningUtils
         {
             string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
 
-            StringBuilder expressionsWithPitchAccentBuilder = Utils.StringBuilderPool.Get().Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
-            StringBuilder numericPitchAccentBuilder = Utils.StringBuilderPool.Get();
-            StringBuilder pitchAccentCategoriesBuilder = Utils.StringBuilderPool.Get();
+            StringBuilder expressionsWithPitchAccentBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
+            StringBuilder numericPitchAccentBuilder = ObjectPoolManager.StringBuilderPool.Get();
+            StringBuilder pitchAccentCategoriesBuilder = ObjectPoolManager.StringBuilderPool.Get();
 
             for (int i = 0; i < expressions.Length; i++)
             {
@@ -681,31 +682,31 @@ public static class MiningUtils
                     string expression = expressions[i];
                     _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {pitchPosition}, ");
 
-                    StringBuilder sb = Utils.StringBuilderPool.Get();
+                    StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
                     _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, sb, pitchPosition)).Append('、');
-                    Utils.StringBuilderPool.Return(sb);
+                    ObjectPoolManager.StringBuilderPool.Return(sb);
 
                     _ = pitchAccentCategoriesBuilder.Append(CultureInfo.InvariantCulture, $"{expression}: {GetPitchAccentCategory(expression, pitchPosition)}, ");
                 }
             }
 
             miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString(0, numericPitchAccentBuilder.Length - 2);
-            Utils.StringBuilderPool.Return(numericPitchAccentBuilder);
+            ObjectPoolManager.StringBuilderPool.Return(numericPitchAccentBuilder);
 
             miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString(0, expressionsWithPitchAccentBuilder.Length - 1);
-            Utils.StringBuilderPool.Return(expressionsWithPitchAccentBuilder);
+            ObjectPoolManager.StringBuilderPool.Return(expressionsWithPitchAccentBuilder);
 
             miningParams[JLField.PitchAccentCategories] = pitchAccentCategoriesBuilder.ToString(0, pitchAccentCategoriesBuilder.Length - 2);
-            Utils.StringBuilderPool.Return(pitchAccentCategoriesBuilder);
+            ObjectPoolManager.StringBuilderPool.Return(pitchAccentCategoriesBuilder);
 
             byte firstPitchPosition = lookupResult.PitchPositions[selectedSpellingIndex];
             if (firstPitchPosition is not byte.MaxValue)
             {
                 string firstExpression = expressions[selectedSpellingIndex];
 
-                StringBuilder sb = Utils.StringBuilderPool.Get();
+                StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
                 miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstExpression, sb, firstPitchPosition)}");
-                Utils.StringBuilderPool.Return(sb);
+                ObjectPoolManager.StringBuilderPool.Return(sb);
 
                 miningParams[JLField.NumericPitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{firstExpression}: {firstPitchPosition}");
                 miningParams[JLField.PitchAccentCategoryForFirstReading] = $"{firstExpression}: {GetPitchAccentCategory(firstExpression, firstPitchPosition)}";
@@ -800,7 +801,7 @@ public static class MiningUtils
                 return selectedRecordDefinitions;
             }
 
-            StringBuilder singleDictStringBuilder = Utils.StringBuilderPool.Get();
+            StringBuilder singleDictStringBuilder = ObjectPoolManager.StringBuilderPool.Get();
             int count = 1;
 
             if (selectedRecordDefinitions is not null)
@@ -819,11 +820,11 @@ public static class MiningUtils
             }
 
             string singleDictDef = singleDictStringBuilder.ToString();
-            Utils.StringBuilderPool.Return(singleDictStringBuilder);
+            ObjectPoolManager.StringBuilderPool.Return(singleDictStringBuilder);
             return singleDictDef;
         }
 
-        StringBuilder stringBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
         if (firstLookupResults.Length is 1)
         {
             if (selectedRecordDefinitions is not null)
@@ -879,7 +880,7 @@ public static class MiningUtils
         }
 
         string def = stringBuilder.ToString();
-        Utils.StringBuilderPool.Return(stringBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
         return def;
     }
 
@@ -893,7 +894,7 @@ public static class MiningUtils
                 return selectedRecordDefinitions;
             }
 
-            StringBuilder singleDictStringBuilder = Utils.StringBuilderPool.Get();
+            StringBuilder singleDictStringBuilder = ObjectPoolManager.StringBuilderPool.Get();
             int count = 1;
 
             if (selectedRecordDefinitions is not null)
@@ -911,11 +912,11 @@ public static class MiningUtils
             }
 
             string singleDictDef = singleDictStringBuilder.ToString();
-            Utils.StringBuilderPool.Return(singleDictStringBuilder);
+            ObjectPoolManager.StringBuilderPool.Return(singleDictStringBuilder);
             return singleDictDef;
         }
 
-        StringBuilder stringBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
         if (firstLookupResults.Length is 1)
         {
             if (selectedRecordDefinitions is not null)
@@ -979,7 +980,7 @@ public static class MiningUtils
         }
 
         string def = stringBuilder.ToString();
-        Utils.StringBuilderPool.Return(stringBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
         return def;
     }
 
@@ -1018,7 +1019,7 @@ public static class MiningUtils
                 return string.Join(", ", lookupResult.WordClasses);
             }
 
-            StringBuilder sb = Utils.StringBuilderPool.Get();
+            StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
             if (lookupResult.WordClasses is not null)
             {
                 _ = sb.AppendJoin(", ", lookupResult.WordClasses);
@@ -1041,7 +1042,7 @@ public static class MiningUtils
             }
 
             string wordClasses = sb.ToString();
-            Utils.StringBuilderPool.Return(sb);
+            ObjectPoolManager.StringBuilderPool.Return(sb);
             return wordClasses;
         }
 
@@ -1143,7 +1144,7 @@ public static class MiningUtils
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
         Dictionary<JLField, string> miningParameters = GetMiningParameters(lookupResults, currentLookupResultIndex, currentText, sentence, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, false, null);
 
-        StringBuilder lineToMine = Utils.StringBuilderPool.Get();
+        StringBuilder lineToMine = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 1; i < jlFields.Length; i++)
         {
             JLField jlField = jlFields[i];
@@ -1162,14 +1163,14 @@ public static class MiningUtils
         }
 
         await File.AppendAllTextAsync(filePath, lineToMine.ToString()).ConfigureAwait(false);
-        Utils.StringBuilderPool.Return(lineToMine);
+        ObjectPoolManager.StringBuilderPool.Return(lineToMine);
 
         StatsUtils.IncrementStat(StatType.CardsMined);
 
-        Utils.Logger.Information("Mined {SelectedSpelling}", selectedSpelling);
+        LoggerManager.Logger.Information("Mined {SelectedSpelling}", selectedSpelling);
         if (CoreConfigManager.Instance.NotifyWhenMiningSucceeds)
         {
-            Utils.Frontend.Alert(AlertLevel.Success, $"Mined {selectedSpelling}");
+            FrontendManager.Frontend.Alert(AlertLevel.Success, $"Mined {selectedSpelling}");
         }
     }
 
@@ -1255,14 +1256,14 @@ public static class MiningUtils
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (!coreConfigManager.AnkiIntegration)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
             return;
         }
 
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig().ConfigureAwait(false);
         if (ankiConfigDict is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
             return;
         }
 
@@ -1287,7 +1288,7 @@ public static class MiningUtils
 
         if (ankiConfig is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
             return;
         }
 
@@ -1303,15 +1304,15 @@ public static class MiningUtils
         bool? canAddNote = await AnkiConnectUtils.CanAddNote(note).ConfigureAwait(false);
         if (canAddNote is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {selectedSpelling}");
-            Utils.Logger.Error("Mining failed for {SelectedSpelling}", selectedSpelling);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Mining failed for {selectedSpelling}");
+            LoggerManager.Logger.Error("Mining failed for {SelectedSpelling}", selectedSpelling);
             return;
         }
 
         if (!coreConfigManager.AllowDuplicateCards && !canAddNote.Value)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, $"Cannot mine {selectedSpelling} because it is a duplicate card");
-            Utils.Logger.Information("Cannot mine {SelectedSpelling} because it is a duplicate card", selectedSpelling);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Cannot mine {selectedSpelling} because it is a duplicate card");
+            LoggerManager.Logger.Information("Cannot mine {SelectedSpelling} because it is a duplicate card", selectedSpelling);
             return;
         }
 
@@ -1336,7 +1337,7 @@ public static class MiningUtils
         byte[]? audioData = audioResponse?.AudioData;
         if (audioResponse?.AudioSource is AudioSourceType.TextToSpeech)
         {
-            audioData = await Utils.Frontend.GetAudioResponseFromTextToSpeech(selectedReading).ConfigureAwait(false);
+            audioData = await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(selectedReading).ConfigureAwait(false);
         }
 
         List<string> sentenceAudioFields = FindFields(JLField.SentenceAudio, userFields);
@@ -1345,7 +1346,7 @@ public static class MiningUtils
         byte[]? sentenceAudioData = needsSentenceAudio
             ? sentenceAudioIsSameAsAudio
                 ? audioData
-                : await Utils.Frontend.GetAudioResponseFromTextToSpeech(sentence).ConfigureAwait(false)
+                : await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(sentence).ConfigureAwait(false)
             : null;
 
         List<string> sourceTextAudioFields = FindFields(JLField.SourceTextAudio, userFields);
@@ -1354,7 +1355,7 @@ public static class MiningUtils
         byte[]? sourceTextAudioData = needsSourceTextAudio
             ? sourceTextAudioIsSameAsSentenceAudio
                 ? sentenceAudioData
-                : await Utils.Frontend.GetAudioResponseFromTextToSpeech(currentText).ConfigureAwait(false)
+                : await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(currentText).ConfigureAwait(false)
             : null;
 
         int totalAudioCount = 0;
@@ -1453,7 +1454,7 @@ public static class MiningUtils
         List<string> imageFields = FindFields(JLField.Image, userFields);
         bool needsImage = imageFields.Count > 0;
         byte[]? imageBytes = needsImage
-            ? await Utils.Frontend.GetImageFromClipboardAsByteArray().ConfigureAwait(false)
+            ? await FrontendManager.Frontend.GetImageFromClipboardAsByteArray().ConfigureAwait(false)
             : null;
 
         if (imageBytes is not null)
@@ -1478,8 +1479,8 @@ public static class MiningUtils
         Response? response = await AnkiConnectClient.AddNoteToDeck(note).ConfigureAwait(false);
         if (response is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {selectedSpelling}");
-            Utils.Logger.Error("Mining failed for {SelectedSpelling}", selectedSpelling);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Mining failed for {selectedSpelling}");
+            LoggerManager.Logger.Error("Mining failed for {SelectedSpelling}", selectedSpelling);
             return;
         }
 
@@ -1487,10 +1488,10 @@ public static class MiningUtils
         bool showDuplicateCardMessage = !canAddNote.Value;
         string message = $"Mined {selectedSpelling}{(showNoAudioMessage ? " (No Audio)" : "")}{(showDuplicateCardMessage ? " (Duplicate)" : "")}";
 
-        Utils.Logger.Information("{Message}", message);
+        LoggerManager.Logger.Information("{Message}", message);
         if (coreConfigManager.NotifyWhenMiningSucceeds)
         {
-            Utils.Frontend.Alert(showNoAudioMessage || showDuplicateCardMessage ? AlertLevel.Warning : AlertLevel.Success, message);
+            FrontendManager.Frontend.Alert(showNoAudioMessage || showDuplicateCardMessage ? AlertLevel.Warning : AlertLevel.Success, message);
         }
 
         if (coreConfigManager.ForceSyncAnki)

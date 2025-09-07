@@ -19,7 +19,7 @@ internal sealed class LookupTests
     [OneTimeSetUp]
     public void ClassInit()
     {
-        Utils.Frontend = new DummyFrontend();
+        FrontendManager.Frontend = new DummyFrontend();
 
         Dict jmdict = DictUtils.BuiltInDicts[nameof(DictType.JMdict)];
         jmdict.Options.NewlineBetweenDefinitions = new NewlineBetweenDefinitionsOption(false);

@@ -1,3 +1,4 @@
+using JL.Core.Frontend;
 using JL.Core.Lookup;
 using JL.Core.Network.WebSocket;
 using JL.Core.Statistics;
@@ -42,7 +43,7 @@ public sealed class CoreConfigManager
     {
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        Utils.s_loggingLevelSwitch.MinimumLevel = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, LogEventLevel.Error, "MinimumLogLevel");
+        LoggerManager.s_loggingLevelSwitch.MinimumLevel = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, LogEventLevel.Error, "MinimumLogLevel");
 
         {
             string? ankiConnectUriStr = configs.GetValueOrDefault(nameof(AnkiConnectUri));
@@ -64,8 +65,8 @@ public sealed class CoreConfigManager
                 else
                 {
                     ConfigDBManager.UpdateSetting(connection, nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
-                    Utils.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+                    LoggerManager.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
+                    FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
                 }
             }
         }
@@ -102,8 +103,8 @@ public sealed class CoreConfigManager
                     }
                     else
                     {
-                        Utils.Logger.Warning("Couldn't save WebSocket address, invalid URL");
-                        Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
+                        LoggerManager.Logger.Warning("Couldn't save WebSocket address, invalid URL");
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
                     }
                 }
 

@@ -15,7 +15,9 @@ using JL.Core.Dicts.KANJIDIC;
 using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Array;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
 
@@ -524,8 +526,8 @@ public static class LookupUtils
                     break;
 
                 default:
-                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(LookupUtils), nameof(LookupText), dict.Type);
-                    Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(LookupUtils), nameof(LookupText), dict.Type);
+                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
                     break;
             }
         });
@@ -777,8 +779,8 @@ public static class LookupUtils
                 break;
 
             default:
-                Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(LookupUtils), nameof(GetValidDeconjugatedResults), dict.Type);
-                Utils.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
+                LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(LookupUtils), nameof(GetValidDeconjugatedResults), dict.Type);
+                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
                 break;
         }
 

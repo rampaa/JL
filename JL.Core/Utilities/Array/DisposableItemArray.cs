@@ -1,4 +1,4 @@
-namespace JL.Core.Lookup;
+namespace JL.Core.Utilities.Array;
 
 internal readonly ref struct DisposableItemArray<T> : IDisposable where T : IDisposable
 {

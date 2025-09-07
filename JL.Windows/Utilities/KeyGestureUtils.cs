@@ -149,7 +149,7 @@ internal static class KeyGestureUtils
             return keyGesture.Key.ToString();
         }
 
-        StringBuilder sb = Utils.StringBuilderPool.Get();
+        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
 
         if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
         {
@@ -175,7 +175,7 @@ internal static class KeyGestureUtils
             ? sb.ToString()
             : "None";
 
-        Utils.StringBuilderPool.Return(sb);
+        ObjectPoolManager.StringBuilderPool.Return(sb);
 
         return formattedText;
     }

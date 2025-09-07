@@ -1,11 +1,14 @@
+using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
+using Microsoft.Extensions.ObjectPool;
 
 namespace JL.Core.Utilities;
 
-public static class StringPoolUtils
+public static class ObjectPoolManager
 {
+    public static readonly ObjectPool<StringBuilder> StringBuilderPool = new DefaultObjectPoolProvider().CreateStringBuilderPool(1024, 1024 * 4);
     public static readonly StringPool StringPoolInstance = StringPool.Shared;
 
     public static void ClearStringPoolIfDictsAreReady()

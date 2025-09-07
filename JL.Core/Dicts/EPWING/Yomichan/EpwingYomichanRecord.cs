@@ -54,7 +54,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
             ? '\n'
             : '；';
 
-        StringBuilder defBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder defBuilder = ObjectPoolManager.StringBuilderPool.Get();
         if (DefinitionTags is not null)
         {
             _ = defBuilder.Append('[').AppendJoin(", ", DefinitionTags).Append(']').Append(newline ? '\n' : ' ');
@@ -72,7 +72,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         }
 
         string def = defBuilder.ToString();
-        Utils.StringBuilderPool.Return(defBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(defBuilder);
         return def;
     }
 

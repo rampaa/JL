@@ -142,7 +142,7 @@ public static class DBUtils
 
     internal static string GetParameter(int parameterCount)
     {
-        StringBuilder parameterBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder parameterBuilder = ObjectPoolManager.StringBuilderPool.Get();
 
         _ = parameterBuilder.Append("(@1");
         for (int i = 1; i < parameterCount; i++)
@@ -151,7 +151,7 @@ public static class DBUtils
         }
 
         string parameter = parameterBuilder.Append(");").ToString();
-        Utils.StringBuilderPool.Return(parameterBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(parameterBuilder);
         return parameter;
     }
 

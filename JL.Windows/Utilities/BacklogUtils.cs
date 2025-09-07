@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows.Controls;
+using JL.Core;
 using JL.Core.Config;
 using JL.Core.Statistics;
 using JL.Core.Utilities;

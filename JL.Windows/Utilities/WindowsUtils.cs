@@ -13,11 +13,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HandyControl.Data;
 using HandyControl.Tools;
+using JL.Core;
 using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
 using JL.Core.Freqs;
+using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -103,7 +105,7 @@ internal static class WindowsUtils
 
                 catch (UnauthorizedAccessException ex)
                 {
-                    Utils.Logger.Error(ex, "GetTypefaces failed for {FontFamily}", fontFamily);
+                    LoggerManager.Logger.Error(ex, "GetTypefaces failed for {FontFamily}", fontFamily);
                 }
             }
             else
@@ -357,14 +359,14 @@ internal static class WindowsUtils
 
         else
         {
-            Utils.Logger.Error("Couldn't update JL. {StatusCode} {ReasonPhrase}", downloadResponse.StatusCode, downloadResponse.ReasonPhrase);
+            LoggerManager.Logger.Error("Couldn't update JL. {StatusCode} {ReasonPhrase}", downloadResponse.StatusCode, downloadResponse.ReasonPhrase);
             Alert(AlertLevel.Error, "Couldn't update JL");
         }
     }
 
     public static async Task InitializeMainWindow()
     {
-        await Task.Run(Utils.CoreInitialize).ConfigureAwait(false);
+        await Task.Run(CoreInitializer.CoreInitialize).ConfigureAwait(false);
 
         if (CoreConfigManager.Instance.CheckForJLUpdatesOnStartUp)
         {
@@ -414,7 +416,7 @@ internal static class WindowsUtils
 
             catch (Exception ex)
             {
-                Utils.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
+                LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
                 Alert(AlertLevel.Error, "Error playing audio");
             }
         });
@@ -437,7 +439,7 @@ internal static class WindowsUtils
             string[] filePaths = Directory.GetFiles(Path.Join(AppInfo.ResourcesPath, "Motivation"));
             if (filePaths.Length is 0)
             {
-                Utils.Logger.Warning("Motivation folder is empty!");
+                LoggerManager.Logger.Warning("Motivation folder is empty!");
                 Alert(AlertLevel.Warning, "Motivation folder is empty!");
                 return;
             }
@@ -452,7 +454,7 @@ internal static class WindowsUtils
         }
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Error motivating");
+            LoggerManager.Logger.Error(ex, "Error motivating");
             Alert(AlertLevel.Error, "Error motivating");
         }
     }
@@ -717,7 +719,7 @@ internal static class WindowsUtils
                 }
                 catch (Exception ex)
                 {
-                    Utils.Logger.Warning(ex, "GetImageFromClipboard failed");
+                    LoggerManager.Logger.Warning(ex, "GetImageFromClipboard failed");
                     await Task.Delay(5).ConfigureAwait(true);
                 }
             }
@@ -904,7 +906,7 @@ internal static class WindowsUtils
             }
             catch (ExternalException ex)
             {
-                Utils.Logger.Warning(ex, "CopyTextToClipboard failed");
+                LoggerManager.Logger.Warning(ex, "CopyTextToClipboard failed");
                 await Task.Delay(5).ConfigureAwait(true);
             }
         }

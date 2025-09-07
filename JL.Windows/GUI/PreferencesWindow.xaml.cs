@@ -9,6 +9,7 @@ using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.External.AnkiConnect;
+using JL.Core.Frontend;
 using JL.Core.Mining;
 using JL.Core.Network;
 using JL.Core.Statistics;
@@ -188,8 +189,8 @@ internal sealed partial class PreferencesWindow
         }
 
         _profileName = ProfileUtils.CurrentProfileName;
-        _profileNamesDict.Path = Utils.GetPortablePath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName));
-        _profileWordsDict.Path = Utils.GetPortablePath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName));
+        _profileNamesDict.Path = PathUtils.GetPortablePath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName));
+        _profileWordsDict.Path = PathUtils.GetPortablePath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName));
 
         if (!_profileNamesDict.Active && !_profileWordsDict.Active)
         {
@@ -337,14 +338,14 @@ internal sealed partial class PreferencesWindow
             else
             {
                 WindowsUtils.Alert(AlertLevel.Error, "Error getting model names from Anki");
-                Utils.Logger.Error("Error getting model names from Anki");
+                LoggerManager.Logger.Error("Error getting model names from Anki");
             }
         }
 
         else
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error getting deck names from Anki");
-            Utils.Logger.Error("Error getting deck names from Anki");
+            LoggerManager.Logger.Error("Error getting deck names from Anki");
         }
     }
 
@@ -377,7 +378,7 @@ internal sealed partial class PreferencesWindow
         else
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
-            Utils.Logger.Error("Error getting fields from AnkiConnect");
+            LoggerManager.Logger.Error("Error getting fields from AnkiConnect");
         }
     }
 
@@ -444,7 +445,7 @@ internal sealed partial class PreferencesWindow
             modelNamesSelector.SelectedItem is null)
         {
             WindowsUtils.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineType} dictionaries"));
-            Utils.Logger.Error("Save failed: Incomplete Anki config for {MineType} dictionaries", mineType);
+            LoggerManager.Logger.Error("Save failed: Incomplete Anki config for {MineType} dictionaries", mineType);
             return null;
         }
 
@@ -524,7 +525,7 @@ internal sealed partial class PreferencesWindow
         }
 
         WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
-        Utils.Logger.Error("Error saving AnkiConfig");
+        LoggerManager.Logger.Error("Error saving AnkiConfig");
         coreConfigManager.AnkiIntegration = false;
         return Task.CompletedTask;
     }
@@ -555,7 +556,7 @@ internal sealed partial class PreferencesWindow
         }
         else
         {
-            StringBuilder sb = Utils.StringBuilderPool.Get();
+            StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
 
             if ((Keyboard.Modifiers & ModifierKeys.Control) is not 0)
             {
@@ -574,7 +575,7 @@ internal sealed partial class PreferencesWindow
 
             hotKeyText = sb.Append(key.ToString()).ToString();
 
-            Utils.StringBuilderPool.Return(sb);
+            ObjectPoolManager.StringBuilderPool.Return(sb);
         }
 
         TextBox currentTextBox = (TextBox)sender;

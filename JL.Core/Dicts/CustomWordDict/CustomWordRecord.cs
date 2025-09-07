@@ -59,7 +59,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             ? '\n'
             : '；';
 
-        StringBuilder defBuilder = Utils.StringBuilderPool.Get();
+        StringBuilder defBuilder = ObjectPoolManager.StringBuilderPool.Get();
 
         string[] definitions = Definitions;
         for (int i = 0; i < definitions.Length; i++)
@@ -73,7 +73,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
         }
 
         string def = defBuilder.ToString();
-        Utils.StringBuilderPool.Return(defBuilder);
+        ObjectPoolManager.StringBuilderPool.Return(defBuilder);
         return def;
     }
 

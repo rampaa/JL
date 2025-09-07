@@ -13,6 +13,7 @@ using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
 using JL.Core.Freqs;
+using JL.Core.Frontend;
 using JL.Core.Lookup;
 using JL.Core.Network.WebSocket;
 using JL.Core.Statistics;
@@ -61,7 +62,7 @@ internal sealed partial class MainWindow
         InitializeComponent();
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow(0);
-        Utils.Frontend = new WindowsFrontend();
+        FrontendManager.Frontend = new WindowsFrontend();
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -140,7 +141,7 @@ internal sealed partial class MainWindow
             }
             catch (ExternalException ex)
             {
-                Utils.Logger.Warning(ex, "CopyFromClipboard failed");
+                LoggerManager.Logger.Warning(ex, "CopyFromClipboard failed");
                 await Task.Delay(5).ConfigureAwait(true);
             }
         }

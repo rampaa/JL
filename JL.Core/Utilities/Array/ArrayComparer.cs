@@ -1,4 +1,4 @@
-namespace JL.Core.Utilities;
+namespace JL.Core.Utilities.Array;
 
 internal sealed class ArrayComparer<T> : IEqualityComparer<T[]?> where T : IEquatable<T>
 {

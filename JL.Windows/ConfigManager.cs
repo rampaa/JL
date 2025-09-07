@@ -6,7 +6,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using HandyControl.Data;
+using JL.Core;
 using JL.Core.Config;
+using JL.Core.Frontend;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
@@ -644,7 +646,7 @@ internal sealed class ConfigManager
                 else
                 {
                     ConfigDBManager.UpdateSetting(connection, nameof(SearchUrl), SearchUrl);
-                    Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
+                    LoggerManager.Logger.Warning("Couldn't save Search URL, invalid URL");
                     WindowsUtils.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
                 }
             }
@@ -659,7 +661,7 @@ internal sealed class ConfigManager
             else if (!string.IsNullOrEmpty(browserPathStr) && !Path.IsPathFullyQualified(browserPathStr))
             {
                 ConfigDBManager.UpdateSetting(connection, nameof(BrowserPath), BrowserPath);
-                Utils.Logger.Warning("Couldn't save Browser Path, invalid path");
+                LoggerManager.Logger.Warning("Couldn't save Browser Path, invalid path");
                 WindowsUtils.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
             }
             else
@@ -702,7 +704,7 @@ internal sealed class ConfigManager
 
                 default:
                     ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursor", "BottomRight");
-                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupPositionRelativeToCursor", nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorStr);
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupPositionRelativeToCursor", nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorStr);
                     WindowsUtils.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor option: {popupPositionRelativeToCursorStr}");
                     break;
             }
@@ -729,7 +731,7 @@ internal sealed class ConfigManager
 
                 default:
                     ConfigDBManager.UpdateSetting(connection, "PopupFlip", "Both");
-                    Utils.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupFlip", nameof(ConfigManager), nameof(ApplyPreferences), popupFlipStr);
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupFlip", nameof(ConfigManager), nameof(ApplyPreferences), popupFlipStr);
                     WindowsUtils.Alert(AlertLevel.Error, $"Invalid PopupFlip: {popupFlipStr}");
                     break;
             }
