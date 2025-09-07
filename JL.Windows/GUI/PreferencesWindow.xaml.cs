@@ -687,7 +687,7 @@ internal sealed partial class PreferencesWindow
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        Application.Current.Dispatcher.Invoke(() =>
+        Application.Current?.Dispatcher.Invoke(() =>
         {
             using (SqliteConnection preferencesConnection = ConfigDBManager.CreateReadWriteDBConnection())
             {

@@ -30,7 +30,7 @@ internal static class SpeechSynthesisUtils
 
         return installedVoices.Count is 0
             ? null
-            : Application.Current.Dispatcher.Invoke(() =>
+            : Application.Current?.Dispatcher.Invoke(() =>
             {
                 ReadOnlySpan<InstalledVoice> installedVoicesSpan = installedVoices.AsReadOnlySpan();
                 ComboBoxItem[] installedVoiceComboboxItems = new ComboBoxItem[installedVoicesSpan.Length];

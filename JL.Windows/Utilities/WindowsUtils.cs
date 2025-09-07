@@ -354,14 +354,18 @@ internal static class WindowsUtils
                 archive.ExtractToDirectory(tmpDirectory);
             }
 
-            await Application.Current.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
-            using Process? process = Process.Start(new ProcessStartInfo
+            Application? application = Application.Current;
+            if (application is not null)
             {
-                WorkingDirectory = AppInfo.ApplicationPath,
-                FileName = "update-helper.cmd",
-                Arguments = Environment.ProcessId.ToString(CultureInfo.InvariantCulture),
-                UseShellExecute = true
-            });
+                await application.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
+                using Process? process = Process.Start(new ProcessStartInfo
+                {
+                    WorkingDirectory = AppInfo.ApplicationPath,
+                    FileName = "update-helper.cmd",
+                    Arguments = Environment.ProcessId.ToString(CultureInfo.InvariantCulture),
+                    UseShellExecute = true
+                });
+            }
         }
 
         else
@@ -377,27 +381,31 @@ internal static class WindowsUtils
 
         if (CoreConfigManager.Instance.CheckForJLUpdatesOnStartUp)
         {
-            Application.Current.Dispatcher.Invoke(static () =>
+            Application? application = Application.Current;
+            if (application is not null)
             {
-                PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
-            });
-
-            await Task.Run(static () => NetworkUtils.CheckForJLUpdates(true)).ConfigureAwait(false);
-
-            Application.Current.Dispatcher.Invoke(static () =>
-            {
-                PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
-                if (!PreferencesWindow.Instance.IsVisible)
+                application.Dispatcher.Invoke(static () =>
                 {
-                    PreferencesWindow.Instance.Close();
-                }
-            });
+                    PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
+                });
+
+                await Task.Run(static () => NetworkUtils.CheckForJLUpdates(true)).ConfigureAwait(false);
+
+                application.Dispatcher.Invoke(static () =>
+                {
+                    PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
+                    if (!PreferencesWindow.Instance.IsVisible)
+                    {
+                        PreferencesWindow.Instance.Close();
+                    }
+                });
+            }
         }
     }
 
     public static void PlayAudio(byte[] audio, string audioFormat)
     {
-        _ = Application.Current.Dispatcher.InvokeAsync(async () =>
+        _ = Application.Current?.Dispatcher.InvokeAsync(async () =>
         {
             try
             {
@@ -489,9 +497,15 @@ internal static class WindowsUtils
 
     public static void Alert(AlertLevel alertLevel, string message)
     {
-        _ = Application.Current.Dispatcher.InvokeAsync(async () =>
+        Application? application = Application.Current;
+        if (application is null)
         {
-            List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
+            return;
+        }
+
+        _ = application.Dispatcher.InvokeAsync(async () =>
+        {
+            List<AlertWindow> alertWindowList = application.Windows.OfType<AlertWindow>().ToList();
 
             AlertWindow alertWindow = new();
             alertWindow.Show();
@@ -689,7 +703,11 @@ internal static class WindowsUtils
 
     public static void ChangeTheme(SkinType skin)
     {
-        ResourceDictionary resources = Application.Current.Resources;
+        ResourceDictionary? resources = Application.Current?.Resources;
+        if (resources is null)
+        {
+            return;
+        }
 
         //resources.MergedDictionaries.Clear();
         resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("GUI/Styles/ResourceDictionary.xaml", UriKind.Relative) });
@@ -705,7 +723,10 @@ internal static class WindowsUtils
 
     public static Task<byte[]?> GetImageFromClipboardAsByteArray()
     {
-        return Application.Current.Dispatcher.Invoke(static async () =>
+        Application? application = Application.Current;
+        return application is null
+            ? Task.FromResult<byte[]?>(null)
+            : application.Dispatcher.Invoke(static async () =>
         {
             while (Clipboard.ContainsImage())
             {
