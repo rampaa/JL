@@ -7,7 +7,7 @@ namespace JL.Core.Tests.Deconjugation;
 
 [TestFixture]
 #pragma warning disable CA1812 // Avoid uninstantiated internal classes"
-internal sealed class DeconjugatorTestsFor_VSS
+internal sealed class DeconjugatorTestsForVSS
 #pragma warning restore CA1812 // Avoid uninstantiated internal classes
 {
     [OneTimeSetUp]
