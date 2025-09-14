@@ -18,11 +18,11 @@ public interface IFrontend
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray();
 
-    public Task TextToSpeech(string voiceName, string text);
+    public void TextToSpeech(string voiceName, string text);
 
-    public Task StopTextToSpeech();
+    public void StopTextToSpeech();
 
-    public ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text);
+    public byte[]? GetAudioResponseFromTextToSpeech(string text);
 
     public void SetInstalledVoiceWithHighestPriority();
 }

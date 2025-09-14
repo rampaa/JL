@@ -1533,7 +1533,7 @@ internal sealed partial class PopupWindow
                         : LastLookupResults[_listViewItemIndex].PrimarySpelling;
                 }
 
-                return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text);
+                SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text);
             }
         }
 

@@ -17,12 +17,16 @@ internal static class SpeechSynthesisUtils
     private static long s_lastAudioPlayTimestamp;
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
     private static readonly SpeechSynthesizer s_synthesizer = new();
+    private static readonly SpeechSynthesizer s_streamSynthesizer = new();
 
     public static ComboBoxItem[]? InstalledVoices { get; } = GetInstalledVoiceNames();
 
     private static ComboBoxItem[]? GetInstalledVoiceNames()
     {
         s_synthesizer.InjectOneCoreVoices();
+        s_synthesizer.SetOutputToDefaultAudioDevice();
+
+        s_streamSynthesizer.InjectOneCoreVoices();
 
 #pragma warning disable CA1304 // Specify CultureInfo
         List<InstalledVoice> installedVoices = s_synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled && iv.VoiceInfo.Name is not null && iv.VoiceInfo.Culture is not null).ToList();
@@ -59,20 +63,12 @@ internal static class SpeechSynthesisUtils
             });
     }
 
-    public static async Task StopTextToSpeech()
+    public static void StopTextToSpeech()
     {
-        if (s_synthesizer.State is SynthesizerState.Speaking)
-        {
-            s_synthesizer.SpeakAsyncCancelAll();
-
-            while (s_synthesizer.State is SynthesizerState.Speaking)
-            {
-                await Task.Delay(100).ConfigureAwait(false);
-            }
-        }
+        s_synthesizer.SpeakAsyncCancelAll();
     }
 
-    public static async Task TextToSpeech(string voiceName, string text)
+    public static void TextToSpeech(string voiceName, string text)
     {
         if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing)
         {
@@ -87,7 +83,7 @@ internal static class SpeechSynthesisUtils
 
         s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
 
-        await StopTextToSpeech().ConfigureAwait(false);
+        s_synthesizer.SpeakAsyncCancelAll();
 
         try
         {
@@ -102,23 +98,21 @@ internal static class SpeechSynthesisUtils
             return;
         }
 
-        s_synthesizer.SetOutputToDefaultAudioDevice();
         _ = s_synthesizer.SpeakAsync(text);
     }
 
-    public static async ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text)
+    public static byte[]? GetAudioResponseFromTextToSpeech(string text)
     {
         if (InstalledVoiceWithHighestPriority is null)
         {
             return null;
         }
 
-        await StopTextToSpeech().ConfigureAwait(false);
-
-        s_synthesizer.SelectVoice(InstalledVoiceWithHighestPriority);
+        s_streamSynthesizer.SpeakAsyncCancelAll();
+        s_streamSynthesizer.SelectVoice(InstalledVoiceWithHighestPriority);
         using MemoryStream audioDataStream = new();
-        s_synthesizer.SetOutputToWaveStream(audioDataStream);
-        s_synthesizer.Speak(text);
+        s_streamSynthesizer.SetOutputToWaveStream(audioDataStream);
+        s_streamSynthesizer.Speak(text);
         return audioDataStream.ToArray();
     }
 

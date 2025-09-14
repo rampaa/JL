@@ -337,7 +337,7 @@ internal sealed partial class MainWindow
         if (configManager.TextToSpeechOnTextChange
             && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
         {
-            _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, sanitizedNewText).ConfigureAwait(false);
+            SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, sanitizedNewText);
         }
 
         return true;
@@ -894,7 +894,7 @@ internal sealed partial class MainWindow
 
                 if (selectedText.Length > 0)
                 {
-                    return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText);
+                    SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText);
                 }
             }
         }

@@ -1337,7 +1337,7 @@ public static class MiningUtils
         byte[]? audioData = audioResponse?.AudioData;
         if (audioResponse?.AudioSource is AudioSourceType.TextToSpeech)
         {
-            audioData = await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(selectedReading).ConfigureAwait(false);
+            audioData = FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(selectedReading);
         }
 
         List<string> sentenceAudioFields = FindFields(JLField.SentenceAudio, userFields);
@@ -1346,7 +1346,7 @@ public static class MiningUtils
         byte[]? sentenceAudioData = needsSentenceAudio
             ? sentenceAudioIsSameAsAudio
                 ? audioData
-                : await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(sentence).ConfigureAwait(false)
+                : FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(sentence)
             : null;
 
         List<string> sourceTextAudioFields = FindFields(JLField.SourceTextAudio, userFields);
@@ -1355,7 +1355,7 @@ public static class MiningUtils
         byte[]? sourceTextAudioData = needsSourceTextAudio
             ? sourceTextAudioIsSameAsSentenceAudio
                 ? sentenceAudioData
-                : await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(currentText).ConfigureAwait(false)
+                : FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(currentText)
             : null;
 
         int totalAudioCount = 0;

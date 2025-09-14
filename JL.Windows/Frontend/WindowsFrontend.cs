@@ -24,11 +24,11 @@ internal sealed class WindowsFrontend : IFrontend
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
 
-    public Task TextToSpeech(string voiceName, string text) => SpeechSynthesisUtils.TextToSpeech(voiceName, text);
+    public void TextToSpeech(string voiceName, string text) => SpeechSynthesisUtils.TextToSpeech(voiceName, text);
 
-    public Task StopTextToSpeech() => SpeechSynthesisUtils.StopTextToSpeech();
+    public void StopTextToSpeech() => SpeechSynthesisUtils.StopTextToSpeech();
 
-    public ValueTask<byte[]?> GetAudioResponseFromTextToSpeech(string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(text);
+    public byte[]? GetAudioResponseFromTextToSpeech(string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(text);
 
     public void SetInstalledVoiceWithHighestPriority() => SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
 }

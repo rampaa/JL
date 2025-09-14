@@ -447,7 +447,7 @@ internal static class WindowsUtils
 
         s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
 
-        await SpeechSynthesisUtils.StopTextToSpeech().ConfigureAwait(false);
+        SpeechSynthesisUtils.StopTextToSpeech();
 
         try
         {
@@ -767,10 +767,7 @@ internal static class WindowsUtils
 
         try
         {
-            return await owner.Dispatcher.InvokeAsync(() =>
-            {
-                return HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
-            });
+            return await owner.Dispatcher.InvokeAsync(() => HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes);
         }
         finally
         {
