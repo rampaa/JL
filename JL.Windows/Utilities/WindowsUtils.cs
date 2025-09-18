@@ -775,11 +775,6 @@ internal static class WindowsUtils
         }
     }
 
-    public static void ShowOkDialog(string text, string caption, Window owner)
-    {
-        _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-    }
-
     public static async Task ShowOkDialogAsync(string text, string caption, Window owner)
     {
         await s_dialogSemaphore.WaitAsync().ConfigureAwait(false);
