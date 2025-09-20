@@ -6,7 +6,7 @@ internal sealed class AtomicBool : IEquatable<AtomicBool>, IEquatable<bool>
 
     private bool Value
     {
-        get => Volatile.Read(ref _value) != 0;
+        get => Volatile.Read(ref _value) is not 0;
         set => Volatile.Write(ref _value, value ? 1 : 0);
     }
 
