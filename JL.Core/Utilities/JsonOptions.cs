@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace JL.Core.Utilities;
+
 public static class JsonOptions
 {
     public static readonly JsonSerializerOptions DefaultJso = new()

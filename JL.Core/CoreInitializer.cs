@@ -10,6 +10,7 @@ using JL.Core.Utilities;
 using JL.Core.WordClass;
 
 namespace JL.Core;
+
 public static class CoreInitializer
 {
     public static async Task CoreInitialize()

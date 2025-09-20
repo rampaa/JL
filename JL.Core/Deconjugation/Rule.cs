@@ -21,7 +21,7 @@ internal readonly struct Rule(string type, string[] decEnds, string[] conEnds, s
         {
             int hash = (17 * 37) + Type.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Detail.GetHashCode(StringComparison.Ordinal);
-            hash = (hash * 37) + ContextRule?.GetHashCode(StringComparison.Ordinal) ?? 37;
+            hash = (hash * 37) + (ContextRule?.GetHashCode(StringComparison.Ordinal) ?? 37);
 
             string[] decEnds = DecEnds;
             foreach (string decEnd in decEnds)

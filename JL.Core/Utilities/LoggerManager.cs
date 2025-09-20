@@ -4,6 +4,7 @@ using Serilog.Core;
 using Serilog.Events;
 
 namespace JL.Core.Utilities;
+
 public static class LoggerManager
 {
     internal static readonly LoggingLevelSwitch s_loggingLevelSwitch = new()

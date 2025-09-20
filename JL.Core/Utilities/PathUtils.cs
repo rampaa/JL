@@ -1,4 +1,5 @@
 namespace JL.Core.Utilities;
+
 public static class PathUtils
 {
     public static string GetPortablePath(string path)

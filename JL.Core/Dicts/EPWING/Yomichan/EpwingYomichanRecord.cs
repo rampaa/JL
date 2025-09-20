@@ -164,7 +164,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency, IEqua
         unchecked
         {
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
-            hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
+            hash = (hash * 37) + (Reading?.GetHashCode(StringComparison.Ordinal) ?? 37);
 
             if (Definitions is not null)
             {

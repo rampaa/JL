@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 
 namespace JL.Core.Utilities;
+
 internal static class HashUtils
 {
 #pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms

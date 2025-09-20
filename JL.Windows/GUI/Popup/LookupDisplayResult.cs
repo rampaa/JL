@@ -1,6 +1,7 @@
 using JL.Core.Lookup;
 
 namespace JL.Windows.GUI.Popup;
+
 internal sealed class LookupDisplayResult(PopupWindow popupWindow, LookupResult lookupResult, int index, bool nonLastItem)
 {
     public PopupWindow OwnerWindow { get; } = popupWindow;

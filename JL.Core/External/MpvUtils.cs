@@ -6,6 +6,7 @@ using JL.Core.Network;
 using JL.Core.Utilities;
 
 namespace JL.Core.External;
+
 public static class MpvUtils
 {
     private static readonly ReadOnlyMemory<byte> s_getPausePropertyCommand = NetworkUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"get_property\",\"pause\"]}\n");

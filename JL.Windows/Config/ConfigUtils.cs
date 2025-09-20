@@ -5,6 +5,7 @@ using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Windows.Config;
+
 internal static class ConfigUtils
 {
     public static Brush GetBrushFromConfig(SqliteConnection connection, Dictionary<string, string> configs, Brush solidColorBrush, string configKey)
