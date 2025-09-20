@@ -905,7 +905,7 @@ public static class DictUtils
             return;
         }
 
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmdictDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, dictDBPaths, KanjidicDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -993,7 +993,7 @@ public static class DictUtils
             return;
         }
 
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmdictDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, dictDBPaths, EpwingYomichanDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -1080,7 +1080,7 @@ public static class DictUtils
             return;
         }
 
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmdictDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, dictDBPaths, YomichanKanjiDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -1253,7 +1253,7 @@ public static class DictUtils
 
     private static void LoadNazekaDict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmdictDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, dictDBPaths, EpwingNazekaDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -1341,7 +1341,7 @@ public static class DictUtils
             return;
         }
 
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmdictDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, dictDBPaths, YomichanPitchAccentDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
