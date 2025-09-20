@@ -3,6 +3,7 @@ using System.Text.Json;
 using JL.Core.Frontend;
 using JL.Core.Mining;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Bool;
 
 namespace JL.Core.External.AnkiConnect;
 
@@ -48,7 +49,7 @@ public static class AnkiConfigUtils
                 }
 
                 Debug.Assert(s_ankiConfigDict is not null);
-                int firstFieldChangedFlag = 0;
+                AtomicBool firstFieldChanged = new(false);
                 await Parallel.ForEachAsync(s_ankiConfigDict.Values, async (ankiConfig, cancellationToken) =>
                 {
                     Debug.Assert(ankiConfig.Fields.Count > 0);
@@ -58,7 +59,7 @@ public static class AnkiConfigUtils
                         ReadOnlySpan<string> fieldsSpan = fields.AsReadOnlySpan();
                         if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
                         {
-                            _ = Interlocked.CompareExchange(ref firstFieldChangedFlag, 1, 0);
+                            firstFieldChanged.SetTrue();
 
                             OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length);
                             for (int i = 0; i < fieldsSpan.Length; i++)
@@ -72,7 +73,7 @@ public static class AnkiConfigUtils
                     }
                 }).ConfigureAwait(false);
 
-                if (firstFieldChangedFlag is 1)
+                if (firstFieldChanged)
                 {
                     await WriteAnkiConfig(s_ankiConfigDict).ConfigureAwait(false);
                 }

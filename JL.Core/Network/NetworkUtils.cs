@@ -7,6 +7,7 @@ using System.Timers;
 using JL.Core.Config;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Bool;
 using Timer = System.Timers.Timer;
 
 namespace JL.Core.Network;
@@ -24,11 +25,11 @@ public static class NetworkUtils
     internal const string Jpod101NoAudioMd5Hash = "7E2C2F954EF6051373BA916F000168DC";
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
     private static readonly Timer s_updaterTimer = new();
-    private static int s_updatingJL; // 0
+    private static readonly AtomicBool s_updatingJL = new(false);
 
     public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
-        if (Interlocked.CompareExchange(ref s_updatingJL, 1, 0) is not 0)
+        if (!s_updatingJL.TrySetTrue())
         {
             return;
         }
@@ -114,7 +115,7 @@ public static class NetworkUtils
         }
         finally
         {
-            Volatile.Write(ref s_updatingJL, 0);
+            s_updatingJL.SetFalse();
         }
     }
 
