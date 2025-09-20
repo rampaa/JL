@@ -1218,10 +1218,7 @@ public static class DictUtils
 
                 dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
 
-                if (ProfileCustomNamesCancellationTokenSource is null)
-                {
-                    ProfileCustomNamesCancellationTokenSource = new CancellationTokenSource();
-                }
+                Debug.Assert(ProfileCustomNamesCancellationTokenSource is not null);
 
                 CustomNameLoader.Load(dict,
                     dict.Type is DictType.CustomNameDictionary
