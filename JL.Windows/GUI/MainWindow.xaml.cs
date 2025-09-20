@@ -18,6 +18,7 @@ using JL.Core.Lookup;
 using JL.Core.Network.WebSocket;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Database;
 using JL.Windows.Config;
 using JL.Windows.External;
 using JL.Windows.Frontend;

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using JL.Core.Statistics;
-using JL.Core.Utilities;
+using JL.Core.Utilities.Database;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;

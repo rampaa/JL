@@ -8,6 +8,7 @@ using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.Freqs.Options;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Database;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Freqs;

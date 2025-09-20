@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using JL.Core.Utilities;
+using JL.Core.Utilities.Database;
 
 namespace JL.Core.Dicts.Options;
 

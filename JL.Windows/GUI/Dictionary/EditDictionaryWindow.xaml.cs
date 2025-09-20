@@ -11,6 +11,7 @@ using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Database;
 using JL.Windows.GUI.Options;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;

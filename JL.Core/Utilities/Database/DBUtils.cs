@@ -6,7 +6,7 @@ using JL.Core.Dicts;
 using JL.Core.Freqs;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.Utilities;
+namespace JL.Core.Utilities.Database;
 
 public static class DBUtils
 {

@@ -18,6 +18,7 @@ using JL.Core.Freqs;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Array;
+using JL.Core.Utilities.Database;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
 
