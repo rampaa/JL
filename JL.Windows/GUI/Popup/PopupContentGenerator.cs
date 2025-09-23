@@ -137,19 +137,19 @@ internal sealed class PopupContentGenerator : Decorator
     private static void CreatePrimarySpellingOrthographyInfo(LookupResult result, WrapPanel top)
     {
         JmdictLookupResult? jmdictLookupResult = result.JmdictLookupResult;
-        if (jmdictLookupResult is null)
+        if (jmdictLookupResult is null || jmdictLookupResult.PrimarySpellingOrthographyInfoList is null)
         {
             return;
         }
 
-        Dict jmdict = result.Dict;
-        Debug.Assert(jmdict.Options.POrthographyInfo is not null);
-        bool showPOrthographyInfo = jmdict.Options.POrthographyInfo.Value;
+        DictOptions jmdictOptions = result.Dict.Options;
+        Debug.Assert(jmdictOptions.POrthographyInfo is not null);
+        bool showPOrthographyInfo = jmdictOptions.POrthographyInfo.Value;
 
-        Debug.Assert(jmdict.Options.POrthographyInfoFontSize is not null);
-        double pOrthographyInfoFontSize = jmdict.Options.POrthographyInfoFontSize.Value;
+        Debug.Assert(jmdictOptions.POrthographyInfoFontSize is not null);
+        double pOrthographyInfoFontSize = jmdictOptions.POrthographyInfoFontSize.Value;
 
-        if (!showPOrthographyInfo || jmdictLookupResult.PrimarySpellingOrthographyInfoList is null)
+        if (!showPOrthographyInfo)
         {
             return;
         }
@@ -190,9 +190,9 @@ internal sealed class PopupContentGenerator : Decorator
         JmdictLookupResult? jmdictLookupResult = result.JmdictLookupResult;
         if (jmdictLookupResult is not null)
         {
-            Dict jmdict = result.Dict;
-            Debug.Assert(jmdict.Options.ROrthographyInfo is not null);
-            showROrthographyInfo = jmdict.Options.ROrthographyInfo.Value;
+            DictOptions jmdictOptions = result.Dict.Options;
+            Debug.Assert(jmdictOptions.ROrthographyInfo is not null);
+            showROrthographyInfo = jmdictOptions.ROrthographyInfo.Value;
         }
 
         string readingsText = showROrthographyInfo && jmdictLookupResult!.ReadingsOrthographyInfoList is not null
@@ -313,9 +313,9 @@ internal sealed class PopupContentGenerator : Decorator
         JmdictLookupResult? jmdictLookupResult = result.JmdictLookupResult;
         if (jmdictLookupResult is not null)
         {
-            Dict jmdict = result.Dict;
-            Debug.Assert(jmdict.Options.AOrthographyInfo is not null);
-            showAOrthographyInfo = jmdict.Options.AOrthographyInfo.Value;
+            DictOptions jmdictOptions = result.Dict.Options;
+            Debug.Assert(jmdictOptions.AOrthographyInfo is not null);
+            showAOrthographyInfo = jmdictOptions.AOrthographyInfo.Value;
         }
 
         string alternativeSpellingsText = showAOrthographyInfo && jmdictLookupResult!.AlternativeSpellingsOrthographyInfoList is not null
