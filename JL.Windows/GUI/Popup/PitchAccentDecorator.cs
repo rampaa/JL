@@ -10,29 +10,29 @@ namespace JL.Windows.GUI.Popup;
 
 internal sealed class PitchAccentDecorator : Decorator
 {
-    private readonly string[] _readings;
-    private readonly string[] _splitReadingsWithRInfo;
-    private readonly byte[] _pitchPositions;
+    private readonly StreamGeometry _geometry;
     private readonly Pen _pen;
 
-    public PitchAccentDecorator(FrameworkElement child, string[] reading, string[] splitReadingsWithRInfo, byte[] pitchPositions, Pen pen)
+    public PitchAccentDecorator(FrameworkElement child, string[] readings, string[] splitReadingsWithRInfo, byte[] pitchPositions, Pen pen)
     {
         Child = child;
         VerticalAlignment = child.VerticalAlignment;
         HorizontalAlignment = child.HorizontalAlignment;
         Margin = child.Margin;
         UseLayoutRounding = true;
-        _readings = reading;
-        _splitReadingsWithRInfo = splitReadingsWithRInfo;
-        _pitchPositions = pitchPositions;
+
         _pen = pen;
+        _geometry = CreatePitchAccentGeometry(child, readings, splitReadingsWithRInfo, pitchPositions);
     }
 
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
+        drawingContext.DrawGeometry(null, _pen, _geometry);
+    }
 
-        FrameworkElement childElement = (FrameworkElement)Child;
+    private static StreamGeometry CreatePitchAccentGeometry(FrameworkElement childElement, string[] readings, string[] splitReadingsWithRInfo, byte[] pitchPositions)
+    {
         double fontSize = childElement switch
         {
             TextBlock textBlock => textBlock.FontSize,
@@ -42,30 +42,32 @@ internal sealed class PitchAccentDecorator : Decorator
 
         double horizontalOffsetForReading = childElement.Margin.Left;
         double uniformCharHeight = WindowsUtils.GetMaxHeight(WindowsUtils.PopupFontTypeFace, fontSize);
-        for (int i = 0; i < _readings.Length; i++)
+
+        StreamGeometry geometry = new();
+        using StreamGeometryContext streamGeometryContext = geometry.Open();
+
+        for (int i = 0; i < readings.Length; i++)
         {
             if (i > 0)
             {
-                horizontalOffsetForReading += WindowsUtils.MeasureTextSize($"{_splitReadingsWithRInfo[i - 1]}、", fontSize).Width;
+                horizontalOffsetForReading += WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo[i - 1]}、", fontSize).Width;
             }
 
-            byte pitchPosition = _pitchPositions[i];
+            byte pitchPosition = pitchPositions[i];
             if (pitchPosition is byte.MaxValue)
             {
                 continue;
             }
 
-            StreamGeometry lineGeometry = BuildPitchAccentGeometry(_readings[i], pitchPosition, horizontalOffsetForReading, uniformCharHeight, fontSize);
-            lineGeometry.Freeze();
-            drawingContext.DrawGeometry(null, _pen, lineGeometry);
+            AppendPitchAccentGeometry(readings[i], pitchPosition, horizontalOffsetForReading, uniformCharHeight, fontSize, streamGeometryContext);
         }
+
+        geometry.Freeze();
+        return geometry;
     }
 
-    private static StreamGeometry BuildPitchAccentGeometry(string expression, byte pitchPosition, double horizontalOffsetForReading, double uniformCharHeight, double fontSize)
+    private static void AppendPitchAccentGeometry(string expression, byte pitchPosition, double horizontalOffsetForReading, double uniformCharHeight, double fontSize, StreamGeometryContext streamGeometryContext)
     {
-        StreamGeometry geometry = new();
-        using StreamGeometryContext streamGeometryContext = geometry.Open();
-
         bool lowPitch = false;
         double horizontalOffsetForChar = horizontalOffsetForReading;
         ReadOnlySpan<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expression);
@@ -105,7 +107,5 @@ internal sealed class PitchAccentDecorator : Decorator
 
             horizontalOffsetForChar += charWidth;
         }
-
-        return geometry;
     }
 }
