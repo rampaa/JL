@@ -8,7 +8,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using JL.Core;
-using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
