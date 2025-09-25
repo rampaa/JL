@@ -12,7 +12,7 @@ using static JL.Windows.Interop.WinApi.NativeMethods;
 
 namespace JL.Windows.Interop;
 
-internal sealed partial class WinApi
+internal static partial class WinApi
 {
 #pragma warning disable IDE1006 // Naming rule violation
     internal static partial class NativeMethods
@@ -185,9 +185,9 @@ internal sealed partial class WinApi
 
     private static ulong s_clipboardSequenceNo;
 
-    public event EventHandler? ClipboardChanged;
+    public static event EventHandler? ClipboardChanged;
 
-    public void SubscribeToWndProc(Window windowSource)
+    public static void SubscribeToWndProc(Window windowSource)
     {
         if (PresentationSource.FromVisual(windowSource) is not HwndSource source)
         {
@@ -199,7 +199,7 @@ internal sealed partial class WinApi
         source.AddHook(WndProc);
     }
 
-    public void UnsubscribeFromWndProc(Window windowSource)
+    public static void UnsubscribeFromWndProc(Window windowSource)
     {
         if (PresentationSource.FromVisual(windowSource) is HwndSource source)
         {
@@ -394,7 +394,7 @@ internal sealed partial class WinApi
         }
     }
 
-    private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
+    private static nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
     {
         if (msg is WM_CLIPBOARDUPDATE)
         {

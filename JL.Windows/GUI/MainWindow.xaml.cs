@@ -43,7 +43,6 @@ namespace JL.Windows.GUI;
 internal sealed partial class MainWindow
 #pragma warning restore CA1812 // Internal class that is apparently never instantiated
 {
-    private WinApi? _winApi;
     public nint WindowHandle { get; private set; }
 
     public PopupWindow FirstPopupWindow { get; }
@@ -80,10 +79,8 @@ internal sealed partial class MainWindow
 
         WindowHandle = new WindowInteropHelper(this).Handle;
         WinApi.SetCompositedAndNoRedirectionBitmapStyle(WindowHandle);
-
-        _winApi = new WinApi();
-        _winApi.ClipboardChanged += ClipboardChanged;
-        _winApi.SubscribeToWndProc(this);
+        WinApi.ClipboardChanged += ClipboardChanged;
+        WinApi.SubscribeToWndProc(this);
 
         _input = InputMethod.Current;
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
@@ -543,9 +540,7 @@ internal sealed partial class MainWindow
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
-
-        Debug.Assert(_winApi is not null);
-        _winApi.UnsubscribeFromWndProc(this);
+        WinApi.UnsubscribeFromWndProc(this);
 
         await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(true);
 
