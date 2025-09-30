@@ -724,7 +724,7 @@ internal sealed partial class PopupWindow
         if (checkForDuplicateCards)
         {
             Debug.Assert(duplicateIcons is not null);
-            _ = CheckResultForDuplicates((LookupDisplayResult[])PopupListView.ItemsSource);
+            CheckResultForDuplicates((LookupDisplayResult[])PopupListView.ItemsSource).SafeFireAndForget("Unexpected error while checking results for duplicates");
         }
 
         GenerateDictTypeButtons();
@@ -1509,7 +1509,7 @@ internal sealed partial class PopupWindow
 
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                     {
-                        _ = MpvUtils.ResumePlayback();
+                        MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
                     }
                 }
             }

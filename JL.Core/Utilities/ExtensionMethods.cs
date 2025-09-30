@@ -290,4 +290,19 @@ public static class ExtensionMethods
         using Stream stream = dataReader.GetStream(index);
         return MessagePackSerializer.Deserialize<T>(stream);
     }
+
+    public static void SafeFireAndForget(this Task task, string errorMessage)
+    {
+        _ = task.ContinueWith(
+            static (t, state) =>
+            {
+                string? message = (string?)state;
+                Debug.Assert(message is not null);
+                LoggerManager.Logger.Error(t.Exception, message);
+            },
+            errorMessage,
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
+    }
 }

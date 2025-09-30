@@ -328,7 +328,7 @@ internal static class WindowsUtils
 
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
         {
-            _ = MpvUtils.PausePlayback();
+            MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
         }
     }
 
@@ -658,7 +658,7 @@ internal static class WindowsUtils
 
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                     {
-                        _ = MpvUtils.ResumePlayback();
+                        MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
                     }
                 }
             }
@@ -687,7 +687,7 @@ internal static class WindowsUtils
 
             if (configManager.AutoPauseOrResumeMpvOnHoverChange)
             {
-                _ = MpvUtils.ResumePlayback();
+                MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
             }
 
             if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized)

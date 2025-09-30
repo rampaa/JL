@@ -874,7 +874,7 @@ internal sealed partial class MainWindow
 
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                     {
-                        _ = MpvUtils.ResumePlayback();
+                        MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
                     }
                 }
             }
@@ -923,7 +923,7 @@ internal sealed partial class MainWindow
                 {
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
                     {
-                        _ = MpvUtils.PausePlayback();
+                        MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
                     }
 
                     return FirstPopupWindow.LookupOnSelect(MainTextBox);
@@ -933,7 +933,7 @@ internal sealed partial class MainWindow
                 {
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
                     {
-                        _ = MpvUtils.PausePlayback();
+                        MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
                     }
 
                     MoveWindowToScreen();
@@ -1049,7 +1049,7 @@ internal sealed partial class MainWindow
 
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
         {
-            _ = MpvUtils.ResumePlayback();
+            MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
         }
     }
 
@@ -1734,7 +1734,7 @@ internal sealed partial class MainWindow
 
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
         {
-            _ = MpvUtils.ResumePlayback().ConfigureAwait(false);
+            MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
         }
     }
 

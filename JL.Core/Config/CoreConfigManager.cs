@@ -112,7 +112,7 @@ public sealed class CoreConfigManager
                 {
                     if (!newWebSocketUris.Contains(uri))
                     {
-                        _ = WebSocketUtils.DisconnectFromWebSocket(uri);
+                        WebSocketUtils.DisconnectFromWebSocket(uri).SafeFireAndForget("Unexpected error while disconnecting from WebSocket");
                     }
                 }
 

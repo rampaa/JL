@@ -44,15 +44,16 @@ internal sealed class WebSocketConnection : IDisposable
         if (_webSocketCancellationTokenSource is null)
         {
             _webSocketCancellationTokenSource = new CancellationTokenSource();
-            ListenWebSocket(_webSocketCancellationTokenSource.Token);
+            ListenWebSocket(_webSocketCancellationTokenSource.Token).SafeFireAndForget("Unexpected error while listening the WebSocket");
         }
     }
 
-    private void ListenWebSocket(CancellationToken cancellationToken)
+    private Task ListenWebSocket(CancellationToken cancellationToken)
     {
-        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-        _ = Task.Run(async () =>
+        return Task.Run(async () =>
         {
+            CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+
             do
             {
                 try
@@ -100,7 +101,7 @@ internal sealed class WebSocketConnection : IDisposable
                                     }
 
                                     string text = NetworkUtils.s_utf8NoBom.GetString(buffer.Span[..totalBytesReceived]);
-                                    _ = FrontendManager.Frontend.CopyFromWebSocket(text);
+                                    FrontendManager.Frontend.CopyFromWebSocket(text).SafeFireAndForget("Frontend copy from WebSocket failed");
                                 }
                                 else if (result.MessageType is WebSocketMessageType.Close)
                                 {
@@ -157,9 +158,21 @@ internal sealed class WebSocketConnection : IDisposable
                         LoggerManager.Logger.Verbose(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
                     }
                 }
+
+                catch (OperationCanceledException)
+                {
+                    LoggerManager.Logger.Debug("WebSocket connection was cancelled.");
+                    return;
+                }
+
+                catch (Exception ex)
+                {
+                    LoggerManager.Logger.Error(ex, "An unexpected error occured while listening the websocket server at {WebSocketUri}", _webSocketUri);
+                    return;
+                }
             }
             while (coreConfigManager is { AutoReconnectToWebSocket: true, CaptureTextFromWebSocket: true } && !cancellationToken.IsCancellationRequested);
-        }, cancellationToken);
+        }, CancellationToken.None);
     }
 
     public void Dispose()
