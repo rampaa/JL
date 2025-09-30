@@ -293,6 +293,11 @@ public static class ExtensionMethods
 
     public static void SafeFireAndForget(this Task task, string errorMessage)
     {
+        if (task.IsCompletedSuccessfully)
+        {
+            return;
+        }
+
         _ = task.ContinueWith(
             static (t, state) =>
             {
