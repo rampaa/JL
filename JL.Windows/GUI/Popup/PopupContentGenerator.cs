@@ -136,7 +136,7 @@ internal sealed class PopupContentGenerator : Decorator
     private static void CreatePrimarySpellingOrthographyInfo(LookupResult result, WrapPanel top)
     {
         JmdictLookupResult? jmdictLookupResult = result.JmdictLookupResult;
-        if (jmdictLookupResult is null || jmdictLookupResult.PrimarySpellingOrthographyInfoList is null)
+        if (jmdictLookupResult?.PrimarySpellingOrthographyInfoList is null)
         {
             return;
         }
