@@ -1,11 +1,11 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using JL.Core;
+using JL.Core.Utilities;
 using JL.Windows.Config;
-using JL.Windows.External;
+using JL.Windows.External.Magpie;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
 using static JL.Windows.Interop.WinApi.NativeMethods;
@@ -22,6 +22,7 @@ internal static partial class WinApi
         internal const int GWL_EXSTYLE = -20;
         internal const nint WS_EX_NOREDIRECTIONBITMAP = 0x00200000;
         internal const nint WS_EX_COMPOSITED = 0x02000000;
+        internal const nint WS_EX_TRANSPARENT = 0x00000020;
         internal const nint HWND_TOPMOST = -1;
         // internal const nint HWND_TOP = 0;
         // internal const nint HWND_NOTOPMOST = -2;
@@ -46,14 +47,12 @@ internal static partial class WinApi
         }
 
         // ReSharper disable UnusedMember.Global
-#pragma warning disable CA1028 // Enum storage should be Int32
-        internal enum ChangeWindowMessageFilterExAction : uint
+        internal enum ChangeWindowMessageFilterExAction
         {
             Reset = 0,
             Allow = 1,
             Disallow = 2
         }
-#pragma warning restore CA1028 // Enum storage should be Int32
         // ReSharper restore UnusedMember.Global
 
         [LibraryImport("user32.dll", EntryPoint = "AddClipboardFormatListener", SetLastError = true)]
@@ -185,7 +184,7 @@ internal static partial class WinApi
 
     private static ulong s_clipboardSequenceNo;
 
-    public static event EventHandler? ClipboardChanged;
+    private static readonly MainWindow s_mainWindow = MainWindow.Instance;
 
     public static void SubscribeToWndProc(Window windowSource)
     {
@@ -301,6 +300,16 @@ internal static partial class WinApi
         _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOREDIRECTIONBITMAP | WS_EX_COMPOSITED);
     }
 
+    public static void SetTransparentStyle(nint windowHandle)
+    {
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_TRANSPARENT);
+    }
+
+    public static void UnsetTransparentStyle(nint windowHandle)
+    {
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) & ~WS_EX_TRANSPARENT);
+    }
+
     public static void PreventActivation(nint windowHandle)
     {
         _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
@@ -402,9 +411,7 @@ internal static partial class WinApi
             if (s_clipboardSequenceNo != clipboardSequenceNo)
             {
                 s_clipboardSequenceNo = clipboardSequenceNo;
-
-                Debug.Assert(ClipboardChanged is not null);
-                ClipboardChanged.Invoke(null, EventArgs.Empty);
+                s_mainWindow.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedtly");
                 handled = true;
             }
         }
@@ -428,7 +435,7 @@ internal static partial class WinApi
                 MagpieUtils.SetMagpieInfo(lParam);
                 if (ConfigManager.Instance.AlwaysOnTop)
                 {
-                    MainWindow.Instance.BringToFront();
+                    s_mainWindow.BringToFront();
                 }
             }
 

@@ -1913,7 +1913,9 @@
                                 </DockPanel>
                             </ListBoxItem>
 
-                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="To use this hotkey, &quot;Global hotkey&quot; option should be enabled">
                                 <DockPanel Margin="10,0,10,0">
                                     <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                      Click="ClearKeyGestureButton_Click" />

@@ -167,7 +167,7 @@ internal sealed class ConfigManager
     public KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture SearchWithBrowserKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
-    public KeyGesture MousePassThroughModeKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture MousePassThroughModeKeyGesture { get; private set; } = new(Key.T, ModifierKeys.Alt);
     public KeyGesture SteppedBacklogBackwardsKeyGesture { get; private set; } = new(Key.Left, ModifierKeys.Alt);
     public KeyGesture SteppedBacklogForwardsKeyGesture { get; private set; } = new(Key.Right, ModifierKeys.Alt);
     public KeyGesture InactiveLookupModeKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);

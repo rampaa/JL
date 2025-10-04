@@ -13,15 +13,13 @@ using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
 using JL.Core.Freqs;
-using JL.Core.Frontend;
 using JL.Core.Lookup;
 using JL.Core.Network.WebSocket;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Windows.Config;
-using JL.Windows.External;
-using JL.Windows.Frontend;
+using JL.Windows.External.Magpie;
 using JL.Windows.GUI.Audio;
 using JL.Windows.GUI.Dictionary;
 using JL.Windows.GUI.Frequency;
@@ -39,9 +37,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-#pragma warning disable CA1812 // Internal class that is apparently never instantiated
 internal sealed partial class MainWindow
-#pragma warning restore CA1812 // Internal class that is apparently never instantiated
 {
     public nint WindowHandle { get; private set; }
 
@@ -56,6 +52,7 @@ internal sealed partial class MainWindow
     public double WidthBeforeResolutionChange { get; set; }
     public bool ContextMenuIsOpening { get; private set; } // = false;
     private bool _contextMenuIsClosed = true;
+    private bool _passThroughMode; // = false;
     public bool MouseEnterDueToFirstPopupHide { get; set; } // = false;
     private Point _swipeStartPoint;
     private InputMethod? _input;
@@ -69,7 +66,6 @@ internal sealed partial class MainWindow
         InitializeComponent();
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow(0);
-        FrontendManager.Frontend = new WindowsFrontend();
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -79,14 +75,12 @@ internal sealed partial class MainWindow
 
         WindowHandle = new WindowInteropHelper(this).Handle;
         WinApi.SetCompositedAndNoRedirectionBitmapStyle(WindowHandle);
-        WinApi.ClipboardChanged += ClipboardChanged;
         WinApi.SubscribeToWndProc(this);
 
         _input = InputMethod.Current;
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
         MagpieUtils.RegisterToMagpieScalingChangedMessage(WindowHandle);
-        MagpieUtils.MarkWindowAsMagpieToolWindow(WindowHandle);
 
         ConfigDBManager.CreateDB();
 
@@ -359,8 +353,7 @@ internal sealed partial class MainWindow
         }
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void ClipboardChanged(object? sender, EventArgs e)
+    public async Task ClipboardChanged()
     {
         bool gotTextFromClipboard = await CopyFromClipboard().ConfigureAwait(true);
 
@@ -464,8 +457,7 @@ internal sealed partial class MainWindow
         ConfigManager configManager = ConfigManager.Instance;
         if (!configManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
             || FontSizeSlider.IsVisible
-            || OpacitySlider.IsVisible
-            || (Background.Opacity is 0 && !configManager.GlobalHotKeys))
+            || OpacitySlider.IsVisible)
         {
             return;
         }
@@ -479,12 +471,7 @@ internal sealed partial class MainWindow
         {
             FontSizeSlider.Visibility = Visibility.Collapsed;
 
-            if (Background.Opacity is 0)
-            {
-                Background.Opacity = OpacitySlider.Value / 100;
-                _ = MainTextBox.Focus();
-            }
-            else if (OpacitySlider.Visibility is Visibility.Collapsed)
+            if (OpacitySlider.Visibility is Visibility.Collapsed)
             {
                 OpacitySlider.Visibility = Visibility.Visible;
                 _ = OpacitySlider.Focus();
@@ -539,7 +526,6 @@ internal sealed partial class MainWindow
     public async Task HandleAppClosing()
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
-        MagpieUtils.UnmarkWindowAsMagpieToolWindow(WindowHandle);
         WinApi.UnsubscribeFromWndProc(this);
 
         await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(true);
@@ -628,26 +614,7 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.MousePassThroughModeKeyGesture))
         {
-            if (Background.Opacity is not 0)
-            {
-                Background.Opacity = 0d;
-                FontSizeSlider.Visibility = Visibility.Collapsed;
-                OpacitySlider.Visibility = Visibility.Collapsed;
-
-                if (!configManager.GlobalHotKeys)
-                {
-                    ShowTitleBarButtons();
-                }
-
-                Keyboard.ClearFocus();
-            }
-
-            else
-            {
-                Background.Opacity = OpacitySlider.Value / 100;
-                _ = MainTextBox.Focus();
-                ChangeVisibility();
-            }
+            HandlePassThroughKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.KanjiModeKeyGesture))
@@ -997,11 +964,6 @@ internal sealed partial class MainWindow
     public void ChangeVisibilityOfTitleBarButtons()
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (Background.Opacity is 0 && !configManager.GlobalHotKeys)
-        {
-            return;
-        }
-
         if (configManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
         {
             if (TitleBar.IsMouseOver
@@ -1434,7 +1396,7 @@ internal sealed partial class MainWindow
             MainGrid.Opacity = 1d;
         }
 
-        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
         {
             Background.Opacity = OpacitySlider.Value / 100;
         }
@@ -1713,23 +1675,27 @@ internal sealed partial class MainWindow
             return;
         }
 
-        if (configManager.TextOnlyVisibleOnHover)
+        if (!_passThroughMode)
         {
-            MainGrid.Opacity = 0d;
-        }
+            if (configManager.TextOnlyVisibleOnHover)
+            {
+                MainGrid.Opacity = 0d;
+            }
 
-        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0d)
-        {
-            Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
-        }
+            if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            {
+                Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+            }
 
-        nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
-        if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
-            && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
-            && lastActiveWindowHandle is not 0
-            && lastActiveWindowHandle != WindowHandle)
-        {
-            WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+            if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
+                && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup))
+            {
+                nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
+                if (lastActiveWindowHandle is not 0 && lastActiveWindowHandle != WindowHandle)
+                {
+                    WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+                }
+            }
         }
 
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
@@ -1768,7 +1734,7 @@ internal sealed partial class MainWindow
             MainGrid.Opacity = 1d;
         }
 
-        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0d)
+        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
         {
             Background.Opacity = OpacitySlider.Value / 100;
         }
@@ -1897,8 +1863,7 @@ internal sealed partial class MainWindow
         ConfigManager configManager = ConfigManager.Instance;
         if (!configManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
             || FontSizeSlider.IsVisible
-            || OpacitySlider.IsVisible
-            || (Background.Opacity is 0 && !configManager.GlobalHotKeys))
+            || OpacitySlider.IsVisible)
         {
             return;
         }
@@ -2147,23 +2112,27 @@ internal sealed partial class MainWindow
             return;
         }
 
-        if (configManager.TextOnlyVisibleOnHover)
+        if (!_passThroughMode)
         {
-            MainGrid.Opacity = 0d;
-        }
+            if (configManager.TextOnlyVisibleOnHover)
+            {
+                MainGrid.Opacity = 0d;
+            }
 
-        if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0d)
-        {
-            Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
-        }
+            if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            {
+                Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+            }
 
-        nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
-        if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
-            && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup)
-            && lastActiveWindowHandle is not 0
-            && lastActiveWindowHandle != WindowHandle)
-        {
-            WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+            if (configManager is { RestoreFocusToPreviouslyActiveWindow: true, Focusable: true }
+                && (configManager.MainWindowFocusOnHover || configManager.PopupFocusOnLookup))
+            {
+                nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
+                if (lastActiveWindowHandle is not 0 && lastActiveWindowHandle != WindowHandle)
+                {
+                    WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+                }
+            }
         }
 
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
@@ -2218,6 +2187,52 @@ internal sealed partial class MainWindow
             }
 
             Opacity = 1d;
+        }
+    }
+
+    public void HandlePassThroughKeyGesture()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        if (!_passThroughMode)
+        {
+            if (configManager.GlobalHotKeys)
+            {
+                _passThroughMode = true;
+                WinApi.SetTransparentStyle(WindowHandle);
+
+                MainGrid.Opacity = 1d;
+                FontSizeSlider.Visibility = Visibility.Collapsed;
+                OpacitySlider.Visibility = Visibility.Collapsed;
+
+                HideTitleBarButtons();
+
+                if (configManager.Focusable)
+                {
+                    nint lastActiveWindowHandle = WindowsUtils.LastActiveWindowHandle;
+                    if (configManager.RestoreFocusToPreviouslyActiveWindow
+                        && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
+                        && lastActiveWindowHandle is not 0
+                        && lastActiveWindowHandle != WindowHandle
+                        && !FirstPopupWindow.IsVisible)
+                    {
+                        WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+                    }
+                    else
+                    {
+                        Keyboard.ClearFocus();
+                    }
+                }
+            }
+        }
+        else
+        {
+            _passThroughMode = false;
+            WinApi.UnsetTransparentStyle(WindowHandle);
+
+            Background.Opacity = OpacitySlider.Value / 100;
+            _ = MainTextBox.Focus();
+            ChangeVisibility();
+            ChangeVisibilityOfTitleBarButtons();
         }
     }
 }
