@@ -5,7 +5,9 @@ using System.Runtime;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
+using JL.Windows.Frontend;
 using JL.Windows.Interop;
 
 namespace JL.Windows;
@@ -19,14 +21,17 @@ internal sealed partial class App
 {
     public App()
     {
+        Environment.CurrentDirectory = AppContext.BaseDirectory;
+
         AppDomain.CurrentDomain.UnhandledException += LogUnhandledException;
         TaskScheduler.UnobservedTaskException += LogUnobservedTaskException;
 
-        Environment.CurrentDirectory = AppContext.BaseDirectory;
-
         ProfileOptimization.SetProfileRoot(AppContext.BaseDirectory);
         ProfileOptimization.StartProfile("Startup.Profile");
+    }
 
+    protected override void OnStartup(StartupEventArgs e)
+    {
         if (!HasModifyPermission(AppContext.BaseDirectory))
         {
             LoggerManager.Logger.Information(
@@ -46,16 +51,23 @@ internal sealed partial class App
             return;
         }
 
-        if (IsSingleInstance())
+        if (!IsSingleInstance(out nint windowHandleOfRunningInstance))
         {
-            AppContext.SetSwitch("Switch.System.Windows.Input.Stylus.DisableImplicitTouchKeyboardInvocation", true);
-
-            StartupUri = new Uri("GUI/MainWindow.xaml", UriKind.Relative);
-            ShutdownMode = ShutdownMode.OnMainWindowClose;
+            WinApi.RestoreWindow(windowHandleOfRunningInstance);
+            Shutdown();
+            return;
         }
+
+        AppContext.SetSwitch("Switch.System.Windows.Input.Stylus.DisableImplicitTouchKeyboardInvocation", true);
+        ShutdownMode = ShutdownMode.OnMainWindowClose;
+
+        GUI.MainWindow mainWindow = new();
+        FrontendManager.Frontend = new WindowsFrontend(mainWindow);
+        MainWindow = mainWindow;
+        mainWindow.Show();
     }
 
-    private bool IsSingleInstance()
+    private static bool IsSingleInstance(out nint windowHandleOfRunningInstance)
     {
         Process currentProcess = Process.GetCurrentProcess();
         ReadOnlySpan<Process> processes = Process.GetProcessesByName(currentProcess.ProcessName);
@@ -70,8 +82,7 @@ internal sealed partial class App
                     {
                         if (Environment.ProcessPath?.Equals(process.MainModule?.FileName, StringComparison.OrdinalIgnoreCase) ?? false)
                         {
-                            WinApi.RestoreWindow(process.MainWindowHandle);
-                            Shutdown();
+                            windowHandleOfRunningInstance = process.MainWindowHandle;
                             return false;
                         }
                     }
@@ -83,6 +94,7 @@ internal sealed partial class App
             }
         }
 
+        windowHandleOfRunningInstance = 0;
         return true;
     }
 
@@ -99,7 +111,7 @@ internal sealed partial class App
     // ReSharper disable once AsyncVoidMethod
     private async void Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)
     {
-        await GUI.MainWindow.Instance.HandleAppClosing().ConfigureAwait(false);
+        await ((GUI.MainWindow)MainWindow).HandleAppClosing().ConfigureAwait(false);
     }
 
     private static bool HasModifyPermission(string folderPath)
