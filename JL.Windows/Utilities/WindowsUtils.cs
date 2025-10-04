@@ -23,8 +23,9 @@ using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Array;
 using JL.Windows.Config;
-using JL.Windows.External;
+using JL.Windows.External.Magpie;
 using JL.Windows.GUI;
 using JL.Windows.GUI.Audio;
 using JL.Windows.GUI.Dictionary;
@@ -41,13 +42,15 @@ namespace JL.Windows.Utilities;
 
 internal static class WindowsUtils
 {
+    private static readonly MainWindow s_mainWindow = MainWindow.Instance;
+
     public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
     private static long s_lastAudioPlayTimestamp;
     public static WaveOut? AudioPlayer { get; private set; }
 
-    public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
+    public static Screen ActiveScreen { get; set; } = Screen.FromHandle(s_mainWindow.WindowHandle);
 
-    public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
+    public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(s_mainWindow);
     public static double DpiAwareXOffset { get; set; } = ConfigManager.Instance.PopupXOffset * Dpi.DpiScaleX;
     public static double DpiAwareYOffset { get; set; } = ConfigManager.Instance.PopupYOffset * Dpi.DpiScaleY;
 
@@ -162,7 +165,7 @@ internal static class WindowsUtils
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
         }
 
         _ = addNameWindowInstance.ShowDialog();
@@ -179,7 +182,7 @@ internal static class WindowsUtils
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
         }
 
         _ = addWordWindowInstance.ShowDialog();
@@ -190,14 +193,13 @@ internal static class WindowsUtils
         PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
         ConfigManager configManager = ConfigManager.Instance;
         configManager.LoadPreferenceWindow(preferencesWindow);
-        MainWindow mainWindow = MainWindow.Instance;
-        preferencesWindow.Owner = mainWindow;
+        preferencesWindow.Owner = s_mainWindow;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StopTimeStatStopWatch();
 
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
         }
 
         _ = preferencesWindow.ShowDialog();
@@ -223,15 +225,14 @@ internal static class WindowsUtils
         }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        manageDictionariesWindow.Owner = mainWindow;
+        manageDictionariesWindow.Owner = s_mainWindow;
         manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
         }
 
         _ = manageDictionariesWindow.ShowDialog();
@@ -245,15 +246,14 @@ internal static class WindowsUtils
         }
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        manageFrequenciesWindow.Owner = mainWindow;
+        manageFrequenciesWindow.Owner = s_mainWindow;
         manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
         }
 
         _ = manageFrequenciesWindow.ShowDialog();
@@ -266,14 +266,13 @@ internal static class WindowsUtils
         StatsUtils.StopIdleItemTimer();
 
         StatsWindow statsWindow = StatsWindow.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        statsWindow.Owner = mainWindow;
+        statsWindow.Owner = s_mainWindow;
         statsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
         }
 
         _ = statsWindow.ShowDialog();
@@ -287,15 +286,14 @@ internal static class WindowsUtils
         }
 
         ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        manageAudioSourcesWindow.Owner = mainWindow;
+        manageAudioSourcesWindow.Owner = s_mainWindow;
         manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
         }
 
         _ = manageAudioSourcesWindow.ShowDialog();
@@ -357,7 +355,7 @@ internal static class WindowsUtils
             Application? application = Application.Current;
             if (application is not null)
             {
-                await application.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
+                await application.Dispatcher.Invoke(static () => s_mainWindow.HandleAppClosing()).ConfigureAwait(false);
                 using Process? process = Process.Start(new ProcessStartInfo
                 {
                     WorkingDirectory = AppInfo.ApplicationPath,
@@ -410,25 +408,34 @@ internal static class WindowsUtils
             try
             {
                 AudioPlayer?.Dispose();
-                AudioPlayer = new WaveOut();
+                AudioPlayer = null;
 
-                MemoryStream audioStream = new(audio);
-                await using (audioStream.ConfigureAwait(false))
+                (WaveOut audioPlayer, DisposableItemArray<Stream> disposableStreams) = await Task.Run(() =>
                 {
+                    MemoryStream memoryStream = new(audio);
+
                     IWaveProvider waveProvider = audioFormat is "ogg" or "oga"
-                        ? new VorbisWaveReader(audioStream)
-                        : new StreamMediaFoundationReader(audioStream);
+                        ? new VorbisWaveReader(memoryStream)
+                        : new StreamMediaFoundationReader(memoryStream);
 
-                    AudioPlayer.Init(waveProvider);
-                    AudioPlayer.Play();
+                    WaveOut waveOut = new();
+                    waveOut.Init(waveProvider);
 
-                    while (AudioPlayer.PlaybackState is PlaybackState.Playing)
-                    {
-                        await Task.Delay(100).ConfigureAwait(false);
-                    }
-                }
+                    DisposableItemArray<Stream> disposableStreams = new([memoryStream, (Stream)waveProvider]);
+
+                    return (waveOut, disposableStreams);
+                }).ConfigureAwait(true);
+
+                audioPlayer.PlaybackStopped += (_, _) =>
+                {
+                    disposableStreams.Dispose();
+                    audioPlayer.Dispose();
+                    AudioPlayer = null;
+                };
+
+                AudioPlayer = audioPlayer;
+                audioPlayer.Play();
             }
-
             catch (Exception ex)
             {
                 LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
@@ -626,35 +633,41 @@ internal static class WindowsUtils
         textBox.ScrollToVerticalOffset(verticalOffset);
     }
 
+    private static void RestoreFocusToPreviouslyActiveWindow()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        nint lastActiveWindowHandle = LastActiveWindowHandle;
+        if (configManager.Focusable
+            && configManager.RestoreFocusToPreviouslyActiveWindow
+            && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
+            && lastActiveWindowHandle is not 0
+            && lastActiveWindowHandle != s_mainWindow.WindowHandle)
+        {
+            WinApi.GiveFocusToWindow(lastActiveWindowHandle);
+        }
+    }
+
     public static void UpdateMainWindowVisibility()
     {
         ConfigManager configManager = ConfigManager.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        bool mainWindowIsNotMinimized = mainWindow.WindowState is not WindowState.Minimized;
+        bool mainWindowIsNotMinimized = s_mainWindow.WindowState is not WindowState.Minimized;
         if (mainWindowIsNotMinimized)
         {
-            if (!mainWindow.FirstPopupWindow.IsVisible)
+            if (!s_mainWindow.FirstPopupWindow.IsVisible)
             {
-                if (!mainWindow.IsMouseOver)
+                if (!s_mainWindow.IsMouseOver)
                 {
                     if (configManager.TextOnlyVisibleOnHover)
                     {
-                        mainWindow.MainGrid.Opacity = 0d;
+                        s_mainWindow.MainGrid.Opacity = 0d;
                     }
 
                     if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
                     {
-                        mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                        s_mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
                     }
 
-                    nint lastActiveWindowHandle = LastActiveWindowHandle;
-                    if (configManager.RestoreFocusToPreviouslyActiveWindow
-                        && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
-                        && lastActiveWindowHandle is not 0
-                        && lastActiveWindowHandle != mainWindow.WindowHandle)
-                    {
-                        WinApi.GiveFocusToWindow(lastActiveWindowHandle);
-                    }
+                    RestoreFocusToPreviouslyActiveWindow();
 
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                     {
@@ -671,19 +684,12 @@ internal static class WindowsUtils
 
             if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
             {
-                WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
+                WinApi.RegisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
             }
         }
         else
         {
-            nint lastActiveWindowHandle = LastActiveWindowHandle;
-            if (configManager.RestoreFocusToPreviouslyActiveWindow
-                && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
-                && lastActiveWindowHandle is not 0
-                && lastActiveWindowHandle != mainWindow.WindowHandle)
-            {
-                WinApi.GiveFocusToWindow(lastActiveWindowHandle);
-            }
+            RestoreFocusToPreviouslyActiveWindow();
 
             if (configManager.AutoPauseOrResumeMpvOnHoverChange)
             {
@@ -961,7 +967,7 @@ internal static class WindowsUtils
             catch (ExternalException ex)
             {
                 LoggerManager.Logger.Warning(ex, "CopyTextToClipboard failed");
-                await Task.Delay(5).ConfigureAwait(true);
+                await Task.Delay(5).ConfigureAwait(false);
             }
         }
         while (!copied);

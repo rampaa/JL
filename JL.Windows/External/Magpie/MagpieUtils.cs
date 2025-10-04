@@ -2,7 +2,7 @@ using System.Windows;
 using JL.Windows.Interop;
 using JL.Windows.Utilities;
 
-namespace JL.Windows.External;
+namespace JL.Windows.External.Magpie;
 
 internal static class MagpieUtils
 {
@@ -22,16 +22,6 @@ internal static class MagpieUtils
     {
         MagpieScalingChangedWindowMessage = WinApi.RegisterToWindowMessage("MagpieScalingChanged");
         _ = WinApi.AllowWindowMessage(windowHandle, MagpieScalingChangedWindowMessage);
-    }
-
-    public static void MarkWindowAsMagpieToolWindow(nint windowHandle)
-    {
-        WinApi.SetProp(windowHandle, "Magpie.ToolWindow", 1);
-    }
-
-    public static void UnmarkWindowAsMagpieToolWindow(nint windowHandle)
-    {
-        WinApi.RemoveProp(windowHandle, "Magpie.ToolWindow");
     }
 
     private static double GetMagpieWindowLeftEdgePositionFromMagpie(nint windowHandle)
