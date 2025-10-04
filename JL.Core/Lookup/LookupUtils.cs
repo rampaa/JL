@@ -78,12 +78,12 @@ public static class LookupUtils
             }
         }
 
-        using DisposableItemArray<SqliteConnection> sqliteFreqConnectionsForJmdict = dbWordFreqs is not null && DictUtils.JmdictIsActive
-            ? new DisposableItemArray<SqliteConnection>(dbWordFreqs.Length)
+        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForJmdict = dbWordFreqs is not null && DictUtils.JmdictIsActive
+            ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
             : default;
 
-        using DisposableItemArray<SqliteConnection> sqliteFreqConnectionsForCustomWordDict = dbWordFreqs is not null && DictUtils.AnyCustomWordDictIsActive
-            ? new DisposableItemArray<SqliteConnection>(dbWordFreqs.Length)
+        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForCustomWordDict = dbWordFreqs is not null && DictUtils.AnyCustomWordDictIsActive
+            ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
             : default;
 
         bool sqliteFreqConnectionsForJmdictExist = sqliteFreqConnectionsForJmdict.Items is not null;
@@ -281,9 +281,9 @@ public static class LookupUtils
             }
         }
 
-        bool dbIsUsedAtLeastOneYomichanOrNazekaWordDict = DictUtils.DBIsUsedAtLeastOneYomichanOrNazekaWordDict;
+        bool dbIsUsedForAtLeastOneYomichanOrNazekaWordDict = DictUtils.DBIsUsedForAtLeastOneYomichanOrNazekaWordDict;
         HashSet<string>? allSearchKeys = null;
-        if (dbIsUsedForPitchDict || dbIsUsedAtLeastOneYomichanOrNazekaWordDict)
+        if (dbIsUsedForPitchDict || dbIsUsedForAtLeastOneYomichanOrNazekaWordDict)
         {
             Debug.Assert(deconjugatedTexts is not null);
             allSearchKeys = new HashSet<string>(textInHiraganaList.Count + deconjugatedTexts.Length + textWithoutLongVowelMarksCount, StringComparer.Ordinal);
@@ -309,7 +309,7 @@ public static class LookupUtils
             Parallel.Invoke(
             () =>
             {
-                frequencyDicts = dbWordFreqs is not null && dbIsUsedAtLeastOneYomichanOrNazekaWordDict
+                frequencyDicts = dbWordFreqs is not null && dbIsUsedForAtLeastOneYomichanOrNazekaWordDict
                     ? GetFrequencyDictsFromDB(dbWordFreqs, allSearchKeys)
                     : null;
             },

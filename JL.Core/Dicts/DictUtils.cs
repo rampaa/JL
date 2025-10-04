@@ -41,7 +41,7 @@ public static class DictUtils
     internal static bool AnyCustomWordDictIsActive { get; private set; }
     internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; }
     internal static bool AtLeastOneKanjiDictIsActive { get; private set; }
-    internal static bool DBIsUsedAtLeastOneYomichanOrNazekaWordDict { get; private set; }
+    internal static bool DBIsUsedForAtLeastOneYomichanOrNazekaWordDict { get; private set; }
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
@@ -1588,7 +1588,7 @@ public static class DictUtils
         DBIsUsedForAtLeastOneWordDict = false;
         DBIsUsedForAtLeastOneYomichanDict = false;
         DBIsUsedForAtLeastOneNazekaDict = false;
-        DBIsUsedAtLeastOneYomichanOrNazekaWordDict = false;
+        DBIsUsedForAtLeastOneYomichanOrNazekaWordDict = false;
         AtLeastOneKanjiDictIsActive = false;
         DBIsUsedForJmdict = false;
 
@@ -1627,7 +1627,7 @@ public static class DictUtils
 
                     if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificYomichan or DictType.NonspecificWordNazeka or DictType.NonspecificNazeka)
                     {
-                        DBIsUsedAtLeastOneYomichanOrNazekaWordDict = true;
+                        DBIsUsedForAtLeastOneYomichanOrNazekaWordDict = true;
                     }
                 }
 
@@ -1635,7 +1635,7 @@ public static class DictUtils
                     && DBIsUsedForAtLeastOneWordDict
                     && DBIsUsedForAtLeastOneYomichanDict
                     && DBIsUsedForAtLeastOneNazekaDict
-                    && DBIsUsedAtLeastOneYomichanOrNazekaWordDict
+                    && DBIsUsedForAtLeastOneYomichanOrNazekaWordDict
                     && AtLeastOneKanjiDictIsActive
                     && DBIsUsedForJmdict)
                 {
