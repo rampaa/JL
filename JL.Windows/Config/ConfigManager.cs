@@ -22,7 +22,9 @@ namespace JL.Windows.Config;
 
 internal sealed class ConfigManager
 {
-    public static ConfigManager Instance { get; private set; } = new();
+    public static ConfigManager Instance { get; private set; } = new(MainWindow.Instance);
+
+    private readonly MainWindow _mainWindow;
 
     #region General
 
@@ -223,8 +225,9 @@ internal sealed class ConfigManager
 
     private SkinType Theme { get; set; } = SkinType.Dark;
 
-    private ConfigManager()
+    private ConfigManager(MainWindow mainWindow)
     {
+        _mainWindow = mainWindow;
     }
 
     public static void ResetConfigs()
@@ -233,7 +236,7 @@ internal sealed class ConfigManager
         Instance.SaveBeforeClosing(connection);
         ConfigDBManager.DeleteAllSettingsFromProfile(connection, "MainWindowTopPosition", "MainWindowLeftPosition");
 
-        ConfigManager newInstance = new();
+        ConfigManager newInstance = new(MainWindow.Instance);
         ConfigDBManager.InsertSetting(connection, nameof(Theme), newInstance.Theme.ToString());
         ConfigDBManager.InsertSetting(connection, nameof(StripPunctuationBeforeCalculatingCharacterCount), newInstance.StripPunctuationBeforeCalculatingCharacterCount.ToString());
 
@@ -253,7 +256,6 @@ internal sealed class ConfigManager
         Dictionary<string, string> configs = ConfigDBManager.GetAllConfigs(connection);
         coreConfigManager.ApplyPreferences(connection, configs);
 
-        MainWindow mainWindow = MainWindow.Instance;
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         SkinType theme = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, Theme, nameof(Theme));
@@ -261,16 +263,16 @@ internal sealed class ConfigManager
         {
             Theme = theme;
             WindowsUtils.ChangeTheme(Theme);
-            mainWindow.UpdateLayout();
+            _mainWindow.UpdateLayout();
         }
 
         if (coreConfigManager.CaptureTextFromClipboard)
         {
-            WinApi.SubscribeToClipboardChanged(mainWindow.WindowHandle);
+            WinApi.SubscribeToClipboardChanged(_mainWindow.WindowHandle);
         }
         else
         {
-            WinApi.UnsubscribeFromClipboardChanged(mainWindow.WindowHandle);
+            WinApi.UnsubscribeFromClipboardChanged(_mainWindow.WindowHandle);
         }
 
         bool stripPunctuationBeforeCalculatingCharacterCount = StripPunctuationBeforeCalculatingCharacterCount;
@@ -301,7 +303,7 @@ internal sealed class ConfigManager
         MinePrimarySpellingMouseButton = minePrimarySpellingMouseButton;
 
         MainWindowTextVerticalAlignment = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, MainWindowTextVerticalAlignment, nameof(MainWindowTextVerticalAlignment));
-        mainWindow.MainTextBox.VerticalContentAlignment = MainWindowTextVerticalAlignment;
+        _mainWindow.MainTextBox.VerticalContentAlignment = MainWindowTextVerticalAlignment;
 
         AutoAdjustFontSizesOnResolutionChange = ConfigDBManager.GetValueFromConfig(connection, configs, AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange));
         HighlightLongestMatch = ConfigDBManager.GetValueFromConfig(connection, configs, HighlightLongestMatch, nameof(HighlightLongestMatch));
@@ -310,7 +312,7 @@ internal sealed class ConfigManager
         StopIncreasingTimeAndCharStatsWhenMinimized = ConfigDBManager.GetValueFromConfig(connection, configs, StopIncreasingTimeAndCharStatsWhenMinimized, nameof(StopIncreasingTimeAndCharStatsWhenMinimized));
         MineToFileInsteadOfAnki = ConfigDBManager.GetValueFromConfig(connection, configs, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki));
         AlwaysOnTop = ConfigDBManager.GetValueFromConfig(connection, configs, AlwaysOnTop, nameof(AlwaysOnTop));
-        mainWindow.Topmost = AlwaysOnTop;
+        _mainWindow.Topmost = AlwaysOnTop;
 
         RequireLookupKeyPress = ConfigDBManager.GetValueFromConfig(connection, configs, RequireLookupKeyPress, nameof(RequireLookupKeyPress));
         DisableHotkeys = ConfigDBManager.GetValueFromConfig(connection, configs, DisableHotkeys, nameof(DisableHotkeys));
@@ -318,11 +320,11 @@ internal sealed class ConfigManager
         Focusable = ConfigDBManager.GetValueFromConfig(connection, configs, Focusable, nameof(Focusable));
         if (Focusable)
         {
-            WinApi.AllowActivation(mainWindow.WindowHandle);
+            WinApi.AllowActivation(_mainWindow.WindowHandle);
         }
         else
         {
-            WinApi.PreventActivation(mainWindow.WindowHandle);
+            WinApi.PreventActivation(_mainWindow.WindowHandle);
         }
 
         RestoreFocusToPreviouslyActiveWindow = ConfigDBManager.GetValueFromConfig(connection, configs, RestoreFocusToPreviouslyActiveWindow, nameof(RestoreFocusToPreviouslyActiveWindow));
@@ -350,20 +352,20 @@ internal sealed class ConfigManager
         ShowDictionaryTabsInMiningMode = ConfigDBManager.GetValueFromConfig(connection, configs, ShowDictionaryTabsInMiningMode, nameof(ShowDictionaryTabsInMiningMode));
 
         TextBoxIsReadOnly = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxIsReadOnly, nameof(TextBoxIsReadOnly));
-        if (mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
+        if (_mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
         {
-            mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
-            mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
-            mainWindow.MainTextBox.AcceptsReturn = !TextBoxIsReadOnly;
-            mainWindow.MainTextBox.AcceptsTab = !TextBoxIsReadOnly;
-            mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
+            _mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
+            _mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
+            _mainWindow.MainTextBox.AcceptsReturn = !TextBoxIsReadOnly;
+            _mainWindow.MainTextBox.AcceptsTab = !TextBoxIsReadOnly;
+            _mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
         }
 
         AlwaysShowMainTextBoxCaret = ConfigDBManager.GetValueFromConfig(connection, configs, AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret));
-        mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
+        _mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
 
         HorizontallyCenterMainWindowText = ConfigDBManager.GetValueFromConfig(connection, configs, HorizontallyCenterMainWindowText, nameof(HorizontallyCenterMainWindowText));
-        mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
+        _mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
             ? HorizontalAlignment.Center
             : HorizontalAlignment.Left;
 
@@ -388,7 +390,7 @@ internal sealed class ConfigManager
         AllowPartialMatchingForTextMerge = ConfigDBManager.GetValueFromConfig(connection, configs, AllowPartialMatchingForTextMerge, nameof(AllowPartialMatchingForTextMerge));
 
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = ConfigDBManager.GetValueFromConfig(connection, configs, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar));
-        mainWindow.ChangeVisibilityOfTitleBarButtons();
+        _mainWindow.ChangeVisibilityOfTitleBarButtons();
 
         MainTextBoxDropShadowEffectShadowDepth = ConfigDBManager.GetValueFromConfig(connection, configs, MainTextBoxDropShadowEffectShadowDepth, nameof(MainTextBoxDropShadowEffectShadowDepth));
         MainTextBoxDropShadowEffectDirection = ConfigDBManager.GetValueFromConfig(connection, configs, MainTextBoxDropShadowEffectDirection, nameof(MainTextBoxDropShadowEffectDirection));
@@ -409,12 +411,12 @@ internal sealed class ConfigManager
             };
 
             dropShadowEffect.Freeze();
-            mainWindow.MainTextBox.Effect = dropShadowEffect;
+            _mainWindow.MainTextBox.Effect = dropShadowEffect;
         }
 
         else
         {
-            mainWindow.MainTextBox.Effect = null;
+            _mainWindow.MainTextBox.Effect = null;
         }
 
         MaxSearchLength = ConfigDBManager.GetValueFromConfig(connection, configs, MaxSearchLength, nameof(MaxSearchLength));
@@ -434,13 +436,13 @@ internal sealed class ConfigManager
         TextBoxCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxCustomLineHeight, nameof(TextBoxCustomLineHeight));
         if (TextBoxUseCustomLineHeight)
         {
-            mainWindow.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.BlockLineHeight);
-            mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, TextBoxCustomLineHeight);
+            _mainWindow.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.BlockLineHeight);
+            _mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, TextBoxCustomLineHeight);
         }
         else
         {
-            mainWindow.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.MaxHeight);
-            mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, double.NaN);
+            _mainWindow.MainTextBox.SetValue(TextBlock.LineStackingStrategyProperty, LineStackingStrategy.MaxHeight);
+            _mainWindow.MainTextBox.SetValue(TextBlock.LineHeightProperty, double.NaN);
         }
 
         PopupDictionaryTabFontSize = ConfigDBManager.GetValueFromConfig(connection, configs, PopupDictionaryTabFontSize, nameof(PopupDictionaryTabFontSize));
@@ -465,8 +467,8 @@ internal sealed class ConfigManager
         FixedPopupXPosition = ConfigDBManager.GetValueFromConfig(connection, configs, FixedPopupXPosition, nameof(FixedPopupXPosition));
         FixedPopupYPosition = ConfigDBManager.GetValueFromConfig(connection, configs, FixedPopupYPosition, nameof(FixedPopupYPosition));
 
-        mainWindow.OpacitySlider.Value = ConfigDBManager.GetValueFromConfig(connection, configs, mainWindow.OpacitySlider.Value, "MainWindowOpacity");
-        mainWindow.FontSizeSlider.Value = ConfigDBManager.GetValueFromConfig(connection, configs, mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
+        _mainWindow.OpacitySlider.Value = ConfigDBManager.GetValueFromConfig(connection, configs, _mainWindow.OpacitySlider.Value, "MainWindowOpacity");
+        _mainWindow.FontSizeSlider.Value = ConfigDBManager.GetValueFromConfig(connection, configs, _mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
         MainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowBackgroundOpacityOnUnhover, nameof(MainWindowBackgroundOpacityOnUnhover));
 
         MainWindowHeight = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowHeight, nameof(MainWindowHeight));
@@ -475,35 +477,35 @@ internal sealed class ConfigManager
         MainWindowMaxDynamicHeight = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowMaxDynamicHeight, nameof(MainWindowMaxDynamicHeight));
         MainWindowMinDynamicWidth = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowMinDynamicWidth, nameof(MainWindowMinDynamicWidth));
         MainWindowMinDynamicHeight = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowMinDynamicHeight, nameof(MainWindowMinDynamicHeight));
-        mainWindow.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowMinDynamicWidth, MainWindowMinDynamicHeight, MainWindowWidth, MainWindowHeight);
-        mainWindow.WidthBeforeResolutionChange = MainWindowWidth;
-        mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
+        _mainWindow.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowMinDynamicWidth, MainWindowMinDynamicHeight, MainWindowWidth, MainWindowHeight);
+        _mainWindow.WidthBeforeResolutionChange = MainWindowWidth;
+        _mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
 
-        double mainWindowTop = ConfigDBManager.GetValueFromConfig(connection, configs, mainWindow.Top, "MainWindowTopPosition");
-        double mainWindowLeft = ConfigDBManager.GetValueFromConfig(connection, configs, mainWindow.Left, "MainWindowLeftPosition");
-        WinApi.MoveWindowToPosition(mainWindow.WindowHandle, mainWindowLeft, mainWindowTop);
+        double mainWindowTop = ConfigDBManager.GetValueFromConfig(connection, configs, _mainWindow.Top, "MainWindowTopPosition");
+        double mainWindowLeft = ConfigDBManager.GetValueFromConfig(connection, configs, _mainWindow.Left, "MainWindowLeftPosition");
+        WinApi.MoveWindowToPosition(_mainWindow.WindowHandle, mainWindowLeft, mainWindowTop);
 
-        mainWindow.TopPositionBeforeResolutionChange = mainWindow.Top;
-        mainWindow.LeftPositionBeforeResolutionChange = mainWindow.Left;
+        _mainWindow.TopPositionBeforeResolutionChange = _mainWindow.Top;
+        _mainWindow.LeftPositionBeforeResolutionChange = _mainWindow.Left;
 
         RepositionMainWindowOnTextChangeByBottomPosition = ConfigDBManager.GetValueFromConfig(connection, configs, RepositionMainWindowOnTextChangeByBottomPosition, nameof(RepositionMainWindowOnTextChangeByBottomPosition));
         RepositionMainWindowOnTextChangeByRightPosition = ConfigDBManager.GetValueFromConfig(connection, configs, RepositionMainWindowOnTextChangeByRightPosition, nameof(RepositionMainWindowOnTextChangeByRightPosition));
         MainWindowFixedBottomPosition = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowFixedBottomPosition, nameof(MainWindowFixedBottomPosition));
         MainWindowFixedRightPosition = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowFixedRightPosition, nameof(MainWindowFixedRightPosition));
-        mainWindow.UpdatePosition();
+        _mainWindow.UpdatePosition();
 
-        mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0d : 1d;
+        _mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !_mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0d : 1d;
 
         // MAKE SURE YOU FREEZE ANY NEW FREEZABLE OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
         MainWindowTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, MainWindowTextColor, nameof(MainWindowTextColor));
         MainWindowBacklogTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
 
-        mainWindow.MainTextBox.Foreground = MaxBacklogCapacity is 0 || mainWindow.MainTextBox.Text == (BacklogUtils.LastItem ?? "")
+        _mainWindow.MainTextBox.Foreground = MaxBacklogCapacity is 0 || _mainWindow.MainTextBox.Text == (BacklogUtils.LastItem ?? "")
             ? MainWindowTextColor
             : MainWindowBacklogTextColor;
 
-        mainWindow.MainTextBox.CaretBrush = MainWindowTextColor;
+        _mainWindow.MainTextBox.CaretBrush = MainWindowTextColor;
 
         PrimarySpellingColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, PrimarySpellingColor, nameof(PrimarySpellingColor));
         ReadingsColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, ReadingsColor, nameof(ReadingsColor));
@@ -517,24 +519,24 @@ internal sealed class ConfigManager
         MiningButtonColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, MiningButtonColor, nameof(MiningButtonColor));
 
         HighlightColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, HighlightColor, nameof(HighlightColor));
-        mainWindow.MainTextBox.SelectionBrush = HighlightColor;
+        _mainWindow.MainTextBox.SelectionBrush = HighlightColor;
 
         PopupBackgroundColor = ConfigUtils.GetBrushFromConfig(connection, configs, PopupBackgroundColor, nameof(PopupBackgroundColor));
         PopupBackgroundColor.Opacity = ConfigDBManager.GetValueFromConfig(connection, configs, 80.0, "PopupOpacity") / 100;
         PopupBackgroundColor.Freeze();
 
-        mainWindow.Background = ConfigUtils.GetBrushFromConfig(connection, configs, mainWindow.Background, "MainWindowBackgroundColor");
+        _mainWindow.Background = ConfigUtils.GetBrushFromConfig(connection, configs, _mainWindow.Background, "MainWindowBackgroundColor");
 
-        mainWindow.Background.Opacity = ChangeMainWindowBackgroundOpacityOnUnhover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible()
+        _mainWindow.Background.Opacity = ChangeMainWindowBackgroundOpacityOnUnhover && !_mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible()
             ? MainWindowBackgroundOpacityOnUnhover / 100
-            : mainWindow.OpacitySlider.Value / 100;
+            : _mainWindow.OpacitySlider.Value / 100;
 
-        WinApi.UnregisterAllGlobalHotKeys(mainWindow.WindowHandle);
+        WinApi.UnregisterAllGlobalHotKeys(_mainWindow.WindowHandle);
         KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Clear();
 
-        if ((!StopIncreasingTimeAndCharStatsWhenMinimized || mainWindow.WindowState is not WindowState.Minimized)
+        if ((!StopIncreasingTimeAndCharStatsWhenMinimized || _mainWindow.WindowState is not WindowState.Minimized)
             && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
-            && mainWindow.MainTextBox.Text.Length > 0)
+            && _mainWindow.MainTextBox.Text.Length > 0)
         {
             StatsUtils.StartTimeStatStopWatch();
             StatsUtils.InitializeIdleTimeTimer();
@@ -617,17 +619,17 @@ internal sealed class ConfigManager
 
         if (GlobalHotKeys && !DisableHotkeys)
         {
-            WinApi.RegisterAllGlobalHotKeys(mainWindow.WindowHandle);
+            WinApi.RegisterAllGlobalHotKeys(_mainWindow.WindowHandle);
         }
 
-        mainWindow.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
-        mainWindow.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);
-        mainWindow.SearchMenuItem.SetInputGestureText(SearchWithBrowserKeyGesture);
-        mainWindow.PreferencesMenuItem.SetInputGestureText(ShowPreferencesWindowKeyGesture);
-        mainWindow.ManageDictionariesMenuItem.SetInputGestureText(ShowManageDictionariesWindowKeyGesture);
-        mainWindow.ManageFrequenciesMenuItem.SetInputGestureText(ShowManageFrequenciesWindowKeyGesture);
-        mainWindow.ManageAudioSourcesMenuItem.SetInputGestureText(ShowManageAudioSourcesWindowKeyGesture);
-        mainWindow.StatsMenuItem.SetInputGestureText(ShowStatsKeyGesture);
+        _mainWindow.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
+        _mainWindow.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);
+        _mainWindow.SearchMenuItem.SetInputGestureText(SearchWithBrowserKeyGesture);
+        _mainWindow.PreferencesMenuItem.SetInputGestureText(ShowPreferencesWindowKeyGesture);
+        _mainWindow.ManageDictionariesMenuItem.SetInputGestureText(ShowManageDictionariesWindowKeyGesture);
+        _mainWindow.ManageFrequenciesMenuItem.SetInputGestureText(ShowManageFrequenciesWindowKeyGesture);
+        _mainWindow.ManageAudioSourcesMenuItem.SetInputGestureText(ShowManageAudioSourcesWindowKeyGesture);
+        _mainWindow.StatsMenuItem.SetInputGestureText(ShowStatsKeyGesture);
 
         {
             string? searchUrlStr = configs.GetValueOrDefault(nameof(SearchUrl));
@@ -674,10 +676,10 @@ internal sealed class ConfigManager
 
         {
             string mainWindowFontStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Meiryo", "MainWindowFont");
-            mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
+            _mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
 
             string mainWindowFontWeightStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Normal", "MainWindowFontWeight");
-            mainWindow.MainTextBox.FontWeight = WindowsUtils.GetFontWeightFromName(mainWindowFontWeightStr);
+            _mainWindow.MainTextBox.FontWeight = WindowsUtils.GetFontWeightFromName(mainWindowFontWeightStr);
         }
 
         {
@@ -771,7 +773,7 @@ internal sealed class ConfigManager
             WindowsUtils.PopupFontTypeFace = new Typeface(popupFontStr);
         }
 
-        PopupWindow? currentPopupWindow = mainWindow.FirstPopupWindow;
+        PopupWindow? currentPopupWindow = _mainWindow.FirstPopupWindow;
         while (currentPopupWindow is not null)
         {
             currentPopupWindow.Background = PopupBackgroundColor;
@@ -887,10 +889,8 @@ internal sealed class ConfigManager
         preferenceWindow.SelectedTextToSpeechTextBox.Text =
             SelectedTextToSpeechKeyGesture.ToFormattedString();
 
-        MainWindow mainWindow = MainWindow.Instance;
-
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
-        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
+        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, _mainWindow.Background.CloneCurrentValue());
         WindowsUtils.SetButtonColor(preferenceWindow.TextBoxTextColorButton, MainWindowTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.TextBoxBacklogTextColorButton, MainWindowBacklogTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainTextBoxDropShadowEffectColorButton, MainTextBoxDropShadowEffectColor);
@@ -945,8 +945,8 @@ internal sealed class ConfigManager
 
         preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
         preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
-        preferenceWindow.TextBoxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
-        preferenceWindow.MainWindowOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
+        preferenceWindow.TextBoxFontSizeNumericUpDown.Value = _mainWindow.FontSizeSlider.Value;
+        preferenceWindow.MainWindowOpacityNumericUpDown.Value = _mainWindow.OpacitySlider.Value;
 
         preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked = ChangeMainWindowBackgroundOpacityOnUnhover;
         preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value = MainWindowBackgroundOpacityOnUnhover;
@@ -980,7 +980,7 @@ internal sealed class ConfigManager
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f => f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f => f.Content.ToString() == _mainWindow.MainTextBox.FontFamily.Source);
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
             preferenceWindow.MainWindowFontComboBox.SelectedIndex = 0;
@@ -993,7 +993,7 @@ internal sealed class ConfigManager
         }
 
         preferenceWindow.MainWindowFontWeightComboBox.ItemsSource = MainWindowFontWeights;
-        int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => (string)fw.Content == mainWindow.MainTextBox.FontWeight.ToString());
+        int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => (string)fw.Content == _mainWindow.MainTextBox.FontWeight.ToString());
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
             mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, static fw => fw.Content is "Normal");
@@ -1553,13 +1553,12 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MinePrimarySpellingMouseButton),
                 preferenceWindow.MinePrimarySpellingMouseButtonComboBox.SelectedValue.ToString());
 
-            MainWindow mainWindow = MainWindow.Instance;
             DpiScale dpi = WindowsUtils.Dpi;
             ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition",
-                (mainWindow.Top * dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture));
+                (_mainWindow.Top * dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition",
-                (mainWindow.Left * dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
+                (_mainWindow.Left * dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
 
 #pragma warning disable CA1849 // Call async methods when in an async method
             transaction.Commit();
@@ -1576,43 +1575,41 @@ internal sealed class ConfigManager
 
     public void SaveBeforeClosing(SqliteConnection connection)
     {
-        MainWindow mainWindow = MainWindow.Instance;
-
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         ConfigDBManager.UpdateSetting(connection, "MainWindowFontSize",
-            mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));
+            _mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));
 
         ConfigDBManager.UpdateSetting(connection, "MainWindowOpacity",
-            mainWindow.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture));
+            _mainWindow.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture));
 
-        double mainWindowHeight = MainWindowHeight > mainWindow.MinHeight
+        double mainWindowHeight = MainWindowHeight > _mainWindow.MinHeight
             ? MainWindowHeight <= SystemParameters.VirtualScreenHeight
                 ? MainWindowHeight
                 : SystemParameters.VirtualScreenHeight
-            : mainWindow.MinHeight;
+            : _mainWindow.MinHeight;
         ConfigDBManager.UpdateSetting(connection, nameof(MainWindowHeight), mainWindowHeight.ToString(CultureInfo.InvariantCulture));
 
-        double mainWindowWidth = MainWindowWidth > mainWindow.MinWidth
+        double mainWindowWidth = MainWindowWidth > _mainWindow.MinWidth
             ? MainWindowWidth <= SystemParameters.VirtualScreenWidth
                 ? MainWindowWidth
                 : SystemParameters.VirtualScreenWidth
-            : mainWindow.MinWidth;
+            : _mainWindow.MinWidth;
         ConfigDBManager.UpdateSetting(connection, nameof(MainWindowWidth), mainWindowWidth.ToString(CultureInfo.InvariantCulture));
 
         Rectangle bounds = WindowsUtils.ActiveScreen.Bounds;
         DpiScale dpi = WindowsUtils.Dpi;
-        double mainWindowTopPosition = mainWindow.Top >= SystemParameters.VirtualScreenTop
-            ? mainWindow.Top + mainWindow.Height <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight
-                ? mainWindow.Top * dpi.DpiScaleY
-                : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - mainWindow.Height) * dpi.DpiScaleY
+        double mainWindowTopPosition = _mainWindow.Top >= SystemParameters.VirtualScreenTop
+            ? _mainWindow.Top + _mainWindow.Height <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight
+                ? _mainWindow.Top * dpi.DpiScaleY
+                : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - _mainWindow.Height) * dpi.DpiScaleY
             : bounds.Y;
         ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", mainWindowTopPosition.ToString(CultureInfo.InvariantCulture));
 
-        double mainWindowLeftPosition = mainWindow.Left >= SystemParameters.VirtualScreenLeft
-            ? mainWindow.Left + mainWindow.Width <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
-                ? mainWindow.Left * dpi.DpiScaleX
-                : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - mainWindow.Width) * dpi.DpiScaleX
+        double mainWindowLeftPosition = _mainWindow.Left >= SystemParameters.VirtualScreenLeft
+            ? _mainWindow.Left + _mainWindow.Width <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
+                ? _mainWindow.Left * dpi.DpiScaleX
+                : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - _mainWindow.Width) * dpi.DpiScaleX
             : bounds.X;
         ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));
 

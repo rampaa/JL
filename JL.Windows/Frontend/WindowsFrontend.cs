@@ -8,19 +8,26 @@ namespace JL.Windows.Frontend;
 
 internal sealed class WindowsFrontend : IFrontend
 {
+    private readonly MainWindow _mainWindow;
+
+    public WindowsFrontend(MainWindow mainWindow)
+    {
+        _mainWindow = mainWindow;
+    }
+
     public void PlayAudio(byte[] audio, string audioFormat) => WindowsUtils.PlayAudio(audio, audioFormat);
 
     public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
 
-    public Task<bool> ShowYesNoDialogAsync(string text, string caption) => WindowsUtils.ShowYesNoDialogAsync(text, caption, MainWindow.Instance);
+    public Task<bool> ShowYesNoDialogAsync(string text, string caption) => WindowsUtils.ShowYesNoDialogAsync(text, caption, _mainWindow);
 
-    public Task ShowOkDialogAsync(string text, string caption) => WindowsUtils.ShowOkDialogAsync(text, caption, MainWindow.Instance);
+    public Task ShowOkDialogAsync(string text, string caption) => WindowsUtils.ShowOkDialogAsync(text, caption, _mainWindow);
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => WindowsUtils.UpdateJL(downloadUrlOfLatestJLRelease);
 
     public void ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
 
-    public Task CopyFromWebSocket(string text) => MainWindow.Instance.CopyFromWebSocket(text);
+    public Task CopyFromWebSocket(string text) => _mainWindow.CopyFromWebSocket(text);
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
 
