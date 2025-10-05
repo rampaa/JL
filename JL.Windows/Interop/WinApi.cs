@@ -141,15 +141,6 @@ internal static partial class WinApi
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool ChangeWindowMessageFilterEx(nint hWnd, int msg, ChangeWindowMessageFilterExAction action, nint changeInfo);
 
-        [LibraryImport("user32.dll", EntryPoint = "SetPropW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool SetPropW(nint hWnd, string lpString, nint hData);
-
-        [LibraryImport("user32.dll", EntryPoint = "RemovePropW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static partial nint RemovePropW(nint hWnd, string lpString);
-
         [LibraryImport("user32.dll", EntryPoint = "GetPropW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial nint GetPropW(nint hWnd, string lpString);
@@ -348,16 +339,6 @@ internal static partial class WinApi
         return ChangeWindowMessageFilter(windowHandle, message, ChangeWindowMessageFilterExAction.Allow);
     }
 
-    public static void SetProp(nint windowHandle, string lpString, nint hData)
-    {
-        _ = SetPropW(windowHandle, lpString, hData);
-    }
-
-    public static void RemoveProp(nint windowHandle, string lpString)
-    {
-        _ = RemovePropW(windowHandle, lpString);
-    }
-
     public static nint GetProp(nint windowHandle, string lpString)
     {
         return GetPropW(windowHandle, lpString);
@@ -411,7 +392,7 @@ internal static partial class WinApi
             if (s_clipboardSequenceNo != clipboardSequenceNo)
             {
                 s_clipboardSequenceNo = clipboardSequenceNo;
-                s_mainWindow.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedtly");
+                s_mainWindow.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedly");
                 handled = true;
             }
         }

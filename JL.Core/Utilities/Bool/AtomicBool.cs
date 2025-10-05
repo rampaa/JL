@@ -39,6 +39,8 @@ internal sealed class AtomicBool : IEquatable<AtomicBool>, IEquatable<bool>
 
 
     public static implicit operator bool(AtomicBool tsb) => tsb.Value;
+
+    // ReSharper disable once UnusedMember.Global
     public bool ToBoolean() => Value;
 
     public void SetTrue()
@@ -52,5 +54,7 @@ internal sealed class AtomicBool : IEquatable<AtomicBool>, IEquatable<bool>
     }
 
     public bool TrySetTrue() => Interlocked.CompareExchange(ref _value, 1, 0) is 0;
+
+    // ReSharper disable once UnusedMember.Global
     public bool TrySetFalse() => Interlocked.CompareExchange(ref _value, 0, 1) is 1;
 }

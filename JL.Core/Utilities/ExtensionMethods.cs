@@ -194,7 +194,7 @@ public static class ExtensionMethods
 
     internal static string GetPooledString(this string str)
     {
-        return ObjectPoolManager.StringPoolInstance.GetOrAdd(str);
+        return ObjectPoolManager.s_stringPoolInstance.GetOrAdd(str);
     }
 
     internal static void DeduplicateStringsInArray(this string[] strings)
@@ -303,7 +303,7 @@ public static class ExtensionMethods
             {
                 string? message = (string?)state;
                 Debug.Assert(message is not null);
-                LoggerManager.Logger.Error(t.Exception, message);
+                LoggerManager.Logger.Error(t.Exception, "{Message}", message);
             },
             errorMessage,
             CancellationToken.None,

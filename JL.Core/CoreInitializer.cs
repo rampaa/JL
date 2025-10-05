@@ -87,6 +87,6 @@ public static class CoreInitializer
             Task.Run(static () => DeconjugatorUtils.DeserializeRules()))
             .ConfigureAwait(false);
 
-        ObjectPoolManager.StringPoolInstance.Reset();
+        ObjectPoolManager.s_stringPoolInstance.Reset();
     }
 }

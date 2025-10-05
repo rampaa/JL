@@ -9,7 +9,7 @@ namespace JL.Core.Utilities;
 public static class ObjectPoolManager
 {
     public static readonly ObjectPool<StringBuilder> StringBuilderPool = new DefaultObjectPoolProvider().CreateStringBuilderPool(1024, 1024 * 4);
-    public static readonly StringPool StringPoolInstance = StringPool.Shared;
+    internal static readonly StringPool s_stringPoolInstance = StringPool.Shared;
 
     public static void ClearStringPoolIfDictsAreReady()
     {
@@ -18,7 +18,7 @@ public static class ObjectPoolManager
             && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating)
             && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating))
         {
-            StringPoolInstance.Reset();
+            s_stringPoolInstance.Reset();
         }
     }
 }
