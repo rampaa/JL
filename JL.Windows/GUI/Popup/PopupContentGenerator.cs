@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -55,20 +56,7 @@ internal sealed class PopupContentGenerator : Decorator
 
         StackPanel bottom = new();
         CreateFormattedDefinition(lookupDisplayResult, bottom);
-
-        KanjiLookupResult? kanjiLookupResult = result.KanjiLookupResult;
-        if (kanjiLookupResult is not null)
-        {
-            CreateOnReadings(ownerWindow, kanjiLookupResult, bottom);
-            CreateKunReadings(ownerWindow, kanjiLookupResult, bottom);
-            CreateNanoriReadings(ownerWindow, kanjiLookupResult, bottom);
-            CreateRadicalNames(ownerWindow, kanjiLookupResult, bottom);
-            CreateKanjiGrade(kanjiLookupResult, bottom);
-            CreateStrokeCount(kanjiLookupResult, bottom);
-            CreateKanjiComposition(ownerWindow, kanjiLookupResult, bottom);
-            CreateKanjiStats(ownerWindow, kanjiLookupResult, bottom);
-        }
-
+        CreateKanjiText(ownerWindow, result.KanjiLookupResult, bottom);
         CreateImages(lookupDisplayResult, bottom);
         CreateSeparator(lookupDisplayResult.NonLastItem, bottom);
 
@@ -550,9 +538,15 @@ internal sealed class PopupContentGenerator : Decorator
         }
     }
 
-    private static void CreateOnReadings(PopupWindow ownerWindow, KanjiLookupResult kanjiLookupResult, StackPanel bottom)
+    private static void CreateKanjiText(PopupWindow ownerWindow, KanjiLookupResult? kanjiLookupResult, StackPanel bottom)
     {
-        if (kanjiLookupResult.OnReadings is null)
+        if (kanjiLookupResult is null)
+        {
+            return;
+        }
+
+        string? kanjiText = GetKanjiText(kanjiLookupResult);
+        if (kanjiText is null)
         {
             return;
         }
@@ -560,247 +554,75 @@ internal sealed class PopupContentGenerator : Decorator
         ConfigManager configManager = ConfigManager.Instance;
         if (ownerWindow.MiningMode)
         {
-            TextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.OnReadings),
-                $"On: {string.Join('、', kanjiLookupResult.OnReadings)}",
+            TextBox kanjiTextTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiText),
+                kanjiText,
                 configManager.DefinitionsColor,
                 configManager.DefinitionsFontSize,
                 VerticalAlignment.Center,
                 new Thickness(0, 2, 2, 2),
                 ownerWindow.PopupContextMenu);
 
-            ownerWindow.AddEventHandlersToTextBox(onReadingsTextBox);
+            ownerWindow.AddEventHandlersToTextBox(kanjiTextTextBox);
 
-            _ = bottom.Children.Add(onReadingsTextBox);
+            _ = bottom.Children.Add(kanjiTextTextBox);
         }
-
         else
         {
-            TextBlock onReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.OnReadings),
-                $"On: {string.Join('、', kanjiLookupResult.OnReadings)}",
+            TextBlock kanjiTextTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiText),
+                kanjiText,
                 configManager.DefinitionsColor,
                 configManager.DefinitionsFontSize,
                 VerticalAlignment.Center,
                 new Thickness(2));
 
-            _ = bottom.Children.Add(onReadingsTextBlock);
+            _ = bottom.Children.Add(kanjiTextTextBlock);
         }
     }
 
-    private static void CreateKunReadings(PopupWindow ownerWindow, KanjiLookupResult kanjiLookupResult, StackPanel bottom)
+    private static string? GetKanjiText(KanjiLookupResult kanjiLookupResult)
     {
-        if (kanjiLookupResult.KunReadings is null)
+        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
+        if (kanjiLookupResult.OnReadings is not null)
         {
-            return;
+            _ = sb.Append(CultureInfo.InvariantCulture, $"On: {string.Join('、', kanjiLookupResult.OnReadings)}");
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
-        if (ownerWindow.MiningMode)
+        if (kanjiLookupResult.KunReadings is not null)
         {
-            TextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.KunReadings),
-                $"Kun: {string.Join('、', kanjiLookupResult.KunReadings)}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(0, 2, 2, 2),
-                ownerWindow.PopupContextMenu);
-
-            ownerWindow.AddEventHandlersToTextBox(kunReadingsTextBox);
-
-            _ = bottom.Children.Add(kunReadingsTextBox);
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Kun: {string.Join('、', kanjiLookupResult.KunReadings)}");
         }
 
-        else
+        if (kanjiLookupResult.NanoriReadings is not null)
         {
-            TextBlock kunReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KunReadings),
-                $"Kun: {string.Join('、', kanjiLookupResult.KunReadings)}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
-
-            _ = bottom.Children.Add(kunReadingsTextBlock);
-        }
-    }
-
-    private static void CreateNanoriReadings(PopupWindow ownerWindow, KanjiLookupResult kanjiLookupResult, StackPanel bottom)
-    {
-        if (kanjiLookupResult.NanoriReadings is null)
-        {
-            return;
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Nanori: {string.Join('、', kanjiLookupResult.NanoriReadings)}");
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
-        if (ownerWindow.MiningMode)
+        if (kanjiLookupResult.RadicalNames is not null)
         {
-            TextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.NanoriReadings),
-                $"Nanori: {string.Join('、', kanjiLookupResult.NanoriReadings)}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(0, 2, 2, 2),
-                ownerWindow.PopupContextMenu);
-
-            ownerWindow.AddEventHandlersToTextBox(nanoriReadingsTextBox);
-
-            _ = bottom.Children.Add(nanoriReadingsTextBox);
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Radical names: {string.Join('、', kanjiLookupResult.RadicalNames)}");
         }
 
-        else
+        if (kanjiLookupResult.KanjiGrade is not byte.MaxValue)
         {
-            TextBlock nanoriReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.NanoriReadings),
-                $"Nanori: {string.Join('、', kanjiLookupResult.NanoriReadings)}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
-
-            _ = bottom.Children.Add(nanoriReadingsTextBlock);
-        }
-    }
-
-    private static void CreateRadicalNames(PopupWindow ownerWindow, KanjiLookupResult kanjiLookupResult, StackPanel bottom)
-    {
-        if (kanjiLookupResult.RadicalNames is null)
-        {
-            return;
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Grade: {LookupResultUtils.GradeToText(kanjiLookupResult.KanjiGrade)}");
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
-        if (ownerWindow.MiningMode)
+        if (kanjiLookupResult.KanjiGrade is not 0)
         {
-            TextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.RadicalNames),
-                $"Radical names: {string.Join('、', kanjiLookupResult.RadicalNames)}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(0, 2, 2, 2),
-                ownerWindow.PopupContextMenu);
-
-            ownerWindow.AddEventHandlersToTextBox(radicalNameTextBox);
-
-            _ = bottom.Children.Add(radicalNameTextBox);
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Stroke count: {kanjiLookupResult.StrokeCount}");
         }
 
-        else
+        if (kanjiLookupResult.KanjiComposition is not null)
         {
-            TextBlock radicalNameTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.RadicalNames),
-                $"Radical names: {string.Join('、', kanjiLookupResult.RadicalNames)}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
-
-            _ = bottom.Children.Add(radicalNameTextBlock);
-        }
-    }
-
-    private static void CreateKanjiGrade(KanjiLookupResult kanjiLookupResult, StackPanel bottom)
-    {
-        if (kanjiLookupResult.KanjiGrade is byte.MaxValue)
-        {
-            return;
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Composition: {string.Join('、', kanjiLookupResult.KanjiComposition)}");
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
-        TextBlock gradeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KanjiGrade),
-            $"Grade: {LookupResultUtils.GradeToText(kanjiLookupResult.KanjiGrade)}",
-            configManager.DefinitionsColor,
-            configManager.DefinitionsFontSize,
-            VerticalAlignment.Center,
-            new Thickness(2));
-
-        _ = bottom.Children.Add(gradeTextBlock);
-    }
-
-    private static void CreateStrokeCount(KanjiLookupResult kanjiLookupResult, StackPanel bottom)
-    {
-        if (kanjiLookupResult.StrokeCount is 0)
+        if (kanjiLookupResult.KanjiStats is not null)
         {
-            return;
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Statistics:\n{kanjiLookupResult.KanjiStats}");
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
-        TextBlock strokeCountTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.StrokeCount),
-            string.Create(CultureInfo.InvariantCulture, $"Stroke count: {kanjiLookupResult.StrokeCount}"),
-            configManager.DefinitionsColor,
-            configManager.DefinitionsFontSize,
-            VerticalAlignment.Center,
-            new Thickness(2));
-
-        _ = bottom.Children.Add(strokeCountTextBlock);
-    }
-
-    private static void CreateKanjiComposition(PopupWindow ownerWindow, KanjiLookupResult kanjiLookupResult, StackPanel bottom)
-    {
-        if (kanjiLookupResult.KanjiComposition is null)
-        {
-            return;
-        }
-
-        ConfigManager configManager = ConfigManager.Instance;
-        string composition = $"Composition: {string.Join('、', kanjiLookupResult.KanjiComposition)}";
-        if (ownerWindow.MiningMode)
-        {
-            TextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.KanjiComposition),
-                composition,
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(0, 2, 2, 2),
-                ownerWindow.PopupContextMenu);
-
-            ownerWindow.AddEventHandlersToTextBox(compositionTextBox);
-
-            _ = bottom.Children.Add(compositionTextBox);
-        }
-
-        else
-        {
-            TextBlock compositionTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KanjiComposition),
-                composition,
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
-
-            _ = bottom.Children.Add(compositionTextBlock);
-        }
-    }
-
-    private static void CreateKanjiStats(PopupWindow ownerWindow, KanjiLookupResult kanjiLookupResult, StackPanel bottom)
-    {
-        if (kanjiLookupResult.KanjiStats is null)
-        {
-            return;
-        }
-
-        ConfigManager configManager = ConfigManager.Instance;
-        if (ownerWindow.MiningMode)
-        {
-            TextBox kanjiStatsTextBlock = PopupWindowUtils.CreateTextBox(nameof(kanjiLookupResult.KanjiStats),
-                $"Statistics:\n{kanjiLookupResult.KanjiStats}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(0, 2, 2, 2),
-                ownerWindow.PopupContextMenu);
-
-            ownerWindow.AddEventHandlersToTextBox(kanjiStatsTextBlock);
-
-            _ = bottom.Children.Add(kanjiStatsTextBlock);
-        }
-
-        else
-        {
-            TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiLookupResult.KanjiStats),
-                $"Statistics:\n{kanjiLookupResult.KanjiStats}",
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
-
-            _ = bottom.Children.Add(kanjiStatsTextBlock);
-        }
+        return sb.Length > 0 ? sb.ToString() : null;
     }
 
     private static void CreateImages(LookupDisplayResult lookupDisplayResult, StackPanel bottom)
