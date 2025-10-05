@@ -671,8 +671,7 @@ internal static class WindowsUtils
     {
         ConfigManager configManager = ConfigManager.Instance;
         nint lastActiveWindowHandle = LastActiveWindowHandle;
-        if (configManager.Focusable
-            && configManager.RestoreFocusToPreviouslyActiveWindow
+        if (configManager is { Focusable: true, RestoreFocusToPreviouslyActiveWindow: true }
             && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
             && lastActiveWindowHandle is not 0
             && lastActiveWindowHandle != s_mainWindow.WindowHandle)

@@ -29,7 +29,7 @@ internal sealed class AtomicBool : IEquatable<AtomicBool>, IEquatable<bool>
 
     public bool Equals(bool other) => Value == other;
 
-    public static bool operator ==(AtomicBool? left, AtomicBool? right) => left is not null ? left.Equals(right) : right is null;
+    public static bool operator ==(AtomicBool? left, AtomicBool? right) => left?.Equals(right) ?? right is null;
     public static bool operator !=(AtomicBool? left, AtomicBool? right) => !(left == right);
 
     public static bool operator ==(AtomicBool? left, bool right) => left is not null && left.Value == right;
@@ -41,8 +41,15 @@ internal sealed class AtomicBool : IEquatable<AtomicBool>, IEquatable<bool>
     public static implicit operator bool(AtomicBool tsb) => tsb.Value;
     public bool ToBoolean() => Value;
 
-    public void SetTrue() => Value = true;
-    public void SetFalse() => Value = false;
+    public void SetTrue()
+    {
+        Value = true;
+    }
+
+    public void SetFalse()
+    {
+        Value = false;
+    }
 
     public bool TrySetTrue() => Interlocked.CompareExchange(ref _value, 1, 0) is 0;
     public bool TrySetFalse() => Interlocked.CompareExchange(ref _value, 0, 1) is 1;

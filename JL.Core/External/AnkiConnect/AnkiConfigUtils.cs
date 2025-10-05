@@ -50,7 +50,7 @@ public static class AnkiConfigUtils
 
                 Debug.Assert(s_ankiConfigDict is not null);
                 AtomicBool firstFieldChanged = new(false);
-                await Parallel.ForEachAsync(s_ankiConfigDict.Values, async (ankiConfig, cancellationToken) =>
+                await Parallel.ForEachAsync(s_ankiConfigDict.Values, async (ankiConfig, _) =>
                 {
                     Debug.Assert(ankiConfig.Fields.Count > 0);
                     string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName).ConfigureAwait(false);

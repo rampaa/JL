@@ -342,7 +342,6 @@ public static class FreqUtils
                     string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                    freqNamesToBeRemoved ??= [];
                     freqNamesToBeRemoved.Add(freq.Name);
                 }
             }));

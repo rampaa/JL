@@ -111,7 +111,11 @@ internal sealed partial class App
     // ReSharper disable once AsyncVoidMethod
     private async void Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)
     {
-        await ((GUI.MainWindow)MainWindow).HandleAppClosing().ConfigureAwait(false);
+        GUI.MainWindow? mainWindow = (GUI.MainWindow?)MainWindow;
+        if (mainWindow is not null)
+        {
+            await mainWindow.HandleAppClosing().ConfigureAwait(false);
+        }
     }
 
     private static bool HasModifyPermission(string folderPath)

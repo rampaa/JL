@@ -668,17 +668,11 @@ public static class DictUtils
                 FrontendManager.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
             }
 
-            if (ProfileCustomWordsCancellationTokenSource is not null)
-            {
-                ProfileCustomWordsCancellationTokenSource.Dispose();
-                ProfileCustomWordsCancellationTokenSource = null;
-            }
+            ProfileCustomWordsCancellationTokenSource.Dispose();
+            ProfileCustomWordsCancellationTokenSource = null;
 
-            if (ProfileCustomNamesCancellationTokenSource is not null)
-            {
-                ProfileCustomNamesCancellationTokenSource.Dispose();
-                ProfileCustomNamesCancellationTokenSource = null;
-            }
+            ProfileCustomNamesCancellationTokenSource.Dispose();
+            ProfileCustomNamesCancellationTokenSource = null;
         }
 
         DictsReady = true;
