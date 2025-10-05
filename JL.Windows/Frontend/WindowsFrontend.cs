@@ -15,7 +15,7 @@ internal sealed class WindowsFrontend : IFrontend
         _mainWindow = mainWindow;
     }
 
-    public void PlayAudio(byte[] audio, string audioFormat) => WindowsUtils.PlayAudio(audio, audioFormat);
+    public Task PlayAudio(byte[] audio, string audioFormat) => WindowsUtils.PlayAudio(audio, audioFormat);
 
     public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
 
@@ -31,7 +31,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
 
-    public void TextToSpeech(string voiceName, string text) => SpeechSynthesisUtils.TextToSpeech(voiceName, text);
+    public Task TextToSpeech(string voiceName, string text) => SpeechSynthesisUtils.TextToSpeech(voiceName, text);
 
     public void StopTextToSpeech() => SpeechSynthesisUtils.StopTextToSpeech();
 

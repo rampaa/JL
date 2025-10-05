@@ -68,11 +68,23 @@ internal static class SpeechSynthesisUtils
         s_synthesizer.SpeakAsyncCancelAll();
     }
 
-    public static void TextToSpeech(string voiceName, string text)
+    public static async Task TextToSpeech(string voiceName, string text)
     {
         if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing)
         {
-            WindowsUtils.AudioPlayer.Dispose();
+            await WindowsUtils.AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                WindowsUtils.AudioPlayer.Stop();
+            }
+            catch (Exception ex)
+            {
+                LoggerManager.Logger.Error(ex, "Error while stopping audio player");
+            }
+            finally
+            {
+                _ = WindowsUtils.AudioPlayerSemaphoreSlim.Release();
+            }
         }
 
         if (s_synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)

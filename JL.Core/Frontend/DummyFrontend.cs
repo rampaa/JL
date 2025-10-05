@@ -2,9 +2,7 @@ namespace JL.Core.Frontend;
 
 internal sealed class DummyFrontend : IFrontend
 {
-    public void PlayAudio(byte[] audio, string audioFormat)
-    {
-    }
+    public Task PlayAudio(byte[] audio, string audioFormat) => Task.CompletedTask;
 
     public void Alert(AlertLevel alertLevel, string message)
     {
@@ -24,9 +22,7 @@ internal sealed class DummyFrontend : IFrontend
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray() => Task.FromResult<byte[]?>(null);
 
-    public void TextToSpeech(string voiceName, string text)
-    {
-    }
+    public Task TextToSpeech(string voiceName, string text) => Task.CompletedTask;
 
     public void StopTextToSpeech()
     {

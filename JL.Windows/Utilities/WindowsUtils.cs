@@ -23,7 +23,6 @@ using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
-using JL.Core.Utilities.Array;
 using JL.Windows.Config;
 using JL.Windows.External.Magpie;
 using JL.Windows.GUI;
@@ -46,7 +45,10 @@ internal static class WindowsUtils
 
     public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
     private static long s_lastAudioPlayTimestamp;
-    public static WaveOut? AudioPlayer { get; private set; }
+
+    private static WaveOutEvent? s_audioPlayer;
+    public static WaveOutEvent? AudioPlayer => Volatile.Read(ref s_audioPlayer);
+    public static SemaphoreSlim AudioPlayerSemaphoreSlim { get; } = new(1, 1);
 
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(s_mainWindow.WindowHandle);
 
@@ -401,47 +403,75 @@ internal static class WindowsUtils
         }
     }
 
-    public static void PlayAudio(byte[] audio, string audioFormat)
+    public static async Task PlayAudio(byte[] audio, string audioFormat)
     {
-        _ = Application.Current?.Dispatcher.InvokeAsync(async () =>
+        await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+
+        try
         {
+            WaveOutEvent? oldPlayer = Interlocked.Exchange(ref s_audioPlayer, null);
+            oldPlayer?.Stop();
+
+            MemoryStream memoryStream = new(audio);
+
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            WaveStream waveProvider = audioFormat is "ogg" or "oga"
+                ? new VorbisWaveReader(memoryStream)
+                : new StreamMediaFoundationReader(memoryStream);
+#pragma warning restore CA2000 // Dispose objects before losing scope
+
+            WaveOutEvent audioPlayer = new();
+
             try
             {
-                AudioPlayer?.Dispose();
-                AudioPlayer = null;
-
-                (WaveOut audioPlayer, DisposableItemArray<Stream> disposableStreams) = await Task.Run(() =>
-                {
-                    MemoryStream memoryStream = new(audio);
-
-                    IWaveProvider waveProvider = audioFormat is "ogg" or "oga"
-                        ? new VorbisWaveReader(memoryStream)
-                        : new StreamMediaFoundationReader(memoryStream);
-
-                    WaveOut waveOut = new();
-                    waveOut.Init(waveProvider);
-
-                    DisposableItemArray<Stream> disposableStreams = new([memoryStream, (Stream)waveProvider]);
-
-                    return (waveOut, disposableStreams);
-                }).ConfigureAwait(true);
-
-                audioPlayer.PlaybackStopped += (_, _) =>
-                {
-                    disposableStreams.Dispose();
-                    audioPlayer.Dispose();
-                    AudioPlayer = null;
-                };
-
-                AudioPlayer = audioPlayer;
+                audioPlayer.Init(waveProvider);
+                _ = Interlocked.Exchange(ref s_audioPlayer, audioPlayer);
                 audioPlayer.Play();
             }
             catch (Exception ex)
             {
+                audioPlayer.Dispose();
+                await waveProvider.DisposeAsync().ConfigureAwait(false);
+                await memoryStream.DisposeAsync().ConfigureAwait(false);
+                _ = Interlocked.Exchange(ref s_audioPlayer, null);
+
                 LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
                 Alert(AlertLevel.Error, "Error playing audio");
             }
-        });
+
+            audioPlayer.PlaybackStopped += async (_, _) =>
+            {
+                await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    audioPlayer.Dispose();
+                    await waveProvider.DisposeAsync().ConfigureAwait(false);
+                    await memoryStream.DisposeAsync().ConfigureAwait(false);
+
+                    if (AudioPlayer == audioPlayer)
+                    {
+                        _ = Interlocked.Exchange(ref s_audioPlayer, null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LoggerManager.Logger.Error(ex, "Error while disposing audio player");
+                }
+                finally
+                {
+                    _ = AudioPlayerSemaphoreSlim.Release();
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
+            Alert(AlertLevel.Error, "Error playing audio");
+        }
+        finally
+        {
+            _ = AudioPlayerSemaphoreSlim.Release();
+        }
     }
 
     public static async Task Motivate()
@@ -453,8 +483,6 @@ internal static class WindowsUtils
         }
 
         s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
-
-        SpeechSynthesisUtils.StopTextToSpeech();
 
         try
         {
@@ -471,7 +499,13 @@ internal static class WindowsUtils
 #pragma warning restore CA5394 // Do not use insecure randomness
 
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
-            PlayAudio(audioData, "mp3");
+
+            await Task.Run(async () =>
+            {
+                SpeechSynthesisUtils.StopTextToSpeech();
+                await PlayAudio(audioData, "mp3").ConfigureAwait(false);
+            }).ConfigureAwait(false);
+
             StatsUtils.IncrementStat(StatType.Imoutos);
         }
         catch (Exception ex)

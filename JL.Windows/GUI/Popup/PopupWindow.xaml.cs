@@ -1528,7 +1528,7 @@ internal sealed partial class PopupWindow
                         : LastLookupResults[_listViewItemIndex].PrimarySpelling;
                 }
 
-                SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text);
+                return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text);
             }
         }
 

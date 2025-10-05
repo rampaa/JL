@@ -162,7 +162,7 @@ public static class AudioUtils
                     }
 
                     case AudioSourceType.TextToSpeech:
-                        FrontendManager.Frontend.TextToSpeech(uri, reading);
+                        await FrontendManager.Frontend.TextToSpeech(uri, reading).ConfigureAwait(false);
                         return s_textToSpeechAudioResponse;
 
                     default:
@@ -189,7 +189,7 @@ public static class AudioUtils
         if (audioResponse?.AudioData is not null)
         {
             FrontendManager.Frontend.StopTextToSpeech();
-            FrontendManager.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat);
+            await FrontendManager.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat).ConfigureAwait(false);
             StatsUtils.IncrementStat(StatType.TimesPlayedAudio);
         }
     }
