@@ -622,7 +622,9 @@ internal sealed class PopupContentGenerator : Decorator
             _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Statistics:\n{kanjiLookupResult.KanjiStats}");
         }
 
-        return sb.Length > 0 ? sb.ToString() : null;
+        string? result = sb.Length > 0 ? sb.ToString() : null;
+        ObjectPoolManager.StringBuilderPool.Return(sb);
+        return result;
     }
 
     private static void CreateImages(LookupDisplayResult lookupDisplayResult, StackPanel bottom)
