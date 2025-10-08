@@ -211,10 +211,7 @@ public static class DBUtils
 
         if (AppInfo.Is64BitProcess)
         {
-#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-            command.CommandText = $"PRAGMA mmap_size = {1024L * 1024L * 2000L};";
-#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
-
+            command.CommandText = "PRAGMA mmap_size = 2097152000;"; // 1024L * 1024L * 2000L = 2097152000 bytes ≈ 1.953 GiB. Max allowed value is 2147418112 bytes (≈1.999 GiB)
             _ = command.ExecuteNonQuery();
         }
     }

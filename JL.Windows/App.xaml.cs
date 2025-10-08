@@ -28,6 +28,8 @@ internal sealed partial class App
 
         ProfileOptimization.SetProfileRoot(AppContext.BaseDirectory);
         ProfileOptimization.StartProfile("Startup.Profile");
+
+        AppContext.SetSwitch("Switch.System.Windows.Input.Stylus.DisableImplicitTouchKeyboardInvocation", true);
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -58,7 +60,6 @@ internal sealed partial class App
             return;
         }
 
-        AppContext.SetSwitch("Switch.System.Windows.Input.Stylus.DisableImplicitTouchKeyboardInvocation", true);
         ShutdownMode = ShutdownMode.OnMainWindowClose;
 
         GUI.MainWindow mainWindow = new();
