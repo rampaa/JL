@@ -637,32 +637,37 @@ internal sealed class PopupContentGenerator : Decorator
 
         ShowImagesOption? showImagesOption = result.Dict.Options.ShowImagesOption;
         Debug.Assert(showImagesOption is not null);
-        bool showImages = showImagesOption.Value;
-        if (!showImages)
+        if (!showImagesOption.Value)
         {
             return;
         }
 
+        int maxPopupWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth);
+        int maxPopupHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight);
+        BitmapCreateOptions delayCreationAndIgnoreColorProfile = BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile;
+
         for (int i = 0; i < result.ImagePaths.Length; i++)
         {
             string imagePath = Path.GetFullPath(result.ImagePaths[i], AppInfo.ApplicationPath);
-
-            BitmapImage bitmap = new();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(imagePath);
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+            Uri imageUri = new(imagePath);
 
             try
             {
-                BitmapFrame frame = BitmapFrame.Create(bitmap.UriSource, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+                BitmapFrame frame = BitmapFrame.Create(imageUri, delayCreationAndIgnoreColorProfile, BitmapCacheOption.None);
+
+                BitmapImage bitmap = new();
+                bitmap.BeginInit();
+                bitmap.UriSource = imageUri;
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+
                 if (frame.PixelWidth > frame.PixelHeight)
                 {
-                    bitmap.DecodePixelWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth);
+                    bitmap.DecodePixelWidth = maxPopupWidth;
                 }
                 else
                 {
-                    bitmap.DecodePixelHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight);
+                    bitmap.DecodePixelHeight = maxPopupHeight;
                 }
 
                 bitmap.EndInit();
@@ -681,10 +686,23 @@ internal sealed class PopupContentGenerator : Decorator
 
                 _ = bottom.Children.Add(image);
             }
+            catch (NotSupportedException ex)
+            {
+                LoggerManager.Logger.Error(ex, "Image type is not supported: {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, result.Dict.Name);
+                showImagesOption.Value = false;
+                return;
+            }
             catch (DirectoryNotFoundException ex)
             {
-                LoggerManager.Logger.Error(ex, "Image path not found {ImagePath}", imagePath);
+                LoggerManager.Logger.Error(ex, "Image path is not found {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, result.Dict.Name);
                 showImagesOption.Value = false;
+                return;
+            }
+            catch (Exception ex)
+            {
+                LoggerManager.Logger.Error(ex, "Unexpected error while showing image: {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, result.Dict.Name);
+                showImagesOption.Value = false;
+                return;
             }
         }
     }
