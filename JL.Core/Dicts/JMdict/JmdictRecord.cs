@@ -167,8 +167,6 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         string[]?[]? dialects = Dialects;
         string[]?[]? fields = Fields;
         string?[]? definitionInfo = DefinitionInfo;
-        string[]?[]? spellingRestrictions = SpellingRestrictions;
-        string[]?[]? readingRestrictions = ReadingRestrictions;
         LoanwordSource[]?[]? loanwordEtymology = LoanwordEtymology;
         string[]?[]? relatedTerms = RelatedTerms;
         string[]?[]? antonyms = Antonyms;
@@ -234,116 +232,25 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (showSpellingRestrictionInfo)
             {
-                string[]? spellingRestrictionsElement = null;
-                if (showSpellingRestrictions)
-                {
-                    Debug.Assert(spellingRestrictions is not null);
-                    spellingRestrictionsElement = spellingRestrictions[i];
-                }
-
-                string[]? readingRestrictionsElement = null;
-                if (showReadingRestrictionss)
-                {
-                    Debug.Assert(readingRestrictions is not null);
-                    readingRestrictionsElement = readingRestrictions[i];
-                }
-
-                bool spellingRestrictionsExist = spellingRestrictionsElement is not null;
-                bool readingRestrictionsExist = readingRestrictionsElement is not null;
-                if (spellingRestrictionsExist || readingRestrictionsExist)
-                {
-                    _ = defBuilder.Append("(only applies to ");
-
-                    if (spellingRestrictionsExist)
-                    {
-                        Debug.Assert(spellingRestrictionsElement is not null);
-                        _ = defBuilder.AppendJoin("; ", spellingRestrictionsElement);
-                    }
-
-                    if (readingRestrictionsExist)
-                    {
-                        if (spellingRestrictionsExist)
-                        {
-                            _ = defBuilder.Append("; ");
-                        }
-
-                        Debug.Assert(readingRestrictionsElement is not null);
-                        _ = defBuilder.AppendJoin("; ", readingRestrictionsElement);
-                    }
-
-                    _ = defBuilder.Append(") ");
-                }
+                AppendSpellingRestrictionInfo(defBuilder, showSpellingRestrictions, SpellingRestrictions, showReadingRestrictionss, ReadingRestrictions, i);
             }
 
             if (showLoanwordEtymology)
             {
                 Debug.Assert(loanwordEtymology is not null);
-                ref readonly LoanwordSource[]? lSources = ref loanwordEtymology[i];
-                if (lSources is not null)
-                {
-                    _ = defBuilder.Append('(');
-
-                    for (int j = 0; j < lSources.Length; j++)
-                    {
-                        ref readonly LoanwordSource lSource = ref lSources[j];
-                        if (lSource.IsWasei)
-                        {
-                            _ = defBuilder.Append("wasei ");
-                        }
-                        else if (j is 0)
-                        {
-                            _ = defBuilder.Append("from ");
-                        }
-
-                        _ = defBuilder.Append(lSource.Language);
-
-                        if (lSource.OriginalWord is not null)
-                        {
-                            _ = defBuilder.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
-                        }
-
-                        if (j + 1 < lSources.Length)
-                        {
-                            _ = defBuilder.Append(lSource.IsPart ? " + " : ", ");
-                        }
-                    }
-
-                    _ = defBuilder.Append(") ");
-                }
+                AppendLoanwordEtymology(defBuilder, loanwordEtymology[i]);
             }
 
             if (showRelatedTerms)
             {
                 Debug.Assert(relatedTerms is not null);
-                string[]? relatedTermsElement = relatedTerms[i];
-                if (relatedTermsElement is not null)
-                {
-                    if (relatedTermsElement.Length is 1)
-                    {
-                        _ = defBuilder.Append(CultureInfo.InvariantCulture, $"(related term: {relatedTermsElement[0]}) ");
-                    }
-                    else
-                    {
-                        _ = defBuilder.Append("(related terms: ").AppendJoin(", ", relatedTermsElement).Append(") ");
-                    }
-                }
+                AppendRelatedTerms(defBuilder, relatedTerms[i]);
             }
 
             if (showAntonyms)
             {
                 Debug.Assert(antonyms is not null);
-                string[]? antonymsElement = antonyms[i];
-                if (antonymsElement is not null)
-                {
-                    if (antonymsElement.Length is 1)
-                    {
-                        _ = defBuilder.Append(CultureInfo.InvariantCulture, $"(antonym: {antonymsElement[0]}) ");
-                    }
-                    else
-                    {
-                        _ = defBuilder.Append("(antonyms: ").AppendJoin(", ", antonymsElement).Append(") ");
-                    }
-                }
+                AppendAntonyms(defBuilder, antonyms[i]);
             }
 
             if (i + 1 != definitions.Length)
@@ -355,6 +262,114 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         string def = defBuilder.ToString(0, defBuilder.Length - 1);
         ObjectPoolManager.StringBuilderPool.Return(defBuilder);
         return def;
+    }
+
+    private static void AppendSpellingRestrictionInfo(StringBuilder defBuilder, bool showSpellingRestrictions, string[]?[]? spellingRestrictions, bool showReadingRestrictionss, string[]?[]? readingRestrictions, int index)
+    {
+        string[]? spellingRestrictionsElement = null;
+        if (showSpellingRestrictions)
+        {
+            Debug.Assert(spellingRestrictions is not null);
+            spellingRestrictionsElement = spellingRestrictions[index];
+        }
+
+        string[]? readingRestrictionsElement = null;
+        if (showReadingRestrictionss)
+        {
+            Debug.Assert(readingRestrictions is not null);
+            readingRestrictionsElement = readingRestrictions[index];
+        }
+
+        bool spellingRestrictionsExist = spellingRestrictionsElement is not null;
+        bool readingRestrictionsExist = readingRestrictionsElement is not null;
+        if (spellingRestrictionsExist || readingRestrictionsExist)
+        {
+            _ = defBuilder.Append("(only applies to ");
+
+            if (spellingRestrictionsExist)
+            {
+                Debug.Assert(spellingRestrictionsElement is not null);
+                _ = defBuilder.AppendJoin("; ", spellingRestrictionsElement);
+            }
+
+            if (readingRestrictionsExist)
+            {
+                if (spellingRestrictionsExist)
+                {
+                    _ = defBuilder.Append("; ");
+                }
+
+                Debug.Assert(readingRestrictionsElement is not null);
+                _ = defBuilder.AppendJoin("; ", readingRestrictionsElement);
+            }
+
+            _ = defBuilder.Append(") ");
+        }
+    }
+
+    private static void AppendLoanwordEtymology(StringBuilder defBuilder, LoanwordSource[]? lSources)
+    {
+        if (lSources is not null)
+        {
+            _ = defBuilder.Append('(');
+
+            for (int j = 0; j < lSources.Length; j++)
+            {
+                ref readonly LoanwordSource lSource = ref lSources[j];
+                if (lSource.IsWasei)
+                {
+                    _ = defBuilder.Append("wasei ");
+                }
+                else if (j is 0)
+                {
+                    _ = defBuilder.Append("from ");
+                }
+
+                _ = defBuilder.Append(lSource.Language);
+
+                if (lSource.OriginalWord is not null)
+                {
+                    _ = defBuilder.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
+                }
+
+                if (j + 1 < lSources.Length)
+                {
+                    _ = defBuilder.Append(lSource.IsPart ? " + " : ", ");
+                }
+            }
+
+            _ = defBuilder.Append(") ");
+        }
+    }
+
+    private static void AppendRelatedTerms(StringBuilder defBuilder, string[]? relatedTermsElement)
+    {
+        if (relatedTermsElement is not null)
+        {
+            if (relatedTermsElement.Length is 1)
+            {
+                _ = defBuilder.Append(CultureInfo.InvariantCulture, $"(related term: {relatedTermsElement[0]}) ");
+            }
+            else
+            {
+                _ = defBuilder.Append("(related terms: ").AppendJoin(", ", relatedTermsElement).Append(") ");
+            }
+        }
+    }
+
+    private static void AppendAntonyms(StringBuilder defBuilder, string[]? antonymsElement)
+    {
+        if (antonymsElement is not null)
+        {
+            if (antonymsElement.Length is 1)
+            {
+                _ = defBuilder.Append(CultureInfo.InvariantCulture, $"(antonym: {antonymsElement[0]}) ");
+            }
+            else
+            {
+                _ = defBuilder.Append("(antonyms: ").AppendJoin(", ", antonymsElement).Append(") ");
+            }
+        }
     }
 
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)
