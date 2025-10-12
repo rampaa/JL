@@ -1966,9 +1966,15 @@ internal sealed partial class PopupWindow
             PopupListView.Items.Filter = DictFilter;
         }
 
+        if (PopupListView.Items.Count > 0)
+        {
+            PopupListView.ScrollIntoView(PopupListView.Items[0]);
+        }
+
+        UpdateLayout();
+
         Debug.Assert(_popupListViewScrollViewer is not null);
         _popupListViewScrollViewer.ScrollToTop();
-        UpdateLayout();
         _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
         _listViewItemIndex = _firstVisibleListViewItemIndex;
         LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
