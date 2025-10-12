@@ -644,7 +644,6 @@ internal sealed class PopupContentGenerator : Decorator
 
         int maxPopupWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth);
         int maxPopupHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight);
-        BitmapCreateOptions delayCreationAndIgnoreColorProfile = BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile;
 
         for (int i = 0; i < result.ImagePaths.Length; i++)
         {
@@ -653,7 +652,7 @@ internal sealed class PopupContentGenerator : Decorator
 
             try
             {
-                BitmapFrame frame = BitmapFrame.Create(imageUri, delayCreationAndIgnoreColorProfile, BitmapCacheOption.None);
+                BitmapFrame frame = BitmapFrame.Create(imageUri, BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
 
                 BitmapImage bitmap = new();
                 bitmap.BeginInit();
