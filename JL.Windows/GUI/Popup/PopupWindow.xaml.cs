@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -787,14 +788,15 @@ internal sealed partial class PopupWindow
 
     private int GetFirstVisibleListViewItemIndex()
     {
-        foreach (object dataItem in PopupListView.Items)
+        ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
+        ReadOnlyCollection<object> items = generator.Items;
+        foreach (LookupDisplayResult item in items.Cast<LookupDisplayResult>())
         {
-            if (PopupListView.ItemContainerGenerator.ContainerFromItem(dataItem) is ListViewItem)
+            if (generator.ContainerFromItem(item) is ListViewItem)
             {
-                return ((LookupDisplayResult)dataItem).Index;
+                return item.Index;
             }
         }
-
         return 0;
     }
 
@@ -949,11 +951,14 @@ internal sealed partial class PopupWindow
         else
         {
             listViewItemIndex = _listViewItemIndex;
-            foreach (LookupDisplayResult item in PopupListView.Items.Cast<LookupDisplayResult>())
+
+            ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
+            ReadOnlyCollection<object> items = generator.Items;
+            foreach (LookupDisplayResult item in items.Cast<LookupDisplayResult>())
             {
                 if (item.Index == listViewItemIndex)
                 {
-                    popupListViewItem = (ListViewItem?)PopupListView.ItemContainerGenerator.ContainerFromItem(item);
+                    popupListViewItem = (ListViewItem)generator.ContainerFromItem(item);
                     break;
                 }
             }
@@ -1007,11 +1012,14 @@ internal sealed partial class PopupWindow
         else
         {
             listViewItemIndex = _listViewItemIndex;
-            foreach (LookupDisplayResult item in PopupListView.Items.Cast<LookupDisplayResult>())
+
+            ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
+            ReadOnlyCollection<object> items = generator.Items;
+            foreach (LookupDisplayResult item in items.Cast<LookupDisplayResult>())
             {
                 if (item.Index == listViewItemIndex)
                 {
-                    popupListViewItem = (ListViewItem?)PopupListView.ItemContainerGenerator.ContainerFromItem(item);
+                    popupListViewItem = (ListViewItem)generator.ContainerFromItem(item);
                     break;
                 }
             }
@@ -1968,7 +1976,9 @@ internal sealed partial class PopupWindow
 
         if (PopupListView.Items.Count > 0)
         {
-            PopupListView.ScrollIntoView(PopupListView.Items[0]);
+            object? firstItem = PopupListView.Items[0];
+            Debug.Assert(firstItem is LookupDisplayResult);
+            PopupListView.ScrollIntoView(firstItem);
         }
 
         UpdateLayout();
@@ -2161,11 +2171,13 @@ internal sealed partial class PopupWindow
 
     public TextBox? GetDefinitionTextBox(int listViewIndex)
     {
-        foreach (LookupDisplayResult lookupDisplayResult in PopupListView.Items.Cast<LookupDisplayResult>())
+        ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
+        ReadOnlyCollection<object> items = generator.Items;
+        foreach (LookupDisplayResult lookupDisplayResult in items.Cast<LookupDisplayResult>())
         {
             if (lookupDisplayResult.Index == listViewIndex)
             {
-                ListViewItem container = (ListViewItem)PopupListView.ItemContainerGenerator.ContainerFromItem(lookupDisplayResult);
+                ListViewItem container = (ListViewItem)generator.ContainerFromItem(lookupDisplayResult);
                 return container.GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));
             }
         }
