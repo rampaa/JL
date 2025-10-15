@@ -2364,7 +2364,7 @@
                                        ToolTip="This option sets the minimum reading speed (in characters per minute) required to continue increasing the time stat.
                                        &#10;If the reading speed for the last captured text drops below this value, JL will consider the user idle
                                        &#10;and stop increasing the time stat until a new text is captured.
-                                       &#10;The lower this value, the more time you have to read before being considered idle.
+                                       &#10;A lower value gives you more time to read the last captured text before you are considered idle.
                                        &#10;Set it to your slowest possible reading speed, NOT to your average speed.">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Minimum reading speed to keep time stat increasing (in Characters Per Minute)"
