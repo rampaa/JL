@@ -196,6 +196,11 @@ internal sealed partial class MainWindow
             return false;
         }
 
+        if (configManager.MaxTextLengthToCapture > 0 && sanitizedNewText.Length > configManager.MaxTextLengthToCapture)
+        {
+            return false;
+        }
+
         bool mergeTexts = false;
         string? subsequentText = null;
         string? mergedText = null;

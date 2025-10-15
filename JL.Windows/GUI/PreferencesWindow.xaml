@@ -578,6 +578,18 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                        Cursor="Help"
+                                       ToolTip="Texts longer than this will not be captured from the clipboard or a WebSocket server. Setting it to 0 will remove the length limit.">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Max text length to capture"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <hc:NumericUpDown x:Name="MaxTextLengthToCaptureNumericUpDown" Minimum="0" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                       Cursor="Help"
                                        ToolTip="If the new text found in Clipboard/WebSocket starts with the current text
                                        &#10;then the subsequent text is simply appended to the current text, instead of being copied as a new text.
                                        &#10;For example, if the current text is 我が and 我が妹よ is the next text found in Clipboard/WebSocket, 妹よ is appended to 我が.

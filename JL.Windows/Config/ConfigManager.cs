@@ -77,6 +77,7 @@ internal sealed class ConfigManager
     public bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
     public bool AllowPartialMatchingForTextMerge { get; private set; } // = false;
     public double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
+    public int MaxTextLengthToCapture { get; set; } // = 0;
     public bool TextBoxUseCustomLineHeight { get; private set; } // = false;
     public double TextBoxCustomLineHeight { get; private set; } = 75;
     public bool RepositionMainWindowOnTextChangeByBottomPosition { get; private set; } // = false;
@@ -430,6 +431,7 @@ internal sealed class ConfigManager
         AudioButtonFontSize = ConfigDBManager.GetValueFromConfig(connection, configs, AudioButtonFontSize, nameof(AudioButtonFontSize));
         MiningButtonFontSize = ConfigDBManager.GetValueFromConfig(connection, configs, MiningButtonFontSize, nameof(MiningButtonFontSize));
         MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds = ConfigDBManager.GetValueFromConfig(connection, configs, MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds));
+        MaxTextLengthToCapture = ConfigDBManager.GetValueFromConfig(connection, configs, MaxTextLengthToCapture, nameof(MaxTextLengthToCapture));
         MaxNumResultsNotInMiningMode = ConfigDBManager.GetValueFromConfig(connection, configs, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode));
 
         TextBoxUseCustomLineHeight = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxUseCustomLineHeight, nameof(TextBoxUseCustomLineHeight));
@@ -1040,6 +1042,8 @@ internal sealed class ConfigManager
         preferenceWindow.AudioButtonFontSizeNumericUpDown.Value = AudioButtonFontSize;
         preferenceWindow.MiningButtonFontSizeNumericUpDown.Value = MiningButtonFontSize;
         preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value = MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds;
+        preferenceWindow.MaxTextLengthToCaptureNumericUpDown.Value = MaxTextLengthToCapture;
+
         preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value = TextBoxCustomLineHeight;
         preferenceWindow.PopupDictionaryTabFontSizeNumericUpDown.Value = PopupDictionaryTabFontSize;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
@@ -1470,6 +1474,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds),
                 preferenceWindow.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(MaxTextLengthToCapture),
+                preferenceWindow.MaxTextLengthToCaptureNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(TextBoxCustomLineHeight),
                 preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
