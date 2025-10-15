@@ -77,7 +77,7 @@ internal sealed class ConfigManager
     public bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
     public bool AllowPartialMatchingForTextMerge { get; private set; } // = false;
     public double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
-    public int MaxTextLengthToCapture { get; set; } // = 0;
+    public int MaxTextLengthToCapture { get; private set; } // = 0;
     public bool TextBoxUseCustomLineHeight { get; private set; } // = false;
     public double TextBoxCustomLineHeight { get; private set; } = 75;
     public bool RepositionMainWindowOnTextChangeByBottomPosition { get; private set; } // = false;
