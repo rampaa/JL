@@ -1601,6 +1601,7 @@ internal sealed partial class MainWindow
     {
         ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating);
+        SearchMenuItem.IsEnabled = MainTextBox.SelectionLength > 0;
 
         bool customNameDictReady = false;
         if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict))
