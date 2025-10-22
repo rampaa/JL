@@ -1548,7 +1548,7 @@ public static class DictUtils
         {
             if (ShowImagesOption.ValidDictTypes.Contains(dict.Type))
             {
-                dict.Options.ShowImagesOption ??= new ShowImagesOption(true);
+                dict.Options.ShowImages ??= new ShowImagesOption(true);
             }
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
             {

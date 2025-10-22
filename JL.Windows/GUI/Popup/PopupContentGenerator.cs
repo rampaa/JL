@@ -635,7 +635,7 @@ internal sealed class PopupContentGenerator : Decorator
             return;
         }
 
-        ShowImagesOption? showImagesOption = result.Dict.Options.ShowImagesOption;
+        ShowImagesOption? showImagesOption = result.Dict.Options.ShowImages;
         Debug.Assert(showImagesOption is not null);
         if (!showImagesOption.Value)
         {

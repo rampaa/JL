@@ -43,5 +43,5 @@ public sealed class DictOptions(
     public LoanwordEtymologyOption? LoanwordEtymology { get; internal set; } = loanwordEtymology;
     public ShowPitchAccentWithDottedLinesOption? ShowPitchAccentWithDottedLines { get; internal set; } = showPitchAccentWithDottedLines;
     public AutoUpdateAfterNDaysOption? AutoUpdateAfterNDays { get; internal set; } = autoUpdateAfterNDays;
-    public ShowImagesOption? ShowImagesOption { get; internal set; } = showImagesOption;
+    public ShowImagesOption? ShowImages { get; internal set; } = showImagesOption;
 }
