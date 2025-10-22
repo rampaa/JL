@@ -50,38 +50,9 @@ internal sealed partial class FreqOptionsControl
     public void GenerateFreqOptionsElements(FreqType freqType, FreqOptions? freqOptions)
     {
         bool showFreqOptions = false;
-        if (UseDBOption.ValidFreqTypes.Contains(freqType))
-        {
-            UseDBCheckBox.IsChecked = freqOptions?.UseDB.Value ?? true;
-            UseDBCheckBox.Visibility = Visibility.Visible;
-            showFreqOptions = true;
-        }
-        else
-        {
-            UseDBCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freqType))
-        {
-            HigherValueMeansHigherFrequencyCheckBox.IsChecked = freqOptions?.HigherValueMeansHigherFrequency.Value ?? false;
-            HigherValueMeansHigherFrequencyCheckBox.Visibility = Visibility.Visible;
-            showFreqOptions = true;
-        }
-        else
-        {
-            HigherValueMeansHigherFrequencyCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (AutoUpdateAfterNDaysOption.ValidFreqTypes.Contains(freqType))
-        {
-            AutoUpdateAfterNDaysNumericUpDown.Value = freqOptions?.AutoUpdateAfterNDays?.Value ?? 0;
-            AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
-            showFreqOptions = true;
-        }
-        else
-        {
-            AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
-        }
+        OptionUtils.ChangeVisibilityOfCheckBox(UseDBOption.ValidFreqTypes.Contains(freqType), UseDBCheckBox, freqOptions?.UseDB.Value ?? true, ref showFreqOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freqType), HigherValueMeansHigherFrequencyCheckBox, freqOptions?.HigherValueMeansHigherFrequency.Value ?? false, ref showFreqOptions);
+        // OptionUtils.ChangeVisibilityOfNumericUpDown(AutoUpdateAfterNDaysOption.ValidFreqTypes.Contains(freqType), AutoUpdateAfterNDaysNumericUpDown, AutoUpdateAfterNDaysDockPanel, freqOptions?.AutoUpdateAfterNDays?.Value ?? 0, ref showFreqOptions);
 
         if (showFreqOptions)
         {

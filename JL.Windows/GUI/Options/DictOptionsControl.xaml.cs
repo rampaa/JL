@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Windows.Config;
@@ -209,244 +208,27 @@ internal sealed partial class DictOptionsControl
     public void GenerateDictOptionsElements(DictType dictType, DictOptions? dictOptions)
     {
         bool showDictOptions = false;
-        if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dictType))
-        {
-            NewlineCheckBox.IsChecked = dictOptions?.NewlineBetweenDefinitions?.Value ?? true;
-            NewlineCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            NewlineCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (NoAllOption.ValidDictTypes.Contains(dictType))
-        {
-            NoAllCheckBox.IsChecked = dictOptions?.NoAll.Value ?? false;
-            NoAllCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            NoAllCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dictType))
-        {
-            Brush pitchAccentMarkerBrush = dictOptions?.PitchAccentMarkerColor?.Value is not null
-                ? WindowsUtils.FrozenBrushFromHex(dictOptions.PitchAccentMarkerColor.Value)
-                : DictOptionManager.PitchAccentMarkerColor;
-
-            PitchAccentMarkerColorButton.Background = pitchAccentMarkerBrush;
-            PitchAccentMarkerColorDockPanel.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            PitchAccentMarkerColorDockPanel.Visibility = Visibility.Collapsed;
-        }
-
-        if (WordClassInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            WordClassInfoCheckBox.IsChecked = dictOptions?.WordClassInfo?.Value ?? true;
-            WordClassInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            WordClassInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (DialectInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            DialectInfoCheckBox.IsChecked = dictOptions?.DialectInfo?.Value ?? true;
-            DialectInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            DialectInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (POrthographyInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            POrthographyInfoCheckBox.IsChecked = dictOptions?.POrthographyInfo?.Value ?? true;
-            POrthographyInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            POrthographyInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (POrthographyInfoColorOption.ValidDictTypes.Contains(dictType))
-        {
-            Brush pOrthographyInfoBrush = dictOptions?.POrthographyInfoColor?.Value is not null
-                ? WindowsUtils.FrozenBrushFromHex(dictOptions.POrthographyInfoColor.Value)
-                : DictOptionManager.POrthographyInfoColor;
-
-            POrthographyInfoColorButton.Background = pOrthographyInfoBrush;
-            POrthographyInfoColorDockPanel.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            POrthographyInfoColorDockPanel.Visibility = Visibility.Collapsed;
-        }
-
-        if (POrthographyInfoFontSizeOption.ValidDictTypes.Contains(dictType))
-        {
-            POrthographyInfoFontSizeNumericUpDown.Value = dictOptions?.POrthographyInfoFontSize?.Value ?? 15;
-            POrthographyInfoFontSizeDockPanel.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            POrthographyInfoFontSizeDockPanel.Visibility = Visibility.Collapsed;
-        }
-
-        if (AOrthographyInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            AOrthographyInfoCheckBox.IsChecked = dictOptions?.AOrthographyInfo?.Value ?? true;
-            AOrthographyInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            AOrthographyInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (ROrthographyInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            ROrthographyInfoCheckBox.IsChecked = dictOptions?.ROrthographyInfo?.Value ?? true;
-            ROrthographyInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            ROrthographyInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (WordTypeInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            WordTypeInfoCheckBox.IsChecked = dictOptions?.WordTypeInfo?.Value ?? true;
-            WordTypeInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            WordTypeInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (SpellingRestrictionInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            SpellingRestrictionInfoCheckBox.IsChecked = dictOptions?.SpellingRestrictionInfo?.Value ?? true;
-            SpellingRestrictionInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            SpellingRestrictionInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (ExtraDefinitionInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            ExtraDefinitionInfoCheckBox.IsChecked = dictOptions?.ExtraDefinitionInfo?.Value ?? true;
-            ExtraDefinitionInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            ExtraDefinitionInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (MiscInfoOption.ValidDictTypes.Contains(dictType))
-        {
-            MiscInfoCheckBox.IsChecked = dictOptions?.MiscInfo?.Value ?? true;
-            MiscInfoCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            MiscInfoCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (LoanwordEtymologyOption.ValidDictTypes.Contains(dictType))
-        {
-            LoanwordEtymologyCheckBox.IsChecked = dictOptions?.LoanwordEtymology?.Value ?? true;
-            LoanwordEtymologyCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            LoanwordEtymologyCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (RelatedTermOption.ValidDictTypes.Contains(dictType))
-        {
-            RelatedTermCheckBox.IsChecked = dictOptions?.RelatedTerm?.Value ?? false;
-            RelatedTermCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            RelatedTermCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (AntonymOption.ValidDictTypes.Contains(dictType))
-        {
-            AntonymCheckBox.IsChecked = dictOptions?.Antonym?.Value ?? false;
-            AntonymCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            AntonymCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (UseDBOption.ValidDictTypes.Contains(dictType))
-        {
-            UseDBCheckBox.IsChecked = dictOptions?.UseDB.Value ?? true;
-            UseDBCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            UseDBCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dictType))
-        {
-            ShowPitchAccentWithDottedLinesCheckBox.IsChecked = dictOptions?.ShowPitchAccentWithDottedLines?.Value ?? true;
-            ShowPitchAccentWithDottedLinesCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            ShowPitchAccentWithDottedLinesCheckBox.Visibility = Visibility.Collapsed;
-        }
-
-        if (AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dictType))
-        {
-            AutoUpdateAfterNDaysNumericUpDown.Value = dictOptions?.AutoUpdateAfterNDays?.Value ?? 0;
-            AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Collapsed;
-        }
-
-        if (ShowImagesOption.ValidDictTypes.Contains(dictType))
-        {
-            ShowImagesCheckBox.IsChecked = dictOptions?.ShowImagesOption?.Value ?? true;
-            ShowImagesCheckBox.Visibility = Visibility.Visible;
-            showDictOptions = true;
-        }
-        else
-        {
-            ShowImagesCheckBox.Visibility = Visibility.Collapsed;
-        }
+        OptionUtils.ChangeVisibilityOfCheckBox(NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dictType), NewlineCheckBox, dictOptions?.NewlineBetweenDefinitions?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(NoAllOption.ValidDictTypes.Contains(dictType), NoAllCheckBox, dictOptions?.NoAll?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(WordClassInfoOption.ValidDictTypes.Contains(dictType), WordClassInfoCheckBox, dictOptions?.WordClassInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(DialectInfoOption.ValidDictTypes.Contains(dictType), DialectInfoCheckBox, dictOptions?.DialectInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(POrthographyInfoOption.ValidDictTypes.Contains(dictType), POrthographyInfoCheckBox, dictOptions?.POrthographyInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(AOrthographyInfoOption.ValidDictTypes.Contains(dictType), AOrthographyInfoCheckBox, dictOptions?.AOrthographyInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(ROrthographyInfoOption.ValidDictTypes.Contains(dictType), ROrthographyInfoCheckBox, dictOptions?.ROrthographyInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(WordTypeInfoOption.ValidDictTypes.Contains(dictType), WordTypeInfoCheckBox, dictOptions?.WordTypeInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(SpellingRestrictionInfoOption.ValidDictTypes.Contains(dictType), SpellingRestrictionInfoCheckBox, dictOptions?.SpellingRestrictionInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(ExtraDefinitionInfoOption.ValidDictTypes.Contains(dictType), ExtraDefinitionInfoCheckBox, dictOptions?.ExtraDefinitionInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(MiscInfoOption.ValidDictTypes.Contains(dictType), MiscInfoCheckBox, dictOptions?.MiscInfo?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(LoanwordEtymologyOption.ValidDictTypes.Contains(dictType), LoanwordEtymologyCheckBox, dictOptions?.LoanwordEtymology?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(RelatedTermOption.ValidDictTypes.Contains(dictType), RelatedTermCheckBox, dictOptions?.RelatedTerm?.Value ?? false, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(AntonymOption.ValidDictTypes.Contains(dictType), AntonymCheckBox, dictOptions?.Antonym?.Value ?? false, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(UseDBOption.ValidDictTypes.Contains(dictType), UseDBCheckBox, dictOptions?.UseDB.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dictType), ShowPitchAccentWithDottedLinesCheckBox, dictOptions?.ShowPitchAccentWithDottedLines?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(ShowImagesOption.ValidDictTypes.Contains(dictType), ShowImagesCheckBox, dictOptions?.ShowImages?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfColorButton(PitchAccentMarkerColorOption.ValidDictTypes.Contains(dictType), PitchAccentMarkerColorButton, PitchAccentMarkerColorDockPanel, dictOptions?.PitchAccentMarkerColor?.Value, DictOptionManager.PitchAccentMarkerColor, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfColorButton(POrthographyInfoColorOption.ValidDictTypes.Contains(dictType), POrthographyInfoColorButton, POrthographyInfoColorDockPanel, dictOptions?.POrthographyInfoColor?.Value, DictOptionManager.POrthographyInfoColor, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(POrthographyInfoFontSizeOption.ValidDictTypes.Contains(dictType), POrthographyInfoFontSizeNumericUpDown, POrthographyInfoFontSizeDockPanel, dictOptions?.POrthographyInfoFontSize?.Value ?? 15, ref showDictOptions);
+        // OptionUtils.ChangeVisibilityOfNumericUpDown(AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dictType), AutoUpdateAfterNDaysNumericUpDown, AutoUpdateAfterNDaysDockPanel, dictOptions?.AutoUpdateAfterNDays?.Value ?? 0, ref showOptions);
 
         if (showDictOptions)
         {
