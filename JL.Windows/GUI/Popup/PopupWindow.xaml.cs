@@ -1170,53 +1170,12 @@ internal sealed partial class PopupWindow
         ConfigManager configManager = ConfigManager.Instance;
         if (keyGesture.IsEqual(configManager.DisableHotkeysKeyGesture))
         {
-            configManager.DisableHotkeys = !configManager.DisableHotkeys;
-            if (configManager.GlobalHotKeys)
-            {
-                if (configManager.DisableHotkeys)
-                {
-                    WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
-                }
-                else
-                {
-                    WinApi.RegisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
-                }
-            }
+            s_mainWindow.HandleDisableHotkeysToggle();
         }
 
         else if (keyGesture.IsEqual(configManager.MiningModeKeyGesture))
         {
-            if (MiningMode)
-            {
-                return Task.CompletedTask;
-            }
-
-            EnableMiningMode();
-            DisplayResults();
-
-            if (configManager.Focusable)
-            {
-                if (configManager.RestoreFocusToPreviouslyActiveWindow && PopupIndex is 0)
-                {
-                    nint previousWindowHandle = WinApi.GetActiveWindowHandle();
-                    if (previousWindowHandle != s_mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
-                    {
-                        WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
-                    }
-                }
-
-                if (!Activate())
-                {
-                    WinApi.StealFocus(WindowHandle);
-                }
-            }
-
-            _ = Focus();
-
-            if (configManager.AutoHidePopupIfMouseIsNotOverIt)
-            {
-                PopupWindowUtils.SetPopupAutoHideTimer();
-            }
+            HandleMiningModeKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.PlayAudioKeyGesture))
@@ -1234,20 +1193,7 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.ClosePopupKeyGesture))
         {
-            if (PopupIndex is 0)
-            {
-                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-                {
-                    s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
-                }
-
-                HidePopup();
-                s_mainWindow.ChangeVisibility();
-            }
-            else
-            {
-                HidePopup();
-            }
+            HandleClosePopupKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.KanjiModeKeyGesture))
@@ -1277,126 +1223,17 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
-            if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
-            {
-                if (!MiningMode)
-                {
-                    if (PopupIndex > 0)
-                    {
-                        PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
-                        Debug.Assert(popupWindow is not null);
-                        popupWindow.ShowAddNameWindow(true);
-                    }
-
-                    else
-                    {
-                        s_mainWindow.ShowAddNameWindow();
-                    }
-
-                    if (PopupIndex is 0)
-                    {
-                        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-                        {
-                            s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
-                        }
-
-                        HidePopup();
-                        s_mainWindow.ChangeVisibility();
-                    }
-                    else
-                    {
-                        HidePopup();
-                    }
-                }
-
-                else
-                {
-                    ShowAddNameWindow(false);
-                }
-
-                PopupWindowUtils.PopupAutoHideTimer.Start();
-            }
+            HandleShowAddNameWindowKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.ShowAddWordWindowKeyGesture))
         {
-            if (DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready)
-            {
-                if (!MiningMode)
-                {
-                    if (PopupIndex > 0)
-                    {
-                        PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
-                        Debug.Assert(popupWindow is not null);
-                        popupWindow.ShowAddWordWindow(true);
-                    }
-
-                    else
-                    {
-                        s_mainWindow.ShowAddWordWindow();
-                    }
-
-                    if (PopupIndex is 0)
-                    {
-                        if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-                        {
-                            s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
-                        }
-
-                        HidePopup();
-                        s_mainWindow.ChangeVisibility();
-                    }
-                    else
-                    {
-                        HidePopup();
-                    }
-                }
-
-                else
-                {
-                    ShowAddWordWindow(false);
-                }
-
-                PopupWindowUtils.PopupAutoHideTimer.Start();
-            }
+            HandleShowAddWordWindowKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.SearchWithBrowserKeyGesture))
         {
-            if (!MiningMode)
-            {
-                if (PopupIndex > 0)
-                {
-                    PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
-                    Debug.Assert(popupWindow is not null);
-                    popupWindow.SearchWithBrowser(true);
-                }
-
-                else
-                {
-                    s_mainWindow.SearchWithBrowser();
-                }
-
-                if (PopupIndex is 0)
-                {
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-                    {
-                        s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
-                    }
-
-                    HidePopup();
-                    s_mainWindow.ChangeVisibility();
-                }
-                else
-                {
-                    HidePopup();
-                }
-            }
-
-            else
-            {
-                SearchWithBrowser(false);
-            }
+            HandleSearchWithBrowserKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.InactiveLookupModeKeyGesture))
@@ -1411,76 +1248,12 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.NextDictKeyGesture))
         {
-            bool foundSelectedButton = false;
-
-            Button? nextButton = null;
-            ItemCollection dictButtons = DictTabButtonsItemsControl.Items;
-            int buttonCount = dictButtons.Count;
-            for (int i = 0; i < buttonCount; i++)
-            {
-                Button? button = (Button?)dictButtons[i];
-                Debug.Assert(button is not null);
-
-                if (button.Background == Brushes.DodgerBlue)
-                {
-                    foundSelectedButton = true;
-                    continue;
-                }
-
-                if (foundSelectedButton && button.IsEnabled)
-                {
-                    nextButton = button;
-                    break;
-                }
-            }
-
-            ClickDictTypeButton(nextButton ?? AllDictionaryTabButton);
+            HandleNextDictKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.PreviousDictKeyGesture))
         {
-            bool foundSelectedButton = false;
-            Button? previousButton = null;
-
-            ItemCollection dictButtons = DictTabButtonsItemsControl.Items;
-            int dictCount = dictButtons.Count;
-            for (int i = dictCount - 1; i >= 0; i--)
-            {
-                Button? button = (Button?)dictButtons[i];
-                Debug.Assert(button is not null);
-
-                if (button.Background == Brushes.DodgerBlue)
-                {
-                    foundSelectedButton = true;
-                    continue;
-                }
-
-                if (foundSelectedButton && button.IsEnabled)
-                {
-                    previousButton = button;
-                    break;
-                }
-            }
-
-            if (previousButton is not null)
-            {
-                ClickDictTypeButton(previousButton);
-            }
-
-            else
-            {
-                for (int i = dictCount - 1; i > 0; i--)
-                {
-                    Button? button = (Button?)dictButtons[i];
-                    Debug.Assert(button is not null);
-
-                    if (button.IsEnabled)
-                    {
-                        ClickDictTypeButton(button);
-                        break;
-                    }
-                }
-            }
+            HandlePreviousDictKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture))
@@ -1490,54 +1263,12 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
-            PopupWindowUtils.HidePopups(0);
-
-            if (configManager.Focusable)
-            {
-                s_mainWindow.WindowState = s_mainWindow.WindowState is WindowState.Minimized
-                    ? WindowState.Normal
-                    : WindowState.Minimized;
-            }
-
-            else
-            {
-                if (s_mainWindow.WindowState is WindowState.Minimized)
-                {
-                    WinApi.RestoreWindow(s_mainWindow.WindowHandle);
-                }
-
-                else
-                {
-                    WinApi.MinimizeWindow(s_mainWindow.WindowHandle);
-
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-                    {
-                        MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
-                    }
-                }
-            }
+            HandleToggleMinimizedStateKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.SelectedTextToSpeechKeyGesture))
         {
-            if (MiningMode && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
-            {
-                string text;
-                if (PopupListView.SelectedItem is not null)
-                {
-                    int listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
-                    text = LastLookupResults[listViewItemIndex].PrimarySpelling;
-                }
-                else
-                {
-                    TextBox? lastInteractedTextBox = _lastInteractedTextBox;
-                    text = lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0
-                        ? lastInteractedTextBox.SelectedText
-                        : LastLookupResults[_listViewItemIndex].PrimarySpelling;
-                }
-
-                return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text);
-            }
+            return HandleSelectedTextToSpeechKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.SelectNextItemKeyGesture))
@@ -1580,42 +1311,7 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(configManager.LookupSelectedTextKeyGesture))
         {
-            if (MiningMode)
-            {
-                TextBox? lastInteractedTextBox = _lastInteractedTextBox;
-                if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0 && PopupIndex < PopupWindowUtils.MaxPopupWindowsIndex)
-                {
-                    PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
-                    if (childPopupWindow is null)
-                    {
-                        childPopupWindow = new PopupWindow(PopupIndex + 1)
-                        {
-                            Owner = this
-                        };
-
-                        PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
-                    }
-
-                    return childPopupWindow.LookupOnSelect(lastInteractedTextBox);
-                }
-            }
-
-            else if (PopupIndex > 0)
-            {
-                PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
-                Debug.Assert(popupWindow is not null);
-
-                TextBox? lastInteractedTextBox = popupWindow._lastInteractedTextBox;
-                if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0)
-                {
-                    return LookupOnSelect(lastInteractedTextBox);
-                }
-            }
-
-            else
-            {
-                return s_mainWindow.FirstPopupWindow.LookupOnSelect(s_mainWindow.MainTextBox);
-            }
+            return HandleLookupSelectedTextKeyGesture();
         }
 
         else if (keyGesture.IsEqual(configManager.MousePassThroughModeKeyGesture))
@@ -1625,23 +1321,175 @@ internal sealed partial class PopupWindow
 
         else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))
         {
-            string? textToCopy = _lastInteractedTextBox?.SelectedText;
-            if (string.IsNullOrEmpty(textToCopy))
-            {
-                textToCopy = _previousTextBox?.SelectedText;
-            }
-
-            if (!string.IsNullOrEmpty(textToCopy))
-            {
-                return WindowsUtils.CopyTextToClipboard(textToCopy);
-            }
+            return HandleCtrlCKeyGesture();
         }
 
         else if (keyGesture.IsEqual(KeyGestureUtils.AltF4KeyGesture))
         {
+            HandleAltF4KeyGesture();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void HandleMiningModeKeyGesture()
+    {
+        if (MiningMode)
+        {
+            return;
+        }
+
+        EnableMiningMode();
+        DisplayResults();
+
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.Focusable)
+        {
+            if (configManager.RestoreFocusToPreviouslyActiveWindow && PopupIndex is 0)
+            {
+                nint previousWindowHandle = WinApi.GetActiveWindowHandle();
+                if (previousWindowHandle != s_mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
+                {
+                    WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
+                }
+            }
+
+            if (!Activate())
+            {
+                WinApi.StealFocus(WindowHandle);
+            }
+        }
+
+        _ = Focus();
+
+        if (configManager.AutoHidePopupIfMouseIsNotOverIt)
+        {
+            PopupWindowUtils.SetPopupAutoHideTimer();
+        }
+    }
+
+    private void HandleClosePopupKeyGesture()
+    {
+        if (PopupIndex is 0)
+        {
+            if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
+            }
+
+            HidePopup();
+            s_mainWindow.ChangeVisibility();
+        }
+        else
+        {
+            HidePopup();
+        }
+    }
+
+    private void HandleShowAddNameWindowKeyGesture()
+    {
+        if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
+        {
+            if (!MiningMode)
+            {
+                if (PopupIndex > 0)
+                {
+                    PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+                    Debug.Assert(popupWindow is not null);
+                    popupWindow.ShowAddNameWindow(true);
+                }
+
+                else
+                {
+                    s_mainWindow.ShowAddNameWindow();
+                }
+
+                if (PopupIndex is 0)
+                {
+                    if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
+                    }
+
+                    HidePopup();
+                    s_mainWindow.ChangeVisibility();
+                }
+                else
+                {
+                    HidePopup();
+                }
+            }
+
+            else
+            {
+                ShowAddNameWindow(false);
+            }
+
+            PopupWindowUtils.PopupAutoHideTimer.Start();
+        }
+    }
+
+    private void HandleShowAddWordWindowKeyGesture()
+    {
+        if (DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready)
+        {
+            if (!MiningMode)
+            {
+                if (PopupIndex > 0)
+                {
+                    PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+                    Debug.Assert(popupWindow is not null);
+                    popupWindow.ShowAddWordWindow(true);
+                }
+
+                else
+                {
+                    s_mainWindow.ShowAddWordWindow();
+                }
+
+                if (PopupIndex is 0)
+                {
+                    if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+                    {
+                        s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
+                    }
+
+                    HidePopup();
+                    s_mainWindow.ChangeVisibility();
+                }
+                else
+                {
+                    HidePopup();
+                }
+            }
+
+            else
+            {
+                ShowAddWordWindow(false);
+            }
+
+            PopupWindowUtils.PopupAutoHideTimer.Start();
+        }
+    }
+
+    private void HandleSearchWithBrowserKeyGesture()
+    {
+        if (!MiningMode)
+        {
+            if (PopupIndex > 0)
+            {
+                PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+                Debug.Assert(popupWindow is not null);
+                popupWindow.SearchWithBrowser(true);
+            }
+            else
+            {
+                s_mainWindow.SearchWithBrowser();
+            }
+
             if (PopupIndex is 0)
             {
-                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
                 {
                     s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
                 }
@@ -1655,7 +1503,83 @@ internal sealed partial class PopupWindow
             }
         }
 
-        return Task.CompletedTask;
+        else
+        {
+            SearchWithBrowser(false);
+        }
+    }
+
+    private void HandleNextDictKeyGesture()
+    {
+        bool foundSelectedButton = false;
+
+        Button? nextButton = null;
+        ItemCollection dictButtons = DictTabButtonsItemsControl.Items;
+        int buttonCount = dictButtons.Count;
+        for (int i = 0; i < buttonCount; i++)
+        {
+            Button? button = (Button?)dictButtons[i];
+            Debug.Assert(button is not null);
+
+            if (button.Background == Brushes.DodgerBlue)
+            {
+                foundSelectedButton = true;
+                continue;
+            }
+
+            if (foundSelectedButton && button.IsEnabled)
+            {
+                nextButton = button;
+                break;
+            }
+        }
+
+        ClickDictTypeButton(nextButton ?? AllDictionaryTabButton);
+    }
+
+    private void HandlePreviousDictKeyGesture()
+    {
+        bool foundSelectedButton = false;
+        Button? previousButton = null;
+
+        ItemCollection dictButtons = DictTabButtonsItemsControl.Items;
+        int dictCount = dictButtons.Count;
+        for (int i = dictCount - 1; i >= 0; i--)
+        {
+            Button? button = (Button?)dictButtons[i];
+            Debug.Assert(button is not null);
+
+            if (button.Background == Brushes.DodgerBlue)
+            {
+                foundSelectedButton = true;
+                continue;
+            }
+
+            if (foundSelectedButton && button.IsEnabled)
+            {
+                previousButton = button;
+                break;
+            }
+        }
+
+        if (previousButton is not null)
+        {
+            ClickDictTypeButton(previousButton);
+        }
+        else
+        {
+            for (int i = dictCount - 1; i > 0; i--)
+            {
+                Button? button = (Button?)dictButtons[i];
+                Debug.Assert(button is not null);
+
+                if (button.IsEnabled)
+                {
+                    ClickDictTypeButton(button);
+                    break;
+                }
+            }
+        }
     }
 
     private Task HandleLookupCategoryKeyGesture(LookupCategory lookupCategory)
@@ -1707,6 +1631,134 @@ internal sealed partial class PopupWindow
         DictTabButtonsItemsControl.Visibility = DictTabButtonsItemsControl.Visibility is Visibility.Visible
             ? Visibility.Collapsed
             : Visibility.Visible;
+    }
+
+    private static void HandleToggleMinimizedStateKeyGesture()
+    {
+        PopupWindowUtils.HidePopups(0);
+
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.Focusable)
+        {
+            s_mainWindow.WindowState = s_mainWindow.WindowState is WindowState.Minimized
+                ? WindowState.Normal
+                : WindowState.Minimized;
+        }
+
+        else
+        {
+            if (s_mainWindow.WindowState is WindowState.Minimized)
+            {
+                WinApi.RestoreWindow(s_mainWindow.WindowHandle);
+            }
+
+            else
+            {
+                WinApi.MinimizeWindow(s_mainWindow.WindowHandle);
+
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
+                }
+            }
+        }
+    }
+
+    private Task HandleSelectedTextToSpeechKeyGesture()
+    {
+        if (MiningMode && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
+        {
+            string text;
+            if (PopupListView.SelectedItem is not null)
+            {
+                int listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+                text = LastLookupResults[listViewItemIndex].PrimarySpelling;
+            }
+            else
+            {
+                TextBox? lastInteractedTextBox = _lastInteractedTextBox;
+                text = lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0
+                    ? lastInteractedTextBox.SelectedText
+                    : LastLookupResults[_listViewItemIndex].PrimarySpelling;
+            }
+
+            return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleLookupSelectedTextKeyGesture()
+    {
+        if (MiningMode)
+        {
+            TextBox? lastInteractedTextBox = _lastInteractedTextBox;
+            if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0 && PopupIndex < PopupWindowUtils.MaxPopupWindowsIndex)
+            {
+                PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
+                if (childPopupWindow is null)
+                {
+                    childPopupWindow = new PopupWindow(PopupIndex + 1)
+                    {
+                        Owner = this
+                    };
+
+                    PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
+                }
+
+                return childPopupWindow.LookupOnSelect(lastInteractedTextBox);
+            }
+        }
+
+        else if (PopupIndex > 0)
+        {
+            PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+            Debug.Assert(popupWindow is not null);
+
+            TextBox? lastInteractedTextBox = popupWindow._lastInteractedTextBox;
+            if (lastInteractedTextBox is not null && lastInteractedTextBox.SelectionLength > 0)
+            {
+                return LookupOnSelect(lastInteractedTextBox);
+            }
+        }
+
+        else
+        {
+            return s_mainWindow.FirstPopupWindow.LookupOnSelect(s_mainWindow.MainTextBox);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleCtrlCKeyGesture()
+    {
+        string? textToCopy = _lastInteractedTextBox?.SelectedText;
+        if (string.IsNullOrEmpty(textToCopy))
+        {
+            textToCopy = _previousTextBox?.SelectedText;
+        }
+
+        return !string.IsNullOrEmpty(textToCopy)
+            ? WindowsUtils.CopyTextToClipboard(textToCopy)
+            : Task.CompletedTask;
+    }
+
+    private void HandleAltF4KeyGesture()
+    {
+        if (PopupIndex is 0)
+        {
+            if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+            {
+                s_mainWindow.MouseEnterDueToFirstPopupHide = s_mainWindow.IsMouseWithinWindowBounds();
+            }
+
+            HidePopup();
+            s_mainWindow.ChangeVisibility();
+        }
+        else
+        {
+            HidePopup();
+        }
     }
 
     private Task PlayAudio(bool useSelectedListViewItemIfItExists)

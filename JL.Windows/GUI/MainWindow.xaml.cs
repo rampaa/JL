@@ -576,27 +576,7 @@ internal sealed partial class MainWindow
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (keyGesture.IsEqual(configManager.DisableHotkeysKeyGesture))
         {
-            configManager.DisableHotkeys = !configManager.DisableHotkeys;
-
-            if (configManager.GlobalHotKeys)
-            {
-                if (configManager.DisableHotkeys)
-                {
-                    int disableHotkeysKeyGestureId = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.IndexOf(nameof(configManager.DisableHotkeys));
-                    if (disableHotkeysKeyGestureId >= 0)
-                    {
-                        WinApi.UnregisterAllGlobalHotKeys(WindowHandle, disableHotkeysKeyGestureId);
-                    }
-                    else
-                    {
-                        WinApi.UnregisterAllGlobalHotKeys(WindowHandle);
-                    }
-                }
-                else
-                {
-                    WinApi.RegisterAllGlobalHotKeys(WindowHandle);
-                }
-            }
+            HandleDisableHotkeysToggle();
         }
 
         else if (keyGesture.IsEqual(configManager.SteppedBacklogBackwardsKeyGesture))
@@ -657,48 +637,17 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.ShowAddNameWindowKeyGesture))
         {
-            bool customNameDictReady = false;
-            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict))
-            {
-                customNameDictReady = customNameDict.Ready;
-            }
-
-            bool profileCustomNameDictReady = false;
-            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict))
-            {
-                profileCustomNameDictReady = profileCustomNameDict.Ready;
-            }
-
-            if (customNameDictReady && profileCustomNameDictReady)
-            {
-                ShowAddNameWindow();
-            }
+            HandleShowAddNameWindow();
         }
 
         else if (keyGesture.IsEqual(configManager.ShowAddWordWindowKeyGesture))
         {
-            bool customWordDictReady = false;
-            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict))
-            {
-                customWordDictReady = customWordDict.Ready;
-            }
-
-            bool profileCustomWordDictReady = false;
-            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict))
-            {
-                profileCustomWordDictReady = profileCustomWordDict.Ready;
-            }
-
-            if (customWordDictReady && profileCustomWordDictReady)
-            {
-                ShowAddWordWindow();
-            }
+            HandleShowAddWordWindow();
         }
 
         else if (keyGesture.IsEqual(configManager.ShowManageDictionariesWindowKeyGesture))
         {
-            if (DictUtils.DictsReady
-                && DictUtils.Dicts.Values.ToArray().All(static dict => dict.Ready))
+            if (DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => dict.Ready))
             {
                 return WindowsUtils.ShowManageDictionariesWindow();
             }
@@ -740,74 +689,27 @@ internal sealed partial class MainWindow
         else if (keyGesture.IsEqual(configManager.AlwaysOnTopKeyGesture))
         {
             configManager.AlwaysOnTop = !configManager.AlwaysOnTop;
-
             Topmost = configManager.AlwaysOnTop;
         }
 
         else if (keyGesture.IsEqual(configManager.CaptureTextFromClipboardKeyGesture))
         {
-            coreConfigManager.CaptureTextFromClipboard = !coreConfigManager.CaptureTextFromClipboard;
-            if (coreConfigManager.CaptureTextFromClipboard)
-            {
-                WinApi.SubscribeToClipboardChanged(WindowHandle);
-            }
-            else
-            {
-                WinApi.UnsubscribeFromClipboardChanged(WindowHandle);
-            }
-
-            if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
-            {
-                StatsUtils.StopTimeStatStopWatch();
-            }
-            else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
-            {
-                StatsUtils.StartTimeStatStopWatch();
-            }
+            HandleClipboardCaptureToggle();
         }
 
         else if (keyGesture.IsEqual(configManager.CaptureTextFromWebSocketKeyGesture))
         {
-            coreConfigManager.CaptureTextFromWebSocket = !coreConfigManager.CaptureTextFromWebSocket;
-            if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
-            {
-                StatsUtils.StopTimeStatStopWatch();
-            }
-            else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
-            {
-                StatsUtils.StartTimeStatStopWatch();
-            }
-
-            if (coreConfigManager.CaptureTextFromWebSocket)
-            {
-                WebSocketUtils.ConnectToAllWebSockets();
-            }
-            else
-            {
-                return WebSocketUtils.DisconnectFromAllWebSocketConnections();
-            }
+            return HandleWebSocketCaptureToggle();
         }
 
         else if (keyGesture.IsEqual(configManager.ReconnectToWebSocketServerKeyGesture))
         {
-            coreConfigManager.CaptureTextFromWebSocket = true;
-
-            WebSocketUtils.ConnectToAllWebSockets();
-            if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
-            {
-                if (!StatsUtils.TimeStatStopWatch.IsRunning)
-                {
-                    StatsUtils.StartTimeStatStopWatch();
-                }
-            }
+            HandleReconnectToWebSocket();
         }
 
         else if (keyGesture.IsEqual(configManager.TextBoxIsReadOnlyKeyGesture))
         {
-            configManager.TextBoxIsReadOnly = !configManager.TextBoxIsReadOnly;
-            MainTextBox.IsReadOnly = configManager.TextBoxIsReadOnly;
-            MainTextBox.IsUndoEnabled = !configManager.TextBoxIsReadOnly;
-            MainTextBox.UndoLimit = configManager.TextBoxIsReadOnly ? 0 : -1;
+            HandleTextBoxReadOnlyToggle();
         }
 
         else if (keyGesture.IsEqual(configManager.DeleteCurrentLineKeyGesture))
@@ -817,54 +719,12 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.ToggleMinimizedStateKeyGesture))
         {
-            if (FirstPopupWindow.IsVisible)
-            {
-                PopupWindowUtils.HidePopups(0);
-            }
-
-            if (configManager.Focusable)
-            {
-                WindowState = WindowState is WindowState.Minimized
-                    ? WindowState.Normal
-                    : WindowState.Minimized;
-            }
-
-            else
-            {
-                if (WindowState is WindowState.Minimized)
-                {
-                    // If another window is not set as active window
-                    // Main Window gets activated on restore
-                    WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
-
-                    WinApi.RestoreWindow(WindowHandle);
-                }
-
-                else
-                {
-                    WinApi.MinimizeWindow(WindowHandle);
-
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-                    {
-                        MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
-                    }
-                }
-            }
+            HandleToggleMinimizedState();
         }
 
         else if (keyGesture.IsEqual(configManager.SelectedTextToSpeechKeyGesture))
         {
-            if (SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
-            {
-                string selectedText = MainTextBox.SelectionLength > 0
-                        ? MainTextBox.SelectedText
-                        : MainTextBox.Text;
-
-                if (selectedText.Length > 0)
-                {
-                    return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText);
-                }
-            }
+            return HandleSelectedTextToSpeech();
         }
 
         else if (keyGesture.IsEqual(configManager.MoveCaretLeftKeyGesture))
@@ -889,38 +749,12 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.LookupTermAtCaretIndexKeyGesture))
         {
-            if (MainTextBox.Text.Length > 0)
-            {
-                if (configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
-                {
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
-                    {
-                        MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
-                    }
-
-                    return FirstPopupWindow.LookupOnSelect(MainTextBox);
-                }
-
-                if (MainTextBox.Text.Length > MainTextBox.CaretIndex)
-                {
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
-                    {
-                        MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
-                    }
-
-                    MoveWindowToScreen();
-                    return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true, true);
-                }
-            }
+            return HandleLookupTermAtCaret();
         }
 
         else if (keyGesture.IsEqual(configManager.LookupFirstTermKeyGesture))
         {
-            if (MainTextBox.Text.Length > 0)
-            {
-                MoveWindowToScreen();
-                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true);
-            }
+            return HandleLookupFirstTerm();
         }
 
         else if (keyGesture.IsEqual(configManager.LookupSelectedTextKeyGesture))
@@ -949,6 +783,214 @@ internal sealed partial class MainWindow
 
         return Task.CompletedTask;
     }
+
+    public void HandleDisableHotkeysToggle()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        configManager.DisableHotkeys = !configManager.DisableHotkeys;
+
+        if (configManager.GlobalHotKeys)
+        {
+            if (configManager.DisableHotkeys)
+            {
+                int disableHotkeysKeyGestureId = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.IndexOf(nameof(configManager.DisableHotkeys));
+                if (disableHotkeysKeyGestureId >= 0)
+                {
+                    WinApi.UnregisterAllGlobalHotKeys(WindowHandle, disableHotkeysKeyGestureId);
+                }
+                else
+                {
+                    WinApi.UnregisterAllGlobalHotKeys(WindowHandle);
+                }
+            }
+            else
+            {
+                WinApi.RegisterAllGlobalHotKeys(WindowHandle);
+            }
+        }
+    }
+
+    private void HandleShowAddNameWindow()
+    {
+        bool customNameDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict) && customNameDict.Ready;
+        bool profileCustomNameDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict) && profileCustomNameDict.Ready;
+        if (customNameDictReady && profileCustomNameDictReady)
+        {
+            ShowAddNameWindow();
+        }
+    }
+
+    private void HandleShowAddWordWindow()
+    {
+        bool customWordDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict) && customWordDict.Ready;
+        bool profileCustomWordDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict) && profileCustomWordDict.Ready;
+        if (customWordDictReady && profileCustomWordDictReady)
+        {
+            ShowAddWordWindow();
+        }
+    }
+
+    private void HandleClipboardCaptureToggle()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        coreConfigManager.CaptureTextFromClipboard = !coreConfigManager.CaptureTextFromClipboard;
+
+        if (coreConfigManager.CaptureTextFromClipboard)
+        {
+            WinApi.SubscribeToClipboardChanged(WindowHandle);
+        }
+        else
+        {
+            WinApi.UnsubscribeFromClipboardChanged(WindowHandle);
+        }
+
+        if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
+        {
+            StatsUtils.StopTimeStatStopWatch();
+        }
+        else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
+        {
+            StatsUtils.StartTimeStatStopWatch();
+        }
+    }
+
+    private Task HandleWebSocketCaptureToggle()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        coreConfigManager.CaptureTextFromWebSocket = !coreConfigManager.CaptureTextFromWebSocket;
+
+        if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
+        {
+            StatsUtils.StopTimeStatStopWatch();
+        }
+        else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
+        {
+            StatsUtils.StartTimeStatStopWatch();
+        }
+
+        if (coreConfigManager.CaptureTextFromWebSocket)
+        {
+            WebSocketUtils.ConnectToAllWebSockets();
+            return Task.CompletedTask;
+        }
+        else
+        {
+            return WebSocketUtils.DisconnectFromAllWebSocketConnections();
+        }
+    }
+
+    private void HandleReconnectToWebSocket()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager.Instance.CaptureTextFromWebSocket = true;
+
+        WebSocketUtils.ConnectToAllWebSockets();
+        if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
+        {
+            if (!StatsUtils.TimeStatStopWatch.IsRunning)
+            {
+                StatsUtils.StartTimeStatStopWatch();
+            }
+        }
+    }
+
+    private void HandleTextBoxReadOnlyToggle()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        configManager.TextBoxIsReadOnly = !configManager.TextBoxIsReadOnly;
+        MainTextBox.IsReadOnly = configManager.TextBoxIsReadOnly;
+        MainTextBox.IsUndoEnabled = !configManager.TextBoxIsReadOnly;
+        MainTextBox.UndoLimit = configManager.TextBoxIsReadOnly ? 0 : -1;
+    }
+
+    private void HandleToggleMinimizedState()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        if (FirstPopupWindow.IsVisible)
+        {
+            PopupWindowUtils.HidePopups(0);
+        }
+
+        if (configManager.Focusable)
+        {
+            WindowState = WindowState is WindowState.Minimized
+                ? WindowState.Normal
+                : WindowState.Minimized;
+        }
+        else
+        {
+            if (WindowState is WindowState.Minimized)
+            {
+                WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
+                WinApi.RestoreWindow(WindowHandle);
+            }
+            else
+            {
+                WinApi.MinimizeWindow(WindowHandle);
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
+                }
+            }
+        }
+    }
+
+    private Task HandleSelectedTextToSpeech()
+    {
+        if (SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
+        {
+            string selectedText = MainTextBox.SelectionLength > 0
+                    ? MainTextBox.SelectedText
+                    : MainTextBox.Text;
+
+            if (selectedText.Length > 0)
+            {
+                return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText);
+            }
+        }
+        return Task.CompletedTask;
+    }
+
+    private Task HandleLookupTermAtCaret()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        string text = MainTextBox.Text;
+        if (text.Length > 0)
+        {
+            if (configManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
+            {
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
+                {
+                    MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
+                }
+                return FirstPopupWindow.LookupOnSelect(MainTextBox);
+            }
+
+            if (text.Length > MainTextBox.CaretIndex)
+            {
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
+                {
+                    MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
+                }
+                MoveWindowToScreen();
+                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true, true);
+            }
+        }
+        return Task.CompletedTask;
+    }
+
+    private Task HandleLookupFirstTerm()
+    {
+        if (MainTextBox.Text.Length > 0)
+        {
+            MoveWindowToScreen();
+            return FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true);
+        }
+        return Task.CompletedTask;
+    }
+
 
     private void ShowTitleBarButtons()
     {
@@ -1601,34 +1643,14 @@ internal sealed partial class MainWindow
     {
         ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating);
-        SearchMenuItem.IsEnabled = MainTextBox.SelectionLength > 0;
+        SearchMenuItem.IsEnabled = !string.IsNullOrWhiteSpace(MainTextBox.SelectedText);
 
-        bool customNameDictReady = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict))
-        {
-            customNameDictReady = customNameDict.Ready;
-        }
-
-        bool profileCustomNameDictReady = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict))
-        {
-            profileCustomNameDictReady = profileCustomNameDict.Ready;
-        }
-
+        bool customNameDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict) && customNameDict.Ready;
+        bool profileCustomNameDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict) && profileCustomNameDict.Ready;
         AddNameMenuItem.IsEnabled = customNameDictReady && profileCustomNameDictReady;
 
-        bool customWordDictReady = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict))
-        {
-            customWordDictReady = customWordDict.Ready;
-        }
-
-        bool profileCustomWordDictReady = false;
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict))
-        {
-            profileCustomWordDictReady = profileCustomWordDict.Ready;
-        }
-
+        bool customWordDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict) && customWordDict.Ready;
+        bool profileCustomWordDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict) && profileCustomWordDict.Ready;
         AddWordMenuItem.IsEnabled = customWordDictReady && profileCustomWordDictReady;
 
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
