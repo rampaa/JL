@@ -16,6 +16,7 @@ public sealed class HigherValueMeansHigherFrequencyOption(bool value)
 
 public sealed class AutoUpdateAfterNDaysOption(int value)
 {
+    // ReSharper disable once MemberCanBeInternal
     public int Value { get; } = value;
 
     [JsonIgnore]

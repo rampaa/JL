@@ -42,6 +42,9 @@ public sealed class DictOptions(
     public AntonymOption? Antonym { get; internal set; } = antonym;
     public LoanwordEtymologyOption? LoanwordEtymology { get; internal set; } = loanwordEtymology;
     public ShowPitchAccentWithDottedLinesOption? ShowPitchAccentWithDottedLines { get; internal set; } = showPitchAccentWithDottedLines;
+
+    // ReSharper disable once MemberCanBeInternal
     public AutoUpdateAfterNDaysOption? AutoUpdateAfterNDays { get; internal set; } = autoUpdateAfterNDays;
+
     public ShowImagesOption? ShowImages { get; internal set; } = showImages;
 }

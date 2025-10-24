@@ -6,5 +6,7 @@ public sealed class FreqOptions(UseDBOption useDB,
 {
     public UseDBOption UseDB { get; } = useDB;
     public HigherValueMeansHigherFrequencyOption HigherValueMeansHigherFrequency { get; } = higherValueMeansHigherFrequency;
+
+    // ReSharper disable once MemberCanBeInternal
     public AutoUpdateAfterNDaysOption? AutoUpdateAfterNDays { get; internal set; } = autoUpdateAfterNDays;
 }
