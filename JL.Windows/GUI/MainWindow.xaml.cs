@@ -875,10 +875,8 @@ internal sealed partial class MainWindow
             WebSocketUtils.ConnectToAllWebSockets();
             return Task.CompletedTask;
         }
-        else
-        {
-            return WebSocketUtils.DisconnectFromAllWebSocketConnections();
-        }
+
+        return WebSocketUtils.DisconnectFromAllWebSocketConnections();
     }
 
     private void HandleReconnectToWebSocket()
