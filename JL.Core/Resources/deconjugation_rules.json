@@ -1552,6 +1552,14 @@
   },
   {
     "type": "onlyfinalrule",
+    "dec_end": [ "" ],
+    "con_end": [ "にゃ" ],
+    "dec_tag": [ "stem-mizenkei" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "colloquial negative conditional"
+  },
+  {
+    "type": "onlyfinalrule",
     "dec_end": [ "す" ],
     "con_end": [ "せば" ],
     "dec_tag": [ "vs-c" ],

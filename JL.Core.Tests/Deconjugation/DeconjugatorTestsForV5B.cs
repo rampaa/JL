@@ -2025,4 +2025,12 @@ internal sealed class DeconjugatorTestsForV5B
         Assert.That(actual, Is.EqualTo(expected));
     }
 
+    [Test]
+    public void Deconjugate_PlainNonPastColloquialNegativeConditional_V5B()
+    {
+        const string termToDeconjugate = "選ばにゃ";
+        const string expected = "～colloquial negative conditional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "選ぶ" && form.Tags[^1] is "v5b").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }
