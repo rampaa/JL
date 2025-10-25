@@ -209,7 +209,7 @@ internal sealed partial class DictOptionsControl
     {
         bool showDictOptions = false;
         OptionUtils.ChangeVisibilityOfCheckBox(NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dictType), NewlineCheckBox, dictOptions?.NewlineBetweenDefinitions?.Value ?? true, ref showDictOptions);
-        OptionUtils.ChangeVisibilityOfCheckBox(NoAllOption.ValidDictTypes.Contains(dictType), NoAllCheckBox, dictOptions?.NoAll.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(NoAllOption.ValidDictTypes.Contains(dictType), NoAllCheckBox, dictOptions?.NoAll.Value ?? false, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(WordClassInfoOption.ValidDictTypes.Contains(dictType), WordClassInfoCheckBox, dictOptions?.WordClassInfo?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(DialectInfoOption.ValidDictTypes.Contains(dictType), DialectInfoCheckBox, dictOptions?.DialectInfo?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(POrthographyInfoOption.ValidDictTypes.Contains(dictType), POrthographyInfoCheckBox, dictOptions?.POrthographyInfo?.Value ?? true, ref showDictOptions);
