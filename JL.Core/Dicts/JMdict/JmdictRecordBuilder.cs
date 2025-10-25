@@ -33,22 +33,41 @@ internal static class JmdictRecordBuilder
             alternativeSpellingsForFirstPrimarySpelling = null;
         }
 
-        int index = 0;
         ReadOnlySpan<KanjiElement> kanjiElementsSpan = entry.KanjiElements.AsReadOnlySpan();
         ReadOnlySpan<ReadingElement> readingElementsSpan = entry.ReadingElements.AsReadOnlySpan();
-        ReadOnlySpan<Sense> senseListSpan = entry.SenseList.AsReadOnlySpan();
+        Dictionary<string, JmdictRecord> recordDictionary = new(kanjiElementsSpan.Length + readingElementsSpan.Length, StringComparer.Ordinal);
 
-        int kanjiElementsSpanLength = kanjiElementsSpan.Length;
-        int readingElementsLength = readingElementsSpan.Length;
-        int senseListSpanLength = senseListSpan.Length;
+        ProcessKanjiElements(in entry, recordDictionary, allSpellingsWithoutSearchOnlyForms, allKanjiOrthographyInfoWithoutSearchOnlyForms, firstPrimarySpelling, spellingsWithoutSearchOnlyFormsExist);
+        ProcessReadingElements(in entry, recordDictionary, allSpellingsWithoutSearchOnlyForms, firstPrimarySpelling, alternativeSpellingsForFirstPrimarySpelling, spellingsWithoutSearchOnlyFormsExist);
 
-        string? firstPrimarySpellingInHiragana = firstPrimarySpelling is not null
-            ? JapaneseUtils.KatakanaToHiragana(firstPrimarySpelling)
-            : null;
+        foreach ((string key, JmdictRecord jmdictRecord) in recordDictionary)
+        {
+            if (jmdictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
+            {
+                tempRecordList.Add(jmdictRecord);
+            }
+            else
+            {
+                jmdictDictionary[key] = [jmdictRecord];
+            }
+        }
+    }
 
-        Dictionary<string, JmdictRecord> recordDictionary = new(kanjiElementsSpanLength + readingElementsLength, StringComparer.Ordinal);
+    private static void ProcessKanjiElements(in JmdictEntry entry, Dictionary<string, JmdictRecord> recordDictionary, string[] allSpellingsWithoutSearchOnlyForms, string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms, string? firstPrimarySpelling, bool spellingsWithoutSearchOnlyFormsExist)
+    {
         if (spellingsWithoutSearchOnlyFormsExist)
         {
+            int index = 0;
+            ReadOnlySpan<KanjiElement> kanjiElementsSpan = entry.KanjiElements.AsReadOnlySpan();
+            ReadOnlySpan<ReadingElement> readingElementsSpan = entry.ReadingElements.AsReadOnlySpan();
+            ReadOnlySpan<Sense> senseListSpan = entry.SenseList.AsReadOnlySpan();
+            int readingElementsLength = readingElementsSpan.Length;
+            int senseListSpanLength = senseListSpan.Length;
+
+            string? firstPrimarySpellingInHiragana = firstPrimarySpelling is not null
+                ? JapaneseUtils.KatakanaToHiragana(firstPrimarySpelling)
+                : null;
+
             foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)
             {
                 ReadOnlySpan<string> keInfListSpan = kanjiElement.KeInfList.AsReadOnlySpan();
@@ -159,7 +178,10 @@ internal static class JmdictRecordBuilder
                 ++index;
             }
         }
+    }
 
+    private static void ProcessReadingElements(in JmdictEntry entry, Dictionary<string, JmdictRecord> recordDictionary, string[] allSpellingsWithoutSearchOnlyForms, string? firstPrimarySpelling, string[]? alternativeSpellingsForFirstPrimarySpelling, bool spellingsWithoutSearchOnlyFormsExist)
+    {
         ReadOnlySpan<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => !ke.ReInfList.AsReadOnlySpan().Contains("sk")).ToList().AsReadOnlySpan();
         bool readingElementsWithoutSearchOnlyFormsExist = readingElementsWithoutSearchOnlyForms.Length > 0;
         if (readingElementsWithoutSearchOnlyFormsExist)
@@ -175,7 +197,12 @@ internal static class JmdictRecordBuilder
 
             string firstReadingInHiragana = JapaneseUtils.KatakanaToHiragana(allReadingsWithoutSearchOnlyForms[0]);
 
-            index = 0;
+            int index = 0;
+            ReadOnlySpan<ReadingElement> readingElementsSpan = entry.ReadingElements.AsReadOnlySpan();
+            ReadOnlySpan<Sense> senseListSpan = entry.SenseList.AsReadOnlySpan();
+            ReadOnlySpan<KanjiElement> kanjiElementsSpan = entry.KanjiElements.AsReadOnlySpan();
+            int senseListSpanLength = senseListSpan.Length;
+
             for (int i = 0; i < readingElementsSpan.Length; i++)
             {
                 ref readonly ReadingElement readingElement = ref readingElementsSpan[i];
@@ -322,18 +349,6 @@ internal static class JmdictRecordBuilder
                 }
             }
         }
-
-        foreach ((string key, JmdictRecord jmdictRecord) in recordDictionary)
-        {
-            if (jmdictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
-            {
-                tempRecordList.Add(jmdictRecord);
-            }
-            else
-            {
-                jmdictDictionary[key] = [jmdictRecord];
-            }
-        }
     }
 
     private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNonNullableSenseField(List<string[]> senseField)
@@ -351,47 +366,7 @@ internal static class JmdictRecordBuilder
 
         List<string> sharedSenseCandidates = senseField[0].ToList();
 
-        ReadOnlySpan<string[]> senseFieldSpan = senseField.AsReadOnlySpan();
-        for (int i = 1; i < senseFieldSpan.Length; i++)
-        {
-            ReadOnlySpan<string> sensesSpan = senseFieldSpan[i].AsSpan();
-            for (int j = sharedSenseCandidates.Count - 1; j >= 0; j--)
-            {
-                string sharedSenseCandidate = sharedSenseCandidates[j];
-                if (!sensesSpan.Contains(sharedSenseCandidate))
-                {
-                    if (sharedSenseCandidates.Count is 1)
-                    {
-                        return (senseField.ToArray(), null);
-                    }
-
-                    sharedSenseCandidates.RemoveAt(j);
-                }
-            }
-        }
-
-        string[]?[]? exclusiveSenseFieldValues = null;
-        for (int i = 0; i < senseFieldSpan.Length; i++)
-        {
-            List<string>? currentExclusiveList = null;
-            ReadOnlySpan<string> senseSpan = senseFieldSpan[i].AsReadOnlySpan();
-            foreach (string sense in senseSpan)
-            {
-                if (!sharedSenseCandidates.Contains(sense))
-                {
-                    currentExclusiveList ??= [];
-                    currentExclusiveList.Add(sense);
-                }
-            }
-
-            if (currentExclusiveList is not null)
-            {
-                exclusiveSenseFieldValues ??= new string[senseFieldSpan.Length][];
-                exclusiveSenseFieldValues[i] = currentExclusiveList.ToArray();
-            }
-        }
-
-        return (exclusiveSenseFieldValues, sharedSenseCandidates.ToArray());
+        return GetExclusiveAndSharedValuesForSenseField(senseField, sharedSenseCandidates);
     }
 
     private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNullableSenseField(List<string[]?> senseField)
@@ -419,7 +394,12 @@ internal static class JmdictRecordBuilder
         string[]? firstSensesArray = senseFieldSpan[0];
         Debug.Assert(firstSensesArray is not null);
         List<string> sharedSenseCandidates = firstSensesArray.ToList();
+        return GetExclusiveAndSharedValuesForSenseField(senseField!, sharedSenseCandidates);
+    }
 
+    private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForSenseField(List<string[]> senseField, List<string> sharedSenseCandidates)
+    {
+        ReadOnlySpan<string[]> senseFieldSpan = senseField.AsReadOnlySpan();
         for (int i = 1; i < senseFieldSpan.Length; i++)
         {
             ReadOnlySpan<string> sensesSpan = senseFieldSpan[i].AsReadOnlySpan();
