@@ -99,7 +99,7 @@ internal sealed partial class StatsWindow
 
         CardsMinedTextBlock.Text = stats.CardsMined.ToString("N0", CultureInfo.InvariantCulture);
         TimesPlayedAudioTextBlock.Text = stats.TimesPlayedAudio.ToString("N0", CultureInfo.InvariantCulture);
-        NumberOfLookupsTextBlock.Text = stats.NumberOfLookups.ToString(CultureInfo.InvariantCulture);
+        NumberOfLookupsTextBlock.Text = stats.NumberOfLookups.ToString("N0", CultureInfo.InvariantCulture);
         ImoutosTextBlock.Text = stats.Imoutos.ToString("N0", CultureInfo.InvariantCulture);
         ShowTermLookupCountsButton.IsEnabled = CoreConfigManager.Instance.TrackTermLookupCounts;
     }
