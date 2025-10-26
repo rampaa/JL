@@ -2270,7 +2270,7 @@ internal sealed partial class PopupWindow
     private void PopupListView_MouseLeave(object sender, MouseEventArgs e)
     {
         if (!PopupContextMenu.IsVisible
-            && DefinitionsTextBoxContextMenu.IsVisible
+            && !DefinitionsTextBoxContextMenu.IsVisible
             && !TitleBarContextMenu.IsVisible
             && !DictTabButtonsItemsControlContextMenu.IsVisible
             && LastLookupResults.Length > 0)
