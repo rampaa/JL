@@ -104,6 +104,7 @@ internal sealed partial class ManageFrequenciesWindow
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
+                ToolTip = "Move up (click while pressing Ctrl to move to top)",
                 Tag = freq
             };
             increasePriorityButton.Click += IncreasePriorityButton_Click;
@@ -115,6 +116,7 @@ internal sealed partial class ManageFrequenciesWindow
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
+                ToolTip = "Move down (click while pressing Ctrl to move to bottom)",
                 Tag = freq
             };
             decreasePriorityButton.Click += DecreasePriorityButton_Click;

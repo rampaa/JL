@@ -107,6 +107,7 @@ internal sealed partial class ManageDictionariesWindow
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
+                ToolTip = "Move up (click while pressing Ctrl to move to top)",
                 Tag = dict
             };
             increasePriorityButton.Click += IncreasePriorityButton_Click;
@@ -118,6 +119,7 @@ internal sealed partial class ManageDictionariesWindow
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
+                ToolTip = "Move down (click while pressing Ctrl to move to bottom)",
                 Tag = dict
             };
             decreasePriorityButton.Click += DecreasePriorityButton_Click;
