@@ -1,3 +1,5 @@
+using System.Collections.Frozen;
+
 namespace JL.Core.Mining;
 
 public static class JLFieldUtils
@@ -115,5 +117,16 @@ public static class JLFieldUtils
         JLField.PitchAccentCategoryForFirstReading,
         JLField.EdictId,
         JLField.LocalTime
+    ];
+
+    public static readonly FrozenSet<JLField> JLFieldsToExcludeFromWhenMiningToFile =
+    [
+        JLField.Nothing,
+        JLField.Audio,
+        JLField.SentenceAudio,
+        JLField.SourceTextAudio,
+        JLField.Image,
+        JLField.PitchAccents,
+        JLField.PitchAccentForFirstReading
     ];
 }

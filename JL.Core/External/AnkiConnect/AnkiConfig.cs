@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json.Serialization;
 using JL.Core.Mining;
 
@@ -9,4 +10,5 @@ public sealed class AnkiConfig(string deckName, string modelName, OrderedDiction
     [JsonPropertyName("modelName")] public string ModelName { get; } = modelName;
     [JsonPropertyName("fields")] public OrderedDictionary<string, JLField> Fields { get; internal set; } = fields;
     [JsonPropertyName("tags")] public string[]? Tags { get; } = tags;
+    [JsonIgnore] internal FrozenSet<JLField> UsedJLFields { get; set; } = fields.Values.Where(f => f is not JLField.Nothing).ToFrozenSet();
 }

@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Frontend;
@@ -69,6 +70,7 @@ public static class AnkiConfigUtils
                             }
 
                             ankiConfig.Fields = upToDateFields;
+                            ankiConfig.UsedJLFields = upToDateFields.Values.Where(f => f is not JLField.Nothing).ToFrozenSet();
                         }
                     }
                 }).ConfigureAwait(false);
