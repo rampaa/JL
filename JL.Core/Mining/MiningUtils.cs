@@ -77,8 +77,6 @@ public static class MiningUtils
         </style>
         """;
 
-    private static readonly int s_totalJLFieldCountFileMining = JLFieldUtils.JLFieldsForWordDicts.Length - JLFieldUtils.JLFieldsToExcludeFromWhenMiningToFile.Count;
-
     private static string GetLeadingSentencePart(LookupResult lookupResult, ReadOnlySpan<char> currentText, int currentCharPosition)
     {
         ReadOnlySpan<char> sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
@@ -544,7 +542,7 @@ public static class MiningUtils
         LookupResult lookupResult = lookupResults[currentLookupResultIndex];
 
         bool mineAllFields = jlFields is null;
-        Dictionary<JLField, string> miningParams = new(mineAllFields ? s_totalJLFieldCountFileMining : jlFields!.Count);
+        Dictionary<JLField, string> miningParams = new(mineAllFields ? JLFieldUtils.JLFieldsForWordDicts.Length - JLFieldUtils.JLFieldsToExcludeFromWhenMiningToFile.Count : jlFields!.Count);
         if (mineAllFields || jlFields!.Contains(JLField.LocalTime))
         {
             miningParams[JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
