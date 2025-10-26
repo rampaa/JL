@@ -77,7 +77,8 @@ internal sealed partial class PopupWindow
 
     private ScrollViewer? _popupListViewScrollViewer;
 
-    private readonly ContextMenu _editableTextBoxContextMenu = new();
+    public ContextMenu DefinitionsTextBoxContextMenu { get; } = new();
+
     public int PopupIndex { get; }
 
     private static readonly MainWindow s_mainWindow = MainWindow.Instance;
@@ -133,29 +134,92 @@ internal sealed partial class PopupWindow
 
     private void AddMenuItemsToEditableTextBoxContextMenu()
     {
-        // ReSharper disable BadExpressionBracesLineBreaks
-        MenuItem addNameMenuItem = new() { Name = "AddNameMenuItem", Header = "Add name", Padding = new Thickness() };
+        ConfigManager configManger = ConfigManager.Instance;
+
+        MenuItem addNameMenuItem = new()
+        {
+            Name = "AddNameMenuItem",
+            Header = "Add name"
+        };
         addNameMenuItem.Click += AddName;
-        _ = _editableTextBoxContextMenu.Items.Add(addNameMenuItem);
+        _ = DefinitionsTextBoxContextMenu.Items.Add(addNameMenuItem);
 
-        MenuItem addWordMenuItem = new() { Name = "AddWordMenuItem", Header = "Add word", Padding = new Thickness() };
+        MenuItem addWordMenuItem = new()
+        {
+            Name = "AddWordMenuItem",
+            Header = "Add word"
+        };
         addWordMenuItem.Click += AddWord;
-        _ = _editableTextBoxContextMenu.Items.Add(addWordMenuItem);
+        _ = DefinitionsTextBoxContextMenu.Items.Add(addWordMenuItem);
 
-        MenuItem copyMenuItem = new() { Header = "Copy", Command = ApplicationCommands.Copy, Padding = new Thickness() };
-        _ = _editableTextBoxContextMenu.Items.Add(copyMenuItem);
+        MenuItem copyMenuItem = new()
+        {
+            Header = "Copy",
+            Command = ApplicationCommands.Copy
+        };
+        _ = DefinitionsTextBoxContextMenu.Items.Add(copyMenuItem);
 
-        MenuItem cutMenuItem = new() { Header = "Cut", Command = ApplicationCommands.Cut, Padding = new Thickness() };
-        _ = _editableTextBoxContextMenu.Items.Add(cutMenuItem);
+        MenuItem cutMenuItem = new()
+        {
+            Header = "Cut",
+            Command = ApplicationCommands.Cut
+        };
+        _ = DefinitionsTextBoxContextMenu.Items.Add(cutMenuItem);
 
-        MenuItem deleteMenuItem = new() { Name = "DeleteMenuItem", Header = "Delete", InputGestureText = "Backspace", Padding = new Thickness() };
+        MenuItem deleteMenuItem = new()
+        {
+            Name = "DeleteMenuItem",
+            Header = "Delete",
+            InputGestureText = "Backspace"
+        };
         deleteMenuItem.Click += PressBackSpace;
-        _ = _editableTextBoxContextMenu.Items.Add(deleteMenuItem);
+        _ = DefinitionsTextBoxContextMenu.Items.Add(deleteMenuItem);
 
-        MenuItem searchMenuItem = new() { Name = "SearchMenuItem", Header = "Search", Padding = new Thickness() };
+        MenuItem enableEditingButton = new()
+        {
+            Name = "EditableMenuItem",
+            Header = "Enable editing",
+            InputGestureText = "Ins + Left button",
+            IsCheckable = true
+        };
+        enableEditingButton.Click += (_, _) =>
+        {
+            TextBox definitionTextBox = (TextBox)DefinitionsTextBoxContextMenu.PlacementTarget;
+            ToggleReadOnly(definitionTextBox);
+        };
+        _ = DefinitionsTextBoxContextMenu.Items.Add(enableEditingButton);
+
+        MenuItem searchMenuItem = new()
+        {
+            Name = "SearchMenuItem",
+            Header = "Search"
+        };
+
         searchMenuItem.Click += SearchWithBrowser;
-        _ = _editableTextBoxContextMenu.Items.Add(searchMenuItem);
-        // ReSharper restore BadExpressionBracesLineBreaks
+        searchMenuItem.SetInputGestureText(configManger.SearchWithBrowserKeyGesture);
+        _ = DefinitionsTextBoxContextMenu.Items.Add(searchMenuItem);
+
+        DefinitionsTextBoxContextMenu.Opened += (_, _) =>
+        {
+            HandleContextMenuOpening();
+
+            TextBox definitionTextBox = (TextBox)DefinitionsTextBoxContextMenu.PlacementTarget;
+            enableEditingButton.IsChecked = !definitionTextBox.IsReadOnly;
+
+            ConfigManager configManger = ConfigManager.Instance;
+            addNameMenuItem.SetInputGestureText(configManger.ShowAddNameWindowKeyGesture);
+            addWordMenuItem.SetInputGestureText(configManger.ShowAddWordWindowKeyGesture);
+        };
+    }
+
+    private static void ToggleReadOnly(TextBox definitionsTextBox)
+    {
+        bool isEditable = definitionsTextBox.IsReadOnly;
+        definitionsTextBox.IsReadOnly = !isEditable;
+        definitionsTextBox.IsUndoEnabled = isEditable;
+        definitionsTextBox.AcceptsReturn = isEditable;
+        definitionsTextBox.AcceptsTab = isEditable;
+        definitionsTextBox.UndoLimit = isEditable ? -1 : 0;
     }
 
     private void PressBackSpace(object sender, RoutedEventArgs e)
@@ -804,6 +868,7 @@ internal sealed partial class PopupWindow
     {
         StackPanel stackPanel = (StackPanel)sender;
         if (PopupContextMenu.IsVisible
+            || DefinitionsTextBoxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || DictTabButtonsItemsControlContextMenu.IsVisible)
         {
@@ -845,22 +910,7 @@ internal sealed partial class PopupWindow
             return;
         }
 
-        bool isEditable = definitionsTextBox.IsReadOnly;
-        definitionsTextBox.IsReadOnly = !isEditable;
-        definitionsTextBox.IsUndoEnabled = isEditable;
-        definitionsTextBox.AcceptsReturn = isEditable;
-        definitionsTextBox.AcceptsTab = isEditable;
-
-        if (isEditable)
-        {
-            definitionsTextBox.ContextMenu = _editableTextBoxContextMenu;
-            definitionsTextBox.UndoLimit = -1;
-        }
-        else
-        {
-            definitionsTextBox.ContextMenu = PopupContextMenu;
-            definitionsTextBox.UndoLimit = 0;
-        }
+        ToggleReadOnly(definitionsTextBox);
     }
 
     private Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs e)
@@ -871,6 +921,7 @@ internal sealed partial class PopupWindow
             || configManager.LookupOnMouseClickOnly
             || e.LeftButton is MouseButtonState.Pressed
             || PopupContextMenu.IsVisible
+            || DefinitionsTextBoxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || DictTabButtonsItemsControlContextMenu.IsVisible
             || ReadingSelectionWindow.IsItVisible()
@@ -1908,6 +1959,7 @@ internal sealed partial class PopupWindow
             if (ConfigManager.Instance.AutoHidePopupIfMouseIsNotOverIt)
             {
                 if (PopupContextMenu.IsVisible
+                    || DefinitionsTextBoxContextMenu.IsVisible
                     || TitleBarContextMenu.IsVisible
                     || DictTabButtonsItemsControlContextMenu.IsVisible
                     || ReadingSelectionWindow.IsItVisible()
@@ -2061,6 +2113,7 @@ internal sealed partial class PopupWindow
 
             if (!IsMouseOver
                 && !PopupContextMenu.IsVisible
+                && !DefinitionsTextBoxContextMenu.IsVisible
                 && !TitleBarContextMenu.IsVisible
                 && !DictTabButtonsItemsControlContextMenu.IsVisible
                 && !AddWordWindow.IsItVisible()
@@ -2204,6 +2257,11 @@ internal sealed partial class PopupWindow
 
     private void Window_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
+        HandleContextMenuOpening();
+    }
+
+    private void HandleContextMenuOpening()
+    {
         _contextMenuIsOpening = true;
         PopupWindowUtils.HidePopups(PopupIndex + 1);
         _contextMenuIsOpening = false;
@@ -2212,6 +2270,7 @@ internal sealed partial class PopupWindow
     private void PopupListView_MouseLeave(object sender, MouseEventArgs e)
     {
         if (!PopupContextMenu.IsVisible
+            && DefinitionsTextBoxContextMenu.IsVisible
             && !TitleBarContextMenu.IsVisible
             && !DictTabButtonsItemsControlContextMenu.IsVisible
             && LastLookupResults.Length > 0)

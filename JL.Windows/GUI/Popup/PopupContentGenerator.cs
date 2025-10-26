@@ -519,7 +519,7 @@ internal sealed class PopupContentGenerator : Decorator
                 configManager.DefinitionsFontSize,
                 VerticalAlignment.Center,
                 new Thickness(0, 2, 2, 2),
-                ownerWindow.PopupContextMenu);
+                ownerWindow.DefinitionsTextBoxContextMenu);
 
             ownerWindow.AddEventHandlersToDefinitionsTextBox(definitionsTextBox);
             _ = bottom.Children.Add(definitionsTextBox);
