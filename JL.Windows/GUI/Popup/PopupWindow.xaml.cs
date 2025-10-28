@@ -185,7 +185,7 @@ internal sealed partial class PopupWindow
         enableEditingButton.Click += (_, _) =>
         {
             TextBox definitionTextBox = (TextBox)DefinitionsTextBoxContextMenu.PlacementTarget;
-            ToggleReadOnly(definitionTextBox);
+            definitionTextBox.SetIsReadOnly(!definitionTextBox.IsReadOnly);
         };
         _ = DefinitionsTextBoxContextMenu.Items.Add(enableEditingButton);
 
@@ -205,21 +205,11 @@ internal sealed partial class PopupWindow
 
             TextBox definitionTextBox = (TextBox)DefinitionsTextBoxContextMenu.PlacementTarget;
             enableEditingButton.IsChecked = !definitionTextBox.IsReadOnly;
-
+            deleteMenuItem.IsEnabled = !definitionTextBox.IsReadOnly;
             ConfigManager configManger = ConfigManager.Instance;
             addNameMenuItem.SetInputGestureText(configManger.ShowAddNameWindowKeyGesture);
             addWordMenuItem.SetInputGestureText(configManger.ShowAddWordWindowKeyGesture);
         };
-    }
-
-    private static void ToggleReadOnly(TextBox definitionsTextBox)
-    {
-        bool isEditable = definitionsTextBox.IsReadOnly;
-        definitionsTextBox.IsReadOnly = !isEditable;
-        definitionsTextBox.IsUndoEnabled = isEditable;
-        definitionsTextBox.AcceptsReturn = isEditable;
-        definitionsTextBox.AcceptsTab = isEditable;
-        definitionsTextBox.UndoLimit = isEditable ? -1 : 0;
     }
 
     private void PressBackSpace(object sender, RoutedEventArgs e)
@@ -910,7 +900,7 @@ internal sealed partial class PopupWindow
             return;
         }
 
-        ToggleReadOnly(definitionsTextBox);
+        definitionsTextBox.SetIsReadOnly(!definitionsTextBox.IsReadOnly);
     }
 
     private Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs e)

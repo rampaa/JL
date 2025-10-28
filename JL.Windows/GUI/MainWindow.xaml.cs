@@ -898,9 +898,7 @@ internal sealed partial class MainWindow
     {
         ConfigManager configManager = ConfigManager.Instance;
         configManager.TextBoxIsReadOnly = !configManager.TextBoxIsReadOnly;
-        MainTextBox.IsReadOnly = configManager.TextBoxIsReadOnly;
-        MainTextBox.IsUndoEnabled = !configManager.TextBoxIsReadOnly;
-        MainTextBox.UndoLimit = configManager.TextBoxIsReadOnly ? 0 : -1;
+        MainTextBox.SetIsReadOnly(configManager.TextBoxIsReadOnly);
     }
 
     private void HandleToggleMinimizedState()
@@ -1651,6 +1649,8 @@ internal sealed partial class MainWindow
         bool profileCustomWordDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict) && profileCustomWordDict.Ready;
         AddWordMenuItem.IsEnabled = customWordDictReady && profileCustomWordDictReady;
 
+        EnableEditingMenuItem.IsChecked = !MainTextBox.IsReadOnly;
+
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;
 
@@ -2260,5 +2260,10 @@ internal sealed partial class MainWindow
             ChangeVisibility();
             ChangeVisibilityOfTitleBarButtons();
         }
+    }
+
+    private void ToggleIsReadOnly(object sender, RoutedEventArgs e)
+    {
+        HandleTextBoxReadOnlyToggle();
     }
 }

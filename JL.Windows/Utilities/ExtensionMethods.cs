@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace JL.Windows.Utilities;
@@ -53,5 +54,14 @@ internal static class ExtensionMethods
         }
 
         return null;
+    }
+
+    public static void SetIsReadOnly(this TextBox textBox, bool isReadOnly)
+    {
+        textBox.IsReadOnly = isReadOnly;
+        textBox.IsUndoEnabled = !isReadOnly;
+        textBox.AcceptsReturn = !isReadOnly;
+        textBox.AcceptsTab = !isReadOnly;
+        textBox.UndoLimit = isReadOnly ? 0 : -1;
     }
 }

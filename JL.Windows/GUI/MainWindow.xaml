@@ -62,6 +62,11 @@
                         Header="Copy"
                         Command="Copy"/>
                     <MenuItem
+                        Name="EnableEditingMenuItem"
+                        Header="Enable editing"
+                        IsCheckable="True"
+                        Click="ToggleIsReadOnly" />
+                    <MenuItem
                         Name="SearchMenuItem"
                         Header="Search"
                         Click="SearchWithBrowser" />

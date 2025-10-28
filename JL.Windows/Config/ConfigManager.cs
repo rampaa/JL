@@ -353,14 +353,7 @@ internal sealed class ConfigManager
         ShowDictionaryTabsInMiningMode = ConfigDBManager.GetValueFromConfig(connection, configs, ShowDictionaryTabsInMiningMode, nameof(ShowDictionaryTabsInMiningMode));
 
         TextBoxIsReadOnly = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxIsReadOnly, nameof(TextBoxIsReadOnly));
-        if (_mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
-        {
-            _mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
-            _mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
-            _mainWindow.MainTextBox.AcceptsReturn = !TextBoxIsReadOnly;
-            _mainWindow.MainTextBox.AcceptsTab = !TextBoxIsReadOnly;
-            _mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
-        }
+        _mainWindow.MainTextBox.SetIsReadOnly(TextBoxIsReadOnly);
 
         AlwaysShowMainTextBoxCaret = ConfigDBManager.GetValueFromConfig(connection, configs, AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret));
         _mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
@@ -632,6 +625,7 @@ internal sealed class ConfigManager
         _mainWindow.ManageFrequenciesMenuItem.SetInputGestureText(ShowManageFrequenciesWindowKeyGesture);
         _mainWindow.ManageAudioSourcesMenuItem.SetInputGestureText(ShowManageAudioSourcesWindowKeyGesture);
         _mainWindow.StatsMenuItem.SetInputGestureText(ShowStatsKeyGesture);
+        _mainWindow.EnableEditingMenuItem.SetInputGestureText(TextBoxIsReadOnlyKeyGesture);
 
         {
             string? searchUrlStr = configs.GetValueOrDefault(nameof(SearchUrl));
