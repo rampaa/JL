@@ -47,7 +47,7 @@ public static class StatsUtils
         double minReadingSpeedThreshold = CoreConfigManager.Instance.MinCharactersPerMinuteBeforeStoppingTimeTracking;
         if (minReadingSpeedThreshold > 0 && textLength > 0 && TimeStatStopWatch.IsRunning)
         {
-            s_idleTimeTimer.Interval = TimeSpan.FromMinutes(textLength / minReadingSpeedThreshold).TotalMilliseconds;
+            s_idleTimeTimer.Interval = Math.Max(TimeSpan.FromMinutes(textLength / minReadingSpeedThreshold).TotalMilliseconds, 1500);
             s_idleTimeTimer.Enabled = true;
         }
         else
