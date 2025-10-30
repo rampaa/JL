@@ -1058,6 +1058,10 @@ internal sealed partial class PopupWindow
 
             childPopupWindow.LookupOnMouseMoveOrClick(_lastInteractedTextBox, false).SafeFireAndForget("LookupOnMouseMoveOrClick failed unexpectedly");
         }
+        else
+        {
+            _lastCharPosition = charPosition;
+        }
     }
 
     // ReSharper disable once AsyncVoidMethod
