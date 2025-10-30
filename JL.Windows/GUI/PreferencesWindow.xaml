@@ -521,6 +521,16 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Lookup delay (in milliseconds)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" />
+                                    <hc:NumericUpDown x:Name="MainWindowLookupDelayNumericUpDown" Minimum="0"
+                                              HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Enable WebSocket text capture"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -1217,6 +1227,16 @@
                                         <ComboBoxItem Content="Back button" Tag="XButton1" />
                                         <ComboBoxItem Content="Forward button" Tag="XButton2" />
                                     </ComboBox>
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Lookup delay (in milliseconds)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" />
+                                    <hc:NumericUpDown x:Name="PopupLookupDelayNumericUpDown" Minimum="0"
+                                              HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
 

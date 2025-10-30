@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -31,6 +32,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 using Rectangle = System.Drawing.Rectangle;
 using Screen = System.Windows.Forms.Screen;
+using Timer = System.Timers.Timer;
 
 namespace JL.Windows.GUI;
 
@@ -59,6 +61,8 @@ internal sealed partial class MainWindow
     private static long s_lastTextCopyTimestamp;
     private static DpiScale? s_previousDpi;
     private Point _lastMouseMovePosition;
+    private Timer? _lookupDelayTimer;
+    private int _lastCharPosition = -1;
 
     public MainWindow()
     {
@@ -381,7 +385,7 @@ internal sealed partial class MainWindow
     private Task HandleMouseMove(MouseEventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        return configManager.InactiveLookupMode
+        if (configManager.InactiveLookupMode
                || configManager.LookupOnSelectOnly
                || configManager.LookupOnMouseClickOnly
                || e.LeftButton is MouseButtonState.Pressed
@@ -391,9 +395,93 @@ internal sealed partial class MainWindow
                || OpacitySlider.IsVisible
                || FirstPopupWindow.MiningMode
                || (!configManager.TextBoxIsReadOnly && _input?.ImeState is InputMethodState.On)
-               || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
-            ? Task.CompletedTask
-            : FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, false);
+               || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed()))
+        {
+            return Task.CompletedTask;
+        }
+
+        if (_lookupDelayTimer is null)
+        {
+            return FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, false);
+        }
+
+        InitDelayedLookup();
+        return Task.CompletedTask;
+    }
+
+    public void InitLookupDelayTimer(int delay)
+    {
+        if (delay is 0)
+        {
+            if (_lookupDelayTimer is not null)
+            {
+                _lookupDelayTimer.Stop();
+                _lookupDelayTimer.Dispose();
+                _lookupDelayTimer = null;
+            }
+        }
+        else
+        {
+            _lookupDelayTimer ??= new Timer()
+            {
+                AutoReset = false
+            };
+
+            _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
+            _lookupDelayTimer.Interval = delay;
+            _lookupDelayTimer.Enabled = true;
+        }
+    }
+
+    private void InitDelayedLookup()
+    {
+        Debug.Assert(_lookupDelayTimer is not null);
+
+        int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
+        if (charPosition < 0)
+        {
+            _lookupDelayTimer.Stop();
+            _lastCharPosition = charPosition;
+            FirstPopupWindow.HidePopup();
+            return;
+        }
+
+        if (char.IsLowSurrogate(MainTextBox.Text[charPosition]))
+        {
+            --charPosition;
+        }
+
+        if (charPosition != _lastCharPosition)
+        {
+            _lookupDelayTimer.Stop();
+            _lastCharPosition = charPosition;
+            _lookupDelayTimer.Start();
+        }
+    }
+
+    private void LookupDelayTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    {
+        Dispatcher.Invoke(HandleDelayedLookup);
+    }
+
+    private void HandleDelayedLookup()
+    {
+        int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
+        if (charPosition < 0)
+        {
+            _lastCharPosition = charPosition;
+            return;
+        }
+
+        if (char.IsLowSurrogate(MainTextBox.Text[charPosition]))
+        {
+            --charPosition;
+        }
+
+        if (charPosition == _lastCharPosition)
+        {
+            FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, false).SafeFireAndForget("LookupOnMouseMoveOrClick failed unexpectedly");
+        }
     }
 
     // ReSharper disable once AsyncVoidMethod

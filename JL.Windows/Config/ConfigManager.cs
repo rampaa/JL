@@ -89,6 +89,7 @@ internal sealed class ConfigManager
     public int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 8;
     public int MainTextBoxDropShadowEffectBlurOpacity { get; private set; } = 100;
     public int MainTextBoxDropShadowEffectDirection { get; private set; } = 315;
+    public int MainWindowLookupDelay { get; private set; } // 0
     private VerticalAlignment MainWindowTextVerticalAlignment { get; set; } = VerticalAlignment.Top;
 
     #endregion
@@ -146,6 +147,7 @@ internal sealed class ConfigManager
     public bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } // = false;
     public bool AutoLookupFirstTermWhenTextIsCopiedFromWebSocket { get; private set; } // = false;
     public bool AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized { get; private set; } = true;
+    public int PopupLookupDelay { get; private set; } // 0
     public MouseButton MineMouseButton { get; private set; } = MouseButton.Left;
     public MouseButton MinePrimarySpellingMouseButton { get; private set; } = MouseButton.Middle;
 
@@ -413,6 +415,10 @@ internal sealed class ConfigManager
             _mainWindow.MainTextBox.Effect = null;
         }
 
+        MainWindowLookupDelay = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowLookupDelay, nameof(MainWindowLookupDelay));
+        _mainWindow.InitLookupDelayTimer(MainWindowLookupDelay);
+
+        PopupLookupDelay = ConfigDBManager.GetValueFromConfig(connection, configs, PopupLookupDelay, nameof(PopupLookupDelay));
         MaxSearchLength = ConfigDBManager.GetValueFromConfig(connection, configs, MaxSearchLength, nameof(MaxSearchLength));
         PrimarySpellingFontSize = ConfigDBManager.GetValueFromConfig(connection, configs, PrimarySpellingFontSize, nameof(PrimarySpellingFontSize));
         ReadingsFontSize = ConfigDBManager.GetValueFromConfig(connection, configs, ReadingsFontSize, nameof(ReadingsFontSize));
@@ -790,6 +796,8 @@ internal sealed class ConfigManager
             currentPopupWindow.DictTabButtonsItemsControlToggleVisibilityOfDictTabsMenuItem.SetInputGestureText(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
             currentPopupWindow.DictTabButtonsItemsControlHidePopupMenuItem.SetInputGestureText(ClosePopupKeyGesture);
 
+            currentPopupWindow.InitLookupDelayTimer(PopupLookupDelay);
+
             currentPopupWindow = PopupWindowUtils.PopupWindows[currentPopupWindow.PopupIndex + 1];
         }
 
@@ -907,6 +915,8 @@ internal sealed class ConfigManager
         preferenceWindow.BrowserPathTextBox.Text = BrowserPath;
         preferenceWindow.MpvNamedPipePathTextBox.Text = coreConfigManager.MpvNamedPipePath;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
+        preferenceWindow.MainWindowLookupDelayNumericUpDown.Value = MainWindowLookupDelay;
+        preferenceWindow.PopupLookupDelayNumericUpDown.Value = PopupLookupDelay;
         preferenceWindow.AnkiUriTextBox.Text = coreConfigManager.AnkiConnectUri.OriginalString;
         preferenceWindow.WebSocketUrisTextBox.Text = string.Join('\n', coreConfigManager.WebSocketUris.Select(static ws => ws.OriginalString));
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
@@ -1192,8 +1202,10 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(BrowserPath), preferenceWindow.BrowserPathTextBox.Text);
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.MpvNamedPipePath), preferenceWindow.MpvNamedPipePathTextBox.Text);
 
-            ConfigDBManager.UpdateSetting(connection, nameof(MaxSearchLength),
-                preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            ConfigDBManager.UpdateSetting(connection, nameof(MaxSearchLength), preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(MainWindowLookupDelay), preferenceWindow.MainWindowLookupDelayNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupLookupDelay), preferenceWindow.PopupLookupDelayNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiConnectUri), preferenceWindow.AnkiUriTextBox.Text);
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.WebSocketUris), preferenceWindow.WebSocketUrisTextBox.Text);

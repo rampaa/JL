@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Rectangle = System.Drawing.Rectangle;
 using Screen = System.Windows.Forms.Screen;
+using Timer = System.Timers.Timer;
 
 namespace JL.Windows.GUI.Popup;
 
@@ -41,6 +43,8 @@ internal sealed partial class PopupWindow
     private int _currentSourceTextCharPosition;
 
     private string _currentSourceText = "";
+    private Timer? _lookupDelayTimer;
+    private int _lastCharPosition = -1;
 
     public Button AllDictionaryTabButton { get; } = new()
     {
@@ -130,6 +134,8 @@ internal sealed partial class PopupWindow
         AllDictionaryTabButton.Click += DictTypeButtonOnClick;
 
         AddMenuItemsToEditableTextBoxContextMenu();
+
+        InitLookupDelayTimer(configManager.PopupLookupDelay);
     }
 
     private void AddMenuItemsToEditableTextBoxContextMenu()
@@ -905,6 +911,11 @@ internal sealed partial class PopupWindow
 
     private Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs e)
     {
+        if (!MiningMode)
+        {
+            return Task.CompletedTask;
+        }
+
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.InactiveLookupMode
             || configManager.LookupOnSelectOnly
@@ -922,37 +933,131 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
-        if (childPopupWindow is null)
+        if (configManager.DisableLookupsForNonJapaneseCharsInPopups && !JapaneseUtils.ContainsJapaneseCharacters(textBox.Text))
         {
-            childPopupWindow = new PopupWindow(PopupIndex + 1)
+            if (configManager.HighlightLongestMatch)
             {
-                Owner = this
-            };
+                WindowsUtils.Unselect(PopupWindowUtils.PopupWindows[PopupIndex + 1]?._previousTextBox);
+            }
 
-            PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
+            return Task.CompletedTask;
         }
 
-        if (childPopupWindow.MiningMode)
+        PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
+        if (childPopupWindow?.MiningMode ?? false)
         {
             return Task.CompletedTask;
         }
 
-        if (MiningMode)
+        _lastInteractedTextBox = textBox;
+        if (_lookupDelayTimer is null)
         {
-            _lastInteractedTextBox = textBox;
-            if (!configManager.DisableLookupsForNonJapaneseCharsInPopups || JapaneseUtils.ContainsJapaneseCharacters(textBox.Text))
+            if (childPopupWindow is null)
             {
-                return childPopupWindow.LookupOnMouseMoveOrClick(textBox, false);
+                childPopupWindow = new PopupWindow(PopupIndex + 1)
+                {
+                    Owner = this
+                };
+
+                PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
             }
 
-            if (configManager.HighlightLongestMatch)
-            {
-                WindowsUtils.Unselect(childPopupWindow._previousTextBox);
-            }
+            return childPopupWindow.LookupOnMouseMoveOrClick(textBox, false);
         }
 
+        InitDelayedLookup(textBox, childPopupWindow);
         return Task.CompletedTask;
+    }
+
+    public void InitLookupDelayTimer(int delay)
+    {
+        if (delay is 0)
+        {
+            if (_lookupDelayTimer is not null)
+            {
+                _lookupDelayTimer.Stop();
+                _lookupDelayTimer.Dispose();
+                _lookupDelayTimer = null;
+            }
+        }
+        else
+        {
+            _lookupDelayTimer ??= new Timer()
+            {
+                AutoReset = false
+            };
+
+            _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
+            _lookupDelayTimer.Interval = delay;
+            _lookupDelayTimer.Enabled = true;
+        }
+    }
+
+    private void InitDelayedLookup(TextBox textBox, PopupWindow? childPopupWindow)
+    {
+        Debug.Assert(_lookupDelayTimer is not null);
+
+        int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
+        if (charPosition < 0)
+        {
+            _lookupDelayTimer.Stop();
+            _lastCharPosition = charPosition;
+            childPopupWindow?.HidePopup();
+            return;
+        }
+
+        if (char.IsLowSurrogate(textBox.Text[charPosition]))
+        {
+            --charPosition;
+        }
+
+        if (charPosition != _lastCharPosition)
+        {
+            _lookupDelayTimer.Stop();
+            _lastCharPosition = charPosition;
+            _lookupDelayTimer.Start();
+        }
+    }
+
+    private void LookupDelayTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    {
+        if (_lastInteractedTextBox is not null)
+        {
+            Dispatcher.Invoke(HandleDelayedLookup);
+        }
+    }
+
+    private void HandleDelayedLookup()
+    {
+        Debug.Assert(_lastInteractedTextBox is not null);
+
+        int charPosition = _lastInteractedTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(_lastInteractedTextBox), false);
+        if (charPosition < 0)
+        {
+            _lastCharPosition = charPosition;
+            return;
+        }
+
+        if (char.IsLowSurrogate(_lastInteractedTextBox.Text[charPosition]))
+        {
+            --charPosition;
+        }
+
+        if (charPosition == _lastCharPosition)
+        {
+            PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
+            if (childPopupWindow is null)
+            {
+                childPopupWindow = new PopupWindow(PopupIndex + 1)
+                {
+                    Owner = this
+                };
+
+                PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
+            }
+
+            childPopupWindow.LookupOnMouseMoveOrClick(_lastInteractedTextBox, false).SafeFireAndForget("LookupOnMouseMoveOrClick failed unexpectedly");
+        }
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -1977,7 +2082,7 @@ internal sealed partial class PopupWindow
                 if (isMouseOverMainTextBox)
                 {
                     int charPosition = mainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(mainTextBox), false);
-                    if (charPosition is not -1)
+                    if (charPosition >= 0)
                     {
                         return;
                     }
