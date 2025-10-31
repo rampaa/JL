@@ -969,9 +969,9 @@ internal sealed partial class PopupWindow
         return Task.CompletedTask;
     }
 
-    public void InitLookupDelayTimer(int delay)
+    public void InitLookupDelayTimer(int delayInMilliseconds)
     {
-        if (delay is 0)
+        if (delayInMilliseconds is 0)
         {
             if (_lookupDelayTimer is not null)
             {
@@ -988,7 +988,7 @@ internal sealed partial class PopupWindow
             };
 
             _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
-            _lookupDelayTimer.Interval = delay;
+            _lookupDelayTimer.Interval = delayInMilliseconds;
             _lookupDelayTimer.Enabled = true;
         }
     }
