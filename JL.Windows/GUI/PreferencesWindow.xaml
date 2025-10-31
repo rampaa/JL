@@ -266,7 +266,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Width"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainWindowWidthNumericUpDown" Minimum="1" DecimalPlaces="0"
+                                    <hc:NumericUpDown x:Name="MainWindowWidthNumericUpDown" Minimum="1" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -285,7 +285,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Max dynamic width"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainWindowMaxDynamicWidthNumericUpDown" Minimum="1"
+                                    <hc:NumericUpDown x:Name="MainWindowMaxDynamicWidthNumericUpDown" Minimum="1" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -295,7 +295,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Min dynamic width"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainWindowMinDynamicWidthNumericUpDown" Minimum="125"
+                                    <hc:NumericUpDown x:Name="MainWindowMinDynamicWidthNumericUpDown" Minimum="125" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -323,7 +323,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Fixed right-edge position"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainWindowFixedRightPositionNumericUpDown" Minimum="-2"
+                                    <hc:NumericUpDown x:Name="MainWindowFixedRightPositionNumericUpDown" Minimum="-2" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -333,7 +333,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Height"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainWindowHeightNumericUpDown" Minimum="1" DecimalPlaces="0"
+                                    <hc:NumericUpDown x:Name="MainWindowHeightNumericUpDown" Minimum="1" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -353,7 +353,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Max dynamic height"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainWindowMaxDynamicHeightNumericUpDown" Minimum="1"
+                                    <hc:NumericUpDown x:Name="MainWindowMaxDynamicHeightNumericUpDown" Minimum="1" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -363,7 +363,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Min dynamic height"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainWindowMinDynamicHeightNumericUpDown" Minimum="50"
+                                    <hc:NumericUpDown x:Name="MainWindowMinDynamicHeightNumericUpDown" Minimum="50" Maximum="999999999"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -391,7 +391,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Fixed bottom position"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainWindowFixedBottomPositionNumericUpDown" Minimum="-2"
+                                    <hc:NumericUpDown x:Name="MainWindowFixedBottomPositionNumericUpDown" Minimum="-2" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -434,7 +434,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Font size"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="TextBoxFontSizeNumericUpDown" Maximum="300" Minimum="1"
+                                    <hc:NumericUpDown x:Name="TextBoxFontSizeNumericUpDown" Maximum="300" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -524,7 +524,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Lookup delay (in milliseconds)"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />
-                                    <hc:NumericUpDown x:Name="MainWindowLookupDelayNumericUpDown" Minimum="0"
+                                    <hc:NumericUpDown x:Name="MainWindowLookupDelayNumericUpDown" Minimum="0" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -593,7 +593,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Max text length to capture"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MaxTextLengthToCaptureNumericUpDown" Minimum="0" DecimalPlaces="0"
+                                    <hc:NumericUpDown x:Name="MaxTextLengthToCaptureNumericUpDown" Minimum="0" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -814,7 +814,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Max backlog capacity"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MaxBacklogCapacityNumericUpDown" Minimum="-1" DecimalPlaces="0"
+                                    <hc:NumericUpDown x:Name="MaxBacklogCapacityNumericUpDown" Minimum="-1" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -911,7 +911,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Max width"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
+                                    <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -921,7 +921,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Min width"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PopupMinWidthNumericUpDown" Minimum="0"
+                                    <hc:NumericUpDown x:Name="PopupMinWidthNumericUpDown" Minimum="0" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -942,7 +942,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Max height"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
+                                    <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -952,7 +952,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Min height"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PopupMinHeightNumericUpDown" Minimum="0"
+                                    <hc:NumericUpDown x:Name="PopupMinHeightNumericUpDown" Minimum="0" Maximum="999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -990,7 +990,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Fixed X position"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="FixedPopupXPositionNumericUpDown"
+                                    <hc:NumericUpDown x:Name="FixedPopupXPositionNumericUpDown" Maximum="999999999" Minimum="-999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1019,7 +1019,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Fixed Y position"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="FixedPopupYPositionNumericUpDown"
+                                    <hc:NumericUpDown x:Name="FixedPopupYPositionNumericUpDown" Maximum="999999999" Minimum="-999999999" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1082,7 +1082,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Auto hide popup delay (in milliseconds)"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown" Maximum="999999" Minimum="1" DecimalPlaces="0"
+                                    <hc:NumericUpDown x:Name="AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown" Maximum="999999999" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1149,7 +1149,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="X Offset"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="100" Minimum="1"
+                                    <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="100" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1159,7 +1159,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Y Offset"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="100" Minimum="1"
+                                    <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="100" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1235,7 +1235,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Lookup delay (in milliseconds)"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />
-                                    <hc:NumericUpDown x:Name="PopupLookupDelayNumericUpDown" Minimum="0"
+                                    <hc:NumericUpDown x:Name="PopupLookupDelayNumericUpDown" Maximum="999999999" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1256,8 +1256,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Primary spelling font size"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PrimarySpellingFontSizeNumericUpDown" Maximum="500"
-                                              Minimum="1"
+                                    <hc:NumericUpDown x:Name="PrimarySpellingFontSizeNumericUpDown" Maximum="500" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1278,7 +1277,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Reading font size"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="ReadingsFontSizeNumericUpDown" Maximum="100" Minimum="0"
+                                    <hc:NumericUpDown x:Name="ReadingsFontSizeNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1301,7 +1300,7 @@
                                        Text="Alternative spelling font size"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="AlternativeSpellingsFontSizeNumericUpDown" Maximum="500"
+                                    <hc:NumericUpDown x:Name="AlternativeSpellingsFontSizeNumericUpDown" Maximum="500" DecimalPlaces="0"
                                               Minimum="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
@@ -1321,7 +1320,7 @@
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Definition font size"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="DefinitionsFontSizeNumericUpDown" Maximum="100"
+                                    <hc:NumericUpDown x:Name="DefinitionsFontSizeNumericUpDown" Maximum="100" DecimalPlaces="0"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
@@ -1341,7 +1340,7 @@
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Frequency font size"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="FrequencyFontSizeNumericUpDown" Maximum="100" Minimum="1"
+                                    <hc:NumericUpDown x:Name="FrequencyFontSizeNumericUpDown" Maximum="100" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1361,8 +1360,7 @@
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Deconjugation info font size"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="DeconjugationInfoFontSizeNumericUpDown" Maximum="100"
-                                              Minimum="0"
+                                    <hc:NumericUpDown x:Name="DeconjugationInfoFontSizeNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1381,8 +1379,7 @@
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Dictionary name font size"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="DictTypeFontSizeNumericUpDown" Maximum="100"
-                                              Minimum="0"
+                                    <hc:NumericUpDown x:Name="DictTypeFontSizeNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1401,8 +1398,7 @@
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Audio button font size"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="AudioButtonFontSizeNumericUpDown" Maximum="100"
-                                              Minimum="0"
+                                    <hc:NumericUpDown x:Name="AudioButtonFontSizeNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1421,8 +1417,7 @@
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Mining button font size"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MiningButtonFontSizeNumericUpDown" Maximum="100"
-                                              Minimum="0"
+                                    <hc:NumericUpDown x:Name="MiningButtonFontSizeNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -2327,7 +2322,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />
-                                    <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="250" Minimum="1"
+                                    <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="250" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -2339,8 +2334,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Max number of results when not in mining mode"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Style="{StaticResource TextBlockDefault}" />
-                                    <hc:NumericUpDown x:Name="MaxNumResultsNotInMiningModeNumericUpDown" Maximum="100"
-                                              Minimum="1"
+                                    <hc:NumericUpDown x:Name="MaxNumResultsNotInMiningModeNumericUpDown" Maximum="100" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
