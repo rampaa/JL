@@ -2515,5 +2515,11 @@ internal sealed partial class PopupWindow
         LastLookupResults = [];
         _dictsWithResults.Clear();
         AllDictionaryTabButton.Click -= DictTypeButtonOnClick;
+
+        if (_lookupDelayTimer is not null)
+        {
+            _lookupDelayTimer.Dispose();
+            _lookupDelayTimer = null;
+        }
     }
 }
