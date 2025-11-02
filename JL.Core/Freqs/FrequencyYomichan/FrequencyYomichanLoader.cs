@@ -18,18 +18,19 @@ internal static class FrequencyYomichanLoader
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_meta_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            ReadOnlyMemory<ReadOnlyMemory<JsonElement>> frequencyJson;
+            JsonElement[][]? frequencyJson;
             FileStream fileStream = File.OpenRead(jsonFile);
             await using (fileStream.ConfigureAwait(false))
             {
                 frequencyJson = await JsonSerializer
-                    .DeserializeAsync<ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>(fileStream, JsonOptions.DefaultJso)
+                    .DeserializeAsync<JsonElement[][]>(fileStream, JsonOptions.DefaultJso)
                     .ConfigureAwait(false);
+
+                Debug.Assert(frequencyJson is not null);
             }
 
-            foreach (ref readonly ReadOnlyMemory<JsonElement> valueMemory in frequencyJson.Span)
+            foreach (JsonElement[] value in frequencyJson)
             {
-                ReadOnlySpan<JsonElement> value = valueMemory.Span;
                 string primarySpelling = value[0].GetString()!.GetPooledString();
                 string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString();
                 string? reading = null;

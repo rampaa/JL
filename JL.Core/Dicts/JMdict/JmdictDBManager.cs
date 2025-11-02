@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
@@ -347,8 +348,10 @@ internal static class JmdictDBManager
         while (dataReader.Read())
         {
             JmdictRecord record = GetRecord(dataReader);
-            ReadOnlySpan<string> searchKeys = JsonSerializer.Deserialize<ReadOnlyMemory<string>>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso).Span;
-            foreach (ref readonly string searchKey in searchKeys)
+            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
+            Debug.Assert(searchKeys is not null);
+
+            foreach (string searchKey in searchKeys)
             {
                 if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
                 {

@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -20,19 +21,21 @@ internal static class YomichanPitchAccentLoader
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term*bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            ReadOnlyMemory<ReadOnlyMemory<JsonElement>> jsonObjects;
+            JsonElement[][]? jsonObjects;
 
             FileStream fileStream = File.OpenRead(jsonFile);
             await using (fileStream.ConfigureAwait(false))
             {
                 jsonObjects = await JsonSerializer
-                    .DeserializeAsync<ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>(fileStream, JsonOptions.DefaultJso)
+                    .DeserializeAsync<JsonElement[][]>(fileStream, JsonOptions.DefaultJso)
                     .ConfigureAwait(false);
+
+                Debug.Assert(jsonObjects is not null);
             }
 
-            foreach (ref readonly ReadOnlyMemory<JsonElement> jsonObjectMemory in jsonObjects.Span)
+            foreach (JsonElement[] jsonObject in jsonObjects)
             {
-                PitchAccentRecord newEntry = new(jsonObjectMemory.Span);
+                PitchAccentRecord newEntry = new(jsonObject);
                 if (newEntry.Position is byte.MaxValue || string.IsNullOrWhiteSpace(newEntry.Spelling))
                 {
                     continue;

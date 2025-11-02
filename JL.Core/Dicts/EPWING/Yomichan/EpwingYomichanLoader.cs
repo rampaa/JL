@@ -23,19 +23,21 @@ internal static class EpwingYomichanLoader
 
         foreach (string jsonFile in jsonFiles)
         {
-            ReadOnlyMemory<ReadOnlyMemory<JsonElement>> jsonElementLists;
+            JsonElement[][]? jsonElementLists;
 
             FileStream fileStream = File.OpenRead(jsonFile);
             await using (fileStream.ConfigureAwait(false))
             {
                 jsonElementLists = await JsonSerializer
-                    .DeserializeAsync<ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>(fileStream)
+                    .DeserializeAsync<JsonElement[][]>(fileStream)
                     .ConfigureAwait(false);
+
+                Debug.Assert(jsonElementLists is not null);
             }
 
-            foreach (ref readonly ReadOnlyMemory<JsonElement> jsonElements in jsonElementLists.Span)
+            foreach (JsonElement[] jsonElements in jsonElementLists)
             {
-                EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElements.Span, dict);
+                EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElements, dict);
                 if (record is not null)
                 {
                     AddToDictionary(record, dict, nonKanjiDict, nonNameDict);
@@ -46,7 +48,7 @@ internal static class EpwingYomichanLoader
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static EpwingYomichanRecord? GetEpwingYomichanRecord(ReadOnlySpan<JsonElement> jsonElements, Dict dict)
+    private static EpwingYomichanRecord? GetEpwingYomichanRecord(JsonElement[] jsonElements, Dict dict)
     {
         string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
         string? reading = jsonElements[1].GetString();

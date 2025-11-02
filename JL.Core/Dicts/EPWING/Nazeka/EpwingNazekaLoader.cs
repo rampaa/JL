@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -15,12 +16,13 @@ internal static class EpwingNazekaLoader
             return;
         }
 
-        ReadOnlyMemory<JsonElement> jsonObjects;
+        JsonElement[]? jsonObjects;
 
         FileStream fileStream = File.OpenRead(fullPath);
         await using (fileStream.ConfigureAwait(false))
         {
-            jsonObjects = await JsonSerializer.DeserializeAsync<ReadOnlyMemory<JsonElement>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+            jsonObjects = await JsonSerializer.DeserializeAsync<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+            Debug.Assert(jsonObjects is not null);
         }
 
         IDictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
@@ -28,9 +30,9 @@ internal static class EpwingNazekaLoader
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
 
-        for (int i = 1; i < jsonObjects.Span.Length; i++)
+        for (int i = 1; i < jsonObjects.Length; i++)
         {
-            ref readonly JsonElement jsonObj = ref jsonObjects.Span[i];
+            JsonElement jsonObj = jsonObjects[i];
             string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
 
             JsonElement spellingJsonArray = jsonObj.GetProperty("s");

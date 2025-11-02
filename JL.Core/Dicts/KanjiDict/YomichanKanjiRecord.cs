@@ -25,7 +25,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
         Stats = stats;
     }
 
-    public YomichanKanjiRecord(ReadOnlySpan<JsonElement> jsonElement)
+    public YomichanKanjiRecord(JsonElement[] jsonElement)
     {
         string? onReadingsStr = jsonElement[1].GetString();
         Debug.Assert(onReadingsStr is not null);

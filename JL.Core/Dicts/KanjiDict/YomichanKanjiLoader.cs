@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -18,19 +19,20 @@ internal static class YomichanKanjiLoader
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            ReadOnlyMemory<ReadOnlyMemory<JsonElement>> jsonObjects;
+            JsonElement[][]? jsonObjects;
 
             FileStream fileStream = File.OpenRead(jsonFile);
             await using (fileStream.ConfigureAwait(false))
             {
                 jsonObjects = await JsonSerializer
-                    .DeserializeAsync<ReadOnlyMemory<ReadOnlyMemory<JsonElement>>>(fileStream, JsonOptions.DefaultJso)
+                    .DeserializeAsync<JsonElement[][]>(fileStream, JsonOptions.DefaultJso)
                     .ConfigureAwait(false);
+
+                Debug.Assert(jsonObjects is not null);
             }
 
-            foreach (ref readonly ReadOnlyMemory<JsonElement> jsonObjMemory in jsonObjects.Span)
+            foreach (JsonElement[] jsonObj in jsonObjects)
             {
-                ReadOnlySpan<JsonElement> jsonObj = jsonObjMemory.Span;
                 YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
                 string kanji = jsonObj[0].GetString()!.GetPooledString();
                 if (string.IsNullOrWhiteSpace(kanji))
