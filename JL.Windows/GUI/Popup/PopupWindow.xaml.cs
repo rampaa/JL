@@ -1017,6 +1017,10 @@ internal sealed partial class PopupWindow
             _lastCharPosition = charPosition;
             _lookupDelayTimer.Start();
         }
+        else if (!childPopupWindow?.IsVisible ?? true)
+        {
+            _lookupDelayTimer.Start();
+        }
     }
 
     private void LookupDelayTimer_Elapsed(object? sender, ElapsedEventArgs e)
