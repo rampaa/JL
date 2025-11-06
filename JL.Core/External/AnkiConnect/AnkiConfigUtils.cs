@@ -45,8 +45,7 @@ public static class AnkiConfigUtils
                 FileStream ankiConfigStream = File.OpenRead(filePath);
                 await using (ankiConfigStream.ConfigureAwait(false))
                 {
-                    s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
-                        JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
+                    s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
                 }
 
                 Debug.Assert(s_ankiConfigDict is not null);
@@ -70,7 +69,7 @@ public static class AnkiConfigUtils
                             }
 
                             ankiConfig.Fields = upToDateFields;
-                            ankiConfig.UsedJLFields = upToDateFields.Values.Where(f => f is not JLField.Nothing).ToFrozenSet();
+                            ankiConfig.UsedJLFields = upToDateFields.Values.Where(static f => f is not JLField.Nothing).ToFrozenSet();
                         }
                     }
                 }).ConfigureAwait(false);

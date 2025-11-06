@@ -422,7 +422,7 @@ internal sealed partial class MainWindow
         }
         else
         {
-            _lookupDelayTimer ??= new Timer()
+            _lookupDelayTimer ??= new Timer
             {
                 AutoReset = false
             };

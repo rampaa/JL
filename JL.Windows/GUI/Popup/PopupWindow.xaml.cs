@@ -212,7 +212,6 @@ internal sealed partial class PopupWindow
             TextBox definitionTextBox = (TextBox)DefinitionsTextBoxContextMenu.PlacementTarget;
             enableEditingButton.IsChecked = !definitionTextBox.IsReadOnly;
             deleteMenuItem.IsEnabled = !definitionTextBox.IsReadOnly;
-            ConfigManager configManger = ConfigManager.Instance;
             addNameMenuItem.SetInputGestureText(configManger.ShowAddNameWindowKeyGesture);
             addWordMenuItem.SetInputGestureText(configManger.ShowAddWordWindowKeyGesture);
         };
@@ -982,7 +981,7 @@ internal sealed partial class PopupWindow
         }
         else
         {
-            _lookupDelayTimer ??= new Timer()
+            _lookupDelayTimer ??= new Timer
             {
                 AutoReset = false
             };
