@@ -14,16 +14,7 @@ internal static class KanjidicLoader
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            FileStreamOptions fileStreamOptions = new()
-            {
-                Mode = FileMode.Open,
-                Access = FileAccess.Read,
-                Share = FileShare.Read,
-                BufferSize = 1024 * 64,
-                Options = FileOptions.Asynchronous | FileOptions.SequentialScan
-            };
-
-            FileStream fileStream = new(fullPath, fileStreamOptions);
+            FileStream fileStream = new(fullPath, FileStreamOptionsPresets.AsyncRead64KBufferFso);
             await using (fileStream.ConfigureAwait(false))
             {
                 XmlReaderSettings xmlReaderSettings = new()

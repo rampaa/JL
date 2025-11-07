@@ -209,15 +209,7 @@ public static class AudioUtils
 
     internal static async Task DeserializeAudioSources()
     {
-        FileStreamOptions fileStreamOptions = new()
-        {
-            Mode = FileMode.Open,
-            Access = FileAccess.Read,
-            Share = FileShare.Read,
-            Options = FileOptions.Asynchronous | FileOptions.SequentialScan
-        };
-
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), fileStreamOptions);
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.AsyncReadFso);
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer

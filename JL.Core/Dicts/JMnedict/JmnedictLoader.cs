@@ -15,17 +15,7 @@ internal static class JmnedictLoader
         if (File.Exists(fullPath))
         {
             DictUtils.JmnedictEntities.Clear();
-
-            FileStreamOptions fileStreamOptions = new()
-            {
-                Mode = FileMode.Open,
-                Access = FileAccess.Read,
-                Share = FileShare.Read,
-                BufferSize = 1024 * 64,
-                Options = FileOptions.SequentialScan
-            };
-
-            using (FileStream fileStream = new(fullPath, fileStreamOptions))
+            using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.SyncRead64KBufferFso))
             {
                 // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
                 // And we do need EntityHandling property because we want to get unexpanded entity names

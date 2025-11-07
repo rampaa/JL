@@ -42,15 +42,7 @@ public static class AnkiConfigUtils
         {
             try
             {
-                FileStreamOptions fileStreamOptions = new()
-                {
-                    Mode = FileMode.Open,
-                    Access = FileAccess.Read,
-                    Share = FileShare.Read,
-                    Options = FileOptions.Asynchronous | FileOptions.SequentialScan
-                };
-
-                FileStream ankiConfigStream = new(filePath, fileStreamOptions);
+                FileStream ankiConfigStream = new(filePath, FileStreamOptionsPresets.AsyncReadFso);
                 await using (ankiConfigStream.ConfigureAwait(false))
                 {
                     s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
