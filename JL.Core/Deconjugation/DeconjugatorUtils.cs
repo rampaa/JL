@@ -8,7 +8,15 @@ internal static class DeconjugatorUtils
 {
     public static async Task DeserializeRules()
     {
-        FileStream fileStream = File.OpenRead(Path.Join(AppInfo.ResourcesPath, "deconjugation_rules.json"));
+        FileStreamOptions fileStreamOptions = new()
+        {
+            Mode = FileMode.Open,
+            Access = FileAccess.Read,
+            Share = FileShare.Read,
+            Options = FileOptions.Asynchronous | FileOptions.SequentialScan
+        };
+
+        FileStream fileStream = new(Path.Join(AppInfo.ResourcesPath, "deconjugation_rules.json"), fileStreamOptions);
 
         Rule[]? rules;
         await using (fileStream.ConfigureAwait(false))

@@ -392,7 +392,15 @@ public static class FreqUtils
 
     internal static async Task DeserializeFreqs()
     {
-        FileStream fileStream = File.OpenRead(Path.Join(AppInfo.ConfigPath, "freqs.json"));
+        FileStreamOptions fileStreamOptions = new()
+        {
+            Mode = FileMode.Open,
+            Access = FileAccess.Read,
+            Share = FileShare.Read,
+            Options = FileOptions.Asynchronous | FileOptions.SequentialScan
+        };
+
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), fileStreamOptions);
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer

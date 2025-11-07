@@ -1424,7 +1424,15 @@ public static class DictUtils
 
     internal static async Task DeserializeDicts()
     {
-        FileStream dictStream = File.OpenRead(Path.Join(AppInfo.ConfigPath, "dicts.json"));
+        FileStreamOptions fileStreamOptions = new()
+        {
+            Mode = FileMode.Open,
+            Access = FileAccess.Read,
+            Share = FileShare.Read,
+            Options = FileOptions.Asynchronous | FileOptions.SequentialScan
+        };
+
+        FileStream dictStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), fileStreamOptions);
         await using (dictStream.ConfigureAwait(false))
         {
             Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
