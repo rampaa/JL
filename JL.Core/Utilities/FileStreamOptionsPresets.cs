@@ -7,7 +7,6 @@ public static class FileStreamOptionsPresets
         Mode = FileMode.Open,
         Access = FileAccess.Read,
         Share = FileShare.Read,
-        BufferSize = 1024 * 64,
         Options = FileOptions.SequentialScan
     };
 
