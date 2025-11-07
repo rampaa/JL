@@ -48,7 +48,7 @@ internal static class WindowsUtils
 
     private static WaveOutEvent? s_audioPlayer;
     public static WaveOutEvent? AudioPlayer => Volatile.Read(ref s_audioPlayer);
-    public static SemaphoreSlim AudioPlayerSemaphoreSlim { get; } = new(1, 1);
+    public static readonly SemaphoreSlim AudioPlayerSemaphoreSlim = new(1, 1);
 
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(s_mainWindow.WindowHandle);
 
@@ -435,7 +435,7 @@ internal static class WindowsUtils
                 await memoryStream.DisposeAsync().ConfigureAwait(false);
                 _ = Interlocked.Exchange(ref s_audioPlayer, null);
 
-                LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
+                LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
                 Alert(AlertLevel.Error, "Error playing audio");
             }
 
@@ -465,7 +465,7 @@ internal static class WindowsUtils
         }
         catch (Exception ex)
         {
-            LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
+            LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
             Alert(AlertLevel.Error, "Error playing audio");
         }
         finally

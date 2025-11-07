@@ -10,11 +10,11 @@ namespace JL.Core.Statistics;
 
 public static class StatsUtils
 {
-    public static Stats SessionStats { get; } = new();
+    public static readonly Stats SessionStats = new();
     public static Stats ProfileLifetimeStats { get; set; } = new();
     public static Stats LifetimeStats { get; internal set; } = new();
 
-    public static Stopwatch TimeStatStopWatch { get; } = new();
+    public static readonly Stopwatch TimeStatStopWatch = new();
     private static readonly Timer s_statsTimer = new();
     private static readonly Timer s_idleTimeTimer = new()
     {

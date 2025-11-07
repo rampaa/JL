@@ -17,7 +17,7 @@ public static class FreqUtils
 {
     public static bool FreqsReady { get; private set; } // = false;
 
-    public static Dictionary<string, Freq> FreqDicts { get; } = new(StringComparer.OrdinalIgnoreCase);
+    public static readonly Dictionary<string, Freq> FreqDicts = new(StringComparer.OrdinalIgnoreCase);
 
     internal static Freq[]? WordFreqs { get; private set; }
     internal static Freq[]? KanjiFreqs { get; private set; }

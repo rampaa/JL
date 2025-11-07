@@ -19,7 +19,7 @@ internal static class SpeechSynthesisUtils
     private static readonly SpeechSynthesizer s_synthesizer = new();
     private static readonly SpeechSynthesizer s_streamSynthesizer = new();
 
-    public static ComboBoxItem[]? InstalledVoices { get; } = GetInstalledVoiceNames();
+    public static readonly ComboBoxItem[]? InstalledVoices = GetInstalledVoiceNames();
 
     private static ComboBoxItem[]? GetInstalledVoiceNames()
     {

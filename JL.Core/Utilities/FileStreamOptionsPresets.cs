@@ -1,7 +1,16 @@
 namespace JL.Core.Utilities;
 
-internal static class FileStreamOptionsPresets
+public static class FileStreamOptionsPresets
 {
+    public static readonly FileStreamOptions SyncReadFso = new()
+    {
+        Mode = FileMode.Open,
+        Access = FileAccess.Read,
+        Share = FileShare.Read,
+        BufferSize = 1024 * 64,
+        Options = FileOptions.SequentialScan
+    };
+
     public static readonly FileStreamOptions AsyncReadFso = new()
     {
         Mode = FileMode.Open,
@@ -34,6 +43,14 @@ internal static class FileStreamOptionsPresets
         Access = FileAccess.Write,
         Share = FileShare.None,
         BufferSize = 1024 * 64,
+        Options = FileOptions.Asynchronous
+    };
+
+    public static readonly FileStreamOptions AsyncCreateFso = new()
+    {
+        Mode = FileMode.Create,
+        Access = FileAccess.Write,
+        Share = FileShare.None,
         Options = FileOptions.Asynchronous
     };
 }
