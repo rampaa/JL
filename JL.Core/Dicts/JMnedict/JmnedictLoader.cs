@@ -16,16 +16,27 @@ internal static class JmnedictLoader
         {
             DictUtils.JmnedictEntities.Clear();
 
-            // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
-            // And we do need EntityHandling property because we want to get unexpanded entity names
-            // The downside of using XmlTextReader is that it does not support async methods
-            // And we cannot set some settings (e.g. MaxCharactersFromEntities)
-
-            using (XmlTextReader xmlTextReader = new(fullPath))
+            FileStreamOptions fileStreamOptions = new()
             {
-                xmlTextReader.DtdProcessing = DtdProcessing.Parse;
-                xmlTextReader.WhitespaceHandling = WhitespaceHandling.None;
-                xmlTextReader.EntityHandling = EntityHandling.ExpandCharEntities;
+                Mode = FileMode.Open,
+                Access = FileAccess.Read,
+                Share = FileShare.Read,
+                BufferSize = 1024 * 64,
+                Options = FileOptions.SequentialScan
+            };
+
+            using (FileStream fileStream = new(fullPath, fileStreamOptions))
+            {
+                // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
+                // And we do need EntityHandling property because we want to get unexpanded entity names
+                // The downside of using XmlTextReader is that it does not support async methods
+                // And we cannot set some settings (e.g. MaxCharactersFromEntities)
+                using XmlTextReader xmlTextReader = new(fileStream)
+                {
+                    DtdProcessing = DtdProcessing.Parse,
+                    WhitespaceHandling = WhitespaceHandling.None,
+                    EntityHandling = EntityHandling.ExpandCharEntities
+                };
 
                 while (xmlTextReader.ReadToFollowing("entry"))
                 {

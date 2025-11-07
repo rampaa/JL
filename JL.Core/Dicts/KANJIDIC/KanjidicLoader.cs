@@ -14,15 +14,26 @@ internal static class KanjidicLoader
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            XmlReaderSettings xmlReaderSettings = new()
+            FileStreamOptions fileStreamOptions = new()
             {
-                Async = true,
-                DtdProcessing = DtdProcessing.Parse,
-                IgnoreWhitespace = true
+                Mode = FileMode.Open,
+                Access = FileAccess.Read,
+                Share = FileShare.Read,
+                BufferSize = 1024 * 64,
+                Options = FileOptions.Asynchronous | FileOptions.SequentialScan
             };
 
-            using (XmlReader xmlReader = XmlReader.Create(fullPath, xmlReaderSettings))
+            FileStream fileStream = new(fullPath, fileStreamOptions);
+            await using (fileStream.ConfigureAwait(false))
             {
+                XmlReaderSettings xmlReaderSettings = new()
+                {
+                    Async = true,
+                    DtdProcessing = DtdProcessing.Parse,
+                    IgnoreWhitespace = true
+                };
+
+                using XmlReader xmlReader = XmlReader.Create(fileStream, xmlReaderSettings);
                 while (xmlReader.ReadToFollowing("literal"))
                 {
                     await ReadCharacter(xmlReader, dict.Contents).ConfigureAwait(false);
