@@ -377,30 +377,29 @@ public static class FreqUtils
         }
     }
 
-    public static Task CreateDefaultFreqsConfig()
+    public static async Task CreateDefaultFreqsConfig()
     {
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
-        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "freqs.json"),
-            JsonSerializer.Serialize(s_builtInFreqs, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            await JsonSerializer.SerializeAsync(fileStream, s_builtInFreqs, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+        }
     }
 
-    public static Task SerializeFreqs()
+    public static async Task SerializeFreqs()
     {
-        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "freqs.json"),
-            JsonSerializer.Serialize(FreqDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            await JsonSerializer.SerializeAsync(fileStream, FreqDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+        }
     }
 
     internal static async Task DeserializeFreqs()
     {
-        FileStreamOptions fileStreamOptions = new()
-        {
-            Mode = FileMode.Open,
-            Access = FileAccess.Read,
-            Share = FileShare.Read,
-            Options = FileOptions.Asynchronous | FileOptions.SequentialScan
-        };
-
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), fileStreamOptions);
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.AsyncReadFso);
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
@@ -419,7 +418,7 @@ public static class FreqUtils
                     freq.Path = PathUtils.GetPortablePath(freq.Path);
                     if (freq.Type is FreqType.Yomichan or FreqType.YomichanKanji && freq.Revision is null)
                     {
-                        UpdateRevisionInfo(freq);
+                        await UpdateRevisionInfo(freq).ConfigureAwait(false);
                     }
 
                     InitFreqOptions(freq);
@@ -487,20 +486,24 @@ public static class FreqUtils
         }
     }
 
-    private static void UpdateRevisionInfo(Freq freq)
+    private static async Task UpdateRevisionInfo(Freq freq)
     {
         string indexJsonPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), AppInfo.ApplicationPath);
         if (File.Exists(indexJsonPath))
         {
-            JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), JsonOptions.DefaultJso);
-
-            freq.Revision = jsonElement.GetProperty("revision").GetString();
-            freq.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
-            if (freq.AutoUpdatable)
+            FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.AsyncReadFso);
+            await using (fileStream.ConfigureAwait(false))
             {
-                string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
-                Debug.Assert(indexUrl is not null);
-                freq.Url = new Uri(indexUrl);
+                JsonElement jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+
+                freq.Revision = jsonElement.GetProperty("revision").GetString();
+                freq.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+                if (freq.AutoUpdatable)
+                {
+                    string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                    Debug.Assert(indexUrl is not null);
+                    freq.Url = new Uri(indexUrl);
+                }
             }
         }
     }

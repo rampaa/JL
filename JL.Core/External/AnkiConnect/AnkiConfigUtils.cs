@@ -17,12 +17,15 @@ public static class AnkiConfigUtils
         try
         {
             _ = Directory.CreateDirectory(AppInfo.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "AnkiConfig.json"),
-                JsonSerializer.Serialize(ankiConfig, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation)).ConfigureAwait(false);
+
+            FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AnkiConfig.json"), FileStreamOptionsPresets.AsyncCreateFso);
+            await using (fileStream.ConfigureAwait(false))
+            {
+                await JsonSerializer.SerializeAsync(fileStream, ankiConfig, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+            }
 
             s_ankiConfigDict = ankiConfig;
         }
-
         catch (Exception ex)
         {
             FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");

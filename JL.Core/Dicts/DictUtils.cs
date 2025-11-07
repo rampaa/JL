@@ -1409,17 +1409,24 @@ public static class DictUtils
         }
     }
 
-    public static Task CreateDefaultDictsConfig()
+    public static async Task CreateDefaultDictsConfig()
     {
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
-        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "dicts.json"),
-            JsonSerializer.Serialize(BuiltInDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            await JsonSerializer.SerializeAsync(fileStream, BuiltInDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+        }
     }
 
-    public static Task SerializeDicts()
+    public static async Task SerializeDicts()
     {
-        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "dicts.json"),
-            JsonSerializer.Serialize(Dicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            await JsonSerializer.SerializeAsync(fileStream, Dicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+        }
     }
 
     internal static async Task DeserializeDicts()
@@ -1487,7 +1494,7 @@ public static class DictUtils
 
                     if (dict.Revision is null && YomichanDictTypes.Contains(dict.Type))
                     {
-                        EpwingYomichanUtils.UpdateRevisionInfo(dict);
+                        await EpwingYomichanUtils.UpdateRevisionInfo(dict).ConfigureAwait(false);
                     }
 
                     InitDictOptions(dict);

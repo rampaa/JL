@@ -115,7 +115,7 @@ public static class ResourceUpdater
 
     private static async Task DecompressGzipStream(Stream stream, string filePath)
     {
-        FileStream decompressedFileStream = File.Create(filePath);
+        FileStream decompressedFileStream = new(filePath, FileStreamOptionsPresets.AsyncCreate64KBufferFso);
         await using (decompressedFileStream.ConfigureAwait(false))
         {
             GZipStream decompressionStream = new(stream, CompressionMode.Decompress);

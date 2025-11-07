@@ -270,20 +270,24 @@ internal static class EpwingYomichanUtils
         }
     }
 
-    public static void UpdateRevisionInfo(Dict dict)
+    public static async Task UpdateRevisionInfo(Dict dict)
     {
         string indexJsonPath = Path.GetFullPath(Path.Join(dict.Path, "index.json"), AppInfo.ApplicationPath);
         if (File.Exists(indexJsonPath))
         {
-            JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(indexJsonPath), JsonOptions.DefaultJso);
-
-            dict.Revision = jsonElement.GetProperty("revision").GetString();
-            dict.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
-            if (dict.AutoUpdatable)
+            FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.AsyncReadFso);
+            await using (fileStream.ConfigureAwait(false))
             {
-                string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
-                Debug.Assert(indexUrl is not null);
-                dict.Url = new Uri(indexUrl);
+                JsonElement jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+
+                dict.Revision = jsonElement.GetProperty("revision").GetString();
+                dict.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+                if (dict.AutoUpdatable)
+                {
+                    string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                    Debug.Assert(indexUrl is not null);
+                    dict.Url = new Uri(indexUrl);
+                }
             }
         }
     }

@@ -18,7 +18,7 @@ internal static class JmdictWordClassUtils
 
     internal static async Task Load()
     {
-        FileStream fileStream = File.OpenRead(Path.Join(AppInfo.ResourcesPath, "PoS.json"));
+        FileStream fileStream = new(Path.Join(AppInfo.ResourcesPath, "PoS.json"), FileStreamOptionsPresets.AsyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, IList<JmdictWordClass>>? wordClassDictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
@@ -58,7 +58,7 @@ internal static class JmdictWordClassUtils
         DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(static entry => entry.Key, static IList<JmdictWordClass> (kvp) => kvp.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    internal static Task Serialize()
+    internal static async Task Serialize()
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new(StringComparer.Ordinal);
 
@@ -163,8 +163,11 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        return File.WriteAllTextAsync(Path.Join(AppInfo.ResourcesPath, "PoS.json"),
-            JsonSerializer.Serialize(jmdictWordClassDictionary, JsonOptions.s_jsoIgnoringWhenWritingNull));
+        FileStream fileStream = new(Path.Join(AppInfo.ResourcesPath, "PoS.json"), FileStreamOptionsPresets.AsyncCreate64KBufferFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            await JsonSerializer.SerializeAsync(fileStream, jmdictWordClassDictionary, JsonOptions.s_jsoIgnoringWhenWritingNull).ConfigureAwait(false);
+        }
     }
 
     internal static async Task Initialize()

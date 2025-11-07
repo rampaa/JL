@@ -194,17 +194,24 @@ public static class AudioUtils
         }
     }
 
-    public static Task SerializeAudioSources()
+    public static async Task SerializeAudioSources()
     {
-        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"),
-            JsonSerializer.Serialize(AudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            await JsonSerializer.SerializeAsync(fileStream, AudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+        }
     }
 
-    public static Task CreateDefaultAudioSourceConfig()
+    public static async Task CreateDefaultAudioSourceConfig()
     {
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
-        return File.WriteAllTextAsync(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"),
-            JsonSerializer.Serialize(s_builtInAudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation));
+
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            await JsonSerializer.SerializeAsync(fileStream, s_builtInAudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+        }
     }
 
     internal static async Task DeserializeAudioSources()
