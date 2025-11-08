@@ -14,8 +14,9 @@ namespace JL.Windows.Utilities;
 internal static class BacklogUtils
 {
     private static readonly LinkedList<string> s_backlog = [];
-    private static LinkedListNode<string>? s_currentNode;
     private static readonly MainWindow s_mainWindow = MainWindow.Instance;
+
+    private static LinkedListNode<string>? s_currentNode;
 
     public static string? LastItem => s_backlog.Last?.Value;
 
@@ -189,14 +190,14 @@ internal static class BacklogUtils
     public static void TrimBacklog()
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.MaxBacklogCapacity > 0)
+        if (configManager.MaxBacklogCapacity > 0 && s_backlog.Count > configManager.MaxBacklogCapacity)
         {
             bool changeCurrentNodeToLast = false;
-            while (s_backlog.Count > configManager.MaxBacklogCapacity)
+            do
             {
-                changeCurrentNodeToLast = changeCurrentNodeToLast || s_backlog.Last == s_currentNode;
-                s_backlog.RemoveLast();
-            }
+                changeCurrentNodeToLast = changeCurrentNodeToLast || s_backlog.First == s_currentNode;
+                s_backlog.RemoveFirst();
+            } while (s_backlog.Count > configManager.MaxBacklogCapacity);
 
             if (changeCurrentNodeToLast)
             {
