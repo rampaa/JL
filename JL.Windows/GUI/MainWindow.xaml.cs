@@ -124,12 +124,7 @@ internal sealed partial class MainWindow
         // Makes caret/highlight visible without any mouse click
         MoveCaret(Key.Left);
 
-        nint magpieWindowHandle = MagpieUtils.GetMagpieWindowHandle();
-        MagpieUtils.IsMagpieScaling = magpieWindowHandle is not 0;
-        if (MagpieUtils.IsMagpieScaling)
-        {
-            MagpieUtils.SetMagpieInfo(magpieWindowHandle);
-        }
+        MagpieUtils.Init();
 
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
@@ -1651,7 +1646,6 @@ internal sealed partial class MainWindow
             double yPosition;
             double width;
             double maxDynamicHeight = configManager.MainWindowMaxDynamicHeight * dpi.DpiScaleY;
-            MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieScaling && MagpieUtils.IsMagpieReallyScaling();
             if (!MagpieUtils.IsMagpieScaling || !MagpieUtils.SourceWindowRect.Contains(WinApi.GetMousePosition()))
             {
                 Rectangle workingArea = WindowsUtils.ActiveScreen.WorkingArea;
@@ -2089,24 +2083,20 @@ internal sealed partial class MainWindow
 
         if (MagpieUtils.IsMagpieScaling)
         {
-            MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
-            if (MagpieUtils.IsMagpieScaling)
+            if (rightPosition is 0)
             {
-                if (rightPosition is 0)
-                {
-                    rightPosition = (MagpieUtils.MagpieWindowLeftEdgePosition + MagpieUtils.MagpieWindowRightEdgePosition + currentWidth) / 2;
-                }
-                else if (rightPosition is -1 or -2)
-                {
-                    rightPosition = MagpieUtils.MagpieWindowRightEdgePosition;
-                }
-                else
-                {
-                    return Math.Max(activeScreen.Bounds.Left, rightPosition - currentWidth);
-                }
-
-                return Math.Max(MagpieUtils.MagpieWindowLeftEdgePosition, rightPosition - currentWidth);
+                rightPosition = (MagpieUtils.MagpieWindowLeftEdgePosition + MagpieUtils.MagpieWindowRightEdgePosition + currentWidth) / 2;
             }
+            else if (rightPosition is -1 or -2)
+            {
+                rightPosition = MagpieUtils.MagpieWindowRightEdgePosition;
+            }
+            else
+            {
+                return Math.Max(activeScreen.Bounds.Left, rightPosition - currentWidth);
+            }
+
+            return Math.Max(MagpieUtils.MagpieWindowLeftEdgePosition, rightPosition - currentWidth);
         }
 
         if (rightPosition is 0)
@@ -2132,24 +2122,20 @@ internal sealed partial class MainWindow
 
         if (MagpieUtils.IsMagpieScaling)
         {
-            MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
-            if (MagpieUtils.IsMagpieScaling)
+            if (bottomPosition is -2 or -1)
             {
-                if (bottomPosition is -2 or -1)
-                {
-                    bottomPosition = MagpieUtils.MagpieWindowBottomEdgePosition;
-                }
-                else if (bottomPosition is 0)
-                {
-                    bottomPosition = (MagpieUtils.MagpieWindowTopEdgePosition + MagpieUtils.MagpieWindowBottomEdgePosition + currentHeight) / 2;
-                }
-                else
-                {
-                    return Math.Max(activeScreen.Bounds.Top, bottomPosition - currentHeight);
-                }
-
-                return Math.Max(MagpieUtils.MagpieWindowTopEdgePosition, bottomPosition - currentHeight);
+                bottomPosition = MagpieUtils.MagpieWindowBottomEdgePosition;
             }
+            else if (bottomPosition is 0)
+            {
+                bottomPosition = (MagpieUtils.MagpieWindowTopEdgePosition + MagpieUtils.MagpieWindowBottomEdgePosition + currentHeight) / 2;
+            }
+            else
+            {
+                return Math.Max(activeScreen.Bounds.Top, bottomPosition - currentHeight);
+            }
+
+            return Math.Max(MagpieUtils.MagpieWindowTopEdgePosition, bottomPosition - currentHeight);
         }
 
         if (bottomPosition is -2)

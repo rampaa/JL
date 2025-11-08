@@ -7,7 +7,23 @@ namespace JL.Windows.External.Magpie;
 internal static class MagpieUtils
 {
     public static int MagpieScalingChangedWindowMessage { get; private set; } = -1;
-    public static bool IsMagpieScaling { get; set; }  // = false;
+
+    private static bool s_isMagpieScaling;
+    public static bool IsMagpieScaling
+    {
+        get
+        {
+            if (s_isMagpieScaling)
+            {
+                s_isMagpieScaling = IsMagpieReallyScaling();
+            }
+
+            return s_isMagpieScaling;
+        }
+
+        private set => s_isMagpieScaling = value;
+    }
+
     public static double MagpieWindowLeftEdgePosition { get; private set; }
     public static double MagpieWindowRightEdgePosition { get; private set; }
     public static double MagpieWindowTopEdgePosition { get; private set; }
@@ -17,6 +33,12 @@ internal static class MagpieUtils
     public static Rect SourceWindowRect { get; private set; }
     private static double s_scaleFactorX;
     private static double s_scaleFactorY;
+
+    public static void Init()
+    {
+        nint magpieWindowHandle = GetMagpieWindowHandle();
+        SetMagpieInfo(magpieWindowHandle is not 0, magpieWindowHandle);
+    }
 
     public static void RegisterToMagpieScalingChangedMessage(nint windowHandle)
     {
@@ -74,12 +96,12 @@ internal static class MagpieUtils
     /// Consequently, IsMagpieScaling may not be set to false.
     /// To ensure Magpie is still running, this method must be used to re-check whether any window is currently being scaled by Magpie.
     /// </summary>
-    public static bool IsMagpieReallyScaling()
+    private static bool IsMagpieReallyScaling()
     {
         return GetMagpieWindowHandle() is not 0;
     }
 
-    public static nint GetMagpieWindowHandle()
+    private static nint GetMagpieWindowHandle()
     {
         return WinApi.FindWindow("Window_Magpie_967EB565-6F73-4E94-AE53-00CC42592A22");
     }
@@ -92,7 +114,16 @@ internal static class MagpieUtils
             : mousePosition;
     }
 
-    public static void SetMagpieInfo(nint magpieWindowHandle)
+    public static void SetMagpieInfo(bool isMagpieScaling, nint magpieWindowHandle)
+    {
+        IsMagpieScaling = isMagpieScaling;
+        if (isMagpieScaling)
+        {
+            SetMagpieInfo(magpieWindowHandle);
+        }
+    }
+
+    private static void SetMagpieInfo(nint magpieWindowHandle)
     {
         MagpieWindowTopEdgePosition = GetMagpieWindowTopEdgePositionFromMagpie(magpieWindowHandle);
         MagpieWindowBottomEdgePosition = GetMagpieWindowBottomEdgePositionFromMagpie(magpieWindowHandle);

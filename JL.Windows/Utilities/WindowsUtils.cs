@@ -967,21 +967,11 @@ internal static class WindowsUtils
 
     public static Point GetMousePosition(Point mousePosition, bool mayNeedCoordinateConversion)
     {
-        if (!mayNeedCoordinateConversion)
-        {
-            return mousePosition;
-        }
-
-        if (MagpieUtils.IsMagpieScaling)
-        {
-            MagpieUtils.IsMagpieScaling = MagpieUtils.IsMagpieReallyScaling();
-            if (MagpieUtils.IsMagpieScaling)
-            {
-                return MagpieUtils.GetMousePosition(mousePosition);
-            }
-        }
-
-        return mousePosition;
+        return !mayNeedCoordinateConversion
+            ? mousePosition
+            : MagpieUtils.IsMagpieScaling
+                ? MagpieUtils.GetMousePosition(mousePosition)
+                : mousePosition;
     }
 
     public static async Task CopyTextToClipboard(string text)
