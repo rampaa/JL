@@ -98,7 +98,7 @@ internal static class JmdictLoader
         {
             DictUtils.JmdictEntities.Clear();
 
-            using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.SyncRead64KBufferFso))
+            using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))
             {
                 // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
                 // And we do need EntityHandling property because we want to get unexpanded entity names
