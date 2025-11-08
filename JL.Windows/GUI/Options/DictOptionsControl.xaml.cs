@@ -228,7 +228,10 @@ internal sealed partial class DictOptionsControl
         OptionUtils.ChangeVisibilityOfColorButton(PitchAccentMarkerColorOption.ValidDictTypes.Contains(dictType), PitchAccentMarkerColorButton, PitchAccentMarkerColorDockPanel, dictOptions?.PitchAccentMarkerColor?.Value, DictOptionManager.PitchAccentMarkerColor, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfColorButton(POrthographyInfoColorOption.ValidDictTypes.Contains(dictType), POrthographyInfoColorButton, POrthographyInfoColorDockPanel, dictOptions?.POrthographyInfoColor?.Value, DictOptionManager.POrthographyInfoColor, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfNumericUpDown(POrthographyInfoFontSizeOption.ValidDictTypes.Contains(dictType), POrthographyInfoFontSizeNumericUpDown, POrthographyInfoFontSizeDockPanel, dictOptions?.POrthographyInfoFontSize?.Value ?? 15, ref showDictOptions);
-        // OptionUtils.ChangeVisibilityOfNumericUpDown(AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dictType), AutoUpdateAfterNDaysNumericUpDown, AutoUpdateAfterNDaysDockPanel, dictOptions?.AutoUpdateAfterNDays?.Value ?? 0, ref showOptions);
+        if (dictOptions is not null)
+        {
+            OptionUtils.ChangeVisibilityOfNumericUpDown(AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dictType), AutoUpdateAfterNDaysNumericUpDown, AutoUpdateAfterNDaysDockPanel, dictOptions.AutoUpdateAfterNDays?.Value ?? 0, ref showDictOptions);
+        }
 
         if (showDictOptions)
         {
