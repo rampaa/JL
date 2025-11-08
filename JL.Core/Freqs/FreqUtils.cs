@@ -381,7 +381,7 @@ public static class FreqUtils
     {
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, s_builtInFreqs, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -390,7 +390,7 @@ public static class FreqUtils
 
     public static async Task SerializeFreqs()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, FreqDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -399,38 +399,40 @@ public static class FreqUtils
 
     internal static async Task DeserializeFreqs()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.AsyncReadFso);
+        Dictionary<string, Freq>? deserializedFreqs;
+
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.s_asyncReadFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
+            deserializedFreqs = await JsonSerializer
                 .DeserializeAsync<Dictionary<string, Freq>>(fileStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
+        }
 
-            if (deserializedFreqs is not null)
+        if (deserializedFreqs is not null)
+        {
+            IOrderedEnumerable<Freq> orderedFreqs = deserializedFreqs.Values.OrderBy(static f => f.Priority);
+            int priority = 1;
+
+            foreach (Freq freq in orderedFreqs)
             {
-                IOrderedEnumerable<Freq> orderedFreqs = deserializedFreqs.Values.OrderBy(static f => f.Priority);
-                int priority = 1;
+                freq.Priority = priority;
+                ++priority;
 
-                foreach (Freq freq in orderedFreqs)
+                freq.Path = PathUtils.GetPortablePath(freq.Path);
+                if (freq.Type is FreqType.Yomichan or FreqType.YomichanKanji && freq.Revision is null)
                 {
-                    freq.Priority = priority;
-                    ++priority;
-
-                    freq.Path = PathUtils.GetPortablePath(freq.Path);
-                    if (freq.Type is FreqType.Yomichan or FreqType.YomichanKanji && freq.Revision is null)
-                    {
-                        await UpdateRevisionInfo(freq).ConfigureAwait(false);
-                    }
-
-                    InitFreqOptions(freq);
-
-                    FreqDicts.Add(freq.Name, freq);
+                    await UpdateRevisionInfo(freq).ConfigureAwait(false);
                 }
+
+                InitFreqOptions(freq);
+
+                FreqDicts.Add(freq.Name, freq);
             }
-            else
-            {
-                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
-                throw new SerializationException("Couldn't load Config/freqs.json");
-            }
+        }
+        else
+        {
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
+            throw new SerializationException("Couldn't load Config/freqs.json");
         }
     }
 
@@ -491,19 +493,21 @@ public static class FreqUtils
         string indexJsonPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), AppInfo.ApplicationPath);
         if (File.Exists(indexJsonPath))
         {
-            FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.AsyncReadFso);
+            JsonElement jsonElement;
+
+            FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.s_asyncReadFso);
             await using (fileStream.ConfigureAwait(false))
             {
-                JsonElement jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+                jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+            }
 
-                freq.Revision = jsonElement.GetProperty("revision").GetString();
-                freq.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
-                if (freq.AutoUpdatable)
-                {
-                    string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
-                    Debug.Assert(indexUrl is not null);
-                    freq.Url = new Uri(indexUrl);
-                }
+            freq.Revision = jsonElement.GetProperty("revision").GetString();
+            freq.AutoUpdatable = jsonElement.TryGetProperty("isUpdatable", out JsonElement isUpdatableJsonElement) && isUpdatableJsonElement.GetBoolean();
+            if (freq.AutoUpdatable)
+            {
+                string? indexUrl = jsonElement.GetProperty("indexUrl").GetString();
+                Debug.Assert(indexUrl is not null);
+                freq.Url = new Uri(indexUrl);
             }
         }
     }

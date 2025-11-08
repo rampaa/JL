@@ -43,10 +43,15 @@ public static class NetworkUtils
 
             if (gitHubApiResponse.IsSuccessStatusCode)
             {
+                JsonDocument jsonDocument;
                 Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 await using (githubApiResultStream.ConfigureAwait(false))
                 {
-                    using JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
+                    jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
+                }
+
+                using (jsonDocument)
+                {
                     JsonElement rootElement = jsonDocument.RootElement;
                     string? tagName = rootElement.GetProperty("tag_name").GetString();
                     Debug.Assert(tagName is not null);

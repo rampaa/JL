@@ -18,7 +18,7 @@ public static class AnkiConfigUtils
         {
             _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
-            FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AnkiConfig.json"), FileStreamOptionsPresets.AsyncCreateFso);
+            FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AnkiConfig.json"), FileStreamOptionsPresets.s_asyncCreateFso);
             await using (fileStream.ConfigureAwait(false))
             {
                 await JsonSerializer.SerializeAsync(fileStream, ankiConfig, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -45,7 +45,7 @@ public static class AnkiConfigUtils
         {
             try
             {
-                FileStream ankiConfigStream = new(filePath, FileStreamOptionsPresets.AsyncReadFso);
+                FileStream ankiConfigStream = new(filePath, FileStreamOptionsPresets.s_asyncReadFso);
                 await using (ankiConfigStream.ConfigureAwait(false))
                 {
                     s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);

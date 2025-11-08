@@ -47,8 +47,8 @@ public static class ResourceUpdater
                 using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
-                    Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     string tempDictPath = GetTempPath(fullDictPath);
+                    Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     await using (responseStream.ConfigureAwait(false))
                     {
                         await DecompressGzipStream(responseStream, tempDictPath).ConfigureAwait(false);
@@ -115,7 +115,7 @@ public static class ResourceUpdater
 
     private static async Task DecompressGzipStream(Stream stream, string filePath)
     {
-        FileStream decompressedFileStream = new(filePath, FileStreamOptionsPresets.AsyncCreate64KBufferFso);
+        FileStream decompressedFileStream = new(filePath, FileStreamOptionsPresets.s_asyncCreate64KBufferFso);
         await using (decompressedFileStream.ConfigureAwait(false))
         {
             GZipStream decompressionStream = new(stream, CompressionMode.Decompress);
@@ -232,8 +232,8 @@ public static class ResourceUpdater
                     return false;
                 }
 
-                Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 string tempDictPath = GetTempPath(fullDictPath);
+                Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 await using (responseStream.ConfigureAwait(false))
                 {
                     DecompressZipStream(responseStream, tempDictPath);

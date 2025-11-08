@@ -10,7 +10,7 @@ public static class FileStreamOptionsPresets
         Options = FileOptions.SequentialScan
     };
 
-    public static readonly FileStreamOptions AsyncReadFso = new()
+    internal static readonly FileStreamOptions s_asyncReadFso = new()
     {
         Mode = FileMode.Open,
         Access = FileAccess.Read,
@@ -18,7 +18,7 @@ public static class FileStreamOptionsPresets
         Options = FileOptions.Asynchronous | FileOptions.SequentialScan
     };
 
-    public static readonly FileStreamOptions AsyncRead64KBufferFso = new()
+    internal static readonly FileStreamOptions s_asyncRead64KBufferFso = new()
     {
         Mode = FileMode.Open,
         Access = FileAccess.Read,
@@ -27,7 +27,7 @@ public static class FileStreamOptionsPresets
         Options = FileOptions.Asynchronous | FileOptions.SequentialScan
     };
 
-    public static readonly FileStreamOptions SyncRead64KBufferFso = new()
+    internal static readonly FileStreamOptions s_syncRead64KBufferFso = new()
     {
         Mode = FileMode.Open,
         Access = FileAccess.Read,
@@ -36,7 +36,7 @@ public static class FileStreamOptionsPresets
         Options = FileOptions.SequentialScan
     };
 
-    public static readonly FileStreamOptions AsyncCreate64KBufferFso = new()
+    internal static readonly FileStreamOptions s_asyncCreate64KBufferFso = new()
     {
         Mode = FileMode.Create,
         Access = FileAccess.Write,
@@ -45,7 +45,7 @@ public static class FileStreamOptionsPresets
         Options = FileOptions.Asynchronous
     };
 
-    public static readonly FileStreamOptions AsyncCreateFso = new()
+    internal static readonly FileStreamOptions s_asyncCreateFso = new()
     {
         Mode = FileMode.Create,
         Access = FileAccess.Write,

@@ -196,7 +196,7 @@ public static class AudioUtils
 
     public static async Task SerializeAudioSources()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, AudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -207,7 +207,7 @@ public static class AudioUtils
     {
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, s_builtInAudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -216,31 +216,33 @@ public static class AudioUtils
 
     internal static async Task DeserializeAudioSources()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.AsyncReadFso);
+        Dictionary<string, AudioSource>? deserializedAudioSources;
+
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.s_asyncReadFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer
+            deserializedAudioSources = await JsonSerializer
                 .DeserializeAsync<Dictionary<string, AudioSource>>(fileStream, JsonOptions.s_jsoWithEnumConverter)
                 .ConfigureAwait(false);
+        }
 
-            if (deserializedAudioSources is not null)
+        if (deserializedAudioSources is not null)
+        {
+            IOrderedEnumerable<KeyValuePair<string, AudioSource>> audioSources = deserializedAudioSources.OrderBy(static d => d.Value.Priority);
+            int priority = 1;
+
+            foreach ((string key, AudioSource audioSource) in audioSources)
             {
-                IOrderedEnumerable<KeyValuePair<string, AudioSource>> audioSources = deserializedAudioSources.OrderBy(static d => d.Value.Priority);
-                int priority = 1;
+                audioSource.Priority = priority;
+                AudioSources.Add(key, audioSource);
 
-                foreach ((string key, AudioSource audioSource) in audioSources)
-                {
-                    audioSource.Priority = priority;
-                    AudioSources.Add(key, audioSource);
-
-                    ++priority;
-                }
+                ++priority;
             }
-            else
-            {
-                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
-                throw new SerializationException("Couldn't load Config/AudioSourceConfig.json");
-            }
+        }
+        else
+        {
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
+            throw new SerializationException("Couldn't load Config/AudioSourceConfig.json");
         }
     }
 }

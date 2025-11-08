@@ -1413,7 +1413,7 @@ public static class DictUtils
     {
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, BuiltInDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -1422,7 +1422,7 @@ public static class DictUtils
 
     public static async Task SerializeDicts()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.AsyncCreateFso);
+        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, Dicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -1431,83 +1431,85 @@ public static class DictUtils
 
     internal static async Task DeserializeDicts()
     {
-        FileStream dictStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.AsyncReadFso);
+        Dictionary<string, Dict>? deserializedDicts;
+
+        FileStream dictStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.s_asyncReadFso);
         await using (dictStream.ConfigureAwait(false))
         {
-            Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
+            deserializedDicts = await JsonSerializer
                 .DeserializeAsync<Dictionary<string, Dict>>(dictStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
+        }
 
-            if (deserializedDicts is not null)
+        if (deserializedDicts is not null)
+        {
+            foreach (Dict dict in BuiltInDicts.Values)
             {
-                foreach (Dict dict in BuiltInDicts.Values)
+                if (deserializedDicts.Values.All(d => d.Type != dict.Type))
                 {
-                    if (deserializedDicts.Values.All(d => d.Type != dict.Type))
+                    deserializedDicts.Add(dict.Name, dict);
+                }
+            }
+
+            IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static dict => dict.Priority);
+
+            int priority = 1;
+            foreach (Dict dict in orderedDicts)
+            {
+                dict.Priority = priority;
+                ++priority;
+
+                if (dict.Type is DictType.ProfileCustomNameDictionary)
+                {
+                    dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName);
+                    SingleDictTypeDicts[dict.Type] = dict;
+                }
+                else if (dict.Type is DictType.ProfileCustomWordDictionary)
+                {
+                    dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName);
+                    SingleDictTypeDicts[dict.Type] = dict;
+                }
+                else if (dict.Type is DictType.CustomNameDictionary
+                         or DictType.CustomWordDictionary
+                         or DictType.JMdict
+                         or DictType.Kanjidic
+                         or DictType.JMnedict
+                         or DictType.PitchAccentYomichan)
+                {
+                    SingleDictTypeDicts[dict.Type] = dict;
+                }
+
+                if (dict.Type is DictType.JMdict or DictType.Kanjidic or DictType.JMnedict)
+                {
+                    dict.AutoUpdatable = true;
+                    if (dict.Type is DictType.JMdict)
                     {
-                        deserializedDicts.Add(dict.Name, dict);
+                        dict.Url = s_jmdictUrl;
+                    }
+                    else if (dict.Type is DictType.Kanjidic)
+                    {
+                        dict.Url = s_kanjidicUrl;
+                    }
+                    else if (dict.Type is DictType.JMnedict)
+                    {
+                        dict.Url = s_jmnedictUrl;
                     }
                 }
 
-                IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static dict => dict.Priority);
-
-                int priority = 1;
-                foreach (Dict dict in orderedDicts)
+                if (dict.Revision is null && YomichanDictTypes.Contains(dict.Type))
                 {
-                    dict.Priority = priority;
-                    ++priority;
-
-                    if (dict.Type is DictType.ProfileCustomNameDictionary)
-                    {
-                        dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName);
-                        SingleDictTypeDicts[dict.Type] = dict;
-                    }
-                    else if (dict.Type is DictType.ProfileCustomWordDictionary)
-                    {
-                        dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName);
-                        SingleDictTypeDicts[dict.Type] = dict;
-                    }
-                    else if (dict.Type is DictType.CustomNameDictionary
-                             or DictType.CustomWordDictionary
-                             or DictType.JMdict
-                             or DictType.Kanjidic
-                             or DictType.JMnedict
-                             or DictType.PitchAccentYomichan)
-                    {
-                        SingleDictTypeDicts[dict.Type] = dict;
-                    }
-
-                    if (dict.Type is DictType.JMdict or DictType.Kanjidic or DictType.JMnedict)
-                    {
-                        dict.AutoUpdatable = true;
-                        if (dict.Type is DictType.JMdict)
-                        {
-                            dict.Url = s_jmdictUrl;
-                        }
-                        else if (dict.Type is DictType.Kanjidic)
-                        {
-                            dict.Url = s_kanjidicUrl;
-                        }
-                        else if (dict.Type is DictType.JMnedict)
-                        {
-                            dict.Url = s_jmnedictUrl;
-                        }
-                    }
-
-                    if (dict.Revision is null && YomichanDictTypes.Contains(dict.Type))
-                    {
-                        await EpwingYomichanUtils.UpdateRevisionInfo(dict).ConfigureAwait(false);
-                    }
-
-                    InitDictOptions(dict);
-
-                    dict.Path = PathUtils.GetPortablePath(dict.Path);
-                    Dicts.Add(dict.Name, dict);
+                    await EpwingYomichanUtils.UpdateRevisionInfo(dict).ConfigureAwait(false);
                 }
+
+                InitDictOptions(dict);
+
+                dict.Path = PathUtils.GetPortablePath(dict.Path);
+                Dicts.Add(dict.Name, dict);
             }
-            else
-            {
-                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
-                throw new SerializationException("Couldn't load Config/dicts.json");
-            }
+        }
+        else
+        {
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
+            throw new SerializationException("Couldn't load Config/dicts.json");
         }
     }
 

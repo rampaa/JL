@@ -152,8 +152,11 @@ internal sealed partial class AddDictionaryWindow
             string indexJsonPath = Path.Join(openFolderDialog.FolderName, "index.json");
             if (File.Exists(indexJsonPath))
             {
-                using FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.SyncReadFso);
-                JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(fileStream, JsonOptions.DefaultJso);
+                JsonElement jsonElement;
+                using (FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.SyncReadFso))
+                {
+                    jsonElement = JsonSerializer.Deserialize<JsonElement>(fileStream, JsonOptions.DefaultJso);
+                }
 
                 string? dictionaryTitle = jsonElement.GetProperty("title").GetString();
                 Debug.Assert(dictionaryTitle is not null);
