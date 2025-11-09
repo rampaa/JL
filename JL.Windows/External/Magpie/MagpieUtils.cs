@@ -33,7 +33,14 @@ internal static class MagpieUtils
     public static void Init()
     {
         nint magpieWindowHandle = GetMagpieWindowHandle();
-        SetMagpieInfo(magpieWindowHandle is not 0, magpieWindowHandle);
+
+        bool isMagpieScaling = magpieWindowHandle is not 0;
+        IsMagpieScaling = isMagpieScaling;
+
+        if (isMagpieScaling)
+        {
+            SetMagpieInfo(magpieWindowHandle);
+        }
     }
 
     public static void RegisterToMagpieScalingChangedMessage(nint windowHandle)
@@ -110,12 +117,16 @@ internal static class MagpieUtils
             : mousePosition;
     }
 
-    public static void SetMagpieInfo(bool isMagpieScaling, nint magpieWindowHandle)
+    public static void SetMagpieInfo(nint wParam, nint lParam)
     {
-        IsMagpieScaling = isMagpieScaling;
-        if (isMagpieScaling)
+        if (wParam is 1)
         {
-            SetMagpieInfo(magpieWindowHandle);
+            IsMagpieScaling = true;
+            SetMagpieInfo(lParam);
+        }
+        else // if (wParam is 0)
+        {
+            IsMagpieScaling = lParam is 1;
         }
     }
 
