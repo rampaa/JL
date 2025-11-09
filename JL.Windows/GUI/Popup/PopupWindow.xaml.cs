@@ -31,20 +31,18 @@ internal sealed partial class PopupWindow
     private bool _contextMenuIsOpening; // = false;
 
     private TextBox? _previousTextBox;
-
     private TextBox? _lastInteractedTextBox;
 
     private int _listViewItemIndex; // 0
-
     private int _listViewItemIndexAfterContextMenuIsClosed; // 0
-
     private int _firstVisibleListViewItemIndex; // 0
 
     private int _currentSourceTextCharPosition;
+    private int _lastCharPosition = -1;
 
     private string _currentSourceText = "";
+
     private Timer? _lookupDelayTimer;
-    private int _lastCharPosition = -1;
 
     public Button AllDictionaryTabButton { get; } = new()
     {

@@ -42,13 +42,14 @@ namespace JL.Windows.Utilities;
 internal static class WindowsUtils
 {
     private static readonly MainWindow s_mainWindow = MainWindow.Instance;
-
-    public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
-    private static long s_lastAudioPlayTimestamp;
-
-    private static WaveOutEvent? s_audioPlayer;
-    public static WaveOutEvent? AudioPlayer => Volatile.Read(ref s_audioPlayer);
+    private static readonly SemaphoreSlim s_dialogSemaphore = new(1, 1);
     public static readonly SemaphoreSlim AudioPlayerSemaphoreSlim = new(1, 1);
+
+    private static long s_lastAudioPlayTimestamp;
+    private static WaveOutEvent? s_audioPlayer;
+
+    public static WaveOutEvent? AudioPlayer => Volatile.Read(ref s_audioPlayer);
+    public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
 
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(s_mainWindow.WindowHandle);
 
@@ -57,8 +58,6 @@ internal static class WindowsUtils
     public static double DpiAwareYOffset { get; set; } = ConfigManager.Instance.PopupYOffset * Dpi.DpiScaleY;
 
     public static nint LastActiveWindowHandle { get; set; }
-
-    private static readonly SemaphoreSlim s_dialogSemaphore = new(1, 1);
 
     public static ComboBoxItem[] FindJapaneseFonts()
     {

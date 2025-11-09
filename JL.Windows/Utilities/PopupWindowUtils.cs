@@ -19,14 +19,17 @@ namespace JL.Windows.Utilities;
 internal static class PopupWindowUtils
 {
     public const int MaxPopupWindowsIndex = 40;
+
     public static readonly PopupWindow?[] PopupWindows = new PopupWindow?[MaxPopupWindowsIndex + 2];
-    private static string? s_primarySpellingOfLastPlayedAudio;
-    private static string? s_readingOfLastPlayedAudio;
-    public static Pen PitchAccentMarkerPen { get; private set; } = new();
     public static readonly Timer PopupAutoHideTimer = new()
     {
         AutoReset = false
     };
+
+    private static string? s_primarySpellingOfLastPlayedAudio;
+    private static string? s_readingOfLastPlayedAudio;
+
+    public static Pen PitchAccentMarkerPen { get; private set; } = new();
 
     static PopupWindowUtils()
     {

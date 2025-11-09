@@ -41,28 +41,30 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class MainWindow
 {
-    public nint WindowHandle { get; private set; }
+    private static MainWindow? s_instance;
+    private static long s_lastTextCopyTimestamp;
+    private static DpiScale? s_previousDpi;
 
+    private bool _contextMenuIsClosed = true;
+    private bool _passThroughMode; // = false;
+    private Point _swipeStartPoint;
+    private InputMethod? _input;
+    private Point _lastMouseMovePosition;
+    private Timer? _lookupDelayTimer;
+    private int _lastCharPosition = -1;
+
+    public static MainWindow Instance => s_instance!;
+
+    public nint WindowHandle { get; private set; }
     public PopupWindow FirstPopupWindow { get; }
 
-    private static MainWindow? s_instance;
-    public static MainWindow Instance => s_instance!;
+    public bool ContextMenuIsOpening { get; private set; } // = false;
+    public bool MouseEnterDueToFirstPopupHide { get; set; } // = false;
 
     public double LeftPositionBeforeResolutionChange { get; set; }
     public double TopPositionBeforeResolutionChange { get; set; }
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
-    public bool ContextMenuIsOpening { get; private set; } // = false;
-    private bool _contextMenuIsClosed = true;
-    private bool _passThroughMode; // = false;
-    public bool MouseEnterDueToFirstPopupHide { get; set; } // = false;
-    private Point _swipeStartPoint;
-    private InputMethod? _input;
-    private static long s_lastTextCopyTimestamp;
-    private static DpiScale? s_previousDpi;
-    private Point _lastMouseMovePosition;
-    private Timer? _lookupDelayTimer;
-    private int _lastCharPosition = -1;
 
     public MainWindow()
     {

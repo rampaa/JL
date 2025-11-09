@@ -14,12 +14,13 @@ namespace JL.Windows.SpeechSynthesis;
 
 internal static class SpeechSynthesisUtils
 {
-    private static long s_lastAudioPlayTimestamp;
-    public static string? InstalledVoiceWithHighestPriority { get; private set; }
     private static readonly SpeechSynthesizer s_synthesizer = new();
     private static readonly SpeechSynthesizer s_streamSynthesizer = new();
-
     public static readonly ComboBoxItem[]? InstalledVoices = GetInstalledVoiceNames();
+
+    private static long s_lastAudioPlayTimestamp;
+
+    public static string? InstalledVoiceWithHighestPriority { get; private set; }
 
     private static ComboBoxItem[]? GetInstalledVoiceNames()
     {
