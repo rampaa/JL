@@ -1646,7 +1646,7 @@ internal sealed partial class MainWindow
             double yPosition;
             double width;
             double maxDynamicHeight = configManager.MainWindowMaxDynamicHeight * dpi.DpiScaleY;
-            if (!MagpieUtils.IsMagpieScaling || !MagpieUtils.SourceWindowRect.Contains(WinApi.GetMousePosition()))
+            if (!MagpieUtils.IsMagpieScaling || !MagpieUtils.MagpieWindowRect.Contains(WinApi.GetMousePosition()))
             {
                 Rectangle workingArea = WindowsUtils.ActiveScreen.WorkingArea;
                 if (configManager.PositionPopupAboveCursor)
@@ -1683,29 +1683,30 @@ internal sealed partial class MainWindow
                 if (configManager.PositionPopupAboveCursor
                     || configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true, MainWindowFixedBottomPosition: -2 or -1 })
                 {
-                    yPosition = MagpieUtils.MagpieWindowBottomEdgePosition - maxDynamicHeight;
-                    if (yPosition < MagpieUtils.MagpieWindowTopEdgePosition)
+                    yPosition = MagpieUtils.MagpieWindowRect.Bottom - maxDynamicHeight;
+                    if (yPosition < MagpieUtils.MagpieWindowRect.Top)
                     {
-                        yPosition = MagpieUtils.MagpieWindowTopEdgePosition;
+                        yPosition = MagpieUtils.MagpieWindowRect.Top;
                     }
                 }
                 else
                 {
-                    yPosition = MagpieUtils.MagpieWindowTopEdgePosition;
+                    yPosition = MagpieUtils.MagpieWindowRect.Top;
                 }
 
-                width = !configManager.MainWindowDynamicWidth || Width > MagpieUtils.DpiAwareMagpieWindowWidth
-                    ? MagpieUtils.DpiAwareMagpieWindowWidth
+                double dpiAwareMagpieWindowWidth = MagpieUtils.MagpieWindowRect.Width / WindowsUtils.Dpi.DpiScaleX;
+                width = !configManager.MainWindowDynamicWidth || Width > dpiAwareMagpieWindowWidth
+                    ? dpiAwareMagpieWindowWidth
                     : Width;
 
                 if (configManager.MainWindowFixedRightPosition is 0)
                 {
                     double dpiUnawareWidth = width * dpi.DpiScaleX;
-                    xPosition = ((MagpieUtils.MagpieWindowRightEdgePosition + MagpieUtils.MagpieWindowLeftEdgePosition + dpiUnawareWidth) / 2) - dpiUnawareWidth;
+                    xPosition = ((MagpieUtils.MagpieWindowRect.Right + MagpieUtils.MagpieWindowRect.Left + dpiUnawareWidth) / 2) - dpiUnawareWidth;
                 }
                 else
                 {
-                    xPosition = MagpieUtils.MagpieWindowLeftEdgePosition;
+                    xPosition = MagpieUtils.MagpieWindowRect.Left;
                 }
             }
 
@@ -2085,18 +2086,18 @@ internal sealed partial class MainWindow
         {
             if (rightPosition is 0)
             {
-                rightPosition = (MagpieUtils.MagpieWindowLeftEdgePosition + MagpieUtils.MagpieWindowRightEdgePosition + currentWidth) / 2;
+                rightPosition = (MagpieUtils.MagpieWindowRect.Left + MagpieUtils.MagpieWindowRect.Right + currentWidth) / 2;
             }
             else if (rightPosition is -1 or -2)
             {
-                rightPosition = MagpieUtils.MagpieWindowRightEdgePosition;
+                rightPosition = MagpieUtils.MagpieWindowRect.Right;
             }
             else
             {
                 return Math.Max(activeScreen.Bounds.Left, rightPosition - currentWidth);
             }
 
-            return Math.Max(MagpieUtils.MagpieWindowLeftEdgePosition, rightPosition - currentWidth);
+            return Math.Max(MagpieUtils.MagpieWindowRect.Left, rightPosition - currentWidth);
         }
 
         if (rightPosition is 0)
@@ -2124,18 +2125,18 @@ internal sealed partial class MainWindow
         {
             if (bottomPosition is -2 or -1)
             {
-                bottomPosition = MagpieUtils.MagpieWindowBottomEdgePosition;
+                bottomPosition = MagpieUtils.MagpieWindowRect.Bottom;
             }
             else if (bottomPosition is 0)
             {
-                bottomPosition = (MagpieUtils.MagpieWindowTopEdgePosition + MagpieUtils.MagpieWindowBottomEdgePosition + currentHeight) / 2;
+                bottomPosition = (MagpieUtils.MagpieWindowRect.Top + MagpieUtils.MagpieWindowRect.Bottom + currentHeight) / 2;
             }
             else
             {
                 return Math.Max(activeScreen.Bounds.Top, bottomPosition - currentHeight);
             }
 
-            return Math.Max(MagpieUtils.MagpieWindowTopEdgePosition, bottomPosition - currentHeight);
+            return Math.Max(MagpieUtils.MagpieWindowRect.Top, bottomPosition - currentHeight);
         }
 
         if (bottomPosition is -2)

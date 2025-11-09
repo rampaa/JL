@@ -1,6 +1,5 @@
 using System.Windows;
 using JL.Windows.Interop;
-using JL.Windows.Utilities;
 
 namespace JL.Windows.External.Magpie;
 
@@ -24,13 +23,10 @@ internal static class MagpieUtils
         private set => s_isMagpieScaling = value;
     }
 
-    public static double MagpieWindowLeftEdgePosition { get; private set; }
-    public static double MagpieWindowRightEdgePosition { get; private set; }
-    public static double MagpieWindowTopEdgePosition { get; private set; }
-    public static double MagpieWindowBottomEdgePosition { get; private set; }
-    public static double DpiAwareMagpieWindowWidth { get; private set; }
     // public static nint SourceWindowHandle { get; set; }
     public static Rect SourceWindowRect { get; private set; }
+    public static Rect MagpieWindowRect { get; private set; }
+
     private static double s_scaleFactorX;
     private static double s_scaleFactorY;
 
@@ -109,8 +105,8 @@ internal static class MagpieUtils
     public static Point GetMousePosition(Point mousePosition)
     {
         return SourceWindowRect.Contains(mousePosition)
-            ? new Point(MagpieWindowLeftEdgePosition + ((mousePosition.X - SourceWindowRect.X) * s_scaleFactorX),
-                MagpieWindowTopEdgePosition + ((mousePosition.Y - SourceWindowRect.Y) * s_scaleFactorY))
+            ? new Point(MagpieWindowRect.X + ((mousePosition.X - SourceWindowRect.X) * s_scaleFactorX),
+                MagpieWindowRect.Y + ((mousePosition.Y - SourceWindowRect.Y) * s_scaleFactorY))
             : mousePosition;
     }
 
@@ -125,10 +121,13 @@ internal static class MagpieUtils
 
     private static void SetMagpieInfo(nint magpieWindowHandle)
     {
-        MagpieWindowTopEdgePosition = GetMagpieWindowTopEdgePositionFromMagpie(magpieWindowHandle);
-        MagpieWindowBottomEdgePosition = GetMagpieWindowBottomEdgePositionFromMagpie(magpieWindowHandle);
-        MagpieWindowLeftEdgePosition = GetMagpieWindowLeftEdgePositionFromMagpie(magpieWindowHandle);
-        MagpieWindowRightEdgePosition = GetMagpieWindowRightEdgePositionFromMagpie(magpieWindowHandle);
+        double magpieWindowTopEdgePosition = GetMagpieWindowTopEdgePositionFromMagpie(magpieWindowHandle);
+        double magpieWindowBottomEdgePosition = GetMagpieWindowBottomEdgePositionFromMagpie(magpieWindowHandle);
+        double magpieWindowLeftEdgePosition = GetMagpieWindowLeftEdgePositionFromMagpie(magpieWindowHandle);
+        double magpieWindowRightEdgePosition = GetMagpieWindowRightEdgePositionFromMagpie(magpieWindowHandle);
+        double magpieWindowWidth = magpieWindowRightEdgePosition - magpieWindowLeftEdgePosition;
+        double magpieWindowHeight = magpieWindowBottomEdgePosition - magpieWindowTopEdgePosition;
+        MagpieWindowRect = new Rect(magpieWindowLeftEdgePosition, magpieWindowTopEdgePosition, magpieWindowWidth, magpieWindowHeight);
 
         double sourceWindowLeftEdgePosition = GetSourceWindowLeftEdgePositionFromMagpie(magpieWindowHandle);
         double sourceWindowTopEdgePosition = GetSourceWindowTopEdgePositionFromMagpie(magpieWindowHandle);
@@ -136,16 +135,10 @@ internal static class MagpieUtils
         double sourceWindowBottomEdgePosition = GetSourceWindowBottomEdgePositionFromMagpie(magpieWindowHandle);
         double sourceWindowWidth = sourceWindowRightEdgePosition - sourceWindowLeftEdgePosition;
         double sourceWindowHeight = sourceWindowBottomEdgePosition - sourceWindowTopEdgePosition;
-
         SourceWindowRect = new Rect(sourceWindowLeftEdgePosition, sourceWindowTopEdgePosition, sourceWindowWidth, sourceWindowHeight);
-
-        // SourceWindowHandle = GetSourceWindowHande(lParam);
-
-        double magpieWindowWidth = MagpieWindowRightEdgePosition - MagpieWindowLeftEdgePosition;
-        DpiAwareMagpieWindowWidth = magpieWindowWidth / WindowsUtils.Dpi.DpiScaleX;
-        double magpieWindowHeight = MagpieWindowBottomEdgePosition - MagpieWindowTopEdgePosition;
 
         s_scaleFactorX = magpieWindowWidth / sourceWindowWidth;
         s_scaleFactorY = magpieWindowHeight / sourceWindowHeight;
+        // SourceWindowHandle = GetSourceWindowHande(lParam);
     }
 }
