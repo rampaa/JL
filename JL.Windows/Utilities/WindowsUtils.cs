@@ -514,25 +514,45 @@ internal static class WindowsUtils
         }
     }
 
-    public static Brush BrushFromHex(string hexColorString)
+    public static SolidColorBrush BrushFromHex(ReadOnlySpan<char> hex)
     {
-        Brush? brush = (Brush?)new BrushConverter().ConvertFromInvariantString(hexColorString);
-        Debug.Assert(brush is not null);
+        SolidColorBrush brush = new(ColorFromHex(hex));
         return brush;
     }
 
-    public static Brush FrozenBrushFromHex(string hexColorString)
+    public static SolidColorBrush FrozenBrushFromHex(ReadOnlySpan<char> hex)
     {
-        Brush? brush = (Brush?)new BrushConverter().ConvertFromInvariantString(hexColorString);
-        Debug.Assert(brush is not null);
-
+        SolidColorBrush brush = new(ColorFromHex(hex));
         brush.Freeze();
         return brush;
     }
 
-    public static Color ColorFromHex(string hexColorString)
+    public static Color ColorFromHex(ReadOnlySpan<char> hex)
     {
-        return (Color)ColorConverter.ConvertFromString(hexColorString);
+        Debug.Assert(hex.Length is 9 && hex[0] is '#');
+
+        byte a = HexToByte(hex[1], hex[2]);
+        byte r = HexToByte(hex[3], hex[4]);
+        byte g = HexToByte(hex[5], hex[6]);
+        byte b = HexToByte(hex[7], hex[8]);
+
+        return Color.FromArgb(a, r, g, b);
+    }
+
+    private static byte HexToByte(char highNibble, char lowNibble)
+    {
+        return (byte)((HexDigitToInt(highNibble) * 16) + HexDigitToInt(lowNibble));
+    }
+
+    private static int HexDigitToInt(char c)
+    {
+        return c is >= '0' and <= '9'
+            ? c - '0'
+            : c is >= 'A' and <= 'F'
+                ? c - 'A' + 10
+                : c is >= 'a' and <= 'f'
+                    ? c - 'a' + 10
+                    : throw new FormatException($"Invalid hex digit: {c}");
     }
 
     public static void Alert(AlertLevel alertLevel, string message)
