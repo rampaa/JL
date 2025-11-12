@@ -522,9 +522,8 @@ internal sealed class ConfigManager
         HighlightColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, HighlightColor, nameof(HighlightColor));
         _mainWindow.MainTextBox.SelectionBrush = HighlightColor;
 
-        PopupBackgroundColor = ConfigUtils.GetBrushFromConfig(connection, configs, PopupBackgroundColor, nameof(PopupBackgroundColor));
-        PopupBackgroundColor.Opacity = ConfigDBManager.GetValueFromConfig(connection, configs, 80.0, "PopupOpacity") / 100;
-        PopupBackgroundColor.Freeze();
+        double popupBackgroundColorOpacity = ConfigDBManager.GetValueFromConfig(connection, configs, 80.0, "PopupOpacity") / 100;
+        PopupBackgroundColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, PopupBackgroundColor, popupBackgroundColorOpacity, nameof(PopupBackgroundColor));
 
         _mainWindow.Background = ConfigUtils.GetBrushFromConfig(connection, configs, _mainWindow.Background, "MainWindowBackgroundColor");
 

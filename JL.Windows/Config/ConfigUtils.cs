@@ -16,7 +16,7 @@ internal static class ConfigUtils
         }
 
         ConfigDBManager.InsertSetting(connection, configKey, color.ToString(CultureInfo.InvariantCulture));
-        return WindowsUtils.ColorFromHex(color.ToString(CultureInfo.InvariantCulture));
+        return color;
     }
 
     public static Brush GetBrushFromConfig(SqliteConnection connection, Dictionary<string, string> configs, Brush solidColorBrush, string configKey)
