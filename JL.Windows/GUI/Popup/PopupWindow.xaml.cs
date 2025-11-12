@@ -1030,6 +1030,14 @@ internal sealed partial class PopupWindow
 
     private void HandleDelayedLookup()
     {
+        if (WindowState is WindowState.Minimized
+            || PopupContextMenu.IsVisible
+            || (_lastInteractedTextBox?.ContextMenu.IsVisible ?? false)
+            || TitleBarContextMenu.IsVisible)
+        {
+            return;
+        }
+
         Debug.Assert(_lastInteractedTextBox is not null);
 
         int charPosition = _lastInteractedTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(_lastInteractedTextBox), false);
@@ -2226,6 +2234,7 @@ internal sealed partial class PopupWindow
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
+        _lookupDelayTimer?.Stop();
         ReadingSelectionWindow.HideWindow();
         MiningSelectionWindow.CloseWindow();
 
@@ -2362,6 +2371,7 @@ internal sealed partial class PopupWindow
 
     private void HandleContextMenuOpening()
     {
+        _lookupDelayTimer?.Stop();
         _contextMenuIsOpening = true;
         PopupWindowUtils.HidePopups(PopupIndex + 1);
         _contextMenuIsOpening = false;

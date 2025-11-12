@@ -467,6 +467,13 @@ internal sealed partial class MainWindow
 
     private void HandleDelayedLookup()
     {
+        if (WindowState is WindowState.Minimized
+            || MainTextBoxContextMenu.IsVisible
+            || TitleBarContextMenu.IsVisible)
+        {
+            return;
+        }
+
         int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
         if (charPosition < 0)
         {
@@ -1332,6 +1339,8 @@ internal sealed partial class MainWindow
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
+        _lookupDelayTimer?.Stop();
+
         if (e.ChangedButton == ConfigManager.Instance.MiningModeMouseButton && FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             e.Handled = true;
@@ -1649,8 +1658,7 @@ internal sealed partial class MainWindow
             double width;
             double maxDynamicHeight = configManager.MainWindowMaxDynamicHeight * dpi.DpiScaleY;
 
-            Rect mainWindowRect = new(Left * dpi.DpiScaleX, Top * dpi.DpiScaleY, Width * dpi.DpiScaleX, Height * dpi.DpiScaleY);
-            if (!MagpieUtils.IsMagpieScaling || !MagpieUtils.MagpieWindowRect.IntersectsWith(mainWindowRect))
+            if (!MagpieUtils.IsMagpieScaling || !MagpieUtils.MagpieWindowRect.IntersectsWith(new Rect(Left * dpi.DpiScaleX, Top * dpi.DpiScaleY, Width * dpi.DpiScaleX, Height * dpi.DpiScaleY)))
             {
                 Rectangle workingArea = WindowsUtils.ActiveScreen.WorkingArea;
                 if (configManager.PositionPopupAboveCursor)
@@ -1732,6 +1740,8 @@ internal sealed partial class MainWindow
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
+        _lookupDelayTimer?.Stop();
+
         ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating);
         SearchMenuItem.IsEnabled = !string.IsNullOrWhiteSpace(MainTextBox.SelectedText);
@@ -2037,6 +2047,8 @@ internal sealed partial class MainWindow
 
     private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
+        _lookupDelayTimer?.Stop();
+
         if (FirstPopupWindow.IsVisible)
         {
             PopupWindowUtils.HidePopups(0);
