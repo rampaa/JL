@@ -516,7 +516,17 @@ internal static class WindowsUtils
 
     public static SolidColorBrush BrushFromHex(ReadOnlySpan<char> hex)
     {
-        SolidColorBrush brush = new(ColorFromHex(hex));
+        return new SolidColorBrush(ColorFromHex(hex));
+    }
+
+    public static SolidColorBrush FrozenBrushFromHex(ReadOnlySpan<char> hex, double brushOpacity)
+    {
+        SolidColorBrush brush = new(ColorFromHex(hex))
+        {
+            Opacity = brushOpacity
+        };
+
+        brush.Freeze();
         return brush;
     }
 
