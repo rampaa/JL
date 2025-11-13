@@ -19,7 +19,7 @@ internal static class FrequencyNazekaLoader
         FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, JsonElement[][]>>(fileStream, JsonOptions.Jso64KBuffer).ConfigureAwait(false);
+            frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, JsonElement[][]>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
             Debug.Assert(frequencyJson is not null);
         }
 

@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -16,107 +15,107 @@ internal static class EpwingNazekaLoader
             return;
         }
 
-        JsonElement[]? jsonObjects;
-
-        FileStream fileStream = File.OpenRead(fullPath);
-        await using (fileStream.ConfigureAwait(false))
-        {
-            jsonObjects = await JsonSerializer.DeserializeAsync<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
-            Debug.Assert(jsonObjects is not null);
-        }
-
         IDictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
 
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
 
-        for (int i = 1; i < jsonObjects.Length; i++)
+        FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+        await using (fileStream.ConfigureAwait(false))
         {
-            JsonElement jsonObj = jsonObjects[i];
-            string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
-
-            JsonElement spellingJsonArray = jsonObj.GetProperty("s");
-            List<string>? spellingList = new(spellingJsonArray.GetArrayLength());
-            foreach (JsonElement spellingJsonElement in spellingJsonArray.EnumerateArray())
+            IAsyncEnumerator<JsonElement> enumerator = JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(fileStream, JsonOptions.DefaultJso).GetAsyncEnumerator();
+            await using (enumerator.ConfigureAwait(false))
             {
-                string? spelling = spellingJsonElement.GetString();
-                if (!string.IsNullOrWhiteSpace(spelling))
+                _ = await enumerator.MoveNextAsync().ConfigureAwait(false);
+                while (await enumerator.MoveNextAsync().ConfigureAwait(false))
                 {
-                    spellingList.Add(spelling.GetPooledString());
-                }
-            }
+                    JsonElement jsonObj = enumerator.Current;
+                    string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
 
-            if (spellingList.Count is 0)
-            {
-                spellingList = null;
-            }
-
-            JsonElement definitionJsonArray = jsonObj.GetProperty("l");
-            List<string> definitionList = new(definitionJsonArray.GetArrayLength());
-            foreach (JsonElement definitionJsonElement in definitionJsonArray.EnumerateArray())
-            {
-                string? definition = definitionJsonElement.GetString();
-                if (!string.IsNullOrWhiteSpace(definition))
-                {
-                    definitionList.Add(definition.GetPooledString());
-                }
-            }
-
-            if (definitionList.Count is 0)
-            {
-                continue;
-            }
-
-            string[] definitions = definitionList.ToArray();
-            definitions.DeduplicateStringsInArray();
-
-            if (spellingList is not null)
-            {
-                string primarySpelling = spellingList[0];
-                if (!EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
-                {
-                    continue;
-                }
-
-                string primarySpellingInHiragana = nonKanjiDict
-                    ? JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString()
-                    : primarySpelling.GetPooledString();
-
-                EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions);
-                AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict);
-                if (nonKanjiDict && nonNameDict)
-                {
-                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
-                    if (primarySpellingInHiragana != readingInHiragana)
+                    JsonElement spellingJsonArray = jsonObj.GetProperty("s");
+                    List<string>? spellingList = new(spellingJsonArray.GetArrayLength());
+                    foreach (JsonElement spellingJsonElement in spellingJsonArray.EnumerateArray())
                     {
-                        AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict);
+                        string? spelling = spellingJsonElement.GetString();
+                        if (!string.IsNullOrWhiteSpace(spelling))
+                        {
+                            spellingList.Add(spelling.GetPooledString());
+                        }
                     }
-                }
 
-                ReadOnlySpan<string> spellingListSpan = spellingList.AsReadOnlySpan();
-                for (int j = 1; j < spellingListSpan.Length; j++)
-                {
-                    ref readonly string alternativeSpelling = ref spellingListSpan[j];
-                    if (!EpwingUtils.IsValidEpwingResultForDictType(alternativeSpelling, reading, definitions, dict))
+                    if (spellingList.Count is 0)
+                    {
+                        spellingList = null;
+                    }
+
+                    JsonElement definitionJsonArray = jsonObj.GetProperty("l");
+                    List<string> definitionList = new(definitionJsonArray.GetArrayLength());
+                    foreach (JsonElement definitionJsonElement in definitionJsonArray.EnumerateArray())
+                    {
+                        string? definition = definitionJsonElement.GetString();
+                        if (!string.IsNullOrWhiteSpace(definition))
+                        {
+                            definitionList.Add(definition.GetPooledString());
+                        }
+                    }
+
+                    if (definitionList.Count is 0)
                     {
                         continue;
                     }
 
-                    string alternativeSpellingInHiragana = nonKanjiDict
-                        ? JapaneseUtils.KatakanaToHiragana(alternativeSpelling).GetPooledString()
-                        : alternativeSpelling.GetPooledString();
+                    string[] definitions = definitionList.ToArray();
+                    definitions.DeduplicateStringsInArray();
 
-                    if (primarySpellingInHiragana != alternativeSpellingInHiragana)
+                    if (spellingList is not null)
                     {
-                        AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions), nazekaEpwingDict);
+                        string primarySpelling = spellingList[0];
+                        if (!EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
+                        {
+                            continue;
+                        }
+
+                        string primarySpellingInHiragana = nonKanjiDict
+                            ? JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString()
+                            : primarySpelling.GetPooledString();
+
+                        EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions);
+                        AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict);
+                        if (nonKanjiDict && nonNameDict)
+                        {
+                            string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
+                            if (primarySpellingInHiragana != readingInHiragana)
+                            {
+                                AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict);
+                            }
+                        }
+
+                        ReadOnlySpan<string> spellingListSpan = spellingList.AsReadOnlySpan();
+                        for (int j = 1; j < spellingListSpan.Length; j++)
+                        {
+                            ref readonly string alternativeSpelling = ref spellingListSpan[j];
+                            if (!EpwingUtils.IsValidEpwingResultForDictType(alternativeSpelling, reading, definitions, dict))
+                            {
+                                continue;
+                            }
+
+                            string alternativeSpellingInHiragana = nonKanjiDict
+                                ? JapaneseUtils.KatakanaToHiragana(alternativeSpelling).GetPooledString()
+                                : alternativeSpelling.GetPooledString();
+
+                            if (primarySpellingInHiragana != alternativeSpellingInHiragana)
+                            {
+                                AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions), nazekaEpwingDict);
+                            }
+                        }
+                    }
+
+                    else if (EpwingUtils.IsValidEpwingResultForDictType(reading, null, definitions, dict))
+                    {
+                        EpwingNazekaRecord record = new(reading, null, null, definitions);
+                        AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.KatakanaToHiragana(reading).GetPooledString() : reading, record, nazekaEpwingDict);
                     }
                 }
-            }
-
-            else if (EpwingUtils.IsValidEpwingResultForDictType(reading, null, definitions, dict))
-            {
-                EpwingNazekaRecord record = new(reading, null, null, definitions);
-                AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.KatakanaToHiragana(reading).GetPooledString() : reading, record, nazekaEpwingDict);
             }
         }
 

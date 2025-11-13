@@ -18,97 +18,92 @@ internal static class FrequencyYomichanLoader
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_meta_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            JsonElement[][]? frequencyJson;
-            FileStream fileStream = File.OpenRead(jsonFile);
+            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
             await using (fileStream.ConfigureAwait(false))
             {
-                frequencyJson = await JsonSerializer
-                    .DeserializeAsync<JsonElement[][]>(fileStream, JsonOptions.DefaultJso)
-                    .ConfigureAwait(false);
-
-                Debug.Assert(frequencyJson is not null);
-            }
-
-            foreach (JsonElement[] value in frequencyJson)
-            {
-                string primarySpelling = value[0].GetString()!.GetPooledString();
-                string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString();
-                string? reading = null;
-                int frequency = -1;
-                ref readonly JsonElement thirdElement = ref value[2];
-
-                if (thirdElement.ValueKind is JsonValueKind.Number)
+                await foreach (JsonElement[]? jsonElements in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
                 {
-                    frequency = thirdElement.GetInt32();
-                }
-                else if (thirdElement.ValueKind is JsonValueKind.Object)
-                {
-                    if (thirdElement.TryGetProperty("value", out JsonElement freqValue))
+                    Debug.Assert(jsonElements is not null);
+
+                    string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
+                    string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString();
+                    string? reading = null;
+                    int frequency = -1;
+                    ref readonly JsonElement thirdElement = ref jsonElements[2];
+
+                    if (thirdElement.ValueKind is JsonValueKind.Number)
                     {
-                        frequency = freqValue.GetInt32();
-                        if (frequency <= 0 && thirdElement.TryGetProperty("displayValue", out JsonElement displayValue))
-                        {
-                            frequency = TextUtils.ExtractFirstInt(displayValue.GetString());
-                        }
+                        frequency = thirdElement.GetInt32();
                     }
-                    else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
+                    else if (thirdElement.ValueKind is JsonValueKind.Object)
                     {
-                        reading = readingValue.GetString()!.GetPooledString();
-                        JsonElement frequencyElement = thirdElement.GetProperty("frequency");
-
-                        if (frequencyElement.ValueKind is JsonValueKind.Number)
+                        if (thirdElement.TryGetProperty("value", out JsonElement freqValue))
                         {
-                            frequency = frequencyElement.GetInt32();
-                        }
-                        else if (frequencyElement.ValueKind is JsonValueKind.Object)
-                        {
-                            frequency = frequencyElement.GetProperty("value").GetInt32();
-                            if (frequency <= 0 && frequencyElement.TryGetProperty("displayValue", out JsonElement displayValue))
+                            frequency = freqValue.GetInt32();
+                            if (frequency <= 0 && thirdElement.TryGetProperty("displayValue", out JsonElement displayValue))
                             {
                                 frequency = TextUtils.ExtractFirstInt(displayValue.GetString());
                             }
                         }
-                        else // if (frequencyElement.ValueKind is JsonValueKind.String)
+                        else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
                         {
-                            frequency = TextUtils.ExtractFirstInt(frequencyElement.GetString());
+                            reading = readingValue.GetString()!.GetPooledString();
+                            JsonElement frequencyElement = thirdElement.GetProperty("frequency");
+
+                            if (frequencyElement.ValueKind is JsonValueKind.Number)
+                            {
+                                frequency = frequencyElement.GetInt32();
+                            }
+                            else if (frequencyElement.ValueKind is JsonValueKind.Object)
+                            {
+                                frequency = frequencyElement.GetProperty("value").GetInt32();
+                                if (frequency <= 0 && frequencyElement.TryGetProperty("displayValue", out JsonElement displayValue))
+                                {
+                                    frequency = TextUtils.ExtractFirstInt(displayValue.GetString());
+                                }
+                            }
+                            else // if (frequencyElement.ValueKind is JsonValueKind.String)
+                            {
+                                frequency = TextUtils.ExtractFirstInt(frequencyElement.GetString());
+                            }
                         }
                     }
-                }
-                else // if (thirdElement.ValueKind is JsonValueKind.String)
-                {
-                    string? freqStr = thirdElement.GetString();
-                    Debug.Assert(freqStr is not null);
+                    else // if (thirdElement.ValueKind is JsonValueKind.String)
+                    {
+                        string? freqStr = thirdElement.GetString();
+                        Debug.Assert(freqStr is not null);
 
-                    frequency = TextUtils.ExtractFirstInt(freqStr);
-                }
+                        frequency = TextUtils.ExtractFirstInt(freqStr);
+                    }
 
-                if (frequency <= 0)
-                {
-                    continue;
-                }
+                    if (frequency <= 0)
+                    {
+                        continue;
+                    }
 
-                if (frequency > freq.MaxValue)
-                {
-                    freq.MaxValue = frequency;
-                }
+                    if (frequency > freq.MaxValue)
+                    {
+                        freq.MaxValue = frequency;
+                    }
 
-                if (primarySpelling == reading)
-                {
-                    reading = null;
-                }
+                    if (primarySpelling == reading)
+                    {
+                        reading = null;
+                    }
 
-                FrequencyRecord frequencyRecordWithPrimarySpelling = new(primarySpelling, frequency);
-                if (reading is null)
-                {
-                    FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling);
-                }
-                else
-                {
-                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
-                    FreqUtils.AddOrUpdate(freq.Contents, readingInHiragana, frequencyRecordWithPrimarySpelling);
+                    FrequencyRecord frequencyRecordWithPrimarySpelling = new(primarySpelling, frequency);
+                    if (reading is null)
+                    {
+                        FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling);
+                    }
+                    else
+                    {
+                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
+                        FreqUtils.AddOrUpdate(freq.Contents, readingInHiragana, frequencyRecordWithPrimarySpelling);
 
-                    FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
-                    FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithReading);
+                        FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
+                        FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithReading);
+                    }
                 }
             }
         }

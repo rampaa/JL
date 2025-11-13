@@ -21,61 +21,54 @@ internal static class YomichanPitchAccentLoader
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term*bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            JsonElement[][]? jsonObjects;
-
-            FileStream fileStream = File.OpenRead(jsonFile);
+            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
             await using (fileStream.ConfigureAwait(false))
             {
-                jsonObjects = await JsonSerializer
-                    .DeserializeAsync<JsonElement[][]>(fileStream, JsonOptions.DefaultJso)
-                    .ConfigureAwait(false);
-
-                Debug.Assert(jsonObjects is not null);
-            }
-
-            foreach (JsonElement[] jsonObject in jsonObjects)
-            {
-                PitchAccentRecord newEntry = new(jsonObject);
-                if (newEntry.Position is byte.MaxValue || string.IsNullOrWhiteSpace(newEntry.Spelling))
+                await foreach (JsonElement[]? jsonObject in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
                 {
-                    continue;
-                }
+                    Debug.Assert(jsonObject is not null);
 
-                string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Spelling).GetPooledString();
-                if (pitchDict.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
-                {
-                    if (!result.Contains(newEntry))
+                    PitchAccentRecord newEntry = new(jsonObject);
+                    if (newEntry.Position is byte.MaxValue || string.IsNullOrWhiteSpace(newEntry.Spelling))
                     {
-                        result.Add(newEntry);
+                        continue;
                     }
-                }
 
-                else
-                {
-                    pitchDict[spellingInHiragana] = [newEntry];
-                }
-
-                if (newEntry.Reading is not null)
-                {
-                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading).GetPooledString();
-                    if (spellingInHiragana != readingInHiragana)
+                    string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Spelling).GetPooledString();
+                    if (pitchDict.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
                     {
-                        if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))
+                        if (!result.Contains(newEntry))
                         {
-                            if (!readingResult.Contains(newEntry))
+                            result.Add(newEntry);
+                        }
+                    }
+                    else
+                    {
+                        pitchDict[spellingInHiragana] = [newEntry];
+                    }
+
+                    if (newEntry.Reading is not null)
+                    {
+                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading).GetPooledString();
+                        if (spellingInHiragana != readingInHiragana)
+                        {
+                            if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))
                             {
-                                readingResult.Add(newEntry);
+                                if (!readingResult.Contains(newEntry))
+                                {
+                                    readingResult.Add(newEntry);
+                                }
+                            }
+                            else
+                            {
+                                pitchDict[readingInHiragana] = [newEntry];
                             }
                         }
-                        else
-                        {
-                            pitchDict[readingInHiragana] = [newEntry];
-                        }
                     }
                 }
             }
-        }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+            dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        }
     }
 }

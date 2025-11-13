@@ -23,24 +23,18 @@ internal static class EpwingYomichanLoader
 
         foreach (string jsonFile in jsonFiles)
         {
-            JsonElement[][]? jsonElementLists;
-
-            FileStream fileStream = File.OpenRead(jsonFile);
+            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
             await using (fileStream.ConfigureAwait(false))
             {
-                jsonElementLists = await JsonSerializer
-                    .DeserializeAsync<JsonElement[][]>(fileStream)
-                    .ConfigureAwait(false);
-
-                Debug.Assert(jsonElementLists is not null);
-            }
-
-            foreach (JsonElement[] jsonElements in jsonElementLists)
-            {
-                EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElements, dict);
-                if (record is not null)
+                await foreach (JsonElement[]? jsonElements in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
                 {
-                    AddToDictionary(record, dict, nonKanjiDict, nonNameDict);
+                    Debug.Assert(jsonElements is not null);
+
+                    EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElements, dict);
+                    if (record is not null)
+                    {
+                        AddToDictionary(record, dict, nonKanjiDict, nonNameDict);
+                    }
                 }
             }
         }

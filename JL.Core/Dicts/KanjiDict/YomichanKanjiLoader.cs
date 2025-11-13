@@ -19,37 +19,31 @@ internal static class YomichanKanjiLoader
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            JsonElement[][]? jsonObjects;
-
-            FileStream fileStream = File.OpenRead(jsonFile);
+            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
             await using (fileStream.ConfigureAwait(false))
             {
-                jsonObjects = await JsonSerializer
-                    .DeserializeAsync<JsonElement[][]>(fileStream, JsonOptions.DefaultJso)
-                    .ConfigureAwait(false);
-
-                Debug.Assert(jsonObjects is not null);
-            }
-
-            foreach (JsonElement[] jsonObj in jsonObjects)
-            {
-                YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
-                string kanji = jsonObj[0].GetString()!.GetPooledString();
-                if (string.IsNullOrWhiteSpace(kanji))
+                await foreach (JsonElement[]? jsonObj in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
                 {
-                    continue;
-                }
+                    Debug.Assert(jsonObj is not null);
 
-                if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
-                {
-                    if (!kanjiResult.Contains(yomichanKanjiRecord))
+                    YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
+                    string kanji = jsonObj[0].GetString()!.GetPooledString();
+                    if (string.IsNullOrWhiteSpace(kanji))
                     {
-                        kanjiResult.Add(yomichanKanjiRecord);
+                        continue;
                     }
-                }
-                else
-                {
-                    dict.Contents[kanji] = [yomichanKanjiRecord];
+
+                    if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
+                    {
+                        if (!kanjiResult.Contains(yomichanKanjiRecord))
+                        {
+                            kanjiResult.Add(yomichanKanjiRecord);
+                        }
+                    }
+                    else
+                    {
+                        dict.Contents[kanji] = [yomichanKanjiRecord];
+                    }
                 }
             }
         }
