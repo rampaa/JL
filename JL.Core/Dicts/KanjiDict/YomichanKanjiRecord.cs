@@ -62,7 +62,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
         //if (Tags.Length is 0)
         //{
         //    Tags = null;
-        //
+        //}
 
         // Kun Readings
         string? kunReadingsStr = jsonElement[2].GetString();

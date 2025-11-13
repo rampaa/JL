@@ -111,7 +111,7 @@ public static class TextUtils
         return text;
     }
 
-    public static bool StartsWithWhiteSpace(string text)
+    public static bool StartsWithWhiteSpace(ReadOnlySpan<char> text)
     {
         char firstChar = text[0];
         return !char.IsHighSurrogate(firstChar)
@@ -119,7 +119,7 @@ public static class TextUtils
             : Rune.IsWhiteSpace(new Rune(firstChar, text[1]));
     }
 
-    internal static string GetFirstCharacter(string text)
+    internal static string GetFirstCharacter(ReadOnlySpan<char> text)
     {
         char firstChar = text[0];
         return !char.IsHighSurrogate(firstChar)
