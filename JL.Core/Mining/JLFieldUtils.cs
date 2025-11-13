@@ -119,7 +119,7 @@ public static class JLFieldUtils
         JLField.LocalTime
     ];
 
-    public static readonly FrozenSet<JLField> JLFieldsToExcludeFromWhenMiningToFile =
+    internal static readonly FrozenSet<JLField> s_jlFieldsToExcludeFromWhenMiningToFile =
     [
         JLField.Nothing,
         JLField.Audio,

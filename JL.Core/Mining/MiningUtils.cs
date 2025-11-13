@@ -542,7 +542,7 @@ public static class MiningUtils
         LookupResult lookupResult = lookupResults[currentLookupResultIndex];
 
         bool mineAllFields = jlFields is null;
-        Dictionary<JLField, string> miningParams = new(mineAllFields ? JLFieldUtils.JLFieldsForWordDicts.Length - JLFieldUtils.JLFieldsToExcludeFromWhenMiningToFile.Count : jlFields!.Count);
+        Dictionary<JLField, string> miningParams = new(mineAllFields ? JLFieldUtils.JLFieldsForWordDicts.Length - JLFieldUtils.s_jlFieldsToExcludeFromWhenMiningToFile.Count : jlFields!.Count);
         if (mineAllFields || jlFields!.Contains(JLField.LocalTime))
         {
             miningParams[JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
@@ -1456,7 +1456,7 @@ public static class MiningUtils
         for (int i = 1; i < jlFields.Length; i++)
         {
             JLField jlField = jlFields[i];
-            if (JLFieldUtils.JLFieldsToExcludeFromWhenMiningToFile.Contains(jlField))
+            if (JLFieldUtils.s_jlFieldsToExcludeFromWhenMiningToFile.Contains(jlField))
             {
                 continue;
             }
