@@ -8,14 +8,39 @@
         Title="" MaxHeight="600" MaxWidth="800" ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="WidthAndHeight" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal" Closed="Window_Closed">
     <Grid>
-        <ScrollViewer PanningMode="Both">
-            <StackPanel>
-                <hc:TextBox x:Name="InfoDataGridSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
-                                        hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoDataGridSearchTextBox_TextChanged" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <DataGrid Name="InfoDataGrid" IsReadOnly="True" Width="Auto" Height="Auto" AutoGenerateColumns="False"
-                  CanUserSortColumns="True" CanUserAddRows="False" CanUserDeleteRows="False" />
-            </StackPanel>
-        </ScrollViewer>
+        <hc:TextBox x:Name="InfoDataGridSearchTextBox" Grid.Row="0" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                    hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoDataGridSearchTextBox_TextChanged"/>
+
+        <DataGrid Name="InfoDataGrid" Grid.Row="1" IsReadOnly="True" Width="Auto" Height="Auto" AutoGenerateColumns="False"
+                  CanUserSortColumns="True" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeColumns="False"
+                  EnableRowVirtualization="True" EnableColumnVirtualization="True"
+                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                  ScrollViewer.CanContentScroll="True">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Term" Binding="{Binding Key}" Width="*" MaxWidth="400">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="Count" Binding="{Binding Value}" Width="100">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="TextAlignment" Value="Left"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
     </Grid>
 </Window>

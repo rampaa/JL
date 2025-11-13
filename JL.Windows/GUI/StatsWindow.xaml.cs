@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Interop;
 using JL.Core.Config;
 using JL.Core.Frontend;
@@ -200,21 +198,6 @@ internal sealed partial class StatsWindow
             WindowStartupLocation = WindowStartupLocation.CenterOwner
         };
 
-        DataGridTextColumn termColumn = new()
-        {
-            Header = "Term",
-            Binding = new Binding("Key")
-        };
-
-        DataGridTextColumn frequencyColumn = new()
-        {
-            Header = "Count",
-            Binding = new Binding("Value")
-        };
-
-        infoDataGridWindow.InfoDataGrid.Columns.Add(termColumn);
-        infoDataGridWindow.InfoDataGrid.Columns.Add(frequencyColumn);
-
         if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode mode))
         {
             IList<KeyValuePair<string, int>>? termLookupCounts = mode switch
@@ -226,7 +209,7 @@ internal sealed partial class StatsWindow
             };
 
             infoDataGridWindow.InfoDataGrid.ItemsSource = termLookupCounts;
-
+            infoDataGridWindow.Owner = this;
             _ = infoDataGridWindow.ShowDialog();
         }
 
