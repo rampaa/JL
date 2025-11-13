@@ -1,4 +1,5 @@
 namespace JL.Core;
+
 public static class AppInfo
 {
     public static readonly Version JLVersion = new(3, 8, 3);
