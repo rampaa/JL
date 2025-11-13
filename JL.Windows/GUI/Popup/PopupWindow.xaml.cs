@@ -1032,7 +1032,7 @@ internal sealed partial class PopupWindow
     {
         if (WindowState is WindowState.Minimized
             || PopupContextMenu.IsVisible
-            || (_lastInteractedTextBox?.ContextMenu.IsVisible ?? false)
+            || (_lastInteractedTextBox?.ContextMenu?.IsVisible ?? false)
             || TitleBarContextMenu.IsVisible)
         {
             return;

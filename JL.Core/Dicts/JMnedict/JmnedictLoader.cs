@@ -15,18 +15,18 @@ internal static class JmnedictLoader
         if (File.Exists(fullPath))
         {
             DictUtils.JmnedictEntities.Clear();
+
+            // ReSharper disable once UseAwaitUsing
             using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))
             {
                 // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
                 // And we do need EntityHandling property because we want to get unexpanded entity names
                 // The downside of using XmlTextReader is that it does not support async methods
                 // And we cannot set some settings (e.g. MaxCharactersFromEntities)
-                using XmlTextReader xmlTextReader = new(fileStream)
-                {
-                    DtdProcessing = DtdProcessing.Parse,
-                    WhitespaceHandling = WhitespaceHandling.None,
-                    EntityHandling = EntityHandling.ExpandCharEntities
-                };
+                using XmlTextReader xmlTextReader = new(fileStream);
+                xmlTextReader.DtdProcessing = DtdProcessing.Parse;
+                xmlTextReader.WhitespaceHandling = WhitespaceHandling.None;
+                xmlTextReader.EntityHandling = EntityHandling.ExpandCharEntities;
 
                 while (xmlTextReader.ReadToFollowing("entry"))
                 {
