@@ -16,14 +16,10 @@ internal static class FrequencyNazekaLoader
         }
 
         Dictionary<string, JsonElement[][]>? frequencyJson;
-
-        FileStream fileStream = File.OpenRead(fullPath);
+        FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            frequencyJson = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, JsonElement[][]>>(fileStream, JsonOptions.DefaultJso)
-                .ConfigureAwait(false);
-
+            frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, JsonElement[][]>>(fileStream, JsonOptions.Jso64KBuffer).ConfigureAwait(false);
             Debug.Assert(frequencyJson is not null);
         }
 
@@ -31,8 +27,8 @@ internal static class FrequencyNazekaLoader
         {
             foreach (JsonElement[] elementList in value)
             {
-                string exactSpelling = elementList[0].GetString()!.GetPooledString();
                 int frequencyRank = elementList[1].GetInt32();
+                string exactSpelling = elementList[0].GetString()!.GetPooledString();
 
                 if (frequencyRank > freq.MaxValue)
                 {
