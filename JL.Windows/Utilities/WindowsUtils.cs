@@ -541,10 +541,11 @@ internal static class WindowsUtils
     {
         Debug.Assert(hex.Length is 9 && hex[0] is '#');
 
-        byte a = HexToByte(hex[1], hex[2]);
-        byte r = HexToByte(hex[3], hex[4]);
+        char lastDigit = hex[8];
+        byte b = HexToByte(hex[7], lastDigit);
         byte g = HexToByte(hex[5], hex[6]);
-        byte b = HexToByte(hex[7], hex[8]);
+        byte r = HexToByte(hex[3], hex[4]);
+        byte a = HexToByte(hex[1], hex[2]);
 
         return Color.FromArgb(a, r, g, b);
     }

@@ -461,8 +461,8 @@ internal sealed partial class PreferencesWindow
         OrderedDictionary<string, JLField> dict = new(miningPanel.Children.Count, StringComparer.Ordinal);
         foreach (StackPanel stackPanel in miningPanel.Children.Cast<StackPanel>())
         {
-            TextBlock textBlock = (TextBlock)stackPanel.Children[0];
             ComboBox comboBox = (ComboBox)stackPanel.Children[1];
+            TextBlock textBlock = (TextBlock)stackPanel.Children[0];
 
             string? selectedDescription = comboBox.SelectionBoxItem.ToString();
             Debug.Assert(selectedDescription is not null);

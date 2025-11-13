@@ -67,22 +67,21 @@ public static class CustomWordLoader
             string[] lParts = line.Split('\t', StringSplitOptions.TrimEntries);
             if (lParts.Length >= 4)
             {
-                string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-                string[]? readings = lParts[1].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                if (readings.Length is 0
-                    || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
-                {
-                    readings = null;
-                }
-
-                string[] definitions = lParts[2].Replace("\\n", "\n", StringComparison.Ordinal).Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                string partOfSpeech = lParts[3];
-
                 string[]? wordClasses = null;
                 if (lParts.Length is 5)
                 {
                     wordClasses = lParts[4].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                }
+
+                string partOfSpeech = lParts[3];
+                string[] definitions = lParts[2].Replace("\\n", "\n", StringComparison.Ordinal).Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[]? readings = lParts[1].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+                if (readings.Length is 0
+                    || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
+                {
+                    readings = null;
                 }
 
                 AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses, customWordDictionary);

@@ -27,52 +27,8 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
 
     public YomichanKanjiRecord(JsonElement[] jsonElement)
     {
-        string? onReadingsStr = jsonElement[1].GetString();
-        Debug.Assert(onReadingsStr is not null);
-        OnReadings = onReadingsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (OnReadings.Length is 0)
-        {
-            OnReadings = null;
-        }
-
-        else
-        {
-            OnReadings.DeduplicateStringsInArray();
-        }
-
-        string? kunReadingsStr = jsonElement[2].GetString();
-        Debug.Assert(kunReadingsStr is not null);
-        KunReadings = kunReadingsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (KunReadings.Length is 0)
-        {
-            KunReadings = null;
-        }
-
-        else
-        {
-            KunReadings.DeduplicateStringsInArray();
-        }
-
-        //Tags = jsonElement[3].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        //if (Tags.Length is 0)
-        //{
-        //    Tags = null;
-        //}
-
-        ref readonly JsonElement definitionsArray = ref jsonElement[4];
-        List<string> definitionList = new(definitionsArray.GetArrayLength());
-        foreach (JsonElement definitionElement in definitionsArray.EnumerateArray())
-        {
-            string? definition = definitionElement.GetString();
-            if (!string.IsNullOrWhiteSpace(definition))
-            {
-                definitionList.Add(definition);
-            }
-        }
-
-        Definitions = definitionList.TrimToArray();
-
-        JsonElement statsElement = jsonElement[5];
+        // Stats
+        ref readonly JsonElement statsElement = ref jsonElement[5];
         int statsElementPropertyCount = statsElement.GetPropertyCount();
         if (statsElementPropertyCount > 0)
         {
@@ -83,6 +39,55 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
                 Stats[index] = string.Create(CultureInfo.InvariantCulture, $"{stat.Name}: {stat.Value}");
                 ++index;
             }
+        }
+
+        // Definitions
+        ref readonly JsonElement definitionsArray = ref jsonElement[4];
+        List<string> definitionList = new(definitionsArray.GetArrayLength());
+        foreach (JsonElement definitionElement in definitionsArray.EnumerateArray())
+        {
+            string? definition = definitionElement.GetString();
+            if (!string.IsNullOrWhiteSpace(definition))
+            {
+                definitionList.Add(definition);
+            }
+        }
+        Definitions = definitionList.TrimToArray();
+
+
+        // Tags
+        //string? tagsStr = jsonElement[3].GetString();
+        //Debug.Assert(tagsStr is not null);
+        //Tags = tagsStr!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        //if (Tags.Length is 0)
+        //{
+        //    Tags = null;
+        //
+
+        // Kun Readings
+        string? kunReadingsStr = jsonElement[2].GetString();
+        Debug.Assert(kunReadingsStr is not null);
+        KunReadings = kunReadingsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (KunReadings.Length is 0)
+        {
+            KunReadings = null;
+        }
+        else
+        {
+            KunReadings.DeduplicateStringsInArray();
+        }
+
+        // On readings
+        string? onReadingsStr = jsonElement[1].GetString();
+        Debug.Assert(onReadingsStr is not null);
+        OnReadings = onReadingsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (OnReadings.Length is 0)
+        {
+            OnReadings = null;
+        }
+        else
+        {
+            OnReadings.DeduplicateStringsInArray();
         }
     }
 
