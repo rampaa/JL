@@ -26,6 +26,7 @@
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2" />
     <PackageReference Include="sourcegear.sqlite3" Version="3.50.4.5" />
     <PackageReference Include="Microsoft.NET.StringTools" Version="18.0.2" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
   </ItemGroup>
 
   <ItemGroup>

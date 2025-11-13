@@ -25,6 +25,8 @@
     <PackageReference Include="Microsoft.Testing.Extensions.VSTestBridge" Version="2.0.2" />
     <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="2.0.2" />
     <PackageReference Include="Microsoft.TestPlatform.AdapterUtilities" Version="18.0.1" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.0" />
+    <PackageReference Include="System.Reflection.Metadata" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
