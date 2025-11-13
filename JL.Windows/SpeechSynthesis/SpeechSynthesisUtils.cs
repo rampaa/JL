@@ -24,10 +24,7 @@ internal static class SpeechSynthesisUtils
 
     private static ComboBoxItem[]? GetInstalledVoiceNames()
     {
-        s_synthesizer.InjectOneCoreVoices();
         s_synthesizer.SetOutputToDefaultAudioDevice();
-
-        s_streamSynthesizer.InjectOneCoreVoices();
 
 #pragma warning disable CA1304 // Specify CultureInfo
         List<InstalledVoice> installedVoices = s_synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled && iv.VoiceInfo.Name is not null && iv.VoiceInfo.Culture is not null).ToList();
