@@ -29,7 +29,7 @@ internal sealed class AtomicBool : IEquatable<AtomicBool>, IEquatable<bool>
 
     public bool Equals(bool other) => Value == other;
 
-    public static bool operator ==(AtomicBool? left, AtomicBool? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(AtomicBool? left, AtomicBool? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(AtomicBool? left, AtomicBool? right) => !(left == right);
 
     public static bool operator ==(AtomicBool? left, bool right) => left is not null && left.Value == right;

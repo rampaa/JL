@@ -44,6 +44,6 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
         return other is not null && Name == other.Name;
     }
 
-    public static bool operator ==(Dict? left, Dict? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(Dict? left, Dict? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(Dict? left, Dict? right) => !(left == right);
 }
