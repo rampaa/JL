@@ -4,6 +4,7 @@ using System.Text.Json;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 
 namespace JL.Core.WordClass;
@@ -18,7 +19,13 @@ internal static class JmdictWordClassUtils
 
     internal static async Task Load()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ResourcesPath, "PoS.json"), FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+        string partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
+        if (!File.Exists(partOfSpeechFilePath))
+        {
+            return;
+        }
+
+        FileStream fileStream = new(partOfSpeechFilePath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, IList<JmdictWordClass>>? wordClassDictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
@@ -173,29 +180,28 @@ internal static class JmdictWordClassUtils
     internal static async Task Initialize()
     {
         Dict jmdictDict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        string jmdictPath = Path.GetFullPath(jmdictDict.Path, AppInfo.ApplicationPath);
+        string fullJmdictPath = Path.GetFullPath(jmdictDict.Path, AppInfo.ApplicationPath);
         string partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
 
         if (!File.Exists(partOfSpeechFilePath)
-            || (File.Exists(jmdictPath) && File.GetLastWriteTime(jmdictPath) > File.GetLastWriteTime(partOfSpeechFilePath)))
+            || (File.Exists(fullJmdictPath) && File.GetLastWriteTime(fullJmdictPath) > File.GetLastWriteTime(partOfSpeechFilePath)))
         {
             bool useDB = jmdictDict.Options.UseDB.Value;
             if (jmdictDict.Active && !useDB)
             {
                 await Serialize().ConfigureAwait(false);
             }
-
             else
             {
                 bool deleteJmdictFile = false;
-                if (!File.Exists(jmdictPath))
+                if (!File.Exists(fullJmdictPath))
                 {
                     deleteJmdictFile = true;
 
                     Uri? uri = jmdictDict.Url;
                     Debug.Assert(uri is not null);
 
-                    bool downloaded = await ResourceUpdater.DownloadBuiltInDict(jmdictPath,
+                    bool downloaded = await ResourceUpdater.DownloadBuiltInDict(fullJmdictPath,
                         uri,
                         jmdictDict.Type.ToString(), false, true).ConfigureAwait(false);
 
@@ -206,20 +212,27 @@ internal static class JmdictWordClassUtils
                 }
 
                 jmdictDict.Contents = new Dictionary<string, IList<IDictRecord>>(jmdictDict.Size > 0 ? jmdictDict.Size : 450000, StringComparer.Ordinal);
-                await JmdictLoader.Load(jmdictDict).ConfigureAwait(false);
-                await Serialize().ConfigureAwait(false);
-                jmdictDict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-
-                if (deleteJmdictFile)
+                try
                 {
-                    File.Delete(jmdictPath);
+                    await JmdictLoader.Load(jmdictDict).ConfigureAwait(false);
+                    await Serialize().ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", jmdictDict.Type.GetDescription(), jmdictDict.Name, fullJmdictPath);
+                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {jmdictDict.Name}");
+                }
+                finally
+                {
+                    jmdictDict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                    if (deleteJmdictFile)
+                    {
+                        File.Delete(fullJmdictPath);
+                    }
                 }
             }
         }
 
-        if (DictUtils.WordClassDictionary.Count is 0)
-        {
-            await Load().ConfigureAwait(false);
-        }
+        await Load().ConfigureAwait(false);
     }
 }

@@ -36,7 +36,6 @@ internal static class JmnedictLoader
 
             dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
         }
-
         else
         {
             if (dict.Updating)
@@ -57,15 +56,21 @@ internal static class JmnedictLoader
 
                 if (downloaded)
                 {
-                    await Load(dict).ConfigureAwait(false);
+                    try
+                    {
+                        await Load(dict).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        dict.Updating = false;
+                    }
                 }
             }
             else
             {
                 dict.Active = false;
+                dict.Updating = false;
             }
-
-            dict.Updating = false;
         }
     }
 

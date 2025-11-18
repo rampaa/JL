@@ -637,24 +637,25 @@ public static class DictUtils
                 {
                     foreach (Dict dict in dictsToBeRemoved)
                     {
-                        _ = Dicts.Remove(dict.Name);
-                        _ = SingleDictTypeDicts.Remove(dict.Type);
+                        dict.Active = false;
+                        //_ = Dicts.Remove(dict.Name);
+                        //_ = SingleDictTypeDicts.Remove(dict.Type);
 
-                        string dbPath = DBUtils.GetFreqDBPath(dict.Name);
+                        string dbPath = DBUtils.GetDictDBPath(dict.Name);
                         if (File.Exists(dbPath))
                         {
                             DBUtils.DeleteDB(dbPath);
                         }
                     }
 
-                    IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
-                    int priority = 1;
+                    //IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
+                    //int priority = 1;
 
-                    foreach (Dict dict in orderedDicts)
-                    {
-                        dict.Priority = priority;
-                        ++priority;
-                    }
+                    //foreach (Dict dict in orderedDicts)
+                    //{
+                    //    dict.Priority = priority;
+                    //    ++priority;
+                    //}
                 }
             }
 
@@ -730,6 +731,8 @@ public static class DictUtils
             return;
         }
 
+        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        ResourceUpdater.HandleLeftOverFiles(fullDictPath);
         DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmdictDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
@@ -770,16 +773,16 @@ public static class DictUtils
                             }
                         }
                     }
-
-                    dict.Ready = true;
                 }
                 catch (Exception ex)
                 {
-                    string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     File.Delete(fullDictPath);
-                    await ResourceUpdater.UpdateJmdict(true, false).ConfigureAwait(false);
+                }
+                finally
+                {
+                    dict.Ready = true;
                 }
             }));
         }
@@ -818,6 +821,8 @@ public static class DictUtils
             return;
         }
 
+        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        ResourceUpdater.HandleLeftOverFiles(fullDictPath);
         DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmnedictDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
@@ -851,16 +856,16 @@ public static class DictUtils
                             }
                         }
                     }
-
-                    dict.Ready = true;
                 }
                 catch (Exception ex)
                 {
-                    string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     File.Delete(fullDictPath);
-                    await ResourceUpdater.UpdateJmnedict(true, false).ConfigureAwait(false);
+                }
+                finally
+                {
+                    dict.Ready = true;
                 }
             }));
         }
@@ -899,6 +904,8 @@ public static class DictUtils
             return;
         }
 
+        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        ResourceUpdater.HandleLeftOverFiles(fullDictPath);
         DBState dBContext = PrepareDictDB(dict, dictDBPaths, KanjidicDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
@@ -939,16 +946,16 @@ public static class DictUtils
                             }
                         }
                     }
-
-                    dict.Ready = true;
                 }
                 catch (Exception ex)
                 {
-                    string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     File.Delete(fullDictPath);
-                    await ResourceUpdater.UpdateKanjidic(true, false).ConfigureAwait(false);
+                }
+                finally
+                {
+                    dict.Ready = true;
                 }
             }));
         }
@@ -987,6 +994,8 @@ public static class DictUtils
             return;
         }
 
+        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        ResourceUpdater.HandleLeftOverFolders(fullDictPath);
         DBState dBContext = PrepareDictDB(dict, dictDBPaths, EpwingYomichanDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
@@ -1027,15 +1036,16 @@ public static class DictUtils
                             }
                         }
                     }
-
-                    dict.Ready = true;
                 }
 
                 catch (Exception ex)
                 {
-                    string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                }
+                finally
+                {
+                    dict.Ready = true;
                 }
             }));
         }
@@ -1074,6 +1084,8 @@ public static class DictUtils
             return;
         }
 
+        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        ResourceUpdater.HandleLeftOverFolders(fullDictPath);
         DBState dBContext = PrepareDictDB(dict, dictDBPaths, YomichanKanjiDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
@@ -1110,16 +1122,17 @@ public static class DictUtils
                             }
                         }
                     }
-
-                    dict.Ready = true;
                 }
 
                 catch (Exception ex)
                 {
-                    string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     dictsToBeRemoved.Add(dict);
+                }
+                finally
+                {
+                    dict.Ready = true;
                 }
             }));
         }
@@ -1284,16 +1297,17 @@ public static class DictUtils
                             }
                         }
                     }
-
-                    dict.Ready = true;
                 }
-
                 catch (Exception ex)
                 {
                     string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     dictsToBeRemoved.Add(dict);
+                }
+                finally
+                {
+                    dict.Ready = true;
                 }
             }));
         }
@@ -1332,6 +1346,8 @@ public static class DictUtils
             return;
         }
 
+        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        ResourceUpdater.HandleLeftOverFolders(fullDictPath);
         DBState dBContext = PrepareDictDB(dict, dictDBPaths, YomichanPitchAccentDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
@@ -1368,16 +1384,16 @@ public static class DictUtils
                             }
                         }
                     }
-
-                    dict.Ready = true;
                 }
-
                 catch (Exception ex)
                 {
-                    string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     dictsToBeRemoved.Add(dict);
+                }
+                finally
+                {
+                    dict.Ready = true;
                 }
             }));
         }

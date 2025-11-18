@@ -118,7 +118,6 @@ internal static class JmdictLoader
 
             dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
         }
-
         else
         {
             if (dict.Updating)
@@ -140,18 +139,24 @@ internal static class JmdictLoader
 
                 if (downloaded)
                 {
-                    await Load(dict).ConfigureAwait(false);
+                    try
+                    {
+                        await Load(dict).ConfigureAwait(false);
 
-                    await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
-                    await JmdictWordClassUtils.Load().ConfigureAwait(false);
+                        await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
+                        await JmdictWordClassUtils.Load().ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        dict.Updating = false;
+                    }
                 }
             }
             else
             {
                 dict.Active = false;
+                dict.Updating = false;
             }
-
-            dict.Updating = false;
         }
     }
 

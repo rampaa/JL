@@ -57,7 +57,7 @@ public static class FreqUtils
 
         bool freqCleared = false;
         bool rebuildingAnyDB = false;
-        ConcurrentBag<string> freqNamesToBeRemoved = [];
+        ConcurrentBag<Freq> freqNamesToBeRemoved = [];
 
         Dictionary<string, string> freqDBPaths = new(StringComparer.Ordinal);
 
@@ -122,24 +122,26 @@ public static class FreqUtils
 
                 if (!freqNamesToBeRemoved.IsEmpty)
                 {
-                    foreach (string freqName in freqNamesToBeRemoved)
+                    foreach (Freq freq in freqNamesToBeRemoved)
                     {
-                        _ = FreqDicts.Remove(freqName);
-                        string dbPath = DBUtils.GetFreqDBPath(freqName);
-                        if (File.Exists(dbPath))
-                        {
-                            DBUtils.DeleteDB(dbPath);
-                        }
+                        freq.Active = false;
+
+                        //_ = FreqDicts.Remove(freq.Name);
+                        //string dbPath = DBUtils.GetFreqDBPath(freq.Name);
+                        //if (File.Exists(dbPath))
+                        //{
+                        //    DBUtils.DeleteDB(dbPath);
+                        //}
                     }
 
-                    IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
-                    int priority = 1;
+                    //IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
+                    //int priority = 1;
 
-                    foreach (Freq freq in orderedFreqs)
-                    {
-                        freq.Priority = priority;
-                        ++priority;
-                    }
+                    //foreach (Freq freq in orderedFreqs)
+                    //{
+                    //    freq.Priority = priority;
+                    //    ++priority;
+                    //}
                 }
             }
 
@@ -200,7 +202,7 @@ public static class FreqUtils
         return new DBState(useDB, dbExists, dbExisted);
     }
 
-    private static void LoadNazekaFreq(Freq freq, List<Task> tasks, Dictionary<string, string> freqDBPaths, ConcurrentBag<string> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
+    private static void LoadNazekaFreq(Freq freq, List<Task> tasks, Dictionary<string, string> freqDBPaths, ConcurrentBag<Freq> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
     {
         DBState dBContext = PrepareFreqDB(freq, freqDBPaths, FreqDBManager.Version, ref rebuildingAnyDB);
 
@@ -242,16 +244,17 @@ public static class FreqUtils
                             }
                         }
                     }
-
-                    freq.Ready = true;
                 }
-
                 catch (Exception ex)
                 {
                     string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                    freqNamesToBeRemoved.Add(freq.Name);
+                    freqNamesToBeRemoved.Add(freq);
+                }
+                finally
+                {
+                    freq.Ready = true;
                 }
             }));
         }
@@ -285,13 +288,15 @@ public static class FreqUtils
         }
     }
 
-    private static void LoadYomichanFreq(Freq freq, List<Task> tasks, Dictionary<string, string> freqDBPaths, ConcurrentBag<string> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
+    private static void LoadYomichanFreq(Freq freq, List<Task> tasks, Dictionary<string, string> freqDBPaths, ConcurrentBag<Freq> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
     {
         if (freq.Updating)
         {
             return;
         }
 
+        string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
+        ResourceUpdater.HandleLeftOverFolders(fullFreqPath);
         DBState dBContext = PrepareFreqDB(freq, freqDBPaths, FreqDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
@@ -333,16 +338,16 @@ public static class FreqUtils
                             }
                         }
                     }
-
-                    freq.Ready = true;
                 }
-
                 catch (Exception ex)
                 {
-                    string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                    freqNamesToBeRemoved.Add(freq.Name);
+                    freqNamesToBeRemoved.Add(freq);
+                }
+                finally
+                {
+                    freq.Ready = true;
                 }
             }));
         }

@@ -55,15 +55,21 @@ internal static class KanjidicLoader
 
                 if (downloaded)
                 {
-                    await Load(dict).ConfigureAwait(false);
+                    try
+                    {
+                        await Load(dict).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        dict.Updating = false;
+                    }
                 }
             }
             else
             {
                 dict.Active = false;
+                dict.Updating = false;
             }
-
-            dict.Updating = false;
         }
     }
 
