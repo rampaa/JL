@@ -238,7 +238,8 @@ public static partial class JapaneseUtils
         int unicodeTextListLength = unicodeTextList.Length;
         for (int i = 1; i < unicodeTextListLength; i++)
         {
-            if (unicodeTextList[i] is "ー" or "〜" && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out char vowel))
+            string currentCharacter = unicodeTextList[i];
+            if (currentCharacter is "ー" or "〜" && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out char vowel))
             {
                 if (vowel is not 'お' and not 'え')
                 {
@@ -247,7 +248,6 @@ public static partial class JapaneseUtils
                         _ = stringBuilder.Append(vowel);
                     }
                 }
-
                 else
                 {
                     char alternativeVowel = vowel switch
@@ -271,12 +271,11 @@ public static partial class JapaneseUtils
                     }
                 }
             }
-
             else
             {
                 foreach (ref readonly StringBuilder stringBuilder in stringBuilders.AsReadOnlySpan())
                 {
-                    _ = stringBuilder.Append(unicodeTextList[i]);
+                    _ = stringBuilder.Append(currentCharacter);
                 }
             }
         }
