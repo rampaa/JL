@@ -1,3 +1,4 @@
+using JL.Core.External.AnkiConnect;
 using JL.Core.Frontend;
 using JL.Core.Lookup;
 using JL.Core.Network.WebSocket;
@@ -15,9 +16,12 @@ public sealed class CoreConfigManager
     public Uri AnkiConnectUri { get; set; } = new("http://127.0.0.1:8765");
     public bool AnkiIntegration { get; set; } // = false;
     public bool ForceSyncAnki { get; private set; } // = false;
-    public bool NotifyWhenMiningSucceeds { get; private set; } = true;
     public bool AllowDuplicateCards { get; private set; } // = false;
     public bool CheckForDuplicateCards { get; private set; } // = false;
+    public bool CheckEntireCollectionForDuplicates { get; private set; } // = false;
+    public bool CheckChildDecksForDuplicates { get; private set; } // = false;
+    public bool CheckAllNoteTypesForDuplicates { get; private set; } // = false;
+    public bool NotifyWhenMiningSucceeds { get; private set; } = true;
     public bool CaptureTextFromClipboard { get; set; } = true;
     public bool CaptureTextFromWebSocket { get; set; } // = false;
     public bool AutoReconnectToWebSocket { get; private set; } // = false;
@@ -129,9 +133,42 @@ public sealed class CoreConfigManager
 
         AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, configs, AnkiIntegration, nameof(AnkiIntegration));
         ForceSyncAnki = ConfigDBManager.GetValueFromConfig(connection, configs, ForceSyncAnki, nameof(ForceSyncAnki));
-        NotifyWhenMiningSucceeds = ConfigDBManager.GetValueFromConfig(connection, configs, NotifyWhenMiningSucceeds, nameof(NotifyWhenMiningSucceeds));
         AllowDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, configs, AllowDuplicateCards, nameof(AllowDuplicateCards));
+        CheckEntireCollectionForDuplicates = ConfigDBManager.GetValueFromConfig(connection, configs, CheckEntireCollectionForDuplicates, nameof(CheckEntireCollectionForDuplicates));
+        CheckChildDecksForDuplicates = ConfigDBManager.GetValueFromConfig(connection, configs, CheckChildDecksForDuplicates, nameof(CheckChildDecksForDuplicates));
+        CheckAllNoteTypesForDuplicates = ConfigDBManager.GetValueFromConfig(connection, configs, CheckAllNoteTypesForDuplicates, nameof(CheckAllNoteTypesForDuplicates));
         CheckForDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, configs, CheckForDuplicateCards, nameof(CheckForDuplicateCards));
+        if (AnkiIntegration)
+        {
+            Dictionary<string, object> duplicateScopeOptions = new(2, StringComparer.Ordinal)
+            {
+                {
+                    "checkChildren", CheckChildDecksForDuplicates
+                },
+                {
+                    "checkAllModels", CheckAllNoteTypesForDuplicates
+                }
+            };
+
+            string duplicateScope = CheckEntireCollectionForDuplicates ? "collection" : "deck";
+
+            AnkiConnectUtils.AnkiOptions.Clear();
+            AnkiConnectUtils.AnkiOptions.Add("allowDuplicate", AllowDuplicateCards);
+            AnkiConnectUtils.AnkiOptions.Add("duplicateScope", duplicateScope);
+            AnkiConnectUtils.AnkiOptions.Add("duplicateScopeOptions", duplicateScopeOptions);
+
+            AnkiConnectUtils.CheckDuplicateOptions.Clear();
+            AnkiConnectUtils.CheckDuplicateOptions.Add("allowDuplicate", false);
+            AnkiConnectUtils.CheckDuplicateOptions.Add("duplicateScope", duplicateScope);
+            AnkiConnectUtils.CheckDuplicateOptions.Add("duplicateScopeOptions", duplicateScopeOptions);
+        }
+        else
+        {
+            AnkiConnectUtils.AnkiOptions.Clear();
+            AnkiConnectUtils.AnkiOptions.Clear();
+        }
+
+        NotifyWhenMiningSucceeds = ConfigDBManager.GetValueFromConfig(connection, configs, NotifyWhenMiningSucceeds, nameof(NotifyWhenMiningSucceeds));
         TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters));
         TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines));
         CheckForJLUpdatesOnStartUp = ConfigDBManager.GetValueFromConfig(connection, configs, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp));

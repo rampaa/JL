@@ -921,6 +921,9 @@ internal sealed class ConfigManager
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
         preferenceWindow.NotifyWhenMiningSucceedsCheckBox.IsChecked = coreConfigManager.NotifyWhenMiningSucceeds;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;
+        preferenceWindow.CheckChildDecksForDuplicatesCheckBox.IsChecked = coreConfigManager.CheckChildDecksForDuplicates;
+        preferenceWindow.CheckAllNoteTypesForDuplicatesCheckBox.IsChecked = coreConfigManager.CheckAllNoteTypesForDuplicates;
+        preferenceWindow.CheckEntireCollectionForDuplicatesCheckBox.IsChecked = coreConfigManager.CheckEntireCollectionForDuplicates;
         preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked = coreConfigManager.CheckForDuplicateCards;
         preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
@@ -1344,6 +1347,15 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AllowDuplicateCards),
                 preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckChildDecksForDuplicates),
+                preferenceWindow.CheckChildDecksForDuplicatesCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckAllNoteTypesForDuplicates),
+                preferenceWindow.CheckAllNoteTypesForDuplicatesCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckEntireCollectionForDuplicates),
+                preferenceWindow.CheckEntireCollectionForDuplicatesCheckBox.IsChecked.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckForDuplicateCards),
                 preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked.ToString());

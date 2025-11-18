@@ -1534,7 +1534,7 @@ public static class MiningUtils
                 { firstFieldName, firstFieldValue }
             };
 
-            Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, firstFieldDict);
+            Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, firstFieldDict, AnkiConnectUtils.CheckDuplicateOptions);
             notes.Add(note);
             positions.Add(i);
         }
@@ -1607,7 +1607,7 @@ public static class MiningUtils
 
         // Audio/Picture/Video shouldn't be set here
         // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
-        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields);
+        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, AnkiConnectUtils.CheckDuplicateOptions);
         bool? canAddNote = await AnkiConnectUtils.CanAddNote(note).ConfigureAwait(false);
         if (canAddNote is null)
         {
@@ -1624,12 +1624,7 @@ public static class MiningUtils
         }
 
         note.Tags = ankiConfig.Tags;
-        note.Options = new Dictionary<string, object>(1, StringComparer.Ordinal)
-        {
-            {
-                "allowDuplicate", coreConfigManager.AllowDuplicateCards
-            }
-        };
+        note.Options = AnkiConnectUtils.AnkiOptions;
 
         List<string> audioFields = FindFields(JLField.Audio, userFields);
         bool needsAudio = audioFields.Count > 0;

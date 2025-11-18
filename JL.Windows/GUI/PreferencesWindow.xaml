@@ -1479,9 +1479,37 @@
                                     </DockPanel>
                                 </ListBoxItem>
 
+                                <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                    <DockPanel Margin="10,0,10,0">
+                                        <TextBlock HorizontalAlignment="Left" Text="Check child decks for duplicates"
+                                           Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        <CheckBox x:Name="CheckChildDecksForDuplicatesCheckBox"  HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                </ListBoxItem>
+
                                 <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                              Cursor="Help"
-                                             ToolTip="Checks Anki for Duplicate Expressions when entering Mining Mode">
+                                             ToolTip="Specifies whether duplicate checks are performed across all note types">
+                                    <DockPanel Margin="10,0,10,0">
+                                        <TextBlock HorizontalAlignment="Left" Text="Check all note types for duplicates"
+                                           Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        <CheckBox x:Name="CheckAllNoteTypesForDuplicatesCheckBox"  HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                </ListBoxItem>
+
+                                <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                             Cursor="Help"
+                                             ToolTip="If left unchecked it will only check for duplicates in the target deck; if checked, it will check the entire collection for duplicates">
+                                    <DockPanel Margin="10,0,10,0">
+                                        <TextBlock HorizontalAlignment="Left" Text="Check entire collection for duplicates"
+                                           Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        <CheckBox x:Name="CheckEntireCollectionForDuplicatesCheckBox"  HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                </ListBoxItem>
+
+                                <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                             Cursor="Help"
+                                             ToolTip="Checks Anki for duplicate cards when in mining mode">
                                     <DockPanel Margin="10,0,10,0">
                                         <TextBlock HorizontalAlignment="Left" Text="Check for duplicate cards"
                                             Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />

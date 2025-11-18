@@ -1,10 +1,12 @@
 using System.Diagnostics;
 using System.Text.Json;
-
 namespace JL.Core.External.AnkiConnect;
 
 public static class AnkiConnectUtils
 {
+    internal static Dictionary<string, object?> AnkiOptions { get; } = [];
+    internal static Dictionary<string, object?> CheckDuplicateOptions { get; } = [];
+
     public static async ValueTask<string[]?> GetDeckNames()
     {
         Response? response = await AnkiConnectClient.GetDeckNamesResponse().ConfigureAwait(false);
