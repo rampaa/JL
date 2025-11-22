@@ -1654,14 +1654,14 @@ internal sealed partial class MainWindow
             double xPosition;
             double yPosition;
             double width;
-            double maxDynamicHeight = configManager.MainWindowMaxDynamicHeight * dpi.DpiScaleY;
+            double dpiUnawareHeight = Height * dpi.DpiScaleY;
 
             if (!MagpieUtils.IsMagpieScaling || !MagpieUtils.MagpieWindowRect.IntersectsWith(new Rect(Left * dpi.DpiScaleX, Top * dpi.DpiScaleY, Width * dpi.DpiScaleX, Height * dpi.DpiScaleY)))
             {
                 Rectangle workingArea = WindowsUtils.ActiveScreen.WorkingArea;
                 if (configManager.PositionPopupAboveCursor)
                 {
-                    yPosition = workingArea.Bottom - maxDynamicHeight;
+                    yPosition = workingArea.Bottom - dpiUnawareHeight;
                     if (yPosition < workingArea.Top)
                     {
                         yPosition = workingArea.Top;
@@ -1693,7 +1693,7 @@ internal sealed partial class MainWindow
                 if (configManager.PositionPopupAboveCursor
                     || configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true, MainWindowFixedBottomPosition: -2 or -1 })
                 {
-                    yPosition = magpieWindowRect.Bottom - maxDynamicHeight;
+                    yPosition = magpieWindowRect.Bottom - dpiUnawareHeight;
                     if (yPosition < magpieWindowRect.Top)
                     {
                         yPosition = magpieWindowRect.Top;
