@@ -41,7 +41,6 @@ namespace JL.Windows.Utilities;
 
 internal static class WindowsUtils
 {
-    private static readonly MainWindow s_mainWindow = MainWindow.Instance;
     private static readonly SemaphoreSlim s_dialogSemaphore = new(1, 1);
     public static readonly SemaphoreSlim AudioPlayerSemaphoreSlim = new(1, 1);
 
@@ -51,9 +50,9 @@ internal static class WindowsUtils
     public static WaveOutEvent? AudioPlayer => Volatile.Read(ref s_audioPlayer);
     public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
 
-    public static Screen ActiveScreen { get; set; } = Screen.FromHandle(s_mainWindow.WindowHandle);
+    public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
 
-    public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(s_mainWindow);
+    public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
     public static double DpiAwareXOffset { get; set; } = ConfigManager.Instance.PopupXOffset * Dpi.DpiScaleX;
     public static double DpiAwareYOffset { get; set; } = ConfigManager.Instance.PopupYOffset * Dpi.DpiScaleY;
 
@@ -166,7 +165,7 @@ internal static class WindowsUtils
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = addNameWindowInstance.ShowDialog();
@@ -183,7 +182,7 @@ internal static class WindowsUtils
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = addWordWindowInstance.ShowDialog();
@@ -194,13 +193,13 @@ internal static class WindowsUtils
         PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
         ConfigManager configManager = ConfigManager.Instance;
         configManager.LoadPreferenceWindow(preferencesWindow);
-        preferencesWindow.Owner = s_mainWindow;
+        preferencesWindow.Owner = MainWindow.Instance;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StopTimeStatStopWatch();
 
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = preferencesWindow.ShowDialog();
@@ -226,14 +225,14 @@ internal static class WindowsUtils
         }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
-        manageDictionariesWindow.Owner = s_mainWindow;
+        manageDictionariesWindow.Owner = MainWindow.Instance;
         manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageDictionariesWindow.ShowDialog();
@@ -247,14 +246,14 @@ internal static class WindowsUtils
         }
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
-        manageFrequenciesWindow.Owner = s_mainWindow;
+        manageFrequenciesWindow.Owner = MainWindow.Instance;
         manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageFrequenciesWindow.ShowDialog();
@@ -267,13 +266,13 @@ internal static class WindowsUtils
         StatsUtils.StopIdleItemTimer();
 
         StatsWindow statsWindow = StatsWindow.Instance;
-        statsWindow.Owner = s_mainWindow;
+        statsWindow.Owner = MainWindow.Instance;
         statsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = statsWindow.ShowDialog();
@@ -287,14 +286,14 @@ internal static class WindowsUtils
         }
 
         ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
-        manageAudioSourcesWindow.Owner = s_mainWindow;
+        manageAudioSourcesWindow.Owner = MainWindow.Instance;
         manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StopTimeStatStopWatch();
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
         {
-            WinApi.UnregisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
+            WinApi.UnregisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageAudioSourcesWindow.ShowDialog();
@@ -356,7 +355,7 @@ internal static class WindowsUtils
             Application? application = Application.Current;
             if (application is not null)
             {
-                await application.Dispatcher.Invoke(static () => s_mainWindow.HandleAppClosing()).ConfigureAwait(false);
+                await application.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
                 using Process? process = Process.Start(new ProcessStartInfo
                 {
                     WorkingDirectory = AppInfo.ApplicationPath,
@@ -704,7 +703,7 @@ internal static class WindowsUtils
         if (configManager is { Focusable: true, RestoreFocusToPreviouslyActiveWindow: true }
             && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
             && lastActiveWindowHandle is not 0
-            && lastActiveWindowHandle != s_mainWindow.WindowHandle)
+            && lastActiveWindowHandle != MainWindow.Instance.WindowHandle)
         {
             WinApi.GiveFocusToWindow(lastActiveWindowHandle);
         }
@@ -713,21 +712,21 @@ internal static class WindowsUtils
     public static void UpdateMainWindowVisibility()
     {
         ConfigManager configManager = ConfigManager.Instance;
-        bool mainWindowIsNotMinimized = s_mainWindow.WindowState is not WindowState.Minimized;
+        bool mainWindowIsNotMinimized = MainWindow.Instance.WindowState is not WindowState.Minimized;
         if (mainWindowIsNotMinimized)
         {
-            if (!s_mainWindow.FirstPopupWindow.IsVisible)
+            if (!MainWindow.Instance.FirstPopupWindow.IsVisible)
             {
-                if (!s_mainWindow.IsMouseOver)
+                if (!MainWindow.Instance.IsMouseOver)
                 {
                     if (configManager.TextOnlyVisibleOnHover)
                     {
-                        s_mainWindow.MainGrid.Opacity = 0d;
+                        MainWindow.Instance.MainGrid.Opacity = 0d;
                     }
 
                     if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
                     {
-                        s_mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                        MainWindow.Instance.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
                     }
 
                     RestoreFocusToPreviouslyActiveWindow();
@@ -747,7 +746,7 @@ internal static class WindowsUtils
 
             if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
             {
-                WinApi.RegisterAllGlobalHotKeys(s_mainWindow.WindowHandle);
+                WinApi.RegisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
             }
         }
         else

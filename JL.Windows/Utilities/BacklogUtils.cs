@@ -14,7 +14,6 @@ namespace JL.Windows.Utilities;
 internal static class BacklogUtils
 {
     private static readonly LinkedList<string> s_backlog = [];
-    private static readonly MainWindow s_mainWindow = MainWindow.Instance;
 
     private static LinkedListNode<string>? s_currentNode;
 
@@ -50,15 +49,15 @@ internal static class BacklogUtils
             return;
         }
 
-        if (s_mainWindow.FirstPopupWindow.MiningMode)
+        if (MainWindow.Instance.FirstPopupWindow.MiningMode)
         {
             return;
         }
 
         if (s_currentNode.Previous is not null)
         {
-            s_mainWindow.MainTextBox.Foreground = ConfigManager.Instance.MainWindowBacklogTextColor;
-            s_mainWindow.MainTextBox.Text = s_currentNode.Previous.Value;
+            MainWindow.Instance.MainTextBox.Foreground = ConfigManager.Instance.MainWindowBacklogTextColor;
+            MainWindow.Instance.MainTextBox.Text = s_currentNode.Previous.Value;
             s_currentNode = s_currentNode.Previous;
         }
     }
@@ -70,18 +69,18 @@ internal static class BacklogUtils
             return;
         }
 
-        if (s_mainWindow.FirstPopupWindow.MiningMode)
+        if (MainWindow.Instance.FirstPopupWindow.MiningMode)
         {
             return;
         }
 
         if (s_currentNode.Next is not null)
         {
-            s_mainWindow.MainTextBox.Foreground = s_currentNode.Next != s_backlog.Last
+            MainWindow.Instance.MainTextBox.Foreground = s_currentNode.Next != s_backlog.Last
                 ? ConfigManager.Instance.MainWindowBacklogTextColor
                 : ConfigManager.Instance.MainWindowTextColor;
 
-            s_mainWindow.MainTextBox.Text = s_currentNode.Next.Value;
+            MainWindow.Instance.MainTextBox.Text = s_currentNode.Next.Value;
             s_currentNode = s_currentNode.Next;
         }
     }
@@ -94,7 +93,7 @@ internal static class BacklogUtils
         }
 
         string text = s_currentNode.Value;
-        TextBox mainTextBox = s_mainWindow.MainTextBox;
+        TextBox mainTextBox = MainWindow.Instance.MainTextBox;
         if (text != mainTextBox.Text)
         {
             return;
@@ -134,26 +133,26 @@ internal static class BacklogUtils
             return;
         }
 
-        if (s_mainWindow.FirstPopupWindow.MiningMode)
+        if (MainWindow.Instance.FirstPopupWindow.MiningMode)
         {
             return;
         }
 
         string allBacklogText = string.Join('\n', s_backlog);
-        if (s_mainWindow.MainTextBox.Text != allBacklogText
-            && s_mainWindow.MainTextBox.GetFirstVisibleLineIndex() is 0)
+        if (MainWindow.Instance.MainTextBox.Text != allBacklogText
+            && MainWindow.Instance.MainTextBox.GetFirstVisibleLineIndex() is 0)
         {
-            int caretIndex = allBacklogText.Length - s_mainWindow.MainTextBox.Text.Length;
+            int caretIndex = allBacklogText.Length - MainWindow.Instance.MainTextBox.Text.Length;
 
-            s_mainWindow.MainTextBox.Text = allBacklogText;
-            s_mainWindow.MainTextBox.Foreground = ConfigManager.Instance.MainWindowBacklogTextColor;
+            MainWindow.Instance.MainTextBox.Text = allBacklogText;
+            MainWindow.Instance.MainTextBox.Foreground = ConfigManager.Instance.MainWindowBacklogTextColor;
 
             if (caretIndex >= 0)
             {
-                s_mainWindow.MainTextBox.CaretIndex = caretIndex;
+                MainWindow.Instance.MainTextBox.CaretIndex = caretIndex;
             }
 
-            s_mainWindow.MainTextBox.ScrollToEnd();
+            MainWindow.Instance.MainTextBox.ScrollToEnd();
         }
     }
 
@@ -181,7 +180,7 @@ internal static class BacklogUtils
 
         if (lastText is not null)
         {
-            TextBox mainTextBox = s_mainWindow.MainTextBox;
+            TextBox mainTextBox = MainWindow.Instance.MainTextBox;
             mainTextBox.Foreground = ConfigManager.Instance.MainWindowTextColor;
             mainTextBox.Text = lastText;
         }
@@ -203,7 +202,7 @@ internal static class BacklogUtils
             {
                 s_currentNode = s_backlog.Last;
                 Debug.Assert(s_currentNode is not null);
-                TextBox mainTextBox = s_mainWindow.MainTextBox;
+                TextBox mainTextBox = MainWindow.Instance.MainTextBox;
                 mainTextBox.Foreground = configManager.MainWindowTextColor;
                 mainTextBox.Text = s_currentNode.Value;
             }

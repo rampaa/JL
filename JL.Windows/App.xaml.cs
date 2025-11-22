@@ -62,7 +62,7 @@ internal sealed partial class App
 
         ShutdownMode = ShutdownMode.OnMainWindowClose;
 
-        GUI.MainWindow mainWindow = new();
+        GUI.MainWindow mainWindow = GUI.MainWindow.Instance;
         FrontendManager.Frontend = new WindowsFrontend(mainWindow);
         MainWindow = mainWindow;
         mainWindow.Show();

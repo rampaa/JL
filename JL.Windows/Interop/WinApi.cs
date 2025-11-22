@@ -175,8 +175,6 @@ internal static partial class WinApi
 
     private static ulong s_clipboardSequenceNo;
 
-    private static readonly MainWindow s_mainWindow = MainWindow.Instance;
-
     public static void SubscribeToWndProc(Window windowSource)
     {
         if (PresentationSource.FromVisual(windowSource) is not HwndSource source)
@@ -392,7 +390,7 @@ internal static partial class WinApi
             if (s_clipboardSequenceNo != clipboardSequenceNo)
             {
                 s_clipboardSequenceNo = clipboardSequenceNo;
-                s_mainWindow.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedly");
+                MainWindow.Instance.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedly");
                 handled = true;
             }
         }
@@ -413,7 +411,7 @@ internal static partial class WinApi
             MagpieUtils.SetMagpieInfo(wParam, lParam);
             if (ConfigManager.Instance.AlwaysOnTop && (wParam is 1 || lParam is 1))
             {
-                s_mainWindow.BringToFront();
+                MainWindow.Instance.BringToFront();
             }
 
             handled = true;

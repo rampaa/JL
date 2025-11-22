@@ -41,7 +41,8 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class MainWindow
 {
-    private static MainWindow? s_instance;
+    public static readonly MainWindow Instance = new();
+
     private static long s_lastTextCopyTimestamp;
     private static DpiScale? s_previousDpi;
 
@@ -52,8 +53,6 @@ internal sealed partial class MainWindow
     private Point _lastMouseMovePosition;
     private Timer? _lookupDelayTimer;
     private int _lastCharPosition = -1;
-
-    public static MainWindow Instance => s_instance!;
 
     public nint WindowHandle { get; private set; }
     public PopupWindow FirstPopupWindow { get; }
@@ -66,9 +65,8 @@ internal sealed partial class MainWindow
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
 
-    public MainWindow()
+    private MainWindow()
     {
-        s_instance = this;
         InitializeComponent();
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow(0);
