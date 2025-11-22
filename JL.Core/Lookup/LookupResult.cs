@@ -85,25 +85,25 @@ public sealed class LookupResult
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is LookupResult other
-            && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
+            && PrimarySpelling == other.PrimarySpelling
             && MatchedText == other.MatchedText
             && Dict == other.Dict
             && FormattedDefinitions == other.FormattedDefinitions
-            && other.Readings is not null
+            && (other.Readings is not null
                 ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
-                : Readings is null));
+                : Readings is null);
     }
 
     public bool Equals([NotNullWhen(true)] LookupResult? other)
     {
         return other is not null
-            && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
+            && PrimarySpelling == other.PrimarySpelling
             && MatchedText == other.MatchedText
             && Dict == other.Dict
             && FormattedDefinitions == other.FormattedDefinitions
-            && other.Readings is not null
+            && (other.Readings is not null
                 ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
-                : Readings is null));
+                : Readings is null);
     }
 
     public static bool operator ==(LookupResult? left, LookupResult? right) => left?.Equals(right) ?? (right is null);
