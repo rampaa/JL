@@ -53,6 +53,6 @@ internal sealed class Form(
         }
     }
 
-    public static bool operator ==(Form? left, Form? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(Form? left, Form? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(Form? left, Form? right) => !(left == right);
 }

@@ -63,7 +63,7 @@ public sealed class LookupResult
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + MatchedText.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Dict.GetHashCode();
-            hash = (hash * 37) + FormattedDefinitions?.GetHashCode(StringComparison.Ordinal) ?? 37;
+            hash = ((hash * 37) + FormattedDefinitions?.GetHashCode(StringComparison.Ordinal)) ?? 37;
 
             string[]? readings = Readings;
             if (readings is not null)
@@ -106,7 +106,7 @@ public sealed class LookupResult
                 : Readings is null));
     }
 
-    public static bool operator ==(LookupResult? left, LookupResult? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(LookupResult? left, LookupResult? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(LookupResult? left, LookupResult? right) => !(left == right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

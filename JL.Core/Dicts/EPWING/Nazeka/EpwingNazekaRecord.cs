@@ -138,7 +138,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         unchecked
         {
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
-            hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
+            hash = ((hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal)) ?? 37;
 
             foreach (string definition in Definitions)
             {
@@ -149,6 +149,6 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         }
     }
 
-    public static bool operator ==(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(EpwingNazekaRecord? left, EpwingNazekaRecord? right) => !(left == right);
 }

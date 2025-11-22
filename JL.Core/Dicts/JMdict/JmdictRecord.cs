@@ -507,6 +507,6 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
     }
 
-    public static bool operator ==(JmdictRecord? left, JmdictRecord? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(JmdictRecord? left, JmdictRecord? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(JmdictRecord? left, JmdictRecord? right) => !(left == right);
 }

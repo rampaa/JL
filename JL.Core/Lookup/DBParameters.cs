@@ -26,7 +26,7 @@ internal sealed class DBParameters(List<string>? allTextWithoutLongVowelMark,
 
     public bool Equals(DBParameters? other)
     {
-        return other?.AllTextWithoutLongVowelMark.AsReadOnlySpan().SequenceEqual(AllTextWithoutLongVowelMark.AsReadOnlySpan()) ?? false;
+        return other is not null && other.AllTextWithoutLongVowelMark.AsReadOnlySpan().SequenceEqual(AllTextWithoutLongVowelMark.AsReadOnlySpan());
     }
 
     public override bool Equals(object? obj)
@@ -55,6 +55,6 @@ internal sealed class DBParameters(List<string>? allTextWithoutLongVowelMark,
         }
     }
 
-    public static bool operator ==(DBParameters? left, DBParameters? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(DBParameters? left, DBParameters? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(DBParameters left, DBParameters right) => !(left == right);
 }

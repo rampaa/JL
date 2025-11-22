@@ -49,6 +49,6 @@ internal sealed class CustomNameRecord : IDictRecordWithSingleReading, IEquatabl
             ExtraInfo?.GetHashCode(StringComparison.Ordinal) ?? 37);
     }
 
-    public static bool operator ==(CustomNameRecord? left, CustomNameRecord? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(CustomNameRecord? left, CustomNameRecord? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(CustomNameRecord? left, CustomNameRecord? right) => !(left == right);
 }

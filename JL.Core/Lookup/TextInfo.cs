@@ -5,6 +5,7 @@ using JL.Core.Freqs;
 using JL.Core.Utilities;
 
 namespace JL.Core.Lookup;
+
 internal sealed class TextInfo(List<string> textList,
     List<string> textInHiraganaList,
     List<List<Form>> deconjugationResultsList,
@@ -27,7 +28,7 @@ internal sealed class TextInfo(List<string> textList,
 
     public bool Equals(TextInfo? other)
     {
-        return other?.TextList.AsReadOnlySpan().SequenceEqual(TextList.AsReadOnlySpan()) ?? false;
+        return other is not null && other.TextList.AsReadOnlySpan().SequenceEqual(TextList.AsReadOnlySpan());
     }
 
     public override bool Equals(object? obj)
@@ -49,6 +50,6 @@ internal sealed class TextInfo(List<string> textList,
         }
     }
 
-    public static bool operator ==(TextInfo? left, TextInfo? right) => left?.Equals(right) ?? right is null;
+    public static bool operator ==(TextInfo? left, TextInfo? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(TextInfo? left, TextInfo? right) => !(left == right);
 }
