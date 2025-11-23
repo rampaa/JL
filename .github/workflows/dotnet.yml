@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 9.x
         cache: true
-        cache-dependency-path: JL.Windows/packages.lock.json,JL.Core/packages.lock.json,JL.Core.Tests/packages.lock.json
+        cache-dependency-path: "**/packages.lock.json"
         
     - name: Restore and validate lock files
       run: dotnet restore -c Release --use-lock-file --force-evaluate --locked-mode
