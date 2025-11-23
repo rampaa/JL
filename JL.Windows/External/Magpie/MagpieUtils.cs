@@ -7,20 +7,19 @@ internal static class MagpieUtils
 {
     public static int MagpieScalingChangedWindowMessage { get; private set; } = -1;
 
-    private static bool s_isMagpieScaling;
     public static bool IsMagpieScaling
     {
         get
         {
-            if (s_isMagpieScaling)
+            if (field)
             {
-                s_isMagpieScaling = IsMagpieReallyScaling();
+                field = IsMagpieReallyScaling();
             }
 
-            return s_isMagpieScaling;
+            return field;
         }
 
-        private set => s_isMagpieScaling = value;
+        private set;
     }
 
     private static Rect s_sourceWindowRect;
