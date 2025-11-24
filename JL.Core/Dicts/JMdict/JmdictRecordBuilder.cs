@@ -85,7 +85,19 @@ internal static class JmdictRecordBuilder
                 if (keInfListSpan.Contains("sK"))
                 {
                     Debug.Assert(firstPrimarySpellingInHiragana is not null);
-                    if (recordDictionary.TryGetValue(firstPrimarySpellingInHiragana, out JmdictRecord? primaryRecord))
+                    if (JapaneseUtils.LongVowelMarkToKana(key).Contains(firstPrimarySpellingInHiragana))
+                    {
+                        continue;
+                    }
+
+                    if (JapaneseUtils.LongVowelMarkToKana(firstPrimarySpellingInHiragana).Contains(key))
+                    {
+                        if (recordDictionary.Remove(firstPrimarySpellingInHiragana, out JmdictRecord? primaryRecord))
+                        {
+                            recordDictionary.Add(key, primaryRecord);
+                        }
+                    }
+                    else if (recordDictionary.TryGetValue(firstPrimarySpellingInHiragana, out JmdictRecord? primaryRecord))
                     {
                         recordDictionary.Add(key, primaryRecord);
                     }
