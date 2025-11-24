@@ -189,7 +189,7 @@ internal static class KeyGestureUtils
         if (configs.TryGetValue(keyGestureName, out string? rawKeyGesture))
         {
             KeyGestureConverter keyGestureConverter = new();
-            string keyGestureString = MemoryExtensions.ContainsAny(rawKeyGesture, s_validModifiers)
+            string keyGestureString = rawKeyGesture.ContainsAny(s_validModifiers)
                 ? rawKeyGesture
                 : $"Win+{rawKeyGesture}";
 

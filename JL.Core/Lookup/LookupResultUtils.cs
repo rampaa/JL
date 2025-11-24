@@ -79,15 +79,13 @@ public static class LookupResultUtils
 
     public static string GradeToText(int grade)
     {
-        string gradeText = grade switch
+        return grade switch
         {
             >= 1 and <= 6 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Kyouiku)"),
             8 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jouyou)"),
             9 or 10 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jinmeiyou)"),
             _ => "Hyougai"
         };
-
-        return gradeText;
     }
 
     public static string FrequenciesToText(ReadOnlySpan<LookupFrequencyResult> frequencies, bool forMining, bool singleDict)

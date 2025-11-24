@@ -80,7 +80,7 @@ internal static partial class WinApi
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowLongW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static partial int SetWindowLong32(nint hWnd, int nIndex, int dwNewLong);
+        private static partial int SetWindowLongPtr32(nint hWnd, int nIndex, int dwNewLong);
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -90,7 +90,7 @@ internal static partial class WinApi
         {
             return AppInfo.Is64BitProcess
                 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
-                : SetWindowLong32(hWnd, nIndex, (int)dwNewLong);
+                : SetWindowLongPtr32(hWnd, nIndex, (int)dwNewLong);
         }
 
         [LibraryImport("user32.dll", EntryPoint = "GetWindowLongW", SetLastError = true)]
