@@ -75,9 +75,25 @@ public static partial class JapaneseUtils
 
         new('ヮ', "ゎ"),
 
+        new('ヰ', "ゐ"), new('ヱ', "ゑ"), new('ヵ', "ゕ"), new('ヶ', "ゖ"),
+
         new('ヴ', "ゔ"), new('ヽ', "ゝ"), new('ヾ', "ゞ"), new('ッ', "っ"),
 
         new('ヸ', "ゐ゙"), new('ヹ', "ゑ゙"), new('ヺ', "を゙")
+        // ReSharper restore BadExpressionBracesLineBreaks
+        #pragma warning restore format
+    }.ToFrozenDictionary();
+
+    private static readonly FrozenDictionary<char, string> s_hiraganaToDakutenDict = new KeyValuePair<char, string>[]
+    {
+        #pragma warning disable format
+        // ReSharper disable BadExpressionBracesLineBreaks
+        new('か', "が"), new('き', "ぎ"), new('く', "ぐ"), new('け', "げ"), new('こ', "ご"),
+        new('さ', "ざ"), new('し', "じ"), new('す', "ず"), new('せ', "ぜ"), new('そ', "ぞ"),
+        new('た', "だ"), new('ち', "ぢ"), new('つ', "づ"), new('て', "で"), new('と', "ど"),
+        new('は', "ば"), new('ひ', "び"), new('ふ', "ぶ"), new('へ', "べ"), new('ほ', "ぼ"),
+        new('う', "ゔ"),
+        new('ゐ', "ゐ゙"), new('ゑ', "ゑ゙"), new('を', "を゙")
         // ReSharper restore BadExpressionBracesLineBreaks
         #pragma warning restore format
     }.ToFrozenDictionary();
@@ -176,11 +192,12 @@ public static partial class JapaneseUtils
 
     private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters)]);
 
-    private static int FirstKatakanaIndex(ReadOnlySpan<char> text)
+    private static int FirstKatakanaOrIterationMarkIndex(ReadOnlySpan<char> text)
     {
         for (int i = 0; i < text.Length; i++)
         {
-            if (s_katakanaToHiraganaDict.ContainsKey(text[i]))
+            char character = text[i];
+            if (s_katakanaToHiraganaDict.ContainsKey(character) || IsIterationMark(character))
             {
                 return i;
             }
@@ -189,7 +206,7 @@ public static partial class JapaneseUtils
         return -1;
     }
 
-    public static string KatakanaToHiragana(string text)
+    public static string NormalizeText(string text)
     {
         string normalizedText = text;
         if (!normalizedText.IsNormalized(NormalizationForm.FormKC))
@@ -201,23 +218,38 @@ public static partial class JapaneseUtils
         // Normalizes vs to VS, xxx to XXX, h to H etc.
         normalizedText = normalizedText.ToUpperInvariant();
 
-        int firstKatakanaIndex = FirstKatakanaIndex(normalizedText);
-        if (firstKatakanaIndex < 0)
+        int firstKatakanaOrIterationMarkIndex = FirstKatakanaOrIterationMarkIndex(normalizedText);
+        if (firstKatakanaOrIterationMarkIndex < 0)
         {
             return normalizedText;
         }
 
-        StringBuilder textInHiraganaBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(normalizedText[..firstKatakanaIndex]);
-        for (int i = firstKatakanaIndex; i < normalizedText.Length; i++)
+        StringBuilder textInHiraganaBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(normalizedText[..firstKatakanaOrIterationMarkIndex]);
+        for (int i = firstKatakanaOrIterationMarkIndex; i < normalizedText.Length; i++)
         {
             char character = normalizedText[i];
             if (s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr))
             {
-                _ = textInHiraganaBuilder.Append(hiraganaStr);
+                char hiraganaStrLastChar = hiraganaStr[^1];
+                if (IsIterationMark(hiraganaStrLastChar))
+                {
+                    AppendIterationMark(textInHiraganaBuilder, hiraganaStrLastChar);
+                }
+                else
+                {
+                    _ = textInHiraganaBuilder.Append(hiraganaStr);
+                }
             }
             else
             {
-                _ = textInHiraganaBuilder.Append(character);
+                if (IsIterationMark(character))
+                {
+                    AppendIterationMark(textInHiraganaBuilder, character);
+                }
+                else
+                {
+                    _ = textInHiraganaBuilder.Append(character);
+                }
             }
         }
 
@@ -226,7 +258,62 @@ public static partial class JapaneseUtils
         return textInHiragana;
     }
 
-    internal static List<string> LongVowelMarkToKana(ReadOnlySpan<char> text)
+    private static bool IsIterationMark(char character)
+    {
+        return character is '々' or '〻' or 'ゝ' or 'ゞ';
+    }
+
+    private static void AppendIterationMark(StringBuilder builder, char iterationMark)
+    {
+        if (builder.Length is 0)
+        {
+            _ = builder.Append(iterationMark);
+            return;
+        }
+
+        if (iterationMark is 'ゞ')
+        {
+            char previousChar = builder[^1];
+            if (s_hiraganaToDakutenDict.TryGetValue(previousChar, out string? dakuten))
+            {
+                _ = builder.Append(dakuten);
+            }
+            else
+            {
+                _ = builder.Append(iterationMark);
+            }
+        }
+        else
+        {
+            char previousChar = builder[^1];
+            if (char.IsLowSurrogate(previousChar) && builder.Length > 1)
+            {
+                _ = builder.Append(builder[^2]).Append(previousChar);
+            }
+            else if (previousChar is not '\u3099' and not '\u309A')
+            {
+                _ = builder.Append(previousChar);
+            }
+            else if (builder.Length > 1)
+            {
+                char twoPreviousChar = builder[^2];
+                if (!char.IsLowSurrogate(twoPreviousChar))
+                {
+                    _ = builder.Append(twoPreviousChar).Append(previousChar);
+                }
+                else
+                {
+                    _ = builder.Append(iterationMark);
+                }
+            }
+            else
+            {
+                _ = builder.Append(iterationMark);
+            }
+        }
+    }
+
+    internal static List<string> NormalizeLongVowelMark(ReadOnlySpan<char> text)
     {
         ReadOnlySpan<string> unicodeTextList = text.ListUnicodeCharacters();
 
@@ -543,13 +630,13 @@ public static partial class JapaneseUtils
             int index = -1;
             if (indexes.Length is 0)
             {
-                string readingInHiragana = KatakanaToHiragana(reading);
+                string readingInHiragana = NormalizeText(reading);
                 if (readingInHiragana.Length != reading.Length)
                 {
                     ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                     return null;
                 }
-                string segmentInHiragana = KatakanaToHiragana(segment);
+                string segmentInHiragana = NormalizeText(segment);
                 if (segmentInHiragana.Length != segment.Length)
                 {
                     ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
@@ -662,12 +749,12 @@ public static partial class JapaneseUtils
             int index = -1;
             if (indexes.Length is 0)
             {
-                string readingInHiragana = KatakanaToHiragana(reading);
+                string readingInHiragana = NormalizeText(reading);
                 if (readingInHiragana.Length != reading.Length)
                 {
                     return false;
                 }
-                string segmentInHiragana = KatakanaToHiragana(segment);
+                string segmentInHiragana = NormalizeText(segment);
                 if (segmentInHiragana.Length != segment.Length)
                 {
                     return false;
