@@ -80,7 +80,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)
     {
         bool readingsExist = Readings is not null;
-        if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
+        if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
             for (int i = 0; i < freqResultsCount; i++)
@@ -101,7 +101,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             for (int i = 0; i < readings.Length; i++)
             {
                 string reading = readings[i];
-                if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out IList<FrequencyRecord>? readingFreqResults))
+                if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(reading), out IList<FrequencyRecord>? readingFreqResults))
                 {
                     int readingFreqResultsCount = readingFreqResults.Count;
                     for (int j = 0; j < readingFreqResultsCount; j++)
@@ -123,7 +123,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
     public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         bool readingsExist = Readings is not null;
-        if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
+        if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
             foreach (ref readonly FrequencyRecord freqResult in freqResults.AsReadOnlySpan())
             {
@@ -142,7 +142,7 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
             for (int i = 0; i < readings.Length; i++)
             {
                 string reading = readings[i];
-                if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out List<FrequencyRecord>? readingFreqResults))
+                if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(reading), out List<FrequencyRecord>? readingFreqResults))
                 {
                     foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsReadOnlySpan())
                     {

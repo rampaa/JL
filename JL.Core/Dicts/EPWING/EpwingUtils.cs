@@ -16,7 +16,7 @@ internal static class EpwingUtils
 
     private static bool FilterDuplicateEntries(string primarySpelling, string? reading, string[] definitions, Dict dict)
     {
-        if (dict.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(primarySpelling), out IList<IDictRecord>? previousResults))
+        if (dict.Contents.TryGetValue(JapaneseUtils.NormalizeText(primarySpelling), out IList<IDictRecord>? previousResults))
         {
             int previousResultCount = previousResults.Count;
             for (int i = 0; i < previousResultCount; i++)
@@ -40,7 +40,7 @@ internal static class EpwingUtils
             }
         }
 
-        else if (reading is not null && dict.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out previousResults))
+        else if (reading is not null && dict.Contents.TryGetValue(JapaneseUtils.NormalizeText(reading), out previousResults))
         {
             int previousResultCount = previousResults.Count;
             for (int i = 0; i < previousResultCount; i++)

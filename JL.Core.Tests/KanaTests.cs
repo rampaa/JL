@@ -17,7 +17,7 @@ internal sealed class KanaTests
         const string text = "ア";
 
         // Act
-        string actual = JapaneseUtils.KatakanaToHiragana(text);
+        string actual = JapaneseUtils.NormalizeText(text);
 
         // Assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -31,7 +31,7 @@ internal sealed class KanaTests
         const string text = "㋕";
 
         // Act
-        string actual = JapaneseUtils.KatakanaToHiragana(text);
+        string actual = JapaneseUtils.NormalizeText(text);
 
         // Assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -45,7 +45,7 @@ internal sealed class KanaTests
         const string text = "㌀";
 
         // Act
-        string actual = JapaneseUtils.KatakanaToHiragana(text);
+        string actual = JapaneseUtils.NormalizeText(text);
 
         // Assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -61,7 +61,7 @@ internal sealed class KanaTests
         const string text = "㋿";
 
         // Act
-        string actual = JapaneseUtils.KatakanaToHiragana(text);
+        string actual = JapaneseUtils.NormalizeText(text);
 
         // Assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -76,7 +76,7 @@ internal sealed class KanaTests
         const string text = "オー";
 
         // Act
-        List<string> actual = JapaneseUtils.LongVowelMarkToKana(JapaneseUtils.KatakanaToHiragana(text));
+        List<string> actual = JapaneseUtils.NormalizeLongVowelMark(JapaneseUtils.NormalizeText(text));
 
         // Assert
         Assert.That(actual, Is.EqualTo(expected));

@@ -473,7 +473,7 @@ public static class LookupUtils
 
             textList.Add(currentText);
 
-            string textInHiragana = JapaneseUtils.KatakanaToHiragana(currentText);
+            string textInHiragana = JapaneseUtils.NormalizeText(currentText);
             textInHiraganaList.Add(textInHiragana);
 
             List<Form> deconjugationResults = Deconjugator.Deconjugate(textInHiragana);
@@ -500,7 +500,7 @@ public static class LookupUtils
                     deconjugatedTextWithoutLongVowelMarksList ??= new List<List<List<Form>>?>(textLength);
                     if (longVowelMarkCount < 4)
                     {
-                        List<string> textsWithoutLongVowelMarks = JapaneseUtils.LongVowelMarkToKana(textInHiragana);
+                        List<string> textsWithoutLongVowelMarks = JapaneseUtils.NormalizeLongVowelMark(textInHiragana);
                         textWithoutLongVowelMarksCount += textsWithoutLongVowelMarks.Count;
                         textWithoutLongVowelMarksList.Add(textsWithoutLongVowelMarks);
 
@@ -1046,12 +1046,12 @@ public static class LookupUtils
                 for (int j = 0; j < dictRecordsCount; j++)
                 {
                     IDictRecordWithMultipleReadings record = (IDictRecordWithMultipleReadings)dictRecords[j];
-                    _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling));
+                    _ = searchKeys.Add(JapaneseUtils.NormalizeText(record.PrimarySpelling));
                     if (record.Readings is not null)
                     {
                         foreach (string reading in record.Readings)
                         {
-                            _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(reading));
+                            _ = searchKeys.Add(JapaneseUtils.NormalizeText(reading));
                         }
                     }
                 }
@@ -1527,7 +1527,7 @@ public static class LookupUtils
     {
         if (readings is null)
         {
-            if (pitchDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(primarySpelling), out IList<IDictRecord>? records))
+            if (pitchDictionary.TryGetValue(JapaneseUtils.NormalizeText(primarySpelling), out IList<IDictRecord>? records))
             {
                 int recordsCount = records.Count;
                 for (int i = 0; i < recordsCount; i++)
@@ -1545,18 +1545,18 @@ public static class LookupUtils
         else
         {
             byte[]? positions = null;
-            if (pitchDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(primarySpelling), out IList<IDictRecord>? records))
+            if (pitchDictionary.TryGetValue(JapaneseUtils.NormalizeText(primarySpelling), out IList<IDictRecord>? records))
             {
                 for (int i = 0; i < readings.Length; i++)
                 {
                     byte position = byte.MaxValue;
                     string reading = readings[i];
-                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading);
+                    string readingInHiragana = JapaneseUtils.NormalizeText(reading);
                     int recordsCount = records.Count;
                     for (int j = 0; j < recordsCount; j++)
                     {
                         PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)records[j];
-                        if (pitchAccentRecord.Reading is not null && readingInHiragana == JapaneseUtils.KatakanaToHiragana(pitchAccentRecord.Reading))
+                        if (pitchAccentRecord.Reading is not null && readingInHiragana == JapaneseUtils.NormalizeText(pitchAccentRecord.Reading))
                         {
                             if (positions is null)
                             {
@@ -1583,7 +1583,7 @@ public static class LookupUtils
                 for (int i = 0; i < readings.Length; i++)
                 {
                     string reading = readings[i];
-                    if (pitchDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out records))
+                    if (pitchDictionary.TryGetValue(JapaneseUtils.NormalizeText(reading), out records))
                     {
                         byte position = byte.MaxValue;
                         int recordsCount = records.Count;

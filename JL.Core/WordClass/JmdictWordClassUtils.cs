@@ -48,7 +48,7 @@ internal static class JmdictWordClassUtils
                 {
                     foreach (string reading in jmdictWordClass.Readings)
                     {
-                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
+                        string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
                         if (DictUtils.WordClassDictionary.TryGetValue(readingInHiragana, out IList<JmdictWordClass>? result))
                         {
                             result.Add(jmdictWordClass);
@@ -117,7 +117,7 @@ internal static class JmdictWordClassUtils
                     bool keyFromReading = false;
                     foreach (string reading in jmdictRecord.Readings)
                     {
-                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading);
+                        string readingInHiragana = JapaneseUtils.NormalizeText(reading);
                         if (readingInHiragana == key)
                         {
                             keyFromReading = true;
@@ -127,7 +127,7 @@ internal static class JmdictWordClassUtils
 
                     if (keyFromReading)
                     {
-                        if (JapaneseUtils.KatakanaToHiragana(jmdictRecord.PrimarySpelling) != key)
+                        if (JapaneseUtils.NormalizeText(jmdictRecord.PrimarySpelling) != key)
                         {
                             continue;
                         }

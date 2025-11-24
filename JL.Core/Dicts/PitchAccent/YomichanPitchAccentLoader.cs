@@ -34,7 +34,7 @@ internal static class YomichanPitchAccentLoader
                         continue;
                     }
 
-                    string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Spelling).GetPooledString();
+                    string spellingInHiragana = JapaneseUtils.NormalizeText(newEntry.Spelling).GetPooledString();
                     if (pitchDict.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
                     {
                         if (!result.Contains(newEntry))
@@ -49,7 +49,7 @@ internal static class YomichanPitchAccentLoader
 
                     if (newEntry.Reading is not null)
                     {
-                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading).GetPooledString();
+                        string readingInHiragana = JapaneseUtils.NormalizeText(newEntry.Reading).GetPooledString();
                         if (spellingInHiragana != readingInHiragana)
                         {
                             if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))

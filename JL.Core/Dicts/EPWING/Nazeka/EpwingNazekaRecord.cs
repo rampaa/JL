@@ -53,7 +53,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
     public int GetFrequency(IDictionary<string, IList<FrequencyRecord>> freqDict)
     {
-        if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
+        if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(PrimarySpelling), out IList<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
             for (int i = 0; i < freqResultsCount; i++)
@@ -68,7 +68,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
         else if (Reading is not null)
         {
-            if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out IList<FrequencyRecord>? readingFreqResults))
+            if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(Reading), out IList<FrequencyRecord>? readingFreqResults))
             {
                 int readingFreqResultsCount = readingFreqResults.Count;
                 for (int j = 0; j < readingFreqResultsCount; j++)
@@ -88,7 +88,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
     public int GetFrequency(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
-        if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
+        if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
             foreach (ref readonly FrequencyRecord freqResult in freqResults.AsReadOnlySpan())
             {
@@ -101,7 +101,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
 
         else if (Reading is not null)
         {
-            if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out List<FrequencyRecord>? readingFreqResults))
+            if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(Reading), out List<FrequencyRecord>? readingFreqResults))
             {
                 foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsReadOnlySpan())
                 {

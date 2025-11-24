@@ -13,7 +13,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 21;
+    public const int Version = 22;
 
     private const string SingleTermQuery =
         """
@@ -177,13 +177,13 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.ExecuteNonQuery();
 
             recordIdParam.Value = rowid;
-            string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
+            string primarySpellingInHiragana = JapaneseUtils.NormalizeText(record.PrimarySpelling);
             searchKeyParam.Value = primarySpellingInHiragana;
             _ = insertSearchKeyCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
             {
-                string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
+                string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
                     searchKeyParam.Value = readingInHiragana;

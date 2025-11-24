@@ -26,7 +26,7 @@ internal static class FrequencyYomichanLoader
                     Debug.Assert(jsonElements is not null);
 
                     string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
-                    string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString();
+                    string primarySpellingInHiragana = JapaneseUtils.NormalizeText(primarySpelling).GetPooledString();
                     string? reading = null;
                     int frequency = -1;
                     ref readonly JsonElement thirdElement = ref jsonElements[2];
@@ -98,7 +98,7 @@ internal static class FrequencyYomichanLoader
                     }
                     else
                     {
-                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
+                        string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
                         FreqUtils.AddOrUpdate(freq.Contents, readingInHiragana, frequencyRecordWithPrimarySpelling);
 
                         FrequencyRecord frequencyRecordWithReading = new(reading, frequency);

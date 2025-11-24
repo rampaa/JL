@@ -65,13 +65,13 @@ internal static class JmdictRecordBuilder
             int senseListSpanLength = senseListSpan.Length;
 
             string? firstPrimarySpellingInHiragana = firstPrimarySpelling is not null
-                ? JapaneseUtils.KatakanaToHiragana(firstPrimarySpelling)
+                ? JapaneseUtils.NormalizeText(firstPrimarySpelling)
                 : null;
 
             foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)
             {
                 ReadOnlySpan<string> keInfListSpan = kanjiElement.KeInfList.AsReadOnlySpan();
-                string key = JapaneseUtils.KatakanaToHiragana(kanjiElement.Keb).GetPooledString();
+                string key = JapaneseUtils.NormalizeText(kanjiElement.Keb).GetPooledString();
                 if (recordDictionary.ContainsKey(key))
                 {
                     if (!keInfListSpan.Contains("sK"))
@@ -85,12 +85,12 @@ internal static class JmdictRecordBuilder
                 if (keInfListSpan.Contains("sK"))
                 {
                     Debug.Assert(firstPrimarySpellingInHiragana is not null);
-                    if (JapaneseUtils.LongVowelMarkToKana(key).Contains(firstPrimarySpellingInHiragana))
+                    if (JapaneseUtils.NormalizeLongVowelMark(key).Contains(firstPrimarySpellingInHiragana))
                     {
                         continue;
                     }
 
-                    if (JapaneseUtils.LongVowelMarkToKana(firstPrimarySpellingInHiragana).Contains(key))
+                    if (JapaneseUtils.NormalizeLongVowelMark(firstPrimarySpellingInHiragana).Contains(key))
                     {
                         if (recordDictionary.Remove(firstPrimarySpellingInHiragana, out JmdictRecord? primaryRecord))
                         {
@@ -207,7 +207,7 @@ internal static class JmdictRecordBuilder
                 allROrthographyInfoWithoutSearchOnlyForms[i] = readingElement.ReInfList.TrimToArray();
             }
 
-            string firstReadingInHiragana = JapaneseUtils.KatakanaToHiragana(allReadingsWithoutSearchOnlyForms[0]);
+            string firstReadingInHiragana = JapaneseUtils.NormalizeText(allReadingsWithoutSearchOnlyForms[0]);
 
             int index = 0;
             ReadOnlySpan<ReadingElement> readingElementsSpan = entry.ReadingElements.AsReadOnlySpan();
@@ -220,7 +220,7 @@ internal static class JmdictRecordBuilder
                 ref readonly ReadingElement readingElement = ref readingElementsSpan[i];
 
                 ReadOnlySpan<string> reInfListSpan = readingElement.ReInfList.AsReadOnlySpan();
-                string key = JapaneseUtils.KatakanaToHiragana(readingElement.Reb).GetPooledString();
+                string key = JapaneseUtils.NormalizeText(readingElement.Reb).GetPooledString();
                 if (recordDictionary.ContainsKey(key))
                 {
                     if (!reInfListSpan.Contains("sk"))
@@ -263,7 +263,7 @@ internal static class JmdictRecordBuilder
                         alternativeSpellings = alternativeSpellingsForFirstPrimarySpelling;
                     }
 
-                    if (recordDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(primarySpelling), out JmdictRecord? mainEntry))
+                    if (recordDictionary.TryGetValue(JapaneseUtils.NormalizeText(primarySpelling), out JmdictRecord? mainEntry))
                     {
                         readings = mainEntry.Readings;
                         primarySpellingOrthographyInfo = mainEntry.PrimarySpellingOrthographyInfo;
@@ -356,7 +356,7 @@ internal static class JmdictRecordBuilder
                 {
                     foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)
                     {
-                        _ = recordDictionary.TryAdd(JapaneseUtils.KatakanaToHiragana(kanjiElement.Keb.GetPooledString()), record);
+                        _ = recordDictionary.TryAdd(JapaneseUtils.NormalizeText(kanjiElement.Keb.GetPooledString()), record);
                     }
                 }
             }

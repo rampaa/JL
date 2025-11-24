@@ -12,7 +12,7 @@ namespace JL.Core.Dicts.PitchAccent;
 
 internal static class YomichanPitchAccentDBManager
 {
-    public const int Version = 6;
+    public const int Version = 7;
 
     private enum ColumnIndex
     {
@@ -120,13 +120,13 @@ internal static class YomichanPitchAccentDBManager
             _ = insertRecordCommand.ExecuteNonQuery();
 
             recordIdParam.Value = rowId;
-            string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Spelling);
+            string primarySpellingInHiragana = JapaneseUtils.NormalizeText(record.Spelling);
             searchKeyParam.Value = primarySpellingInHiragana;
             _ = insertSearchKeyCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
             {
-                string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
+                string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading);
                 if (readingInHiragana != primarySpellingInHiragana)
                 {
                     searchKeyParam.Value = readingInHiragana;

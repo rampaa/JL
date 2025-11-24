@@ -38,7 +38,7 @@ internal static class FrequencyNazekaLoader
                 FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
                 FreqUtils.AddOrUpdate(freq.Contents, reading, frequencyRecordWithExactSpelling);
 
-                string exactSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(exactSpelling).GetPooledString();
+                string exactSpellingInHiragana = JapaneseUtils.NormalizeText(exactSpelling).GetPooledString();
                 if (exactSpellingInHiragana != reading)
                 {
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);

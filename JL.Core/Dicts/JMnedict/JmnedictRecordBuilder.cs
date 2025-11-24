@@ -36,7 +36,7 @@ internal static class JmnedictRecordBuilder
             for (int i = 0; i < kebListSpan.Length; i++)
             {
                 ref readonly string keb = ref kebListSpan[i];
-                string key = JapaneseUtils.KatakanaToHiragana(keb).GetPooledString();
+                string key = JapaneseUtils.NormalizeText(keb).GetPooledString();
 
                 if (recordDictionary.ContainsKey(key))
                 {
@@ -57,7 +57,7 @@ internal static class JmnedictRecordBuilder
             for (int i = 0; i < rebListSpan.Length; i++)
             {
                 ref readonly string reb = ref rebListSpan[i];
-                string key = JapaneseUtils.KatakanaToHiragana(reb).GetPooledString();
+                string key = JapaneseUtils.NormalizeText(reb).GetPooledString();
 
                 if (recordDictionary.ContainsKey(key))
                 {

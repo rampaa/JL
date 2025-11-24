@@ -52,8 +52,8 @@ internal sealed partial class InfoDataGridWindow
     private bool InfoDataGridFilter(object item)
     {
         (string term, int count) = (KeyValuePair<string, int>)item;
-        string termInHiragana = JapaneseUtils.KatakanaToHiragana(term);
-        string textInHiragana = JapaneseUtils.KatakanaToHiragana(InfoDataGridSearchTextBox.Text);
+        string termInHiragana = JapaneseUtils.NormalizeText(term);
+        string textInHiragana = JapaneseUtils.NormalizeText(InfoDataGridSearchTextBox.Text);
 
         return termInHiragana.AsSpan().Contains(textInHiragana, StringComparison.Ordinal)
             || count.ToString(CultureInfo.InvariantCulture).AsSpan().Contains(textInHiragana, StringComparison.Ordinal);

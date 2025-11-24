@@ -54,7 +54,7 @@ public static class CustomNameLoader
     {
         CustomNameRecord newNameRecord = new(spelling, reading, nameType, extraInfo);
 
-        string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
+        string spellingInHiragana = JapaneseUtils.NormalizeText(spelling);
         if (customNameDictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? entry))
         {
             //int entryIndex = entry.IndexOf(newNameRecord);

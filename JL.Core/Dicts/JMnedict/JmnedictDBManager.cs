@@ -9,7 +9,7 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictDBManager
 {
-    public const int Version = 6;
+    public const int Version = 7;
 
     private enum ColumnIndex
     {
@@ -110,7 +110,7 @@ internal static class JmnedictDBManager
             rowidParam.Value = rowId;
             jmnedictIdParam.Value = record.Id;
             primarySpellingParam.Value = record.PrimarySpelling;
-            primarySpellingInHiraganaParam.Value = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
+            primarySpellingInHiraganaParam.Value = JapaneseUtils.NormalizeText(record.PrimarySpelling);
             readingsParam.Value = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : DBNull.Value;
             alternativeSpellingsParam.Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
             glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
