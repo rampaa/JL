@@ -174,8 +174,12 @@ internal sealed partial class MainWindow
 
         if (text.Length is 0)
         {
-            MainTextBox.Clear();
-            UpdatePosition();
+            if (!configManager.AlwaysShowBacklog)
+            {
+                MainTextBox.Clear();
+                UpdatePosition();
+            }
+
             if (configManager.AlwaysOnTop)
             {
                 WinApi.BringToFront(WindowHandle);
@@ -204,7 +208,7 @@ internal sealed partial class MainWindow
         string? subsequentText = null;
         string? mergedText = null;
 
-        string previousText = MainTextBox.Text;
+        string previousText = BacklogUtils.LastItem ?? MainTextBox.Text;
         bool sameText = sanitizedNewText == previousText;
         if (configManager.DiscardIdenticalText && sameText)
         {
@@ -258,15 +262,37 @@ internal sealed partial class MainWindow
             }
         }
 
+        bool backlogActive = configManager.MaxBacklogCapacity is not 0;
         mergeTexts = mergeTexts && subsequentText is not null;
+        bool doNotShowAllBacklog = !backlogActive || !configManager.AlwaysShowBacklog;
         if (mergeTexts)
         {
+            if (doNotShowAllBacklog && MainTextBox.Text != previousText)
+            {
+                MainTextBox.Text = previousText;
+            }
+
             MainTextBox.AppendText(subsequentText);
-            mergedText = MainTextBox.Text;
+            mergedText = previousText + subsequentText;
+            if (backlogActive)
+            {
+                BacklogUtils.ReplaceLastBacklogText(mergedText);
+            }
         }
         else
         {
-            MainTextBox.Text = sanitizedNewText;
+            if (doNotShowAllBacklog)
+            {
+                MainTextBox.Text = sanitizedNewText;
+                if (backlogActive)
+                {
+                    BacklogUtils.AddToBacklog(sanitizedNewText);
+                }
+            }
+            else
+            {
+                BacklogUtils.AddToBacklogShowAllBacklog(sanitizedNewText);
+            }
         }
 
         MainTextBox.Foreground = configManager.MainWindowTextColor;
@@ -314,19 +340,6 @@ internal sealed partial class MainWindow
                 {
                     StatsUtils.IncrementStat(StatType.Lines);
                 }
-            }
-        }
-
-        if (configManager.MaxBacklogCapacity is not 0)
-        {
-            if (mergeTexts)
-            {
-                Debug.Assert(mergedText is not null);
-                BacklogUtils.ReplaceLastBacklogText(mergedText);
-            }
-            else
-            {
-                BacklogUtils.AddToBacklog(sanitizedNewText);
             }
         }
 

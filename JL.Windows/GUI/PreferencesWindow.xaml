@@ -819,6 +819,15 @@
                                 </DockPanel>
                             </ListBoxItem>
 
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Always show backlog"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <CheckBox x:Name="AlwaysShowBacklogCheckBox"  HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                        Cursor="Help"
                                        ToolTip="Automatically saves the backlog to Backlogs folder before closing JL">

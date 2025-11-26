@@ -62,6 +62,7 @@ internal sealed class ConfigManager
     public bool SteppedBacklogWithMouseWheel { get; private set; } = true;
     public bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } = true;
     public int MaxBacklogCapacity { get; private set; } = -1;
+    public bool AlwaysShowBacklog { get; private set; } // = false;
     public bool AutoSaveBacklogBeforeClosing { get; private set; } // = false;
     public bool TextToSpeechOnTextChange { get; private set; } // = false;
     public bool HidePopupsOnTextChange { get; private set; } = true;
@@ -373,6 +374,31 @@ internal sealed class ConfigManager
             BacklogUtils.TrimBacklog();
         }
 
+        bool alwaysShowBacklog = ConfigDBManager.GetValueFromConfig(connection, configs, AlwaysShowBacklog, nameof(AlwaysShowBacklog));
+        TextBox mainTextBox = MainWindow.Instance.MainTextBox;
+        if (alwaysShowBacklog)
+        {
+            string allBacklogText = BacklogUtils.AllBacklogText;
+            if (mainTextBox.Text != allBacklogText)
+            {
+                mainTextBox.Text = allBacklogText;
+                mainTextBox.CaretIndex = mainTextBox.Text.Length;
+                mainTextBox.ScrollToEnd();
+            }
+        }
+        else if (!AlwaysShowBacklog)
+        {
+            string lastText = BacklogUtils.LastItem ?? "";
+            if (mainTextBox.Text != lastText)
+            {
+                mainTextBox.Text = lastText;
+                mainTextBox.CaretIndex = mainTextBox.Text.Length;
+                mainTextBox.ScrollToEnd();
+            }
+        }
+
+        AlwaysShowBacklog = alwaysShowBacklog;
+
         AutoSaveBacklogBeforeClosing = ConfigDBManager.GetValueFromConfig(connection, configs, AutoSaveBacklogBeforeClosing, nameof(AutoSaveBacklogBeforeClosing));
 
         TextToSpeechOnTextChange = ConfigDBManager.GetValueFromConfig(connection, configs, TextToSpeechOnTextChange, nameof(TextToSpeechOnTextChange));
@@ -500,7 +526,7 @@ internal sealed class ConfigManager
         MainWindowTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, MainWindowTextColor, nameof(MainWindowTextColor));
         MainWindowBacklogTextColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
 
-        MainWindow.Instance.MainTextBox.Foreground = MaxBacklogCapacity is 0 || MainWindow.Instance.MainTextBox.Text == (BacklogUtils.LastItem ?? "")
+        MainWindow.Instance.MainTextBox.Foreground = MaxBacklogCapacity is 0 || AlwaysShowBacklog || MainWindow.Instance.MainTextBox.Text == (BacklogUtils.LastItem ?? "")
             ? MainWindowTextColor
             : MainWindowBacklogTextColor;
 
@@ -975,6 +1001,7 @@ internal sealed class ConfigManager
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
         preferenceWindow.MaxBacklogCapacityNumericUpDown.Value = MaxBacklogCapacity;
+        preferenceWindow.AlwaysShowBacklogCheckBox.IsChecked = AlwaysShowBacklog;
         preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
@@ -1287,6 +1314,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(MaxBacklogCapacity),
                 preferenceWindow.MaxBacklogCapacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(AlwaysShowBacklog),
+                preferenceWindow.AlwaysShowBacklogCheckBox.IsChecked.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoSaveBacklogBeforeClosing),
                 preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked.ToString());
