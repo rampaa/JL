@@ -740,22 +740,17 @@ internal sealed partial class PopupWindow
 
         PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
 
-        Button[]? duplicateIcons;
         int resultCount;
         bool checkForDuplicateCards;
         if (MiningMode)
         {
             resultCount = LastLookupResults.Length;
             checkForDuplicateCards = coreConfigManager is { CheckForDuplicateCards: true, AnkiIntegration: true } && !configManager.MineToFileInsteadOfAnki;
-            duplicateIcons = checkForDuplicateCards
-                ? new Button[LastLookupResults.Length]
-                : null;
         }
         else
         {
             resultCount = Math.Min(LastLookupResults.Length, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
             checkForDuplicateCards = false;
-            duplicateIcons = null;
         }
 
         LookupDisplayResult[] popupItemSource = new LookupDisplayResult[resultCount];
@@ -776,7 +771,6 @@ internal sealed partial class PopupWindow
 
         if (checkForDuplicateCards)
         {
-            Debug.Assert(duplicateIcons is not null);
             CheckResultForDuplicates((LookupDisplayResult[])PopupListView.ItemsSource).SafeFireAndForget("Unexpected error while checking results for duplicates");
         }
 
