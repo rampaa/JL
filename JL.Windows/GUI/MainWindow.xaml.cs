@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -122,7 +123,7 @@ internal sealed partial class MainWindow
 
         FocusManager.SetFocusedElement(this, MainTextBox);
         // Makes caret/highlight visible without any mouse click
-        MoveCaret(Key.Left);
+        EditingCommands.MoveLeftByCharacter.Execute(null, MainTextBox);
 
         MagpieUtils.Init();
 
@@ -840,22 +841,22 @@ internal sealed partial class MainWindow
 
         else if (keyGesture.IsEqual(configManager.MoveCaretLeftKeyGesture))
         {
-            MoveCaret(Key.Left);
+            EditingCommands.MoveLeftByCharacter.Execute(null, MainTextBox);
         }
 
         else if (keyGesture.IsEqual(configManager.MoveCaretRightKeyGesture))
         {
-            MoveCaret(Key.Right);
+            EditingCommands.MoveRightByCharacter.Execute(null, MainTextBox);
         }
 
         else if (keyGesture.IsEqual(configManager.MoveCaretUpKeyGesture))
         {
-            MoveCaret(Key.Up);
+            EditingCommands.MoveUpByLine.Execute(null, MainTextBox);
         }
 
         else if (keyGesture.IsEqual(configManager.MoveCaretDownKeyGesture))
         {
-            MoveCaret(Key.Down);
+            EditingCommands.MoveDownByLine.Execute(null, MainTextBox);
         }
 
         else if (keyGesture.IsEqual(configManager.LookupTermAtCaretIndexKeyGesture))
