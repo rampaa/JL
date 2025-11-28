@@ -5,6 +5,7 @@ using HandyControl.Controls;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI.Options;
+
 internal static class OptionUtils
 {
     public static void ChangeVisibilityOfCheckBox(bool valid, CheckBox checkBox, bool value, ref bool showOptions)
