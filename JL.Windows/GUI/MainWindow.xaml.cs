@@ -2018,19 +2018,6 @@ internal sealed partial class MainWindow
         HideTitleBarButtons();
     }
 
-    private void MoveCaret(Key key)
-    {
-        WinApi.ActivateWindow(WindowHandle);
-
-        PresentationSource? mainTextBoxSource = PresentationSource.FromVisual(MainTextBox);
-        Debug.Assert(mainTextBoxSource is not null);
-
-        MainTextBox.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, mainTextBoxSource, 0, key)
-        {
-            RoutedEvent = Keyboard.KeyDownEvent
-        });
-    }
-
     private void Swipe(Point currentPosition)
     {
         //Swipe down
