@@ -1013,7 +1013,7 @@ internal sealed class ConfigManager
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f => f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, static f => f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
             preferenceWindow.MainWindowFontComboBox.SelectedIndex = 0;
@@ -1026,7 +1026,7 @@ internal sealed class ConfigManager
         }
 
         preferenceWindow.MainWindowFontWeightComboBox.ItemsSource = MainWindowFontWeights;
-        int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, fw => (string)fw.Content == MainWindow.Instance.MainTextBox.FontWeight.ToString());
+        int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, static fw => (string)fw.Content == MainWindow.Instance.MainTextBox.FontWeight.ToString());
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
             mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, static fw => fw.Content is "Normal");

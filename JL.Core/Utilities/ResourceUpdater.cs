@@ -361,7 +361,7 @@ public static class ResourceUpdater
                     File.Move(dictBackupPath, fullDictPath, true);
                 }
 
-                if (dict.Active && !dict.Options.UseDB.Value)
+                if (dict is { Active: true, Options.UseDB.Value: false })
                 {
                     dict.Contents = new Dictionary<string, IList<IDictRecord>>(450000, StringComparer.Ordinal);
                     try
@@ -462,7 +462,7 @@ public static class ResourceUpdater
                     File.Move(dictBackupPath, fullDictPath, true);
                 }
 
-                if (dict.Active && !dict.Options.UseDB.Value)
+                if (dict is { Active: true, Options.UseDB.Value: false })
                 {
                     dict.Contents = new Dictionary<string, IList<IDictRecord>>(620000, StringComparer.Ordinal);
                     try
@@ -563,7 +563,7 @@ public static class ResourceUpdater
                     File.Move(dictBackupPath, fullDictPath, true);
                 }
 
-                if (dict.Active && !dict.Options.UseDB.Value)
+                if (dict is { Active: true, Options.UseDB.Value: false })
                 {
                     dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
                     try
@@ -690,7 +690,7 @@ public static class ResourceUpdater
                     Directory.Move(dictBackupPath, fullDictPath);
                 }
 
-                if (dict.Active && !dict.Options.UseDB.Value)
+                if (dict is { Active: true, Options.UseDB.Value: false })
                 {
                     dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
                     try
@@ -806,7 +806,7 @@ public static class ResourceUpdater
                     Directory.Move(dictBackupPath, fullFreqPath);
                 }
 
-                if (freq.Active && !freq.Options.UseDB.Value)
+                if (freq is { Active: true, Options.UseDB.Value: false })
                 {
                     freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(13108, StringComparer.Ordinal);
                     try
@@ -914,7 +914,7 @@ public static class ResourceUpdater
         return $"{path}.bak";
     }
 
-    public static void HandleLeftOverFiles(string fullPath)
+    internal static void HandleLeftOverFiles(string fullPath)
     {
         string tempFilePath = GetTempPath(fullPath);
         if (File.Exists(tempFilePath))
@@ -936,7 +936,7 @@ public static class ResourceUpdater
         }
     }
 
-    public static void HandleLeftOverFolders(string fullPath)
+    internal static void HandleLeftOverFolders(string fullPath)
     {
         string tempFolderPath = GetTempPath(fullPath);
         if (Directory.Exists(tempFolderPath))
