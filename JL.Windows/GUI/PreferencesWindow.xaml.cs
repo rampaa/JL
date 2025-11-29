@@ -28,7 +28,19 @@ namespace JL.Windows.GUI;
 internal sealed partial class PreferencesWindow
 {
     private static PreferencesWindow? s_instance;
-    public static PreferencesWindow Instance => s_instance ??= new PreferencesWindow();
+    public static PreferencesWindow Instance
+    {
+        get
+        {
+            if (s_instance is null || !s_instance.IsLoaded)
+            {
+                s_instance = new PreferencesWindow();
+            }
+
+            return s_instance;
+        }
+    }
+
     public bool SetAnkiConfig { get; private set; } // = false;
     private string _profileName;
     private readonly Dict _profileNamesDict;

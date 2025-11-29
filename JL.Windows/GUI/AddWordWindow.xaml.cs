@@ -97,8 +97,18 @@ internal sealed partial class AddWordWindow
         ];
 
     private static AddWordWindow? s_instance;
+    public static AddWordWindow Instance
+    {
+        get
+        {
+            if (s_instance is null || !s_instance.IsLoaded)
+            {
+                s_instance = new AddWordWindow();
+            }
 
-    public static AddWordWindow Instance => s_instance ??= new AddWordWindow();
+            return s_instance;
+        }
+    }
 
     private AddWordWindow()
     {

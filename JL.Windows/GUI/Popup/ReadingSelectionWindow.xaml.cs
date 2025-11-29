@@ -31,7 +31,12 @@ internal sealed partial class ReadingSelectionWindow
 
     public static void Show(Window owner, string primarySpelling, string[] readings, Point position)
     {
-        ReadingSelectionWindow currentInstance = s_instance ??= new ReadingSelectionWindow(primarySpelling);
+        if (s_instance is null || !s_instance.IsLoaded)
+        {
+            s_instance = new ReadingSelectionWindow(primarySpelling);
+        }
+
+        ReadingSelectionWindow currentInstance = s_instance;
         ConfigManager configManager = ConfigManager.Instance;
         currentInstance._primarySpelling = primarySpelling;
         currentInstance.ReadingsListView.ItemsSource = readings;

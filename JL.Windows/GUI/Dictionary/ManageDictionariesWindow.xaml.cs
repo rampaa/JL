@@ -24,10 +24,20 @@ namespace JL.Windows.GUI.Dictionary;
 internal sealed partial class ManageDictionariesWindow
 {
     private static ManageDictionariesWindow? s_instance;
+    public static ManageDictionariesWindow Instance
+    {
+        get
+        {
+            if (s_instance is null || !s_instance.IsLoaded)
+            {
+                s_instance = new ManageDictionariesWindow();
+            }
+
+            return s_instance;
+        }
+    }
 
     private nint _windowHandle;
-
-    public static ManageDictionariesWindow Instance => s_instance ??= new ManageDictionariesWindow();
 
     private ManageDictionariesWindow()
     {

@@ -20,13 +20,24 @@ namespace JL.Windows.GUI;
 internal sealed partial class StatsWindow
 {
     private static StatsWindow? s_instance;
+    public static StatsWindow Instance
+    {
+        get
+        {
+            if (s_instance is null || !s_instance.IsLoaded)
+            {
+                s_instance = new StatsWindow();
+            }
+
+            return s_instance;
+        }
+    }
+
     private nint _windowHandle;
 
     private KeyValuePair<string, int>[]? _sessionLookupCountsForCurrentProfile;
     private List<KeyValuePair<string, int>>? _termLookupCountsForCurrentProfile;
     private List<KeyValuePair<string, int>>? _termLookupCountsForLifetime;
-
-    public static StatsWindow Instance => s_instance ??= new StatsWindow();
 
     private StatsWindow()
     {

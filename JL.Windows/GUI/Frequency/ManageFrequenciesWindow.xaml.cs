@@ -22,10 +22,20 @@ namespace JL.Windows.GUI.Frequency;
 internal sealed partial class ManageFrequenciesWindow
 {
     private static ManageFrequenciesWindow? s_instance;
+    public static ManageFrequenciesWindow Instance
+    {
+        get
+        {
+            if (s_instance is null || !s_instance.IsLoaded)
+            {
+                s_instance = new ManageFrequenciesWindow();
+            }
+
+            return s_instance;
+        }
+    }
 
     private nint _windowHandle;
-
-    public static ManageFrequenciesWindow Instance => s_instance ??= new ManageFrequenciesWindow();
 
     private ManageFrequenciesWindow()
     {

@@ -17,7 +17,18 @@ namespace JL.Windows.GUI;
 internal sealed partial class AddNameWindow
 {
     private static AddNameWindow? s_instance;
-    public static AddNameWindow Instance => s_instance ??= new AddNameWindow();
+    public static AddNameWindow Instance
+    {
+        get
+        {
+            if (s_instance is null || !s_instance.IsLoaded)
+            {
+                s_instance = new AddNameWindow();
+            }
+
+            return s_instance;
+        }
+    }
 
     private AddNameWindow()
     {

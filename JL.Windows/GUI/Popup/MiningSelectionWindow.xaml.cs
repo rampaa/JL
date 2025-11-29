@@ -43,7 +43,12 @@ internal sealed partial class MiningSelectionWindow
 
     internal static void Show(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition, Point position)
     {
-        MiningSelectionWindow currentInstance = s_instance ??= new MiningSelectionWindow(owner, lookupResults, currentLookupResultIndex, currentSourceText, currentSourceTextCharPosition);
+        if (s_instance is null || !s_instance.IsLoaded)
+        {
+            s_instance = new MiningSelectionWindow(owner, lookupResults, currentLookupResultIndex, currentSourceText, currentSourceTextCharPosition);
+        }
+
+        MiningSelectionWindow currentInstance = s_instance;
         ConfigManager configManager = ConfigManager.Instance;
 
         ListViewItem[] listViewItem;

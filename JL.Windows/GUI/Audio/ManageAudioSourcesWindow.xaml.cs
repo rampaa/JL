@@ -19,9 +19,20 @@ namespace JL.Windows.GUI.Audio;
 internal sealed partial class ManageAudioSourcesWindow
 {
     private static ManageAudioSourcesWindow? s_instance;
+    public static ManageAudioSourcesWindow Instance
+    {
+        get
+        {
+            if (s_instance is null || !s_instance.IsLoaded)
+            {
+                s_instance = new ManageAudioSourcesWindow();
+            }
+
+            return s_instance;
+        }
+    }
 
     private nint _windowHandle;
-    public static ManageAudioSourcesWindow Instance => s_instance ??= new ManageAudioSourcesWindow();
 
     private ManageAudioSourcesWindow()
     {
