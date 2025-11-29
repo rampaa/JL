@@ -40,7 +40,13 @@ internal static class KeyGestureUtils
         Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9,
 
         Key.Multiply, Key.Add, Key.Separator, Key.Subtract, Key.Multiply,
-        Key.Decimal, Key.Divide
+        Key.Decimal, Key.Divide,
+
+        // Media keys
+        Key.MediaPlayPause, Key.MediaStop, Key.MediaPreviousTrack, Key.MediaNextTrack,
+
+        // Other
+        Key.Home, Key.PageUp, Key.PageDown, Key.End, Key.Pause, Key.Scroll
 
         #pragma warning restore format
     ]);
