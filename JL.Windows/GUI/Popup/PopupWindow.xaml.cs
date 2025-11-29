@@ -291,7 +291,8 @@ internal sealed partial class PopupWindow
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 })
+        if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 }
+            || (!configManager.SteppedBacklogWithMouseWheel && textBox.Foreground == configManager.MainWindowBacklogTextColor))
         {
             (_currentSourceText, _currentSourceTextCharPosition) = BacklogUtils.GetSourceTextFromIndexPosition(textBoxText, charPosition);
         }
@@ -502,7 +503,8 @@ internal sealed partial class PopupWindow
     public Task LookupOnSelect(TextBox textBox)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 })
+        if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 }
+            || (!configManager.SteppedBacklogWithMouseWheel && textBox.Foreground == configManager.MainWindowBacklogTextColor))
         {
             (_currentSourceText, _currentSourceTextCharPosition) = BacklogUtils.GetSourceTextFromIndexPosition(textBox.Text, textBox.SelectionStart);
         }
