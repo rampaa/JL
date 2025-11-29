@@ -151,6 +151,7 @@ public static partial class JapaneseUtils
         '?',
         '︙',
         '︰',
+        '\u001E',
         '\n'
     ];
 
