@@ -65,7 +65,6 @@ internal static class ExtensionMethods
         textBox.UndoLimit = isReadOnly ? 0 : -1;
     }
 
-
     public static Rect ToRect(this System.Drawing.Rectangle rectangle)
     {
         return new Rect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
