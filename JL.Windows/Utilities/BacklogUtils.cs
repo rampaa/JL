@@ -17,9 +17,11 @@ internal static class BacklogUtils
 
     private static LinkedListNode<string>? s_currentNode;
 
+    private const string RecordSeparator = "\u001E\n";
+
     public static string? LastItem => s_backlog.Last?.Value;
 
-    public static string AllBacklogText => string.Join('\n', s_backlog);
+    public static string AllBacklogText => string.Join(RecordSeparator, s_backlog);
 
     public static void AddToBacklog(string text)
     {
@@ -49,7 +51,7 @@ internal static class BacklogUtils
         {
             if (mainTextBox.Text.Length > 0)
             {
-                mainTextBox.AppendText($"\n{text}");
+                mainTextBox.AppendText($"{RecordSeparator}{text}");
             }
             else
             {
@@ -308,5 +310,20 @@ internal static class BacklogUtils
             StatsUtils.IncrementStat(StatType.Characters, (long)(characterCount - StatsUtils.SessionStats.Characters));
             StatsUtils.IncrementStat(StatType.Lines, (long)(lineCount - StatsUtils.SessionStats.Lines));
         }
+    }
+
+    public static (string sourceText, int charIndexForSourceText) GetSourceTextFromIndexPosition(string text, int currentCharIndex)
+    {
+        int startIndex = text.LastIndexOf(RecordSeparator, currentCharIndex, StringComparison.Ordinal);
+        startIndex = startIndex < 0
+            ? 0
+            : startIndex + RecordSeparator.Length;
+
+        int endIndex = text.IndexOf(RecordSeparator, currentCharIndex, StringComparison.Ordinal);
+        endIndex = endIndex < 0
+            ? text.Length
+            : endIndex;
+
+        return (text[startIndex..endIndex], currentCharIndex - startIndex);
     }
 }

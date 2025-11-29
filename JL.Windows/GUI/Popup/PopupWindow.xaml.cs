@@ -285,17 +285,22 @@ internal sealed partial class PopupWindow
     public Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode, bool mayNeedCoordinateConversion)
     {
         string textBoxText = textBox.Text;
-
-        _currentSourceText = textBoxText;
-
-        if (char.IsLowSurrogate(textBox.Text[charPosition]))
+        if (char.IsLowSurrogate(textBoxText[charPosition]))
         {
             --charPosition;
         }
 
-        _currentSourceTextCharPosition = charPosition;
-
         ConfigManager configManager = ConfigManager.Instance;
+        if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 })
+        {
+            (_currentSourceText, _currentSourceTextCharPosition) = BacklogUtils.GetSourceTextFromIndexPosition(textBoxText, charPosition);
+        }
+        else
+        {
+            _currentSourceText = textBoxText;
+            _currentSourceTextCharPosition = charPosition;
+        }
+
         bool isFirstPopupWindow = PopupIndex is 0;
         if (isFirstPopupWindow ? configManager.DisableLookupsForNonJapaneseCharsInMainWindow : configManager.DisableLookupsForNonJapaneseCharsInPopups)
         {
@@ -496,11 +501,18 @@ internal sealed partial class PopupWindow
 
     public Task LookupOnSelect(TextBox textBox)
     {
-        _currentSourceText = textBox.Text;
-        _currentSourceTextCharPosition = textBox.SelectionStart;
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 })
+        {
+            (_currentSourceText, _currentSourceTextCharPosition) = BacklogUtils.GetSourceTextFromIndexPosition(textBox.Text, textBox.SelectionStart);
+        }
+        else
+        {
+            _currentSourceText = textBox.Text;
+            _currentSourceTextCharPosition = textBox.SelectionStart;
+        }
 
         string selectedText = textBox.SelectedText;
-        ConfigManager configManager = ConfigManager.Instance;
         if (string.IsNullOrEmpty(selectedText) || TextUtils.StartsWithWhiteSpace(selectedText))
         {
             if (PopupIndex is 0)
