@@ -68,6 +68,8 @@ internal static class JmdictRecordBuilder
                 ? JapaneseUtils.NormalizeText(firstPrimarySpelling)
                 : null;
 
+            JmdictRecord? recordForFirstPrimarySpellingInHiragana = null;
+
             foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)
             {
                 ReadOnlySpan<string> keInfListSpan = kanjiElement.KeInfList.AsReadOnlySpan();
@@ -92,9 +94,15 @@ internal static class JmdictRecordBuilder
 
                     if (JapaneseUtils.NormalizeLongVowelMark(firstPrimarySpellingInHiragana).Contains(key))
                     {
-                        if (recordDictionary.Remove(firstPrimarySpellingInHiragana, out JmdictRecord? primaryRecord))
+                        if (recordForFirstPrimarySpellingInHiragana is not null
+                            ? recordDictionary.Remove(firstPrimarySpellingInHiragana)
+                            : recordDictionary.Remove(firstPrimarySpellingInHiragana, out recordForFirstPrimarySpellingInHiragana))
                         {
-                            recordDictionary.Add(key, primaryRecord);
+                            recordDictionary.Add(key, recordForFirstPrimarySpellingInHiragana);
+                        }
+                        else if (recordForFirstPrimarySpellingInHiragana is not null)
+                        {
+                            recordDictionary.Add(key, recordForFirstPrimarySpellingInHiragana);
                         }
                     }
                     else if (recordDictionary.TryGetValue(firstPrimarySpellingInHiragana, out JmdictRecord? primaryRecord))
@@ -208,6 +216,7 @@ internal static class JmdictRecordBuilder
             }
 
             string firstReadingInHiragana = JapaneseUtils.NormalizeText(allReadingsWithoutSearchOnlyForms[0]);
+            JmdictRecord? recordForFirstReadingInHiragana = null;
 
             int index = 0;
             ReadOnlySpan<ReadingElement> readingElementsSpan = entry.ReadingElements.AsReadOnlySpan();
@@ -240,9 +249,15 @@ internal static class JmdictRecordBuilder
 
                     if (JapaneseUtils.NormalizeLongVowelMark(firstReadingInHiragana).Contains(key))
                     {
-                        if (recordDictionary.Remove(firstReadingInHiragana, out JmdictRecord? primaryRecord))
+                        if (recordForFirstReadingInHiragana is not null
+                            ? recordDictionary.Remove(firstReadingInHiragana)
+                            : recordDictionary.Remove(firstReadingInHiragana, out recordForFirstReadingInHiragana))
                         {
-                            recordDictionary.Add(key, primaryRecord);
+                            recordDictionary.Add(key, recordForFirstReadingInHiragana);
+                        }
+                        else if (recordForFirstReadingInHiragana is not null)
+                        {
+                            recordDictionary.Add(key, recordForFirstReadingInHiragana);
                         }
                     }
                     else if (recordDictionary.TryGetValue(firstReadingInHiragana, out JmdictRecord? primaryRecord))
