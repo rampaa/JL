@@ -233,7 +233,19 @@ internal static class JmdictRecordBuilder
 
                 if (reInfListSpan.Contains("sk"))
                 {
-                    if (recordDictionary.TryGetValue(firstReadingInHiragana, out JmdictRecord? primaryRecord))
+                    if (JapaneseUtils.NormalizeLongVowelMark(key).Contains(firstReadingInHiragana))
+                    {
+                        continue;
+                    }
+
+                    if (JapaneseUtils.NormalizeLongVowelMark(firstReadingInHiragana).Contains(key))
+                    {
+                        if (recordDictionary.Remove(firstReadingInHiragana, out JmdictRecord? primaryRecord))
+                        {
+                            recordDictionary.Add(key, primaryRecord);
+                        }
+                    }
+                    else if (recordDictionary.TryGetValue(firstReadingInHiragana, out JmdictRecord? primaryRecord))
                     {
                         recordDictionary.Add(key, primaryRecord);
                     }
