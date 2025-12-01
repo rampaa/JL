@@ -105,10 +105,13 @@ internal static class JmdictRecordBuilder
                             recordDictionary.Add(key, recordForFirstPrimarySpellingInHiragana);
                         }
                     }
-                    else if (recordDictionary.TryGetValue(firstPrimarySpellingInHiragana, out JmdictRecord? primaryRecord))
+                    else if (recordForFirstPrimarySpellingInHiragana is not null
+                        || recordDictionary.TryGetValue(firstPrimarySpellingInHiragana, out recordForFirstPrimarySpellingInHiragana))
                     {
-                        recordDictionary.Add(key, primaryRecord);
+                        recordDictionary.Add(key, recordForFirstPrimarySpellingInHiragana);
                     }
+
+                    Debug.Assert(recordForFirstPrimarySpellingInHiragana is not null);
 
                     continue;
                 }
@@ -260,10 +263,13 @@ internal static class JmdictRecordBuilder
                             recordDictionary.Add(key, recordForFirstReadingInHiragana);
                         }
                     }
-                    else if (recordDictionary.TryGetValue(firstReadingInHiragana, out JmdictRecord? primaryRecord))
+                    else if (recordForFirstReadingInHiragana is not null
+                        || recordDictionary.TryGetValue(firstReadingInHiragana, out recordForFirstReadingInHiragana))
                     {
-                        recordDictionary.Add(key, primaryRecord);
+                        recordDictionary.Add(key, recordForFirstReadingInHiragana);
                     }
+
+                    Debug.Assert(recordForFirstReadingInHiragana is not null);
 
                     continue;
                 }

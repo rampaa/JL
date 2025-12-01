@@ -12,7 +12,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 15;
+    public const int Version = 16;
 
     private enum ColumnIndex
     {
