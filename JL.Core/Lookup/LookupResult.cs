@@ -61,7 +61,6 @@ public sealed class LookupResult
         unchecked
         {
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
-            hash = (hash * 37) + MatchedText.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Dict.GetHashCode();
             hash = ((hash * 37) + FormattedDefinitions?.GetHashCode(StringComparison.Ordinal)) ?? 37;
 
@@ -86,8 +85,7 @@ public sealed class LookupResult
     {
         return obj is LookupResult other
             && PrimarySpelling == other.PrimarySpelling
-            && MatchedText == other.MatchedText
-            && Dict == other.Dict
+            && Dict.Name == other.Dict.Name
             && FormattedDefinitions == other.FormattedDefinitions
             && (other.Readings is not null
                 ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
@@ -98,8 +96,7 @@ public sealed class LookupResult
     {
         return other is not null
             && PrimarySpelling == other.PrimarySpelling
-            && MatchedText == other.MatchedText
-            && Dict == other.Dict
+            && Dict.Name == other.Dict.Name
             && FormattedDefinitions == other.FormattedDefinitions
             && (other.Readings is not null
                 ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
