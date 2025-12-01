@@ -1027,7 +1027,10 @@ public static class LookupUtils
                         wordClasses: jmdictResult.WordClassesSharedByAllSenses
                     );
 
-                    results.Add(result);
+                    if (!results.Contains(result))
+                    {
+                        results.Add(result);
+                    }
                 }
             }
         }
