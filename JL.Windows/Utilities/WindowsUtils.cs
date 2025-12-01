@@ -207,22 +207,10 @@ internal static class WindowsUtils
 
     public static async Task ShowManageDictionariesWindow()
     {
-        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "dicts.json")))
-        {
-            await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(true);
-        }
+        await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(true);
 
-        string customWordsPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
-        if (!File.Exists(customWordsPath))
-        {
-            await File.Create(customWordsPath).DisposeAsync().ConfigureAwait(true);
-        }
-
-        string customNamesPath = Path.Join(AppInfo.ResourcesPath, "custom_names.txt");
-        if (!File.Exists(customNamesPath))
-        {
-            await File.Create(customNamesPath).DisposeAsync().ConfigureAwait(true);
-        }
+        PathUtils.CreateFileIfNotExists(DictUtils.CustomWordDictPath);
+        PathUtils.CreateFileIfNotExists(DictUtils.CustomNameDictPath);
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
         manageDictionariesWindow.Owner = MainWindow.Instance;
@@ -240,10 +228,7 @@ internal static class WindowsUtils
 
     public static async Task ShowManageFrequenciesWindow()
     {
-        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "freqs.json")))
-        {
-            await FreqUtils.CreateDefaultFreqsConfig().ConfigureAwait(true);
-        }
+        await FreqUtils.CreateDefaultFreqsConfig().ConfigureAwait(true);
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
         manageFrequenciesWindow.Owner = MainWindow.Instance;

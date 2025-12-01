@@ -10,6 +10,8 @@ namespace JL.Core.External.AnkiConnect;
 
 public static class AnkiConfigUtils
 {
+    private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "AnkiConfig.json");
+
     private static Dictionary<MineType, AnkiConfig>? s_ankiConfigDict;
 
     public static async Task WriteAnkiConfig(Dictionary<MineType, AnkiConfig> ankiConfig)
@@ -18,12 +20,15 @@ public static class AnkiConfigUtils
         {
             _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
-            FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AnkiConfig.json"), FileStreamOptionsPresets.s_asyncCreateFso);
+            string tempConfigFilePath = PathUtils.GetTempPath(s_configFilePath);
+
+            FileStream fileStream = new(tempConfigFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
             await using (fileStream.ConfigureAwait(false))
             {
                 await JsonSerializer.SerializeAsync(fileStream, ankiConfig, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
             }
 
+            PathUtils.ReplaceFileAtomicallyOnSameVolume(s_configFilePath, tempConfigFilePath);
             s_ankiConfigDict = ankiConfig;
         }
         catch (Exception ex)
@@ -40,61 +45,60 @@ public static class AnkiConfigUtils
             return s_ankiConfigDict;
         }
 
-        string filePath = Path.Join(AppInfo.ConfigPath, "AnkiConfig.json");
-        if (File.Exists(filePath))
+        if (!File.Exists(s_configFilePath))
         {
-            try
-            {
-                FileStream ankiConfigStream = new(filePath, FileStreamOptionsPresets.s_asyncReadFso);
-                await using (ankiConfigStream.ConfigureAwait(false))
-                {
-                    s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
-                }
-
-                Debug.Assert(s_ankiConfigDict is not null);
-                AtomicBool firstFieldChanged = new(false);
-                await Parallel.ForEachAsync(s_ankiConfigDict.Values, async (ankiConfig, _) =>
-                {
-                    Debug.Assert(ankiConfig.Fields.Count > 0);
-                    string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName).ConfigureAwait(false);
-                    if (fields is not null)
-                    {
-                        ReadOnlySpan<string> fieldsSpan = fields.AsReadOnlySpan();
-                        if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
-                        {
-                            firstFieldChanged.SetTrue();
-
-                            OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length);
-                            for (int i = 0; i < fieldsSpan.Length; i++)
-                            {
-                                string fieldName = fieldsSpan[i];
-                                upToDateFields.Add(fieldName, ankiConfig.Fields.GetValueOrDefault(fieldName, JLField.Nothing));
-                            }
-
-                            ankiConfig.Fields = upToDateFields;
-                            ankiConfig.UsedJLFields = upToDateFields.Values.Where(static f => f is not JLField.Nothing).ToFrozenSet();
-                        }
-                    }
-                }).ConfigureAwait(false);
-
-                if (firstFieldChanged)
-                {
-                    await WriteAnkiConfig(s_ankiConfigDict).ConfigureAwait(false);
-                }
-
-                return s_ankiConfigDict;
-            }
-
-            catch (Exception ex)
-            {
-                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
-                LoggerManager.Logger.Error(ex, "Couldn't read AnkiConfig");
-                return null;
-            }
+            // FrontendManager.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+            LoggerManager.Logger.Warning("AnkiConfig.json doesn't exist");
+            return null;
         }
 
-        // FrontendManager.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
-        LoggerManager.Logger.Warning("AnkiConfig.json doesn't exist");
-        return null;
+        try
+        {
+            FileStream ankiConfigStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncReadFso);
+            await using (ankiConfigStream.ConfigureAwait(false))
+            {
+                s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
+            }
+
+            Debug.Assert(s_ankiConfigDict is not null);
+            AtomicBool firstFieldChanged = new(false);
+            await Parallel.ForEachAsync(s_ankiConfigDict.Values, async (ankiConfig, _) =>
+            {
+                Debug.Assert(ankiConfig.Fields.Count > 0);
+                string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName).ConfigureAwait(false);
+                if (fields is not null)
+                {
+                    ReadOnlySpan<string> fieldsSpan = fields.AsReadOnlySpan();
+                    if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
+                    {
+                        firstFieldChanged.SetTrue();
+
+                        OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length);
+                        for (int i = 0; i < fieldsSpan.Length; i++)
+                        {
+                            string fieldName = fieldsSpan[i];
+                            upToDateFields.Add(fieldName, ankiConfig.Fields.GetValueOrDefault(fieldName, JLField.Nothing));
+                        }
+
+                        ankiConfig.Fields = upToDateFields;
+                        ankiConfig.UsedJLFields = upToDateFields.Values.Where(static f => f is not JLField.Nothing).ToFrozenSet();
+                    }
+                }
+            }).ConfigureAwait(false);
+
+            if (firstFieldChanged)
+            {
+                await WriteAnkiConfig(s_ankiConfigDict).ConfigureAwait(false);
+            }
+
+            return s_ankiConfigDict;
+        }
+
+        catch (Exception ex)
+        {
+            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
+            LoggerManager.Logger.Error(ex, "Couldn't read AnkiConfig");
+            return null;
+        }
     }
 }

@@ -23,44 +23,15 @@ public static class CoreInitializer
         _ = Directory.CreateDirectory(DBUtils.s_dictDBFolderPath);
         _ = Directory.CreateDirectory(DBUtils.s_freqDBFolderPath);
 
-        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "dicts.json")))
-        {
-            await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(false);
-        }
+        await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(false);
+        await FreqUtils.CreateDefaultFreqsConfig().ConfigureAwait(false);
+        await AudioUtils.CreateDefaultAudioSourceConfig().ConfigureAwait(false);
 
-        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "freqs.json")))
-        {
-            await FreqUtils.CreateDefaultFreqsConfig().ConfigureAwait(false);
-        }
 
-        if (!File.Exists(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json")))
-        {
-            await AudioUtils.CreateDefaultAudioSourceConfig().ConfigureAwait(false);
-        }
-
-        string customWordsPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
-        if (!File.Exists(customWordsPath))
-        {
-            await File.Create(customWordsPath).DisposeAsync().ConfigureAwait(false);
-        }
-
-        string customNamesPath = Path.Join(AppInfo.ResourcesPath, "custom_names.txt");
-        if (!File.Exists(customNamesPath))
-        {
-            await File.Create(customNamesPath).DisposeAsync().ConfigureAwait(false);
-        }
-
-        string profileCustomWordsPath = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName);
-        if (!File.Exists(profileCustomWordsPath))
-        {
-            await File.Create(profileCustomWordsPath).DisposeAsync().ConfigureAwait(false);
-        }
-
-        string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName);
-        if (!File.Exists(profileCustomNamesPath))
-        {
-            await File.Create(profileCustomNamesPath).DisposeAsync().ConfigureAwait(false);
-        }
+        PathUtils.CreateFileIfNotExists(DictUtils.CustomWordDictPath);
+        PathUtils.CreateFileIfNotExists(DictUtils.CustomNameDictPath);
+        PathUtils.CreateFileIfNotExists(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName));
+        PathUtils.CreateFileIfNotExists(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName));
 
         await Task.WhenAll(
             Task.Run(static async () =>

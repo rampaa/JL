@@ -11,6 +11,8 @@ namespace JL.Core.WordClass;
 
 internal static class JmdictWordClassUtils
 {
+    internal static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
+
     private static readonly FrozenSet<string> s_usedWordClasses =
         [
             "adj-i", "cop", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
@@ -19,13 +21,12 @@ internal static class JmdictWordClassUtils
 
     internal static async Task Load()
     {
-        string partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
-        if (!File.Exists(partOfSpeechFilePath))
+        if (!File.Exists(s_partOfSpeechFilePath))
         {
             return;
         }
 
-        FileStream fileStream = new(partOfSpeechFilePath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+        FileStream fileStream = new(s_partOfSpeechFilePath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
             Dictionary<string, IList<JmdictWordClass>>? wordClassDictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
@@ -170,21 +171,23 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        FileStream fileStream = new(Path.Join(AppInfo.ResourcesPath, "PoS.json"), FileStreamOptionsPresets.s_asyncCreate64KBufferFso);
+        string tempPartOfSpeechFilePath = PathUtils.GetTempPath(s_partOfSpeechFilePath);
+        FileStream fileStream = new(tempPartOfSpeechFilePath, FileStreamOptionsPresets.s_asyncCreate64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, jmdictWordClassDictionary, JsonOptions.s_jsoIgnoringWhenWritingNull).ConfigureAwait(false);
         }
+
+        PathUtils.ReplaceFileAtomicallyOnSameVolume(s_partOfSpeechFilePath, tempPartOfSpeechFilePath);
     }
 
     internal static async Task Initialize()
     {
         Dict jmdictDict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         string fullJmdictPath = Path.GetFullPath(jmdictDict.Path, AppInfo.ApplicationPath);
-        string partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
 
-        if (!File.Exists(partOfSpeechFilePath)
-            || (File.Exists(fullJmdictPath) && File.GetLastWriteTime(fullJmdictPath) > File.GetLastWriteTime(partOfSpeechFilePath)))
+        if (!File.Exists(s_partOfSpeechFilePath)
+            || (File.Exists(fullJmdictPath) && File.GetLastWriteTime(fullJmdictPath) > File.GetLastWriteTime(s_partOfSpeechFilePath)))
         {
             bool useDB = jmdictDict.Options.UseDB.Value;
             if (jmdictDict.Active && !useDB)

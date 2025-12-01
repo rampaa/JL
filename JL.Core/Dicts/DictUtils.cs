@@ -26,6 +26,9 @@ namespace JL.Core.Dicts;
 
 public static class DictUtils
 {
+    public static readonly string CustomWordDictPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
+    public static readonly string CustomNameDictPath = Path.Join(AppInfo.ResourcesPath, "custom_names.txt");
+    internal static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "dicts.json");
     public static bool DictsReady { get; private set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
@@ -76,7 +79,7 @@ public static class DictUtils
         {
             nameof(DictType.CustomWordDictionary), new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
-                Path.Join(AppInfo.ResourcesPath, "custom_words.txt"),
+                CustomWordDictPath,
                 true, 1, 128,
                 new DictOptions(
                     new UseDBOption(false),
@@ -89,7 +92,7 @@ public static class DictUtils
         {
             nameof(DictType.CustomNameDictionary), new Dict(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
-                Path.Join(AppInfo.ResourcesPath, "custom_names.txt"),
+                CustomNameDictPath,
                 true, 2, 128,
                 new DictOptions(
                     new UseDBOption(false),
@@ -1427,9 +1430,14 @@ public static class DictUtils
 
     public static async Task CreateDefaultDictsConfig()
     {
+        if (File.Exists(s_configFilePath))
+        {
+            return;
+        }
+
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.s_asyncCreateFso);
+        FileStream fileStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, BuiltInDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -1438,18 +1446,22 @@ public static class DictUtils
 
     public static async Task SerializeDicts()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.s_asyncCreateFso);
+        string tempConfigFilePath = PathUtils.GetTempPath(s_configFilePath);
+
+        FileStream fileStream = new(tempConfigFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, Dicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
         }
+
+        PathUtils.ReplaceFileAtomicallyOnSameVolume(s_configFilePath, tempConfigFilePath);
     }
 
     internal static async Task DeserializeDicts()
     {
         Dictionary<string, Dict>? deserializedDicts;
 
-        FileStream dictStream = new(Path.Join(AppInfo.ConfigPath, "dicts.json"), FileStreamOptionsPresets.s_asyncReadFso);
+        FileStream dictStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncReadFso);
         await using (dictStream.ConfigureAwait(false))
         {
             deserializedDicts = await JsonSerializer

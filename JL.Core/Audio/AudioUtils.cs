@@ -11,6 +11,8 @@ namespace JL.Core.Audio;
 
 public static class AudioUtils
 {
+    internal static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json");
+
     internal static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
 
     public static readonly OrderedDictionary<string, AudioSource> AudioSources = new(StringComparer.Ordinal);
@@ -196,18 +198,27 @@ public static class AudioUtils
 
     public static async Task SerializeAudioSources()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.s_asyncCreateFso);
+        string tempConfigFilePath = PathUtils.GetTempPath(s_configFilePath);
+
+        FileStream fileStream = new(tempConfigFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, AudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
         }
+
+        PathUtils.ReplaceFileAtomicallyOnSameVolume(s_configFilePath, tempConfigFilePath);
     }
 
     public static async Task CreateDefaultAudioSourceConfig()
     {
+        if (File.Exists(s_configFilePath))
+        {
+            return;
+        }
+
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.s_asyncCreateFso);
+        FileStream fileStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, s_builtInAudioSources, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -218,7 +229,7 @@ public static class AudioUtils
     {
         Dictionary<string, AudioSource>? deserializedAudioSources;
 
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json"), FileStreamOptionsPresets.s_asyncReadFso);
+        FileStream fileStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncReadFso);
         await using (fileStream.ConfigureAwait(false))
         {
             deserializedAudioSources = await JsonSerializer

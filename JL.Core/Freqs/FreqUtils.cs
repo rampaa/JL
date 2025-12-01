@@ -15,6 +15,7 @@ namespace JL.Core.Freqs;
 
 public static class FreqUtils
 {
+    internal static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "freqs.json");
     public static bool FreqsReady { get; private set; } // = false;
 
     public static readonly Dictionary<string, Freq> FreqDicts = new(StringComparer.OrdinalIgnoreCase);
@@ -384,9 +385,14 @@ public static class FreqUtils
 
     public static async Task CreateDefaultFreqsConfig()
     {
+        if (File.Exists(s_configFilePath))
+        {
+            return;
+        }
+
         _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.s_asyncCreateFso);
+        FileStream fileStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, s_builtInFreqs, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
@@ -395,18 +401,22 @@ public static class FreqUtils
 
     public static async Task SerializeFreqs()
     {
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.s_asyncCreateFso);
+        string tempConfigFilePath = PathUtils.GetTempPath(s_configFilePath);
+
+        FileStream fileStream = new(tempConfigFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
             await JsonSerializer.SerializeAsync(fileStream, FreqDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
         }
+
+        PathUtils.ReplaceFileAtomicallyOnSameVolume(s_configFilePath, tempConfigFilePath);
     }
 
     internal static async Task DeserializeFreqs()
     {
         Dictionary<string, Freq>? deserializedFreqs;
 
-        FileStream fileStream = new(Path.Join(AppInfo.ConfigPath, "freqs.json"), FileStreamOptionsPresets.s_asyncReadFso);
+        FileStream fileStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncReadFso);
         await using (fileStream.ConfigureAwait(false))
         {
             deserializedFreqs = await JsonSerializer

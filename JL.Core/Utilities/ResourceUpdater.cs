@@ -45,7 +45,7 @@ public static class ResourceUpdater
                 using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
-                    string tempDictPath = GetTempPath(fullDictPath);
+                    string tempDictPath = PathUtils.GetTempPath(fullDictPath);
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     await using (responseStream.ConfigureAwait(false))
                     {
@@ -54,7 +54,7 @@ public static class ResourceUpdater
 
                     if (File.Exists(fullDictPath))
                     {
-                        File.Move(fullDictPath, GetBackupPath(fullDictPath), true);
+                        PathUtils.ReplaceFileAtomicallyOnSameVolume(GetBackupPath(fullDictPath), fullDictPath);
                     }
 
                     File.Move(tempDictPath, fullDictPath, false);
@@ -105,7 +105,7 @@ public static class ResourceUpdater
                 FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
             }
 
-            string tempDictPath = GetTempPath(fullDictPath);
+            string tempDictPath = PathUtils.GetTempPath(fullDictPath);
             if (File.Exists(tempDictPath))
             {
                 File.Delete(tempDictPath);
@@ -232,7 +232,7 @@ public static class ResourceUpdater
                     return false;
                 }
 
-                string tempDictPath = GetTempPath(fullDictPath);
+                string tempDictPath = PathUtils.GetTempPath(fullDictPath);
                 Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 await using (responseStream.ConfigureAwait(false))
                 {
@@ -273,7 +273,7 @@ public static class ResourceUpdater
                 FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
             }
 
-            string tempDictPath = GetTempPath(fullDictPath);
+            string tempDictPath = PathUtils.GetTempPath(fullDictPath);
             if (Directory.Exists(tempDictPath))
             {
                 Directory.Delete(tempDictPath, true);
@@ -904,11 +904,6 @@ public static class ResourceUpdater
         return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
     }
 
-    private static string GetTempPath(string path)
-    {
-        return $"{path}.tmp";
-    }
-
     private static string GetBackupPath(string path)
     {
         return $"{path}.bak";
@@ -916,7 +911,7 @@ public static class ResourceUpdater
 
     internal static void HandleLeftOverFiles(string fullPath)
     {
-        string tempFilePath = GetTempPath(fullPath);
+        string tempFilePath = PathUtils.GetTempPath(fullPath);
         if (File.Exists(tempFilePath))
         {
             File.Delete(tempFilePath);
@@ -938,7 +933,7 @@ public static class ResourceUpdater
 
     internal static void HandleLeftOverFolders(string fullPath)
     {
-        string tempFolderPath = GetTempPath(fullPath);
+        string tempFolderPath = PathUtils.GetTempPath(fullPath);
         if (Directory.Exists(tempFolderPath))
         {
             Directory.Delete(tempFolderPath, true);
