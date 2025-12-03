@@ -41,7 +41,7 @@ jobs:
           release_name="JL-$tag-${{ matrix.target }}"
           
           # Build everything
-          dotnet publish JL.Windows/JL.Windows.csproj --framework net9.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name" //p:Version=$tag
+          dotnet publish JL.Windows/JL.Windows.csproj --framework net9.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name"
           
           # Mark JL as LARGEADDRESSAWARE
           if [ "${{ matrix.target }}" = "win-x86" ]
