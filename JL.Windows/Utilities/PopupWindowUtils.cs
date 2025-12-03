@@ -111,7 +111,7 @@ internal static class PopupWindowUtils
                 currentPopupWindow = PopupWindows[currentPopupWindow.PopupIndex + 1];
             }
 
-            int index = hoveredPopup?.PopupIndex + 1 ?? 0;
+            int index = (hoveredPopup?.PopupIndex + 1) ?? 0;
             PopupWindow? popupWindow = PopupWindows[index];
             if (popupWindow?.IsVisible ?? false)
             {

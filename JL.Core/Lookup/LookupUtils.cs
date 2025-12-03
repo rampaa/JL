@@ -1575,10 +1575,7 @@ public static class LookupUtils
                         }
                     }
 
-                    if (positions is not null)
-                    {
-                        positions[i] = position;
-                    }
+                    _ = (positions?[i] = position);
                 }
             }
             else
@@ -1610,10 +1607,7 @@ public static class LookupUtils
                             }
                         }
 
-                        if (positions is not null)
-                        {
-                            positions[i] = position;
-                        }
+                        _ = (positions?[i] = position);
                     }
                 }
             }

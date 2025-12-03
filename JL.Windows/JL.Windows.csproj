@@ -1,24 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <RollForward>LatestMajor</RollForward>
+    <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <PackageId>JL.Windows</PackageId>
     <AssemblyName>JL</AssemblyName>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <NoWin32Manifest>true</NoWin32Manifest>
-    <PublishReadyToRun>false</PublishReadyToRun>
-    <AnalysisLevel>9-all</AnalysisLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
