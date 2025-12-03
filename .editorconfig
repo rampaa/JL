@@ -89,6 +89,9 @@ dotnet_diagnostic.CA1062.severity = none
 # CA1819: Properties should not return arrays
 dotnet_diagnostic.CA1819.severity = none
 
+# IDE0005: Remove unnecessary using directives
+dotnet_diagnostic.IDE0005.severity = suggestion
+
 # IDE0305: Use collection expression for fluent
 dotnet_diagnostic.IDE0305.severity = silent
 
