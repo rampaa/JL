@@ -6,7 +6,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using HandyControl.Data;
-using JL.Core;
 using JL.Core.Config;
 using JL.Core.Frontend;
 using JL.Core.Statistics;
@@ -829,7 +828,7 @@ internal sealed class ConfigManager
 
     public void LoadPreferenceWindow(PreferencesWindow preferenceWindow)
     {
-        preferenceWindow.JLVersionTextBlock.Text = string.Create(CultureInfo.InvariantCulture, $"v{AppInfo.JLVersion}");
+        preferenceWindow.JLVersionTextBlock.Text = string.Create(CultureInfo.InvariantCulture, $"v{WindowsUtils.JLVersion}");
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = DisableHotkeysKeyGesture.ToFormattedString();
         preferenceWindow.MiningModeKeyGestureTextBox.Text = MiningModeKeyGesture.ToFormattedString();
         preferenceWindow.PlayAudioKeyGestureTextBox.Text = PlayAudioKeyGesture.ToFormattedString();

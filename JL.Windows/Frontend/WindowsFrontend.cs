@@ -38,4 +38,6 @@ internal sealed class WindowsFrontend : IFrontend
     public byte[]? GetAudioResponseFromTextToSpeech(string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(text);
 
     public void SetInstalledVoiceWithHighestPriority() => SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
+
+    public Version JLVersion { get; } = WindowsUtils.JLVersion;
 }

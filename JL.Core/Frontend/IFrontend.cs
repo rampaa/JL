@@ -25,4 +25,6 @@ public interface IFrontend
     public byte[]? GetAudioResponseFromTextToSpeech(string text);
 
     public void SetInstalledVoiceWithHighestPriority();
+
+    public Version JLVersion { get; }
 }

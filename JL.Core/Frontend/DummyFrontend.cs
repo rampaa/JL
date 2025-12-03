@@ -33,4 +33,6 @@ internal sealed class DummyFrontend : IFrontend
     public void SetInstalledVoiceWithHighestPriority()
     {
     }
+
+    public Version JLVersion { get; } = new(0, 0, 0);
 }

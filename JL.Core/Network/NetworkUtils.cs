@@ -58,7 +58,7 @@ public static class NetworkUtils
 
                     Version latestJLVersion = new(tagName);
 
-                    if (latestJLVersion > AppInfo.JLVersion)
+                    if (latestJLVersion > FrontendManager.Frontend.JLVersion)
                     {
                         bool foundRelease = false;
                         string architecture = RuntimeInformation.ProcessArchitecture is Architecture.Arm64
