@@ -36,15 +36,15 @@ public static class DictUtils
     private static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
-    internal static bool DBIsUsedForAtLeastOneDict { get; private set; }
-    internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; }
-    internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; }
-    internal static bool DBIsUsedForJmdict { get; private set; }
-    internal static bool JmdictIsActive { get; private set; }
-    internal static bool AnyCustomWordDictIsActive { get; private set; }
-    internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; }
-    internal static bool AtLeastOneKanjiDictIsActive { get; private set; }
-    internal static bool DBIsUsedForAtLeastOneYomichanOrNazekaWordDict { get; private set; }
+    internal static bool DBIsUsedForAtLeastOneDict { get; private set; } = true;
+    internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; } = true;
+    internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; } = true;
+    internal static bool DBIsUsedForJmdict { get; private set; } = true;
+    internal static bool JmdictIsActive { get; private set; } = true;
+    internal static bool AnyCustomWordDictIsActive { get; private set; } = true;
+    internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; } = true;
+    internal static bool AtLeastOneKanjiDictIsActive { get; private set; } = true;
+    internal static bool DBIsUsedForAtLeastOneYomichanOrNazekaWordDict { get; private set; } = true;
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
@@ -525,6 +525,8 @@ public static class DictUtils
     {
         DictsReady = false;
 
+        CheckSingleDictActiveness();
+
         ProfileCustomWordsCancellationTokenSource?.Dispose();
         ProfileCustomWordsCancellationTokenSource = new CancellationTokenSource();
 
@@ -540,8 +542,6 @@ public static class DictUtils
         List<Task> tasks = [];
 
         Dict[] dicts = Dicts.Values.ToArray();
-
-        CheckSingleDictActiveness();
         CheckDBUsageForDicts(dicts);
 
         int customDictionaryTaskCount = 0;
@@ -1615,13 +1615,13 @@ public static class DictUtils
 
     private static void CheckDBUsageForDicts(Dict[] dicts)
     {
-        DBIsUsedForAtLeastOneDict = false;
-        DBIsUsedForAtLeastOneWordDict = false;
-        DBIsUsedForAtLeastOneYomichanDict = false;
-        DBIsUsedForAtLeastOneNazekaDict = false;
-        DBIsUsedForAtLeastOneYomichanOrNazekaWordDict = false;
-        AtLeastOneKanjiDictIsActive = false;
-        DBIsUsedForJmdict = false;
+        bool dbIsUsedForAtLeastOneDict = false;
+        bool dbIsUsedForAtLeastOneWordDict = false;
+        bool dbIsUsedForAtLeastOneYomichanDict = false;
+        bool dbIsUsedForAtLeastOneNazekaDict = false;
+        bool dbIsUsedForAtLeastOneYomichanOrNazekaWordDict = false;
+        bool atLeastOneKanjiDictIsActive = false;
+        bool dbIsUsedForJmdict = false;
 
         foreach (Dict dict in dicts)
         {
@@ -1629,50 +1629,58 @@ public static class DictUtils
             {
                 if (KanjiDictTypes.Contains(dict.Type))
                 {
-                    AtLeastOneKanjiDictIsActive = true;
+                    atLeastOneKanjiDictIsActive = true;
                 }
 
                 if (dict.Options.UseDB.Value)
                 {
-                    DBIsUsedForAtLeastOneDict = true;
+                    dbIsUsedForAtLeastOneDict = true;
 
                     if (dict.Type is DictType.JMdict)
                     {
-                        DBIsUsedForJmdict = true;
+                        dbIsUsedForJmdict = true;
                     }
 
                     if (dict.Type is DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificWordNazeka)
                     {
-                        DBIsUsedForAtLeastOneWordDict = true;
+                        dbIsUsedForAtLeastOneWordDict = true;
                     }
 
                     if (s_yomichanWordAndNameDictTypeSet.Contains(dict.Type))
                     {
-                        DBIsUsedForAtLeastOneYomichanDict = true;
+                        dbIsUsedForAtLeastOneYomichanDict = true;
                     }
 
                     if (s_nazekaWordAndNameDictTypeSet.Contains(dict.Type))
                     {
-                        DBIsUsedForAtLeastOneNazekaDict = true;
+                        dbIsUsedForAtLeastOneNazekaDict = true;
                     }
 
                     if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificYomichan or DictType.NonspecificWordNazeka or DictType.NonspecificNazeka)
                     {
-                        DBIsUsedForAtLeastOneYomichanOrNazekaWordDict = true;
+                        dbIsUsedForAtLeastOneYomichanOrNazekaWordDict = true;
                     }
                 }
 
-                if (DBIsUsedForAtLeastOneDict
-                    && DBIsUsedForAtLeastOneWordDict
-                    && DBIsUsedForAtLeastOneYomichanDict
-                    && DBIsUsedForAtLeastOneNazekaDict
-                    && DBIsUsedForAtLeastOneYomichanOrNazekaWordDict
-                    && AtLeastOneKanjiDictIsActive
-                    && DBIsUsedForJmdict)
+                if (dbIsUsedForAtLeastOneDict
+                    && dbIsUsedForAtLeastOneWordDict
+                    && dbIsUsedForAtLeastOneYomichanDict
+                    && dbIsUsedForAtLeastOneNazekaDict
+                    && dbIsUsedForAtLeastOneYomichanOrNazekaWordDict
+                    && atLeastOneKanjiDictIsActive
+                    && dbIsUsedForJmdict)
                 {
-                    return;
+                    break;
                 }
             }
         }
+
+        DBIsUsedForAtLeastOneDict = dbIsUsedForAtLeastOneDict;
+        DBIsUsedForAtLeastOneWordDict = dbIsUsedForAtLeastOneWordDict;
+        DBIsUsedForAtLeastOneYomichanDict = dbIsUsedForAtLeastOneYomichanDict;
+        DBIsUsedForAtLeastOneNazekaDict = dbIsUsedForAtLeastOneNazekaDict;
+        DBIsUsedForAtLeastOneYomichanOrNazekaWordDict = dbIsUsedForAtLeastOneYomichanOrNazekaWordDict;
+        AtLeastOneKanjiDictIsActive = atLeastOneKanjiDictIsActive;
+        DBIsUsedForJmdict = dbIsUsedForJmdict;
     }
 }
