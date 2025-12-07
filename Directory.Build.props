@@ -11,6 +11,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <PublishReadyToRun>false</PublishReadyToRun>
+    <SelfContained>false</SelfContained>
     <RollForward>LatestMajor</RollForward>
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
