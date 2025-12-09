@@ -8,6 +8,8 @@ namespace JL.Core.Utilities;
 
 public static class TextUtils
 {
+    public static readonly Encoding Utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
+
     private const char HighSurrogateStart = '\uD800';
     private const char Noncharacter = '\uFFFE';
     private static readonly SearchValues<char> s_digits = SearchValues.Create('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');

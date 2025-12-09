@@ -667,7 +667,7 @@ public static class DictUtils
             CheckDBUsageForDicts(dictsSnapshot);
 
             if (dictsSnapshot.All(static d => !d.Updating)
-                && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed))
+                && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed.Read()))
             {
                 FrontendManager.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
             }

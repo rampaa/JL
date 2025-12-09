@@ -2,16 +2,15 @@ using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text.Json;
 using JL.Core.Config;
-using JL.Core.Network;
 using JL.Core.Utilities;
 
 namespace JL.Core.External;
 
 public static class MpvUtils
 {
-    private static readonly ReadOnlyMemory<byte> s_getPausePropertyCommand = NetworkUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"get_property\",\"pause\"]}\n");
-    private static readonly ReadOnlyMemory<byte> s_pauseCommand = NetworkUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",true]}\n");
-    private static readonly ReadOnlyMemory<byte> s_unpauseCommand = NetworkUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",false]}\n");
+    private static readonly ReadOnlyMemory<byte> s_getPausePropertyCommand = TextUtils.Utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"get_property\",\"pause\"]}\n");
+    private static readonly ReadOnlyMemory<byte> s_pauseCommand = TextUtils.Utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",true]}\n");
+    private static readonly ReadOnlyMemory<byte> s_unpauseCommand = TextUtils.Utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",false]}\n");
 
     private static long s_lastPausedByJLTimestamp;
     private static bool s_pausedByJL; // = false

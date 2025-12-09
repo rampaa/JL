@@ -1667,7 +1667,7 @@ internal sealed partial class MainWindow
             DpiScale dpi = WindowsUtils.Dpi;
             double dpiUnawareHeight = Height * dpi.DpiScaleY;
 
-            Rect referenceWindowRect = !MagpieUtils.IsMagpieScaling || !MagpieUtils.MagpieWindowRect.IntersectsWith(new Rect(Left * dpi.DpiScaleX, Top * dpi.DpiScaleY, Width * dpi.DpiScaleX, Height * dpi.DpiScaleY))
+            Rect referenceWindowRect = !MagpieUtils.IsMagpieScaling() || !MagpieUtils.MagpieWindowRect.IntersectsWith(new Rect(Left * dpi.DpiScaleX, Top * dpi.DpiScaleY, Width * dpi.DpiScaleX, Height * dpi.DpiScaleY))
                 ? WindowsUtils.ActiveScreen.WorkingArea.ToRect()
                 : MagpieUtils.MagpieWindowRect;
 
@@ -2062,7 +2062,7 @@ internal sealed partial class MainWindow
         double currentWidth = ActualWidth * WindowsUtils.Dpi.DpiScaleX;
         Screen activeScreen = WindowsUtils.ActiveScreen;
 
-        if (MagpieUtils.IsMagpieScaling)
+        if (MagpieUtils.IsMagpieScaling())
         {
             Rect magpieWindowRect = MagpieUtils.MagpieWindowRect;
             if (rightPosition is 0)
@@ -2102,7 +2102,7 @@ internal sealed partial class MainWindow
         double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
         Screen activeScreen = WindowsUtils.ActiveScreen;
 
-        if (MagpieUtils.IsMagpieScaling)
+        if (MagpieUtils.IsMagpieScaling())
         {
             Rect magpieWindowRect = MagpieUtils.MagpieWindowRect;
             if (bottomPosition is -2 or -1)

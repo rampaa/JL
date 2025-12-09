@@ -86,7 +86,7 @@ public static class AnkiConfigUtils
                 }
             }).ConfigureAwait(false);
 
-            if (firstFieldChanged)
+            if (firstFieldChanged.Read())
             {
                 await WriteAnkiConfig(s_ankiConfigDict).ConfigureAwait(false);
             }

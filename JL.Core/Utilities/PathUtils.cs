@@ -2,6 +2,8 @@ namespace JL.Core.Utilities;
 
 public static class PathUtils
 {
+    public const string TempFileExtension = ".tmp";
+
     public static string GetPortablePath(string path)
     {
         string fullPath = Path.GetFullPath(path, AppInfo.ApplicationPath);
@@ -12,7 +14,7 @@ public static class PathUtils
 
     public static string GetTempPath(string path)
     {
-        return $"{path}.tmp";
+        return $"{path}{TempFileExtension}";
     }
 
     public static void CreateFileIfNotExists(string path)

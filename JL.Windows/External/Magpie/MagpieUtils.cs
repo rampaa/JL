@@ -5,21 +5,18 @@ namespace JL.Windows.External.Magpie;
 
 internal static class MagpieUtils
 {
+    private static bool s_isMagpieScaling;
+
     public static int MagpieScalingChangedWindowMessage { get; private set; } = -1;
 
-    public static bool IsMagpieScaling
+    public static bool IsMagpieScaling()
     {
-        get
+        if (s_isMagpieScaling)
         {
-            if (field)
-            {
-                field = IsMagpieReallyScaling();
-            }
-
-            return field;
+            s_isMagpieScaling = IsMagpieReallyScaling();
         }
 
-        private set;
+        return s_isMagpieScaling;
     }
 
     private static Rect s_sourceWindowRect;
@@ -34,7 +31,7 @@ internal static class MagpieUtils
         nint magpieWindowHandle = GetMagpieWindowHandle();
 
         bool isMagpieScaling = magpieWindowHandle is not 0;
-        IsMagpieScaling = isMagpieScaling;
+        s_isMagpieScaling = isMagpieScaling;
 
         if (isMagpieScaling)
         {
@@ -120,12 +117,12 @@ internal static class MagpieUtils
     {
         if (wParam is 1)
         {
-            IsMagpieScaling = true;
+            s_isMagpieScaling = true;
             SetMagpieInfo(lParam);
         }
         else // if (wParam is 0)
         {
-            IsMagpieScaling = lParam is 1;
+            s_isMagpieScaling = lParam is 1;
         }
     }
 

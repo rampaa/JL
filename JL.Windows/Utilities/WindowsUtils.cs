@@ -989,7 +989,7 @@ internal static class WindowsUtils
     {
         return !mayNeedCoordinateConversion
             ? mousePosition
-            : MagpieUtils.IsMagpieScaling
+            : MagpieUtils.IsMagpieScaling()
                 ? MagpieUtils.GetMousePosition(mousePosition)
                 : mousePosition;
     }
