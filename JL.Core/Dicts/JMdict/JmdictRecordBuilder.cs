@@ -94,13 +94,13 @@ internal static class JmdictRecordBuilder
 
                     if (JapaneseUtils.NormalizeLongVowelMark(firstPrimarySpellingInHiragana).Contains(key))
                     {
-                        bool recordForFirstPrimarySpellingInHiraganaIsNotNull = recordForFirstPrimarySpellingInHiragana is not null;
-                        if ((recordForFirstPrimarySpellingInHiraganaIsNotNull
-                            ? recordDictionary.Remove(firstPrimarySpellingInHiragana)
-                            : recordDictionary.Remove(firstPrimarySpellingInHiragana, out recordForFirstPrimarySpellingInHiragana))
-                            || recordForFirstPrimarySpellingInHiraganaIsNotNull)
+                        if (recordForFirstPrimarySpellingInHiragana is not null)
                         {
-                            Debug.Assert(recordForFirstPrimarySpellingInHiragana is not null);
+                            _ = recordDictionary.Remove(firstPrimarySpellingInHiragana);
+                            recordDictionary.Add(key, recordForFirstPrimarySpellingInHiragana);
+                        }
+                        else if (recordDictionary.Remove(firstPrimarySpellingInHiragana, out recordForFirstPrimarySpellingInHiragana))
+                        {
                             recordDictionary.Add(key, recordForFirstPrimarySpellingInHiragana);
                         }
                     }
@@ -111,7 +111,6 @@ internal static class JmdictRecordBuilder
                     }
 
                     Debug.Assert(recordForFirstPrimarySpellingInHiragana is not null);
-
                     continue;
                 }
 
@@ -251,13 +250,13 @@ internal static class JmdictRecordBuilder
 
                     if (JapaneseUtils.NormalizeLongVowelMark(firstReadingInHiragana).Contains(key))
                     {
-                        bool recordForFirstReadingInHiraganaIsNotNull = recordForFirstReadingInHiragana is not null;
-                        if ((recordForFirstReadingInHiraganaIsNotNull
-                            ? recordDictionary.Remove(firstReadingInHiragana)
-                            : recordDictionary.Remove(firstReadingInHiragana, out recordForFirstReadingInHiragana))
-                            || recordForFirstReadingInHiraganaIsNotNull)
+                        if (recordForFirstReadingInHiragana is not null)
                         {
-                            Debug.Assert(recordForFirstReadingInHiragana is not null);
+                            _ = recordDictionary.Remove(firstReadingInHiragana);
+                            recordDictionary.Add(key, recordForFirstReadingInHiragana);
+                        }
+                        else if (recordDictionary.Remove(firstReadingInHiragana, out recordForFirstReadingInHiragana))
+                        {
                             recordDictionary.Add(key, recordForFirstReadingInHiragana);
                         }
                     }
@@ -268,7 +267,6 @@ internal static class JmdictRecordBuilder
                     }
 
                     Debug.Assert(recordForFirstReadingInHiragana is not null);
-
                     continue;
                 }
 
