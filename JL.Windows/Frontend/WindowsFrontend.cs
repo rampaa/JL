@@ -39,5 +39,5 @@ internal sealed class WindowsFrontend : IFrontend
 
     public void SetInstalledVoiceWithHighestPriority() => SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
 
-    public Version JLVersion { get; } = WindowsUtils.JLVersion;
+    public Version JLVersion => WindowsUtils.JLVersion;
 }

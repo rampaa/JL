@@ -94,14 +94,13 @@ internal static class JmdictRecordBuilder
 
                     if (JapaneseUtils.NormalizeLongVowelMark(firstPrimarySpellingInHiragana).Contains(key))
                     {
-                        if (recordForFirstPrimarySpellingInHiragana is not null
+                        bool recordForFirstPrimarySpellingInHiraganaIsNotNull = recordForFirstPrimarySpellingInHiragana is not null;
+                        if ((recordForFirstPrimarySpellingInHiraganaIsNotNull
                             ? recordDictionary.Remove(firstPrimarySpellingInHiragana)
                             : recordDictionary.Remove(firstPrimarySpellingInHiragana, out recordForFirstPrimarySpellingInHiragana))
+                            || recordForFirstPrimarySpellingInHiraganaIsNotNull)
                         {
-                            recordDictionary.Add(key, recordForFirstPrimarySpellingInHiragana);
-                        }
-                        else if (recordForFirstPrimarySpellingInHiragana is not null)
-                        {
+                            Debug.Assert(recordForFirstPrimarySpellingInHiragana is not null);
                             recordDictionary.Add(key, recordForFirstPrimarySpellingInHiragana);
                         }
                     }
@@ -252,14 +251,13 @@ internal static class JmdictRecordBuilder
 
                     if (JapaneseUtils.NormalizeLongVowelMark(firstReadingInHiragana).Contains(key))
                     {
-                        if (recordForFirstReadingInHiragana is not null
+                        bool recordForFirstReadingInHiraganaIsNotNull = recordForFirstReadingInHiragana is not null;
+                        if ((recordForFirstReadingInHiraganaIsNotNull
                             ? recordDictionary.Remove(firstReadingInHiragana)
                             : recordDictionary.Remove(firstReadingInHiragana, out recordForFirstReadingInHiragana))
+                            || recordForFirstReadingInHiraganaIsNotNull)
                         {
-                            recordDictionary.Add(key, recordForFirstReadingInHiragana);
-                        }
-                        else if (recordForFirstReadingInHiragana is not null)
-                        {
+                            Debug.Assert(recordForFirstReadingInHiragana is not null);
                             recordDictionary.Add(key, recordForFirstReadingInHiragana);
                         }
                     }

@@ -45,7 +45,7 @@ internal static class WindowsUtils
     public static readonly Version JLVersion =
         Version.Parse(Assembly.GetExecutingAssembly()
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
-            .InformationalVersion.Split(['-', '+'])[0]);
+            .InformationalVersion.Split('-', '+')[0]);
 
     private static readonly SemaphoreSlim s_dialogSemaphore = new(1, 1);
     public static readonly SemaphoreSlim AudioPlayerSemaphoreSlim = new(1, 1);
