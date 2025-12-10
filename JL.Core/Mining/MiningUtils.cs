@@ -545,7 +545,7 @@ public static class MiningUtils
         Dictionary<JLField, string> miningParams = new(mineAllFields ? JLFieldUtils.JLFieldsForWordDicts.Length - JLFieldUtils.s_jlFieldsToExcludeFromWhenMiningToFile.Count : jlFields!.Count);
         if (mineAllFields || jlFields!.Contains(JLField.LocalTime))
         {
-            miningParams[JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
+            miningParams[JLField.LocalTime] = DateTimeOffset.Now.ToString("O", CultureInfo.InvariantCulture);
         }
 
         if (mineAllFields || jlFields!.Contains(JLField.DictionaryName))
