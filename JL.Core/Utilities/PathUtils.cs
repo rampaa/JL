@@ -29,7 +29,7 @@ public static class PathUtils
     {
         if (OperatingSystem.IsWindows() && File.Exists(fileToBeReplaced))
         {
-            File.Replace(fileToBeReplaced, tempFile, null, true);
+            File.Replace(tempFile, fileToBeReplaced, null, true);
         }
         else
         {
