@@ -56,6 +56,7 @@ public static class CustomWordLoader
 
         IDictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
 
+        Span<Range> tabRanges = stackalloc Range[5];
         foreach (string line in File.ReadLines(fullPath))
         {
             if (cancellationToken.IsCancellationRequested)
@@ -64,19 +65,21 @@ public static class CustomWordLoader
                 break;
             }
 
-            string[] lParts = line.Split('\t', StringSplitOptions.TrimEntries);
-            if (lParts.Length >= 4)
+            ReadOnlySpan<char> lineSpan = line.AsSpan();
+            int tabCount = lineSpan.Split(tabRanges, '\t', StringSplitOptions.TrimEntries);
+
+            if (tabCount >= 4)
             {
                 string[]? wordClasses = null;
-                if (lParts.Length is 5)
+                if (tabCount is 5)
                 {
-                    wordClasses = lParts[4].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    wordClasses = lineSpan[tabRanges[4]].ToString().Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                 }
 
-                string partOfSpeech = lParts[3];
-                string[] definitions = lParts[2].Replace("\\n", "\n", StringComparison.Ordinal).Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                string[]? readings = lParts[1].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string partOfSpeech = lineSpan[tabRanges[3]].ToString();
+                string[] definitions = lineSpan[tabRanges[2]].ToString().Replace("\\n", "\n", StringComparison.Ordinal).Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[]? readings = lineSpan[tabRanges[1]].ToString().Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[] spellings = lineSpan[tabRanges[0]].ToString().Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                 if (readings.Length is 0
                     || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))

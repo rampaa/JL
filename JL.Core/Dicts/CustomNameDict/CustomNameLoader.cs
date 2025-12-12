@@ -15,6 +15,7 @@ public static class CustomNameLoader
 
         IDictionary<string, IList<IDictRecord>> customNameDictionary = dict.Contents;
 
+        Span<Range> tabRanges = stackalloc Range[4];
         foreach (string line in File.ReadLines(fullPath))
         {
             if (cancellationToken.IsCancellationRequested)
@@ -23,22 +24,23 @@ public static class CustomNameLoader
                 break;
             }
 
-            string[] lParts = line.Split('\t', StringSplitOptions.TrimEntries);
+            ReadOnlySpan<char> lineSpan = line.AsSpan();
+            int tabCount = lineSpan.Split(tabRanges, '\t', StringSplitOptions.TrimEntries);
 
-            if (lParts.Length >= 3)
+            if (tabCount >= 3)
             {
                 string? extraInfo = null;
-                if (lParts.Length is 4)
+                if (tabCount is 4)
                 {
-                    extraInfo = lParts[3];
-                    extraInfo = extraInfo.Length is 0
+                    ReadOnlySpan<char> extraInfoSpan = lineSpan[tabRanges[3]];
+                    extraInfo = extraInfoSpan.Length is 0
                         ? null
-                        : extraInfo.Replace("\\n", "\n", StringComparison.Ordinal);
+                        : extraInfoSpan.ToString().Replace("\\n", "\n", StringComparison.Ordinal);
                 }
 
-                string nameType = lParts[2];
-                string? reading = lParts[1];
-                string spelling = lParts[0];
+                string nameType = lineSpan[tabRanges[2]].ToString();
+                string? reading = lineSpan[tabRanges[1]].ToString();
+                string spelling = lineSpan[tabRanges[0]].ToString();
 
                 if (reading.Length is 0 || reading == spelling)
                 {
