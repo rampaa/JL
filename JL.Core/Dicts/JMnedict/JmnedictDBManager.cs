@@ -201,7 +201,7 @@ internal static class JmnedictDBManager
     //         }
     //         else
     //         {
-    //             dict.Contents[searchKey] = new List<IDictRecord> { record };
+    //             dict.Contents[searchKey] = [record];
     //         }
     //     }
     //

@@ -12,7 +12,7 @@ namespace JL.Core.Dicts.PitchAccent;
 
 internal static class YomichanPitchAccentDBManager
 {
-    public const int Version = 7;
+    public const int Version = 8;
 
     private enum ColumnIndex
     {
