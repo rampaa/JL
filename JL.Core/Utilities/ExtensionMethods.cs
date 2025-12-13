@@ -215,7 +215,7 @@ public static class ExtensionMethods
 
     internal static int IndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
     {
-        int index = text[startIndex..].IndexOf(value);
+        int index = text[startIndex..].IndexOf(value, StringComparison.Ordinal);
         return index < 0
             ? -1
             : index + startIndex;
@@ -236,7 +236,7 @@ public static class ExtensionMethods
         ReadOnlySpan<char> textToSearch = text.Slice(startIndex, length);
 
         List<int> indexes = new(textToSearch.Length);
-        for (int i = textToSearch.IndexOf(value); i > -1; i = textToSearch.IndexOf(value, i + 1))
+        for (int i = textToSearch.IndexOf(value, StringComparison.Ordinal); i > -1; i = textToSearch.IndexOf(value, i + 1))
         {
             indexes.Add(i + startIndex);
         }

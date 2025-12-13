@@ -34,7 +34,7 @@ public static class ResourceUpdater
                 using HttpRequestMessage request = new(HttpMethod.Get, dictDownloadUri);
                 if (File.Exists(fullDictPath))
                 {
-                    request.Headers.IfModifiedSince = File.GetLastWriteTime(fullDictPath);
+                    request.Headers.IfModifiedSince = new DateTimeOffset(File.GetLastWriteTimeUtc(fullDictPath), TimeSpan.Zero);
                 }
 
                 if (!noPrompt)
@@ -141,7 +141,7 @@ public static class ResourceUpdater
                     string indexJsonPath = Path.Join(fullDictPath, "index.json");
                     if (File.Exists(indexJsonPath))
                     {
-                        indexRequest.Headers.IfModifiedSince = File.GetLastWriteTime(indexJsonPath);
+                        indexRequest.Headers.IfModifiedSince = new DateTimeOffset(File.GetLastWriteTimeUtc(indexJsonPath), TimeSpan.Zero);
                     }
                 }
 
@@ -855,7 +855,7 @@ public static class ResourceUpdater
             }
 
             bool pathExists = File.Exists(fullPath);
-            if (!pathExists || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
+            if (!pathExists || (DateTime.UtcNow - File.GetLastWriteTimeUtc(fullPath)).Days < dueDate)
             {
                 continue;
             }
@@ -892,7 +892,7 @@ public static class ResourceUpdater
 
             string fullPath = Path.GetFullPath(Path.Join(freq.Path, "index.json"), AppInfo.ApplicationPath);
             bool pathExists = File.Exists(fullPath);
-            if (!pathExists || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days < dueDate)
+            if (!pathExists || (DateTime.UtcNow - File.GetLastWriteTimeUtc(fullPath)).Days < dueDate)
             {
                 continue;
             }

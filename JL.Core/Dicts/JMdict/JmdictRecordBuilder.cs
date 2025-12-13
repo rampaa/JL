@@ -87,12 +87,12 @@ internal static class JmdictRecordBuilder
                 if (keInfListSpan.Contains("sK"))
                 {
                     Debug.Assert(firstPrimarySpellingInHiragana is not null);
-                    if (JapaneseUtils.NormalizeLongVowelMark(key).Contains(firstPrimarySpellingInHiragana))
+                    if (JapaneseUtils.NormalizeLongVowelMark(key).AsReadOnlySpan().Contains(firstPrimarySpellingInHiragana))
                     {
                         continue;
                     }
 
-                    if (JapaneseUtils.NormalizeLongVowelMark(firstPrimarySpellingInHiragana).Contains(key))
+                    if (JapaneseUtils.NormalizeLongVowelMark(firstPrimarySpellingInHiragana).AsReadOnlySpan().Contains(key))
                     {
                         if (recordForFirstPrimarySpellingInHiragana is not null)
                         {
@@ -243,12 +243,12 @@ internal static class JmdictRecordBuilder
 
                 if (reInfListSpan.Contains("sk"))
                 {
-                    if (JapaneseUtils.NormalizeLongVowelMark(key).Contains(firstReadingInHiragana))
+                    if (JapaneseUtils.NormalizeLongVowelMark(key).AsReadOnlySpan().Contains(firstReadingInHiragana))
                     {
                         continue;
                     }
 
-                    if (JapaneseUtils.NormalizeLongVowelMark(firstReadingInHiragana).Contains(key))
+                    if (JapaneseUtils.NormalizeLongVowelMark(firstReadingInHiragana).AsReadOnlySpan().Contains(key))
                     {
                         if (recordForFirstReadingInHiragana is not null)
                         {
@@ -466,7 +466,7 @@ internal static class JmdictRecordBuilder
             List<string>? currentExclusiveList = null;
             foreach (string sense in senseSpan)
             {
-                if (!sharedSenseCandidates.Contains(sense))
+                if (!sharedSenseCandidates.AsReadOnlySpan().Contains(sense))
                 {
                     currentExclusiveList ??= [];
                     currentExclusiveList.Add(sense);

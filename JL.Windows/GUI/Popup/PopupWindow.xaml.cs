@@ -785,7 +785,7 @@ internal sealed partial class PopupWindow
 
         if (checkForDuplicateCards)
         {
-            CheckResultForDuplicates((LookupDisplayResult[])PopupListView.ItemsSource).SafeFireAndForget("Unexpected error while checking results for duplicates");
+            CheckResultForDuplicates(popupItemSource).SafeFireAndForget("Unexpected error while checking results for duplicates");
         }
 
         GenerateDictTypeButtons();

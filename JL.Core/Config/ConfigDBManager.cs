@@ -223,7 +223,7 @@ public static class ConfigDBManager
 
         for (int i = 0; i < excludedSettings.Length; i++)
         {
-            _ = command.Parameters.AddWithValue($"@{i + 2}", excludedSettings[i]);
+            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 2}"), excludedSettings[i]);
         }
 
         _ = command.ExecuteNonQuery();
@@ -245,7 +245,7 @@ public static class ConfigDBManager
         _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
         for (int i = 0; i < settingNames.Length; i++)
         {
-            _ = command.Parameters.AddWithValue($"@{i + 1}", settingNames[i]);
+            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), settingNames[i]);
         }
 
         using SqliteDataReader reader = command.ExecuteReader();

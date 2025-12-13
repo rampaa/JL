@@ -73,7 +73,7 @@ public static class AnkiConfigUtils
                     {
                         firstFieldChanged.SetTrue();
 
-                        OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length);
+                        OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length, StringComparer.Ordinal);
                         for (int i = 0; i < fieldsSpan.Length; i++)
                         {
                             string fieldName = fieldsSpan[i];

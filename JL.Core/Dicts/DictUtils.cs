@@ -787,7 +787,7 @@ public static class DictUtils
                 {
                     dict.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict.Contents.Count > 0 && (!dict.Active || dBContext.UseDB))
@@ -800,7 +800,7 @@ public static class DictUtils
                     JmdictDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
-                }));
+                }, CancellationToken.None));
             }
             else
             {
@@ -870,7 +870,7 @@ public static class DictUtils
                 {
                     dict.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
@@ -883,7 +883,7 @@ public static class DictUtils
                     JmnedictDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
-                }));
+                }, CancellationToken.None));
             }
             else
             {
@@ -960,7 +960,7 @@ public static class DictUtils
                 {
                     dict.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
@@ -973,7 +973,7 @@ public static class DictUtils
                     KanjidicDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
-                }));
+                }, CancellationToken.None));
             }
             else
             {
@@ -1050,7 +1050,7 @@ public static class DictUtils
                 {
                     dict.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
@@ -1063,7 +1063,7 @@ public static class DictUtils
                     EpwingYomichanDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
-                }));
+                }, CancellationToken.None));
             }
             else
             {
@@ -1137,7 +1137,7 @@ public static class DictUtils
                 {
                     dict.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
@@ -1150,7 +1150,7 @@ public static class DictUtils
                     YomichanKanjiDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
-                }));
+                }, CancellationToken.None));
             }
             else
             {
@@ -1197,7 +1197,7 @@ public static class DictUtils
                 }
 
                 dict.Ready = true;
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict is { Active: false, Contents.Count: > 0 })
@@ -1242,7 +1242,7 @@ public static class DictUtils
                 }
 
                 dict.Ready = true;
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict is { Active: false, Contents.Count: > 0 })
@@ -1312,7 +1312,7 @@ public static class DictUtils
                 {
                     dict.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
@@ -1325,7 +1325,7 @@ public static class DictUtils
                     EpwingNazekaDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
-                }));
+                }, CancellationToken.None));
             }
             else
             {
@@ -1398,7 +1398,7 @@ public static class DictUtils
                 {
                     dict.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
 
         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
@@ -1411,7 +1411,7 @@ public static class DictUtils
                     YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
-                }));
+                }, CancellationToken.None));
             }
             else
             {
@@ -1440,7 +1440,7 @@ public static class DictUtils
         FileStream fileStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            await JsonSerializer.SerializeAsync(fileStream, BuiltInDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+            await JsonSerializer.SerializeAsync(fileStream, BuiltInDicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation, CancellationToken.None).ConfigureAwait(false);
         }
     }
 
@@ -1451,7 +1451,7 @@ public static class DictUtils
         FileStream fileStream = new(tempConfigFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            await JsonSerializer.SerializeAsync(fileStream, Dicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation).ConfigureAwait(false);
+            await JsonSerializer.SerializeAsync(fileStream, Dicts, JsonOptions.s_jsoIgnoringWhenWritingNullWithEnumConverterAndIndentation, CancellationToken.None).ConfigureAwait(false);
         }
 
         PathUtils.ReplaceFileAtomicallyOnSameVolume(s_configFilePath, tempConfigFilePath);
@@ -1464,8 +1464,7 @@ public static class DictUtils
         FileStream dictStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncReadFso);
         await using (dictStream.ConfigureAwait(false))
         {
-            deserializedDicts = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
+            deserializedDicts = await JsonSerializer.DeserializeAsync<Dictionary<string, Dict>>(dictStream, JsonOptions.s_jsoWithEnumConverter, CancellationToken.None).ConfigureAwait(false);
         }
 
         if (deserializedDicts is not null)
