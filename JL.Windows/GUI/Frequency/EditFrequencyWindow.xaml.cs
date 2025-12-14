@@ -92,12 +92,12 @@ internal sealed partial class EditFrequencyWindow
         {
             if (pathChanged && _freq.Type is FreqType.Yomichan or FreqType.YomichanKanji)
             {
-                bool hasValidFiles = Directory.EnumerateFiles(fullPath, "*_meta_bank_*.json", SearchOption.TopDirectoryOnly).Any();
-                if (!hasValidFiles)
+                bool validPath = Directory.EnumerateFiles(fullPath, _freq.Type is FreqType.Yomichan ? "term_meta_bank_*" : "kanji_meta_bank_*", SearchOption.TopDirectoryOnly).Any();
+                if (!validPath)
                 {
                     PathTextBlock.BorderBrush = Brushes.Red;
                     PathTextBlock.Cursor = Cursors.Help;
-                    PathTextBlock.ToolTip = "No valid file was found at the specified path!";
+                    PathTextBlock.ToolTip = "No valid file was found at the specified path for the selected freq type!";
                     return;
                 }
             }
