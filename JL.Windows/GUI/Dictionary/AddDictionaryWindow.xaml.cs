@@ -95,7 +95,7 @@ internal sealed partial class AddDictionaryWindow
                 type is DictType.NonspecificKanjiYomichan
                     ? "kanji_bank_*.json"
                     : type is DictType.PitchAccentYomichan
-                        ? "term*bank_*.json"
+                        ? "term_meta_bank_*.json"
                         : "term_bank_*.json",
             SearchOption.TopDirectoryOnly).Any();
 
@@ -103,7 +103,7 @@ internal sealed partial class AddDictionaryWindow
             {
                 PathTextBlock.BorderBrush = Brushes.Red;
                 PathTextBlock.Cursor = Cursors.Help;
-                PathTextBlock.ToolTip = "No valid file was found at the specified path!";
+                PathTextBlock.ToolTip = "No valid file was found at the specified path for the selected dictionary type!";
                 return;
             }
         }
