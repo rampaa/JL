@@ -54,7 +54,9 @@ internal static class WindowsUtils
     private static WaveOutEvent? s_audioPlayer;
 
     public static WaveOutEvent? AudioPlayer => Volatile.Read(ref s_audioPlayer);
+
     public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
+    public static GlyphTypeface? PopupGlyphTypeface { get; set; } = PopupFontTypeFace.TryGetGlyphTypeface(out GlyphTypeface glyphTypeface) ? glyphTypeface : null;
 
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
 
@@ -584,14 +586,7 @@ internal static class WindowsUtils
         });
     }
 
-    public static double GetMaxHeight(Typeface typeface, double fontSize)
-    {
-        return typeface.TryGetGlyphTypeface(out GlyphTypeface glyphTypeface)
-            ? glyphTypeface.Height * fontSize
-            : double.NaN;
-    }
-
-    public static Size MeasureTextSize(string text, double fontSize)
+    private static double MeasureTextWidth(double fontSize, string text)
     {
         FormattedText formattedText = new(
             text,
@@ -602,7 +597,58 @@ internal static class WindowsUtils
             Brushes.Transparent,
             Dpi.PixelsPerDip);
 
-        return new Size(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
+        return formattedText.WidthIncludingTrailingWhitespace;
+    }
+
+    private static double MeasureTextHeight(double fontSize, string text)
+    {
+        FormattedText formattedText = new(
+            text,
+            CultureInfo.InvariantCulture,
+            FlowDirection.LeftToRight,
+            PopupFontTypeFace,
+            fontSize,
+            Brushes.Transparent,
+            Dpi.PixelsPerDip);
+
+        return formattedText.Height;
+    }
+
+    public static double MeasureTextWidthWithGlyph(double fontSize, char character)
+    {
+        return PopupGlyphTypeface is not null && PopupGlyphTypeface.CharacterToGlyphMap.TryGetValue(character, out ushort glyphKey)
+            ? PopupGlyphTypeface.AdvanceWidths[glyphKey] * fontSize
+            : MeasureTextWidth(fontSize, character.ToString());
+    }
+
+    public static double MeasureTextWidthWithGlyph(double fontSize, ReadOnlySpan<char> text)
+    {
+        if (PopupGlyphTypeface is null)
+        {
+            return MeasureTextWidth(fontSize, text.ToString());
+        }
+
+        double totalWidth = 0;
+        foreach (char c in text)
+        {
+            if (PopupGlyphTypeface.CharacterToGlyphMap.TryGetValue(c, out ushort glyphKey))
+            {
+                totalWidth += PopupGlyphTypeface.AdvanceWidths[glyphKey] * fontSize;
+            }
+            else
+            {
+                return MeasureTextWidth(fontSize, text.ToString());
+            }
+        }
+
+        return totalWidth;
+    }
+
+    public static double MeasureMaxHeightWithGlyph(double fontSize)
+    {
+        return PopupGlyphTypeface is not null
+            ? PopupGlyphTypeface.Height * fontSize
+            : MeasureTextHeight(fontSize, "ヲ");
     }
 
     public static void ShowColorPicker(Button button)

@@ -795,6 +795,7 @@ internal sealed class ConfigManager
             string popupFontStr = ConfigDBManager.GetValueFromConfig(connection, configs, PopupFont.Source, nameof(PopupFont));
             PopupFont = new FontFamily(popupFontStr);
             WindowsUtils.PopupFontTypeFace = new Typeface(popupFontStr);
+            WindowsUtils.PopupGlyphTypeface = WindowsUtils.PopupFontTypeFace.TryGetGlyphTypeface(out GlyphTypeface? glyphTypeface) ? glyphTypeface : null;
         }
 
         PopupWindow? currentPopupWindow = MainWindow.Instance.FirstPopupWindow;

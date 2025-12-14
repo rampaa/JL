@@ -41,7 +41,7 @@ internal sealed class PitchAccentDecorator : Decorator
         };
 
         double horizontalOffsetForReading = childElement.Margin.Left;
-        double uniformCharHeight = WindowsUtils.GetMaxHeight(WindowsUtils.PopupFontTypeFace, fontSize);
+        double uniformCharHeight = WindowsUtils.MeasureMaxHeightWithGlyph(fontSize);
 
         StreamGeometry geometry = new();
         using StreamGeometryContext streamGeometryContext = geometry.Open();
@@ -50,7 +50,7 @@ internal sealed class PitchAccentDecorator : Decorator
         {
             if (i > 0)
             {
-                horizontalOffsetForReading += WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo[i - 1]}、", fontSize).Width;
+                horizontalOffsetForReading += WindowsUtils.MeasureTextWidthWithGlyph(fontSize, $"{splitReadingsWithRInfo[i - 1]}、");
             }
 
             byte pitchPosition = pitchPositions[i];
@@ -70,11 +70,26 @@ internal sealed class PitchAccentDecorator : Decorator
     {
         bool lowPitch = false;
         double horizontalOffsetForChar = horizontalOffsetForReading;
-        ReadOnlySpan<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expression);
 
-        for (int i = 0; i < combinedFormList.Length; i++)
+        ReadOnlySpan<char> expressionSpan = expression.AsSpan();
+
+        int i = 0;
+        int currentIndex = 0;
+        while (currentIndex < expressionSpan.Length)
         {
-            double charWidth = WindowsUtils.MeasureTextSize(combinedFormList[i], fontSize).Width;
+            bool combinedCharacter = currentIndex + 1 < expressionSpan.Length && JapaneseUtils.SmallCombiningKanaSet.Contains(expressionSpan[currentIndex + 1]);
+
+            double charWidth;
+            if (combinedCharacter)
+            {
+                charWidth = WindowsUtils.MeasureTextWidthWithGlyph(fontSize, expressionSpan[currentIndex..(currentIndex + 2)]);
+                currentIndex += 2;
+            }
+            else
+            {
+                charWidth = WindowsUtils.MeasureTextWidthWithGlyph(fontSize, expressionSpan[currentIndex]);
+                ++currentIndex;
+            }
 
             if (pitchPosition - 1 == i)
             {
@@ -106,6 +121,7 @@ internal sealed class PitchAccentDecorator : Decorator
             }
 
             horizontalOffsetForChar += charWidth;
+            ++i;
         }
     }
 }
