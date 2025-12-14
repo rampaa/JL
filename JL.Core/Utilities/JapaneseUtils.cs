@@ -127,7 +127,7 @@ public static partial class JapaneseUtils
         #pragma warning restore format
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    private static readonly FrozenSet<char> s_smallCombiningKanaSet = FrozenSet.ToFrozenSet(
+    public static readonly FrozenSet<char> SmallCombiningKanaSet = FrozenSet.ToFrozenSet(
     [
         #pragma warning disable format
         'ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ',
@@ -384,7 +384,7 @@ public static partial class JapaneseUtils
 
         for (int i = 0; i < text.Length; i++)
         {
-            if (i + 1 < text.Length && s_smallCombiningKanaSet.Contains(text[i + 1]))
+            if (i + 1 < text.Length && SmallCombiningKanaSet.Contains(text[i + 1]))
             {
                 combinedForm.Add(text.Slice(i, 2).ToString());
                 ++i;
@@ -405,7 +405,7 @@ public static partial class JapaneseUtils
         for (int i = 0; i < text.Length; i++)
         {
             ++length;
-            if (i < text.Length - 1 && s_smallCombiningKanaSet.Contains(text[i + 1]))
+            if (i < text.Length - 1 && SmallCombiningKanaSet.Contains(text[i + 1]))
             {
                 ++i;
             }
