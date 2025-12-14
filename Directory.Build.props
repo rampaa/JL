@@ -12,7 +12,7 @@
 
     <PublishReadyToRun>false</PublishReadyToRun>
     <SelfContained>false</SelfContained>
-    <RollForward>LatestMajor</RollForward>
+    <RollForward>LatestMinor</RollForward>
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <Deterministic>true</Deterministic>
