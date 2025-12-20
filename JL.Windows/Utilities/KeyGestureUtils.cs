@@ -55,6 +55,7 @@ internal static class KeyGestureUtils
     [
         nameof(ConfigManager.ToggleMinimizedStateKeyGesture),
         nameof(ConfigManager.ClosePopupKeyGesture),
+        nameof(ConfigManager.MiningModeKeyGesture),
         nameof(ConfigManager.DisableHotkeysKeyGesture),
         nameof(ConfigManager.PlayAudioKeyGesture),
         nameof(ConfigManager.ClickAudioButtonKeyGesture),

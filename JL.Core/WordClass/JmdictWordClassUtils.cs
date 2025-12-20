@@ -11,7 +11,7 @@ namespace JL.Core.WordClass;
 
 internal static class JmdictWordClassUtils
 {
-    internal static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
+    private static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
 
     private static readonly FrozenSet<string> s_usedWordClasses =
         [

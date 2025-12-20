@@ -646,9 +646,7 @@ internal static class WindowsUtils
 
     public static double MeasureMaxHeightWithGlyph(double fontSize)
     {
-        return PopupGlyphTypeface is not null
-            ? PopupGlyphTypeface.Height * fontSize
-            : MeasureTextHeight(fontSize, "ヲ");
+        return (PopupGlyphTypeface?.Height * fontSize) ?? MeasureTextHeight(fontSize, "ヲ");
     }
 
     public static void ShowColorPicker(Button button)

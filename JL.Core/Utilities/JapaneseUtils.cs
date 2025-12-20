@@ -378,7 +378,7 @@ public static partial class JapaneseUtils
         return longVowelMarkToKanaList;
     }
 
-    public static ReadOnlySpan<string> CreateCombinedForm(ReadOnlySpan<char> text)
+    internal static ReadOnlySpan<string> CreateCombinedForm(ReadOnlySpan<char> text)
     {
         List<string> combinedForm = new(text.Length);
 

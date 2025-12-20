@@ -154,6 +154,7 @@ internal sealed partial class MainWindow
         return Dispatcher.BeginInvoke(async () =>
         {
             if (CopyText(text)
+                && !FirstPopupWindow.MiningMode
                 && configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
                 && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
                     || WindowState is WindowState.Minimized))
@@ -179,6 +180,11 @@ internal sealed partial class MainWindow
             {
                 MainTextBox.Clear();
                 UpdatePosition();
+            }
+
+            if (!FirstPopupWindow.MiningMode)
+            {
+                FirstPopupWindow.HidePopup();
             }
 
             if (configManager.AlwaysOnTop)
