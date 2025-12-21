@@ -103,7 +103,14 @@ public sealed class CoreConfigManager
                         && (webSocketUri.Scheme == Uri.UriSchemeWs || webSocketUri.Scheme == Uri.UriSchemeWss))
                     {
                         newWebSocketUris.Add(webSocketUri);
-                        WebSocketUtils.ConnectToWebSocket(webSocketUri);
+                        if (CaptureTextFromWebSocket)
+                        {
+                            WebSocketUtils.ConnectToWebSocket(webSocketUri);
+                        }
+                        else
+                        {
+                            WebSocketUtils.DisconnectFromWebSocket(webSocketUri).SafeFireAndForget("Unexpected error while disconnecting from WebSocket");
+                        }
                     }
                     else
                     {
