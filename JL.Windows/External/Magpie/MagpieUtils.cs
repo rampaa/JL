@@ -21,7 +21,7 @@ internal static class MagpieUtils
 
     private static Rect s_sourceWindowRect;
     public static Rect MagpieWindowRect { get; private set; }
-    // public static nint SourceWindowHandle { get; set; }
+    private static nint s_magpieWindowHandle;
 
     private static double s_scaleFactorX;
     private static double s_scaleFactorY;
@@ -32,6 +32,7 @@ internal static class MagpieUtils
 
         bool isMagpieScaling = magpieWindowHandle is not 0;
         s_isMagpieScaling = isMagpieScaling;
+        s_magpieWindowHandle = magpieWindowHandle;
 
         if (isMagpieScaling)
         {
@@ -102,15 +103,26 @@ internal static class MagpieUtils
 
     private static nint GetMagpieWindowHandle()
     {
-        return WinApi.FindWindow("Window_Magpie_967EB565-6F73-4E94-AE53-00CC42592A22");
+        s_magpieWindowHandle = WinApi.FindWindow("Window_Magpie_967EB565-6F73-4E94-AE53-00CC42592A22");
+        return s_magpieWindowHandle;
     }
 
     public static Point GetMousePosition(Point mousePosition)
     {
-        return s_sourceWindowRect.Contains(mousePosition)
-            ? new Point(MagpieWindowRect.X + ((mousePosition.X - s_sourceWindowRect.X) * s_scaleFactorX),
-                MagpieWindowRect.Y + ((mousePosition.Y - s_sourceWindowRect.Y) * s_scaleFactorY))
-            : mousePosition;
+        if (!IsMagpieReallyScaling() || !s_sourceWindowRect.Contains(mousePosition))
+        {
+            return mousePosition;
+        }
+
+        Point virtualMousePosition = new(MagpieWindowRect.X + ((mousePosition.X - s_sourceWindowRect.X) * s_scaleFactorX), MagpieWindowRect.Y + ((mousePosition.Y - s_sourceWindowRect.Y) * s_scaleFactorY));
+        if (!MagpieWindowRect.Contains(virtualMousePosition))
+        {
+            return mousePosition;
+        }
+
+        return WinApi.GetWindowFromPoint(mousePosition) == s_magpieWindowHandle
+            ? mousePosition
+            : virtualMousePosition;
     }
 
     public static void SetMagpieInfo(nint wParam, nint lParam)
