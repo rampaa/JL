@@ -177,13 +177,8 @@ internal sealed partial class MainWindow
 
         try
         {
-            while (true)
+            do
             {
-                if (Interlocked.Exchange(ref _webSocketTextToProcess, null) is null)
-                {
-                    break;
-                }
-
                 await Dispatcher.BeginInvoke(async () =>
                 {
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
@@ -193,8 +188,9 @@ internal sealed partial class MainWindow
 
                     MoveWindowToScreen();
                     await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, false, true).ConfigureAwait(false);
-                }, DispatcherPriority.Background).Task.ConfigureAwait(false);
+                }, DispatcherPriority.Send).Task.ConfigureAwait(false);
             }
+            while (Interlocked.Exchange(ref _webSocketTextToProcess, null) is not null);
         }
         finally
         {
