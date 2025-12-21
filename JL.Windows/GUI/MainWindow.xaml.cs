@@ -19,6 +19,7 @@ using JL.Core.Lookup;
 using JL.Core.Network.WebSocket;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Bool;
 using JL.Core.Utilities.Database;
 using JL.Windows.Config;
 using JL.Windows.External.Magpie;
@@ -54,6 +55,9 @@ internal sealed partial class MainWindow
     private Point _lastMouseMovePosition;
     private Timer? _lookupDelayTimer;
     private int _lastCharPosition = -1;
+
+    private string? _webSocketTextToProcess;
+    private readonly AtomicBool _processingWebSocketText = new(false);
 
     public nint WindowHandle { get; private set; }
     public PopupWindow FirstPopupWindow { get; }
@@ -148,26 +152,56 @@ internal sealed partial class MainWindow
         return false;
     }
 
-    public Task CopyFromWebSocket(string text)
+    public async Task CopyFromWebSocket(string text)
     {
+        Volatile.Write(ref _webSocketTextToProcess, text);
+
         ConfigManager configManager = ConfigManager.Instance;
-        return Dispatcher.BeginInvoke(async () =>
+        bool copiedText = false;
+        await Dispatcher.BeginInvoke(() =>
         {
-            if (CopyText(text)
+            copiedText = CopyText(text)
                 && !FirstPopupWindow.MiningMode
                 && configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
                 && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
-                    || WindowState is WindowState.Minimized))
+                    || WindowState is WindowState.Minimized);
+        }, DispatcherPriority.Send);
+
+        if (!copiedText)
+        {
+            return;
+        }
+
+        if (!_processingWebSocketText.TrySetTrue())
+        {
+            return;
+        }
+
+        try
+        {
+            while (true)
             {
-                if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
+                if (Interlocked.Exchange(ref _webSocketTextToProcess, null) is null)
                 {
-                    await MpvUtils.PausePlayback().ConfigureAwait(true);
+                    break;
                 }
 
-                MoveWindowToScreen();
-                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true).ConfigureAwait(false);
+                await Dispatcher.BeginInvoke(async () =>
+                {
+                    if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
+                    {
+                        await MpvUtils.PausePlayback().ConfigureAwait(true);
+                    }
+
+                    MoveWindowToScreen();
+                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, false, true).ConfigureAwait(false);
+                }, DispatcherPriority.Background).Task.ConfigureAwait(false);
             }
-        }, DispatcherPriority.Send).Task;
+        }
+        finally
+        {
+            _processingWebSocketText.SetFalse();
+        }
     }
 
     private bool CopyText(string text)
