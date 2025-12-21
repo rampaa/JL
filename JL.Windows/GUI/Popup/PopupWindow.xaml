@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JL.Windows.GUI.Popup"
-        mc:Ignorable="d"
+        mc:Ignorable="d" Opacity="0"
         Title="PopupWindow" PreviewMouseDown="Window_PreviewMouseDown"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520" ResizeMode="NoResize" ShowActivated="False"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False" ContextMenuOpening="Window_ContextMenuOpening"

@@ -750,18 +750,19 @@ internal static class WindowsUtils
         bool mainWindowIsNotMinimized = MainWindow.Instance.WindowState is not WindowState.Minimized;
         if (mainWindowIsNotMinimized)
         {
-            if (!MainWindow.Instance.FirstPopupWindow.IsVisible)
+            MainWindow mainWindow = MainWindow.Instance;
+            if (mainWindow.FirstPopupWindow.Opacity is 0)
             {
-                if (!MainWindow.Instance.IsMouseOver)
+                if (!mainWindow.IsMouseOver)
                 {
                     if (configManager.TextOnlyVisibleOnHover)
                     {
-                        MainWindow.Instance.MainGrid.Opacity = 0d;
+                        mainWindow.MainGrid.Opacity = 0d;
                     }
 
                     if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
                     {
-                        MainWindow.Instance.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                        mainWindow.Background.Opacity = configManager.MainWindowBackgroundOpacityOnUnhover / 100;
                     }
 
                     RestoreFocusToPreviouslyActiveWindow();

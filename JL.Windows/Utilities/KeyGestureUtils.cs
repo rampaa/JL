@@ -110,7 +110,7 @@ internal static class KeyGestureUtils
         PopupWindow? lastPopup = null;
         MainWindow mainWindow = MainWindow.Instance;
         PopupWindow? currentPopup = mainWindow.FirstPopupWindow;
-        while (currentPopup?.IsVisible ?? false)
+        while (currentPopup is not null && currentPopup.Opacity is not 0)
         {
             lastPopup = currentPopup;
             currentPopup = PopupWindowUtils.PopupWindows[currentPopup.PopupIndex + 1];

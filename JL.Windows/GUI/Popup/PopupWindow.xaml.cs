@@ -365,7 +365,7 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        if (textToLookUp == _lastLookedUpText && IsVisible)
+        if (textToLookUp == _lastLookedUpText && Opacity is not 0)
         {
             UpdatePosition(mayNeedCoordinateConversion);
             WinApi.BringToFront(WindowHandle);
@@ -400,8 +400,6 @@ internal sealed partial class PopupWindow
             }
 
             LastLookupResults = lookupResults;
-
-            Show();
 
             if (enableMiningMode)
             {
@@ -535,7 +533,7 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        if (selectedText == _lastLookedUpText && IsVisible)
+        if (selectedText == _lastLookedUpText && Opacity is not 0)
         {
             UpdatePosition(false);
             WinApi.BringToFront(WindowHandle);
@@ -558,8 +556,6 @@ internal sealed partial class PopupWindow
             {
                 StatsUtils.IncrementTermLookupCount(firstLookupResult.DeconjugatedMatchedText ?? firstLookupResult.MatchedText);
             }
-
-            Show();
 
             EnableMiningMode();
             DisplayResults();
@@ -962,6 +958,8 @@ internal sealed partial class PopupWindow
                     Owner = this
                 };
 
+                childPopupWindow.Show();
+
                 PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
             }
 
@@ -1020,7 +1018,7 @@ internal sealed partial class PopupWindow
             _lastCharPosition = charPosition;
             _lookupDelayTimer.Start();
         }
-        else if (!childPopupWindow?.IsVisible ?? true)
+        else if (childPopupWindow is null || childPopupWindow.Opacity is 0)
         {
             _lookupDelayTimer.Start();
         }
@@ -1067,6 +1065,8 @@ internal sealed partial class PopupWindow
                 {
                     Owner = this
                 };
+
+                childPopupWindow.Show();
 
                 PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
             }
@@ -1755,7 +1755,7 @@ internal sealed partial class PopupWindow
             ? LookupCategory.All
             : lookupCategory;
 
-        if (IsVisible && _previousTextBox is not null)
+        if (Opacity is not 0 && _previousTextBox is not null)
         {
             if (PopupIndex is 0)
             {
@@ -1868,6 +1868,8 @@ internal sealed partial class PopupWindow
                         Owner = this
                     };
 
+                    childPopupWindow.Show();
+
                     PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
                 }
 
@@ -1949,14 +1951,14 @@ internal sealed partial class PopupWindow
         ConfigManager configManager = ConfigManager.Instance;
         PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
         if (configManager is { LookupOnSelectOnly: false, LookupOnMouseClickOnly: false }
-            && childPopupWindow is { IsVisible: true, MiningMode: false })
+            && childPopupWindow is { Opacity: not 0, MiningMode: false })
         {
             childPopupWindow.HidePopup();
         }
 
         if (MiningMode)
         {
-            if (childPopupWindow is null || !childPopupWindow.IsVisible)
+            if (childPopupWindow is null || childPopupWindow.Opacity is 0)
             {
                 PopupWindowUtils.PopupAutoHideTimer.Stop();
             }
@@ -2047,6 +2049,8 @@ internal sealed partial class PopupWindow
                 Owner = this
             };
 
+            childPopupWindow.Show();
+
             PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
         }
 
@@ -2058,7 +2062,7 @@ internal sealed partial class PopupWindow
     private void OnMouseLeave(object sender, MouseEventArgs e)
     {
         PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
-        if (childPopupWindow is { IsVisible: true, MiningMode: false, UnavoidableMouseEnter: false })
+        if (childPopupWindow is { Opacity: not 0, MiningMode: false, UnavoidableMouseEnter: false })
         {
             childPopupWindow.HidePopup();
         }
@@ -2084,7 +2088,7 @@ internal sealed partial class PopupWindow
                     PopupWindowUtils.PopupAutoHideTimer.Stop();
                 }
 
-                else if (childPopupWindow is null || !childPopupWindow.IsVisible)
+                else if (childPopupWindow is null || childPopupWindow.Opacity is 0)
                 {
                     PopupWindowUtils.PopupAutoHideTimer.Stop();
                     PopupWindowUtils.PopupAutoHideTimer.Start();
@@ -2259,7 +2263,7 @@ internal sealed partial class PopupWindow
                 ShowMiningModeResults();
             }
 
-            else if (childPopupWindow is not null && childPopupWindow.IsVisible)
+            else if (childPopupWindow is not null && childPopupWindow.Opacity is not 0)
             {
                 if (!childPopupWindow.MiningMode)
                 {
@@ -2298,7 +2302,7 @@ internal sealed partial class PopupWindow
 
     public void HidePopup()
     {
-        if (!IsVisible)
+        if (Opacity is 0)
         {
             return;
         }
@@ -2335,7 +2339,6 @@ internal sealed partial class PopupWindow
 
         Opacity = 0d;
         UpdateLayout();
-        Hide();
 
         if (AddNameWindow.IsItVisible() || AddWordWindow.IsItVisible())
         {
@@ -2358,7 +2361,7 @@ internal sealed partial class PopupWindow
             PopupWindow? previousPopup = PopupWindowUtils.PopupWindows[PopupIndex - 1];
             Debug.Assert(previousPopup is not null);
 
-            if (previousPopup.IsVisible)
+            if (previousPopup.Opacity is not 0)
             {
                 WinApi.ActivateWindow(previousPopup.WindowHandle);
             }
@@ -2508,7 +2511,7 @@ internal sealed partial class PopupWindow
     private void PopupListView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
         PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
-        if ((childPopupWindow is not null && childPopupWindow.IsVisible)
+        if ((childPopupWindow is not null && childPopupWindow.Opacity is not 0)
             || ReadingSelectionWindow.IsItVisible()
             || MiningSelectionWindow.IsItVisible())
         {

@@ -119,8 +119,6 @@ internal sealed partial class MainWindow
             _ = await CopyFromClipboard().ConfigureAwait(true);
         }
 
-        FirstPopupWindow.Owner = this;
-
         // Can't use ActivateWindow for FirstPopupWindow if it's not shown at least once
         FirstPopupWindow.Show();
         FirstPopupWindow.HidePopup();
@@ -349,8 +347,8 @@ internal sealed partial class MainWindow
         MainTextBoxContextMenu.IsOpen = false;
 
         if (configManager.HidePopupsOnTextChange
-            && FirstPopupWindow.IsVisible
-            && (!sameText || (PopupWindowUtils.PopupWindows[1]?.IsVisible ?? false)))
+            && FirstPopupWindow.Opacity is not 0
+            && (!sameText || ((PopupWindowUtils.PopupWindows[1]?.Opacity ?? 0) is not 0)))
         {
             PopupWindowUtils.HidePopups(0);
         }
@@ -396,7 +394,7 @@ internal sealed partial class MainWindow
     public void BringToFront()
     {
         if (ConfigManager.Instance.AlwaysOnTop
-            && !FirstPopupWindow.IsVisible
+            && FirstPopupWindow.Opacity is 0
             && !ManageDictionariesWindow.IsItVisible()
             && !ManageFrequenciesWindow.IsItVisible()
             && !ManageAudioSourcesWindow.IsItVisible()
@@ -506,7 +504,7 @@ internal sealed partial class MainWindow
             _lastCharPosition = charPosition;
             _lookupDelayTimer.Start();
         }
-        else if (!FirstPopupWindow.IsVisible)
+        else if (FirstPopupWindow.Opacity is 0)
         {
             _lookupDelayTimer.Start();
         }
@@ -561,7 +559,7 @@ internal sealed partial class MainWindow
             _lastMouseMovePosition = position;
             await HandleMouseMove(e).ConfigureAwait(false);
         }
-        else if (FirstPopupWindow is { IsVisible: true, MiningMode: false })
+        else if (FirstPopupWindow is { Opacity: not 0, MiningMode: false })
         {
             FirstPopupWindow.HidePopup();
             ChangeVisibility();
@@ -641,7 +639,7 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            if (FirstPopupWindow.IsVisible)
+            if (FirstPopupWindow.Opacity is not 0)
             {
                 PopupWindowUtils.HidePopups(0);
             }
@@ -667,7 +665,7 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            if (FirstPopupWindow.IsVisible)
+            if (FirstPopupWindow.Opacity is not 0)
             {
                 PopupWindowUtils.HidePopups(0);
             }
@@ -1056,7 +1054,7 @@ internal sealed partial class MainWindow
     private void HandleToggleMinimizedState()
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (FirstPopupWindow.IsVisible)
+        if (FirstPopupWindow.Opacity is not 0)
         {
             PopupWindowUtils.HidePopups(0);
         }
@@ -1393,14 +1391,14 @@ internal sealed partial class MainWindow
     {
         _lookupDelayTimer?.Stop();
 
-        if (e.ChangedButton == ConfigManager.Instance.MiningModeMouseButton && FirstPopupWindow is { IsVisible: true, MiningMode: false })
+        if (e.ChangedButton == ConfigManager.Instance.MiningModeMouseButton && FirstPopupWindow is { Opacity: not 0, MiningMode: false })
         {
             e.Handled = true;
             FirstPopupWindow.ShowMiningModeResults();
         }
         else if (e.ChangedButton is not MouseButton.Right)
         {
-            if (FirstPopupWindow.IsVisible)
+            if (FirstPopupWindow.Opacity is not 0)
             {
                 PopupWindowUtils.HidePopups(0);
             }
@@ -1582,7 +1580,7 @@ internal sealed partial class MainWindow
 
     private void Border_OnMouseEnter(object sender, MouseEventArgs e)
     {
-        if (FirstPopupWindow is { IsVisible: true, MiningMode: false })
+        if (FirstPopupWindow is { Opacity: not 0, MiningMode: false })
         {
             FirstPopupWindow.HidePopup();
         }
@@ -1687,7 +1685,7 @@ internal sealed partial class MainWindow
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            if (FirstPopupWindow.IsVisible)
+            if (FirstPopupWindow.Opacity is not 0)
             {
                 PopupWindowUtils.HidePopups(0);
             }
@@ -1776,7 +1774,7 @@ internal sealed partial class MainWindow
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;
 
-        if (FirstPopupWindow.IsVisible)
+        if (FirstPopupWindow.Opacity is not 0)
         {
             PopupWindowUtils.HidePopups(0);
         }
@@ -1806,7 +1804,7 @@ internal sealed partial class MainWindow
     {
         ConfigManager configManager = ConfigManager.Instance;
         if (WindowState is WindowState.Minimized
-            || FirstPopupWindow.IsVisible
+            || FirstPopupWindow.Opacity is not 0
             || Mouse.LeftButton is MouseButtonState.Pressed
             || IsMouseWithinWindowBounds()
             || ManageDictionariesWindow.IsItVisible()
@@ -1979,7 +1977,7 @@ internal sealed partial class MainWindow
 
     private void TitleBar_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (FirstPopupWindow is { IsVisible: true, MiningMode: false })
+        if (FirstPopupWindow is { Opacity: not 0, MiningMode: false })
         {
             FirstPopupWindow.HidePopup();
         }
@@ -2053,7 +2051,7 @@ internal sealed partial class MainWindow
     {
         _lookupDelayTimer?.Stop();
 
-        if (FirstPopupWindow.IsVisible)
+        if (FirstPopupWindow.Opacity is not 0)
         {
             PopupWindowUtils.HidePopups(0);
         }
@@ -2227,7 +2225,7 @@ internal sealed partial class MainWindow
         ConfigManager configManager = ConfigManager.Instance;
         if (WindowState is WindowState.Minimized
             || IsMouseOver
-            || FirstPopupWindow.IsVisible
+            || FirstPopupWindow.Opacity is not 0
             || ManageDictionariesWindow.IsItVisible()
             || ManageFrequenciesWindow.IsItVisible()
             || ManageAudioSourcesWindow.IsItVisible()
@@ -2344,7 +2342,7 @@ internal sealed partial class MainWindow
                         && (configManager.PopupFocusOnLookup || configManager.MainWindowFocusOnHover)
                         && lastActiveWindowHandle is not 0
                         && lastActiveWindowHandle != WindowHandle
-                        && !FirstPopupWindow.IsVisible)
+                        && FirstPopupWindow.Opacity is 0)
                     {
                         WinApi.GiveFocusToWindow(lastActiveWindowHandle);
                     }
