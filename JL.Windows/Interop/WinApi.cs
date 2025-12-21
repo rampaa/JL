@@ -46,6 +46,13 @@ internal static partial class WinApi
             public readonly int Y;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        internal readonly record struct POINT(int x, int y)
+        {
+            public readonly int x = x;
+            public readonly int y = y;
+        }
+
         // ReSharper disable UnusedMember.Global
         internal enum ChangeWindowMessageFilterExAction
         {
@@ -148,6 +155,10 @@ internal static partial class WinApi
         [LibraryImport("user32.dll", EntryPoint = "FindWindowW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial nint FindWindowW(string? lpClassName, string? lpWindowName);
+
+        [LibraryImport("user32.dll", EntryPoint = "WindowFromPoint", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static partial nint WindowFromPoint(POINT point);
 
         [LibraryImport("user32.dll", EntryPoint = "GetForegroundWindow")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -345,6 +356,11 @@ internal static partial class WinApi
     public static nint FindWindow(string lpClassName)
     {
         return FindWindowW(lpClassName, null);
+    }
+
+    public static nint GetWindowFromPoint(Point point)
+    {
+        return WindowFromPoint(new POINT(double.ConvertToIntegerNative<int>(point.X), double.ConvertToIntegerNative<int>(point.Y)));
     }
 
     public static void MoveWindowToPosition(nint windowHandle, double x, double y)

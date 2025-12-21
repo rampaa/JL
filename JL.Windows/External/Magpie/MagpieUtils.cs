@@ -115,12 +115,7 @@ internal static class MagpieUtils
         }
 
         Point virtualMousePosition = new(MagpieWindowRect.X + ((mousePosition.X - s_sourceWindowRect.X) * s_scaleFactorX), MagpieWindowRect.Y + ((mousePosition.Y - s_sourceWindowRect.Y) * s_scaleFactorY));
-        if (!MagpieWindowRect.Contains(virtualMousePosition))
-        {
-            return mousePosition;
-        }
-
-        return WinApi.GetWindowFromPoint(mousePosition) == s_magpieWindowHandle
+        return !MagpieWindowRect.Contains(virtualMousePosition) || WinApi.GetWindowFromPoint(mousePosition) == s_magpieWindowHandle
             ? mousePosition
             : virtualMousePosition;
     }
