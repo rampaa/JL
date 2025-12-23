@@ -122,14 +122,14 @@ internal static class MagpieUtils
 
     public static void SetMagpieInfo(nint wParam, nint lParam)
     {
-        if (wParam is 1)
-        {
-            s_isMagpieScaling = true;
-            SetMagpieInfo(lParam);
-        }
-        else // if (wParam is 0)
+        if (wParam is 0)
         {
             s_isMagpieScaling = lParam is 1;
+        }
+        else if (wParam is 1 or 2)
+        {
+            s_isMagpieScaling = true;
+            SetMagpieInfo(wParam is 1 ? lParam : s_magpieWindowHandle);
         }
     }
 

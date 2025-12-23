@@ -425,7 +425,7 @@ internal static partial class WinApi
         else if (msg == MagpieUtils.MagpieScalingChangedWindowMessage)
         {
             MagpieUtils.SetMagpieInfo(wParam, lParam);
-            if (ConfigManager.Instance.AlwaysOnTop && (wParam is 1 || lParam is 1))
+            if (ConfigManager.Instance.AlwaysOnTop && (wParam is 1 or 2))
             {
                 MainWindow.Instance.BringToFront();
             }
