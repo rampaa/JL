@@ -369,7 +369,7 @@ internal sealed partial class MainWindow
 
             if (strippedText.Length > 0)
             {
-                StatsUtils.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
+                StatsUtils.IncrementStat(StatType.Characters, strippedText.GetGraphemeCount());
 
                 if (!mergeTexts)
                 {

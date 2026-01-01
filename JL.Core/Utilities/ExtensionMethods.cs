@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -309,5 +310,21 @@ public static class ExtensionMethods
             CancellationToken.None,
             TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
             TaskScheduler.Default);
+    }
+
+    public static int GetGraphemeCount(this ReadOnlySpan<char> text)
+    {
+        int count = 0;
+
+        int index = 0;
+        while (index < text.Length)
+        {
+            int length = StringInfo.GetNextTextElementLength(text[index..]);
+            index += length;
+
+            ++count;
+        }
+
+        return count;
     }
 }
