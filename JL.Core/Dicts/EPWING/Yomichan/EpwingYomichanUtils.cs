@@ -104,7 +104,7 @@ internal static class EpwingYomichanUtils
 
                         case "rt":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"({contentResult.Content})");
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"[{contentResult.Content}]");
                             break;
                         }
 
