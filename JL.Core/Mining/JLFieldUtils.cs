@@ -25,6 +25,7 @@ public static class JLFieldUtils
         JLField.SentenceAudio,
         JLField.SourceTextAudio,
         JLField.Image,
+        JLField.DefinitionsImages,
         JLField.SourceText,
         JLField.LeadingSourceTextPart,
         JLField.TrailingSourceTextPart,
@@ -69,6 +70,7 @@ public static class JLFieldUtils
         JLField.SentenceAudio,
         JLField.SourceTextAudio,
         JLField.Image,
+        JLField.DefinitionsImages,
         JLField.SourceText,
         JLField.LeadingSourceTextPart,
         JLField.TrailingSourceTextPart,
@@ -103,6 +105,7 @@ public static class JLFieldUtils
         JLField.SentenceAudio,
         JLField.SourceTextAudio,
         JLField.Image,
+        JLField.DefinitionsImages,
         JLField.SourceText,
         JLField.LeadingSourceTextPart,
         JLField.TrailingSourceTextPart,
@@ -126,6 +129,7 @@ public static class JLFieldUtils
         JLField.SentenceAudio,
         JLField.SourceTextAudio,
         JLField.Image,
+        JLField.DefinitionsImages,
         JLField.PitchAccents,
         JLField.PitchAccentForFirstReading
     ];

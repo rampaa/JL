@@ -20,6 +20,7 @@ public enum JLField
     [Description("Sentence Audio")] SentenceAudio,
     [Description("Source Text Audio")] SourceTextAudio,
     [Description("Image (Clipboard)")] Image,
+    [Description("Images (Definitions)")] DefinitionsImages,
     [Description("Source Text")] SourceText,
     [Description("Leading Source Text Part")] LeadingSourceTextPart,
     [Description("Trailing Source Text Part")] TrailingSourceTextPart,

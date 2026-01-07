@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
@@ -532,7 +533,7 @@ public static class MiningUtils
             JLField.PitchAccentCategoryForFirstReading => GetPitchAccentCategoryForFirstReading(lookupResults[currentLookupResultIndex]),
             JLField.SelectedSpelling or JLField.PrimarySpelling => lookupResults[currentLookupResultIndex].PrimarySpelling,
             JLField.SelectedDefinitions or JLField.Definitions => lookupResults[currentLookupResultIndex].FormattedDefinitions?.ReplaceLineEndings("<br/>"),
-            JLField.Nothing or JLField.Audio or JLField.SentenceAudio or JLField.SourceTextAudio or JLField.Image or JLField.LocalTime => null,
+            JLField.Nothing or JLField.Audio or JLField.SentenceAudio or JLField.SourceTextAudio or JLField.Image or JLField.DefinitionsImages or JLField.LocalTime => null,
             _ => null
         };
     }
@@ -1753,29 +1754,67 @@ public static class MiningUtils
             }
         }
 
-        List<string> imageFields = FindFields(JLField.Image, userFields);
-        bool needsImage = imageFields.Count > 0;
-        byte[]? imageBytes = needsImage
+        List<Dictionary<string, object>>? imageDictionaries = null;
+        if (lookupResult.ImagePaths is not null)
+        {
+            List<string> definitionsimagesFields = FindFields(JLField.DefinitionsImages, userFields);
+            if (definitionsimagesFields.Count > 0)
+            {
+                imageDictionaries = new(lookupResult.ImagePaths.Length + 1);
+                for (int i = 0; i < lookupResult.ImagePaths.Length; i++)
+                {
+                    string definitionsImagePath = lookupResult.ImagePaths[i];
+                    string ext = Path.GetExtension(definitionsImagePath);
+                    string definitionsImageFullPath = Path.GetFullPath(definitionsImagePath, AppInfo.ApplicationPath);
+                    imageDictionaries.Add(new Dictionary<string, object>(3, StringComparer.Ordinal)
+                    {
+                        {
+                            "path", definitionsImageFullPath
+                        },
+                        {
+                            "filename", $"JL_definitions_image_{i}_{selectedReading}_{lookupResult.PrimarySpelling}{ext}"
+                        },
+                        {
+                            "fields", definitionsimagesFields
+                        }
+                    });
+                }
+            }
+        }
+
+        List<string> clipboardImageFields = FindFields(JLField.Image, userFields);
+        byte[]? clipboardImageBytes = clipboardImageFields.Count > 0
             ? await FrontendManager.Frontend.GetImageFromClipboardAsByteArray().ConfigureAwait(false)
             : null;
 
-        if (imageBytes is not null)
+        if (clipboardImageBytes is not null)
         {
-            note.Pictures =
-                [
-                    new Dictionary<string, object>(3, StringComparer.Ordinal)
-                    {
-                        {
-                            "data", imageBytes
-                        },
-                        {
-                            "filename", $"JL_image_{selectedReading}_{lookupResult.PrimarySpelling}.png"
-                        },
-                        {
-                            "fields", imageFields
-                        }
-                    }
-                ];
+            Dictionary<string, object> clipboardImageDictionary = new(3, StringComparer.Ordinal)
+            {
+                {
+                    "data", clipboardImageBytes
+                },
+                {
+                    "filename", $"JL_image_{selectedReading}_{lookupResult.PrimarySpelling}.png"
+                },
+                {
+                    "fields", clipboardImageFields
+                }
+            };
+
+            if (imageDictionaries is not null)
+            {
+                imageDictionaries.Add(clipboardImageDictionary);
+            }
+            else
+            {
+                note.Pictures = [clipboardImageDictionary];
+            }
+        }
+
+        if (imageDictionaries is not null)
+        {
+            note.Pictures = imageDictionaries.ToArray();
         }
 
         Response? response = await AnkiConnectClient.AddNoteToDeck(note).ConfigureAwait(false);
