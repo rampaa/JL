@@ -42,7 +42,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-internal sealed partial class MainWindow
+internal sealed partial class MainWindow : IDisposable
 {
     public static readonly MainWindow Instance = new();
 
@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
     private Point _swipeStartPoint;
     private InputMethod? _input;
     private Point _lastMouseMovePosition;
-    private Timer? _lookupDelayTimer;
+    private readonly Timer _lookupDelayTimer;
     private int _lastCharPosition = -1;
 
     private string? _webSocketTextToProcess;
@@ -76,6 +76,13 @@ internal sealed partial class MainWindow
         InitializeComponent();
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow(0);
+
+        _lookupDelayTimer = new()
+        {
+            AutoReset = false,
+            Enabled = false
+        };
+        _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -489,7 +496,7 @@ internal sealed partial class MainWindow
             PopupWindowUtils.TransparentDueToAutoLookup = false;
         }
 
-        if (_lookupDelayTimer is null)
+        if (!_lookupDelayTimer.Enabled)
         {
             return FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, false);
         }
@@ -502,21 +509,10 @@ internal sealed partial class MainWindow
     {
         if (delayInMilliseconds is 0)
         {
-            if (_lookupDelayTimer is not null)
-            {
-                _lookupDelayTimer.Stop();
-                _lookupDelayTimer.Dispose();
-                _lookupDelayTimer = null;
-            }
+            _lookupDelayTimer.Enabled = false;
         }
         else
         {
-            _lookupDelayTimer ??= new Timer
-            {
-                AutoReset = false
-            };
-
-            _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
             _lookupDelayTimer.Interval = delayInMilliseconds;
             _lookupDelayTimer.Enabled = true;
         }
@@ -524,12 +520,10 @@ internal sealed partial class MainWindow
 
     private void InitDelayedLookup()
     {
-        Debug.Assert(_lookupDelayTimer is not null);
-
         int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
         if (charPosition < 0)
         {
-            _lookupDelayTimer.Stop();
+            _lookupDelayTimer.Enabled = false;
             _lastCharPosition = charPosition;
             FirstPopupWindow.HidePopup();
             return;
@@ -542,13 +536,13 @@ internal sealed partial class MainWindow
 
         if (charPosition != _lastCharPosition)
         {
-            _lookupDelayTimer.Stop();
+            _lookupDelayTimer.Enabled = false;
             _lastCharPosition = charPosition;
-            _lookupDelayTimer.Start();
+            _lookupDelayTimer.Enabled = true;
         }
         else if (FirstPopupWindow.Opacity is 0)
         {
-            _lookupDelayTimer.Start();
+            _lookupDelayTimer.Enabled = true;
         }
     }
 
@@ -1481,7 +1475,7 @@ internal sealed partial class MainWindow
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        _lookupDelayTimer?.Stop();
+        _lookupDelayTimer.Enabled = false;
 
         if (e.ChangedButton == ConfigManager.Instance.MiningModeMouseButton && FirstPopupWindow is { Opacity: not 0, MiningMode: false })
         {
@@ -1857,7 +1851,7 @@ internal sealed partial class MainWindow
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        _lookupDelayTimer?.Stop();
+        _lookupDelayTimer.Enabled = false;
 
         ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating);
@@ -2470,5 +2464,11 @@ internal sealed partial class MainWindow
     private void ToggleIsReadOnly(object sender, RoutedEventArgs e)
     {
         HandleTextBoxReadOnlyToggle();
+    }
+
+    public void Dispose()
+    {
+        _lookupDelayTimer.Elapsed -= LookupDelayTimer_Elapsed;
+        _lookupDelayTimer.Dispose();
     }
 }

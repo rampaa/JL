@@ -26,7 +26,7 @@ namespace JL.Windows.GUI.Popup;
 /// <summary>
 /// Interaction logic for PopupWindow.xaml
 /// </summary>
-internal sealed partial class PopupWindow
+internal sealed partial class PopupWindow : IDisposable
 {
     private bool _contextMenuIsOpening; // = false;
 
@@ -42,7 +42,7 @@ internal sealed partial class PopupWindow
 
     private string _currentSourceText = "";
 
-    private Timer? _lookupDelayTimer;
+    private readonly Timer _lookupDelayTimer;
 
     public Button AllDictionaryTabButton { get; } = new()
     {
@@ -88,6 +88,14 @@ internal sealed partial class PopupWindow
         InitializeComponent();
         PopupIndex = popupIndex;
         PopupWindowUtils.PopupWindows[popupIndex] = this;
+
+        _lookupDelayTimer = new Timer
+        {
+            AutoReset = false,
+            Enabled = false
+        };
+        _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
+
         Init();
     }
 
@@ -953,7 +961,7 @@ internal sealed partial class PopupWindow
         }
 
         _lastInteractedTextBox = textBox;
-        if (_lookupDelayTimer is null)
+        if (!_lookupDelayTimer.Enabled)
         {
             if (childPopupWindow is null)
             {
@@ -978,21 +986,10 @@ internal sealed partial class PopupWindow
     {
         if (delayInMilliseconds is 0)
         {
-            if (_lookupDelayTimer is not null)
-            {
-                _lookupDelayTimer.Stop();
-                _lookupDelayTimer.Dispose();
-                _lookupDelayTimer = null;
-            }
+            _lookupDelayTimer.Enabled = false;
         }
         else
         {
-            _lookupDelayTimer ??= new Timer
-            {
-                AutoReset = false
-            };
-
-            _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
             _lookupDelayTimer.Interval = delayInMilliseconds;
             _lookupDelayTimer.Enabled = true;
         }
@@ -1000,12 +997,10 @@ internal sealed partial class PopupWindow
 
     private void InitDelayedLookup(TextBox textBox, PopupWindow? childPopupWindow)
     {
-        Debug.Assert(_lookupDelayTimer is not null);
-
         int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
         if (charPosition < 0)
         {
-            _lookupDelayTimer.Stop();
+            _lookupDelayTimer.Enabled = false;
             _lastCharPosition = charPosition;
             childPopupWindow?.HidePopup();
             return;
@@ -1018,13 +1013,13 @@ internal sealed partial class PopupWindow
 
         if (charPosition != _lastCharPosition)
         {
-            _lookupDelayTimer.Stop();
+            _lookupDelayTimer.Enabled = false;
             _lastCharPosition = charPosition;
-            _lookupDelayTimer.Start();
+            _lookupDelayTimer.Enabled = true;
         }
         else if (childPopupWindow is null || childPopupWindow.Opacity is 0)
         {
-            _lookupDelayTimer.Start();
+            _lookupDelayTimer.Enabled = true;
         }
     }
 
@@ -2257,7 +2252,7 @@ internal sealed partial class PopupWindow
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        _lookupDelayTimer?.Stop();
+        _lookupDelayTimer.Enabled = false;
         ReadingSelectionWindow.HideWindow();
         MiningSelectionWindow.CloseWindow();
 
@@ -2393,7 +2388,7 @@ internal sealed partial class PopupWindow
 
     private void HandleContextMenuOpening()
     {
-        _lookupDelayTimer?.Stop();
+        _lookupDelayTimer.Enabled = false;
         _contextMenuIsOpening = true;
         PopupWindowUtils.HidePopups(PopupIndex + 1);
         _contextMenuIsOpening = false;
@@ -2534,6 +2529,11 @@ internal sealed partial class PopupWindow
 
     private void Window_Closed(object sender, EventArgs e)
     {
+        Dispose();
+    }
+
+    public void Dispose()
+    {
         Owner = null;
         PopupWindowUtils.PopupWindows[PopupIndex] = null;
         _previousTextBox = null;
@@ -2549,7 +2549,7 @@ internal sealed partial class PopupWindow
         _dictsWithResults.Clear();
         AllDictionaryTabButton.Click -= DictTypeButtonOnClick;
 
-        _lookupDelayTimer?.Dispose();
-        _lookupDelayTimer = null;
+        _lookupDelayTimer.Elapsed -= LookupDelayTimer_Elapsed;
+        _lookupDelayTimer.Dispose();
     }
 }
