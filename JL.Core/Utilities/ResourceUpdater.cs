@@ -236,7 +236,7 @@ public static class ResourceUpdater
                 Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 await using (responseStream.ConfigureAwait(false))
                 {
-                    DecompressZipStream(responseStream, tempDictPath);
+                    await DecompressZipStream(responseStream, tempDictPath).ConfigureAwait(false);
                 }
 
                 if (Directory.Exists(fullDictPath))
@@ -283,11 +283,10 @@ public static class ResourceUpdater
         return false;
     }
 
-    private static void DecompressZipStream(Stream stream, string destinationDirectory)
+    private static async Task DecompressZipStream(Stream stream, string destinationDirectory)
     {
         using ZipArchive archive = new(stream, ZipArchiveMode.Read, false);
-        // TODO: Use ExtractToDirectoryAsync in .NET 10
-        archive.ExtractToDirectory(destinationDirectory);
+        await archive.ExtractToDirectoryAsync(destinationDirectory).ConfigureAwait(false);
     }
 
     public static async Task UpdateJmdict(bool isUpdate, bool noPrompt)
