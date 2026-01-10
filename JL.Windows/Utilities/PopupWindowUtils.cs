@@ -29,6 +29,8 @@ internal static class PopupWindowUtils
     private static string? s_primarySpellingOfLastPlayedAudio;
     private static string? s_readingOfLastPlayedAudio;
 
+    public static bool TransparentDueToAutoLookup { get; set; } // = false;
+
     public static Pen PitchAccentMarkerPen { get; private set; } = new();
 
     static PopupWindowUtils()

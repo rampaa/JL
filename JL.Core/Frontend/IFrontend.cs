@@ -10,7 +10,7 @@ public interface IFrontend
 
     public Task ShowOkDialogAsync(string text, string caption);
 
-    public Task CopyFromWebSocket(string text);
+    public Task CopyFromWebSocket(string text, bool tsukikage);
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease);
 

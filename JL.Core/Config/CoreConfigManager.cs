@@ -24,10 +24,13 @@ public sealed class CoreConfigManager
     public bool NotifyWhenMiningSucceeds { get; private set; } = true;
     public bool CaptureTextFromClipboard { get; set; } = true;
     public bool CaptureTextFromWebSocket { get; set; } // = false;
+    public bool CaptureTextFromTsukikageWebsocket { get; set; } // = false;
     public bool AutoReconnectToWebSocket { get; private set; } // = false;
+    public bool AutoReconnectToTsukikageWebSocket { get; private set; } = true;
     public bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public bool TextBoxRemoveNewlines { get; private set; } // = false;
     public List<Uri> WebSocketUris { get; private set; } = [new("ws://127.0.0.1:6677")];
+    public Uri TsukikageWebSocketUri { get; private set; } = new("ws://127.0.0.1:8765");
     public string MpvNamedPipePath { get; private set; } = "/tmp/mpv-socket";
     public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public bool TrackTermLookupCounts { get; private set; } // = false;
@@ -76,6 +79,53 @@ public sealed class CoreConfigManager
         }
 
         {
+            CaptureTextFromTsukikageWebsocket = ConfigDBManager.GetValueFromConfig(connection, configs, CaptureTextFromTsukikageWebsocket, nameof(CaptureTextFromTsukikageWebsocket));
+            AutoReconnectToTsukikageWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, AutoReconnectToTsukikageWebSocket, nameof(AutoReconnectToTsukikageWebSocket));
+
+            string? tsukikageWebSocketUriStr = configs.GetValueOrDefault(nameof(TsukikageWebSocketUri));
+            if (tsukikageWebSocketUriStr is null)
+            {
+                ConfigDBManager.InsertSetting(connection, nameof(TsukikageWebSocketUri), TsukikageWebSocketUri.OriginalString);
+                if (CaptureTextFromTsukikageWebsocket)
+                {
+                    WebSocketUtils.TsukikageWebSocketConnection = new(TsukikageWebSocketUri);
+                    WebSocketUtils.TsukikageWebSocketConnection.Connect(false);
+                }
+            }
+            else
+            {
+                tsukikageWebSocketUriStr = tsukikageWebSocketUriStr
+                    .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
+                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase);
+
+                if (Uri.TryCreate(tsukikageWebSocketUriStr, UriKind.Absolute, out Uri? webSocketUri) && (webSocketUri.Scheme == Uri.UriSchemeWs || webSocketUri.Scheme == Uri.UriSchemeWss))
+                {
+                    if (TsukikageWebSocketUri.OriginalString != webSocketUri.OriginalString)
+                    {
+                        TsukikageWebSocketUri = webSocketUri;
+                        ConfigDBManager.UpdateSetting(connection, nameof(TsukikageWebSocketUri), TsukikageWebSocketUri.OriginalString);
+                    }
+
+                    if (CaptureTextFromTsukikageWebsocket)
+                    {
+                        WebSocketUtils.TsukikageWebSocketConnection ??= new(webSocketUri);
+                        WebSocketUtils.TsukikageWebSocketConnection.Connect(true);
+                    }
+                    else
+                    {
+                        WebSocketUtils.TsukikageWebSocketConnection?.Disconnect().SafeFireAndForget("Unexpected error while disconnecting from Tsukikage WebSocket");
+                        WebSocketUtils.TsukikageWebSocketConnection = null;
+                    }
+                }
+                else
+                {
+                    LoggerManager.Logger.Warning("Couldn't save Tsukikage WebSocket address, invalid URL");
+                    FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't save Tsukikage WebSocket address, invalid URL");
+                }
+            }
+        }
+
+        {
             CaptureTextFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket));
             AutoReconnectToWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, AutoReconnectToWebSocket, nameof(AutoReconnectToWebSocket));
 
@@ -83,9 +133,13 @@ public sealed class CoreConfigManager
             if (webSocketUrisStr is null)
             {
                 ConfigDBManager.InsertSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(static ws => ws.OriginalString)));
-                foreach (Uri webSocketUri in WebSocketUris)
+
+                if (CaptureTextFromWebSocket)
                 {
-                    WebSocketUtils.ConnectToWebSocket(webSocketUri);
+                    foreach (Uri webSocketUri in WebSocketUris)
+                    {
+                        WebSocketUtils.ConnectToWebSocket(webSocketUri);
+                    }
                 }
             }
             else
@@ -102,14 +156,17 @@ public sealed class CoreConfigManager
                     if (Uri.TryCreate(uriStr, UriKind.Absolute, out Uri? webSocketUri)
                         && (webSocketUri.Scheme == Uri.UriSchemeWs || webSocketUri.Scheme == Uri.UriSchemeWss))
                     {
-                        newWebSocketUris.Add(webSocketUri);
-                        if (CaptureTextFromWebSocket)
+                        if (webSocketUri.OriginalString != TsukikageWebSocketUri.OriginalString)
                         {
-                            WebSocketUtils.ConnectToWebSocket(webSocketUri);
-                        }
-                        else
-                        {
-                            WebSocketUtils.DisconnectFromWebSocket(webSocketUri).SafeFireAndForget("Unexpected error while disconnecting from WebSocket");
+                            newWebSocketUris.Add(webSocketUri);
+                            if (CaptureTextFromWebSocket)
+                            {
+                                WebSocketUtils.ConnectToWebSocket(webSocketUri);
+                            }
+                            else
+                            {
+                                WebSocketUtils.DisconnectFromWebSocket(webSocketUri).SafeFireAndForget("Unexpected error while disconnecting from WebSocket");
+                            }
                         }
                     }
                     else
@@ -127,12 +184,9 @@ public sealed class CoreConfigManager
                     }
                 }
 
-                if (newWebSocketUris.Count > 0)
+                if (!WebSocketUris.Select(w => w.OriginalString).SequenceEqual(newWebSocketUris.Select(w => w.OriginalString), StringComparer.Ordinal))
                 {
                     WebSocketUris = newWebSocketUris;
-                }
-                else
-                {
                     ConfigDBManager.UpdateSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(static ws => ws.OriginalString)));
                 }
             }

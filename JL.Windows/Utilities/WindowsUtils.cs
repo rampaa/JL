@@ -61,10 +61,16 @@ internal static class WindowsUtils
     public static Screen ActiveScreen { get; set; } = Screen.FromHandle(MainWindow.Instance.WindowHandle);
 
     public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
+
     public static double DpiAwareXOffset { get; set; } = ConfigManager.Instance.PopupXOffset * Dpi.DpiScaleX;
     public static double DpiAwareYOffset { get; set; } = ConfigManager.Instance.PopupYOffset * Dpi.DpiScaleY;
 
+    public static double DpiAwareXOffsetForVerticalText { get; set; } = ConfigManager.Instance.PopupXOffsetForVerticalText * Dpi.DpiScaleX;
+    public static double DpiAwareYOffsetForVerticalText { get; set; } = ConfigManager.Instance.PopupYOffsetForVerticalText * Dpi.DpiScaleY;
+
     public static nint LastActiveWindowHandle { get; set; }
+
+    public static bool LastWebSocketTextWasVertical { get; set; } // = false;
 
     public static ComboBoxItem[] FindJapaneseFonts()
     {
@@ -775,7 +781,7 @@ internal static class WindowsUtils
             }
 
             CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-            if (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
+            if (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket || coreConfigManager.CaptureTextFromTsukikageWebsocket)
             {
                 StatsUtils.StartTimeStatStopWatch();
             }
@@ -797,7 +803,7 @@ internal static class WindowsUtils
             if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized)
             {
                 CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-                if (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
+                if (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket || coreConfigManager.CaptureTextFromTsukikageWebsocket)
                 {
                     StatsUtils.StartTimeStatStopWatch();
                 }

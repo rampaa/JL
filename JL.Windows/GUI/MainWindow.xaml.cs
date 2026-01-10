@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,6 +23,7 @@ using JL.Core.Utilities.Bool;
 using JL.Core.Utilities.Database;
 using JL.Windows.Config;
 using JL.Windows.External.Magpie;
+using JL.Windows.External.Tsukikage;
 using JL.Windows.GUI.Audio;
 using JL.Windows.GUI.Dictionary;
 using JL.Windows.GUI.Frequency;
@@ -138,7 +139,9 @@ internal sealed partial class MainWindow
         {
             try
             {
-                return CopyText(Clipboard.GetText());
+                string text = Clipboard.GetText();
+                WindowsUtils.LastWebSocketTextWasVertical = false;
+                return CopyText(text);
             }
             catch (ExternalException ex)
             {
@@ -150,47 +153,76 @@ internal sealed partial class MainWindow
         return false;
     }
 
-    public async Task CopyFromWebSocket(string text)
+    public async Task CopyFromWebSocket(string text, bool tsukikage)
     {
         Volatile.Write(ref _webSocketTextToProcess, text);
-
-        ConfigManager configManager = ConfigManager.Instance;
-        bool copiedText = false;
-        await Dispatcher.BeginInvoke(() =>
-        {
-            copiedText = CopyText(text)
-                && !FirstPopupWindow.MiningMode
-                && configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
-                && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
-                    || WindowState is WindowState.Minimized);
-        }, DispatcherPriority.Send);
-
-        if (!copiedText)
-        {
-            return;
-        }
-
         if (!_processingWebSocketText.TrySetTrue())
         {
             return;
         }
 
+        ConfigManager configManager = ConfigManager.Instance;
+        bool copiedText = false;
+
         try
         {
-            do
+            while (true)
             {
+                string? currentText = Interlocked.Exchange(ref _webSocketTextToProcess, null);
+                if (currentText is null)
+                {
+                    break;
+                }
+
+                bool verticalText = false;
+                int charIndex = 0;
+
+                if (tsukikage && currentText.StartsWith('{'))
+                {
+                    try
+                    {
+                        GraphemeInfo? wordInfo = JsonSerializer.Deserialize<GraphemeInfo>(currentText);
+                        Debug.Assert(wordInfo is not null);
+                        currentText = wordInfo.Text;
+                        verticalText = wordInfo.IsVertical;
+                        charIndex = wordInfo.GraphemeStartIndex;
+                    }
+                    catch (JsonException)
+                    {
+                        LoggerManager.Logger.Debug("CopyFromWebSocket: Failed to deserialize WordInfo from SecretProject WebSocket text: {Text}", currentText);
+                    }
+                }
+
+                WindowsUtils.LastWebSocketTextWasVertical = verticalText;
                 await Dispatcher.BeginInvoke(async () =>
                 {
+                    copiedText = CopyText(currentText, tsukikage)
+                        && !FirstPopupWindow.MiningMode
+                        && (tsukikage || configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket)
+                        && (!tsukikage || !configManager.RequireLookupKeyPress || configManager.LookupKeyKeyGesture.IsPressed())
+                        && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized || WindowState is WindowState.Minimized);
+
+                    if (!copiedText)
+                    {
+                        return;
+                    }
+
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
                     {
                         await MpvUtils.PausePlayback().ConfigureAwait(true);
                     }
 
                     MoveWindowToScreen();
-                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, false, true).ConfigureAwait(false);
-                }, DispatcherPriority.Send).Task.ConfigureAwait(false);
+
+                    if (!PopupWindowUtils.TransparentDueToAutoLookup)
+                    {
+                        WinApi.SetTransparentStyle(FirstPopupWindow.WindowHandle);
+                        PopupWindowUtils.TransparentDueToAutoLookup = true;
+                    }
+
+                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, false, true, verticalText).ConfigureAwait(true);
+                }, DispatcherPriority.Send).Task.ConfigureAwait(true);
             }
-            while (Interlocked.Exchange(ref _webSocketTextToProcess, null) is not null);
         }
         finally
         {
@@ -198,7 +230,7 @@ internal sealed partial class MainWindow
         }
     }
 
-    private bool CopyText(string text)
+    private bool CopyText(string text, bool tsukikage = false)
     {
         ConfigManager configManager = ConfigManager.Instance;
 
@@ -213,11 +245,6 @@ internal sealed partial class MainWindow
             if (!FirstPopupWindow.MiningMode)
             {
                 FirstPopupWindow.HidePopup();
-            }
-
-            if (configManager.AlwaysOnTop)
-            {
-                WinApi.BringToFront(WindowHandle);
             }
 
             return false;
@@ -252,7 +279,12 @@ internal sealed partial class MainWindow
                 s_lastTextCopyTimestamp = Stopwatch.GetTimestamp();
             }
 
-            return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard;
+            if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
+            {
+                MainTextBox.Text = BacklogUtils.LastItem;
+            }
+
+            return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard || tsukikage;
         }
 
         if (configManager.MergeSequentialTextsWhenTheyMatch)
@@ -267,7 +299,13 @@ internal sealed partial class MainWindow
             {
                 if (!configManager.DiscardIdenticalText && sameText)
                 {
-                    return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard;
+                    if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
+                    {
+                        MainTextBox.Text = BacklogUtils.LastItem;
+                    }
+
+                    Debug.Assert(MainTextBox.Text.Length > 0);
+                    return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard || tsukikage;
                 }
 
                 if (!configManager.AllowPartialMatchingForTextMerge)
@@ -319,6 +357,7 @@ internal sealed partial class MainWindow
             if (doNotShowAllBacklog)
             {
                 MainTextBox.Text = sanitizedNewText;
+                Debug.Assert(MainTextBox.Text.Length > 0);
                 if (backlogActive)
                 {
                     BacklogUtils.AddToBacklog(sanitizedNewText);
@@ -352,7 +391,7 @@ internal sealed partial class MainWindow
         if (notMinimized)
         {
             UpdatePosition();
-            if (configManager.AlwaysOnTop)
+            if (configManager.AlwaysOnTop && FirstPopupWindow.Opacity is 0)
             {
                 WinApi.BringToFront(WindowHandle);
             }
@@ -384,6 +423,7 @@ internal sealed partial class MainWindow
             SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, sanitizedNewText).SafeFireAndForget("TextToSpeech failed");
         }
 
+        Debug.Assert(MainTextBox.Text.Length > 0);
         return true;
     }
 
@@ -421,7 +461,7 @@ internal sealed partial class MainWindow
             }
 
             MoveWindowToScreen();
-            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true).ConfigureAwait(false);
+            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true, false).ConfigureAwait(false);
         }
     }
 
@@ -441,6 +481,12 @@ internal sealed partial class MainWindow
                || (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed()))
         {
             return Task.CompletedTask;
+        }
+
+        if (PopupWindowUtils.TransparentDueToAutoLookup)
+        {
+            WinApi.UnsetTransparentStyle(FirstPopupWindow.WindowHandle);
+            PopupWindowUtils.TransparentDueToAutoLookup = false;
         }
 
         if (_lookupDelayTimer is null)
@@ -680,6 +726,7 @@ internal sealed partial class MainWindow
         WinApi.UnsubscribeFromWndProc(this);
 
         await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(true);
+        await WebSocketUtils.DisconnectFromTsukikageWebSocketConnection().ConfigureAwait(true);
 
         SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(false))
@@ -853,6 +900,16 @@ internal sealed partial class MainWindow
             HandleReconnectToWebSocket();
         }
 
+        else if (keyGesture.IsEqual(configManager.CaptureTextFromTsukikageWebSocketKeyGesture))
+        {
+            return HandleTsukikageWebSocketCaptureToggle();
+        }
+
+        else if (keyGesture.IsEqual(configManager.ReconnectToTsukikageWebSocketKeyGesture))
+        {
+            HandleReconnectToTsukikageWebSocket();
+        }
+
         else if (keyGesture.IsEqual(configManager.TextBoxIsReadOnlyKeyGesture))
         {
             HandleTextBoxReadOnlyToggle();
@@ -991,7 +1048,7 @@ internal sealed partial class MainWindow
             WinApi.UnsubscribeFromClipboardChanged(WindowHandle);
         }
 
-        if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
+        if (coreConfigManager is { CaptureTextFromTsukikageWebsocket: false, CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
         {
             StatsUtils.StopTimeStatStopWatch();
         }
@@ -1007,7 +1064,7 @@ internal sealed partial class MainWindow
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         coreConfigManager.CaptureTextFromWebSocket = !coreConfigManager.CaptureTextFromWebSocket;
 
-        if (coreConfigManager is { CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
+        if (coreConfigManager is { CaptureTextFromTsukikageWebsocket: false, CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
         {
             StatsUtils.StopTimeStatStopWatch();
         }
@@ -1025,12 +1082,51 @@ internal sealed partial class MainWindow
         return WebSocketUtils.DisconnectFromAllWebSocketConnections();
     }
 
+    private Task HandleTsukikageWebSocketCaptureToggle()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        coreConfigManager.CaptureTextFromTsukikageWebsocket = !coreConfigManager.CaptureTextFromTsukikageWebsocket;
+
+        if (coreConfigManager is { CaptureTextFromTsukikageWebsocket: false, CaptureTextFromWebSocket: false, CaptureTextFromClipboard: false })
+        {
+            StatsUtils.StopTimeStatStopWatch();
+        }
+        else if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
+        {
+            StatsUtils.StartTimeStatStopWatch();
+        }
+
+        if (coreConfigManager.CaptureTextFromTsukikageWebsocket)
+        {
+            WebSocketUtils.ConnectToTsukikageWebSocket();
+            return Task.CompletedTask;
+        }
+
+        return WebSocketUtils.DisconnectFromTsukikageWebSocketConnection();
+    }
+
     private void HandleReconnectToWebSocket()
     {
         ConfigManager configManager = ConfigManager.Instance;
         CoreConfigManager.Instance.CaptureTextFromWebSocket = true;
 
         WebSocketUtils.ConnectToAllWebSockets();
+        if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
+        {
+            if (!StatsUtils.TimeStatStopWatch.IsRunning)
+            {
+                StatsUtils.StartTimeStatStopWatch();
+            }
+        }
+    }
+
+    private void HandleReconnectToTsukikageWebSocket()
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        CoreConfigManager.Instance.CaptureTextFromTsukikageWebsocket = true;
+
+        WebSocketUtils.ConnectToTsukikageWebSocket();
         if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
         {
             if (!StatsUtils.TimeStatStopWatch.IsRunning)
@@ -1117,7 +1213,7 @@ internal sealed partial class MainWindow
                     MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
                 }
                 MoveWindowToScreen();
-                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true, true);
+                return FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true, true, false);
             }
         }
         return Task.CompletedTask;
@@ -1128,7 +1224,7 @@ internal sealed partial class MainWindow
         if (MainTextBox.Text.Length > 0)
         {
             MoveWindowToScreen();
-            return FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true);
+            return FirstPopupWindow.LookupOnCharPosition(MainTextBox, 0, true, true, false);
         }
         return Task.CompletedTask;
     }
@@ -1470,6 +1566,11 @@ internal sealed partial class MainWindow
         WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * dpi.DpiScaleX;
         WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * dpi.DpiScaleY;
 
+        configManager.PopupYOffsetForVerticalText = Math.Round(configManager.PopupYOffsetForVerticalText / ratioY);
+        configManager.PopupXOffsetForVerticalText = Math.Round(configManager.PopupXOffsetForVerticalText / ratioX);
+        WindowsUtils.DpiAwareXOffsetForVerticalText = configManager.PopupXOffsetForVerticalText * dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffsetForVerticalText = configManager.PopupYOffsetForVerticalText * dpi.DpiScaleY;
+
         configManager.FixedPopupYPosition = Math.Round(configManager.FixedPopupYPosition / ratioY);
         if (bounds.Y > configManager.FixedPopupYPosition)
         {
@@ -1535,6 +1636,8 @@ internal sealed partial class MainWindow
             WindowsUtils.Dpi = dpi;
             WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * dpi.DpiScaleX;
             WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * dpi.DpiScaleY;
+            WindowsUtils.DpiAwareXOffsetForVerticalText = configManager.PopupXOffsetForVerticalText * dpi.DpiScaleX;
+            WindowsUtils.DpiAwareYOffsetForVerticalText = configManager.PopupYOffsetForVerticalText * dpi.DpiScaleY;
 
             Rectangle previousScreenBonds = previousActiveScreen.Bounds;
             Rectangle currentScreenBounds = WindowsUtils.ActiveScreen.Bounds;
@@ -1556,6 +1659,8 @@ internal sealed partial class MainWindow
         WindowsUtils.Dpi = e.NewDpi;
         WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * e.NewDpi.DpiScaleX;
         WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * e.NewDpi.DpiScaleY;
+        WindowsUtils.DpiAwareXOffsetForVerticalText = configManager.PopupXOffsetForVerticalText * e.NewDpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffsetForVerticalText = configManager.PopupYOffsetForVerticalText * e.NewDpi.DpiScaleY;
         s_previousDpi = e.OldDpi;
     }
 
@@ -1572,6 +1677,8 @@ internal sealed partial class MainWindow
         WindowsUtils.Dpi = dpi;
         WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * dpi.DpiScaleX;
         WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * dpi.DpiScaleY;
+        WindowsUtils.DpiAwareXOffsetForVerticalText = configManager.PopupXOffsetForVerticalText * dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffsetForVerticalText = configManager.PopupYOffsetForVerticalText * dpi.DpiScaleY;
     }
 
     private void Border_OnMouseEnter(object sender, MouseEventArgs e)
@@ -1722,7 +1829,6 @@ internal sealed partial class MainWindow
             {
                 topPosition = referenceWindowRect.Top;
             }
-
 
             double leftPosition = configManager is { RepositionMainWindowOnTextChangeByRightPosition: true, MainWindowDynamicWidth: true }
                 ? GetDynamicXPosition(configManager.MainWindowFixedRightPosition)
@@ -1947,7 +2053,7 @@ internal sealed partial class MainWindow
         else
         {
             if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized
-                && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket))
+                && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket || coreConfigManager.CaptureTextFromTsukikageWebsocket))
             {
                 StatsUtils.StartTimeStatStopWatch();
             }

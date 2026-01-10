@@ -18,7 +18,7 @@ internal sealed class DummyFrontend : IFrontend
     {
     }
 
-    public Task CopyFromWebSocket(string text) => Task.CompletedTask;
+    public Task CopyFromWebSocket(string text, bool tsukikage) => Task.CompletedTask;
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray() => Task.FromResult<byte[]?>(null);
 

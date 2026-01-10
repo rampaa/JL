@@ -39,16 +39,16 @@ internal sealed class WebSocketConnection : IDisposable
         _webSocketClient = null;
     }
 
-    public void Connect()
+    public void Connect(bool tsukikage)
     {
         if (_webSocketCancellationTokenSource is null)
         {
             _webSocketCancellationTokenSource = new CancellationTokenSource();
-            ListenWebSocket(_webSocketCancellationTokenSource.Token).SafeFireAndForget("Unexpected error while listening the WebSocket");
+            ListenWebSocket(tsukikage, _webSocketCancellationTokenSource.Token).SafeFireAndForget("Unexpected error while listening the WebSocket");
         }
     }
 
-    private Task ListenWebSocket(CancellationToken cancellationToken)
+    private Task ListenWebSocket(bool tsukikage, CancellationToken cancellationToken)
     {
         return Task.Run(async () =>
         {
@@ -67,12 +67,15 @@ internal sealed class WebSocketConnection : IDisposable
                     try
                     {
                         Memory<byte> buffer = rentedBuffer;
-                        while (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
+                        while (!cancellationToken.IsCancellationRequested
+                            && webSocketClient.State is WebSocketState.Open
+                            && (tsukikage ? coreConfigManager.CaptureTextFromTsukikageWebsocket : coreConfigManager.CaptureTextFromWebSocket))
                         {
                             try
                             {
                                 ValueWebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
-                                if (!coreConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
+                                if (cancellationToken.IsCancellationRequested
+                                    || (tsukikage ? !coreConfigManager.CaptureTextFromTsukikageWebsocket : !coreConfigManager.CaptureTextFromWebSocket))
                                 {
                                     if (webSocketClient.State is WebSocketState.Open)
                                     {
@@ -101,7 +104,7 @@ internal sealed class WebSocketConnection : IDisposable
                                     }
 
                                     string text = TextUtils.Utf8NoBom.GetString(buffer.Span[..totalBytesReceived]);
-                                    FrontendManager.Frontend.CopyFromWebSocket(text).SafeFireAndForget("Frontend copy from WebSocket failed");
+                                    FrontendManager.Frontend.CopyFromWebSocket(text, tsukikage).SafeFireAndForget("Frontend copy from WebSocket failed");
                                 }
                                 else if (result.MessageType is WebSocketMessageType.Close)
                                 {
@@ -111,14 +114,15 @@ internal sealed class WebSocketConnection : IDisposable
                             }
                             catch (WebSocketException webSocketException)
                             {
-                                if (coreConfigManager is { AutoReconnectToWebSocket: false, CaptureTextFromClipboard: false }
+                                if (coreConfigManager is { AutoReconnectToTsukikageWebSocket: false, AutoReconnectToWebSocket: false, CaptureTextFromClipboard: false }
                                     && webSocketClient.State is not WebSocketState.Open
                                     && WebSocketUtils.AllConnectionsAreDisconnected())
                                 {
                                     StatsUtils.StopTimeStatStopWatch();
                                 }
 
-                                if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
+                                if (!cancellationToken.IsCancellationRequested
+                                    && (tsukikage ? coreConfigManager.CaptureTextFromTsukikageWebsocket : coreConfigManager.CaptureTextFromWebSocket))
                                 {
                                     LoggerManager.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
                                     // FrontendManager.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
@@ -140,14 +144,15 @@ internal sealed class WebSocketConnection : IDisposable
 
                 catch (WebSocketException webSocketException)
                 {
-                    if (!coreConfigManager.AutoReconnectToWebSocket)
+                    if (tsukikage ? !coreConfigManager.AutoReconnectToTsukikageWebSocket : !coreConfigManager.AutoReconnectToWebSocket)
                     {
                         if (!coreConfigManager.CaptureTextFromClipboard && WebSocketUtils.AllConnectionsAreDisconnected())
                         {
                             StatsUtils.StopTimeStatStopWatch();
                         }
 
-                        if (coreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested)
+                        if (!cancellationToken.IsCancellationRequested
+                            && (tsukikage ? coreConfigManager.CaptureTextFromTsukikageWebsocket : coreConfigManager.CaptureTextFromWebSocket))
                         {
                             LoggerManager.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
                             FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
@@ -171,7 +176,8 @@ internal sealed class WebSocketConnection : IDisposable
                     return;
                 }
             }
-            while (coreConfigManager is { AutoReconnectToWebSocket: true, CaptureTextFromWebSocket: true } && !cancellationToken.IsCancellationRequested);
+            while (!cancellationToken.IsCancellationRequested
+                && (tsukikage ? coreConfigManager is { AutoReconnectToTsukikageWebSocket: true, CaptureTextFromTsukikageWebsocket: true } : coreConfigManager is { AutoReconnectToWebSocket: true, CaptureTextFromWebSocket: true }));
         }, CancellationToken.None);
     }
 

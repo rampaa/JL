@@ -115,10 +115,16 @@ internal sealed class ConfigManager
     };
     public double PopupXOffset { get; set; } = 10;
     public double PopupYOffset { get; set; } = 20;
+    public double PopupXOffsetForVerticalText { get; set; } = 60;
+    public double PopupYOffsetForVerticalText { get; set; } // = 0;
     public bool PositionPopupLeftOfCursor { get; private set; } // = false;
     public bool PositionPopupAboveCursor { get; private set; } // = false;
+    public bool PositionPopupLeftOfCursorForVerticalText { get; private set; } = true;
+    public bool PositionPopupAboveCursorForVerticalText { get; private set; } // = false;
     public bool PopupFlipX { get; private set; } = true;
     public bool PopupFlipY { get; private set; } = true;
+    public bool PopupFlipXForVerticalText { get; private set; } = true;
+    public bool PopupFlipYForVerticalText { get; private set; } = true;
     public Brush PrimarySpellingColor { get; private set; } = Brushes.Chocolate;
     public double PrimarySpellingFontSize { get; set; } = 21;
     public Brush ReadingsColor { get; private set; } = Brushes.Goldenrod;
@@ -182,7 +188,9 @@ internal sealed class ConfigManager
     public KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture CaptureTextFromWebSocketKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture CaptureTextFromTsukikageWebSocketKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture ReconnectToTsukikageWebSocketKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.F1, ModifierKeys.Alt);
@@ -483,6 +491,12 @@ internal sealed class ConfigManager
         PopupYOffset = ConfigDBManager.GetValueFromConfig(connection, configs, PopupYOffset, nameof(PopupYOffset));
         WindowsUtils.DpiAwareYOffset = PopupYOffset * dpi.DpiScaleY;
 
+        PopupXOffsetForVerticalText = ConfigDBManager.GetValueFromConfig(connection, configs, PopupXOffsetForVerticalText, nameof(PopupXOffsetForVerticalText));
+        WindowsUtils.DpiAwareXOffsetForVerticalText = PopupXOffsetForVerticalText * dpi.DpiScaleX;
+
+        PopupYOffsetForVerticalText = ConfigDBManager.GetValueFromConfig(connection, configs, PopupYOffsetForVerticalText, nameof(PopupYOffsetForVerticalText));
+        WindowsUtils.DpiAwareYOffsetForVerticalText = PopupYOffsetForVerticalText * dpi.DpiScaleY;
+
         PopupMaxWidth = ConfigDBManager.GetValueFromConfig(connection, configs, PopupMaxWidth, nameof(PopupMaxWidth));
         PopupMaxHeight = ConfigDBManager.GetValueFromConfig(connection, configs, PopupMaxHeight, nameof(PopupMaxHeight));
         PopupMinWidth = ConfigDBManager.GetValueFromConfig(connection, configs, PopupMinWidth, nameof(PopupMinWidth));
@@ -558,7 +572,7 @@ internal sealed class ConfigManager
         KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Clear();
 
         if ((!StopIncreasingTimeAndCharStatsWhenMinimized || MainWindow.Instance.WindowState is not WindowState.Minimized)
-            && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket)
+            && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket || coreConfigManager.CaptureTextFromTsukikageWebsocket)
             && MainWindow.Instance.MainTextBox.Text.Length > 0)
         {
             StatsUtils.StartTimeStatStopWatch();
@@ -600,7 +614,9 @@ internal sealed class ConfigManager
         ClickMiningButtonKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ClickMiningButtonKeyGesture), ClickMiningButtonKeyGesture);
         CaptureTextFromClipboardKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
         CaptureTextFromWebSocketKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
+        CaptureTextFromTsukikageWebSocketKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(CaptureTextFromTsukikageWebSocketKeyGesture), CaptureTextFromTsukikageWebSocketKeyGesture);
         ReconnectToWebSocketServerKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
+        ReconnectToTsukikageWebSocketKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ReconnectToTsukikageWebSocketKeyGesture), ReconnectToTsukikageWebSocketKeyGesture);
         DeleteCurrentLineKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
 
         ShowPreferencesWindowKeyGesture =
@@ -739,6 +755,38 @@ internal sealed class ConfigManager
         }
 
         {
+            string popupPositionRelativeToCursorForVerticalTextStr = ConfigDBManager.GetValueFromConfig(connection, configs, "BottomLeft", "PopupPositionRelativeToCursorForVerticalText");
+            switch (popupPositionRelativeToCursorForVerticalTextStr)
+            {
+                case "TopLeft":
+                    PositionPopupAboveCursorForVerticalText = true;
+                    PositionPopupLeftOfCursorForVerticalText = true;
+                    break;
+
+                case "TopRight":
+                    PositionPopupAboveCursorForVerticalText = true;
+                    PositionPopupLeftOfCursorForVerticalText = false;
+                    break;
+
+                case "BottomLeft":
+                    PositionPopupAboveCursorForVerticalText = false;
+                    PositionPopupLeftOfCursorForVerticalText = true;
+                    break;
+
+                case "BottomRight":
+                    PositionPopupAboveCursorForVerticalText = false;
+                    PositionPopupLeftOfCursorForVerticalText = false;
+                    break;
+
+                default:
+                    ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursorForVerticalText", "BottomLeft");
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupPositionRelativeToCursorForVerticalText", nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorForVerticalTextStr);
+                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor for vertical text option: {popupPositionRelativeToCursorForVerticalTextStr}");
+                    break;
+            }
+        }
+
+        {
             string popupFlipStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Both", "PopupFlip");
             switch (popupFlipStr)
             {
@@ -761,6 +809,33 @@ internal sealed class ConfigManager
                     ConfigDBManager.UpdateSetting(connection, "PopupFlip", "Both");
                     LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupFlip", nameof(ConfigManager), nameof(ApplyPreferences), popupFlipStr);
                     WindowsUtils.Alert(AlertLevel.Error, $"Invalid PopupFlip: {popupFlipStr}");
+                    break;
+            }
+        }
+
+        {
+            string popupFlipForVerticalTextStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Both", "PopupFlipForVerticalText");
+            switch (popupFlipForVerticalTextStr)
+            {
+                case "X":
+                    PopupFlipXForVerticalText = true;
+                    PopupFlipYForVerticalText = false;
+                    break;
+
+                case "Y":
+                    PopupFlipXForVerticalText = false;
+                    PopupFlipYForVerticalText = true;
+                    break;
+
+                case "Both":
+                    PopupFlipXForVerticalText = true;
+                    PopupFlipYForVerticalText = true;
+                    break;
+
+                default:
+                    ConfigDBManager.UpdateSetting(connection, "PopupFlipForVerticalText", "Both");
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupFlipForVerticalText", nameof(ConfigManager), nameof(ApplyPreferences), popupFlipForVerticalTextStr);
+                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid PopupFlipForVerticalText: {popupFlipForVerticalTextStr}");
                     break;
             }
         }
@@ -907,8 +982,12 @@ internal sealed class ConfigManager
             CaptureTextFromClipboardKeyGesture.ToFormattedString();
         preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text =
             CaptureTextFromWebSocketKeyGesture.ToFormattedString();
+        preferenceWindow.CaptureTextFromTsukikageWebSocketKeyGestureTextBox.Text =
+            CaptureTextFromTsukikageWebSocketKeyGesture.ToFormattedString();
         preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text =
             ReconnectToWebSocketServerKeyGesture.ToFormattedString();
+        preferenceWindow.ReconnectToTsukikageWebSocketKeyGestureTextBox.Text =
+            ReconnectToTsukikageWebSocketKeyGesture.ToFormattedString();
         preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text =
             DeleteCurrentLineKeyGesture.ToFormattedString();
         preferenceWindow.ToggleMinimizedStateKeyGestureTextBox.Text =
@@ -942,6 +1021,7 @@ internal sealed class ConfigManager
         preferenceWindow.PopupLookupDelayNumericUpDown.Value = PopupLookupDelay;
         preferenceWindow.AnkiUriTextBox.Text = coreConfigManager.AnkiConnectUri.OriginalString;
         preferenceWindow.WebSocketUrisTextBox.Text = string.Join('\n', coreConfigManager.WebSocketUris.Select(static ws => ws.OriginalString));
+        preferenceWindow.TsukikageWebSocketUriTextBox.Text = coreConfigManager.TsukikageWebSocketUri.OriginalString;
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = coreConfigManager.ForceSyncAnki;
         preferenceWindow.NotifyWhenMiningSucceedsCheckBox.IsChecked = coreConfigManager.NotifyWhenMiningSucceeds;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = coreConfigManager.AllowDuplicateCards;
@@ -996,6 +1076,8 @@ internal sealed class ConfigManager
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = coreConfigManager.CaptureTextFromClipboard;
         preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = coreConfigManager.CaptureTextFromWebSocket;
         preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked = coreConfigManager.AutoReconnectToWebSocket;
+        preferenceWindow.CaptureTextFromTsukikageWebSocketCheckBox.IsChecked = coreConfigManager.CaptureTextFromTsukikageWebsocket;
+        preferenceWindow.AutoReconnectToTsukikageWebSocketCheckBox.IsChecked = coreConfigManager.AutoReconnectToTsukikageWebSocket;
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked = OnlyCaptureTextWithJapaneseChars;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
@@ -1087,6 +1169,8 @@ internal sealed class ConfigManager
         preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked = PopupFocusOnLookup;
         preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
         preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
+        preferenceWindow.PopupXOffsetForVerticalTextNumericUpDown.Value = PopupXOffsetForVerticalText;
+        preferenceWindow.PopupYOffsetForVerticalTextNumericUpDown.Value = PopupYOffsetForVerticalText;
         preferenceWindow.MainWindowFixedRightPositionNumericUpDown.Value = MainWindowFixedRightPosition;
         preferenceWindow.MainWindowFixedBottomPositionNumericUpDown.Value = MainWindowFixedBottomPosition;
 
@@ -1111,10 +1195,12 @@ internal sealed class ConfigManager
         preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
         preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
 
-        Dictionary<string, string> settingValues = ConfigDBManager.GetSettingValues(connection, "MinimumLogLevel", "PopupPositionRelativeToCursor", "PopupFlip", "LookupMode", nameof(CoreConfigManager.LookupCategory));
+        Dictionary<string, string> settingValues = ConfigDBManager.GetSettingValues(connection, "MinimumLogLevel", "PopupPositionRelativeToCursor", "PopupPositionRelativeToCursorForVerticalText", "PopupFlip", "PopupFlipForVerticalText", "LookupMode", nameof(CoreConfigManager.LookupCategory));
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = settingValues["MinimumLogLevel"];
         preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue = settingValues["PopupPositionRelativeToCursor"];
+        preferenceWindow.PopupPositionRelativeToCursorForVerticalTextComboBox.SelectedValue = settingValues["PopupPositionRelativeToCursorForVerticalText"];
         preferenceWindow.PopupFlipComboBox.SelectedValue = settingValues["PopupFlip"];
+        preferenceWindow.PopupFlipForVerticalTextComboBox.SelectedValue = settingValues["PopupFlipForVerticalText"];
 
         preferenceWindow.LookupModeComboBox.SelectedValue = settingValues["LookupMode"];
         if (preferenceWindow.LookupModeComboBox.SelectedIndex < 0)
@@ -1216,8 +1302,12 @@ internal sealed class ConfigManager
                 preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(CaptureTextFromWebSocketKeyGesture),
                 preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(CaptureTextFromTsukikageWebSocketKeyGesture),
+                preferenceWindow.CaptureTextFromTsukikageWebSocketKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(ReconnectToWebSocketServerKeyGesture),
                 preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ReconnectToTsukikageWebSocketKeyGesture),
+                preferenceWindow.ReconnectToTsukikageWebSocketKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(DeleteCurrentLineKeyGesture),
                 preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(ToggleMinimizedStateKeyGesture),
@@ -1236,6 +1326,7 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiConnectUri), preferenceWindow.AnkiUriTextBox.Text);
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.WebSocketUris), preferenceWindow.WebSocketUrisTextBox.Text);
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.TsukikageWebSocketUri), preferenceWindow.TsukikageWebSocketUriTextBox.Text);
 
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowDynamicWidth),
                 preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked.ToString());
@@ -1299,6 +1390,12 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AutoReconnectToWebSocket),
                 preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CaptureTextFromTsukikageWebsocket),
+                preferenceWindow.CaptureTextFromTsukikageWebSocketCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AutoReconnectToTsukikageWebSocket),
+                preferenceWindow.AutoReconnectToTsukikageWebSocketCheckBox.IsChecked.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(OnlyCaptureTextWithJapaneseChars),
                 preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked.ToString());
@@ -1543,6 +1640,12 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(PopupYOffset),
                 preferenceWindow.PopupYOffsetNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupXOffsetForVerticalText),
+                preferenceWindow.PopupXOffsetForVerticalTextNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(PopupYOffsetForVerticalText),
+                preferenceWindow.PopupYOffsetForVerticalTextNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
             ConfigDBManager.UpdateSetting(connection, nameof(RepositionMainWindowOnTextChangeByBottomPosition),
                 preferenceWindow.RepositionMainWindowOnTextChangeByBottomPositionCheckBox.IsChecked.ToString());
 
@@ -1556,8 +1659,10 @@ internal sealed class ConfigManager
                 preferenceWindow.MainWindowFixedRightPositionNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursor", preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursorForVerticalText", preferenceWindow.PopupPositionRelativeToCursorForVerticalTextComboBox.SelectedValue.ToString());
 
             ConfigDBManager.UpdateSetting(connection, "PopupFlip", preferenceWindow.PopupFlipComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, "PopupFlipForVerticalText", preferenceWindow.PopupFlipForVerticalTextComboBox.SelectedValue.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(DisableLookupsForNonJapaneseCharsInPopups),
                 preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked.ToString());

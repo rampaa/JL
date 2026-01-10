@@ -548,12 +548,39 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                        Cursor="Help"
-                                       ToolTip="If this option is enabled, JL will *continuously* try connecting to the specified WebSocket">
+                                       ToolTip="If this option is enabled, JL will *continuously* try connecting to the specified WebSockets">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Auto reconnect to WebSocket"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                                     <CheckBox x:Name="AutoReconnectToWebSocketCheckBox"  HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Enable Tsukikage WebSocket text capture"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <CheckBox x:Name="CaptureTextFromTsukikageWebSocketCheckBox"  HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Tsukikage WebSocket server address" VerticalAlignment="Center" TextWrapping="Wrap" Style="{StaticResource TextBlockDefault}" />
+                                    <TextBox x:Name="TsukikageWebSocketUriTextBox" HorizontalAlignment="Right" Width="200" MaxHeight="60" TextWrapping="Wrap" AcceptsReturn="True" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                       Cursor="Help"
+                                       ToolTip="If this option is enabled, JL will *continuously* try connecting to the specified WebSocket">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Auto reconnect to Tsukikage WebSocket"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <CheckBox x:Name="AutoReconnectToTsukikageWebSocketCheckBox" HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
 
@@ -1158,7 +1185,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="X Offset"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="100" Minimum="1" DecimalPlaces="0"
+                                    <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="100" Minimum="-100" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1168,7 +1195,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Y Offset"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="100" Minimum="1" DecimalPlaces="0"
+                                    <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="100" Minimum="-100" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
@@ -1194,6 +1221,55 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                                     <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right"
+                                      SelectedValuePath="Content">
+                                        <ComboBoxItem Content="X" />
+                                        <ComboBoxItem Content="Y" />
+                                        <ComboBoxItem Content="Both" />
+                                    </ComboBox>
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="X Offset (Vertical Text)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <hc:NumericUpDown x:Name="PopupXOffsetForVerticalTextNumericUpDown" Maximum="100" Minimum="-100" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Y Offset (Vertical Text)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <hc:NumericUpDown x:Name="PopupYOffsetForVerticalTextNumericUpDown" Maximum="100" Minimum="-100" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Popup position relative to cursor (Vertical Text)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <ComboBox x:Name="PopupPositionRelativeToCursorForVerticalTextComboBox" HorizontalAlignment="Right"
+                                      SelectedValuePath="Tag">
+                                        <ComboBoxItem Content="Top left" Tag="TopLeft" />
+                                        <ComboBoxItem Content="Top right" Tag="TopRight" />
+                                        <ComboBoxItem Content="Bottom left" Tag="BottomLeft" />
+                                        <ComboBoxItem Content="Bottom right" Tag="BottomRight" />
+                                    </ComboBox>
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Flip (Vertical Text)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <ComboBox x:Name="PopupFlipForVerticalTextComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Content">
                                         <ComboBoxItem Content="X" />
                                         <ComboBoxItem Content="Y" />
@@ -1778,6 +1854,19 @@
                                 <DockPanel Margin="10,0,10,0">
                                     <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                     Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="ReconnectToTsukikageWebSocketKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Reconnect to Tsukikage WebSocket" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="PlayAudioKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -2065,6 +2154,19 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                                     <TextBlock Text="Toggle capture text from WebSocket option" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="CaptureTextFromTsukikageWebSocketKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Toggle capture text from Tsukikage WebSocket option" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                                 </DockPanel>

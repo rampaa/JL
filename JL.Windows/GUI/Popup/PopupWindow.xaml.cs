@@ -282,7 +282,7 @@ internal sealed partial class PopupWindow
         WindowsUtils.SearchWithBrowser(text);
     }
 
-    public Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode, bool mayNeedCoordinateConversion)
+    public Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode, bool mayNeedCoordinateConversion, bool verticalText)
     {
         string textBoxText = textBox.Text;
         if (char.IsLowSurrogate(textBoxText[charPosition]))
@@ -367,7 +367,7 @@ internal sealed partial class PopupWindow
 
         if (textToLookUp == _lastLookedUpText && Opacity is not 0)
         {
-            UpdatePosition(mayNeedCoordinateConversion);
+            UpdatePosition(mayNeedCoordinateConversion, verticalText);
             WinApi.BringToFront(WindowHandle);
             return Task.CompletedTask;
         }
@@ -420,7 +420,7 @@ internal sealed partial class PopupWindow
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
-            UpdatePosition(mayNeedCoordinateConversion);
+            UpdatePosition(mayNeedCoordinateConversion, verticalText);
 
             Opacity = 1d;
 
@@ -495,7 +495,7 @@ internal sealed partial class PopupWindow
             return Task.CompletedTask;
         }
 
-        return LookupOnCharPosition(textBox, charPosition, enableMiningMode, false);
+        return LookupOnCharPosition(textBox, charPosition, enableMiningMode, false, false);
     }
 
     public Task LookupOnSelect(TextBox textBox)
@@ -535,7 +535,7 @@ internal sealed partial class PopupWindow
 
         if (selectedText == _lastLookedUpText && Opacity is not 0)
         {
-            UpdatePosition(false);
+            UpdatePosition(false, false);
             WinApi.BringToFront(WindowHandle);
             return Task.CompletedTask;
         }
@@ -568,7 +568,7 @@ internal sealed partial class PopupWindow
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
-            UpdatePosition(false);
+            UpdatePosition(false, false);
 
             Opacity = 1d;
 
@@ -621,7 +621,7 @@ internal sealed partial class PopupWindow
         return Task.CompletedTask;
     }
 
-    private void UpdatePosition(Point cursorPosition)
+    private void UpdatePosition(Point cursorPosition, bool verticalText)
     {
         double mouseX = cursorPosition.X;
         double mouseY = cursorPosition.Y;
@@ -629,28 +629,31 @@ internal sealed partial class PopupWindow
         ConfigManager configManager = ConfigManager.Instance;
 
         DpiScale dpi = WindowsUtils.Dpi;
-        double dpiAwareXOffset = WindowsUtils.DpiAwareXOffset;
-        double dpiAwareYOffset = WindowsUtils.DpiAwareYOffset;
+        double dpiAwareXOffset = verticalText ? WindowsUtils.DpiAwareXOffsetForVerticalText : WindowsUtils.DpiAwareXOffset;
+        double dpiAwareYOffset = verticalText ? WindowsUtils.DpiAwareYOffsetForVerticalText : WindowsUtils.DpiAwareYOffset;
         Rectangle screenBounds = WindowsUtils.ActiveScreen.Bounds;
 
         double currentWidth = ActualWidth * dpi.DpiScaleX;
         double currentHeight = ActualHeight * dpi.DpiScaleY;
 
-        double newLeft = configManager.PositionPopupLeftOfCursor
+        bool positionPopupLeftOfCursor = verticalText ? configManager.PositionPopupLeftOfCursorForVerticalText : configManager.PositionPopupLeftOfCursor;
+        double newLeft = positionPopupLeftOfCursor
             ? mouseX - (currentWidth + dpiAwareXOffset)
             : mouseX + dpiAwareXOffset;
 
-        double newTop = configManager.PositionPopupAboveCursor
+        bool positionPopupAboveCursor = verticalText ? configManager.PositionPopupAboveCursorForVerticalText : configManager.PositionPopupAboveCursor;
+        double newTop = positionPopupAboveCursor
             ? mouseY - (currentHeight + dpiAwareYOffset)
             : mouseY + dpiAwareYOffset;
 
-        if (configManager.PopupFlipX)
+        bool popupFlipX = verticalText ? configManager.PopupFlipXForVerticalText : configManager.PopupFlipX;
+        if (popupFlipX)
         {
-            if (configManager.PositionPopupLeftOfCursor && newLeft < screenBounds.Left)
+            if (positionPopupLeftOfCursor && newLeft < screenBounds.Left)
             {
                 newLeft = mouseX + dpiAwareXOffset;
             }
-            else if (!configManager.PositionPopupLeftOfCursor && newLeft + currentWidth > screenBounds.Right)
+            else if (!positionPopupLeftOfCursor && newLeft + currentWidth > screenBounds.Right)
             {
                 newLeft = mouseX - (currentWidth + dpiAwareXOffset);
             }
@@ -658,13 +661,14 @@ internal sealed partial class PopupWindow
 
         newLeft = Math.Max(screenBounds.Left, Math.Min(newLeft, screenBounds.Right - currentWidth));
 
-        if (configManager.PopupFlipY)
+        bool popupFlipY = verticalText ? configManager.PopupFlipYForVerticalText : configManager.PopupFlipY;
+        if (popupFlipY)
         {
-            if (configManager.PositionPopupAboveCursor && newTop < screenBounds.Top)
+            if (positionPopupAboveCursor && newTop < screenBounds.Top)
             {
                 newTop = mouseY + dpiAwareYOffset;
             }
-            else if (!configManager.PositionPopupAboveCursor && newTop + currentHeight > screenBounds.Bottom)
+            else if (!positionPopupAboveCursor && newTop + currentHeight > screenBounds.Bottom)
             {
                 newTop = mouseY - (currentHeight + dpiAwareYOffset);
             }
@@ -728,7 +732,7 @@ internal sealed partial class PopupWindow
         WinApi.MoveWindowToPosition(WindowHandle, x, y);
     }
 
-    private void UpdatePosition(bool mayNeedCoordinateConversion)
+    private void UpdatePosition(bool mayNeedCoordinateConversion, bool verticalText)
     {
         if (ConfigManager.Instance.FixedPopupPositioning && PopupIndex is 0)
         {
@@ -738,7 +742,7 @@ internal sealed partial class PopupWindow
 
         else
         {
-            UpdatePosition(WindowsUtils.GetMousePosition(mayNeedCoordinateConversion));
+            UpdatePosition(WindowsUtils.GetMousePosition(mayNeedCoordinateConversion), verticalText);
         }
     }
 
@@ -1506,6 +1510,7 @@ internal sealed partial class PopupWindow
 
         EnableMiningMode();
         DisplayResults();
+        UpdatePosition(true, WindowsUtils.LastWebSocketTextWasVertical);
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.Focusable)
@@ -1526,6 +1531,8 @@ internal sealed partial class PopupWindow
         }
 
         _ = Focus();
+
+        WinApi.BringToFront(WindowHandle);
 
         if (configManager.AutoHidePopupIfMouseIsNotOverIt)
         {
@@ -1778,6 +1785,12 @@ internal sealed partial class PopupWindow
     private void EnableMiningMode()
     {
         MiningMode = true;
+
+        if (PopupWindowUtils.TransparentDueToAutoLookup)
+        {
+            WinApi.UnsetTransparentStyle(WindowHandle);
+            PopupWindowUtils.TransparentDueToAutoLookup = false;
+        }
 
         TitleBarGrid.Visibility = Visibility.Visible;
         if (ConfigManager.Instance.ShowDictionaryTabsInMiningMode)
@@ -2477,7 +2490,7 @@ internal sealed partial class PopupWindow
     {
         EnableMiningMode();
         DisplayResults();
-        UpdatePosition(false);
+        UpdatePosition(false, false);
 
         ConfigManager configManager = ConfigManager.Instance;
 
