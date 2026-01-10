@@ -24,11 +24,6 @@
     <PackageReference Include="System.Speech" Version="10.0.1" />
   </ItemGroup>
 
-  <!--Transitive dependencies-->
-  <ItemGroup>
-    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Update="JL.exe.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
