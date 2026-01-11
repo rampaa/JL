@@ -209,11 +209,20 @@ internal sealed partial class MainWindow : IDisposable
                     copiedText = CopyText(currentText, tsukikage)
                         && !FirstPopupWindow.MiningMode
                         && (tsukikage || configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket)
-                        && (!tsukikage || !configManager.RequireLookupKeyPress || configManager.LookupKeyKeyGesture.IsPressed())
                         && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized || WindowState is WindowState.Minimized);
 
                     if (!copiedText)
                     {
+                        return;
+                    }
+
+                    if (tsukikage && configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
+                    {
+                        if (FirstPopupWindow.Opacity is not 0)
+                        {
+                            FirstPopupWindow.HidePopup();
+                        }
+
                         return;
                     }
 
