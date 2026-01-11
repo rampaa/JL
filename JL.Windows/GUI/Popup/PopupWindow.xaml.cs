@@ -373,7 +373,7 @@ internal sealed partial class PopupWindow : IDisposable
             return Task.CompletedTask;
         }
 
-        if (textToLookUp == _lastLookedUpText && Opacity is not 0)
+        if (textToLookUp == _lastLookedUpText && Opacity is not 0 && MiningMode == enableMiningMode)
         {
             UpdatePosition(mayNeedCoordinateConversion, verticalText);
             WinApi.BringToFront(WindowHandle);

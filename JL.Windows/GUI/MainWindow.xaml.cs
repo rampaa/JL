@@ -239,7 +239,8 @@ internal sealed partial class MainWindow : IDisposable
                         PopupWindowUtils.TransparentDueToAutoLookup = true;
                     }
 
-                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, false, true, verticalText).ConfigureAwait(true);
+                    bool enableMiningMode = tsukikage && configManager.MiningModeMouseButton.IsPressed();
+                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, enableMiningMode, true, verticalText).ConfigureAwait(true);
                 }, DispatcherPriority.Send).Task.ConfigureAwait(true);
             }
         }

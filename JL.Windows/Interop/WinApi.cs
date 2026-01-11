@@ -177,6 +177,10 @@ internal static partial class WinApi
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static partial uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId);
 
+        [LibraryImport("user32.dll", EntryPoint = "GetAsyncKeyState")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial short GetAsyncKeyState(int vKey);
+
         [LibraryImport("user32.dll", EntryPoint = "AttachThreadInput")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -396,6 +400,22 @@ internal static partial class WinApi
             _ = SetForegroundWindow(windowHandle);
             _ = AttachThreadInput(currentThreadId, foregroundThread, false);
         }
+    }
+
+    public static bool IsPressed(this MouseButton button)
+    {
+        int virtualKey = button switch
+        {
+            MouseButton.Left => 0x01, // VK_LBUTTON
+            MouseButton.Right => 0x02, // VK_RBUTTON
+            MouseButton.Middle => 0x04, // VK_MBUTTON
+            MouseButton.XButton1 => 0x05, // VK_XBUTTON1
+            MouseButton.XButton2 => 0x06, // VK_XBUTTON2
+            _ => 0
+        };
+
+        const int keyDownMask = 0x8000;
+        return virtualKey is not 0 && (GetAsyncKeyState(virtualKey) & keyDownMask) is not 0;
     }
 
     private static nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
