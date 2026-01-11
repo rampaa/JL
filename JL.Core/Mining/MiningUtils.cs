@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
@@ -597,7 +596,7 @@ public static class MiningUtils
         AddDefinitionFields(miningParams, jlFields, lookupResults, formattedDefinitions, selectedDefinitions, currentLookupResultIndex, selectedSpelling, useHtmlTags);
         AddKanjiFields(miningParams, jlFields, lookupResult.KanjiLookupResult, useHtmlTags);
 
-        int selectedSpellingIndex = lookupResult.Readings.AsReadOnlySpan().IndexOf(selectedSpelling);
+        int selectedSpellingIndex = lookupResult.Readings.IndexOf(selectedSpelling);
         if (selectedSpellingIndex is -1)
         {
             selectedSpellingIndex = 0;
@@ -1079,7 +1078,7 @@ public static class MiningUtils
 
             if (selectedLookupResult.PrimarySpelling == otherLookupResult.PrimarySpelling
                 && otherLookupResult.FormattedDefinitions is not null
-                && ((readingIsSelected && otherLookupResult.Readings is not null && otherLookupResult.Readings.AsReadOnlySpan().Contains(selectedSpelling))
+                && ((readingIsSelected && otherLookupResult.Readings is not null && otherLookupResult.Readings.Contains(selectedSpelling))
                     || (!readingIsSelected
                         && ((selectedLookupResult.Readings is null && otherLookupResult.Readings is null)
                             || (selectedLookupResult.Readings is not null && otherLookupResult.Readings is not null && selectedLookupResult.Readings.Any(otherLookupResult.Readings.Contains))))))
@@ -1381,7 +1380,7 @@ public static class MiningUtils
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
                     && ((reading is null && result.Readings is null)
-                        || (reading is not null && result.Readings is not null && result.Readings.AsReadOnlySpan().Contains(reading))))
+                        || (reading is not null && result.Readings is not null && result.Readings.Contains(reading))))
                 {
                     // If there is more than one valid result, we can't be sure which one applies to the current record, so we return null.
                     // See the entries for 駆ける and 振りかえる in JMdict as examples, where the spelling and reading are the same, but the word classes differ.
@@ -1551,7 +1550,7 @@ public static class MiningUtils
             return null;
         }
 
-        ReadOnlySpan<bool> canAddNoteSpan = canAddNoteList.AsReadOnlySpan();
+        ReadOnlySpan<bool> canAddNoteSpan = canAddNoteList;
         for (int i = 0; i < canAddNoteSpan.Length; i++)
         {
             results[positions[i]] = !canAddNoteSpan[i];

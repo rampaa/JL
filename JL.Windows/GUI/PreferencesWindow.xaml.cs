@@ -386,7 +386,7 @@ internal sealed partial class PreferencesWindow
         if (fieldNames is not null)
         {
             OrderedDictionary<string, JLField> fields = new(fieldNames.Length, StringComparer.Ordinal);
-            foreach (ref readonly string fieldName in fieldNames.AsReadOnlySpan())
+            foreach (string fieldName in fieldNames)
             {
                 fields.Add(fieldName, JLField.Nothing);
             }

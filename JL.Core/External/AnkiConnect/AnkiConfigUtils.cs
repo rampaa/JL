@@ -68,7 +68,7 @@ public static class AnkiConfigUtils
                 string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName).ConfigureAwait(false);
                 if (fields is not null)
                 {
-                    ReadOnlySpan<string> fieldsSpan = fields.AsReadOnlySpan();
+                    ReadOnlySpan<string> fieldsSpan = fields;
                     if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
                     {
                         firstFieldChanged.SetTrue();

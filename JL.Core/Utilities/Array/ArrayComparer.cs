@@ -10,7 +10,7 @@ internal sealed class ArrayComparer<T> : IEqualityComparer<T[]?> where T : IEqua
 
     public bool Equals(T[]? x, T[]? y)
     {
-        return x.AsReadOnlySpan().SequenceEqual(y);
+        return x.SequenceEqual(y);
     }
 
     public int GetHashCode(T[] obj)

@@ -709,7 +709,7 @@ public static class LookupUtils
 
             Debug.Assert(verbQueryOrParameter is not null);
             Debug.Assert(deconjugatedTexts is not null);
-            dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts.AsReadOnlySpan(), verbQueryOrParameter);
+            dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts, verbQueryOrParameter);
 
             if (allTextWithoutLongVowelMark is not null)
             {
@@ -765,7 +765,7 @@ public static class LookupUtils
                 {
                     JmdictRecord dictResult = (JmdictRecord)dictResults[i];
                     if (dictResult.WordClassesSharedByAllSenses is not null
-                        && dictResult.WordClassesSharedByAllSenses.AsReadOnlySpan().Contains(lastTag))
+                        && dictResult.WordClassesSharedByAllSenses.Contains(lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -774,7 +774,7 @@ public static class LookupUtils
                     {
                         foreach (string[]? wordClasses in dictResult.WordClasses)
                         {
-                            if (wordClasses is not null && wordClasses.AsReadOnlySpan().Contains(lastTag))
+                            if (wordClasses is not null && wordClasses.Contains(lastTag))
                             {
                                 resultsList.Add(dictResult);
                                 break;
@@ -793,7 +793,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultsCount; i++)
                 {
                     CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
-                    if (dictResult.WordClasses.AsReadOnlySpan().Contains(lastTag))
+                    if (dictResult.WordClasses.Contains(lastTag))
                     {
                         resultsList.Add(dictResult);
                     }
@@ -1288,9 +1288,9 @@ public static class LookupUtils
             {
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
-                    && ((hasReading && result.Readings is not null && result.Readings.AsReadOnlySpan().Contains(reading!))
+                    && ((hasReading && result.Readings is not null && result.Readings.Contains(reading!))
                         || (!hasReading && result.Readings is null))
-                    && result.WordClasses.AsReadOnlySpan().Contains(tag))
+                    && result.WordClasses.Contains(tag))
                 {
                     return true;
                 }

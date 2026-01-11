@@ -375,7 +375,7 @@ internal sealed class PopupContentGenerator : Decorator
                 _ = top.Children.Add(deconjugationProcessTextBlock);
             }
         }
-        else if (result.PrimarySpelling != result.MatchedText && (result.Readings is null || !result.Readings.AsReadOnlySpan().Contains(result.MatchedText)))
+        else if (result.PrimarySpelling != result.MatchedText && (result.Readings is null || !result.Readings.Contains(result.MatchedText)))
         {
             if (ownerWindow.MiningMode)
             {

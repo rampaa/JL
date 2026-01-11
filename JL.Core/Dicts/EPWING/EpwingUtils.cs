@@ -23,7 +23,7 @@ internal static class EpwingUtils
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
-                if (previousResult.Definitions.AsReadOnlySpan().SequenceEqual(definitions))
+                if (previousResult.Definitions.SequenceEqual(definitions))
                 {
                     // If an entry has reading info while others don't, keep the one with the reading info.
                     if (previousResult.Reading is null && reading is not null)
@@ -47,7 +47,7 @@ internal static class EpwingUtils
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
-                if (previousResult.Definitions.AsReadOnlySpan().SequenceEqual(definitions))
+                if (previousResult.Definitions.SequenceEqual(definitions))
                 {
                     if (previousResult.Reading is null)
                     {

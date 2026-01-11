@@ -25,7 +25,7 @@ internal static class ArrayUtils
         {
             if (array is not null)
             {
-                array.AsReadOnlySpan().CopyTo(concatArray.AsSpan(position, array.Length));
+                array.CopyTo(concatArray.AsSpan(position, array.Length));
                 position += array.Length;
             }
         }

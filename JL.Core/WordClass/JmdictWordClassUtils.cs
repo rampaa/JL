@@ -139,8 +139,8 @@ internal static class JmdictWordClassUtils
                             foreach (JmdictWordClass wordClass in prevResults.AsReadOnlySpan())
                             {
                                 if (wordClass.Spelling == jmdictRecord.PrimarySpelling
-                                    && wordClass.Readings.AsReadOnlySpan().SequenceEqual(jmdictRecord.Readings)
-                                    && wordClass.WordClasses.AsReadOnlySpan().SequenceEqual(wordClasses))
+                                    && wordClass.Readings.SequenceEqual(jmdictRecord.Readings)
+                                    && wordClass.WordClasses.SequenceEqual(wordClasses))
                                 {
                                     alreadyAdded = true;
                                     break;

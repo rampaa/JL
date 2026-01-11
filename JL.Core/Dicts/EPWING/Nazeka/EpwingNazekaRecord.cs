@@ -122,7 +122,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         return obj is EpwingNazekaRecord other
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
-               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)));
+               && other.Definitions.SequenceEqual(Definitions)));
     }
 
     public bool Equals([NotNullWhen(true)] EpwingNazekaRecord? other)
@@ -130,7 +130,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         return other is not null
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
-               && other.Definitions.AsReadOnlySpan().SequenceEqual(Definitions)));
+               && other.Definitions.SequenceEqual(Definitions)));
     }
 
     public override int GetHashCode()

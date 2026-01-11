@@ -88,7 +88,7 @@ public sealed class LookupResult
             && Dict.Name == other.Dict.Name
             && FormattedDefinitions == other.FormattedDefinitions
             && (other.Readings is not null
-                ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
+                ? Readings?.SequenceEqual(other.Readings) ?? false
                 : Readings is null);
     }
 
@@ -99,7 +99,7 @@ public sealed class LookupResult
             && Dict.Name == other.Dict.Name
             && FormattedDefinitions == other.FormattedDefinitions
             && (other.Readings is not null
-                ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
+                ? Readings?.SequenceEqual(other.Readings) ?? false
                 : Readings is null);
     }
 
@@ -135,8 +135,8 @@ public sealed class LookupResult
         }
 
         // 3. ThenByDescending: Readings contains MatchedText
-        int readingIndexOfMatchedText = Readings?.AsReadOnlySpan().IndexOf(MatchedText) ?? -1;
-        int otherReadingIndexOfMatchedText = other.Readings?.AsReadOnlySpan().IndexOf(otherMatchedText) ?? -1;
+        int readingIndexOfMatchedText = Readings?.IndexOf(MatchedText) ?? -1;
+        int otherReadingIndexOfMatchedText = other.Readings?.IndexOf(otherMatchedText) ?? -1;
 
         bool readingsContainMatchedText = readingIndexOfMatchedText >= 0;
         bool otherReadingsContainMatchedText = otherReadingIndexOfMatchedText >= 0;
@@ -241,7 +241,7 @@ public sealed class LookupResult
             Debug.Assert(jmdictLookupResult is not null);
 
             string[]? miscSharedByAllSenses = jmdictLookupResult.MiscSharedByAllSenses;
-            if (miscSharedByAllSenses is not null && miscSharedByAllSenses.AsReadOnlySpan().Contains("uk"))
+            if (miscSharedByAllSenses is not null && miscSharedByAllSenses.Contains("uk"))
             {
                 return 0;
             }
@@ -251,7 +251,7 @@ public sealed class LookupResult
             {
                 foreach (string[]? misc in miscList)
                 {
-                    if (misc is not null && misc.AsReadOnlySpan().Contains("uk"))
+                    if (misc is not null && misc.Contains("uk"))
                     {
                         return 0;
                     }

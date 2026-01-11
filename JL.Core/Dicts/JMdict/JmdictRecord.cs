@@ -382,7 +382,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings.AsReadOnlySpan().Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings.Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
@@ -423,7 +423,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             foreach (ref readonly FrequencyRecord freqResult in freqResults.AsReadOnlySpan())
             {
                 if (freqResult.Spelling == PrimarySpelling
-                    || (readingsExist && Readings.AsReadOnlySpan().Contains(freqResult.Spelling)))
+                    || (readingsExist && Readings.Contains(freqResult.Spelling)))
                 {
                     return freqResult.Frequency;
                 }
@@ -491,9 +491,9 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             && (ReferenceEquals(this, other) || (Id == other.Id
             && PrimarySpelling == other.PrimarySpelling
             && (other.Readings is not null
-                ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
+                ? Readings?.SequenceEqual(other.Readings) ?? false
                 : Readings is null)
-            && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
+            && Definitions.SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
     }
 
     public bool Equals(JmdictRecord? other)
@@ -502,9 +502,9 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             && (ReferenceEquals(this, other) || (Id == other.Id
             && PrimarySpelling == other.PrimarySpelling
             && (other.Readings is not null
-                ? Readings?.AsReadOnlySpan().SequenceEqual(other.Readings) ?? false
+                ? Readings?.SequenceEqual(other.Readings) ?? false
                 : Readings is null)
-            && Definitions.AsReadOnlySpan().SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
+            && Definitions.SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
     }
 
     public static bool operator ==(JmdictRecord? left, JmdictRecord? right) => left?.Equals(right) ?? (right is null);

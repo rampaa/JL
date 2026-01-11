@@ -443,7 +443,7 @@ internal static class JmdictRecordBuilder
         ReadOnlySpan<string[]> senseFieldSpan = senseField.AsReadOnlySpan();
         for (int i = 1; i < senseFieldSpan.Length; i++)
         {
-            ReadOnlySpan<string> sensesSpan = senseFieldSpan[i].AsReadOnlySpan();
+            ReadOnlySpan<string> sensesSpan = senseFieldSpan[i];
             for (int j = sharedSenseCandidates.Count - 1; j >= 0; j--)
             {
                 string sharedSenseCandidate = sharedSenseCandidates[j];
@@ -462,7 +462,7 @@ internal static class JmdictRecordBuilder
         string[]?[]? exclusiveSenseFieldValues = null;
         for (int i = 0; i < senseFieldSpan.Length; i++)
         {
-            ReadOnlySpan<string> senseSpan = senseFieldSpan[i].AsReadOnlySpan();
+            ReadOnlySpan<string> senseSpan = senseFieldSpan[i];
             List<string>? currentExclusiveList = null;
             foreach (string sense in senseSpan)
             {

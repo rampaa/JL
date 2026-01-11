@@ -252,12 +252,6 @@ public static class ExtensionMethods
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[]? array)
-    {
-        return new ReadOnlySpan<T>(array);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[]? array, int start, int length)
     {
         return new ReadOnlySpan<T>(array, start, length);
