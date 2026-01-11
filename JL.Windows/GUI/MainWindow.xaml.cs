@@ -71,6 +71,9 @@ internal sealed partial class MainWindow : IDisposable
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
 
+    private static readonly AtomicBool s_closingEventStarted = new(false);
+    private static readonly AtomicBool s_cleanupStarted = new(false);
+
     private MainWindow()
     {
         InitializeComponent();
@@ -711,11 +714,25 @@ internal sealed partial class MainWindow : IDisposable
     // ReSharper disable once AsyncVoidMethod
     private async void MainWindow_Closing(object sender, CancelEventArgs e)
     {
-        await HandleAppClosing().ConfigureAwait(false);
+        e.Cancel = true;
+
+        if (!s_closingEventStarted.TrySetTrue())
+        {
+            return;
+        }
+
+        Hide();
+        await HandleAppClosing().ConfigureAwait(true);
+        Application.Current.Shutdown();
     }
 
     public async Task HandleAppClosing()
     {
+        if (!s_cleanupStarted.TrySetTrue())
+        {
+            return;
+        }
+
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         WinApi.UnsubscribeFromWndProc(this);
 

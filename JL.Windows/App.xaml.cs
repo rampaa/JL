@@ -109,14 +109,10 @@ internal sealed partial class App
         LoggerManager.Logger.Fatal(args.Exception, "Unobserved task exception");
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)
+    private void Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)
     {
         GUI.MainWindow? mainWindow = (GUI.MainWindow?)MainWindow;
-        if (mainWindow is not null)
-        {
-            await mainWindow.HandleAppClosing().ConfigureAwait(false);
-        }
+        mainWindow?.HandleAppClosing().GetAwaiter().GetResult();
     }
 
     private static bool HasModifyPermission(string folderPath)
