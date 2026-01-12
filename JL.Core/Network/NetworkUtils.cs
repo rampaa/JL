@@ -64,7 +64,7 @@ public static class NetworkUtils
                                 ? "x64"
                                 : "x86";
 
-                        JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
+                        JsonElement assets = rootElement.GetProperty("assets");
 
                         foreach (JsonElement asset in assets.EnumerateArray())
                         {
