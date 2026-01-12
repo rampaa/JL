@@ -23,7 +23,8 @@ internal static class PopupWindowUtils
     public static readonly PopupWindow?[] PopupWindows = new PopupWindow?[MaxPopupWindowsIndex + 2];
     public static readonly Timer PopupAutoHideTimer = new()
     {
-        AutoReset = false
+        AutoReset = false,
+        Enabled = false
     };
 
     private static string? s_primarySpellingOfLastPlayedAudio;

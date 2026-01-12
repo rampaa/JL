@@ -1123,6 +1123,31 @@
                                 </DockPanel>
                             </ListBoxItem>
 
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Automatically enables mining mode after a configurable delay set by the &quot;Mining mode activation delay (in milliseconds)&quot; setting.
+                                         &#10;Other lookup modes enable mining mode immediately and are not affected by this setting.">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Automatically enable mining mode"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}" />
+                                    <CheckBox x:Name="AutoEnableMiningModeForMouseMoveCheckBox"  HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="The delay before mining mode is automatically enabled.
+                                         &#10;Applied only to the &quot;Mouse move&quot; lookup mode when automatic activation is enabled.">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Mining mode activation delay (in milliseconds)"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <hc:NumericUpDown x:Name="AutoEnableMiningModeForMouseMoveDelayInMillisecondsNumericUpDown" Maximum="999999999" Minimum="1" DecimalPlaces="0"
+                                              HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Disable lookups for non-Japanese characters"

@@ -55,6 +55,7 @@ internal sealed partial class MainWindow : IDisposable
     private InputMethod? _input;
     private Point _lastMouseMovePosition;
     private readonly Timer _lookupDelayTimer;
+    private readonly Timer _tsukikageLookupDelayTimer;
     private int _lastCharPosition = -1;
 
     private string? _webSocketTextToProcess;
@@ -86,6 +87,13 @@ internal sealed partial class MainWindow : IDisposable
             Enabled = false
         };
         _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
+
+        _tsukikageLookupDelayTimer = new()
+        {
+            AutoReset = false,
+            Enabled = false
+        };
+        _tsukikageLookupDelayTimer.Elapsed += TsukikageLookupDelayTimer_Elapsed;
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -240,7 +248,14 @@ internal sealed partial class MainWindow : IDisposable
                     }
 
                     bool enableMiningMode = tsukikage && configManager.MiningModeMouseButton.IsPressed();
-                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, enableMiningMode, true, verticalText).ConfigureAwait(true);
+                    if (!tsukikage || configManager.MainWindowLookupDelay is 0)
+                    {
+                        await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, enableMiningMode, true, verticalText).ConfigureAwait(true);
+                    }
+                    else
+                    {
+                        InitDelayedLookup(charIndex);
+                    }
                 }, DispatcherPriority.Send).Task.ConfigureAwait(true);
             }
         }
@@ -266,6 +281,9 @@ internal sealed partial class MainWindow : IDisposable
             {
                 FirstPopupWindow.HidePopup();
             }
+
+            _lookupDelayTimer.Enabled = false;
+            _tsukikageLookupDelayTimer.Enabled = false;
 
             return false;
         }
@@ -301,6 +319,8 @@ internal sealed partial class MainWindow : IDisposable
 
             if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
             {
+                _lookupDelayTimer.Enabled = false;
+                _tsukikageLookupDelayTimer.Enabled = false;
                 MainTextBox.Text = BacklogUtils.LastItem;
             }
 
@@ -321,6 +341,8 @@ internal sealed partial class MainWindow : IDisposable
                 {
                     if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
                     {
+                        _lookupDelayTimer.Enabled = false;
+                        _tsukikageLookupDelayTimer.Enabled = false;
                         MainTextBox.Text = BacklogUtils.LastItem;
                     }
 
@@ -355,6 +377,8 @@ internal sealed partial class MainWindow : IDisposable
             }
         }
 
+        _lookupDelayTimer.Enabled = false;
+        _tsukikageLookupDelayTimer.Enabled = false;
         bool backlogActive = configManager.MaxBacklogCapacity is not 0;
         mergeTexts = mergeTexts && subsequentText is not null;
         bool doNotShowAllBacklog = !backlogActive || !configManager.AlwaysShowBacklog;
@@ -509,7 +533,7 @@ internal sealed partial class MainWindow : IDisposable
             PopupWindowUtils.TransparentDueToAutoLookup = false;
         }
 
-        if (!_lookupDelayTimer.Enabled)
+        if (configManager.MainWindowLookupDelay is 0)
         {
             return FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, false);
         }
@@ -518,16 +542,22 @@ internal sealed partial class MainWindow : IDisposable
         return Task.CompletedTask;
     }
 
-    public void InitLookupDelayTimer(int delayInMilliseconds)
+    private void InitDelayedLookup(int charPosition)
     {
-        if (delayInMilliseconds is 0)
+        if (char.IsLowSurrogate(MainTextBox.Text[charPosition]))
         {
-            _lookupDelayTimer.Enabled = false;
+            --charPosition;
         }
-        else
+
+        if (charPosition != _lastCharPosition)
         {
-            _lookupDelayTimer.Interval = delayInMilliseconds;
-            _lookupDelayTimer.Enabled = true;
+            _tsukikageLookupDelayTimer.Enabled = false;
+            _lastCharPosition = charPosition;
+            _tsukikageLookupDelayTimer.Enabled = true;
+        }
+        else if (FirstPopupWindow.Opacity is 0)
+        {
+            _tsukikageLookupDelayTimer.Enabled = true;
         }
     }
 
@@ -564,6 +594,11 @@ internal sealed partial class MainWindow : IDisposable
         Dispatcher.Invoke(HandleDelayedLookup);
     }
 
+    private async void TsukikageLookupDelayTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    {
+        await Dispatcher.Invoke(HandleDelayedLookupForTsukikage).ConfigureAwait(false);
+    }
+
     private void HandleDelayedLookup()
     {
         if (WindowState is WindowState.Minimized
@@ -593,6 +628,29 @@ internal sealed partial class MainWindow : IDisposable
         {
             _lastCharPosition = charPosition;
         }
+    }
+
+    private async Task HandleDelayedLookupForTsukikage()
+    {
+        if (WindowState is WindowState.Minimized
+            || MainTextBoxContextMenu.IsVisible
+            || TitleBarContextMenu.IsVisible)
+        {
+            return;
+        }
+
+        int charPosition = _lastCharPosition;
+        if (charPosition < 0)
+        {
+            return;
+        }
+
+        if (char.IsLowSurrogate(MainTextBox.Text[charPosition]))
+        {
+            --charPosition;
+        }
+
+        await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charPosition, false, true, WindowsUtils.LastWebSocketTextWasVertical).ConfigureAwait(true);
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -1503,6 +1561,7 @@ internal sealed partial class MainWindow : IDisposable
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         _lookupDelayTimer.Enabled = false;
+        _tsukikageLookupDelayTimer.Enabled = false;
 
         if (e.ChangedButton == ConfigManager.Instance.MiningModeMouseButton && FirstPopupWindow is { Opacity: not 0, MiningMode: false })
         {
@@ -1879,6 +1938,7 @@ internal sealed partial class MainWindow : IDisposable
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         _lookupDelayTimer.Enabled = false;
+        _tsukikageLookupDelayTimer.Enabled = false;
 
         ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating);
@@ -2172,7 +2232,8 @@ internal sealed partial class MainWindow : IDisposable
 
     private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        _lookupDelayTimer?.Stop();
+        _lookupDelayTimer.Enabled = false;
+        _tsukikageLookupDelayTimer.Enabled = false;
 
         if (FirstPopupWindow.Opacity is not 0)
         {
@@ -2497,5 +2558,8 @@ internal sealed partial class MainWindow : IDisposable
     {
         _lookupDelayTimer.Elapsed -= LookupDelayTimer_Elapsed;
         _lookupDelayTimer.Dispose();
+
+        _tsukikageLookupDelayTimer.Elapsed -= TsukikageLookupDelayTimer_Elapsed;
+        _tsukikageLookupDelayTimer.Dispose();
     }
 }

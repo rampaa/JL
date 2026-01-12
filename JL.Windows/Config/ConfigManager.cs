@@ -147,6 +147,8 @@ internal sealed class ConfigManager
     public bool HideDictTabsWithNoResults { get; private set; } = true;
     public bool ShowDictionaryTabsInMiningMode { get; private set; } = true;
     public double PopupDictionaryTabFontSize { get; private set; } = 12;
+    public bool AutoEnableMiningModeForMouseMove { get; private set; } // = false;
+    public double AutoEnableMiningModeForMouseMoveDelayInMilliseconds { get; private set; } = 2000;
     public bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } // = false;
     public double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
     public bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } // = false;
@@ -355,6 +357,7 @@ internal sealed class ConfigManager
         PopupDynamicWidth = ConfigDBManager.GetValueFromConfig(connection, configs, PopupDynamicWidth, nameof(PopupDynamicWidth));
         HideDictTabsWithNoResults = ConfigDBManager.GetValueFromConfig(connection, configs, HideDictTabsWithNoResults, nameof(HideDictTabsWithNoResults));
         AutoHidePopupIfMouseIsNotOverIt = ConfigDBManager.GetValueFromConfig(connection, configs, AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt));
+        AutoEnableMiningModeForMouseMove = ConfigDBManager.GetValueFromConfig(connection, configs, AutoEnableMiningModeForMouseMove, nameof(AutoEnableMiningModeForMouseMove));
         AutoLookupFirstTermWhenTextIsCopiedFromClipboard = ConfigDBManager.GetValueFromConfig(connection, configs, AutoLookupFirstTermWhenTextIsCopiedFromClipboard, nameof(AutoLookupFirstTermWhenTextIsCopiedFromClipboard));
         AutoLookupFirstTermWhenTextIsCopiedFromWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, AutoLookupFirstTermWhenTextIsCopiedFromWebSocket, nameof(AutoLookupFirstTermWhenTextIsCopiedFromWebSocket));
         AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized = ConfigDBManager.GetValueFromConfig(connection, configs, AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized));
@@ -447,8 +450,6 @@ internal sealed class ConfigManager
         }
 
         MainWindowLookupDelay = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowLookupDelay, nameof(MainWindowLookupDelay));
-        MainWindow.Instance.InitLookupDelayTimer(MainWindowLookupDelay);
-
         PopupLookupDelay = ConfigDBManager.GetValueFromConfig(connection, configs, PopupLookupDelay, nameof(PopupLookupDelay));
         MaxSearchLength = ConfigDBManager.GetValueFromConfig(connection, configs, MaxSearchLength, nameof(MaxSearchLength));
         PrimarySpellingFontSize = ConfigDBManager.GetValueFromConfig(connection, configs, PrimarySpellingFontSize, nameof(PrimarySpellingFontSize));
@@ -482,6 +483,8 @@ internal sealed class ConfigManager
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetValueFromConfig(connection, configs, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds));
         PopupWindowUtils.PopupAutoHideTimer.Enabled = false;
         PopupWindowUtils.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
+
+        AutoEnableMiningModeForMouseMoveDelayInMilliseconds = ConfigDBManager.GetValueFromConfig(connection, configs, AutoEnableMiningModeForMouseMoveDelayInMilliseconds, nameof(AutoEnableMiningModeForMouseMoveDelayInMilliseconds));
 
         DpiScale dpi = WindowsUtils.Dpi;
 
@@ -894,8 +897,6 @@ internal sealed class ConfigManager
             currentPopupWindow.DictTabButtonsItemsControlToggleVisibilityOfDictTabsMenuItem.SetInputGestureText(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
             currentPopupWindow.DictTabButtonsItemsControlHidePopupMenuItem.SetInputGestureText(ClosePopupKeyGesture);
 
-            currentPopupWindow.InitLookupDelayTimer(PopupLookupDelay);
-
             currentPopupWindow = PopupWindowUtils.PopupWindows[currentPopupWindow.PopupIndex + 1];
         }
 
@@ -1160,6 +1161,7 @@ internal sealed class ConfigManager
         preferenceWindow.TextBoxCustomLineHeightNumericUpDown.Value = TextBoxCustomLineHeight;
         preferenceWindow.PopupDictionaryTabFontSizeNumericUpDown.Value = PopupDictionaryTabFontSize;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
+        preferenceWindow.AutoEnableMiningModeForMouseMoveDelayInMillisecondsNumericUpDown.Value = AutoEnableMiningModeForMouseMoveDelayInMilliseconds;
         preferenceWindow.MinCharactersPerMinuteBeforeStoppingTimeTrackingNumericUpDown.Value = coreConfigManager.MinCharactersPerMinuteBeforeStoppingTimeTracking;
         preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
         preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
@@ -1182,6 +1184,7 @@ internal sealed class ConfigManager
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
         preferenceWindow.HideDictTabsWithNoResultsCheckBox.IsChecked = HideDictTabsWithNoResults;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked = AutoHidePopupIfMouseIsNotOverIt;
+        preferenceWindow.AutoEnableMiningModeForMouseMoveCheckBox.IsChecked = AutoEnableMiningModeForMouseMove;
 
         preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromClipboardCheckBox.IsChecked = AutoLookupFirstTermWhenTextIsCopiedFromClipboard;
         preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromWebSocketCheckBox.IsChecked = AutoLookupFirstTermWhenTextIsCopiedFromWebSocket;
@@ -1673,11 +1676,17 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(AutoHidePopupIfMouseIsNotOverIt),
                 preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked.ToString());
 
+            ConfigDBManager.UpdateSetting(connection, nameof(AutoEnableMiningModeForMouseMove),
+                preferenceWindow.AutoEnableMiningModeForMouseMoveCheckBox.IsChecked.ToString());
+
             ConfigDBManager.UpdateSetting(connection, nameof(PopupDictionaryTabFontSize),
                 preferenceWindow.PopupDictionaryTabFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds),
                 preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
+
+            ConfigDBManager.UpdateSetting(connection, nameof(AutoEnableMiningModeForMouseMoveDelayInMilliseconds),
+                preferenceWindow.AutoEnableMiningModeForMouseMoveDelayInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.MinCharactersPerMinuteBeforeStoppingTimeTracking),
                 preferenceWindow.MinCharactersPerMinuteBeforeStoppingTimeTrackingNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));

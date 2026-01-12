@@ -43,6 +43,7 @@ internal sealed partial class PopupWindow : IDisposable
     private string _currentSourceText = "";
 
     private readonly Timer _lookupDelayTimer;
+    private readonly Timer _enableMiningModeTimer;
 
     public Button AllDictionaryTabButton { get; } = new()
     {
@@ -96,6 +97,13 @@ internal sealed partial class PopupWindow : IDisposable
         };
         _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
 
+        _enableMiningModeTimer = new Timer
+        {
+            AutoReset = false,
+            Enabled = false
+        };
+        _enableMiningModeTimer.Elapsed += EnableMiningModeTimer_Elapsed;
+
         Init();
     }
 
@@ -138,8 +146,6 @@ internal sealed partial class PopupWindow : IDisposable
         AllDictionaryTabButton.Click += DictTypeButtonOnClick;
 
         AddMenuItemsToEditableTextBoxContextMenu();
-
-        InitLookupDelayTimer(configManager.PopupLookupDelay);
     }
 
     private void AddMenuItemsToEditableTextBoxContextMenu()
@@ -423,6 +429,12 @@ internal sealed partial class PopupWindow : IDisposable
             else
             {
                 DisplayResults();
+                if (configManager.AutoEnableMiningModeForMouseMove)
+                {
+                    Debug.Assert(configManager.AutoEnableMiningModeForMouseMoveDelayInMilliseconds > 0);
+                    _enableMiningModeTimer.Interval = configManager.AutoEnableMiningModeForMouseMoveDelayInMilliseconds;
+                    _enableMiningModeTimer.Enabled = true;
+                }
             }
 
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
@@ -961,7 +973,7 @@ internal sealed partial class PopupWindow : IDisposable
         }
 
         _lastInteractedTextBox = textBox;
-        if (!_lookupDelayTimer.Enabled)
+        if (configManager.PopupLookupDelay > 0)
         {
             if (childPopupWindow is null)
             {
@@ -980,19 +992,6 @@ internal sealed partial class PopupWindow : IDisposable
 
         InitDelayedLookup(textBox, childPopupWindow);
         return Task.CompletedTask;
-    }
-
-    public void InitLookupDelayTimer(int delayInMilliseconds)
-    {
-        if (delayInMilliseconds is 0)
-        {
-            _lookupDelayTimer.Enabled = false;
-        }
-        else
-        {
-            _lookupDelayTimer.Interval = delayInMilliseconds;
-            _lookupDelayTimer.Enabled = true;
-        }
     }
 
     private void InitDelayedLookup(TextBox textBox, PopupWindow? childPopupWindow)
@@ -1029,6 +1028,11 @@ internal sealed partial class PopupWindow : IDisposable
         {
             Dispatcher.Invoke(HandleDelayedLookup);
         }
+    }
+
+    private void EnableMiningModeTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    {
+        Dispatcher.Invoke(HandleMiningModeKeyGesture);
     }
 
     private void HandleDelayedLookup()
@@ -2253,6 +2257,7 @@ internal sealed partial class PopupWindow : IDisposable
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         _lookupDelayTimer.Enabled = false;
+        _enableMiningModeTimer.Enabled = false;
         ReadingSelectionWindow.HideWindow();
         MiningSelectionWindow.CloseWindow();
 
@@ -2317,6 +2322,9 @@ internal sealed partial class PopupWindow : IDisposable
 
         ReadingSelectionWindow.HideWindow();
         MiningSelectionWindow.CloseWindow();
+
+        _lookupDelayTimer.Enabled = false;
+        _enableMiningModeTimer.Enabled = false;
 
         PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
         bool isFirstPopup = PopupIndex is 0;
@@ -2389,6 +2397,7 @@ internal sealed partial class PopupWindow : IDisposable
     private void HandleContextMenuOpening()
     {
         _lookupDelayTimer.Enabled = false;
+        _enableMiningModeTimer.Enabled = false;
         _contextMenuIsOpening = true;
         PopupWindowUtils.HidePopups(PopupIndex + 1);
         _contextMenuIsOpening = false;
@@ -2551,5 +2560,8 @@ internal sealed partial class PopupWindow : IDisposable
 
         _lookupDelayTimer.Elapsed -= LookupDelayTimer_Elapsed;
         _lookupDelayTimer.Dispose();
+
+        _enableMiningModeTimer.Elapsed -= EnableMiningModeTimer_Elapsed;
+        _enableMiningModeTimer.Dispose();
     }
 }
