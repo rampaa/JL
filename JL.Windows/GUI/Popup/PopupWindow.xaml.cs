@@ -1014,10 +1014,13 @@ internal sealed partial class PopupWindow : IDisposable
         {
             _lookupDelayTimer.Enabled = false;
             _lastCharPosition = charPosition;
+            _lookupDelayTimer.Interval = ConfigManager.Instance.PopupLookupDelay;
             _lookupDelayTimer.Enabled = true;
         }
-        else if (childPopupWindow is null || childPopupWindow.Opacity is 0)
+        else if (!_lookupDelayTimer.Enabled
+            && (childPopupWindow is null || childPopupWindow.Opacity is 0))
         {
+            _lookupDelayTimer.Interval = ConfigManager.Instance.PopupLookupDelay;
             _lookupDelayTimer.Enabled = true;
         }
     }

@@ -553,10 +553,12 @@ internal sealed partial class MainWindow : IDisposable
         {
             _tsukikageLookupDelayTimer.Enabled = false;
             _lastCharPosition = charPosition;
+            _tsukikageLookupDelayTimer.Interval = ConfigManager.Instance.MainWindowLookupDelay;
             _tsukikageLookupDelayTimer.Enabled = true;
         }
-        else if (FirstPopupWindow.Opacity is 0)
+        else if (FirstPopupWindow.Opacity is 0 && !_tsukikageLookupDelayTimer.Enabled)
         {
+            _tsukikageLookupDelayTimer.Interval = ConfigManager.Instance.MainWindowLookupDelay;
             _tsukikageLookupDelayTimer.Enabled = true;
         }
     }
@@ -581,10 +583,12 @@ internal sealed partial class MainWindow : IDisposable
         {
             _lookupDelayTimer.Enabled = false;
             _lastCharPosition = charPosition;
+            _lookupDelayTimer.Interval = ConfigManager.Instance.MainWindowLookupDelay;
             _lookupDelayTimer.Enabled = true;
         }
-        else if (FirstPopupWindow.Opacity is 0)
+        else if (FirstPopupWindow.Opacity is 0 && !_lookupDelayTimer.Enabled)
         {
+            _lookupDelayTimer.Interval = ConfigManager.Instance.MainWindowLookupDelay;
             _lookupDelayTimer.Enabled = true;
         }
     }
