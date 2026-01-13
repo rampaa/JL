@@ -32,6 +32,7 @@ internal sealed class ConfigManager
     public bool LookupOnSelectOnly { get; private set; } // = false;
     public bool LookupOnMouseClickOnly { get; private set; } // = false;
     public KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
+    public bool EnableMiningModeForDelayedLookups { get; private set; } // = false;
     public bool HighlightLongestMatch { get; private set; } // = false;
     public bool AutoPlayAudio { get; private set; } // = false;
     public bool Focusable { get; private set; } = true;
@@ -317,6 +318,7 @@ internal sealed class ConfigManager
         MainWindow.Instance.MainTextBox.VerticalContentAlignment = MainWindowTextVerticalAlignment;
 
         AutoAdjustFontSizesOnResolutionChange = ConfigDBManager.GetValueFromConfig(connection, configs, AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange));
+        EnableMiningModeForDelayedLookups = ConfigDBManager.GetValueFromConfig(connection, configs, EnableMiningModeForDelayedLookups, nameof(EnableMiningModeForDelayedLookups));
         HighlightLongestMatch = ConfigDBManager.GetValueFromConfig(connection, configs, HighlightLongestMatch, nameof(HighlightLongestMatch));
         AutoPlayAudio = ConfigDBManager.GetValueFromConfig(connection, configs, AutoPlayAudio, nameof(AutoPlayAudio));
         GlobalHotKeys = ConfigDBManager.GetValueFromConfig(connection, configs, GlobalHotKeys, nameof(GlobalHotKeys));
@@ -1031,6 +1033,7 @@ internal sealed class ConfigManager
         preferenceWindow.CheckEntireCollectionForDuplicatesCheckBox.IsChecked = coreConfigManager.CheckEntireCollectionForDuplicates;
         preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked = coreConfigManager.CheckForDuplicateCards;
         preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked = AutoAdjustFontSizesOnResolutionChange;
+        preferenceWindow.EnableMiningModeForDelayedLookupsCheckBox.IsChecked = EnableMiningModeForDelayedLookups;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = coreConfigManager.CheckForJLUpdatesOnStartUp;
@@ -1490,6 +1493,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(AutoAdjustFontSizesOnResolutionChange),
                 preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(EnableMiningModeForDelayedLookups),
+                preferenceWindow.EnableMiningModeForDelayedLookupsCheckBox.IsChecked.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(HighlightLongestMatch),
                 preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString());

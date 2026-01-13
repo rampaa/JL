@@ -622,7 +622,7 @@ internal sealed partial class MainWindow : IDisposable
 
         if (charPosition == _lastCharPosition)
         {
-            FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, false).SafeFireAndForget("LookupOnMouseMoveOrClick failed unexpectedly");
+            FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, ConfigManager.Instance.EnableMiningModeForDelayedLookups).SafeFireAndForget("LookupOnMouseMoveOrClick failed unexpectedly");
         }
         else
         {
@@ -650,7 +650,7 @@ internal sealed partial class MainWindow : IDisposable
             --charPosition;
         }
 
-        await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charPosition, false, true, WindowsUtils.LastWebSocketTextWasVertical).ConfigureAwait(true);
+        await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charPosition, ConfigManager.Instance.EnableMiningModeForDelayedLookups, true, WindowsUtils.LastWebSocketTextWasVertical).ConfigureAwait(true);
     }
 
     // ReSharper disable once AsyncVoidMethod
