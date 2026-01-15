@@ -9,13 +9,15 @@ internal sealed class CustomNameRecord : IDictRecordWithSingleReading, IEquatabl
     public string? Reading { get; }
     private string NameType { get; }
     private string? ExtraInfo { get; }
+    public string? ImagePath { get; }
 
-    public CustomNameRecord(string primarySpelling, string? reading, string nameType, string? extraInfo)
+    public CustomNameRecord(string primarySpelling, string? reading, string nameType, string? extraInfo, string? imagePath)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
         NameType = nameType;
         ExtraInfo = extraInfo;
+        ImagePath = imagePath;
     }
 
     public string BuildFormattedDefinition()
@@ -29,7 +31,8 @@ internal sealed class CustomNameRecord : IDictRecordWithSingleReading, IEquatabl
                && PrimarySpelling == customNameRecord.PrimarySpelling
                && Reading == customNameRecord.Reading
                && NameType == customNameRecord.NameType
-               && ExtraInfo == customNameRecord.ExtraInfo;
+               && ExtraInfo == customNameRecord.ExtraInfo
+               && ImagePath == customNameRecord.ImagePath;
     }
 
     public bool Equals([NotNullWhen(true)] CustomNameRecord? other)
@@ -38,7 +41,8 @@ internal sealed class CustomNameRecord : IDictRecordWithSingleReading, IEquatabl
                && PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
                && NameType == other.NameType
-               && ExtraInfo == other.ExtraInfo;
+               && ExtraInfo == other.ExtraInfo
+               && ImagePath == other.ImagePath;
     }
 
     public override int GetHashCode()
@@ -46,7 +50,8 @@ internal sealed class CustomNameRecord : IDictRecordWithSingleReading, IEquatabl
         return HashCode.Combine(PrimarySpelling.GetHashCode(StringComparison.Ordinal),
             Reading?.GetHashCode(StringComparison.Ordinal) ?? 37,
             NameType.GetHashCode(StringComparison.Ordinal),
-            ExtraInfo?.GetHashCode(StringComparison.Ordinal) ?? 37);
+            ExtraInfo?.GetHashCode(StringComparison.Ordinal) ?? 37,
+            ImagePath?.GetHashCode(StringComparison.Ordinal) ?? 37);
     }
 
     public static bool operator ==(CustomNameRecord? left, CustomNameRecord? right) => left?.Equals(right) ?? (right is null);

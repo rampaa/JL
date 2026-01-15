@@ -15,7 +15,7 @@ public static class CustomNameLoader
 
         IDictionary<string, IList<IDictRecord>> customNameDictionary = dict.Contents;
 
-        Span<Range> tabRanges = stackalloc Range[4];
+        Span<Range> tabRanges = stackalloc Range[5];
         foreach (string line in File.ReadLines(fullPath))
         {
             if (cancellationToken.IsCancellationRequested)
@@ -30,12 +30,21 @@ public static class CustomNameLoader
             if (tabCount >= 3)
             {
                 string? extraInfo = null;
-                if (tabCount is 4)
+                string? imagePath = null;
+                if (tabCount is >= 4)
                 {
                     ReadOnlySpan<char> extraInfoSpan = lineSpan[tabRanges[3]];
                     extraInfo = extraInfoSpan.Length is 0
                         ? null
                         : extraInfoSpan.ToString().Replace("\\n", "\n", StringComparison.Ordinal);
+
+                    if (tabCount is 5)
+                    {
+                        ReadOnlySpan<char> imagePathSpan = lineSpan[tabRanges[4]];
+                        imagePath = imagePathSpan.Length is 0
+                            ? null
+                            : imagePathSpan.ToString();
+                    }
                 }
 
                 string nameType = lineSpan[tabRanges[2]].ToString();
@@ -47,14 +56,14 @@ public static class CustomNameLoader
                     reading = null;
                 }
 
-                AddToDictionary(spelling, reading, nameType, extraInfo, customNameDictionary);
+                AddToDictionary(spelling, reading, nameType, extraInfo, imagePath, customNameDictionary);
             }
         }
     }
 
-    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, IDictionary<string, IList<IDictRecord>> customNameDictionary)
+    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, string? imagePath, IDictionary<string, IList<IDictRecord>> customNameDictionary)
     {
-        CustomNameRecord newNameRecord = new(spelling, reading, nameType, extraInfo);
+        CustomNameRecord newNameRecord = new(spelling, reading, nameType, extraInfo, imagePath);
 
         string spellingInHiragana = JapaneseUtils.NormalizeText(spelling);
         if (customNameDictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? entry))

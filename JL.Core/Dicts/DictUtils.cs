@@ -71,7 +71,8 @@ public static class DictUtils
                 true, 0, 128,
                 new DictOptions(
                     new UseDBOption(false),
-                    new NoAllOption(false)),
+                    new NoAllOption(false),
+                    showImages: new ShowImagesOption(true)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -96,7 +97,8 @@ public static class DictUtils
                 true, 2, 128,
                 new DictOptions(
                     new UseDBOption(false),
-                    new NoAllOption(false)),
+                    new NoAllOption(false),
+                    showImages: new ShowImagesOption(true)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -1579,6 +1581,10 @@ public static class DictUtils
         {
             DictOptions builtInCustomWordOptions = BuiltInDicts[nameof(DictType.CustomWordDictionary)].Options;
             dict.Options.NewlineBetweenDefinitions ??= builtInCustomWordOptions.NewlineBetweenDefinitions;
+        }
+        else if (dict.Type is DictType.CustomNameDictionary or DictType.ProfileCustomNameDictionary)
+        {
+            dict.Options.ShowImages = new ShowImagesOption(true);
         }
         else
         {

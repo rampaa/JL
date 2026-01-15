@@ -1437,7 +1437,8 @@ public static class LookupUtils
                         dict: customNameResult.Dict,
                         readings: readings,
                         formattedDefinitions: customNameDictResult.BuildFormattedDefinition(),
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(customNameDictResult.PrimarySpelling, readings, pitchAccentDict!) : null
+                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(customNameDictResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                        imagePaths: customNameDictResult.ImagePath is not null ? [customNameDictResult.ImagePath] : null
                     );
 
                     ++freq;
