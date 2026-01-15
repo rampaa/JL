@@ -14,13 +14,15 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
     public string? Reading { get; }
     public string[]? AlternativeSpellings { get; }
     public string[] Definitions { get; }
+    public string? ImagePath { get; }
 
-    public EpwingNazekaRecord(string primarySpelling, string? reading, string[]? alternativeSpellings, string[] definitions)
+    public EpwingNazekaRecord(string primarySpelling, string? reading, string[]? alternativeSpellings, string[] definitions, string? imagePath)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
         AlternativeSpellings = alternativeSpellings;
         Definitions = definitions;
+        ImagePath = imagePath;
     }
 
     public string BuildFormattedDefinition(DictOptions options)
@@ -122,6 +124,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         return obj is EpwingNazekaRecord other
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
+               && ImagePath == other.ImagePath
                && other.Definitions.SequenceEqual(Definitions)));
     }
 
@@ -130,6 +133,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         return other is not null
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
+               && ImagePath == other.ImagePath
                && other.Definitions.SequenceEqual(Definitions)));
     }
 
@@ -139,6 +143,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquata
         {
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = ((hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal)) ?? 37;
+            hash = ((hash * 37) + ImagePath?.GetHashCode(StringComparison.Ordinal)) ?? 37;
 
             foreach (string definition in Definitions)
             {

@@ -1266,7 +1266,8 @@ public static class LookupUtils
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
+                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                        imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
                     );
 
                     results.Add(result);
@@ -1322,7 +1323,8 @@ public static class LookupUtils
                     readings: readings,
                     kanjiLookupResult: new KanjiLookupResult(kanjiCompositions),
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
-                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null
+                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                    imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
                 );
 
                 results.Add(result);

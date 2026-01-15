@@ -79,7 +79,13 @@ internal static class EpwingNazekaLoader
                             ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
                             : primarySpelling.GetPooledString();
 
-                        EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions);
+                        string? imagePath = null;
+                        if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
+                        {
+                            imagePath = imagePathProperty.GetString();
+                        }
+
+                        EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions, imagePath);
                         AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict);
                         if (nonKanjiDict && nonNameDict)
                         {
@@ -105,14 +111,20 @@ internal static class EpwingNazekaLoader
 
                             if (primarySpellingInHiragana != alternativeSpellingInHiragana)
                             {
-                                AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions), nazekaEpwingDict);
+                                AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imagePath), nazekaEpwingDict);
                             }
                         }
                     }
 
                     else if (EpwingUtils.IsValidEpwingResultForDictType(reading, null, definitions, dict))
                     {
-                        EpwingNazekaRecord record = new(reading, null, null, definitions);
+                        string? imagePath = null;
+                        if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
+                        {
+                            imagePath = imagePathProperty.GetString();
+                        }
+
+                        EpwingNazekaRecord record = new(reading, null, null, definitions, imagePath);
                         AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.NormalizeText(reading).GetPooledString() : reading, record, nazekaEpwingDict);
                     }
                 }
