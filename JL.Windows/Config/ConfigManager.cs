@@ -4,13 +4,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
 using HandyControl.Data;
 using JL.Core.Config;
 using JL.Core.Frontend;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
+using JL.Windows.GUI.CustomControls;
 using JL.Windows.GUI.Popup;
 using JL.Windows.Interop;
 using JL.Windows.Utilities;
@@ -71,7 +71,7 @@ internal sealed class ConfigManager
     public double MainWindowMaxDynamicHeight { get; set; } = 269;
     public double MainWindowMinDynamicWidth { get; set; } = 125;
     public double MainWindowMinDynamicHeight { get; set; } = 50;
-    private bool TextBoxApplyDropShadowEffect { get; set; } = true;
+    private EffectMode MainTextBoxEffect { get; set; } = EffectMode.DropShadow;
     private bool HorizontallyCenterMainWindowText { get; set; } // = false;
     public bool DiscardIdenticalText { get; set; } // = false;
     public bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
@@ -428,28 +428,16 @@ internal sealed class ConfigManager
         MainTextBoxDropShadowEffectDirection = ConfigDBManager.GetValueFromConfig(connection, configs, MainTextBoxDropShadowEffectDirection, nameof(MainTextBoxDropShadowEffectDirection));
         MainTextBoxDropShadowEffectBlurRadius = ConfigDBManager.GetValueFromConfig(connection, configs, MainTextBoxDropShadowEffectBlurRadius, nameof(MainTextBoxDropShadowEffectBlurRadius));
         MainTextBoxDropShadowEffectBlurOpacity = ConfigDBManager.GetValueFromConfig(connection, configs, MainTextBoxDropShadowEffectBlurOpacity, nameof(MainTextBoxDropShadowEffectBlurOpacity));
-        TextBoxApplyDropShadowEffect = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect));
-        MainTextBoxDropShadowEffectColor = ConfigUtils.GetColorFromConfig(connection, configs, MainTextBoxDropShadowEffectColor, nameof(MainTextBoxDropShadowEffectColor));
-        if (TextBoxApplyDropShadowEffect)
-        {
-            DropShadowEffect dropShadowEffect = new()
-            {
-                Direction = MainTextBoxDropShadowEffectDirection,
-                BlurRadius = MainTextBoxDropShadowEffectBlurRadius,
-                ShadowDepth = MainTextBoxDropShadowEffectShadowDepth,
-                Opacity = MainTextBoxDropShadowEffectBlurOpacity / 100.0,
-                Color = MainTextBoxDropShadowEffectColor,
-                RenderingBias = RenderingBias.Quality
-            };
 
-            dropShadowEffect.Freeze();
-            MainWindow.Instance.MainTextBox.Effect = dropShadowEffect;
-        }
-
-        else
-        {
-            MainWindow.Instance.MainTextBox.Effect = null;
-        }
+        MainTextBoxEffect = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, MainTextBoxEffect, nameof(MainTextBoxEffect));
+        EffectWrapper mainTextBoxEffectWrapper = MainWindow.Instance.MainTextBoxEffectWrapper;
+        mainTextBoxEffectWrapper.EffectMode = MainTextBoxEffect;
+        mainTextBoxEffectWrapper.ShadowDirection = MainTextBoxDropShadowEffectDirection;
+        mainTextBoxEffectWrapper.EffectBlurRadius = MainTextBoxDropShadowEffectBlurRadius;
+        mainTextBoxEffectWrapper.EffectShadowDepth = MainTextBoxDropShadowEffectShadowDepth;
+        mainTextBoxEffectWrapper.EffectOpacity = MainTextBoxDropShadowEffectBlurOpacity / 100.0;
+        mainTextBoxEffectWrapper.EffectColor = MainTextBoxDropShadowEffectColor;
+        mainTextBoxEffectWrapper.RebuildEffects();
 
         MainWindowLookupDelay = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowLookupDelay, nameof(MainWindowLookupDelay));
         PopupLookupDelay = ConfigDBManager.GetValueFromConfig(connection, configs, PopupLookupDelay, nameof(PopupLookupDelay));
@@ -1076,7 +1064,6 @@ internal sealed class ConfigManager
         preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked = AlwaysShowMainTextBoxCaret;
         preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = coreConfigManager.TextBoxTrimWhiteSpaceCharacters;
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = coreConfigManager.TextBoxRemoveNewlines;
-        preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = coreConfigManager.CaptureTextFromClipboard;
         preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = coreConfigManager.CaptureTextFromWebSocket;
         preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked = coreConfigManager.AutoReconnectToWebSocket;
@@ -1196,6 +1183,7 @@ internal sealed class ConfigManager
 
         preferenceWindow.ThemeComboBox.SelectedValue = Theme;
         preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue = MainWindowTextVerticalAlignment;
+        preferenceWindow.MainTextBoxEffectComboBox.SelectedValue = MainTextBoxEffect;
 
         using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
         preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
@@ -1385,9 +1373,6 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.TextBoxRemoveNewlines),
                 preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked.ToString());
 
-            ConfigDBManager.UpdateSetting(connection, nameof(TextBoxApplyDropShadowEffect),
-                preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked.ToString());
-
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard),
                 preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked.ToString());
 
@@ -1461,7 +1446,7 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(Theme), preferenceWindow.ThemeComboBox.SelectedValue.ToString());
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowTextVerticalAlignment), preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue.ToString());
-
+            ConfigDBManager.UpdateSetting(connection, nameof(MainTextBoxEffect), preferenceWindow.MainTextBoxEffectComboBox.SelectedValue.ToString());
             ConfigDBManager.UpdateSetting(connection, "MinimumLogLevel", preferenceWindow.MinimumLogLevelComboBox.SelectedValue.ToString());
 
             ConfigDBManager.UpdateSetting(connection, "MainWindowFont", preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString());

@@ -747,16 +747,20 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="Add shadow to text"
-                                       Style="{StaticResource TextBlockDefault}"
+                                    <TextBlock HorizontalAlignment="Left" Text="Text effect" Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <CheckBox x:Name="TextBoxApplyDropShadowEffectCheckBox"  HorizontalAlignment="Right" />
+                                    <ComboBox x:Name="MainTextBoxEffectComboBox" HorizontalAlignment="Right"
+                                      SelectedValuePath="Tag" Width="Auto">
+                                        <ComboBoxItem Content="None" Tag="None" />
+                                        <ComboBoxItem Content="Shadow" Tag="DropShadow" />
+                                        <ComboBoxItem Content="Outline" Tag="Outline" />
+                                    </ComboBox>
                                 </DockPanel>
                             </ListBoxItem>
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="Shadow color"
+                                    <TextBlock HorizontalAlignment="Left" Text="Text effect color"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                                     <Button x:Name="MainTextBoxDropShadowEffectColorButton"  HorizontalAlignment="Right"
@@ -767,7 +771,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="Shadow depth"
+                                    <TextBlock HorizontalAlignment="Left" Text="Text effect shadow depth"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                                     <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectShadowDepthNumericUpDown" Maximum="10" Minimum="0" DecimalPlaces="1"
@@ -777,7 +781,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="Shadow blur radius"
+                                    <TextBlock HorizontalAlignment="Left" Text="Text effect blur radius"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                                     <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectBlurRadiusNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
@@ -787,7 +791,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="Shadow opacity"
+                                    <TextBlock HorizontalAlignment="Left" Text="Text effect opacity"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                                     <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectBlurOpacityNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
@@ -795,7 +799,9 @@
                                 </DockPanel>
                             </ListBoxItem>
 
-                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Ignored if &quot;Text effect&quot; is not set to &quot;Shadow &quot;">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Shadow direction (in degrees)"
                                        Style="{StaticResource TextBlockDefault}"

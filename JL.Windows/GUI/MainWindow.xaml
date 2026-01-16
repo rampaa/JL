@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="clr-namespace:JL.Windows.GUI.CustomControls"
         Title="JL"
         AllowsTransparency="True"
         mc:Ignorable="d" MinWidth="125" MinHeight="50" Width="800" Height="200" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
@@ -40,59 +41,60 @@
             </Rectangle.ContextMenu>
         </Rectangle>
 
-        <TextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        <c:EffectWrapper x:Name="MainTextBoxEffectWrapper" Margin="5,20,5,5">
+            <TextBox x:Name="MainTextBox" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                  Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
                  MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" PreviewTouchDown="MainTextBox_PreviewTouchDown" PreviewTouchUp="MainTextBox_PreviewTouchUp"
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" UndoLimit="0"
                  PreviewMouseUp="MainTextBox_PreviewMouseUp" ContextMenuOpening="MainTextBox_ContextMenuOpening" ContextMenuClosing="Window_ContextMenuClosing" AcceptsReturn="True" AcceptsTab="True">
-
-            <TextBox.ContextMenu>
-                <ContextMenu Name="MainTextBoxContextMenu" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight">
-                    <MenuItem
-                        Name="AddNameMenuItem"
-                        Header="Add name"
-                        Click="AddName" />
-                    <MenuItem
-                        Name="AddWordMenuItem"
-                        Header="Add word"
-                        Click="AddWord" />
-                    <MenuItem
-                        Header="Copy"
-                        Command="Copy"/>
-                    <MenuItem
-                        Name="EnableEditingMenuItem"
-                        Header="Enable editing"
-                        IsCheckable="True"
-                        Click="ToggleIsReadOnly" />
-                    <MenuItem
-                        Name="SearchMenuItem"
-                        Header="Search"
-                        Click="SearchWithBrowser" />
-                    <MenuItem
-                        Name="StatsMenuItem"
-                        Header="Stats"
-                        Click="ShowStats" />
-                    <MenuItem
-                        Name="ManageAudioSourcesMenuItem"
-                        Header="Manage audio sources"
-                        Click="ShowManageAudioSourcesWindow" />
-                    <MenuItem
-                        Name="ManageFrequenciesMenuItem"
-                        Header="Manage frequencies"
-                        Click="ShowManageFrequenciesWindow" />
-                    <MenuItem
-                        Name="ManageDictionariesMenuItem"
-                        Header="Manage dictionaries"
-                        Click="ShowManageDictionariesWindow" />
-                    <MenuItem
-                        Name="PreferencesMenuItem"
-                        Header="Preferences"
-                        Click="ShowPreferences" />
-                </ContextMenu>
-            </TextBox.ContextMenu>
-        </TextBox>
+                <TextBox.ContextMenu>
+                    <ContextMenu Name="MainTextBoxContextMenu" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight">
+                        <MenuItem
+                            Name="AddNameMenuItem"
+                            Header="Add name"
+                            Click="AddName" />
+                        <MenuItem
+                            Name="AddWordMenuItem"
+                            Header="Add word"
+                            Click="AddWord" />
+                        <MenuItem
+                            Header="Copy"
+                            Command="Copy"/>
+                        <MenuItem
+                            Name="EnableEditingMenuItem"
+                            Header="Enable editing"
+                            IsCheckable="True"
+                            Click="ToggleIsReadOnly" />
+                        <MenuItem
+                            Name="SearchMenuItem"
+                            Header="Search"
+                            Click="SearchWithBrowser" />
+                        <MenuItem
+                            Name="StatsMenuItem"
+                            Header="Stats"
+                            Click="ShowStats" />
+                        <MenuItem
+                            Name="ManageAudioSourcesMenuItem"
+                            Header="Manage audio sources"
+                            Click="ShowManageAudioSourcesWindow" />
+                        <MenuItem
+                            Name="ManageFrequenciesMenuItem"
+                            Header="Manage frequencies"
+                            Click="ShowManageFrequenciesWindow" />
+                        <MenuItem
+                            Name="ManageDictionariesMenuItem"
+                            Header="Manage dictionaries"
+                            Click="ShowManageDictionariesWindow" />
+                        <MenuItem
+                            Name="PreferencesMenuItem"
+                            Header="Preferences"
+                            Click="ShowPreferences" />
+                    </ContextMenu>
+                </TextBox.ContextMenu>
+            </TextBox>
+        </c:EffectWrapper>
 
         <DockPanel Margin="10,0,0,0" HorizontalAlignment="Left">
             <StackPanel Width="20">
