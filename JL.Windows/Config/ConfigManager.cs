@@ -428,6 +428,7 @@ internal sealed class ConfigManager
         MainTextBoxDropShadowEffectDirection = ConfigDBManager.GetValueFromConfig(connection, configs, MainTextBoxDropShadowEffectDirection, nameof(MainTextBoxDropShadowEffectDirection));
         MainTextBoxDropShadowEffectBlurRadius = ConfigDBManager.GetValueFromConfig(connection, configs, MainTextBoxDropShadowEffectBlurRadius, nameof(MainTextBoxDropShadowEffectBlurRadius));
         MainTextBoxDropShadowEffectBlurOpacity = ConfigDBManager.GetValueFromConfig(connection, configs, MainTextBoxDropShadowEffectBlurOpacity, nameof(MainTextBoxDropShadowEffectBlurOpacity));
+        MainTextBoxDropShadowEffectColor = ConfigUtils.GetColorFromConfig(connection, configs, MainTextBoxDropShadowEffectColor, nameof(MainTextBoxDropShadowEffectColor));
 
         MainTextBoxEffect = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, MainTextBoxEffect, nameof(MainTextBoxEffect));
         EffectWrapper mainTextBoxEffectWrapper = MainWindow.Instance.MainTextBoxEffectWrapper;

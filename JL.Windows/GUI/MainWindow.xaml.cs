@@ -81,14 +81,14 @@ internal sealed partial class MainWindow : IDisposable
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow(0);
 
-        _lookupDelayTimer = new()
+        _lookupDelayTimer = new Timer
         {
             AutoReset = false,
             Enabled = false
         };
         _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
 
-        _tsukikageLookupDelayTimer = new()
+        _tsukikageLookupDelayTimer = new Timer
         {
             AutoReset = false,
             Enabled = false

@@ -17,7 +17,7 @@ internal static class ExtensionMethods
                 return result;
             }
 
-            T? grandChild = GetChildOfType<T>(child);
+            T? grandChild = child.GetChildOfType<T>();
             if (grandChild is not null)
             {
                 return grandChild;
@@ -45,7 +45,7 @@ internal static class ExtensionMethods
             }
             else
             {
-                T? tChild = GetChildByName<T>(child, childName);
+                T? tChild = child.GetChildByName<T>(childName);
                 if (tChild is not null)
                 {
                     return tChild;

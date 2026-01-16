@@ -88,7 +88,7 @@ public sealed class CoreConfigManager
                 ConfigDBManager.InsertSetting(connection, nameof(TsukikageWebSocketUri), TsukikageWebSocketUri.OriginalString);
                 if (CaptureTextFromTsukikageWebsocket)
                 {
-                    WebSocketUtils.TsukikageWebSocketConnection = new(TsukikageWebSocketUri);
+                    WebSocketUtils.TsukikageWebSocketConnection = new WebSocketConnection(TsukikageWebSocketUri);
                     WebSocketUtils.TsukikageWebSocketConnection.Connect(false);
                 }
             }
@@ -108,7 +108,7 @@ public sealed class CoreConfigManager
 
                     if (CaptureTextFromTsukikageWebsocket)
                     {
-                        WebSocketUtils.TsukikageWebSocketConnection ??= new(webSocketUri);
+                        WebSocketUtils.TsukikageWebSocketConnection ??= new WebSocketConnection(webSocketUri);
                         WebSocketUtils.TsukikageWebSocketConnection.Connect(true);
                     }
                     else
@@ -184,7 +184,7 @@ public sealed class CoreConfigManager
                     }
                 }
 
-                if (!WebSocketUris.Select(w => w.OriginalString).SequenceEqual(newWebSocketUris.Select(w => w.OriginalString), StringComparer.Ordinal))
+                if (!WebSocketUris.Select(static w => w.OriginalString).SequenceEqual(newWebSocketUris.Select(static w => w.OriginalString), StringComparer.Ordinal))
                 {
                     WebSocketUris = newWebSocketUris;
                     ConfigDBManager.UpdateSetting(connection, nameof(WebSocketUris), string.Join('\n', WebSocketUris.Select(static ws => ws.OriginalString)));

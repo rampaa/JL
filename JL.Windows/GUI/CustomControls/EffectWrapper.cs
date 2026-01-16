@@ -6,8 +6,10 @@ using System.Windows.Media.Effects;
 
 namespace JL.Windows.GUI.CustomControls;
 
-internal class EffectWrapper : ContentControl
+#pragma warning disable CA1812 // Internal class that is apparently never instantiated
+internal sealed class EffectWrapper : ContentControl
 {
+#pragma warning restore CA1812 // Internal class that is apparently never instantiated
     public EffectMode EffectMode { get; set; } = EffectMode.DropShadow;
     public Color EffectColor { get; set; } = Colors.Black;
     public double EffectShadowDepth { get; set; } = 2;
@@ -44,7 +46,7 @@ internal class EffectWrapper : ContentControl
 
         for (int i = 0; i < 8; i++)
         {
-            _layers[i] = (Grid)GetTemplateChild($"DIRECTION_{i + 1}");
+            _layers[i] = (Grid?)GetTemplateChild($"DIRECTION_{i + 1}");
         }
 
         _templateInitialized = true;

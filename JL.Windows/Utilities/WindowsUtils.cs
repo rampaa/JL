@@ -347,8 +347,11 @@ internal static class WindowsUtils
             Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
             await using (downloadResponseStream.ConfigureAwait(false))
             {
-                using ZipArchive archive = new(downloadResponseStream);
-                await archive.ExtractToDirectoryAsync(tmpDirectory).ConfigureAwait(false);
+                ZipArchive archive = new(downloadResponseStream);
+                await using (archive.ConfigureAwait(false))
+                {
+                    await archive.ExtractToDirectoryAsync(tmpDirectory).ConfigureAwait(false);
+                }
             }
 
             Application? application = Application.Current;

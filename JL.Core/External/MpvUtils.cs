@@ -8,9 +8,9 @@ namespace JL.Core.External;
 
 public static class MpvUtils
 {
-    private static readonly ReadOnlyMemory<byte> s_getPausePropertyCommand = TextUtils.Utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"get_property\",\"pause\"]}\n");
-    private static readonly ReadOnlyMemory<byte> s_pauseCommand = TextUtils.Utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",true]}\n");
-    private static readonly ReadOnlyMemory<byte> s_unpauseCommand = TextUtils.Utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",false]}\n");
+    private static readonly ReadOnlyMemory<byte> s_getPausePropertyCommand = TextUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"get_property\",\"pause\"]}\n");
+    private static readonly ReadOnlyMemory<byte> s_pauseCommand = TextUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",true]}\n");
+    private static readonly ReadOnlyMemory<byte> s_unpauseCommand = TextUtils.s_utf8NoBom.GetBytes(/*lang=json,strict*/ "{\"command\":[\"set_property\",\"pause\",false]}\n");
 
     private static long s_lastPausedByJLTimestamp;
     private static bool s_pausedByJL; // = false

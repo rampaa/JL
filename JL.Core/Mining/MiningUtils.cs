@@ -1759,7 +1759,7 @@ public static class MiningUtils
             List<string> definitionsimagesFields = FindFields(JLField.DefinitionsImages, userFields);
             if (definitionsimagesFields.Count > 0)
             {
-                imageDictionaries = new(lookupResult.ImagePaths.Length + 1);
+                imageDictionaries = new List<Dictionary<string, object>>(lookupResult.ImagePaths.Length + 1);
                 for (int i = 0; i < lookupResult.ImagePaths.Length; i++)
                 {
                     string definitionsImagePath = lookupResult.ImagePaths[i];

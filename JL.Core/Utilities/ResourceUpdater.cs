@@ -285,8 +285,11 @@ public static class ResourceUpdater
 
     private static async Task DecompressZipStream(Stream stream, string destinationDirectory)
     {
-        using ZipArchive archive = new(stream, ZipArchiveMode.Read, false);
-        await archive.ExtractToDirectoryAsync(destinationDirectory).ConfigureAwait(false);
+        ZipArchive archive = new(stream, ZipArchiveMode.Read, false);
+        await using (archive.ConfigureAwait(false))
+        {
+            await archive.ExtractToDirectoryAsync(destinationDirectory).ConfigureAwait(false);
+        }
     }
 
     public static async Task UpdateJmdict(bool isUpdate, bool noPrompt)

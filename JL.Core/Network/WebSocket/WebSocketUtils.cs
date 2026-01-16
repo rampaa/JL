@@ -14,12 +14,11 @@ public static class WebSocketUtils
         }
     }
 
-    public static async Task DisconnectFromTsukikageWebSocketConnection()
+    public static Task DisconnectFromTsukikageWebSocketConnection()
     {
-        if (TsukikageWebSocketConnection is not null)
-        {
-            await TsukikageWebSocketConnection.Disconnect().ConfigureAwait(false);
-        }
+        return TsukikageWebSocketConnection is not null
+            ? TsukikageWebSocketConnection.Disconnect()
+            : Task.CompletedTask;
     }
 
     internal static async Task DisconnectFromWebSocket(Uri webSocketUri)

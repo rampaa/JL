@@ -103,7 +103,7 @@ internal sealed class WebSocketConnection : IDisposable
                                         totalBytesReceived += result.Count;
                                     }
 
-                                    string text = TextUtils.Utf8NoBom.GetString(buffer.Span[..totalBytesReceived]);
+                                    string text = TextUtils.s_utf8NoBom.GetString(buffer.Span[..totalBytesReceived]);
                                     FrontendManager.Frontend.CopyFromWebSocket(text, tsukikage).SafeFireAndForget("Frontend copy from WebSocket failed");
                                 }
                                 else if (result.MessageType is WebSocketMessageType.Close)

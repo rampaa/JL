@@ -31,7 +31,7 @@ public static class CustomNameLoader
             {
                 string? extraInfo = null;
                 string? imagePath = null;
-                if (tabCount is >= 4)
+                if (tabCount >= 4)
                 {
                     ReadOnlySpan<char> extraInfoSpan = lineSpan[tabRanges[3]];
                     extraInfo = extraInfoSpan.Length is 0
