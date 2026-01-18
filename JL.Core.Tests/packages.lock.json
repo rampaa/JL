@@ -77,26 +77,26 @@
       },
       "Microsoft.Data.Sqlite": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "qCod03ZbVomDbCRNTy7HXL//FcjKf8p06Lw/m2jcFKFvXGhwAfJ0m3rF2ekTmeRxtep+1LWTPciLFKgQepCqUg==",
+        "resolved": "10.0.2",
+        "contentHash": "kST8oJAIM1GBKZ9kpzqy+U7DAZ50m3whANKVc9NpL7PYFHmPRM1qIHjG99BsmhvUMwku+imJHWWi3kcG4OCs7Q==",
         "dependencies": {
-          "Microsoft.Data.Sqlite.Core": "10.0.1",
+          "Microsoft.Data.Sqlite.Core": "10.0.2",
           "SQLitePCLRaw.bundle_e_sqlite3": "2.1.11",
           "SQLitePCLRaw.core": "2.1.11"
         }
       },
       "Microsoft.Data.Sqlite.Core": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "ACiR0/BskX5iKL0q9oYSdO46Igc2rD867Vd+RvM/0CU0+7dn4R40vIQPUWQkza5EGfc4Ts3DinnB8jo7WgQOTg==",
+        "resolved": "10.0.2",
+        "contentHash": "/8ubtRdyED4qyxmL1CAu3UZZUEgc9l0dPCItW5tlOkYlKOb3QNhjGuEeb7uTKAqm8L7kwFOx1fCsndiylrzZAg==",
         "dependencies": {
           "SQLitePCLRaw.core": "2.1.11"
         }
       },
       "Microsoft.Extensions.ObjectPool": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "HqAEbtoAhgvH53c54IV5e4vQ60PYvl7Z/WIHsbet+UGGE7n+7dwVNXw1mb9LZlWbsxnupCevvtgIne5P//ZKpQ=="
+        "resolved": "10.0.2",
+        "contentHash": "kpCp4m7nwJVBcRKWXYHdVK/W0dkKyyFOjCmKVdO+zKThWvUxP1V+jVEP9FGpqRu4GPl9041SEXu2f+U/l825nQ=="
       },
       "Microsoft.NET.StringTools": {
         "type": "Transitive",
@@ -217,8 +217,8 @@
         "dependencies": {
           "CommunityToolkit.HighPerformance": "[8.4.0, )",
           "MessagePack": "[3.1.4, )",
-          "Microsoft.Data.Sqlite": "[10.0.1, )",
-          "Microsoft.Extensions.ObjectPool": "[10.0.1, )",
+          "Microsoft.Data.Sqlite": "[10.0.2, )",
+          "Microsoft.Extensions.ObjectPool": "[10.0.2, )",
           "Microsoft.NET.StringTools": "[18.0.2, )",
           "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.2, )",
           "Serilog": "[4.3.0, )",
