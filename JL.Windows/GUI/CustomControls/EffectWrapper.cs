@@ -65,13 +65,13 @@ internal sealed class EffectWrapper : ContentControl
 
     private DropShadowEffect? CreateFrozenEffect(int layerIndex)
     {
-        if (EffectMode == EffectMode.None)
+        if (EffectMode is EffectMode.None)
         {
             return null;
         }
 
         double direction;
-        if (EffectMode == EffectMode.DropShadow)
+        if (EffectMode is EffectMode.DropShadow)
         {
             if (layerIndex > 1)
             {

@@ -234,13 +234,6 @@ internal sealed partial class MainWindow : IDisposable
                         return;
                     }
 
-                    if (configManager.AutoPauseOrResumeMpvOnHoverChange && !IsMouseOver)
-                    {
-                        await MpvUtils.PausePlayback().ConfigureAwait(true);
-                    }
-
-                    MoveWindowToScreen();
-
                     if (!PopupWindowUtils.TransparentDueToAutoLookup)
                     {
                         WinApi.SetTransparentStyle(FirstPopupWindow.WindowHandle);
@@ -250,7 +243,12 @@ internal sealed partial class MainWindow : IDisposable
                     bool enableMiningMode = tsukikage && configManager.MiningModeMouseButton.IsPressed();
                     if (!tsukikage || configManager.MainWindowLookupDelay is 0)
                     {
+                        MoveWindowToScreen();
                         await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, enableMiningMode, true, verticalText).ConfigureAwait(true);
+                        if (configManager.AutoPauseOrResumeMpvOnHoverChange && FirstPopupWindow.Opacity is not 0)
+                        {
+                            MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
+                        }
                     }
                     else
                     {
@@ -277,9 +275,13 @@ internal sealed partial class MainWindow : IDisposable
                 UpdatePosition();
             }
 
-            if (!FirstPopupWindow.MiningMode)
+            if (FirstPopupWindow is { MiningMode: false, Opacity: not 0 })
             {
                 FirstPopupWindow.HidePopup();
+                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
+                }
             }
 
             _lookupDelayTimer.Enabled = false;
@@ -603,7 +605,8 @@ internal sealed partial class MainWindow : IDisposable
         await Dispatcher.Invoke(HandleDelayedLookupForTsukikage).ConfigureAwait(false);
     }
 
-    private void HandleDelayedLookup()
+    // ReSharper disable once AsyncVoidMethod
+    private async void HandleDelayedLookup()
     {
         if (WindowState is WindowState.Minimized
             || MainTextBoxContextMenu.IsVisible
@@ -626,7 +629,13 @@ internal sealed partial class MainWindow : IDisposable
 
         if (charPosition == _lastCharPosition)
         {
-            FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, ConfigManager.Instance.EnableMiningModeForDelayedLookups).SafeFireAndForget("LookupOnMouseMoveOrClick failed unexpectedly");
+            MoveWindowToScreen();
+            ConfigManager configManager = ConfigManager.Instance;
+            await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, configManager.EnableMiningModeForDelayedLookups).ConfigureAwait(false);
+            if (configManager.AutoPauseOrResumeMpvOnHoverChange && FirstPopupWindow.Opacity is not 0)
+            {
+                await MpvUtils.PausePlayback().ConfigureAwait(false);
+            }
         }
         else
         {
