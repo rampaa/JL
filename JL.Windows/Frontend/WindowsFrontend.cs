@@ -39,5 +39,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public void SetInstalledVoiceWithHighestPriority() => SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
 
+    public byte[]? GetMonitorScreenshotAsByteArray() => ScreenshotUtils.GetMonitorScreenshot();
+
     public Version JLVersion => WindowsUtils.JLVersion;
 }

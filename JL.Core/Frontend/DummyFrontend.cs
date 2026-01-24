@@ -34,5 +34,7 @@ internal sealed class DummyFrontend : IFrontend
     {
     }
 
+    public byte[]? GetMonitorScreenshotAsByteArray() => null;
+
     public Version JLVersion { get; } = new(0, 0, 0);
 }

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Point = System.Windows.Point;
 
 namespace JL.Windows.Utilities;
 
@@ -68,5 +69,20 @@ internal static class ExtensionMethods
     public static Rect ToRect(this System.Drawing.Rectangle rectangle)
     {
         return new Rect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+    }
+
+    public static System.Drawing.Rectangle ToRectangle(this Rect rect)
+    {
+        return new System.Drawing.Rectangle(double.ConvertToIntegerNative<int>(rect.X), double.ConvertToIntegerNative<int>(rect.Y), double.ConvertToIntegerNative<int>(rect.Width), double.ConvertToIntegerNative<int>(rect.Height));
+    }
+
+    public static Interop.Point ToPoint(this Point point)
+    {
+        return new Interop.Point(double.ConvertToIntegerNative<int>(point.X), double.ConvertToIntegerNative<int>(point.Y));
+    }
+
+    public static Point ToPoint(this Interop.Point point)
+    {
+        return new Point(point.X, point.Y);
     }
 }

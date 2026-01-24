@@ -33,6 +33,7 @@ using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
+using Point = System.Windows.Point;
 using Rectangle = System.Drawing.Rectangle;
 using Screen = System.Windows.Forms.Screen;
 using Timer = System.Timers.Timer;
@@ -1899,20 +1900,19 @@ internal sealed partial class MainWindow : IDisposable
         if (e.ClickCount is 2)
         {
             DpiScale dpi = WindowsUtils.Dpi;
-            double dpiUnawareHeight = Height * dpi.DpiScaleY;
-
-            Rect referenceWindowRect = !MagpieUtils.IsMagpieScaling() || !MagpieUtils.MagpieWindowRect.IntersectsWith(new Rect(Left * dpi.DpiScaleX, Top * dpi.DpiScaleY, Width * dpi.DpiScaleX, Height * dpi.DpiScaleY))
+            bool useMagpiePositioning = WindowsUtils.UseMagpiePositioning(this);
+            Rect referenceWindowRect = !useMagpiePositioning
                 ? WindowsUtils.ActiveScreen.WorkingArea.ToRect()
                 : MagpieUtils.MagpieWindowRect;
 
             double topPosition;
             if (configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true })
             {
-                topPosition = GetDynamicYPosition(configManager.MainWindowFixedBottomPosition);
+                topPosition = GetDynamicYPosition(configManager.MainWindowFixedBottomPosition, useMagpiePositioning);
             }
             else if (configManager.PositionPopupAboveCursor)
             {
-                topPosition = referenceWindowRect.Bottom - dpiUnawareHeight;
+                topPosition = referenceWindowRect.Bottom - (Height * dpi.DpiScaleY);
                 if (topPosition < referenceWindowRect.Top)
                 {
                     topPosition = referenceWindowRect.Top;
@@ -1986,7 +1986,7 @@ internal sealed partial class MainWindow : IDisposable
 
     public bool IsMouseWithinWindowBounds()
     {
-        Point mousePosition = WinApi.GetMousePosition();
+        Interop.Point mousePosition = WinApi.GetMousePosition();
         DpiScale dpi = WindowsUtils.Dpi;
         double physicalWidth = ActualWidth * dpi.DpiScaleX;
         double physicalHeight = ActualHeight * dpi.DpiScaleY;
@@ -2270,7 +2270,7 @@ internal sealed partial class MainWindow : IDisposable
             double newTop = currentTop;
             if (configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true })
             {
-                newTop = GetDynamicYPosition(configManager.MainWindowFixedBottomPosition);
+                newTop = GetDynamicYPosition(configManager.MainWindowFixedBottomPosition, WindowsUtils.UseMagpiePositioning(this));
             }
 
             double currentLeft = Left * dpi.DpiScaleX;
@@ -2332,12 +2332,12 @@ internal sealed partial class MainWindow : IDisposable
         return Math.Max(rightPosition is -1 ? activeScreen.WorkingArea.Left : activeScreen.Bounds.Left, rightPosition);
     }
 
-    private double GetDynamicYPosition(double bottomPosition)
+    private double GetDynamicYPosition(double bottomPosition, bool useMagpiePositioning)
     {
         double currentHeight = ActualHeight * WindowsUtils.Dpi.DpiScaleY;
         Screen activeScreen = WindowsUtils.ActiveScreen;
 
-        if (MagpieUtils.IsMagpieScaling())
+        if (useMagpiePositioning)
         {
             Rect magpieWindowRect = MagpieUtils.MagpieWindowRect;
             if (bottomPosition is -2 or -1)
@@ -2469,12 +2469,10 @@ internal sealed partial class MainWindow : IDisposable
 
     private void MoveWindowToScreen()
     {
-        Point mousePosition = WinApi.GetMousePosition();
-        int x = double.ConvertToIntegerNative<int>(mousePosition.X);
-        int y = double.ConvertToIntegerNative<int>(mousePosition.Y);
-        if (!WindowsUtils.ActiveScreen.Bounds.Contains(x, y))
+        Interop.Point mousePosition = WinApi.GetMousePosition();
+        if (!WindowsUtils.ActiveScreen.Bounds.Contains(mousePosition.X, mousePosition.Y))
         {
-            Rectangle workingArea = Screen.FromPoint(new System.Drawing.Point(x, y)).WorkingArea;
+            Rectangle workingArea = Screen.FromPoint(new System.Drawing.Point(mousePosition.X, mousePosition.Y)).WorkingArea;
 
             Opacity = 0d;
             UpdateLayout();

@@ -17,6 +17,7 @@ using JL.Windows.Config;
 using JL.Windows.Interop;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
+using Point = System.Windows.Point;
 using Rectangle = System.Drawing.Rectangle;
 using Screen = System.Windows.Forms.Screen;
 using Timer = System.Timers.Timer;

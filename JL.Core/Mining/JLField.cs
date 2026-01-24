@@ -19,6 +19,7 @@ public enum JLField
     Audio,
     [Description("Sentence Audio")] SentenceAudio,
     [Description("Source Text Audio")] SourceTextAudio,
+    [Description("Monitor Screenshot")] MonitorScreenshot,
     [Description("Image (Clipboard)")] Image,
     [Description("Images (Definitions)")] DefinitionsImages,
     [Description("Source Text")] SourceText,

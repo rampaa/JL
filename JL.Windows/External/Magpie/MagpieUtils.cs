@@ -1,5 +1,7 @@
 using System.Windows;
 using JL.Windows.Interop;
+using JL.Windows.Utilities;
+using Point = System.Windows.Point;
 
 namespace JL.Windows.External.Magpie;
 
@@ -115,7 +117,7 @@ internal static class MagpieUtils
         }
 
         Point virtualMousePosition = new(MagpieWindowRect.X + ((mousePosition.X - s_sourceWindowRect.X) * s_scaleFactorX), MagpieWindowRect.Y + ((mousePosition.Y - s_sourceWindowRect.Y) * s_scaleFactorY));
-        return !MagpieWindowRect.Contains(virtualMousePosition) || WinApi.GetWindowFromPoint(mousePosition) == s_magpieWindowHandle
+        return !MagpieWindowRect.Contains(virtualMousePosition) || WinApi.GetWindowFromPoint(mousePosition.ToPoint()) == s_magpieWindowHandle
             ? mousePosition
             : virtualMousePosition;
     }

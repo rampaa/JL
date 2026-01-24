@@ -5,6 +5,7 @@ using System.Windows.Interop;
 using JL.Windows.Config;
 using JL.Windows.Interop;
 using JL.Windows.Utilities;
+using Point = System.Windows.Point;
 
 namespace JL.Windows.GUI.Popup;
 

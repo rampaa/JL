@@ -18,6 +18,8 @@ public interface IFrontend
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray();
 
+    public byte[]? GetMonitorScreenshotAsByteArray();
+
     public Task TextToSpeech(string voiceName, string text);
 
     public void StopTextToSpeech();

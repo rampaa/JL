@@ -387,6 +387,15 @@ dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_r
 dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.style      = pascal_case_style
 dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.severity   = warning
 
+# All public/protected/protected_internal readonly instance fields in structs must be PascalCase
+dotnet_naming_symbols.public_protected_readonly_instance_struct_fields_group.applicable_accessibilities = public, protected, protected_internal
+dotnet_naming_symbols.public_protected_readonly_instance_struct_fields_group.required_modifiers         = readonly
+dotnet_naming_symbols.public_protected_readonly_instance_struct_fields_group.applicable_kinds           = field
+dotnet_naming_symbols.public_protected_readonly_instance_struct_fields_group.applicable_containers      = struct
+dotnet_naming_rule.public_protected_readonly_instance_struct_fields_must_be_pascal_case_rule.symbols    = public_protected_readonly_instance_struct_fields_group
+dotnet_naming_rule.public_protected_readonly_instance_struct_fields_must_be_pascal_case_rule.style      = pascal_case_style
+dotnet_naming_rule.public_protected_readonly_instance_struct_fields_must_be_pascal_case_rule.severity   = warning
+
 # No other public/protected/protected_internal fields are allowed
 # https://docs.microsoft.com/dotnet/standard/design-guidelines/field
 dotnet_naming_symbols.other_public_protected_fields_group.applicable_accessibilities = public, protected, protected_internal
