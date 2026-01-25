@@ -1,3 +1,5 @@
+using Microsoft.Data.Sqlite;
+
 namespace JL.Core.Frontend;
 
 public interface IFrontend
@@ -27,6 +29,10 @@ public interface IFrontend
     public byte[]? GetAudioResponseFromTextToSpeech(string text);
 
     public void SetInstalledVoiceWithHighestPriority();
+
+    public void InsertSettingsForMpvProfile(SqliteConnection connection, int mpvProfileId);
+
+    public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId);
 
     public Version JLVersion { get; }
 }

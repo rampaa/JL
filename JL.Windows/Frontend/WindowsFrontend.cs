@@ -3,6 +3,7 @@ using JL.Windows.Config;
 using JL.Windows.GUI;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Windows.Frontend;
 
@@ -40,6 +41,10 @@ internal sealed class WindowsFrontend : IFrontend
     public void SetInstalledVoiceWithHighestPriority() => SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
 
     public byte[]? GetMonitorScreenshotAsByteArray() => ScreenshotUtils.GetMonitorScreenshot();
+
+    public void InsertSettingsForMpvProfile(SqliteConnection connection, int mpvProfileId) => ConfigManager.Instance.InsertSettingsForMpvProfile(connection, mpvProfileId);
+
+    public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId) => ConfigManager.Instance.InsertSettingsForTsukikageProfile(connection, tsukikageProfileId);
 
     public Version JLVersion => WindowsUtils.JLVersion;
 }

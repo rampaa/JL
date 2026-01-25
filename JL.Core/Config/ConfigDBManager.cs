@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using JL.Core.Frontend;
 using JL.Core.Statistics;
 using JL.Core.Utilities.Database;
 using Microsoft.Data.Sqlite;
@@ -100,15 +101,36 @@ public static class ConfigDBManager
                 StatsUtils.LifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.DefaultProfileId);
             }
 
-            ProfileDBUtils.InsertGlobalProfile(connection);
+            ProfileDBUtils.InsertProfile(connection, ProfileUtils.GlobalProfileName, ProfileUtils.GlobalProfileId);
             StatsDBUtils.InsertStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
         }
 
-        if (!defaultProfileExists && !ProfileDBUtils.ProfileExists(connection))
+        if (!ProfileDBUtils.ProfileExists(connection))
         {
-            ProfileDBUtils.InsertDefaultProfile(connection);
+            ProfileDBUtils.InsertProfile(connection, ProfileUtils.DefaultProfileName, ProfileUtils.DefaultProfileId);
             StatsDBUtils.InsertStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
+
+            InsertMpvProfile(connection);
+            InsertTsukikageProfile(connection);
         }
+    }
+
+    private static void InsertMpvProfile(SqliteConnection connection)
+    {
+        const string mpvProfileName = "mpv";
+        ProfileDBUtils.InsertProfile(connection, mpvProfileName);
+        int mpvProfileId = ProfileDBUtils.GetProfileId(connection, mpvProfileName);
+        FrontendManager.Frontend.InsertSettingsForMpvProfile(connection, mpvProfileId);
+        StatsDBUtils.InsertStats(connection, new Stats(), mpvProfileId);
+    }
+
+    private static void InsertTsukikageProfile(SqliteConnection connection)
+    {
+        const string tsukikageProfileName = "Tsukikage";
+        ProfileDBUtils.InsertProfile(connection, tsukikageProfileName);
+        int mpvProfileId = ProfileDBUtils.GetProfileId(connection, tsukikageProfileName);
+        FrontendManager.Frontend.InsertSettingsForTsukikageProfile(connection, mpvProfileId);
+        StatsDBUtils.InsertStats(connection, new Stats(), mpvProfileId);
     }
 
     private static bool NeedToMigrate(SqliteConnection connection)

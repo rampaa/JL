@@ -19,7 +19,7 @@ public static class ProfileDBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    internal static void InsertGlobalProfile(SqliteConnection connection)
+    internal static void InsertProfile(SqliteConnection connection, string profileName, int profileId)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
@@ -28,24 +28,8 @@ public static class ProfileDBUtils
             VALUES (@id, @name);
             """;
 
-        _ = command.Parameters.AddWithValue("@id", ProfileUtils.GlobalProfileId);
-        _ = command.Parameters.AddWithValue("@name", ProfileUtils.GlobalProfileName);
-        _ = command.ExecuteNonQuery();
-
-        ConfigDBManager.InsertSetting(connection, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.CurrentProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.GlobalProfileId);
-    }
-
-    internal static void InsertDefaultProfile(SqliteConnection connection)
-    {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
-            """
-            INSERT INTO profile (id, name)
-            VALUES (@id, @name);
-            """;
-
-        _ = command.Parameters.AddWithValue("@id", ProfileUtils.DefaultProfileId);
-        _ = command.Parameters.AddWithValue("@name", ProfileUtils.DefaultProfileName);
+        _ = command.Parameters.AddWithValue("@id", profileId);
+        _ = command.Parameters.AddWithValue("@name", profileName);
         _ = command.ExecuteNonQuery();
     }
 

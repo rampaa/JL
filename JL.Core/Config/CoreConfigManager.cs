@@ -37,6 +37,10 @@ public sealed class CoreConfigManager
     public int MinCharactersPerMinuteBeforeStoppingTimeTracking { get; private set; } = 10;
     public LookupCategory LookupCategory { get; set; } = LookupCategory.All;
 
+    #region Implicit setting names
+    public const string MinimumLogLevelSettingName = "MinimumLogLevel";
+    #endregion
+
     private CoreConfigManager()
     {
     }
@@ -50,7 +54,7 @@ public sealed class CoreConfigManager
     {
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        LoggerManager.s_loggingLevelSwitch.MinimumLevel = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, LogEventLevel.Error, "MinimumLogLevel");
+        LoggerManager.s_loggingLevelSwitch.MinimumLevel = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, LogEventLevel.Error, MinimumLogLevelSettingName);
 
         {
             string? ankiConnectUriStr = configs.GetValueOrDefault(nameof(AnkiConnectUri));

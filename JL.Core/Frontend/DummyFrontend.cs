@@ -1,3 +1,5 @@
+using Microsoft.Data.Sqlite;
+
 namespace JL.Core.Frontend;
 
 internal sealed class DummyFrontend : IFrontend
@@ -35,6 +37,14 @@ internal sealed class DummyFrontend : IFrontend
     }
 
     public byte[]? GetMonitorScreenshotAsByteArray() => null;
+
+    public void InsertSettingsForMpvProfile(SqliteConnection connection, int mpvProfileId)
+    {
+    }
+
+    public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId)
+    {
+    }
 
     public Version JLVersion { get; } = new(0, 0, 0);
 }

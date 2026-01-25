@@ -784,7 +784,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Text effect blur radius"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                                    <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectBlurRadiusNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="0"
+                                    <hc:NumericUpDown x:Name="MainTextBoxDropShadowEffectBlurRadiusNumericUpDown" Maximum="100" Minimum="0" DecimalPlaces="1"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>

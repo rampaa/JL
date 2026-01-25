@@ -86,7 +86,7 @@ internal sealed class ConfigManager
     public double MainWindowFixedRightPosition { get; private set; } // = 0;
     public Color MainTextBoxDropShadowEffectColor { get; private set; } = Colors.Black;
     public double MainTextBoxDropShadowEffectShadowDepth { get; private set; } = 2;
-    public int MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 8;
+    public double MainTextBoxDropShadowEffectBlurRadius { get; private set; } = 8;
     public int MainTextBoxDropShadowEffectBlurOpacity { get; private set; } = 100;
     public int MainTextBoxDropShadowEffectDirection { get; private set; } = 315;
     public int MainWindowLookupDelay { get; private set; } // 0
@@ -232,6 +232,22 @@ internal sealed class ConfigManager
 
     #endregion
 
+    #region Implicit setting names
+    private const string MainWindowOpacitySettingName = "MainWindowOpacity";
+    private const string MainWindowFontSizeSettingName = "MainWindowFontSize";
+    private const string MainWindowTopPositionSettingName = "MainWindowTopPosition";
+    private const string MainWindowLeftPositionSettingName = "MainWindowLeftPosition";
+    private const string PopupOpacitySettingName = "PopupOpacity";
+    private const string MainWindowBackgroundColorSettingName = "MainWindowBackgroundColor";
+    private const string MainWindowFontSettingName = "MainWindowFont";
+    private const string MainWindowFontWeightSettingName = "MainWindowFontWeight";
+    private const string PopupPositionRelativeToCursorSettingName = "PopupPositionRelativeToCursor";
+    private const string PopupPositionRelativeToCursorForVerticalTextSettingName = "PopupPositionRelativeToCursorForVerticalText";
+    private const string PopupFlipSettingName = "PopupFlip";
+    private const string PopupFlipForVerticalTextSettingName = "PopupFlipForVerticalText";
+    private const string LookupModeSettingName = "LookupMode";
+    #endregion
+
     private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
     private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneComboBoxItems(s_japaneseFonts);
     public static ComboBoxItem[] MainWindowFontWeights { get; set; } = [];
@@ -246,7 +262,7 @@ internal sealed class ConfigManager
     {
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         Instance.SaveBeforeClosing(connection);
-        ConfigDBManager.DeleteAllSettingsFromProfile(connection, "MainWindowTopPosition", "MainWindowLeftPosition");
+        ConfigDBManager.DeleteAllSettingsFromProfile(connection, MainWindowTopPositionSettingName, MainWindowLeftPositionSettingName);
 
         ConfigManager newInstance = new();
         ConfigDBManager.InsertSetting(connection, nameof(Theme), newInstance.Theme.ToString());
@@ -499,8 +515,8 @@ internal sealed class ConfigManager
         FixedPopupXPosition = ConfigDBManager.GetValueFromConfig(connection, configs, FixedPopupXPosition, nameof(FixedPopupXPosition));
         FixedPopupYPosition = ConfigDBManager.GetValueFromConfig(connection, configs, FixedPopupYPosition, nameof(FixedPopupYPosition));
 
-        MainWindow.Instance.OpacitySlider.Value = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindow.Instance.OpacitySlider.Value, "MainWindowOpacity");
-        MainWindow.Instance.FontSizeSlider.Value = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindow.Instance.FontSizeSlider.Value, "MainWindowFontSize");
+        MainWindow.Instance.OpacitySlider.Value = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindow.Instance.OpacitySlider.Value, MainWindowOpacitySettingName);
+        MainWindow.Instance.FontSizeSlider.Value = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindow.Instance.FontSizeSlider.Value, MainWindowFontSizeSettingName);
         MainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowBackgroundOpacityOnUnhover, nameof(MainWindowBackgroundOpacityOnUnhover));
 
         MainWindowHeight = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowHeight, nameof(MainWindowHeight));
@@ -513,8 +529,8 @@ internal sealed class ConfigManager
         MainWindow.Instance.WidthBeforeResolutionChange = MainWindowWidth;
         MainWindow.Instance.HeightBeforeResolutionChange = MainWindowHeight;
 
-        double mainWindowTop = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindow.Instance.Top, "MainWindowTopPosition");
-        double mainWindowLeft = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindow.Instance.Left, "MainWindowLeftPosition");
+        double mainWindowTop = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindow.Instance.Top, MainWindowTopPositionSettingName);
+        double mainWindowLeft = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindow.Instance.Left, MainWindowLeftPositionSettingName);
         WinApi.MoveWindowToPosition(MainWindow.Instance.WindowHandle, mainWindowLeft, mainWindowTop);
 
         MainWindow.Instance.TopPositionBeforeResolutionChange = MainWindow.Instance.Top;
@@ -553,10 +569,10 @@ internal sealed class ConfigManager
         HighlightColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, HighlightColor, nameof(HighlightColor));
         MainWindow.Instance.MainTextBox.SelectionBrush = HighlightColor;
 
-        double popupBackgroundColorOpacity = ConfigDBManager.GetValueFromConfig(connection, configs, 80.0, "PopupOpacity") / 100;
+        double popupBackgroundColorOpacity = ConfigDBManager.GetValueFromConfig(connection, configs, 80.0, PopupOpacitySettingName) / 100;
         PopupBackgroundColor = ConfigUtils.GetFrozenBrushFromConfig(connection, configs, PopupBackgroundColor, popupBackgroundColorOpacity, nameof(PopupBackgroundColor));
 
-        MainWindow.Instance.Background = ConfigUtils.GetBrushFromConfig(connection, configs, MainWindow.Instance.Background, "MainWindowBackgroundColor");
+        MainWindow.Instance.Background = ConfigUtils.GetBrushFromConfig(connection, configs, MainWindow.Instance.Background, MainWindowBackgroundColorSettingName);
 
         MainWindow.Instance.Background.Opacity = ChangeMainWindowBackgroundOpacityOnUnhover && !MainWindow.Instance.IsMouseOver && !PreferencesWindow.IsItVisible()
             ? MainWindowBackgroundOpacityOnUnhover / 100
@@ -709,15 +725,15 @@ internal sealed class ConfigManager
         }
 
         {
-            string mainWindowFontStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Meiryo", "MainWindowFont");
+            string mainWindowFontStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Meiryo", MainWindowFontSettingName);
             MainWindow.Instance.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
 
-            string mainWindowFontWeightStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Normal", "MainWindowFontWeight");
+            string mainWindowFontWeightStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Normal", MainWindowFontWeightSettingName);
             MainWindow.Instance.MainTextBox.FontWeight = WindowsUtils.GetFontWeightFromName(mainWindowFontWeightStr);
         }
 
         {
-            string popupPositionRelativeToCursorStr = ConfigDBManager.GetValueFromConfig(connection, configs, "BottomRight", "PopupPositionRelativeToCursor");
+            string popupPositionRelativeToCursorStr = ConfigDBManager.GetValueFromConfig(connection, configs, "BottomRight", PopupPositionRelativeToCursorSettingName);
             switch (popupPositionRelativeToCursorStr)
             {
                 case "TopLeft":
@@ -741,15 +757,15 @@ internal sealed class ConfigManager
                     break;
 
                 default:
-                    ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursor", "BottomRight");
-                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupPositionRelativeToCursor", nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorStr);
+                    ConfigDBManager.UpdateSetting(connection, PopupPositionRelativeToCursorSettingName, "BottomRight");
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", PopupPositionRelativeToCursorSettingName, nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorStr);
                     WindowsUtils.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor option: {popupPositionRelativeToCursorStr}");
                     break;
             }
         }
 
         {
-            string popupPositionRelativeToCursorForVerticalTextStr = ConfigDBManager.GetValueFromConfig(connection, configs, "BottomLeft", "PopupPositionRelativeToCursorForVerticalText");
+            string popupPositionRelativeToCursorForVerticalTextStr = ConfigDBManager.GetValueFromConfig(connection, configs, "BottomLeft", PopupPositionRelativeToCursorForVerticalTextSettingName);
             switch (popupPositionRelativeToCursorForVerticalTextStr)
             {
                 case "TopLeft":
@@ -773,15 +789,15 @@ internal sealed class ConfigManager
                     break;
 
                 default:
-                    ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursorForVerticalText", "BottomLeft");
-                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupPositionRelativeToCursorForVerticalText", nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorForVerticalTextStr);
+                    ConfigDBManager.UpdateSetting(connection, PopupPositionRelativeToCursorForVerticalTextSettingName, "BottomLeft");
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", PopupPositionRelativeToCursorForVerticalTextSettingName, nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorForVerticalTextStr);
                     WindowsUtils.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor for vertical text option: {popupPositionRelativeToCursorForVerticalTextStr}");
                     break;
             }
         }
 
         {
-            string popupFlipStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Both", "PopupFlip");
+            string popupFlipStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Both", PopupFlipSettingName);
             switch (popupFlipStr)
             {
                 case "X":
@@ -800,15 +816,15 @@ internal sealed class ConfigManager
                     break;
 
                 default:
-                    ConfigDBManager.UpdateSetting(connection, "PopupFlip", "Both");
-                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupFlip", nameof(ConfigManager), nameof(ApplyPreferences), popupFlipStr);
-                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid PopupFlip: {popupFlipStr}");
+                    ConfigDBManager.UpdateSetting(connection, PopupFlipSettingName, "Both");
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", PopupFlipSettingName, nameof(ConfigManager), nameof(ApplyPreferences), popupFlipStr);
+                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid {PopupFlipSettingName}: {popupFlipStr}");
                     break;
             }
         }
 
         {
-            string popupFlipForVerticalTextStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Both", "PopupFlipForVerticalText");
+            string popupFlipForVerticalTextStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Both", PopupFlipForVerticalTextSettingName);
             switch (popupFlipForVerticalTextStr)
             {
                 case "X":
@@ -827,15 +843,15 @@ internal sealed class ConfigManager
                     break;
 
                 default:
-                    ConfigDBManager.UpdateSetting(connection, "PopupFlipForVerticalText", "Both");
-                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", "PopupFlipForVerticalText", nameof(ConfigManager), nameof(ApplyPreferences), popupFlipForVerticalTextStr);
-                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid PopupFlipForVerticalText: {popupFlipForVerticalTextStr}");
+                    ConfigDBManager.UpdateSetting(connection, PopupFlipForVerticalTextSettingName, "Both");
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", PopupFlipForVerticalTextSettingName, nameof(ConfigManager), nameof(ApplyPreferences), popupFlipForVerticalTextStr);
+                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid {PopupFlipForVerticalTextSettingName}: {popupFlipForVerticalTextStr}");
                     break;
             }
         }
 
         {
-            string lookupModeStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Hover", "LookupMode");
+            string lookupModeStr = ConfigDBManager.GetValueFromConfig(connection, configs, "Hover", LookupModeSettingName);
             switch (lookupModeStr)
             {
                 case "Hover":
@@ -1190,14 +1206,14 @@ internal sealed class ConfigManager
         preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
         preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
 
-        Dictionary<string, string> settingValues = ConfigDBManager.GetSettingValues(connection, "MinimumLogLevel", "PopupPositionRelativeToCursor", "PopupPositionRelativeToCursorForVerticalText", "PopupFlip", "PopupFlipForVerticalText", "LookupMode", nameof(CoreConfigManager.LookupCategory));
-        preferenceWindow.MinimumLogLevelComboBox.SelectedValue = settingValues["MinimumLogLevel"];
-        preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue = settingValues["PopupPositionRelativeToCursor"];
-        preferenceWindow.PopupPositionRelativeToCursorForVerticalTextComboBox.SelectedValue = settingValues["PopupPositionRelativeToCursorForVerticalText"];
-        preferenceWindow.PopupFlipComboBox.SelectedValue = settingValues["PopupFlip"];
-        preferenceWindow.PopupFlipForVerticalTextComboBox.SelectedValue = settingValues["PopupFlipForVerticalText"];
+        Dictionary<string, string> settingValues = ConfigDBManager.GetSettingValues(connection, CoreConfigManager.MinimumLogLevelSettingName, PopupPositionRelativeToCursorSettingName, PopupPositionRelativeToCursorForVerticalTextSettingName, PopupFlipSettingName, PopupFlipForVerticalTextSettingName, LookupModeSettingName, nameof(CoreConfigManager.LookupCategory));
+        preferenceWindow.MinimumLogLevelComboBox.SelectedValue = settingValues[CoreConfigManager.MinimumLogLevelSettingName];
+        preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue = settingValues[PopupPositionRelativeToCursorSettingName];
+        preferenceWindow.PopupPositionRelativeToCursorForVerticalTextComboBox.SelectedValue = settingValues[PopupPositionRelativeToCursorForVerticalTextSettingName];
+        preferenceWindow.PopupFlipComboBox.SelectedValue = settingValues[PopupFlipSettingName];
+        preferenceWindow.PopupFlipForVerticalTextComboBox.SelectedValue = settingValues[PopupFlipForVerticalTextSettingName];
 
-        preferenceWindow.LookupModeComboBox.SelectedValue = settingValues["LookupMode"];
+        preferenceWindow.LookupModeComboBox.SelectedValue = settingValues[LookupModeSettingName];
         if (preferenceWindow.LookupModeComboBox.SelectedIndex < 0)
         {
             preferenceWindow.LookupModeComboBox.SelectedIndex = 0;
@@ -1353,7 +1369,7 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MainTextBoxDropShadowEffectColor), preferenceWindow.MainTextBoxDropShadowEffectColorButton.Tag.ToString());
 
             // We want the opaque color here
-            ConfigDBManager.UpdateSetting(connection, "MainWindowBackgroundColor",
+            ConfigDBManager.UpdateSetting(connection, MainWindowBackgroundColorSettingName,
                 preferenceWindow.MainWindowBackgroundColorButton.Background.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(ChangeMainWindowBackgroundOpacityOnUnhover),
@@ -1439,20 +1455,20 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowBacklogTextColor),
                 preferenceWindow.TextBoxBacklogTextColorButton.Tag.ToString());
 
-            ConfigDBManager.UpdateSetting(connection, "MainWindowFontSize",
+            ConfigDBManager.UpdateSetting(connection, MainWindowFontSizeSettingName,
                 preferenceWindow.TextBoxFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, "MainWindowOpacity",
+            ConfigDBManager.UpdateSetting(connection, MainWindowOpacitySettingName,
                 preferenceWindow.MainWindowOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(Theme), preferenceWindow.ThemeComboBox.SelectedValue.ToString());
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowTextVerticalAlignment), preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue.ToString());
             ConfigDBManager.UpdateSetting(connection, nameof(MainTextBoxEffect), preferenceWindow.MainTextBoxEffectComboBox.SelectedValue.ToString());
-            ConfigDBManager.UpdateSetting(connection, "MinimumLogLevel", preferenceWindow.MinimumLogLevelComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, CoreConfigManager.MinimumLogLevelSettingName, preferenceWindow.MinimumLogLevelComboBox.SelectedValue.ToString());
 
-            ConfigDBManager.UpdateSetting(connection, "MainWindowFont", preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, MainWindowFontSettingName, preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString());
 
-            ConfigDBManager.UpdateSetting(connection, "MainWindowFontWeight", preferenceWindow.MainWindowFontWeightComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, MainWindowFontWeightSettingName, preferenceWindow.MainWindowFontWeightComboBox.SelectedValue.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(PopupFont), preferenceWindow.PopupFontComboBox.SelectedValue.ToString());
 
@@ -1579,7 +1595,7 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(DeconjugationInfoColor),
                 preferenceWindow.DeconjugationInfoColorButton.Tag.ToString());
 
-            ConfigDBManager.UpdateSetting(connection, "PopupOpacity",
+            ConfigDBManager.UpdateSetting(connection, PopupOpacitySettingName,
                 preferenceWindow.PopupOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
             ConfigDBManager.UpdateSetting(connection, nameof(PrimarySpellingFontSize),
@@ -1653,11 +1669,11 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(MainWindowFixedRightPosition),
                 preferenceWindow.MainWindowFixedRightPositionNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursor", preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue.ToString());
-            ConfigDBManager.UpdateSetting(connection, "PopupPositionRelativeToCursorForVerticalText", preferenceWindow.PopupPositionRelativeToCursorForVerticalTextComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, PopupPositionRelativeToCursorSettingName, preferenceWindow.PopupPositionRelativeToCursorComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, PopupPositionRelativeToCursorForVerticalTextSettingName, preferenceWindow.PopupPositionRelativeToCursorForVerticalTextComboBox.SelectedValue.ToString());
 
-            ConfigDBManager.UpdateSetting(connection, "PopupFlip", preferenceWindow.PopupFlipComboBox.SelectedValue.ToString());
-            ConfigDBManager.UpdateSetting(connection, "PopupFlipForVerticalText", preferenceWindow.PopupFlipForVerticalTextComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, PopupFlipSettingName, preferenceWindow.PopupFlipComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, PopupFlipForVerticalTextSettingName, preferenceWindow.PopupFlipForVerticalTextComboBox.SelectedValue.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(DisableLookupsForNonJapaneseCharsInPopups),
                 preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked.ToString());
@@ -1695,7 +1711,7 @@ internal sealed class ConfigManager
             ConfigDBManager.UpdateSetting(connection, nameof(ShowDictionaryTabsInMiningMode),
                 preferenceWindow.ShowDictionaryTabsInMiningModeCheckBox.IsChecked.ToString());
 
-            ConfigDBManager.UpdateSetting(connection, "LookupMode", preferenceWindow.LookupModeComboBox.SelectedValue.ToString());
+            ConfigDBManager.UpdateSetting(connection, LookupModeSettingName, preferenceWindow.LookupModeComboBox.SelectedValue.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.LookupCategory), preferenceWindow.LookupCategoryComboBox.SelectedValue.ToString());
 
@@ -1712,10 +1728,10 @@ internal sealed class ConfigManager
                 preferenceWindow.MinePrimarySpellingMouseButtonComboBox.SelectedValue.ToString());
 
             DpiScale dpi = WindowsUtils.Dpi;
-            ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition",
+            ConfigDBManager.UpdateSetting(connection, MainWindowTopPositionSettingName,
                 (MainWindow.Instance.Top * dpi.DpiScaleY).ToString(CultureInfo.InvariantCulture));
 
-            ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition",
+            ConfigDBManager.UpdateSetting(connection, MainWindowLeftPositionSettingName,
                 (MainWindow.Instance.Left * dpi.DpiScaleX).ToString(CultureInfo.InvariantCulture));
 
 #pragma warning disable CA1849 // Call async methods when in an async method
@@ -1735,10 +1751,10 @@ internal sealed class ConfigManager
     {
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ConfigDBManager.UpdateSetting(connection, "MainWindowFontSize",
+        ConfigDBManager.UpdateSetting(connection, MainWindowFontSizeSettingName,
             MainWindow.Instance.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));
 
-        ConfigDBManager.UpdateSetting(connection, "MainWindowOpacity",
+        ConfigDBManager.UpdateSetting(connection, MainWindowOpacitySettingName,
             MainWindow.Instance.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture));
 
         double mainWindowHeight = MainWindowHeight > MainWindow.Instance.MinHeight
@@ -1762,17 +1778,59 @@ internal sealed class ConfigManager
                 ? MainWindow.Instance.Top * dpi.DpiScaleY
                 : Math.Max(SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - MainWindow.Instance.Height) * dpi.DpiScaleY
             : bounds.Y;
-        ConfigDBManager.UpdateSetting(connection, "MainWindowTopPosition", mainWindowTopPosition.ToString(CultureInfo.InvariantCulture));
+        ConfigDBManager.UpdateSetting(connection, MainWindowTopPositionSettingName, mainWindowTopPosition.ToString(CultureInfo.InvariantCulture));
 
         double mainWindowLeftPosition = MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
             ? MainWindow.Instance.Left + MainWindow.Instance.Width <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
                 ? MainWindow.Instance.Left * dpi.DpiScaleX
                 : Math.Max(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - MainWindow.Instance.Width) * dpi.DpiScaleX
             : bounds.X;
-        ConfigDBManager.UpdateSetting(connection, "MainWindowLeftPosition", mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));
+        ConfigDBManager.UpdateSetting(connection, MainWindowLeftPositionSettingName, mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));
 
         transaction.Commit();
 
         ConfigDBManager.AnalyzeAndVacuum(connection);
+    }
+
+    public void InsertSettingsForMpvProfile(SqliteConnection connection, int mpvProfileId)
+    {
+        using SqliteTransaction transaction = connection.BeginTransaction();
+
+        ConfigDBManager.InsertSetting(connection, nameof(AutoPauseOrResumeMpvOnHoverChange), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromWebSocket), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.AutoReconnectToWebSocket), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard), false.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(OnlyCaptureTextWithJapaneseChars), false.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainWindowDynamicHeight), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainWindowDynamicWidth), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(RepositionMainWindowOnTextChangeByRightPosition), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainWindowFixedRightPosition), "0", mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(HorizontallyCenterMainWindowText), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(TextOnlyVisibleOnHover), false.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainWindowOpacitySettingName), "0.2", mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainTextBoxEffect), "Outline", mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainTextBoxDropShadowEffectBlurOpacity), "100", mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainTextBoxDropShadowEffectShadowDepth), "1.5", mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainTextBoxDropShadowEffectBlurRadius), "1.5", mpvProfileId);
+
+        transaction.Commit();
+    }
+
+    public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId)
+    {
+        using SqliteTransaction transaction = connection.BeginTransaction();
+
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromTsukikageWebsocket), true.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.AutoReconnectToTsukikageWebSocket), true.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(HidePopupsOnTextChange), false.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(DiscardIdenticalText), true.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard), false.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), true.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(TextOnlyVisibleOnHover), true.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(ChangeMainWindowBackgroundOpacityOnUnhover), true.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized), false.ToString(), tsukikageProfileId);
+
+        transaction.Commit();
     }
 }
