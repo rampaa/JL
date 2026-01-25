@@ -10,6 +10,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <PublishReadyToRun>false</PublishReadyToRun>
     <SelfContained>false</SelfContained>
     <RollForward>LatestMinor</RollForward>
@@ -17,7 +18,7 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <Deterministic>true</Deterministic>
 
-    <AnalysisLevel>9-all</AnalysisLevel>
+    <AnalysisLevel>10-all</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
