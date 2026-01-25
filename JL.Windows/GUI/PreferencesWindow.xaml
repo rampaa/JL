@@ -227,12 +227,23 @@
                             </ListBoxItem>
                         </ListBox>
 
-                        <Button x:Name="CheckForJLUpdatesButton" Content="Check for updates"
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock x:Name="JLVersionTextBlock" Grid.Column="0"
+                                       TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}" Margin="20,10,20,10"
+                                       VerticalAlignment="Center" />
+
+                            <Button x:Name="CheckForJLUpdatesButton" Grid.Column="1"
+                                    Content="Check for updates"
                                     Width="119" Height="32" HorizontalAlignment="Center" HorizontalContentAlignment="Center"
-                                    Click="CheckForJLUpdatesButton_Click"  Margin="20,10,20,10" />
-                        <TextBlock x:Name="JLVersionTextBlock" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                   Style="{StaticResource TextBlockDefault}"  Margin="20,10,20,10"
-                                   VerticalAlignment="Bottom" />
+                                    Click="CheckForJLUpdatesButton_Click" Margin="20,10,20,10" />
+                        </Grid>
+                        
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

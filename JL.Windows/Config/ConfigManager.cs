@@ -174,7 +174,7 @@ internal sealed class ConfigManager
     public KeyGesture ClickAudioButtonKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
-    public KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Alt);
     public KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture SearchWithBrowserKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
