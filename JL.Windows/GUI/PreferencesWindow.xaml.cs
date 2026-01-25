@@ -705,14 +705,11 @@ internal sealed partial class PreferencesWindow
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        Application.Current?.Dispatcher.Invoke(() =>
+        using (SqliteConnection preferencesConnection = ConfigDBManager.CreateReadWriteDBConnection())
         {
-            using (SqliteConnection preferencesConnection = ConfigDBManager.CreateReadWriteDBConnection())
-            {
-                configManager.ApplyPreferences(preferencesConnection);
-            }
-            configManager.LoadPreferenceWindow(this);
-        });
+            configManager.ApplyPreferences(preferencesConnection);
+        }
+        configManager.LoadPreferenceWindow(this);
 
         RegexReplacerUtils.PopulateRegexReplacements();
     }
@@ -802,10 +799,15 @@ internal sealed partial class PreferencesWindow
 
     private void MainWindowFontComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        string selectedFont = (string)((ComboBox)sender).SelectedValue;
-        string selectedFontWeight = (string)MainWindowFontWeightComboBox.SelectedValue;
+        string? selectedFont = (string?)((ComboBox)sender).SelectedValue;
+        if (selectedFont is null)
+        {
+            return;
+        }
 
         ComboBoxItem[] fontWeightNames = WindowsUtils.GetFontWeightNames(selectedFont);
+
+        string? selectedFontWeight = (string?)MainWindowFontWeightComboBox.SelectedValue;
 
         ConfigManager.MainWindowFontWeights = fontWeightNames;
         MainWindowFontWeightComboBox.ItemsSource = fontWeightNames;
