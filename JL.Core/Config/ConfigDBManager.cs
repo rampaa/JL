@@ -123,8 +123,15 @@ public static class ConfigDBManager
             bool insertedNewProfilesOnceV4 = GetValueFromConfigWithoutUpsert(connection, false, InsertedNewProfilesOnceV4SettingName, ProfileUtils.GlobalProfileId);
             if (!insertedNewProfilesOnceV4)
             {
-                InsertMpvProfile(connection);
-                InsertTsukikageProfile(connection);
+                if (!ProfileDBUtils.ProfileExists(connection, ProfileUtils.MpvProfileName))
+                {
+                    InsertMpvProfile(connection);
+                }
+
+                if (!ProfileDBUtils.ProfileExists(connection, ProfileUtils.TsukikageProfileName))
+                {
+                    InsertTsukikageProfile(connection);
+                }
 
                 InsertSetting(connection, InsertedNewProfilesOnceV4SettingName, bool.TrueString, ProfileUtils.GlobalProfileId);
             }
@@ -133,20 +140,18 @@ public static class ConfigDBManager
 
     private static void InsertMpvProfile(SqliteConnection connection)
     {
-        const string mpvProfileName = "mpv";
-        ProfileDBUtils.InsertProfile(connection, mpvProfileName);
-        int mpvProfileId = ProfileDBUtils.GetProfileId(connection, mpvProfileName);
+        ProfileDBUtils.InsertProfile(connection, ProfileUtils.MpvProfileName);
+        int mpvProfileId = ProfileDBUtils.GetProfileId(connection, ProfileUtils.MpvProfileName);
         FrontendManager.Frontend.InsertSettingsForMpvProfile(connection, mpvProfileId);
         StatsDBUtils.InsertStats(connection, new Stats(), mpvProfileId);
     }
 
     private static void InsertTsukikageProfile(SqliteConnection connection)
     {
-        const string tsukikageProfileName = "Tsukikage";
-        ProfileDBUtils.InsertProfile(connection, tsukikageProfileName);
-        int mpvProfileId = ProfileDBUtils.GetProfileId(connection, tsukikageProfileName);
-        FrontendManager.Frontend.InsertSettingsForTsukikageProfile(connection, mpvProfileId);
-        StatsDBUtils.InsertStats(connection, new Stats(), mpvProfileId);
+        ProfileDBUtils.InsertProfile(connection, ProfileUtils.TsukikageProfileName);
+        int tsukikageProfileId = ProfileDBUtils.GetProfileId(connection, ProfileUtils.TsukikageProfileName);
+        FrontendManager.Frontend.InsertSettingsForTsukikageProfile(connection, tsukikageProfileId);
+        StatsDBUtils.InsertStats(connection, new Stats(), tsukikageProfileId);
     }
 
     private static bool NeedToMigrate(SqliteConnection connection)

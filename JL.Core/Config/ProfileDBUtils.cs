@@ -139,9 +139,8 @@ public static class ProfileDBUtils
         return reader.GetBoolean(0);
     }
 
-    public static bool ProfileExists(string profileName)
+    public static bool ProfileExists(SqliteConnection connection, string profileName)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -159,6 +158,12 @@ public static class ProfileDBUtils
         using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
         return reader.GetBoolean(0);
+    }
+
+    public static bool ProfileExists(string profileName)
+    {
+        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        return ProfileExists(connection, profileName);
     }
 
     private static string GetProfileName(SqliteConnection connection, int profileId)

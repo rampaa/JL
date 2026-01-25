@@ -6,6 +6,9 @@ public static class ProfileUtils
     internal const string GlobalProfileName = "JLGlobal";
     internal const int DefaultProfileId = 1;
     internal const string DefaultProfileName = "Default";
+    internal const string MpvProfileName = "mpv";
+    internal const string TsukikageProfileName = "Tsukikage";
+
     public static readonly string ProfileFolderPath = Path.Join(AppInfo.ApplicationPath, "Profiles");
     public static int CurrentProfileId { get; set; } = DefaultProfileId;
     public static string CurrentProfileName { get; set; } = DefaultProfileName;
