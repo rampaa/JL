@@ -30,6 +30,8 @@ public static class ConfigDBManager
         WHERE profile_id = @profileId AND name = @name;
         """;
 
+    private const string InsertedNewProfilesOnceV4SettingName = "InsertedNewProfilesOnceV4";
+
     private static readonly string s_configsPath = Path.Join(AppInfo.ConfigPath, "Configs.sqlite");
 
     public static void CreateDB()
@@ -95,23 +97,37 @@ public static class ConfigDBManager
 
         if (!globalProfileExists)
         {
+            ProfileDBUtils.InsertProfile(connection, ProfileUtils.GlobalProfileName, ProfileUtils.GlobalProfileId);
+            StatsDBUtils.InsertStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
+            InsertSetting(connection, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.CurrentProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.GlobalProfileId);
+
             if (defaultProfileExists)
             {
                 ProfileUtils.CurrentProfileId = ProfileDBUtils.GetCurrentProfileIdFromDB(connection, ProfileUtils.DefaultProfileId);
                 StatsUtils.LifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.DefaultProfileId);
             }
-
-            ProfileDBUtils.InsertProfile(connection, ProfileUtils.GlobalProfileName, ProfileUtils.GlobalProfileId);
-            StatsDBUtils.InsertStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
         }
 
         if (!ProfileDBUtils.ProfileExists(connection))
         {
             ProfileDBUtils.InsertProfile(connection, ProfileUtils.DefaultProfileName, ProfileUtils.DefaultProfileId);
-            StatsDBUtils.InsertStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
+            StatsDBUtils.InsertStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.DefaultProfileId);
 
             InsertMpvProfile(connection);
             InsertTsukikageProfile(connection);
+
+            InsertSetting(connection, InsertedNewProfilesOnceV4SettingName, bool.TrueString, ProfileUtils.GlobalProfileId);
+        }
+        else
+        {
+            bool insertedNewProfilesOnceV4 = GetValueFromConfigWithoutUpsert(connection, false, InsertedNewProfilesOnceV4SettingName, ProfileUtils.GlobalProfileId);
+            if (!insertedNewProfilesOnceV4)
+            {
+                InsertMpvProfile(connection);
+                InsertTsukikageProfile(connection);
+
+                InsertSetting(connection, InsertedNewProfilesOnceV4SettingName, bool.TrueString, ProfileUtils.GlobalProfileId);
+            }
         }
     }
 
@@ -294,6 +310,34 @@ public static class ConfigDBManager
         _ = command.Parameters.AddWithValue("@sourceProfileId", sourceProfileId);
         _ = command.Parameters.AddWithValue("@targetProfileId", targetProfileId);
         _ = command.ExecuteNonQuery();
+    }
+
+    private static T GetValueFromConfigWithoutUpsert<T>(SqliteConnection connection, T defaultValue, string configKey, int profileId) where T : struct, IConvertible, IParsable<T>
+    {
+        using SqliteCommand command = connection.CreateCommand();
+
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+        command.CommandText =
+        $"""
+        SELECT value
+        FROM setting
+        WHERE profile_id = @profileId AND name = @name;
+        """;
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
+        _ = command.Parameters.AddWithValue("@profileId", profileId);
+        _ = command.Parameters.AddWithValue("@name", configKey);
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        string? configValue = null;
+        if (reader.Read())
+        {
+            configValue = reader.GetString(0);
+        }
+
+        return configValue is not null && T.TryParse(configValue, CultureInfo.InvariantCulture, out T value)
+            ? value
+            : defaultValue;
     }
 
     public static T GetValueFromConfig<T>(SqliteConnection connection, Dictionary<string, string> configs, T defaultValue, string configKey) where T : struct, IConvertible, IParsable<T>

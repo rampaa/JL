@@ -1796,19 +1796,20 @@ internal sealed class ConfigManager
     {
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ConfigDBManager.InsertSetting(connection, nameof(AutoPauseOrResumeMpvOnHoverChange), true.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromWebSocket), true.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.AutoReconnectToWebSocket), true.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard), false.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(OnlyCaptureTextWithJapaneseChars), false.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(MainWindowDynamicHeight), true.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(MainWindowDynamicWidth), true.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(RepositionMainWindowOnTextChangeByRightPosition), true.ToString(), mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(AutoPauseOrResumeMpvOnHoverChange), bool.TrueString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromWebSocket), bool.TrueString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.AutoReconnectToWebSocket), bool.TrueString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard), bool.FalseString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(OnlyCaptureTextWithJapaneseChars), bool.FalseString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainWindowDynamicHeight), bool.TrueString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainWindowDynamicWidth), bool.TrueString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(RepositionMainWindowOnTextChangeByRightPosition), bool.TrueString, mpvProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(MainWindowFixedRightPosition), "0", mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(HorizontallyCenterMainWindowText), true.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), true.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(TextOnlyVisibleOnHover), false.ToString(), mpvProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(MainWindowOpacitySettingName), "0.2", mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(HorizontallyCenterMainWindowText), bool.TrueString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TrueString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(TextOnlyVisibleOnHover), bool.FalseString, mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, MainWindowOpacitySettingName, "0.2", mpvProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(MainWindowBackgroundOpacityOnUnhover), "0.2", mpvProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(MainTextBoxEffect), "Outline", mpvProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(MainTextBoxDropShadowEffectBlurOpacity), "100", mpvProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(MainTextBoxDropShadowEffectShadowDepth), "1.5", mpvProfileId);
@@ -1821,15 +1822,15 @@ internal sealed class ConfigManager
     {
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromTsukikageWebsocket), true.ToString(), tsukikageProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.AutoReconnectToTsukikageWebSocket), true.ToString(), tsukikageProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(HidePopupsOnTextChange), false.ToString(), tsukikageProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(DiscardIdenticalText), true.ToString(), tsukikageProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard), false.ToString(), tsukikageProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), true.ToString(), tsukikageProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(TextOnlyVisibleOnHover), true.ToString(), tsukikageProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(ChangeMainWindowBackgroundOpacityOnUnhover), true.ToString(), tsukikageProfileId);
-        ConfigDBManager.InsertSetting(connection, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized), false.ToString(), tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromTsukikageWebsocket), bool.TrueString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.AutoReconnectToTsukikageWebSocket), bool.TrueString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(HidePopupsOnTextChange), bool.FalseString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(DiscardIdenticalText), bool.TrueString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard), bool.FalseString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TrueString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(TextOnlyVisibleOnHover), bool.TrueString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(ChangeMainWindowBackgroundOpacityOnUnhover), bool.TrueString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized), bool.FalseString, tsukikageProfileId);
 
         transaction.Commit();
     }
