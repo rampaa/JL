@@ -974,7 +974,7 @@ internal sealed partial class PopupWindow : IDisposable
         }
 
         _lastInteractedTextBox = textBox;
-        if (configManager.PopupLookupDelay > 0)
+        if (configManager.PopupLookupDelay is 0)
         {
             if (childPopupWindow is null)
             {
