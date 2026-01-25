@@ -36,6 +36,8 @@ public static class DictUtils
     private static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
+    private static readonly SemaphoreSlim s_loadDictionariesSemaphoreSlim = new(1, 1);
+
     internal static bool DBIsUsedForAtLeastOneDict { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; } = true;
@@ -525,163 +527,172 @@ public static class DictUtils
 
     public static async Task LoadDictionaries()
     {
-        DictsReady = false;
+        await s_loadDictionariesSemaphoreSlim.WaitAsync().ConfigureAwait(false);
 
-        CheckSingleDictActiveness();
-
-        ProfileCustomWordsCancellationTokenSource?.Dispose();
-        ProfileCustomWordsCancellationTokenSource = new CancellationTokenSource();
-
-        ProfileCustomNamesCancellationTokenSource?.Dispose();
-        ProfileCustomNamesCancellationTokenSource = new CancellationTokenSource();
-
-        bool dictCleared = false;
-        bool rebuildingAnyDB = false;
-        ConcurrentBag<Dict> dictsToBeRemoved = [];
-
-        Dictionary<string, string> dictDBPaths = new(StringComparer.Ordinal);
-
-        List<Task> tasks = [];
-
-        Dict[] dicts = Dicts.Values.ToArray();
-        CheckDBUsageForDicts(dicts);
-
-        int customDictionaryTaskCount = 0;
-        AtomicBool anyCustomDictionaryTaskIsActuallyUsed = new(false);
-
-        foreach (Dict dict in dicts)
+        try
         {
-            switch (dict.Type)
+            DictsReady = false;
+
+            CheckSingleDictActiveness();
+
+            ProfileCustomWordsCancellationTokenSource?.Dispose();
+            ProfileCustomWordsCancellationTokenSource = new CancellationTokenSource();
+
+            ProfileCustomNamesCancellationTokenSource?.Dispose();
+            ProfileCustomNamesCancellationTokenSource = new CancellationTokenSource();
+
+            bool dictCleared = false;
+            bool rebuildingAnyDB = false;
+            ConcurrentBag<Dict> dictsToBeRemoved = [];
+
+            Dictionary<string, string> dictDBPaths = new(StringComparer.Ordinal);
+
+            List<Task> tasks = [];
+
+            Dict[] dicts = Dicts.Values.ToArray();
+            CheckDBUsageForDicts(dicts);
+
+            int customDictionaryTaskCount = 0;
+            AtomicBool anyCustomDictionaryTaskIsActuallyUsed = new(false);
+
+            foreach (Dict dict in dicts)
             {
-                case DictType.JMdict:
-                    LoadJmdict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
-                    break;
-
-                case DictType.JMnedict:
-                    LoadJmnedict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
-                    break;
-
-                case DictType.Kanjidic:
-                    LoadKanjidic(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
-                    break;
-
-                case DictType.NonspecificWordYomichan:
-                case DictType.NonspecificKanjiWithWordSchemaYomichan:
-                case DictType.NonspecificNameYomichan:
-                case DictType.NonspecificYomichan:
-                    LoadYomichanDict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
-                    break;
-
-                case DictType.NonspecificKanjiYomichan:
-                    LoadYomichanKanjiDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
-                    break;
-
-                case DictType.CustomWordDictionary:
-                case DictType.ProfileCustomWordDictionary:
-                    LoadCustomWordDict(dict, tasks, anyCustomDictionaryTaskIsActuallyUsed, ref customDictionaryTaskCount, ref dictCleared);
-                    break;
-
-                case DictType.CustomNameDictionary:
-                case DictType.ProfileCustomNameDictionary:
-                    LoadCustomNameDict(dict, tasks, anyCustomDictionaryTaskIsActuallyUsed, ref customDictionaryTaskCount, ref dictCleared);
-                    break;
-
-                case DictType.NonspecificWordNazeka:
-                case DictType.NonspecificKanjiNazeka:
-                case DictType.NonspecificNameNazeka:
-                case DictType.NonspecificNazeka:
-                    LoadNazekaDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
-                    break;
-
-                case DictType.PitchAccentYomichan:
-                    LoadYomichanPitchAccentDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
-                    break;
-
-                default:
+                switch (dict.Type)
                 {
-                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(DictUtils), nameof(LoadDictionaries), dict.Type);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
-                    break;
-                }
-            }
-        }
+                    case DictType.JMdict:
+                        LoadJmdict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
+                        break;
 
-        if (dictDBPaths.Count > 0)
-        {
-            KeyValuePair<string, string>[] tempDictDBPathKeyValuePairs = new KeyValuePair<string, string>[DBUtils.DictDBPaths.Count + dictDBPaths.Count];
-            int index = 0;
-            foreach ((string key, string value) in DBUtils.DictDBPaths)
-            {
-                tempDictDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
-                ++index;
-            }
+                    case DictType.JMnedict:
+                        LoadJmnedict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
+                        break;
 
-            foreach ((string key, string value) in dictDBPaths)
-            {
-                tempDictDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
-                ++index;
-            }
+                    case DictType.Kanjidic:
+                        LoadKanjidic(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
+                        break;
 
-            DBUtils.DictDBPaths = tempDictDBPathKeyValuePairs.ToFrozenDictionary(StringComparer.Ordinal);
-        }
+                    case DictType.NonspecificWordYomichan:
+                    case DictType.NonspecificKanjiWithWordSchemaYomichan:
+                    case DictType.NonspecificNameYomichan:
+                    case DictType.NonspecificYomichan:
+                        LoadYomichanDict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
+                        break;
 
-        if (tasks.Count > 0 || dictCleared)
-        {
-            SqliteConnection.ClearAllPools();
+                    case DictType.NonspecificKanjiYomichan:
+                        LoadYomichanKanjiDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        break;
 
-            if (tasks.Count > 0)
-            {
-                if (rebuildingAnyDB)
-                {
-                    FrontendManager.Frontend.Alert(AlertLevel.Information, "Rebuilding some databases because their schemas are out of date...");
-                }
+                    case DictType.CustomWordDictionary:
+                    case DictType.ProfileCustomWordDictionary:
+                        LoadCustomWordDict(dict, tasks, anyCustomDictionaryTaskIsActuallyUsed, ref customDictionaryTaskCount, ref dictCleared);
+                        break;
 
-                await Task.WhenAll(tasks).ConfigureAwait(false);
+                    case DictType.CustomNameDictionary:
+                    case DictType.ProfileCustomNameDictionary:
+                        LoadCustomNameDict(dict, tasks, anyCustomDictionaryTaskIsActuallyUsed, ref customDictionaryTaskCount, ref dictCleared);
+                        break;
 
-                if (!dictsToBeRemoved.IsEmpty)
-                {
-                    foreach (Dict dict in dictsToBeRemoved)
+                    case DictType.NonspecificWordNazeka:
+                    case DictType.NonspecificKanjiNazeka:
+                    case DictType.NonspecificNameNazeka:
+                    case DictType.NonspecificNazeka:
+                        LoadNazekaDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        break;
+
+                    case DictType.PitchAccentYomichan:
+                        LoadYomichanPitchAccentDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        break;
+
+                    default:
                     {
-                        dict.Active = false;
-                        //_ = Dicts.Remove(dict.Name);
-                        //_ = SingleDictTypeDicts.Remove(dict.Type);
+                        LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(DictUtils), nameof(LoadDictionaries), dict.Type);
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
+                        break;
+                    }
+                }
+            }
 
-                        string dbPath = DBUtils.GetDictDBPath(dict.Name);
-                        if (File.Exists(dbPath))
-                        {
-                            DBUtils.DeleteDB(dbPath);
-                        }
+            if (dictDBPaths.Count > 0)
+            {
+                KeyValuePair<string, string>[] tempDictDBPathKeyValuePairs = new KeyValuePair<string, string>[DBUtils.DictDBPaths.Count + dictDBPaths.Count];
+                int index = 0;
+                foreach ((string key, string value) in DBUtils.DictDBPaths)
+                {
+                    tempDictDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
+                    ++index;
+                }
+
+                foreach ((string key, string value) in dictDBPaths)
+                {
+                    tempDictDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
+                    ++index;
+                }
+
+                DBUtils.DictDBPaths = tempDictDBPathKeyValuePairs.ToFrozenDictionary(StringComparer.Ordinal);
+            }
+
+            if (tasks.Count > 0 || dictCleared)
+            {
+                SqliteConnection.ClearAllPools();
+
+                if (tasks.Count > 0)
+                {
+                    if (rebuildingAnyDB)
+                    {
+                        FrontendManager.Frontend.Alert(AlertLevel.Information, "Rebuilding some databases because their schemas are out of date...");
                     }
 
-                    //IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
-                    //int priority = 1;
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
 
-                    //foreach (Dict dict in orderedDicts)
-                    //{
-                    //    dict.Priority = priority;
-                    //    ++priority;
-                    //}
+                    if (!dictsToBeRemoved.IsEmpty)
+                    {
+                        foreach (Dict dict in dictsToBeRemoved)
+                        {
+                            dict.Active = false;
+                            //_ = Dicts.Remove(dict.Name);
+                            //_ = SingleDictTypeDicts.Remove(dict.Type);
+
+                            string dbPath = DBUtils.GetDictDBPath(dict.Name);
+                            if (File.Exists(dbPath))
+                            {
+                                DBUtils.DeleteDB(dbPath);
+                            }
+                        }
+
+                        //IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
+                        //int priority = 1;
+
+                        //foreach (Dict dict in orderedDicts)
+                        //{
+                        //    dict.Priority = priority;
+                        //    ++priority;
+                        //}
+                    }
                 }
+
+                Dict[] dictsSnapshot = Dicts.Values.ToArray();
+                CheckSingleDictActiveness();
+                CheckDBUsageForDicts(dictsSnapshot);
+
+                if (dictsSnapshot.All(static d => !d.Updating)
+                    && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed.Read()))
+                {
+                    FrontendManager.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
+                }
+
+                ProfileCustomWordsCancellationTokenSource.Dispose();
+                ProfileCustomWordsCancellationTokenSource = null;
+
+                ProfileCustomNamesCancellationTokenSource.Dispose();
+                ProfileCustomNamesCancellationTokenSource = null;
             }
 
-            Dict[] dictsSnapshot = Dicts.Values.ToArray();
-            CheckSingleDictActiveness();
-            CheckDBUsageForDicts(dictsSnapshot);
-
-            if (dictsSnapshot.All(static d => !d.Updating)
-                && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed.Read()))
-            {
-                FrontendManager.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
-            }
-
-            ProfileCustomWordsCancellationTokenSource.Dispose();
-            ProfileCustomWordsCancellationTokenSource = null;
-
-            ProfileCustomNamesCancellationTokenSource.Dispose();
-            ProfileCustomNamesCancellationTokenSource = null;
+            DictsReady = true;
         }
-
-        DictsReady = true;
+        finally
+        {
+            _ = s_loadDictionariesSemaphoreSlim.Release();
+        }
     }
 
     private static DBState PrepareDictDB(Dict dict, Dictionary<string, string> dictDBPaths, int dbVersion, ref bool rebuildingAnyDB)
