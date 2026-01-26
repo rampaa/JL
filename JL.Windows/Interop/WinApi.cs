@@ -123,7 +123,7 @@ internal static partial class WinApi
         [LibraryImport("user32.dll", EntryPoint = "GetCursorPos", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static partial bool GetCursorPos(ref Point pt);
+        internal static partial bool GetCursorPos(out Point pt);
 
         [LibraryImport("user32.dll", EntryPoint = "RegisterWindowMessageW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -317,8 +317,7 @@ internal static partial class WinApi
 
     public static Point GetMousePosition()
     {
-        Point lpPoint = new();
-        _ = GetCursorPos(ref lpPoint);
+        _ = GetCursorPos(out Point lpPoint);
         return lpPoint;
     }
 
