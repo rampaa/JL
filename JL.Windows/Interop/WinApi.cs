@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using JL.Core;
 using JL.Core.Utilities;
 using JL.Windows.Config;
@@ -410,7 +411,12 @@ internal static partial class WinApi
             if (s_clipboardSequenceNo != clipboardSequenceNo)
             {
                 s_clipboardSequenceNo = clipboardSequenceNo;
-                MainWindow.Instance.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedly");
+
+                _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, () =>
+                {
+                    MainWindow.Instance.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedly");
+                });
+
                 handled = true;
             }
         }
@@ -421,7 +427,12 @@ internal static partial class WinApi
             if (KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.Count > keyGestureId)
             {
                 KeyGesture keyGesture = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.GetAt(keyGestureId).Value;
-                _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
+
+                _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, () =>
+                {
+                    KeyGestureUtils.HandleHotKey(keyGesture).SafeFireAndForget("HandleHotKey failed unexpectedly");
+                });
+
                 handled = true;
             }
         }
