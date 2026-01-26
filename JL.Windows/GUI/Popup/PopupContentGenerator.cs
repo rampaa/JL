@@ -642,8 +642,9 @@ internal sealed class PopupContentGenerator : Decorator
             return;
         }
 
-        int maxPopupWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth);
-        int maxPopupHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight);
+        DpiScale dpi = WindowsUtils.Dpi;
+        int maxPopupWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth * dpi.DpiScaleX);
+        int maxPopupHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight * dpi.DpiScaleY);
 
         for (int i = 0; i < result.ImagePaths.Length; i++)
         {
@@ -660,13 +661,17 @@ internal sealed class PopupContentGenerator : Decorator
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
 
-                if (frame.PixelWidth > frame.PixelHeight)
+                (int finalImageWidth, int finalImageHeight) = FitImage(frame.PixelWidth, frame.PixelHeight, maxPopupWidth, maxPopupHeight);
+                if (frame.PixelWidth > maxPopupWidth || frame.PixelHeight > maxPopupHeight)
                 {
-                    bitmap.DecodePixelWidth = maxPopupWidth;
-                }
-                else
-                {
-                    bitmap.DecodePixelHeight = maxPopupHeight;
+                    if ((long)maxPopupWidth * frame.PixelHeight < (long)maxPopupHeight * frame.PixelWidth)
+                    {
+                        bitmap.DecodePixelWidth = maxPopupWidth;
+                    }
+                    else
+                    {
+                        bitmap.DecodePixelHeight = maxPopupHeight;
+                    }
                 }
 
                 bitmap.EndInit();
@@ -676,10 +681,9 @@ internal sealed class PopupContentGenerator : Decorator
                 {
                     Name = $"Image{i}",
                     Source = bitmap,
-                    Stretch = Stretch.Uniform,
-                    StretchDirection = StretchDirection.DownOnly,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Stretch = Stretch.None,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    HorizontalAlignment = HorizontalAlignment.Left,
                     Margin = new Thickness(2, 2, 2, 4)
                 };
 
@@ -703,6 +707,23 @@ internal sealed class PopupContentGenerator : Decorator
                 showImagesOption.Value = false;
                 return;
             }
+        }
+    }
+
+    private static (int finalImageWidth, int finalImageHeight) FitImage(int imageWidth, int imageHeight, int containerWidth, int containerHeight)
+    {
+        if (imageWidth <= containerWidth && imageHeight <= containerHeight)
+        {
+            return (imageWidth, imageHeight);
+        }
+
+        if ((long)containerWidth * imageHeight < (long)containerHeight * imageWidth)
+        {
+            return (containerWidth, (int)((long)imageHeight * containerWidth / imageWidth));
+        }
+        else
+        {
+            return ((int)((long)imageWidth * containerHeight / imageHeight), containerHeight);
         }
     }
 
