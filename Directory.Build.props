@@ -17,6 +17,7 @@
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <Deterministic>true</Deterministic>
+    <CETCompat>false</CETCompat>
 
     <AnalysisLevel>10-all</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
