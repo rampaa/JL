@@ -60,7 +60,7 @@ internal static partial class WinApi
 
         [LibraryImport("user32.dll", EntryPoint = "GetClipboardSequenceNumber")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static partial ulong GetClipboardSequenceNumber();
+        internal static partial uint GetClipboardSequenceNumber();
 
         [LibraryImport("user32.dll", EntryPoint = "SendMessageW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -174,7 +174,7 @@ internal static partial class WinApi
     }
 #pragma warning restore IDE1006 // Naming rule violation
 
-    private static ulong s_clipboardSequenceNo;
+    private static uint s_clipboardSequenceNo;
 
     public static void SubscribeToWndProc(Window windowSource)
     {
@@ -407,7 +407,7 @@ internal static partial class WinApi
     {
         if (msg is WM_CLIPBOARDUPDATE)
         {
-            ulong clipboardSequenceNo = GetClipboardSequenceNumber();
+            uint clipboardSequenceNo = GetClipboardSequenceNumber();
             if (s_clipboardSequenceNo != clipboardSequenceNo)
             {
                 s_clipboardSequenceNo = clipboardSequenceNo;
