@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JL.Windows.GUI.Popup"
         mc:Ignorable="d" Opacity="0"
-        Title="PopupWindow" PreviewMouseDown="Window_PreviewMouseDown"
+        Title="PopupWindow" PreviewMouseDown="Window_PreviewMouseDown" LostFocus="Window_LostFocus"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520" ResizeMode="NoResize" ShowActivated="False"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False" ContextMenuOpening="Window_ContextMenuOpening"
         PreviewKeyDown="Window_PreviewKeyDown" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" Closed="Window_Closed"

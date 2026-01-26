@@ -2568,4 +2568,18 @@ internal sealed partial class PopupWindow : IDisposable
         _enableMiningModeTimer.Elapsed -= EnableMiningModeTimer_Elapsed;
         _enableMiningModeTimer.Dispose();
     }
+
+    private void Window_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (Opacity is 0)
+        {
+            return;
+        }
+
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.Focusable && configManager.AlwaysOnTop)
+        {
+            WinApi.BringToFront(WindowHandle);
+        }
+    }
 }
