@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using HandyControl.Data;
 using HandyControl.Tools;
 using JL.Core;
@@ -359,14 +360,16 @@ internal static class WindowsUtils
             if (application is not null)
             {
                 await application.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
+
                 using Process? process = Process.Start(new ProcessStartInfo
                 {
                     WorkingDirectory = AppInfo.ApplicationPath,
                     FileName = "update-helper.cmd",
                     Arguments = Environment.ProcessId.ToString(CultureInfo.InvariantCulture),
-                    UseShellExecute = true,
-                    Verb = "runas"
+                    UseShellExecute = true
                 });
+
+                await application.Dispatcher.InvokeAsync(application.Shutdown, DispatcherPriority.Send);
             }
         }
 
