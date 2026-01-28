@@ -71,6 +71,9 @@ Optional if you use the "Mouse move" look up mode, required otherwise: Disable t
 ### How can I use JL with mpv?
 See: [Using JL with mpv to watch anime with Japanese subtitles](https://github.com/rampaa/JL/blob/master/Docs/Using%20JL%20with%20mpv.md)
 
+### How can I use JL to read raw manga or an unhookable game?
+You can use JL with [Tsukikage](https://github.com/rampaa/Tsukikage) to read unhookable media such as manga. See [How do I use Tsukikage?](https://github.com/rampaa/Tsukikage?tab=readme-ov-file#how-do-i-use-tsukikage) for more information.
+
 ### How do I add new dictionaries?
 
 #### [Yomichan Import]
