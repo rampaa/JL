@@ -36,7 +36,8 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 * Remembers last window position
 * Halfwidth -> Fullwidth conversions (and vice-versa)
 * Hiragana -> Katakana conversions (and vice-versa)
-* Chouonpu conversions (e.g. can find 清掃 from セーソー)
+* Chouonpu conversions (e.g. can find 清掃 from セーソー and セ〜ソ〜)
+* Can handle 々, 〻, ゝ, ヽ, ゞ, and ヾ conversions
 * Text normalization (e.g. can find 株式会社 when ㍿ is looked up)
 * Has a backlog
 * Touch screen support (i.e. Left Click/Touch lookup mode)
