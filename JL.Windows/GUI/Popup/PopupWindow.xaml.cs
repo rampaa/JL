@@ -256,7 +256,7 @@ internal sealed partial class PopupWindow : IDisposable
         string text;
         if (PopupListView.SelectedItem is not null && useSelectedListViewItemIfItExists)
         {
-            int index = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+            int index = ((LookupDisplayResult)PopupListView.SelectedItem).Index;
             text = LastLookupResults[index].PrimarySpelling;
         }
         else
@@ -281,7 +281,7 @@ internal sealed partial class PopupWindow : IDisposable
         if (useSelectedListViewItemIfItExists)
         {
             int listViewItemIndex = PopupListView.SelectedItem is not null
-                ? PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem)
+                ? ((LookupDisplayResult)PopupListView.SelectedItem).Index
                 : _listViewItemIndex;
 
             text = LastLookupResults[listViewItemIndex].PrimarySpelling;
@@ -1288,9 +1288,9 @@ internal sealed partial class PopupWindow : IDisposable
             int listViewItemIndex;
             if (useSelectedItem)
             {
-                StackPanel? mainStackPanel = (StackPanel?)PopupListView.SelectedItem;
-                Debug.Assert(mainStackPanel is not null);
-                listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel(mainStackPanel);
+                LookupDisplayResult? lookupDisplayResult = (LookupDisplayResult?)PopupListView.SelectedItem;
+                Debug.Assert(lookupDisplayResult is not null);
+                listViewItemIndex = lookupDisplayResult.Index;
             }
             else
             {
@@ -1852,7 +1852,7 @@ internal sealed partial class PopupWindow : IDisposable
             string text;
             if (PopupListView.SelectedItem is not null)
             {
-                int listViewItemIndex = PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+                int listViewItemIndex = ((LookupDisplayResult)PopupListView.SelectedItem).Index;
                 text = LastLookupResults[listViewItemIndex].PrimarySpelling;
             }
             else
@@ -1952,7 +1952,7 @@ internal sealed partial class PopupWindow : IDisposable
         }
 
         int listViewItemIndex = PopupListView.SelectedItem is not null && useSelectedListViewItemIfItExists
-            ? PopupWindowUtils.GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem)
+            ? ((LookupDisplayResult)PopupListView.SelectedItem).Index
             : _listViewItemIndex;
 
         LookupResult lastLookupResult = LastLookupResults[listViewItemIndex];
