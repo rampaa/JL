@@ -103,7 +103,7 @@ public static class DBUtils
 
     internal static bool CheckIfDBSchemaIsOutOfDate(int version, string dbPath)
     {
-        return version > GetVersionFromDB(dbPath);
+        return version != GetVersionFromDB(dbPath);
     }
 
     public static void DeleteDB(string dbPath)
