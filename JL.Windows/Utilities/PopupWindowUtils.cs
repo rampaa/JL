@@ -114,11 +114,46 @@ internal static class PopupWindowUtils
                 currentPopupWindow = PopupWindows[currentPopupWindow.PopupIndex + 1];
             }
 
-            int index = (hoveredPopup?.PopupIndex + 1) ?? 0;
-            PopupWindow? popupWindow = PopupWindows[index];
-            if (popupWindow is not null && popupWindow.Opacity is not 0)
+            bool hidPopup = false;
+            if (hoveredPopup is null)
             {
-                HidePopups(index);
+                MainWindow mainWindow = MainWindow.Instance;
+                PopupWindow firstPopupWindow = mainWindow.FirstPopupWindow;
+                if (firstPopupWindow.Opacity is not 0)
+                {
+                    TextBox textBox = mainWindow.MainTextBox;
+                    PopupWindow? childPopup = PopupWindows[firstPopupWindow.PopupIndex + 1];
+                    if ((childPopup is not null && childPopup.Opacity is not 0)
+                        || firstPopupWindow.CurrentSourceTextCharPosition != textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false))
+                    {
+                        HidePopups(firstPopupWindow.PopupIndex);
+                        hidPopup = true;
+                    }
+                }
+            }
+
+            else
+            {
+                PopupWindow? popupWindow = PopupWindows[hoveredPopup.PopupIndex + 1];
+                if (popupWindow is not null)
+                {
+                    if (popupWindow.Opacity is not 0)
+                    {
+                        PopupWindow? childPopup = PopupWindows[popupWindow.PopupIndex + 1];
+                        TextBox? textBox = popupWindow.PreviousTextBox;
+                        if ((childPopup is not null && childPopup.Opacity is not 0)
+                            || popupWindow.CurrentSourceTextCharPosition != (textBox?.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false) ?? -1))
+                        {
+                            HidePopups(popupWindow.PopupIndex);
+                            hidPopup = true;
+                        }
+                    }
+                }
+            }
+
+            if (!hidPopup && !PopupAutoHideTimer.Enabled)
+            {
+                PopupAutoHideTimer.Enabled = true;
             }
         });
     }

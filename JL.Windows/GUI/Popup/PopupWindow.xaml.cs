@@ -31,14 +31,14 @@ internal sealed partial class PopupWindow : IDisposable
 {
     private bool _contextMenuIsOpening; // = false;
 
-    private TextBox? _previousTextBox;
+    public TextBox? PreviousTextBox { get; private set; }
     private TextBox? _lastInteractedTextBox;
 
     private int _listViewItemIndex; // 0
     private int _listViewItemIndexAfterContextMenuIsClosed; // 0
     private int _firstVisibleListViewItemIndex; // 0
 
-    private int _currentSourceTextCharPosition;
+    public int CurrentSourceTextCharPosition { get; private set; }
     private int _lastCharPosition = -1;
 
     private string _currentSourceText = "";
@@ -309,12 +309,12 @@ internal sealed partial class PopupWindow : IDisposable
         if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 }
             || (!configManager.SteppedBacklogWithMouseWheel && textBox.Foreground == configManager.MainWindowBacklogTextColor))
         {
-            (_currentSourceText, _currentSourceTextCharPosition) = BacklogUtils.GetSourceTextFromIndexPosition(textBoxText, charPosition);
+            (_currentSourceText, CurrentSourceTextCharPosition) = BacklogUtils.GetSourceTextFromIndexPosition(textBoxText, charPosition);
         }
         else
         {
             _currentSourceText = textBoxText;
-            _currentSourceTextCharPosition = charPosition;
+            CurrentSourceTextCharPosition = charPosition;
         }
 
         bool isFirstPopupWindow = PopupIndex is 0;
@@ -393,7 +393,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (lookupResults is not null && lookupResults.Length > 0)
         {
-            _previousTextBox = textBox;
+            PreviousTextBox = textBox;
             LookupResult firstLookupResult = lookupResults[0];
             LastSelectedText = firstLookupResult.MatchedText;
 
@@ -525,12 +525,12 @@ internal sealed partial class PopupWindow : IDisposable
         if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 }
             || (!configManager.SteppedBacklogWithMouseWheel && textBox.Foreground == configManager.MainWindowBacklogTextColor))
         {
-            (_currentSourceText, _currentSourceTextCharPosition) = BacklogUtils.GetSourceTextFromIndexPosition(textBox.Text, textBox.SelectionStart);
+            (_currentSourceText, CurrentSourceTextCharPosition) = BacklogUtils.GetSourceTextFromIndexPosition(textBox.Text, textBox.SelectionStart);
         }
         else
         {
             _currentSourceText = textBox.Text;
-            _currentSourceTextCharPosition = textBox.SelectionStart;
+            CurrentSourceTextCharPosition = textBox.SelectionStart;
         }
 
         string selectedText = textBox.SelectedText;
@@ -567,7 +567,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (lookupResults is not null && lookupResults.Length > 0)
         {
-            _previousTextBox = textBox;
+            PreviousTextBox = textBox;
             LookupResult firstLookupResult = lookupResults[0];
             LastSelectedText = firstLookupResult.MatchedText;
             LastLookupResults = lookupResults;
@@ -847,7 +847,7 @@ internal sealed partial class PopupWindow : IDisposable
     private async Task CheckResultForDuplicates(LookupDisplayResult[] lookupDisplayResults)
     {
         LookupResult[] lastLookupResults = LastLookupResults;
-        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(lastLookupResults, _currentSourceText, _currentSourceTextCharPosition).ConfigureAwait(true);
+        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(lastLookupResults, _currentSourceText, CurrentSourceTextCharPosition).ConfigureAwait(true);
         if (duplicateCard is not null)
         {
             Debug.Assert(lookupDisplayResults.Length == duplicateCard.Length);
@@ -961,7 +961,7 @@ internal sealed partial class PopupWindow : IDisposable
         {
             if (configManager.HighlightLongestMatch)
             {
-                WindowsUtils.Unselect(PopupWindowUtils.PopupWindows[PopupIndex + 1]?._previousTextBox);
+                WindowsUtils.Unselect(PopupWindowUtils.PopupWindows[PopupIndex + 1]?.PreviousTextBox);
             }
 
             return Task.CompletedTask;
@@ -1200,7 +1200,7 @@ internal sealed partial class PopupWindow : IDisposable
         LookupResult[] lookupResults = LastLookupResults;
         LookupResult lookupResult = lookupResults[listViewItemIndex];
         string currentSourceText = _currentSourceText;
-        int currentSourceTextCharPosition = _currentSourceTextCharPosition;
+        int currentSourceTextCharPosition = CurrentSourceTextCharPosition;
 
         if (minePrimarySpelling
             || lookupResult.Readings is null
@@ -1765,7 +1765,7 @@ internal sealed partial class PopupWindow : IDisposable
             ? LookupCategory.All
             : lookupCategory;
 
-        if (Opacity is not 0 && _previousTextBox is not null)
+        if (Opacity is not 0 && PreviousTextBox is not null)
         {
             if (PopupIndex is 0)
             {
@@ -1778,8 +1778,8 @@ internal sealed partial class PopupWindow : IDisposable
             HidePopup();
 
             return configManager.LookupOnSelectOnly
-                ? LookupOnSelect(_previousTextBox)
-                : LookupOnMouseMoveOrClick(_previousTextBox, configManager.LookupOnMouseClickOnly);
+                ? LookupOnSelect(PreviousTextBox)
+                : LookupOnMouseMoveOrClick(PreviousTextBox, configManager.LookupOnMouseClickOnly);
         }
 
         return Task.CompletedTask;
@@ -1918,7 +1918,7 @@ internal sealed partial class PopupWindow : IDisposable
         string? textToCopy = _lastInteractedTextBox?.SelectedText;
         if (string.IsNullOrEmpty(textToCopy))
         {
-            textToCopy = _previousTextBox?.SelectedText;
+            textToCopy = PreviousTextBox?.SelectedText;
         }
 
         return !string.IsNullOrEmpty(textToCopy)
@@ -2352,7 +2352,7 @@ internal sealed partial class PopupWindow : IDisposable
         _currentSourceText = "";
         _listViewItemIndex = 0;
         _firstVisibleListViewItemIndex = 0;
-        _currentSourceTextCharPosition = 0;
+        CurrentSourceTextCharPosition = 0;
         _lastInteractedTextBox = null;
 
         PopupWindowUtils.PopupAutoHideTimer.Stop();
@@ -2372,7 +2372,7 @@ internal sealed partial class PopupWindow : IDisposable
 
             if (configManager.HighlightLongestMatch && !MainWindow.Instance.ContextMenuIsOpening)
             {
-                WindowsUtils.Unselect(_previousTextBox);
+                WindowsUtils.Unselect(PreviousTextBox);
             }
         }
 
@@ -2388,7 +2388,7 @@ internal sealed partial class PopupWindow : IDisposable
 
             if (configManager.HighlightLongestMatch && !previousPopup._contextMenuIsOpening)
             {
-                WindowsUtils.Unselect(_previousTextBox);
+                WindowsUtils.Unselect(PreviousTextBox);
             }
         }
     }
@@ -2549,7 +2549,7 @@ internal sealed partial class PopupWindow : IDisposable
     {
         Owner = null;
         PopupWindowUtils.PopupWindows[PopupIndex] = null;
-        _previousTextBox = null;
+        PreviousTextBox = null;
         _lastInteractedTextBox = null;
         LastSelectedText = null;
         _lastLookedUpText = null;
