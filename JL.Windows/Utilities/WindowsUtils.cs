@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -349,11 +348,7 @@ internal static class WindowsUtils
             Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
             await using (downloadResponseStream.ConfigureAwait(false))
             {
-                ZipArchive archive = new(downloadResponseStream);
-                await using (archive.ConfigureAwait(false))
-                {
-                    await archive.ExtractToDirectoryAsync(tmpDirectory).ConfigureAwait(false);
-                }
+                ArchiveUtils.DecompressZipStream(downloadResponseStream, tmpDirectory);
             }
 
             Application? application = Application.Current;

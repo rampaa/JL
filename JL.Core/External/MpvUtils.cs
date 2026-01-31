@@ -35,7 +35,11 @@ public static class MpvUtils
                     return;
                 }
 
-                bool isPaused = JsonElement.Parse(responseJson).GetProperty("data").GetBoolean();
+                using JsonDocument jsonDocument = JsonDocument.Parse(responseJson);
+                bool isPaused = jsonDocument.RootElement.GetProperty("data").GetBoolean();
+
+                // TODO: Uncomment this for .NET 10
+                //bool isPaused = JsonElement.Parse(responseJson).GetProperty("data").GetBoolean();
                 if (!isPaused)
                 {
                     await pipeClient.WriteAsync(s_pauseCommand).ConfigureAwait(false);

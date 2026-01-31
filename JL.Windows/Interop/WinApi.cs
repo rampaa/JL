@@ -428,7 +428,7 @@ internal static partial class WinApi
             {
                 KeyGesture keyGesture = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.GetAt(keyGestureId).Value;
 
-                _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+                _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
                 {
                     KeyGestureUtils.HandleHotKey(keyGesture).SafeFireAndForget("HandleHotKey failed unexpectedly");
                 });
