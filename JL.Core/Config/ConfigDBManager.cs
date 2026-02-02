@@ -323,7 +323,7 @@ public static class ConfigDBManager
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
-        $"""
+        """
         SELECT value
         FROM setting
         WHERE profile_id = @profileId AND name = @name;

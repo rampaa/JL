@@ -1,6 +1,6 @@
 # Supported Dictionaries
 
-* JMdict (displayed info can be customized through Manage Dictionaries->JMdict->Edit->Options)
+* JMdict (displayed info can be customized through Manage Dictionaries→JMdict→Edit→Options)
 * JMnedict
 * KANJIDIC2 (with de/composition data provided by [ids.txt](https://github.com/cjkvi/cjkvi-ids/blob/master/ids.txt))
 
@@ -11,7 +11,7 @@
   * Name dictionaries through `Name Dictionary (Yomichan)` type
   * Pitch accent dictionaries through `Pitch Accent Dictionary (Yomichan)` type
   * Other dictionaries (such as grammar dictionaries) through `Nonspecific Dictionary (Yomichan)` type
-  * Note: JL *can* import Yomichan dictionaries with structured content but it will strip the non-content parts (e.g. HTML tags) so whether the displayed result will be satisfactory depends on the dictionary. It's recommended to avoid using dictionaries like `JMdict for Yomichan` and `Jitendex` that essentially have the same data as JMdict. Since JL already supports the JMdict itself, using these dictionaries will only result in an inferior user experience on JL.
+  * Note: JL *can* import Yomichan dictionaries with structured content, but it will strip the non-content parts (e.g. HTML tags) so whether the displayed result will be satisfactory depends on the dictionary. It's recommended to avoid using dictionaries like `JMdict for Yomichan` and `Jitendex` that essentially have the same data as JMdict. Since JL already supports the JMdict itself, using these dictionaries will only result in an inferior user experience on JL.
 
 * [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format
   * Word dictionaries (Daijirin, Shinmeikai, Kenkyuusha etc.) through `Word Dictionary (Nazeka)` type

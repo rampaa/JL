@@ -52,7 +52,7 @@ internal static class ScreenshotUtils
             graphics.CopyFromScreen(referenceWindowRect.Left, referenceWindowRect.Top, 0, 0, new Size(referenceWindowRect.Width, referenceWindowRect.Height), CopyPixelOperation.SourceCopy);
         }
 
-        using MemoryStream ms = new(capacity: referenceWindowRect.Width * referenceWindowRect.Height * 3 / 4);
+        using MemoryStream ms = new(referenceWindowRect.Width * referenceWindowRect.Height * 3 / 4);
         bitmap.Save(ms, s_encoder, s_encoderParams);
         return ms.ToArray();
     }

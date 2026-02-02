@@ -28,7 +28,7 @@ public static class DictUtils
 {
     public static readonly string CustomWordDictPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
     public static readonly string CustomNameDictPath = Path.Join(AppInfo.ResourcesPath, "custom_names.txt");
-    internal static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "dicts.json");
+    private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "dicts.json");
     public static bool DictsReady { get; private set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272

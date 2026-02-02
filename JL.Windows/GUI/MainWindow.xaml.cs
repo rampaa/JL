@@ -432,7 +432,7 @@ internal sealed partial class MainWindow : IDisposable
 
         if (configManager.HidePopupsOnTextChange
             && FirstPopupWindow.Opacity is not 0
-            && (!sameText || ((PopupWindowUtils.PopupWindows[1]?.Opacity ?? 0) is not 0)))
+            && (!sameText || (PopupWindowUtils.PopupWindows[1]?.Opacity ?? 0) is not 0))
         {
             PopupWindowUtils.HidePopups(0);
         }

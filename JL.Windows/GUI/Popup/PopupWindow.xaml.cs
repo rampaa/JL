@@ -278,10 +278,7 @@ internal sealed partial class PopupWindow : IDisposable
         string text;
         if (useSelectedListViewItemIfItExists)
         {
-            int listViewItemIndex = PopupListView.SelectedItem is not null
-                ? ((LookupDisplayResult)PopupListView.SelectedItem).Index
-                : _listViewItemIndex;
-
+            int listViewItemIndex = ((LookupDisplayResult)PopupListView.SelectedItem)?.Index ?? _listViewItemIndex;
             text = LastLookupResults[listViewItemIndex].PrimarySpelling;
         }
         else
@@ -2575,7 +2572,7 @@ internal sealed partial class PopupWindow : IDisposable
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.Focusable && configManager.AlwaysOnTop)
+        if (configManager is { Focusable: true, AlwaysOnTop: true })
         {
             WinApi.BringToFront(WindowHandle);
         }

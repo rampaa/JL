@@ -1656,8 +1656,8 @@ public static class MiningUtils
 
         if (lookupResult.ImagePaths is not null)
         {
-            List<string> definitionsimagesFields = FindFields(JLField.DefinitionsImages, userFields);
-            if (definitionsimagesFields.Count > 0)
+            List<string> definitionsImagesFields = FindFields(JLField.DefinitionsImages, userFields);
+            if (definitionsImagesFields.Count > 0)
             {
                 if (imageDictionaries is null)
                 {
@@ -1682,7 +1682,7 @@ public static class MiningUtils
                             "filename", $"JL_definitions_image_{i}_{selectedReading}_{lookupResult.PrimarySpelling}{ext}"
                         },
                         {
-                            "fields", definitionsimagesFields
+                            "fields", definitionsImagesFields
                         }
                     });
                 }

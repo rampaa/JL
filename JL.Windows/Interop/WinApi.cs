@@ -412,7 +412,7 @@ internal static partial class WinApi
             {
                 s_clipboardSequenceNo = clipboardSequenceNo;
 
-                _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+                _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, static () =>
                 {
                     MainWindow.Instance.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedly");
                 });

@@ -661,7 +661,6 @@ internal sealed class PopupContentGenerator : Decorator
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
 
-                (int finalImageWidth, int finalImageHeight) = FitImage(frame.PixelWidth, frame.PixelHeight, maxPopupWidth, maxPopupHeight);
                 if (frame.PixelWidth > maxPopupWidth || frame.PixelHeight > maxPopupHeight)
                 {
                     if ((long)maxPopupWidth * frame.PixelHeight < (long)maxPopupHeight * frame.PixelWidth)
@@ -707,23 +706,6 @@ internal sealed class PopupContentGenerator : Decorator
                 showImagesOption.Value = false;
                 return;
             }
-        }
-    }
-
-    private static (int finalImageWidth, int finalImageHeight) FitImage(int imageWidth, int imageHeight, int containerWidth, int containerHeight)
-    {
-        if (imageWidth <= containerWidth && imageHeight <= containerHeight)
-        {
-            return (imageWidth, imageHeight);
-        }
-
-        if ((long)containerWidth * imageHeight < (long)containerHeight * imageWidth)
-        {
-            return (containerWidth, (int)((long)imageHeight * containerWidth / imageWidth));
-        }
-        else
-        {
-            return ((int)((long)imageWidth * containerHeight / imageHeight), containerHeight);
         }
     }
 
