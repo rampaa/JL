@@ -143,6 +143,8 @@ internal sealed partial class MainWindow : IDisposable
         FirstPopupWindow.Show();
         FirstPopupWindow.HidePopup();
 
+        FirstPopupWindow.Owner = this;
+
         FocusManager.SetFocusedElement(this, MainTextBox);
         // Makes caret/highlight visible without any mouse click
         EditingCommands.MoveLeftByCharacter.Execute(null, MainTextBox);
