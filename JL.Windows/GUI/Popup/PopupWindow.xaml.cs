@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -235,10 +236,7 @@ internal sealed partial class PopupWindow : IDisposable
         PresentationSource? lastInteractedTextBoxSource = PresentationSource.FromVisual(_lastInteractedTextBox);
         Debug.Assert(lastInteractedTextBoxSource is not null);
 
-        _lastInteractedTextBox.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, lastInteractedTextBoxSource, 0, Key.Back)
-        {
-            RoutedEvent = Keyboard.KeyDownEvent
-        });
+        EditingCommands.Backspace.Execute(null, _lastInteractedTextBox);
     }
 
     private void AddName(object sender, RoutedEventArgs e)
