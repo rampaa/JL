@@ -1486,6 +1486,30 @@ internal sealed partial class PopupWindow : IDisposable
             MainWindow.Instance.HandlePassThroughKeyGesture();
         }
 
+        else if (keyGesture.IsEqual(configManager.ScrollUpKeyGesture))
+        {
+            if (_popupListViewScrollViewer is not null)
+            {
+                int wheelScrollLines = SystemParameters.WheelScrollLines;
+                for (int i = 0; i < wheelScrollLines; i++)
+                {
+                    _popupListViewScrollViewer.LineUp();
+                }
+            }
+        }
+
+        else if (keyGesture.IsEqual(configManager.ScrollDownKeyGesture))
+        {
+            if (_popupListViewScrollViewer is not null)
+            {
+                int wheelScrollLines = SystemParameters.WheelScrollLines;
+                for (int i = 0; i < wheelScrollLines; i++)
+                {
+                    _popupListViewScrollViewer.LineDown();
+                }
+            }
+        }
+
         else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))
         {
             return HandleCtrlCKeyGesture();

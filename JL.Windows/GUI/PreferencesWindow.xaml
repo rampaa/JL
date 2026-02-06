@@ -2406,6 +2406,34 @@
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="ScrollUpKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Scroll up"
+                                       TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="ScrollDownKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Scroll down"
+                                       TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
                                      Click="ClearKeyGestureButton_Click" />
                                     <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox"
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"

@@ -1066,6 +1066,16 @@ internal sealed partial class MainWindow : IDisposable
             MainTextBox.IsReadOnlyCaretVisible = configManager.AlwaysShowMainTextBoxCaret;
         }
 
+        else if (keyGesture.IsEqual(configManager.ScrollUpKeyGesture))
+        {
+            MainTextBox.LineUp();
+        }
+
+        else if (keyGesture.IsEqual(configManager.ScrollDownKeyGesture))
+        {
+            MainTextBox.LineDown();
+        }
+
         else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))
         {
             if (MainTextBox.SelectedText.Length > 0)

@@ -211,6 +211,8 @@ internal sealed class ConfigManager
     public KeyGesture ConfirmItemSelectionKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ClickMiningButtonKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture ScrollUpKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture ScrollDownKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     #endregion
 
     #region Advanced
@@ -608,6 +610,8 @@ internal sealed class ConfigManager
         NextDictKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(NextDictKeyGesture), NextDictKeyGesture);
         PreviousDictKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(PreviousDictKeyGesture), PreviousDictKeyGesture);
         ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture), ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
+        ScrollUpKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ScrollUpKeyGesture), ScrollUpKeyGesture);
+        ScrollDownKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ScrollDownKeyGesture), ScrollDownKeyGesture);
         AlwaysOnTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
         TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
         ToggleAlwaysShowMainTextBoxCaretKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture), ToggleAlwaysShowMainTextBoxCaretKeyGesture);
@@ -958,6 +962,10 @@ internal sealed class ConfigManager
             PreviousDictKeyGesture.ToFormattedString();
         preferenceWindow.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGestureTextBox.Text =
             ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture.ToFormattedString();
+        preferenceWindow.ScrollUpKeyGestureTextBox.Text =
+            ScrollUpKeyGesture.ToFormattedString();
+        preferenceWindow.ScrollDownKeyGestureTextBox.Text =
+            ScrollDownKeyGesture.ToFormattedString();
         preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
             AlwaysOnTopKeyGesture.ToFormattedString();
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
@@ -1281,6 +1289,10 @@ internal sealed class ConfigManager
                 preferenceWindow.PreviousDictKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture),
                 preferenceWindow.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ScrollUpKeyGesture),
+                preferenceWindow.ScrollUpKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ScrollDownKeyGesture),
+                preferenceWindow.ScrollDownKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(AlwaysOnTopKeyGesture),
                 preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(TextBoxIsReadOnlyKeyGesture),
