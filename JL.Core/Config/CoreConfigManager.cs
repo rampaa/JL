@@ -106,6 +106,9 @@ public sealed class CoreConfigManager
                 {
                     if (TsukikageWebSocketUri.OriginalString != webSocketUri.OriginalString)
                     {
+                        WebSocketUtils.TsukikageWebSocketConnection?.Disconnect().SafeFireAndForget("Unexpected error while disconnecting from Tsukikage WebSocket");
+                        WebSocketUtils.TsukikageWebSocketConnection = null;
+
                         TsukikageWebSocketUri = webSocketUri;
                         ConfigDBManager.UpdateSetting(connection, nameof(TsukikageWebSocketUri), TsukikageWebSocketUri.OriginalString);
                     }
