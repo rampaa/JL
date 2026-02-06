@@ -44,8 +44,28 @@ internal static class EpwingYomichanLoader
 
     private static EpwingYomichanRecord? GetEpwingYomichanRecord(JsonElement[] jsonElements, Dict dict)
     {
-        string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
-        string? reading = jsonElements[1].GetString();
+        string primarySpelling;
+        try
+        {
+            primarySpelling = jsonElements[0].GetString()!.GetPooledString();
+        }
+        catch (InvalidOperationException ex)
+        {
+            LoggerManager.Logger.Error(ex, "Failed to get the primary spelling for EPWING Yomichan record: {JsonElements}", jsonElements);
+            return null;
+        }
+
+        string? reading;
+        try
+        {
+            reading = jsonElements[1].GetString();
+        }
+        catch (InvalidOperationException ex)
+        {
+            LoggerManager.Logger.Error(ex, "Failed to get the reading for EPWING Yomichan record: {JsonElements}", jsonElements);
+            return null;
+        }
+
         reading = string.IsNullOrWhiteSpace(reading) || reading == primarySpelling
             ? null
             : reading.GetPooledString();
@@ -65,9 +85,18 @@ internal static class EpwingYomichanLoader
         ref readonly JsonElement definitionTagsElement = ref jsonElements[2];
         if (definitionTagsElement.ValueKind is JsonValueKind.String)
         {
-            string? definitionTagsStr = definitionTagsElement.GetString();
-            Debug.Assert(definitionTagsStr is not null);
+            string? definitionTagsStr;
+            try
+            {
+                definitionTagsStr = definitionTagsElement.GetString();
+            }
+            catch (InvalidOperationException ex)
+            {
+                LoggerManager.Logger.Error(ex, "Failed to get definition tags for EPWING Yomichan record: {JsonElements}", jsonElements);
+                return null;
+            }
 
+            Debug.Assert(definitionTagsStr is not null);
             definitionTags = definitionTagsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             if (definitionTags.Length is 0)
             {
@@ -85,7 +114,17 @@ internal static class EpwingYomichanLoader
         }
 
         List<string> imagePaths = [];
-        string[]? definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5], dict, imagePaths);
+        string[]? definitions;
+        try
+        {
+            definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5], dict, imagePaths);
+        }
+        catch (InvalidOperationException ex)
+        {
+            LoggerManager.Logger.Error(ex, "Failed to get definitions for EPWING Yomichan record: {JsonElements}", jsonElements);
+            return null;
+        }
+
         definitions?.DeduplicateStringsInArray();
 
         if (definitions is null
@@ -95,7 +134,17 @@ internal static class EpwingYomichanLoader
             return null;
         }
 
-        string? wordClassesStr = jsonElements[3].GetString();
+        string? wordClassesStr;
+        try
+        {
+            wordClassesStr = jsonElements[3].GetString();
+        }
+        catch (InvalidOperationException ex)
+        {
+            LoggerManager.Logger.Error(ex, "Failed to get word classes for EPWING Yomichan record: {JsonElements}", jsonElements);
+            return null;
+        }
+
         Debug.Assert(wordClassesStr is not null);
         string[]? wordClasses = wordClassesStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (wordClasses.Length is 0)

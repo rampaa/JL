@@ -560,22 +560,22 @@ public static class DictUtils
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        LoadJmdict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
+                        LoadJmdict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.JMnedict:
-                        LoadJmnedict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
+                        LoadJmnedict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.Kanjidic:
-                        LoadKanjidic(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
+                        LoadKanjidic(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.NonspecificWordYomichan:
                     case DictType.NonspecificKanjiWithWordSchemaYomichan:
                     case DictType.NonspecificNameYomichan:
                     case DictType.NonspecificYomichan:
-                        LoadYomichanDict(dict, tasks, dictDBPaths, ref rebuildingAnyDB, ref dictCleared);
+                        LoadYomichanDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
@@ -740,7 +740,7 @@ public static class DictUtils
         return new DBState(useDB, dbExists, dbExisted);
     }
 
-    private static void LoadJmdict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadJmdict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -795,6 +795,7 @@ public static class DictUtils
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     File.Delete(fullDictPath);
+                    dictsToBeRemoved.Add(dict);
                 }
                 finally
                 {
@@ -830,7 +831,7 @@ public static class DictUtils
         }
     }
 
-    private static void LoadJmnedict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadJmnedict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -878,6 +879,7 @@ public static class DictUtils
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     File.Delete(fullDictPath);
+                    dictsToBeRemoved.Add(dict);
                 }
                 finally
                 {
@@ -913,7 +915,7 @@ public static class DictUtils
         }
     }
 
-    private static void LoadKanjidic(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadKanjidic(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -968,6 +970,7 @@ public static class DictUtils
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                     File.Delete(fullDictPath);
+                    dictsToBeRemoved.Add(dict);
                 }
                 finally
                 {
@@ -1003,7 +1006,7 @@ public static class DictUtils
         }
     }
 
-    private static void LoadYomichanDict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadYomichanDict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -1041,7 +1044,13 @@ public static class DictUtils
                         await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
                         dict.Size = dict.Contents.Count;
 
-                        if (!dbExists && (useDB || dbExisted))
+                        if (dict.Size is 0)
+                        {
+                            LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                            FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {dict.Name}");
+                            dictsToBeRemoved.Add(dict);
+                        }
+                        else if (!dbExists && (useDB || dbExisted))
                         {
                             EpwingYomichanDBManager.CreateDB(dict.Name);
                             EpwingYomichanDBManager.InsertRecordsToDB(dict);
@@ -1058,6 +1067,7 @@ public static class DictUtils
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                    dictsToBeRemoved.Add(dict);
                 }
                 finally
                 {
