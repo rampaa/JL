@@ -99,6 +99,27 @@ public static class ProfileDBUtils
         return profiles;
     }
 
+    public static List<int> GetProfileIds(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT id
+            FROM profile;
+            """;
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+
+        List<int> profiles = [];
+        while (dataReader.Read())
+        {
+            profiles.Add(dataReader.GetInt32(0));
+        }
+
+        return profiles;
+    }
+
     internal static bool ProfileExists(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();

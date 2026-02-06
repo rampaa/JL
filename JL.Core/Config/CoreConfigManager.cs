@@ -30,7 +30,7 @@ public sealed class CoreConfigManager
     public bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public bool TextBoxRemoveNewlines { get; private set; } // = false;
     public List<Uri> WebSocketUris { get; private set; } = [new("ws://127.0.0.1:6677")];
-    public Uri TsukikageWebSocketUri { get; private set; } = new("ws://127.0.0.1:8765");
+    public Uri TsukikageWebSocketUri { get; private set; } = new("ws://127.0.0.1:8768");
     public string MpvNamedPipePath { get; private set; } = "/tmp/mpv-socket";
     public bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public bool TrackTermLookupCounts { get; private set; } // = false;

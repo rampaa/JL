@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using JL.Core.Frontend;
 using JL.Core.Statistics;
+using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using Microsoft.Data.Sqlite;
 
@@ -31,6 +32,7 @@ public static class ConfigDBManager
         """;
 
     private const string InsertedNewProfilesOnceV4SettingName = "InsertedNewProfilesOnceV4";
+    private const string ChangedDefaultValueOfTsukikageOnceV4SettingName = "ChangedDefaultValueOfTsukikageOnceV4";
 
     private static readonly string s_configsPath = Path.Join(AppInfo.ConfigPath, "Configs.sqlite");
 
@@ -117,6 +119,7 @@ public static class ConfigDBManager
             InsertTsukikageProfile(connection);
 
             InsertSetting(connection, InsertedNewProfilesOnceV4SettingName, bool.TrueString, ProfileUtils.GlobalProfileId);
+            InsertSetting(connection, ChangedDefaultValueOfTsukikageOnceV4SettingName, bool.TrueString, ProfileUtils.GlobalProfileId);
         }
         else
         {
@@ -131,9 +134,22 @@ public static class ConfigDBManager
                 if (!ProfileDBUtils.ProfileExists(connection, ProfileUtils.TsukikageProfileName))
                 {
                     InsertTsukikageProfile(connection);
+                    InsertSetting(connection, ChangedDefaultValueOfTsukikageOnceV4SettingName, bool.TrueString, ProfileUtils.GlobalProfileId);
                 }
 
                 InsertSetting(connection, InsertedNewProfilesOnceV4SettingName, bool.TrueString, ProfileUtils.GlobalProfileId);
+            }
+
+            bool changedDefaultValueOfTsukikageOnceV4 = GetValueFromConfigWithoutUpsert(connection, false, ChangedDefaultValueOfTsukikageOnceV4SettingName, ProfileUtils.GlobalProfileId);
+            if (!changedDefaultValueOfTsukikageOnceV4)
+            {
+                ReadOnlySpan<int> profileIds = ProfileDBUtils.GetProfileIds(connection).AsReadOnlySpan();
+                foreach (int profileId in profileIds)
+                {
+                    UpdateSetting(connection, nameof(CoreConfigManager.TsukikageWebSocketUri), CoreConfigManager.Instance.TsukikageWebSocketUri.OriginalString, profileId);
+                }
+
+                InsertSetting(connection, ChangedDefaultValueOfTsukikageOnceV4SettingName, bool.TrueString, ProfileUtils.GlobalProfileId);
             }
         }
     }
