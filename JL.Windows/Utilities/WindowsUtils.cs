@@ -736,7 +736,7 @@ internal static class WindowsUtils
         }
 
         double verticalOffset = textBox.VerticalOffset;
-        textBox.Select(0, 0);
+        textBox.SelectionLength = 0;
         textBox.ScrollToVerticalOffset(verticalOffset);
     }
 
