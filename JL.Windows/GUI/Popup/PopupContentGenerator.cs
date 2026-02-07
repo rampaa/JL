@@ -55,9 +55,24 @@ internal sealed class PopupContentGenerator : Decorator
         CreateMiningButton(lookupDisplayResult, top);
 
         StackPanel bottom = new();
+
+        bool imagesExist = result.ImagePaths is not null;
+        Debug.Assert(!imagesExist || (result.Dict.Options.ShowImages is not null && result.Dict.Options.ShowImageAtBottom is not null));
+        bool showImagesAtBottom = imagesExist && result.Dict.Options.ShowImageAtBottom!.Value;
+
+        if (imagesExist && !showImagesAtBottom)
+        {
+            CreateImages(lookupDisplayResult, bottom);
+        }
+
         CreateFormattedDefinition(lookupDisplayResult, bottom);
         CreateKanjiText(ownerWindow, result.KanjiLookupResult, bottom);
-        CreateImages(lookupDisplayResult, bottom);
+
+        if (imagesExist && showImagesAtBottom)
+        {
+            CreateImages(lookupDisplayResult, bottom);
+        }
+
         CreateSeparator(lookupDisplayResult.NonLastItem, bottom);
 
         StackPanel stackPanel = new()
@@ -630,11 +645,6 @@ internal sealed class PopupContentGenerator : Decorator
     private static void CreateImages(LookupDisplayResult lookupDisplayResult, StackPanel bottom)
     {
         LookupResult result = lookupDisplayResult.LookupResult;
-        if (result.ImagePaths is null)
-        {
-            return;
-        }
-
         ShowImagesOption? showImagesOption = result.Dict.Options.ShowImages;
         Debug.Assert(showImagesOption is not null);
         if (!showImagesOption.Value)
@@ -646,6 +656,7 @@ internal sealed class PopupContentGenerator : Decorator
         int maxPopupWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth * dpi.DpiScaleX);
         int maxPopupHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight * dpi.DpiScaleY);
 
+        Debug.Assert(result.ImagePaths is not null);
         for (int i = 0; i < result.ImagePaths.Length; i++)
         {
             string imagePath = Path.GetFullPath(result.ImagePaths[i], AppInfo.ApplicationPath);

@@ -21,7 +21,8 @@ public sealed class DictOptions(
     AntonymOption? antonym = null,
     ShowPitchAccentWithDottedLinesOption? showPitchAccentWithDottedLines = null,
     AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null,
-    ShowImagesOption? showImages = null)
+    ShowImagesOption? showImages = null,
+    ShowImageAtBottomOption? showImageAtBottom = null)
 {
     public UseDBOption UseDB { get; } = useDB;
     public NoAllOption NoAll { get; } = noAll;
@@ -47,4 +48,5 @@ public sealed class DictOptions(
     public AutoUpdateAfterNDaysOption? AutoUpdateAfterNDays { get; internal set; } = autoUpdateAfterNDays;
 
     public ShowImagesOption? ShowImages { get; internal set; } = showImages;
+    public ShowImageAtBottomOption? ShowImageAtBottom { get; internal set; } = showImageAtBottom;
 }

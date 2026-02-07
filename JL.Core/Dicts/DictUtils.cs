@@ -74,7 +74,8 @@ public static class DictUtils
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
-                    showImages: new ShowImagesOption(true)),
+                    showImages: new ShowImagesOption(true),
+                    showImageAtBottom: new ShowImageAtBottomOption(true)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -100,7 +101,8 @@ public static class DictUtils
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
-                    showImages: new ShowImagesOption(true)),
+                    showImages: new ShowImagesOption(true),
+                    showImageAtBottom: new ShowImageAtBottomOption(true)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -1606,12 +1608,17 @@ public static class DictUtils
         else if (dict.Type is DictType.CustomNameDictionary or DictType.ProfileCustomNameDictionary)
         {
             dict.Options.ShowImages = new ShowImagesOption(true);
+            dict.Options.ShowImageAtBottom = new ShowImageAtBottomOption(true);
         }
         else
         {
             if (ShowImagesOption.ValidDictTypes.Contains(dict.Type))
             {
                 dict.Options.ShowImages ??= new ShowImagesOption(true);
+            }
+            if (ShowImageAtBottomOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.ShowImageAtBottom ??= new ShowImageAtBottomOption(true);
             }
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
             {

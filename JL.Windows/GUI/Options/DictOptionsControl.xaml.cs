@@ -179,6 +179,13 @@ internal sealed partial class DictOptionsControl
             showImagesOption = new ShowImagesOption(ShowImagesCheckBox.IsChecked.Value);
         }
 
+        ShowImageAtBottomOption? showImageAtBottomOption = null;
+        if (ShowImageAtBottomOption.ValidDictTypes.Contains(type))
+        {
+            Debug.Assert(ShowImageAtBottomCheckBox.IsChecked is not null);
+            showImageAtBottomOption = new ShowImageAtBottomOption(ShowImageAtBottomCheckBox.IsChecked.Value);
+        }
+
         DictOptions options = new(
             useDBOption,
             noAllOption,
@@ -200,7 +207,8 @@ internal sealed partial class DictOptionsControl
             antonymOption,
             showPitchAccentWithDottedLines,
             autoUpdateAfterNDaysOption,
-            showImagesOption);
+            showImagesOption,
+            showImageAtBottomOption);
 
         return options;
     }
@@ -225,6 +233,7 @@ internal sealed partial class DictOptionsControl
         OptionUtils.ChangeVisibilityOfCheckBox(UseDBOption.ValidDictTypes.Contains(dictType), UseDBCheckBox, dictOptions?.UseDB.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dictType), ShowPitchAccentWithDottedLinesCheckBox, dictOptions?.ShowPitchAccentWithDottedLines?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(ShowImagesOption.ValidDictTypes.Contains(dictType), ShowImagesCheckBox, dictOptions?.ShowImages?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(ShowImageAtBottomOption.ValidDictTypes.Contains(dictType), ShowImageAtBottomCheckBox, dictOptions?.ShowImageAtBottom?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfColorButton(PitchAccentMarkerColorOption.ValidDictTypes.Contains(dictType), PitchAccentMarkerColorButton, PitchAccentMarkerColorDockPanel, dictOptions?.PitchAccentMarkerColor?.Value, DictOptionManager.PitchAccentMarkerColor, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfColorButton(POrthographyInfoColorOption.ValidDictTypes.Contains(dictType), POrthographyInfoColorButton, POrthographyInfoColorDockPanel, dictOptions?.POrthographyInfoColor?.Value, DictOptionManager.POrthographyInfoColor, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfNumericUpDown(POrthographyInfoFontSizeOption.ValidDictTypes.Contains(dictType), POrthographyInfoFontSizeNumericUpDown, POrthographyInfoFontSizeDockPanel, dictOptions?.POrthographyInfoFontSize?.Value ?? 15, ref showDictOptions);
