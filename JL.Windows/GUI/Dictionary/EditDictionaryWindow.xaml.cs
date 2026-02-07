@@ -175,7 +175,7 @@ internal sealed partial class EditDictionaryWindow
             {
                 DBUtils.SendOptimizePragmaToAllDBs();
                 SqliteConnection.ClearAllPools();
-                PathUtils.ReplaceFileAtomicallyOnSameVolume(dbPath, DBUtils.GetDictDBPath(name));
+                PathUtils.ReplaceFileAtomicallyOnSameVolume(DBUtils.GetDictDBPath(name), dbPath);
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);
