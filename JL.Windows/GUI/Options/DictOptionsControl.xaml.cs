@@ -81,8 +81,7 @@ internal sealed partial class DictOptionsControl
         POrthographyInfoFontSizeOption? pOrthographyInfoFontSize = null;
         if (POrthographyInfoFontSizeOption.ValidDictTypes.Contains(type))
         {
-            pOrthographyInfoFontSize =
-                new POrthographyInfoFontSizeOption(POrthographyInfoFontSizeNumericUpDown.Value);
+            pOrthographyInfoFontSize = new POrthographyInfoFontSizeOption(POrthographyInfoFontSizeNumericUpDown.Value);
         }
 
         AOrthographyInfoOption? aOrthographyInfoOption = null;
@@ -186,6 +185,18 @@ internal sealed partial class DictOptionsControl
             showImageAtBottomOption = new ShowImageAtBottomOption(ShowImageAtBottomCheckBox.IsChecked.Value);
         }
 
+        MaxImageWidthOption? maxImageWidthOption = null;
+        if (MaxImageWidthOption.ValidDictTypes.Contains(type))
+        {
+            maxImageWidthOption = new MaxImageWidthOption(double.ConvertToIntegerNative<int>(MaxImageWidthNumericUpDown.Value));
+        }
+
+        MaxImageHeightOption? maxImageHeightOption = null;
+        if (MaxImageHeightOption.ValidDictTypes.Contains(type))
+        {
+            maxImageHeightOption = new MaxImageHeightOption(double.ConvertToIntegerNative<int>(MaxImageHeightNumericUpDown.Value));
+        }
+
         DictOptions options = new(
             useDBOption,
             noAllOption,
@@ -208,7 +219,9 @@ internal sealed partial class DictOptionsControl
             showPitchAccentWithDottedLines,
             autoUpdateAfterNDaysOption,
             showImagesOption,
-            showImageAtBottomOption);
+            showImageAtBottomOption,
+            maxImageWidthOption,
+            maxImageHeightOption);
 
         return options;
     }
@@ -233,6 +246,8 @@ internal sealed partial class DictOptionsControl
         OptionUtils.ChangeVisibilityOfCheckBox(UseDBOption.ValidDictTypes.Contains(dictType), UseDBCheckBox, dictOptions?.UseDB.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dictType), ShowPitchAccentWithDottedLinesCheckBox, dictOptions?.ShowPitchAccentWithDottedLines?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(ShowImagesOption.ValidDictTypes.Contains(dictType), ShowImagesCheckBox, dictOptions?.ShowImages?.Value ?? true, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxImageWidthOption.ValidDictTypes.Contains(dictType), MaxImageWidthNumericUpDown, MaxImageWidthDockPanel, dictOptions?.MaxImageWidth?.Value ?? 0, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxImageHeightOption.ValidDictTypes.Contains(dictType), MaxImageHeightNumericUpDown, MaxImageHeightDockPanel, dictOptions?.MaxImageHeight?.Value ?? 0, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(ShowImageAtBottomOption.ValidDictTypes.Contains(dictType), ShowImageAtBottomCheckBox, dictOptions?.ShowImageAtBottom?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfColorButton(PitchAccentMarkerColorOption.ValidDictTypes.Contains(dictType), PitchAccentMarkerColorButton, PitchAccentMarkerColorDockPanel, dictOptions?.PitchAccentMarkerColor?.Value, DictOptionManager.PitchAccentMarkerColor, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfColorButton(POrthographyInfoColorOption.ValidDictTypes.Contains(dictType), POrthographyInfoColorButton, POrthographyInfoColorDockPanel, dictOptions?.POrthographyInfoColor?.Value, DictOptionManager.POrthographyInfoColor, ref showDictOptions);

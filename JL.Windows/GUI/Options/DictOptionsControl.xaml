@@ -72,7 +72,7 @@
                 </DockPanel>
 
                 <DockPanel x:Name="POrthographyInfoFontSizeDockPanel" Visibility="Collapsed">
-                    <hc:NumericUpDown x:Name="POrthographyInfoFontSizeNumericUpDown" Minimum="1"
+                    <hc:NumericUpDown x:Name="POrthographyInfoFontSizeNumericUpDown" Minimum="1" DecimalPlaces="0"
                                       HorizontalAlignment="Left" VerticalAlignment="Center"
                                       Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
                     <TextBlock Text="Orthography info font size for primary spelling"
@@ -134,6 +134,36 @@
                                HorizontalAlignment="Left"
                                Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
+
+                <DockPanel x:Name="MaxImageWidthDockPanel"
+                           Visibility="Collapsed"
+                           Cursor="Help"
+                           ToolTip="Maximum image width in physical pixels.
+                           &#10;Images are never upscaled.
+                           &#10;If this value is larger than the popup’s Max width setting, the popup width is used instead.
+                           &#10;Set to 0 to ignore this setting and use the popup width." >
+                    <hc:NumericUpDown x:Name="MaxImageWidthNumericUpDown" Minimum="0" DecimalPlaces="0"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Max image width"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
+                <DockPanel x:Name="MaxImageHeightDockPanel"
+                           Visibility="Collapsed"
+                           Cursor="Help"
+                           ToolTip="Maximum image height in physical pixels.
+                           &#10;Images are never upscaled.
+                           &#10;If this value is larger than the popup’s Max height setting, the popup height is used instead.
+                           &#10;Set to 0 to ignore this setting and use the popup height.">
+                    <hc:NumericUpDown x:Name="MaxImageHeightNumericUpDown" Minimum="0" DecimalPlaces="0"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Max image height"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
 
                 <CheckBox Name="ShowPitchAccentWithDottedLinesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show pitch accent with dotted lines"

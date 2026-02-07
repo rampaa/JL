@@ -75,7 +75,9 @@ public static class DictUtils
                     new UseDBOption(false),
                     new NoAllOption(false),
                     showImages: new ShowImagesOption(true),
-                    showImageAtBottom: new ShowImageAtBottomOption(true)),
+                    showImageAtBottom: new ShowImageAtBottomOption(true),
+                    maxImageWidth: new MaxImageWidthOption(0),
+                    maxImageHeight: new MaxImageHeightOption(0)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -102,7 +104,9 @@ public static class DictUtils
                     new UseDBOption(false),
                     new NoAllOption(false),
                     showImages: new ShowImagesOption(true),
-                    showImageAtBottom: new ShowImageAtBottomOption(true)),
+                    showImageAtBottom: new ShowImageAtBottomOption(true),
+                    maxImageWidth: new MaxImageWidthOption(0),
+                    maxImageHeight: new MaxImageHeightOption(0)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -1609,6 +1613,8 @@ public static class DictUtils
         {
             dict.Options.ShowImages = new ShowImagesOption(true);
             dict.Options.ShowImageAtBottom = new ShowImageAtBottomOption(true);
+            dict.Options.MaxImageWidth = new MaxImageWidthOption(0);
+            dict.Options.MaxImageHeight = new MaxImageHeightOption(0);
         }
         else
         {
@@ -1619,6 +1625,14 @@ public static class DictUtils
             if (ShowImageAtBottomOption.ValidDictTypes.Contains(dict.Type))
             {
                 dict.Options.ShowImageAtBottom ??= new ShowImageAtBottomOption(true);
+            }
+            if (MaxImageWidthOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.MaxImageWidth ??= new MaxImageWidthOption(0);
+            }
+            if (MaxImageHeightOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.MaxImageHeight ??= new MaxImageHeightOption(0);
             }
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
             {

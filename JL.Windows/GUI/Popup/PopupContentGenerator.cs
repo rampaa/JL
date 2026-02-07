@@ -652,9 +652,26 @@ internal sealed class PopupContentGenerator : Decorator
             return;
         }
 
+        MaxImageWidthOption? maxImageWidthOption = result.Dict.Options.MaxImageWidth;
+        Debug.Assert(maxImageWidthOption is not null);
+        int maxImageWidthOptionValue = maxImageWidthOption.Value;
+
+        MaxImageHeightOption? maxImageHeightOption = result.Dict.Options.MaxImageHeight;
+        Debug.Assert(maxImageHeightOption is not null);
+        int maxImageHeightOptionValue = maxImageHeightOption.Value;
+
         DpiScale dpi = WindowsUtils.Dpi;
-        int maxPopupWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth * dpi.DpiScaleX);
-        int maxPopupHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight * dpi.DpiScaleY);
+        int maxWidth = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxWidth * dpi.DpiScaleX);
+        if (maxImageWidthOptionValue > 0)
+        {
+            maxWidth = Math.Min(maxWidth, maxImageWidthOptionValue);
+        }
+
+        int maxHeight = double.ConvertToIntegerNative<int>(lookupDisplayResult.OwnerWindow.MaxHeight * dpi.DpiScaleY);
+        if (maxImageHeightOptionValue > 0)
+        {
+            maxHeight = Math.Min(maxHeight, maxImageHeightOptionValue);
+        }
 
         Debug.Assert(result.ImagePaths is not null);
         for (int i = 0; i < result.ImagePaths.Length; i++)
@@ -672,15 +689,15 @@ internal sealed class PopupContentGenerator : Decorator
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
 
-                if (frame.PixelWidth > maxPopupWidth || frame.PixelHeight > maxPopupHeight)
+                if (frame.PixelWidth > maxWidth || frame.PixelHeight > maxHeight)
                 {
-                    if ((long)maxPopupWidth * frame.PixelHeight < (long)maxPopupHeight * frame.PixelWidth)
+                    if ((long)maxWidth * frame.PixelHeight < (long)maxHeight * frame.PixelWidth)
                     {
-                        bitmap.DecodePixelWidth = maxPopupWidth;
+                        bitmap.DecodePixelWidth = maxWidth;
                     }
                     else
                     {
-                        bitmap.DecodePixelHeight = maxPopupHeight;
+                        bitmap.DecodePixelHeight = maxHeight;
                     }
                 }
 

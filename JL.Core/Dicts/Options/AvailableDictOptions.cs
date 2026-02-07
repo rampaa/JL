@@ -157,3 +157,25 @@ public sealed class ShowImageAtBottomOption(bool value)
         DictType.NonspecificNameNazeka, DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificKanjiNazeka,
         DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary];
 }
+
+public sealed class MaxImageWidthOption(int value)
+{
+    public int Value { get; set; } = value;
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.NonspecificWordYomichan, DictType.NonspecificNameYomichan, DictType.NonspecificKanjiWithWordSchemaYomichan, DictType.NonspecificYomichan, DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificNameNazeka, DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificKanjiNazeka,
+        DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary];
+}
+
+public sealed class MaxImageHeightOption(int value)
+{
+    public int Value { get; set; } = value;
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.NonspecificWordYomichan, DictType.NonspecificNameYomichan, DictType.NonspecificKanjiWithWordSchemaYomichan, DictType.NonspecificYomichan, DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificNameNazeka, DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificKanjiNazeka,
+        DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary];
+}

@@ -22,7 +22,9 @@ public sealed class DictOptions(
     ShowPitchAccentWithDottedLinesOption? showPitchAccentWithDottedLines = null,
     AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null,
     ShowImagesOption? showImages = null,
-    ShowImageAtBottomOption? showImageAtBottom = null)
+    ShowImageAtBottomOption? showImageAtBottom = null,
+    MaxImageWidthOption? maxImageWidth = null,
+    MaxImageHeightOption? maxImageHeight = null)
 {
     public UseDBOption UseDB { get; } = useDB;
     public NoAllOption NoAll { get; } = noAll;
@@ -49,4 +51,6 @@ public sealed class DictOptions(
 
     public ShowImagesOption? ShowImages { get; internal set; } = showImages;
     public ShowImageAtBottomOption? ShowImageAtBottom { get; internal set; } = showImageAtBottom;
+    public MaxImageWidthOption? MaxImageWidth { get; internal set; } = maxImageWidth;
+    public MaxImageHeightOption? MaxImageHeight { get; internal set; } = maxImageHeight;
 }
