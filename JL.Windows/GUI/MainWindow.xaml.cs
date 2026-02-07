@@ -2125,6 +2125,10 @@ internal sealed partial class MainWindow : IDisposable
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (WindowState is WindowState.Minimized)
         {
+            FirstPopupWindow.Hide();
+            FirstPopupWindow.Owner = null;
+            FirstPopupWindow.Show();
+
             if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized)
             {
                 StatsUtils.StopTimeStatStopWatch();
@@ -2158,6 +2162,10 @@ internal sealed partial class MainWindow : IDisposable
 
         else
         {
+            FirstPopupWindow.Hide();
+            FirstPopupWindow.Owner = this;
+            FirstPopupWindow.Show();
+
             if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized
                 && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket || coreConfigManager.CaptureTextFromTsukikageWebsocket))
             {
