@@ -715,7 +715,11 @@ public static partial class JapaneseUtils
             }
             else
             {
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{segment} ");
+                _ = stringBuilder.Append(segment);
+                if (i + 2 <= primarySpellingSegments.Length)
+                {
+                    _ = stringBuilder.Append(' ');
+                }
             }
 
             currentReadingPosition = index + segment.Length;
