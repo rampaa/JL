@@ -49,6 +49,17 @@
                                TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
                 </DockPanel>
 
+                <CheckBox Name="ProperNameEntriesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Include proper name entries"
+                               Cursor="Help"
+                               ToolTip="Includes the proper name entries available in the full JMdict dataset.
+                               &#10;These entries overlap with a subset of JMnedict.
+                               &#10;Changing this option downloads a different dictionary file."
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
                 <CheckBox Name="WordClassInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show part-of-speech info" ToolTip="e.g. n, v5s" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>

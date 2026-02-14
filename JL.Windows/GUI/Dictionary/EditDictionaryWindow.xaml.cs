@@ -157,6 +157,33 @@ internal sealed partial class EditDictionaryWindow
             }
         }
 
+        if (_dict.Type is DictType.JMdict)
+        {
+            ProperNameEntriesOption? properNameEntries = options.ProperNameEntries;
+            Debug.Assert(properNameEntries is not null);
+            bool includeProperNameEntries = properNameEntries.Value;
+
+            ProperNameEntriesOption? oldProperNameEntries = _dict.Options.ProperNameEntries;
+            Debug.Assert(oldProperNameEntries is not null);
+            bool oldIncludeProperNameEntries = oldProperNameEntries.Value;
+
+            if (includeProperNameEntries != oldIncludeProperNameEntries)
+            {
+                _dict.Url = includeProperNameEntries
+                    ? DictUtils.JmdictUrl
+                    : DictUtils.JmdictWithoutJmnedictEntriesUrl;
+
+                _dict.Ready = false;
+                if (dbExists)
+                {
+                    DBUtils.DeleteDB(dbPath);
+                    dbExists = false;
+                }
+
+                ManageDictionariesWindow.JmdictUrlChanged = true;
+            }
+        }
+
         if (_dict.Options.UseDB.Value != options.UseDB.Value)
         {
             _dict.Ready = false;
@@ -179,7 +206,7 @@ internal sealed partial class EditDictionaryWindow
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);
-            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, _dict.Options, _dict.AutoUpdatable, _dict.Url, _dict.Revision));
+            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, options, _dict.AutoUpdatable, _dict.Url, _dict.Revision));
         }
 
         Close();

@@ -39,6 +39,8 @@ internal sealed partial class ManageDictionariesWindow
 
     private nint _windowHandle;
 
+    public static bool JmdictUrlChanged { get; set; }
+
     private ManageDictionariesWindow()
     {
         InitializeComponent();
@@ -81,6 +83,19 @@ internal sealed partial class ManageDictionariesWindow
         await Task.Run(static async () =>
         {
             await DictUtils.SerializeDicts().ConfigureAwait(false);
+
+            if (JmdictUrlChanged)
+            {
+                string fullPath = Path.GetFullPath(DictUtils.SingleDictTypeDicts[DictType.JMdict].Path, AppInfo.ApplicationPath);
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                    await ResourceUpdater.UpdateJmdict(false, true).ConfigureAwait(false);
+                }
+
+                JmdictUrlChanged = false;
+            }
+
             await DictUtils.LoadDictionaries().ConfigureAwait(false);
             await DictUtils.SerializeDicts().ConfigureAwait(false);
 

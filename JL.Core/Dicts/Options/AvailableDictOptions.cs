@@ -28,6 +28,12 @@ public sealed class PitchAccentMarkerColorOption(string value)
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.PitchAccentYomichan];
 }
 
+public sealed class ProperNameEntriesOption(bool value)
+{
+    public bool Value { get; } = value;
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
+}
+
 public sealed class WordClassInfoOption(bool value)
 {
     public bool Value { get; } = value;

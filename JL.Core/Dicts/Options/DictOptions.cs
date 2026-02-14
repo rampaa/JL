@@ -5,6 +5,7 @@ public sealed class DictOptions(
     NoAllOption noAll,
     NewlineBetweenDefinitionsOption? newlineBetweenDefinitions = null,
     PitchAccentMarkerColorOption? pitchAccentMarkerColor = null,
+    ProperNameEntriesOption? properNameEntries = null,
     WordClassInfoOption? wordClassInfo = null,
     DialectInfoOption? dialectInfo = null,
     POrthographyInfoOption? pOrthographyInfo = null,
@@ -30,6 +31,7 @@ public sealed class DictOptions(
     public NoAllOption NoAll { get; } = noAll;
     public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; internal set; } = newlineBetweenDefinitions;
     public PitchAccentMarkerColorOption? PitchAccentMarkerColor { get; internal set; } = pitchAccentMarkerColor;
+    public ProperNameEntriesOption? ProperNameEntries { get; internal set; } = properNameEntries;
     public WordClassInfoOption? WordClassInfo { get; internal set; } = wordClassInfo;
     public DialectInfoOption? DialectInfo { get; internal set; } = dialectInfo;
     public POrthographyInfoOption? POrthographyInfo { get; internal set; } = pOrthographyInfo;
