@@ -155,7 +155,7 @@ public sealed class ShowImagesOption(bool value)
 
 public sealed class ShowImageAtBottomOption(bool value)
 {
-    public bool Value { get; set; } = value;
+    public bool Value { get; } = value;
 
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
@@ -166,7 +166,7 @@ public sealed class ShowImageAtBottomOption(bool value)
 
 public sealed class MaxImageWidthOption(int value)
 {
-    public int Value { get; set; } = value;
+    public int Value { get; } = value;
 
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
@@ -177,7 +177,7 @@ public sealed class MaxImageWidthOption(int value)
 
 public sealed class MaxImageHeightOption(int value)
 {
-    public int Value { get; set; } = value;
+    public int Value { get; } = value;
 
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
