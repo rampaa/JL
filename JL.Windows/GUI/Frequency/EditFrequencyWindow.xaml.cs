@@ -88,7 +88,7 @@ internal sealed partial class EditFrequencyWindow
 
         string? revision = (string?)NameTextBox.Tag;
         bool pathChanged = _freq.Path != path;
-        if (pathChanged || _freq.Revision == revision)
+        if (pathChanged || _freq.Revision != revision)
         {
             if (pathChanged && _freq.Type is FreqType.Yomichan or FreqType.YomichanKanji)
             {

@@ -91,7 +91,7 @@ internal sealed partial class EditDictionaryWindow
 
         string? revision = (string?)NameTextBox.Tag;
         bool pathChanged = _dict.Path != path;
-        if (pathChanged || _dict.Revision == revision)
+        if (pathChanged || _dict.Revision != revision)
         {
             if (pathChanged && DictUtils.YomichanDictTypes.Contains(_dict.Type))
             {
