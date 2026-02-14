@@ -137,7 +137,7 @@ internal static class JmdictRecordBuilder
                 }
 
                 List<string[]> definitionList = new(senseListSpanLength);
-                List<string[]> wordClassList = new(senseListSpanLength);
+                List<string[]?> wordClassList = new(senseListSpanLength);
                 List<string[]?> readingRestrictionList = new(senseListSpanLength);
                 List<string[]?> spellingRestrictionList = new(senseListSpanLength);
                 List<string[]?> fieldList = new(senseListSpanLength);
@@ -159,7 +159,7 @@ internal static class JmdictRecordBuilder
                         || stagRListSpan.ContainsAny(readingListSpan))
                     {
                         definitionList.Add(sense.GlossList.ToArray());
-                        wordClassList.Add(sense.PosList.ToArray());
+                        wordClassList.Add(sense.PosList.TrimToArray());
                         readingRestrictionList.Add(sense.StagRList.TrimToArray());
                         spellingRestrictionList.Add(sense.StagKList.TrimToArray());
                         fieldList.Add(sense.FieldList.TrimToArray());
@@ -172,7 +172,7 @@ internal static class JmdictRecordBuilder
                     }
                 }
 
-                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetExclusiveAndSharedValuesForNonNullableSenseField(wordClassList);
+                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(wordClassList);
                 (string[]?[]? exclusiveMiscValues, string[]? miscValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(miscList);
                 (string[]?[]? exclusiveFieldValues, string[]? fieldValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(fieldList);
                 (string[]?[]? exclusiveDialectValues, string[]? dialectValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(dialectList);
@@ -317,7 +317,7 @@ internal static class JmdictRecordBuilder
                 }
 
                 List<string[]> definitionList = new(senseListSpanLength);
-                List<string[]> wordClassList = new(senseListSpanLength);
+                List<string[]?> wordClassList = new(senseListSpanLength);
                 List<string[]?> readingRestrictionList = new(senseListSpanLength);
                 List<string[]?> spellingRestrictionList = new(senseListSpanLength);
                 List<string[]?> fieldList = new(senseListSpanLength);
@@ -340,7 +340,7 @@ internal static class JmdictRecordBuilder
                         || (alternativeSpellingsExist && stagKListSpan.ContainsAny(alternativeSpellings)))
                     {
                         definitionList.Add(sense.GlossList.ToArray());
-                        wordClassList.Add(sense.PosList.ToArray());
+                        wordClassList.Add(sense.PosList.TrimToArray());
                         readingRestrictionList.Add(sense.StagRList.TrimToArray());
                         spellingRestrictionList.Add(sense.StagKList.TrimToArray());
                         fieldList.Add(sense.FieldList.TrimToArray());
@@ -353,7 +353,7 @@ internal static class JmdictRecordBuilder
                     }
                 }
 
-                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetExclusiveAndSharedValuesForNonNullableSenseField(wordClassList);
+                (string[]?[]? exclusiveWordClasses, string[]? wordClassesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(wordClassList);
                 (string[]?[]? exclusiveMiscValues, string[]? miscValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(miscList);
                 (string[]?[]? exclusiveFieldValues, string[]? fieldValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(fieldList);
                 (string[]?[]? exclusiveDialectValues, string[]? dialectValuesSharedByAllSenses) = GetExclusiveAndSharedValuesForNullableSenseField(dialectList);
@@ -396,24 +396,6 @@ internal static class JmdictRecordBuilder
                 }
             }
         }
-    }
-
-    private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNonNullableSenseField(List<string[]> senseField)
-    {
-        int senseCount = senseField.Count;
-        if (senseCount is 0)
-        {
-            return (null, null);
-        }
-
-        if (senseCount is 1)
-        {
-            return (null, senseField[0]);
-        }
-
-        List<string> sharedSenseCandidates = senseField[0].ToList();
-
-        return GetExclusiveAndSharedValuesForSenseField(senseField, sharedSenseCandidates);
     }
 
     private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForNullableSenseField(List<string[]?> senseField)
