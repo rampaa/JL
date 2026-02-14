@@ -907,7 +907,7 @@ internal static class WindowsUtils
 
     public static Window GetVisibleOwnedWindowOrOwner(Window owner)
     {
-        return Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Owner == owner && w is { IsVisible: true, Opacity: > 0 }, owner);
+        return owner.Dispatcher.Invoke(() => Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Owner == owner && w is { IsVisible: true, Opacity: > 0 }, owner));
     }
 
     public static void UpdatePositionForSelectionWindows(Window window, nint windowHandle, Point cursorPosition)
