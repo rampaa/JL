@@ -905,6 +905,11 @@ internal static class WindowsUtils
         }
     }
 
+    public static Window GetVisibleOwnedWindowOrOwner(Window owner)
+    {
+        return Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Owner == owner && w.IsVisible && w.Opacity > 0, owner);
+    }
+
     public static void UpdatePositionForSelectionWindows(Window window, nint windowHandle, Point cursorPosition)
     {
         double mouseX = cursorPosition.X;

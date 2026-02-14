@@ -20,9 +20,9 @@ internal sealed class WindowsFrontend : IFrontend
 
     public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
 
-    public Task<bool> ShowYesNoDialogAsync(string text, string caption) => WindowsUtils.ShowYesNoDialogAsync(text, caption, _mainWindow);
+    public Task<bool> ShowYesNoDialogAsync(string text, string caption) => WindowsUtils.ShowYesNoDialogAsync(text, caption, WindowsUtils.GetVisibleOwnedWindowOrOwner(_mainWindow));
 
-    public Task ShowOkDialogAsync(string text, string caption) => WindowsUtils.ShowOkDialogAsync(text, caption, _mainWindow);
+    public Task ShowOkDialogAsync(string text, string caption) => WindowsUtils.ShowOkDialogAsync(text, caption, WindowsUtils.GetVisibleOwnedWindowOrOwner(_mainWindow));
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => WindowsUtils.UpdateJL(downloadUrlOfLatestJLRelease);
 
