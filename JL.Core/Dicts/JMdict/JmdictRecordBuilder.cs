@@ -6,8 +6,14 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictRecordBuilder
 {
-    public static void AddToDictionary(in JmdictEntry entry, IDictionary<string, IList<IDictRecord>> jmdictDictionary)
+    public static void AddToDictionary(in JmdictEntry entry, IDictionary<string, IList<IDictRecord>> jmdictDictionary, bool includeProperNames)
     {
+        // https://github.com/JMdictProject/JMdictIssues/issues/94#issuecomment-1535592300
+        if (!includeProperNames && entry.Id is >= 5000000 and <= 5999999)
+        {
+            return;
+        }
+
         ReadOnlySpan<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.AsReadOnlySpan().Contains("sK")).ToList().AsReadOnlySpan();
         string[] allSpellingsWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length];
         string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length][];

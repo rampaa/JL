@@ -32,8 +32,7 @@ public static class DictUtils
     public static bool DictsReady { get; private set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
-    public static readonly Uri JmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
-    public static readonly Uri JmdictWithoutJmnedictEntriesUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_b.gz");
+    private static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     private static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
@@ -138,7 +137,7 @@ public static class DictUtils
                     autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)
                 ),
                 autoUpdatable: true,
-                url: JmdictUrl,
+                url: s_jmdictUrl,
                 revision: null)
         },
         {
@@ -1542,9 +1541,7 @@ public static class DictUtils
                     if (dict.Type is DictType.JMdict)
                     {
                         bool includeProperNameEntries = dict.Options.ProperNameEntries?.Value ?? true;
-                        dict.Url = includeProperNameEntries
-                            ? JmdictUrl
-                            : JmdictWithoutJmnedictEntriesUrl;
+                        dict.Url = s_jmdictUrl;
                     }
                     else if (dict.Type is DictType.Kanjidic)
                     {

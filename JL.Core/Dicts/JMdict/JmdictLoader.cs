@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Dicts.Options;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
@@ -121,9 +122,13 @@ internal static class JmdictLoader
                 xmlReader.WhitespaceHandling = WhitespaceHandling.None;
                 xmlReader.EntityHandling = EntityHandling.ExpandCharEntities;
 
+                ProperNameEntriesOption? properNamesEntriesOption = dict.Options.ProperNameEntries;
+                Debug.Assert(properNamesEntriesOption is not null);
+                bool includeProperNames = properNamesEntriesOption.Value;
+
                 while (xmlReader.ReadToFollowing("entry"))
                 {
-                    JmdictRecordBuilder.AddToDictionary(ReadEntry(xmlReader), dict.Contents);
+                    JmdictRecordBuilder.AddToDictionary(ReadEntry(xmlReader), dict.Contents, includeProperNames);
                 }
             }
 

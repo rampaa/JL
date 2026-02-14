@@ -169,18 +169,14 @@ internal sealed partial class EditDictionaryWindow
 
             if (includeProperNameEntries != oldIncludeProperNameEntries)
             {
-                _dict.Url = includeProperNameEntries
-                    ? DictUtils.JmdictUrl
-                    : DictUtils.JmdictWithoutJmnedictEntriesUrl;
-
                 _dict.Ready = false;
+                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
                 if (dbExists)
                 {
                     DBUtils.DeleteDB(dbPath);
                     dbExists = false;
                 }
-
-                ManageDictionariesWindow.JmdictUrlChanged = true;
             }
         }
 
