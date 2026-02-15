@@ -1289,7 +1289,7 @@ public static class LookupUtils
             {
                 JmdictWordClass result = jmdictWcResults[i];
                 if (primarySpelling == result.Spelling
-                    && ((hasReading && result.Readings is not null && result.Readings.Contains(reading!))
+                    && ((hasReading && result.Readings is not null && result.Readings.Contains(reading))
                         || (!hasReading && result.Readings is null))
                     && result.WordClasses.Contains(tag))
                 {
