@@ -1078,6 +1078,7 @@ internal static class WindowsUtils
     public static bool UseMagpiePositioning(Window window)
     {
         DpiScale dpi = Dpi;
-        return MagpieUtils.IsMagpieScaling() && MagpieUtils.MagpieWindowRect.IntersectsWith(new Rect(window.Left * dpi.DpiScaleX, window.Top * dpi.DpiScaleY, window.Width * dpi.DpiScaleX, window.Height * dpi.DpiScaleY));
+        return MagpieUtils.IsMagpieScaling()
+            && window.Dispatcher.Invoke(() => MagpieUtils.MagpieWindowRect.IntersectsWith(new Rect(window.Left * dpi.DpiScaleX, window.Top * dpi.DpiScaleY, window.Width * dpi.DpiScaleX, window.Height * dpi.DpiScaleY)));
     }
 }
