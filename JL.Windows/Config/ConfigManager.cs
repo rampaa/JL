@@ -1045,6 +1045,7 @@ internal sealed class ConfigManager
         preferenceWindow.CheckAllNoteTypesForDuplicatesCheckBox.IsChecked = coreConfigManager.CheckAllNoteTypesForDuplicates;
         preferenceWindow.CheckEntireCollectionForDuplicatesCheckBox.IsChecked = coreConfigManager.CheckEntireCollectionForDuplicates;
         preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked = coreConfigManager.CheckForDuplicateCards;
+        preferenceWindow.DuplicateCheckIndependentOfMiningModeCheckBox.IsChecked = coreConfigManager.DuplicateCheckIndependentOfMiningMode;
         preferenceWindow.AutoAdjustFontSizesOnResolutionChangeCheckBox.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.EnableMiningModeForDelayedLookupsCheckBox.IsChecked = EnableMiningModeForDelayedLookups;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
@@ -1501,6 +1502,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckEntireCollectionForDuplicates),
                 preferenceWindow.CheckEntireCollectionForDuplicatesCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.DuplicateCheckIndependentOfMiningMode),
+                preferenceWindow.DuplicateCheckIndependentOfMiningModeCheckBox.IsChecked.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CheckForDuplicateCards),
                 preferenceWindow.CheckForDuplicateCardsCheckBox.IsChecked.ToString());

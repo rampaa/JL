@@ -1590,7 +1590,7 @@
                                         <ItemsPresenter></ItemsPresenter>
                                     </ControlTemplate>
                                 </ListBox.Template>
-                                
+
                                 <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                     <DockPanel Margin="10,0,10,0">
                                         <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address" Style="{StaticResource TextBlockDefault}"
@@ -1648,15 +1648,28 @@
 
                                 <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                              Cursor="Help"
-                                             ToolTip="Checks Anki for duplicate cards when in mining mode">
+                                             ToolTip="Checks Anki for duplicate cards">
                                     <DockPanel Margin="10,0,10,0">
-                                        <TextBlock HorizontalAlignment="Left" Text="Check for duplicate cards"
+                                        <TextBlock HorizontalAlignment="Left" Text="Enable duplicate card checking"
                                             Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
                                         <CheckBox x:Name="CheckForDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
                                     </DockPanel>
                                 </ListBoxItem>
-                            </ListBox>
 
+                                <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                             Cursor="Help"
+                                             ToolTip="Only takes effect if &quot;Enable duplicate card checking&quot; is enabled.
+                                             &#10;Shows the mining button even when mining mode is not enabled.
+                                             &#10;May affect the performance of &quot;Mouse move&quot; lookup mode.">
+                                    <DockPanel Margin="10,0,10,0">
+                                        <TextBlock HorizontalAlignment="Left" Text="Show duplicate status even when mining mode is not enabled"
+                                            Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        <CheckBox x:Name="DuplicateCheckIndependentOfMiningModeCheckBox"  HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                </ListBoxItem>
+
+                            </ListBox>
+                            
                             <TabControl Margin="0,10,0,0">
                                 <TabControl.Resources>
                                     <Style TargetType="{x:Type TabPanel}">

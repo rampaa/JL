@@ -780,7 +780,7 @@ internal sealed partial class PopupWindow : IDisposable
         else
         {
             resultCount = Math.Min(LastLookupResults.Length, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
-            checkForDuplicateCards = false;
+            checkForDuplicateCards = coreConfigManager is { DuplicateCheckIndependentOfMiningMode: true, CheckForDuplicateCards: true, AnkiIntegration: true } && !configManager.MineToFileInsteadOfAnki;
         }
 
         LookupDisplayResult[] popupItemSource = new LookupDisplayResult[resultCount];

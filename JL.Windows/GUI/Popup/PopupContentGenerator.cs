@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using JL.Core;
+using JL.Core.Config;
 using JL.Core.Dicts.Options;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
@@ -478,14 +479,17 @@ internal sealed class PopupContentGenerator : Decorator
 
     private static void CreateMiningButton(LookupDisplayResult lookupDisplayResult, WrapPanel top)
     {
-        PopupWindow ownerWindow = lookupDisplayResult.OwnerWindow;
-        if (!ownerWindow.MiningMode)
+        ConfigManager configManager = ConfigManager.Instance;
+        if (configManager.MiningButtonFontSize is 0)
         {
             return;
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.MiningButtonFontSize is 0)
+        PopupWindow ownerWindow = lookupDisplayResult.OwnerWindow;
+        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+        if (!ownerWindow.MiningMode
+            && ((coreConfigManager is not { DuplicateCheckIndependentOfMiningMode: true, CheckForDuplicateCards: true, AnkiIntegration: true })
+                || !configManager.MineToFileInsteadOfAnki))
         {
             return;
         }

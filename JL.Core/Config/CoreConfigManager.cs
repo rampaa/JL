@@ -18,6 +18,7 @@ public sealed class CoreConfigManager
     public bool ForceSyncAnki { get; private set; } // = false;
     public bool AllowDuplicateCards { get; private set; } // = false;
     public bool CheckForDuplicateCards { get; private set; } // = false;
+    public bool DuplicateCheckIndependentOfMiningMode { get; private set; } // = false;
     public bool CheckEntireCollectionForDuplicates { get; private set; } // = false;
     public bool CheckChildDecksForDuplicates { get; private set; } // = false;
     public bool CheckAllNoteTypesForDuplicates { get; private set; } // = false;
@@ -205,7 +206,6 @@ public sealed class CoreConfigManager
         CheckEntireCollectionForDuplicates = ConfigDBManager.GetValueFromConfig(connection, configs, CheckEntireCollectionForDuplicates, nameof(CheckEntireCollectionForDuplicates));
         CheckChildDecksForDuplicates = ConfigDBManager.GetValueFromConfig(connection, configs, CheckChildDecksForDuplicates, nameof(CheckChildDecksForDuplicates));
         CheckAllNoteTypesForDuplicates = ConfigDBManager.GetValueFromConfig(connection, configs, CheckAllNoteTypesForDuplicates, nameof(CheckAllNoteTypesForDuplicates));
-        CheckForDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, configs, CheckForDuplicateCards, nameof(CheckForDuplicateCards));
         if (AnkiIntegration)
         {
             Dictionary<string, object> duplicateScopeOptions = new(2, StringComparer.Ordinal)
@@ -236,6 +236,8 @@ public sealed class CoreConfigManager
             AnkiConnectUtils.AnkiOptions.Clear();
         }
 
+        CheckForDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, configs, CheckForDuplicateCards, nameof(CheckForDuplicateCards));
+        DuplicateCheckIndependentOfMiningMode = ConfigDBManager.GetValueFromConfig(connection, configs, DuplicateCheckIndependentOfMiningMode, nameof(DuplicateCheckIndependentOfMiningMode));
         NotifyWhenMiningSucceeds = ConfigDBManager.GetValueFromConfig(connection, configs, NotifyWhenMiningSucceeds, nameof(NotifyWhenMiningSucceeds));
         TextBoxTrimWhiteSpaceCharacters = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters));
         TextBoxRemoveNewlines = ConfigDBManager.GetValueFromConfig(connection, configs, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines));
