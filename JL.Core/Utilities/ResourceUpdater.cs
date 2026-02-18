@@ -135,18 +135,29 @@ public static class ResourceUpdater
             if (!isUpdate || noPrompt || await FrontendManager.Frontend.ShowYesNoDialogAsync($"Do you want to download the latest version of {name}?",
                 isUpdate ? "Update dictionary?" : "Download dictionary?").ConfigureAwait(false))
             {
+                bool indexJsonExists = false;
                 using HttpRequestMessage indexRequest = new(HttpMethod.Get, url);
                 if (Directory.Exists(fullDictPath))
                 {
                     string indexJsonPath = Path.Join(fullDictPath, "index.json");
                     if (File.Exists(indexJsonPath))
                     {
+                        //FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.s_asyncReadFso);
+                        //await using (fileStream.ConfigureAwait(false))
+                        //{
+                        //    JsonElement tempIndexJsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+                        //    string? tempRevision = tempIndexJsonElement.GetProperty("revision").GetString();
+                        //    Debug.Assert(tempRevision is not null);
+                        //    revision = tempRevision;
+                        //}
+
                         indexRequest.Headers.IfModifiedSince = new DateTimeOffset(File.GetLastWriteTimeUtc(indexJsonPath), TimeSpan.Zero);
+                        indexJsonExists = true;
                     }
                 }
 
                 using HttpResponseMessage indexResponse = await NetworkUtils.Client.SendAsync(indexRequest, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-                if (indexResponse.StatusCode is HttpStatusCode.NotModified)
+                if (indexJsonExists && indexResponse.StatusCode is HttpStatusCode.NotModified)
                 {
                     if (!noPrompt)
                     {
@@ -183,7 +194,7 @@ public static class ResourceUpdater
                 JsonElement indexJsonElement = await indexResponse.Content.ReadFromJsonAsync<JsonElement>().ConfigureAwait(false);
                 string? newRevision = indexJsonElement.GetProperty("revision").GetString();
                 Debug.Assert(newRevision is not null);
-                if (revision == newRevision)
+                if (indexJsonExists && revision == newRevision)
                 {
                     if (!noPrompt)
                     {
