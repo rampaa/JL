@@ -132,7 +132,13 @@ internal static class EpwingYomichanUtils
                         case "th":
                         case "td":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\t{contentResult.Content.TrimStart()}");
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" | {contentResult.Content.TrimStart()}");
+                            break;
+                        }
+
+                        case "tr":
+                        {
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart()} |");
                             break;
                         }
 
@@ -142,7 +148,7 @@ internal static class EpwingYomichanUtils
                             break;
                         }
 
-                        // "div" or "tr" or "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot"
+                        // "div" or "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot"
                         default:
                         {
                             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart()}");
@@ -179,6 +185,10 @@ internal static class EpwingYomichanUtils
                     else
                     {
                         contentText = contentElement.GetString();
+                        if (tag is "th" && string.IsNullOrWhiteSpace(contentText))
+                        {
+                            contentText = "×";
+                        }
                     }
 
                     bool appendWhitespace = tag is "span"
@@ -239,6 +249,11 @@ internal static class EpwingYomichanUtils
                     Debug.Assert(imagePath is not null);
 
                     return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false);
+                }
+
+                if (jsonElement.TryGetProperty("title", out JsonElement titleJsonElement))
+                {
+                    return new YomichanContent(parentTag ?? tag, titleJsonElement.GetString(), false);
                 }
             }
             else if (jsonElement.TryGetProperty("type", out JsonElement typeJsonElement))
