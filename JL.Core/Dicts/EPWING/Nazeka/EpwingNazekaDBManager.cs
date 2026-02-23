@@ -102,20 +102,21 @@ internal static class EpwingNazekaDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        int totalRecordCount = 0;
-        ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        Dictionary<EpwingNazekaRecord, List<string>> recordToKeysDict = [];
+        foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
-            totalRecordCount += dictRecords.Count;
-        }
-
-        HashSet<EpwingNazekaRecord> nazekaWordRecords = new(totalRecordCount);
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
-        {
-            int dictRecordsCount = dictRecords.Count;
-            for (int i = 0; i < dictRecordsCount; i++)
+            int recordsCount = records.Count;
+            for (int i = 0; i < recordsCount; i++)
             {
-                _ = nazekaWordRecords.Add((EpwingNazekaRecord)dictRecords[i]);
+                EpwingNazekaRecord record = (EpwingNazekaRecord)records[i];
+                if (recordToKeysDict.TryGetValue(record, out List<string>? keys))
+                {
+                    keys.Add(key);
+                }
+                else
+                {
+                    recordToKeysDict[record] = [key];
+                }
             }
         }
 
@@ -161,7 +162,7 @@ internal static class EpwingNazekaDBManager
         insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
-        foreach (EpwingNazekaRecord record in nazekaWordRecords)
+        foreach ((EpwingNazekaRecord record, List<string> keys) in recordToKeysDict)
         {
             rowidParam.Value = rowId;
             primarySpellingParam.Value = record.PrimarySpelling;
@@ -172,18 +173,10 @@ internal static class EpwingNazekaDBManager
             _ = insertRecordCommand.ExecuteNonQuery();
 
             recordIdParam.Value = rowId;
-            string primarySpellingInHiragana = JapaneseUtils.NormalizeText(record.PrimarySpelling);
-            searchKeyParam.Value = primarySpellingInHiragana;
-            _ = insertSearchKeyCommand.ExecuteNonQuery();
-
-            if (record.Reading is not null)
+            foreach (ref readonly string key in keys.AsReadOnlySpan())
             {
-                string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading);
-                if (readingInHiragana != primarySpellingInHiragana)
-                {
-                    searchKeyParam.Value = readingInHiragana;
-                    _ = insertSearchKeyCommand.ExecuteNonQuery();
-                }
+                searchKeyParam.Value = key;
+                _ = insertSearchKeyCommand.ExecuteNonQuery();
             }
 
             ++rowId;
