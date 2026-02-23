@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
-using JL.Core.Utilities.Japanese.Okurigana;
 using JL.Core.Utilities.Japanese;
+using JL.Core.Utilities.Japanese.Okurigana;
 
 namespace JL.Core.Dicts.JMdict;
 
