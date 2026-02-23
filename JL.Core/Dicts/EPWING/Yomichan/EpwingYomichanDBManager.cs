@@ -122,7 +122,7 @@ internal static class EpwingYomichanDBManager
             }
         }
 
-        ulong rowid = 1;
+        ulong rowId = 1;
 
         using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
         DBUtils.SetSynchronousModeToNormal(connection);
@@ -168,7 +168,7 @@ internal static class EpwingYomichanDBManager
 
         foreach ((EpwingYomichanRecord record, List<string> keys) in recordToKeysDict)
         {
-            rowidParam.Value = rowid;
+            rowidParam.Value = rowId;
             primarySpellingParam.Value = record.PrimarySpelling;
             readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
             glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
@@ -177,14 +177,14 @@ internal static class EpwingYomichanDBManager
             imagePathsParam.Value = record.ImagePaths is not null ? MessagePackSerializer.Serialize(record.ImagePaths) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            recordIdParam.Value = rowid;
+            recordIdParam.Value = rowId;
             foreach (ref readonly string key in keys.AsReadOnlySpan())
             {
                 searchKeyParam.Value = key;
                 _ = insertSearchKeyCommand.ExecuteNonQuery();
             }
 
-            ++rowid;
+            ++rowId;
         }
 
         transaction.Commit();
