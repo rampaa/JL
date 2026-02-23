@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese.Okurigana;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
 
@@ -190,6 +191,21 @@ internal static class EpwingYomichanLoader
                 else
                 {
                     dict.Contents[readingInHiragana] = [yomichanRecord];
+                }
+
+                foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
+                {
+                    if (dict.Contents.TryGetValue(variant, out IList<IDictRecord>? tempRecordList))
+                    {
+                        if (!tempRecordList.Contains(yomichanRecord))
+                        {
+                            tempRecordList.Add(yomichanRecord);
+                        }
+                    }
+                    else
+                    {
+                        dict.Contents[variant] = [yomichanRecord];
+                    }
                 }
             }
         }

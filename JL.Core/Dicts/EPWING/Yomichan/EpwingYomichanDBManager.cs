@@ -13,7 +13,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 24;
+    public const int Version = 25;
 
     private const string SingleTermQuery =
         """
@@ -104,20 +104,21 @@ internal static class EpwingYomichanDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        int totalRecordCount = 0;
-        ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
+        Dictionary<EpwingYomichanRecord, List<string>> recordToKeysDict = [];
+        foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
-            totalRecordCount += dictRecords.Count;
-        }
-
-        HashSet<EpwingYomichanRecord> yomichanWordRecords = new(totalRecordCount);
-        foreach (IList<IDictRecord> dictRecords in dictRecordValues)
-        {
-            int dictRecordsCount = dictRecords.Count;
-            for (int i = 0; i < dictRecordsCount; i++)
+            int recordsCount = records.Count;
+            for (int i = 0; i < recordsCount; i++)
             {
-                _ = yomichanWordRecords.Add((EpwingYomichanRecord)dictRecords[i]);
+                EpwingYomichanRecord record = (EpwingYomichanRecord)records[i];
+                if (recordToKeysDict.TryGetValue(record, out List<string>? keys))
+                {
+                    keys.Add(key);
+                }
+                else
+                {
+                    recordToKeysDict[record] = [key];
+                }
             }
         }
 
@@ -165,7 +166,7 @@ internal static class EpwingYomichanDBManager
         insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
-        foreach (EpwingYomichanRecord record in yomichanWordRecords)
+        foreach ((EpwingYomichanRecord record, List<string> keys) in recordToKeysDict)
         {
             rowidParam.Value = rowid;
             primarySpellingParam.Value = record.PrimarySpelling;
@@ -177,18 +178,10 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.ExecuteNonQuery();
 
             recordIdParam.Value = rowid;
-            string primarySpellingInHiragana = JapaneseUtils.NormalizeText(record.PrimarySpelling);
-            searchKeyParam.Value = primarySpellingInHiragana;
-            _ = insertSearchKeyCommand.ExecuteNonQuery();
-
-            if (record.Reading is not null)
+            foreach (ref readonly string key in keys.AsReadOnlySpan())
             {
-                string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading);
-                if (readingInHiragana != primarySpellingInHiragana)
-                {
-                    searchKeyParam.Value = readingInHiragana;
-                    _ = insertSearchKeyCommand.ExecuteNonQuery();
-                }
+                searchKeyParam.Value = key;
+                _ = insertSearchKeyCommand.ExecuteNonQuery();
             }
 
             ++rowid;

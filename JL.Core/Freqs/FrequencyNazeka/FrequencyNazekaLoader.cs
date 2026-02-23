@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese.Okurigana;
 
 namespace JL.Core.Freqs.FrequencyNazeka;
 
@@ -43,6 +44,11 @@ internal static class FrequencyNazekaLoader
                 {
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
                     FreqUtils.AddOrUpdate(freq.Contents, exactSpellingInHiragana, frequencyRecordWithReading);
+
+                    foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(exactSpellingInHiragana, reading))
+                    {
+                        FreqUtils.AddOrUpdate(freq.Contents, variant, frequencyRecordWithReading);
+                    }
                 }
             }
         }

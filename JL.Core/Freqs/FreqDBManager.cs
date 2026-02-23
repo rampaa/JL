@@ -11,7 +11,7 @@ namespace JL.Core.Freqs;
 
 internal static class FreqDBManager
 {
-    public const int Version = 9;
+    public const int Version = 10;
 
     private enum ColumnIndex
     {

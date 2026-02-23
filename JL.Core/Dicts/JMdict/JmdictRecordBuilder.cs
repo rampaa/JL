@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese.Okurigana;
 
 namespace JL.Core.Dicts.JMdict;
 
@@ -55,6 +56,36 @@ internal static class JmdictRecordBuilder
             else
             {
                 jmdictDictionary[key] = [jmdictRecord];
+            }
+
+            if (jmdictRecord.Readings is not null)
+            {
+                foreach (string reading in jmdictRecord.Readings)
+                {
+                    string readingInHiragana = JapaneseUtils.NormalizeText(reading);
+                    if (readingInHiragana == key)
+                    {
+                        break;
+                    }
+
+                    foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(key, readingInHiragana))
+                    {
+                        if (!recordDictionary.ContainsKey(variant))
+                        {
+                            if (jmdictDictionary.TryGetValue(variant, out tempRecordList))
+                            {
+                                if (!tempRecordList.Contains(jmdictRecord))
+                                {
+                                    tempRecordList.Add(jmdictRecord);
+                                }
+                            }
+                            else
+                            {
+                                jmdictDictionary[variant] = [jmdictRecord];
+                            }
+                        }
+                    }
+                }
             }
         }
     }

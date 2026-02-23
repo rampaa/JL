@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese.Okurigana;
 
 namespace JL.Core.Freqs.FrequencyYomichan;
 
@@ -103,6 +104,11 @@ internal static class FrequencyYomichanLoader
 
                         FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
                         FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithReading);
+
+                        foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, reading))
+                        {
+                            FreqUtils.AddOrUpdate(freq.Contents, variant, frequencyRecordWithReading);
+                        }
                     }
                 }
             }

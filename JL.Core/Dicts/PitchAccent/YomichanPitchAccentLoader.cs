@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese.Okurigana;
 
 namespace JL.Core.Dicts.PitchAccent;
 
@@ -62,6 +63,21 @@ internal static class YomichanPitchAccentLoader
                             else
                             {
                                 pitchDict[readingInHiragana] = [newEntry];
+                            }
+                        }
+
+                        foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(spellingInHiragana, readingInHiragana))
+                        {
+                            if (pitchDict.TryGetValue(variant, out IList<IDictRecord>? tempRecordList))
+                            {
+                                if (!tempRecordList.Contains(newEntry))
+                                {
+                                    tempRecordList.Add(newEntry);
+                                }
+                            }
+                            else
+                            {
+                                pitchDict[variant] = [newEntry];
                             }
                         }
                     }

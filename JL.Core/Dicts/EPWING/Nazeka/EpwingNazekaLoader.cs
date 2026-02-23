@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese.Okurigana;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 
@@ -93,6 +94,21 @@ internal static class EpwingNazekaLoader
                             if (primarySpellingInHiragana != readingInHiragana)
                             {
                                 AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict);
+                            }
+
+                            foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
+                            {
+                                if (dict.Contents.TryGetValue(variant, out IList<IDictRecord>? tempRecordList))
+                                {
+                                    if (!tempRecordList.Contains(record))
+                                    {
+                                        tempRecordList.Add(record);
+                                    }
+                                }
+                                else
+                                {
+                                    dict.Contents[variant] = [record];
+                                }
                             }
                         }
 
