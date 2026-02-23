@@ -21,6 +21,7 @@ using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Bool;
 using JL.Core.Utilities.Database;
+using JL.Core.Utilities.Japanese;
 using JL.Windows.Config;
 using JL.Windows.External.Magpie;
 using JL.Windows.External.Tsukikage;

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Dicts.JMnedict;
 

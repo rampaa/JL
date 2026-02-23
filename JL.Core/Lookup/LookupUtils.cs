@@ -21,6 +21,7 @@ using JL.Core.Utilities.Array;
 using JL.Core.Utilities.Database;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
+using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Lookup;
 

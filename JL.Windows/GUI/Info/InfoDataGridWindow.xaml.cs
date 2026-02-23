@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese;
 using JL.Windows.Config;
 using JL.Windows.Interop;
 

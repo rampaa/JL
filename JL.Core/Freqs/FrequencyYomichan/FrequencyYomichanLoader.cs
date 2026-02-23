@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese;
 using JL.Core.Utilities.Japanese.Okurigana;
 
 namespace JL.Core.Freqs.FrequencyYomichan;

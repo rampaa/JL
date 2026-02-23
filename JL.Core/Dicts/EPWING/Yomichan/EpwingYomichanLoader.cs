@@ -4,6 +4,7 @@ using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Japanese.Okurigana;
+using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
 

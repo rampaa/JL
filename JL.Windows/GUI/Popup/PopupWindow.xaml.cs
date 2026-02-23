@@ -14,6 +14,7 @@ using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese;
 using JL.Windows.Config;
 using JL.Windows.Interop;
 using JL.Windows.SpeechSynthesis;

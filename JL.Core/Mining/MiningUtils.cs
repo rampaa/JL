@@ -13,6 +13,7 @@ using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
+using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Mining;
 

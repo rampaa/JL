@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using JL.Core;
 using JL.Core.Config;
 using JL.Core.Statistics;
-using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese;
 using JL.Windows.Config;
 using JL.Windows.GUI;
 

@@ -5,6 +5,7 @@ using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 

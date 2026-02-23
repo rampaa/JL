@@ -6,6 +6,7 @@ using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.WordClass;
 

@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace JL.Core.Utilities;
+namespace JL.Core.Utilities.Japanese;
 
 public static partial class JapaneseUtils
 {
@@ -868,15 +868,15 @@ public static partial class JapaneseUtils
             {
                 // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included
                 int codePoint = currentChar;
-                if (codePoint is 0x00D7 // × (\u00D7)
+                if (codePoint is (>= 0x2FF0 and <= 0x30FF) // Ideographic Description Characters (2FF0–2FFF), CJK Symbols and Punctuation (3000–303F), Hiragana (3040–309F), Katakana (30A0–30FF)
+                    or (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
+                    or 0x00D7 // × (\u00D7)
                     or (>= 0x2000 and <= 0x206F) // General Punctuation (2000-206F): ‥, …, •, ※
                     or (>= 0x25A0 and <= 0x25FF) // Geometric Shapes (25A0-U+25FF): ◦, ◎, ○, △, ◉
                     or (>= 0x2E80 and <= 0x2FDF) // CJK Radicals Supplement (2E80–2EFF), Kangxi Radicals (2F00–2FDF)
-                    or (>= 0x2FF0 and <= 0x30FF) // Ideographic Description Characters (2FF0–2FFF), CJK Symbols and Punctuation (3000–303F), Hiragana (3040–309F), Katakana (30A0–30FF)
                     or (>= 0x3190 and <= 0x319F) // Kanbun (3190–319F)
                     or (>= 0x31C0 and <= 0x325F) // CJK Strokes (31C0–31EF), Katakana Phonetic Extensions (31F0–31FF), Enclosed CJK Letters and Months 3220-325F
                     or (>= 0x3280 and <= 0x4DBF) // Enclosed CJK Letters and Months 3280-32FF, CJK Compatibility (3300–33FF), CJK Unified Ideographs Extension A (3400–4DBF)
-                    or (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
                     or (>= 0xF900 and <= 0xFAFF) // CJK Compatibility Ideographs(F900–FAFF)
                     or (>= 0xFE30 and <= 0xFE4F) // CJK Compatibility Forms (FE30–FE4F)
                     or (>= 0xFF00 and <= 0xFF9F) // Halfwidth and Fullwidth Forms FF00-FF9F

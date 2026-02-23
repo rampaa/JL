@@ -4,6 +4,7 @@ using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using MessagePack;
 using Microsoft.Data.Sqlite;
+using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Dicts.JMnedict;
 
