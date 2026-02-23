@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using JL.Core.Utilities;
 
 namespace JL.Core.Utilities.Japanese.Okurigana;
 

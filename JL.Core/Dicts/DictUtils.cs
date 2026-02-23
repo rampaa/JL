@@ -1540,7 +1540,6 @@ public static class DictUtils
                     dict.AutoUpdatable = true;
                     if (dict.Type is DictType.JMdict)
                     {
-                        bool includeProperNameEntries = dict.Options.ProperNameEntries?.Value ?? true;
                         dict.Url = s_jmdictUrl;
                     }
                     else if (dict.Type is DictType.Kanjidic)
