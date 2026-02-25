@@ -71,6 +71,15 @@ internal sealed class DeconjugatorTestsForV5US
     }
 
     [Test]
+    public void Deconjugate_PlainPastAffirmative_2_V5US()
+    {
+        const string termToDeconjugate = "問うた";
+        const string expected = "～past";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "問う" && form.Tags[^1] is "v5u-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainPastNegative_V5US()
     {
         const string termToDeconjugate = "問わなかった";
@@ -101,6 +110,15 @@ internal sealed class DeconjugatorTestsForV5US
     public void Deconjugate_PlainTeFormAffirmative_V5US()
     {
         const string termToDeconjugate = "問って";
+        const string expected = "～te";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "問う" && form.Tags[^1] is "v5u-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PlainTeFormAffirmative_2_V5US()
+    {
+        const string termToDeconjugate = "問うて";
         const string expected = "～te";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "問う" && form.Tags[^1] is "v5u-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -371,6 +389,15 @@ internal sealed class DeconjugatorTestsForV5US
     public void Deconjugate_TemporalConditionalAffirmative_V5US()
     {
         const string termToDeconjugate = "問ったら";
+        const string expected = "～conditional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "問う" && form.Tags[^1] is "v5u-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_TemporalConditionalAffirmative_2_V5US()
+    {
+        const string termToDeconjugate = "問うたら";
         const string expected = "～conditional";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "問う" && form.Tags[^1] is "v5u-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -1416,6 +1443,15 @@ internal sealed class DeconjugatorTestsForV5US
     public void Deconjugate_PlainNonPastTariAffirmative_V5US()
     {
         const string termToDeconjugate = "問ったり";
+        const string expected = "～tari";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "問う" && form.Tags[^1] is "v5u-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PlainNonPastTariAffirmative_2_V5US()
+    {
+        const string termToDeconjugate = "問うたり";
         const string expected = "～tari";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "問う" && form.Tags[^1] is "v5u-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
