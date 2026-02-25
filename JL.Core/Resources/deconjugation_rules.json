@@ -658,22 +658,38 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "" ],
-    "con_end": [ "すぎる" ],
+    "dec_end": [ "い" ],
+    "con_end": [ "き" ],
+    "dec_tag": [ "adj-i" ],
+    "con_tag": [ "stem-adj-base" ],
+    "detail": "classical attributive"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "い", "い" ],
+    "con_end": [ "げ", "気" ],
+    "dec_tag": [ "adj-i" ],
+    "con_tag": [ "stem-adj-base" ],
+    "detail": "seeming"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "", "" ],
+    "con_end": [ "すぎる", "過ぎる" ],
     "dec_tag": [ "stem-adj-base" ],
     "con_tag": [ "v1" ],
     "detail": "excess"
   },
   {
-    "type": "stdrule",
-    "dec_end": [ "" ],
-    "con_end": [ "すぎる" ],
+    "type": "onlyfinalrule",
+    "dec_end": [ "", "" ],
+    "con_end": [ "すぎる", "過ぎる" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "v1" ],
     "detail": "too much"
   },
   {
-    "type": "stdrule",
+    "type": "onlyfinalrule",
     "dec_end": [ "" ],
     "con_end": [ "そう" ],
     "dec_tag": [ "stem-adj-base" ],
@@ -697,7 +713,7 @@
     "detail": "garu"
   },
   {
-    "type": "stdrule",
+    "type": "onlyfinalrule",
     "dec_end": [ "" ],
     "con_end": [ "さ" ],
     "dec_tag": [ "stem-adj-base" ],
@@ -1341,7 +1357,7 @@
     "detail": "ksb"
   },
   {
-    "type": "stdrule",
+    "type": "onlyfinalrule",
     "dec_end": [ "" ],
     "con_end": [ "ください" ],
     "dec_tag": [ "stem-te" ],

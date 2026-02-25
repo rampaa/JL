@@ -125,6 +125,15 @@ internal sealed class DeconjugatorTestsForAdjI
     }
 
     [Test]
+    public void Deconjugate_PlainNonPastSugiruAffirmative_2_AdjI()
+    {
+        const string termToDeconjugate = "小さ過ぎる";
+        const string expected = "～excess";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "小さい" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastSouAffirmative_AdjI()
     {
         const string termToDeconjugate = "小さそう";
@@ -202,6 +211,33 @@ internal sealed class DeconjugatorTestsForAdjI
         const string termToDeconjugate = "小ささ";
         const string expected = "～noun form";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "小さい" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_ClassicalAttributive_AdjI()
+    {
+        const string termToDeconjugate = "小さき";
+        const string expected = "～classical attributive";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "小さい" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Ge_AdjI()
+    {
+        const string termToDeconjugate = "怪しげ";
+        const string expected = "～seeming";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "怪しい" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Ge_2_AdjI()
+    {
+        const string termToDeconjugate = "怪し気";
+        const string expected = "～seeming";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "怪しい" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 }
