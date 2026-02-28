@@ -2016,6 +2016,15 @@ internal sealed class DeconjugatorTestsForV1
     }
 
     [Test]
+    public void Deconjugate_PlainNonPastNegativeConjectural_2_V1()
+    {
+        const string termToDeconjugate = "生きるまい";
+        const string expected = "～negative conjectural";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "生きる" && form.Tags[^1] is "v1").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastNegativeConditional_V1()
     {
         const string termToDeconjugate = "生きねば";
