@@ -1286,17 +1286,9 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "る", "る", "する", "する", "る", "す", "る", "ぶ", "ぐ", "く", "く", "む", "ぬ", "る", "つ", "う", "う", "ずる", "る", "る" ],
-    "con_end": [ "さす", "さす", "さす", "しさす", "さす", "さす", "らす", "ばす", "がす", "かす", "かす", "ます", "なす", "らす", "たす", "わす", "わす", "じさす", "らす", "らす" ],
-    "dec_tag": [ "v1", "v1-s", "vs-s", "vs-s", "vk", "v5s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5t", "v5u", "v5u-s", "vz", "v4r", "v5r-i" ],
-    "con_tag": [ "v1", "v1-s", "vs-s", "vs-s", "vk", "v5s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5t", "v5u", "v5u-s", "vz", "v4r", "v5r-i" ],
-    "detail": "short causative"
-  },
-  {
-    "type": "stdrule",
-    "dec_end": [ "する" ],
-    "con_end": [ "さす" ],
-    "dec_tag": [ "vs-i" ],
+    "dec_end": [ "る", "る", "する", "する", "る", "す", "る", "ぶ", "ぐ", "く", "く", "む", "ぬ", "る", "つ", "う", "う", "ずる", "る", "る", "する", "す" ],
+    "con_end": [ "さす", "さす", "さす", "しさす", "さす", "さす", "らす", "ばす", "がす", "かす", "かす", "ます", "なす", "らす", "たす", "わす", "わす", "じさす", "らす", "らす", "さす", "さす" ],
+    "dec_tag": [ "v1", "v1-s", "vs-s", "vs-s", "vk", "v5s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5t", "v5u", "v5u-s", "vz", "v4r", "v5r-i", "vs-i", "vs-c" ],
     "con_tag": [ "v5s" ],
     "detail": "short causative"
   },
@@ -1323,14 +1315,6 @@
     "dec_tag": [ "v1", "v1-s" ],
     "con_tag": [ "v1", "v1-s" ],
     "detail": "causative"
-  },
-  {
-    "type": "stdrule",
-    "dec_end": [ "" ],
-    "con_end": [ "ささる" ],
-    "dec_tag": [ "stem-mizenkei" ],
-    "con_tag": [ "v1" ],
-    "detail": "colloquial causative"
   },
   {
     "type": "stdrule",

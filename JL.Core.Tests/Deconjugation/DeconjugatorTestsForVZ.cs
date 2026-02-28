@@ -386,6 +386,15 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_PoliteShortCausativeAffirmative_VZ()
+    {
+        const string termToDeconjugate = "命じさします";
+        const string expected = "～short causative→polite";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PoliteCausativeNegative_VZ()
     {
         const string termToDeconjugate = "命じさせません";
@@ -1911,7 +1920,7 @@ internal sealed class DeconjugatorTestsForVZ
     public void Deconjugate_PlainNonPastColloquialCausativeNegative_VZ()
     {
         const string termToDeconjugate = "命じささない";
-        const string expected = "～colloquial causative→negative";
+        const string expected = "～short causative→negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }

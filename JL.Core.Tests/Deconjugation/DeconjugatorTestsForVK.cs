@@ -359,6 +359,15 @@ internal sealed class DeconjugatorTestsForVK
     }
 
     [Test]
+    public void Deconjugate_PoliteShortCausativeAffirmative_VK()
+    {
+        const string termToDeconjugate = "来さします";
+        const string expected = "～short causative→polite";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "来る" && form.Tags[^1] is "vk").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PoliteCausativeNegative_VK()
     {
         const string termToDeconjugate = "来させません";
@@ -1947,7 +1956,7 @@ internal sealed class DeconjugatorTestsForVK
     public void Deconjugate_PlainNonPastColloquialCausativeNegative_VK()
     {
         const string termToDeconjugate = "来ささない";
-        const string expected = "～colloquial causative→negative";
+        const string expected = "～short causative→negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "来る" && form.Tags[^1] is "vk").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
