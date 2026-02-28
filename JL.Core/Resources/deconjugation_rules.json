@@ -1014,10 +1014,10 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "" ],
-    "con_end": [ "いらっしゃる" ],
-    "dec_tag": [ "stem-te-verbal" ],
-    "con_tag": [ "v5aru" ],
+    "dec_end": [ "", "" ],
+    "con_end": [ "いらっしゃる", "らっしゃる" ],
+    "dec_tag": [ "stem-te-verbal", "stem-te-verbal" ],
+    "con_tag": [ "v5aru", "v5aru" ],
     "detail": "honorific teiru"
   },
   {
@@ -1582,11 +1582,11 @@
     "detail": "contracted"
   },
   {
-    "type": "onlyfinalrule",
-    "dec_end": [ "る", "る", "る", "る", "る" ],
-    "con_end": [ "ん", "ん", "ん", "ん", "ん" ],
-    "dec_tag": [ "v1", "v1-s", "v5r", "v5aru", "vk" ],
-    "con_tag": [ "uninflectable" ],
+    "type": "stdrule",
+    "dec_end": [ "る", "る", "る", "る", "る", "る" ],
+    "con_end": [ "ん", "ん", "ん", "ん", "ん", "ん" ],
+    "dec_tag": [ "v1", "v1-s", "v5r", "v5aru", "vk", "vs-i" ],
+    "con_tag": [ "stem-mizenkei" ],
     "detail": "slurred"
   },
   {
