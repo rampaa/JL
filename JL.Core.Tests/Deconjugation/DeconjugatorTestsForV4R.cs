@@ -2016,6 +2016,15 @@ internal sealed class DeconjugatorTestsForV4R
     }
 
     [Test]
+    public void Deconjugate_PoliteNonPastNegativeConjectural_V4R()
+    {
+        const string termToDeconjugate = "おじゃりますまい";
+        const string expected = "～polite negative conjectural";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "おじゃる" && form.Tags[^1] is "v4r").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastClassicalHypotheticalConditional_V4R()
     {
         const string termToDeconjugate = "おじゃらば";

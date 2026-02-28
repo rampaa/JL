@@ -2017,6 +2017,15 @@ internal sealed class DeconjugatorTestsForV5B
     }
 
     [Test]
+    public void Deconjugate_PoliteNonPastNegativeConjectural_V5B()
+    {
+        const string termToDeconjugate = "選びますまい";
+        const string expected = "～polite negative conjectural";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "選ぶ" && form.Tags[^1] is "v5b").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastClassicalHypotheticalConditional_V5B()
     {
         const string termToDeconjugate = "選ばば";

@@ -2052,6 +2052,15 @@ internal sealed class DeconjugatorTestsForV5RI
     }
 
     [Test]
+    public void Deconjugate_PoliteNonPastNegativeConjectural_V5RI()
+    {
+        const string termToDeconjugate = "有りますまい";
+        const string expected = "～polite negative conjectural";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "有る" && form.Tags[^1] is "v5r-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastClassicalHypotheticalConditional_V5RI()
     {
         const string termToDeconjugate = "有らば";

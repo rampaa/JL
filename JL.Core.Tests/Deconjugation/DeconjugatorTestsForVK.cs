@@ -2016,6 +2016,15 @@ internal sealed class DeconjugatorTestsForVK
     }
 
     [Test]
+    public void Deconjugate_PoliteNonPastNegativeConjectural_VK()
+    {
+        const string termToDeconjugate = "来ますまい";
+        const string expected = "～polite negative conjectural";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "来る" && form.Tags[^1] is "vk").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastNegativeConditional_VK()
     {
         const string termToDeconjugate = "来ねば";
