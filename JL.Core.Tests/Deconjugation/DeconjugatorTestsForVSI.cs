@@ -2116,6 +2116,15 @@ internal sealed class DeconjugatorTestsForVSI
     }
 
     [Test]
+    public void Deconjugate_PlainNonPastNegativeConjectural3_VSI()
+    {
+        const string termToDeconjugate = "しまい";
+        const string expected = "～negative conjectural";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "する" && form.Tags[^1] is "vs-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PoliteNonPastNegativeConjectural_VSI()
     {
         const string termToDeconjugate = "しますまい";
