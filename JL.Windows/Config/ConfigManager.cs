@@ -1126,7 +1126,7 @@ internal sealed class ConfigManager
 
         preferenceWindow.MainWindowFontWeightComboBox.ItemsSource = MainWindowFontWeights;
         int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, static fw => (string)fw.Content == MainWindow.Instance.MainTextBox.FontWeight.ToString());
-        if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
+        if (mainWindowFontWeightIndex < 0)
         {
             mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, static fw => fw.Content is "Normal");
             if (mainWindowFontWeightIndex < 0)

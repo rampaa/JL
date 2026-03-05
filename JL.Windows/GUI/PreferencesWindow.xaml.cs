@@ -806,12 +806,21 @@ internal sealed partial class PreferencesWindow
         }
 
         ComboBoxItem[] fontWeightNames = WindowsUtils.GetFontWeightNames(selectedFont);
-
-        string? selectedFontWeight = (string?)MainWindowFontWeightComboBox.SelectedValue;
+        if (fontWeightNames.Length is 0)
+        {
+            LoggerManager.Logger.Error("No font weights found for font {FontFamily}", selectedFont);
+            fontWeightNames = [new ComboBoxItem
+            {
+                Content = "Normal",
+                FontFamily = new System.Windows.Media.FontFamily(selectedFont),
+                FontWeight = FontWeights.Normal
+            }];
+        }
 
         ConfigManager.MainWindowFontWeights = fontWeightNames;
         MainWindowFontWeightComboBox.ItemsSource = fontWeightNames;
 
+        string? selectedFontWeight = (string?)MainWindowFontWeightComboBox.SelectedValue;
         int index = Array.FindIndex(fontWeightNames, fw => (string)fw.Content == selectedFontWeight);
         if (index < 0)
         {
