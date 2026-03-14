@@ -213,9 +213,10 @@ internal static class EpwingYomichanUtils
                     Debug.Assert(contentText is not null);
 
                     bool appendWhitespace = tag is "span"
-                        && ((jsonElement.TryGetProperty("style", out JsonElement styleElement) && styleElement.TryGetProperty("marginRight", out _))
+                        && (jsonElement.TryGetProperty("style", out JsonElement styleElement)
+                            ? styleElement.TryGetProperty("marginRight", out _)
                             // Heuristic for Japanese-English dictionaries whose CSS is stored in a separate file and thus cannot be parsed currently
-                            || (jsonElement.TryGetProperty("data", out JsonElement dataElement) && dataElement.TryGetProperty("class", out _) && char.IsAscii(contentText[0])));
+                            : jsonElement.TryGetProperty("data", out JsonElement dataElement) && dataElement.TryGetProperty("class", out _) && char.IsAscii(contentText[0]));
 
                     return new YomichanContent(parentTag ?? tag, contentText, appendWhitespace);
                 }
