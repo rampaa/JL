@@ -1568,7 +1568,7 @@ public static class LookupUtils
                             if (positions is null)
                             {
                                 positions = new byte[readings.Length];
-                                for (int k = 0; j < k; k++)
+                                for (int k = 0; k < i; k++)
                                 {
                                     positions[k] = byte.MaxValue;
                                 }
@@ -1600,7 +1600,7 @@ public static class LookupUtils
                                 if (positions is null)
                                 {
                                     positions = new byte[readings.Length];
-                                    for (int k = 0; i < k; k++)
+                                    for (int k = 0; k < i; k++)
                                     {
                                         positions[k] = byte.MaxValue;
                                     }
