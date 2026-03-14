@@ -99,14 +99,21 @@ internal static class EpwingYomichanLoader
             }
 
             Debug.Assert(definitionTagsStr is not null);
-            definitionTags = definitionTagsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            if (definitionTags.Length is 0)
+            if (definitionTagsStr.Length > 0)
             {
-                definitionTags = null;
+                definitionTags = definitionTagsStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                if (definitionTags.Length is 0)
+                {
+                    definitionTags = null;
+                }
+                else
+                {
+                    definitionTags.DeduplicateStringsInArray();
+                }
             }
             else
             {
-                definitionTags.DeduplicateStringsInArray();
+                definitionTags = null;
             }
         }
 
@@ -115,11 +122,11 @@ internal static class EpwingYomichanLoader
             return null;
         }
 
-        List<string> imagePaths = [];
+        List<string>? imagePaths = null;
         string[]? definitions;
         try
         {
-            definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5], dict, imagePaths);
+            definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5], dict, ref imagePaths);
         }
         catch (InvalidOperationException ex)
         {
@@ -130,7 +137,7 @@ internal static class EpwingYomichanLoader
         definitions?.DeduplicateStringsInArray();
 
         if (definitions is null
-            ? imagePaths.Count is 0
+            ? imagePaths is null
             : !EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
         {
             return null;
@@ -148,21 +155,29 @@ internal static class EpwingYomichanLoader
         }
 
         Debug.Assert(wordClassesStr is not null);
-        string[]? wordClasses = wordClassesStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (wordClasses.Length is 0)
+        string[]? wordClasses;
+        if (wordClassesStr.Length > 0)
         {
-            wordClasses = null;
+            wordClasses = wordClassesStr.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (wordClasses.Length is 0)
+            {
+                wordClasses = null;
+            }
+            else
+            {
+                wordClasses.DeduplicateStringsInArray();
+            }
         }
         else
         {
-            wordClasses.DeduplicateStringsInArray();
+            wordClasses = null;
         }
 
         //jsonElements[4].TryGetInt32(out int score);
         //jsonElements[6].TryGetInt32(out int sequence);
         //string[] termTags = jsonElements[7].ToString();
 
-        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imagePaths.TrimToArray());
+        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imagePaths?.TrimToArray());
     }
 
     private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict, bool nonKanjiDict, bool nonNameDict)

@@ -8,7 +8,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanUtils
 {
-    public static string[]? GetDefinitions(JsonElement jsonElement, Dict dict, List<string> imagePaths)
+    public static string[]? GetDefinitions(JsonElement jsonElement, Dict dict, ref List<string>? imagePaths)
     {
         List<string> definitions = new(jsonElement.GetArrayLength());
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
@@ -22,7 +22,7 @@ internal static class EpwingYomichanUtils
             {
                 StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
 
-                AppendDefinitionsFromJsonArray(sb, definitionElement, dict, imagePaths, null);
+                AppendDefinitionsFromJsonArray(sb, definitionElement, dict, ref imagePaths, null);
                 if (sb.Length > 0)
                 {
                     definition = sb.ToString();
@@ -32,11 +32,12 @@ internal static class EpwingYomichanUtils
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
             {
-                YomichanContent objContent = GetDefinitionsFromJsonObject(definitionElement, dict, imagePaths, null);
+                YomichanContent objContent = GetDefinitionsFromJsonObject(definitionElement, dict, ref imagePaths, null);
                 if (objContent.Tag is "img")
                 {
                     if (objContent.Content is not null)
                     {
+                        imagePaths ??= [];
                         imagePaths.Add(objContent.Content);
                     }
                 }
@@ -59,7 +60,7 @@ internal static class EpwingYomichanUtils
         return definitions.TrimToArray();
     }
 
-    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict, List<string> imagePaths, string? parentTag)
+    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict, ref List<string>? imagePaths, string? parentTag)
     {
         bool first = true;
         string? lastTag = null;
@@ -72,7 +73,7 @@ internal static class EpwingYomichanUtils
             }
             else if (definitionElement.ValueKind is JsonValueKind.Array)
             {
-                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, imagePaths, null);
+                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, ref imagePaths, null);
                 lastTag = null;
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
@@ -83,14 +84,15 @@ internal static class EpwingYomichanUtils
                     parentTag = null;
                 }
 
-                YomichanContent contentResult = GetDefinitionsFromJsonObject(definitionElement, dict, imagePaths, parentTag);
-                if (contentResult.Content is not null)
+                YomichanContent contentResult = GetDefinitionsFromJsonObject(definitionElement, dict, ref imagePaths, parentTag);
+                string? content = contentResult.Content;
+                if (content is not null)
                 {
                     switch (contentResult.Tag)
                     {
                         case "span":
                         {
-                            _ = stringBuilder.Append(contentResult.Content);
+                            _ = stringBuilder.Append(content);
                             if (contentResult.AppendWhitespace)
                             {
                                 _ = stringBuilder.Append(' ');
@@ -101,19 +103,19 @@ internal static class EpwingYomichanUtils
                         case "a":
                         case "ruby":
                         {
-                            _ = stringBuilder.Append(contentResult.Content);
+                            _ = stringBuilder.Append(content);
                             break;
                         }
 
                         case "rt":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"[{contentResult.Content}]");
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"[{content}]");
                             break;
                         }
 
                         case "li":
                         {
-                            string content = contentResult.Content.TrimStart();
+                            content = content.TrimStart();
                             if (!content.StartsWith('•'))
                             {
                                 _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n• {content}");
@@ -128,26 +130,27 @@ internal static class EpwingYomichanUtils
                         case "ul":
                         case "ol":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.Trim()}\n");
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content.Trim()}\n");
                             break;
                         }
 
                         case "th":
                         case "td":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" | {contentResult.Content.TrimStart()}");
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" | {content.TrimStart()}");
                             break;
                         }
 
                         case "tr":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart()} |");
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content.TrimStart()} |");
                             break;
                         }
 
                         case "img":
                         {
-                            imagePaths.Add(contentResult.Content);
+                            imagePaths ??= [];
+                            imagePaths.Add(content);
                             break;
                         }
 
@@ -155,11 +158,11 @@ internal static class EpwingYomichanUtils
                         {
                             if (lastTag is "div" && stringBuilder.Length > 0 && stringBuilder[^1] is '\n')
                             {
-                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{contentResult.Content.Trim()}\n");
+                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{content.Trim()}\n");
                             }
                             else
                             {
-                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.Trim()}\n");
+                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content.Trim()}\n");
                             }
 
                             break;
@@ -168,7 +171,7 @@ internal static class EpwingYomichanUtils
                         // "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot"
                         default:
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart()}");
+                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content.TrimStart()}");
                             break;
                         }
                     }
@@ -179,7 +182,7 @@ internal static class EpwingYomichanUtils
         }
     }
 
-    private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict, List<string> imagePaths, string? parentTag)
+    private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict, ref List<string>? imagePaths, string? parentTag)
     {
         while (true)
         {
@@ -225,7 +228,7 @@ internal static class EpwingYomichanUtils
                 {
                     StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
 
-                    AppendDefinitionsFromJsonArray(sb, contentElement, dict, imagePaths, tag);
+                    AppendDefinitionsFromJsonArray(sb, contentElement, dict, ref imagePaths, tag);
                     string? content = null;
                     if (sb.Length > 0)
                     {

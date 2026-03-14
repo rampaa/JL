@@ -225,7 +225,7 @@ public static partial class JapaneseUtils
             return normalizedText;
         }
 
-        StringBuilder textInHiraganaBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(normalizedText[..firstKatakanaOrIterationMarkIndex]);
+        StringBuilder textInHiraganaBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(normalizedText.AsSpan()[..firstKatakanaOrIterationMarkIndex]);
         for (int i = firstKatakanaOrIterationMarkIndex; i < normalizedText.Length; i++)
         {
             char character = normalizedText[i];
