@@ -204,7 +204,7 @@ public sealed class LookupResult
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int GetPrimarySpellingOrthographyScore(JmdictLookupResult? jmdictResult, bool jmdictLookupResultExists, bool matchedPrimarySpelling)
     {
-        Debug.Assert(jmdictResult is not null == jmdictLookupResultExists);
+        Debug.Assert((jmdictResult is not null) == jmdictLookupResultExists);
 
         if (matchedPrimarySpelling && jmdictLookupResultExists)
         {
@@ -234,7 +234,7 @@ public sealed class LookupResult
             return 2;
         }
 
-        Debug.Assert(jmdictLookupResult is not null == jmdictLookupResultExists);
+        Debug.Assert((jmdictLookupResult is not null) == jmdictLookupResultExists);
         if (jmdictLookupResultExists)
         {
             Debug.Assert(jmdictLookupResult is not null);
