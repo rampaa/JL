@@ -177,7 +177,7 @@ internal static class EpwingYomichanLoader
         //jsonElements[6].TryGetInt32(out int sequence);
         //string[] termTags = jsonElements[7].ToString();
 
-        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imagePaths?.TrimToArray());
+        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imagePaths?.ToArray());
     }
 
     private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict, bool nonKanjiDict, bool nonNameDict)
