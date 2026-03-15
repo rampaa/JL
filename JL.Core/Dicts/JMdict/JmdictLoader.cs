@@ -229,7 +229,7 @@ internal static class JmdictLoader
     private static KanjiElement ReadKanjiElement(XmlTextReader xmlReader)
     {
         string keb = "";
-        List<string> keInfList = [];
+        List<string>? keInfList = null;
 
         _ = xmlReader.Read();
 
@@ -249,6 +249,7 @@ internal static class JmdictLoader
                         break;
 
                     case "ke_inf":
+                        keInfList ??= [];
                         keInfList.Add(ReadEntity(xmlReader));
                         break;
 
@@ -268,14 +269,14 @@ internal static class JmdictLoader
             }
         }
 
-        return new KanjiElement(keb, keInfList);
+        return new KanjiElement(keb, keInfList?.ToArray());
     }
 
     private static ReadingElement ReadReadingElement(XmlTextReader xmlReader)
     {
         string reb = "";
-        List<string> reRestrList = [];
-        List<string> reInfList = [];
+        List<string>? reRestrList = null;
+        List<string>? reInfList = null;
 
         _ = xmlReader.Read();
 
@@ -295,10 +296,12 @@ internal static class JmdictLoader
                         break;
 
                     case "re_restr":
+                        reRestrList ??= [];
                         reRestrList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
                     case "re_inf":
+                        reInfList ??= [];
                         reInfList.Add(ReadEntity(xmlReader));
                         break;
 
@@ -318,22 +321,22 @@ internal static class JmdictLoader
             }
         }
 
-        return new ReadingElement(reb, reRestrList, reInfList);
+        return new ReadingElement(reb, reRestrList, reInfList?.ToArray());
     }
 
     private static Sense ReadSense(XmlTextReader xmlReader)
     {
-        string? sInf = null;
-        List<string> stagKList = [];
-        List<string> stagRList = [];
-        List<string> posList = [];
-        List<string> fieldList = [];
-        List<string> miscList = [];
-        List<string> dialList = [];
         List<string> glossList = [];
-        List<string> xRefList = [];
-        List<string> antList = [];
-        List<LoanwordSource> lSourceList = [];
+        List<string> posList = [];
+        string? sInf = null;
+        List<string>? stagKList = null;
+        List<string>? stagRList = null;
+        List<string>? fieldList = null;
+        List<string>? miscList = null;
+        List<string>? dialList = null;
+        List<string>? xRefList = null;
+        List<string>? antList = null;
+        List<LoanwordSource>? lSourceList = null;
 
         _ = xmlReader.Read();
 
@@ -349,10 +352,12 @@ internal static class JmdictLoader
                 switch (xmlReader.Name)
                 {
                     case "stagk":
+                        stagKList ??= [];
                         stagKList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
                     case "stagr":
+                        stagRList ??= [];
                         stagRList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
@@ -361,10 +366,12 @@ internal static class JmdictLoader
                         break;
 
                     case "field":
+                        fieldList ??= [];
                         fieldList.Add(ReadEntity(xmlReader));
                         break;
 
                     case "misc":
+                        miscList ??= [];
                         miscList.Add(ReadEntity(xmlReader));
                         break;
 
@@ -373,6 +380,7 @@ internal static class JmdictLoader
                         break;
 
                     case "dial":
+                        dialList ??= [];
                         dialList.Add(ReadEntity(xmlReader));
                         break;
 
@@ -395,10 +403,12 @@ internal static class JmdictLoader
                         break;
 
                     case "xref":
+                        xRefList ??= [];
                         xRefList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
                     case "ant":
+                        antList ??= [];
                         antList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
@@ -439,6 +449,7 @@ internal static class JmdictLoader
                         string? originalWord = xmlReader.ReadElementContentAsString();
                         originalWord = originalWord.Length > 0 ? originalWord : null;
 
+                        lSourceList ??= [];
                         lSourceList.Add(new LoanwordSource(lang.GetPooledString(), isPart, isWasei, originalWord));
                         break;
 
@@ -454,7 +465,7 @@ internal static class JmdictLoader
             }
         }
 
-        return new Sense(sInf, stagKList, stagRList, posList, fieldList, miscList, dialList, glossList, xRefList, antList, lSourceList);
+        return new Sense(glossList.ToArray(), posList.TrimToArray(), sInf, stagKList?.ToArray(), stagRList?.ToArray(), fieldList?.ToArray(), miscList?.ToArray(), dialList?.ToArray(), xRefList?.ToArray(), antList?.ToArray(), lSourceList?.ToArray());
     }
 
     private static string ReadEntity(XmlTextReader xmlReader)

@@ -1,27 +1,27 @@
 namespace JL.Core.Dicts.JMdict;
 
 internal sealed class Sense(
+    string[] glossArray,
+    string[]? posArray,
     string? sInf,
-    List<string> stagKList,
-    List<string> stagRList,
-    List<string> posList,
-    List<string> fieldList,
-    List<string> miscList,
-    List<string> dialList,
-    List<string> glossList,
-    List<string> xRefList,
-    List<string> antList,
-    List<LoanwordSource> lSourceList)
+    string[]? stagKArray,
+    string[]? stagRArray,
+    string[]? fieldArray,
+    string[]? miscArray,
+    string[]? dialArray,
+    string[]? xRefArray,
+    string[]? antArray,
+    LoanwordSource[]? lSourceArray)
 {
-    public List<string> StagKList { get; } = stagKList; // Meaning only valid for these kebs.
-    public List<string> StagRList { get; } = stagRList; // Meaning only valid for these rebs.
-    public List<string> PosList { get; } = posList; // e.g. "noun"
-    public List<string> FieldList { get; } = fieldList; // e.g. "martial arts"
-    public List<string> MiscList { get; } = miscList; // e.g. "abbr"
+    public string[] GlossArray { get; } = glossArray; // English meaning
+    public string[]? PosArray { get; } = posArray; // e.g. "noun"
     public string? SInf { get; } = sInf; // e.g. "often derog"
-    public List<string> DialList { get; } = dialList; // e.g. ksb
-    public List<string> GlossList { get; } = glossList; // English meaning
-    public List<string> XRefList { get; } = xRefList; // Related terms
-    public List<string> AntList { get; } = antList; // Antonyms
-    public List<LoanwordSource> LSourceList { get; } = lSourceList;
+    public string[]? StagKArray { get; } = stagKArray; // Meaning only valid for these kebs.
+    public string[]? StagRArray { get; } = stagRArray; // Meaning only valid for these rebs.
+    public string[]? FieldArray { get; } = fieldArray; // e.g. "martial arts"
+    public string[]? MiscArray { get; } = miscArray; // e.g. "abbr"
+    public string[]? DialArray { get; } = dialArray; // e.g. ksb
+    public string[]? XRefArray { get; } = xRefArray; // Related terms
+    public string[]? AntArray { get; } = antArray; // Antonyms
+    public LoanwordSource[]? LSourceArray { get; } = lSourceArray;
 }

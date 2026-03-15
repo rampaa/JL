@@ -16,14 +16,14 @@ internal static class JmdictRecordBuilder
             return;
         }
 
-        ReadOnlySpan<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.AsReadOnlySpan().Contains("sK")).ToList().AsReadOnlySpan();
+        ReadOnlySpan<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfArray.Contains("sK")).ToList().AsReadOnlySpan();
         string[] allSpellingsWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length];
         string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length][];
         for (int i = 0; i < kanjiElementsWithoutSearchOnlyForms.Length; i++)
         {
             ref readonly KanjiElement kanjiElement = ref kanjiElementsWithoutSearchOnlyForms[i];
             allSpellingsWithoutSearchOnlyForms[i] = kanjiElement.Keb;
-            allKanjiOrthographyInfoWithoutSearchOnlyForms[i] = kanjiElement.KeInfList.TrimToArray();
+            allKanjiOrthographyInfoWithoutSearchOnlyForms[i] = kanjiElement.KeInfArray;
         }
 
         string? firstPrimarySpelling;
@@ -110,11 +110,10 @@ internal static class JmdictRecordBuilder
 
             foreach (ref readonly KanjiElement kanjiElement in kanjiElementsSpan)
             {
-                ReadOnlySpan<string> keInfListSpan = kanjiElement.KeInfList.AsReadOnlySpan();
                 string key = JapaneseUtils.NormalizeText(kanjiElement.Keb).GetPooledString();
                 if (recordDictionary.ContainsKey(key))
                 {
-                    if (!keInfListSpan.Contains("sK"))
+                    if (!kanjiElement.KeInfArray.Contains("sK"))
                     {
                         ++index;
                     }
@@ -122,7 +121,7 @@ internal static class JmdictRecordBuilder
                     continue;
                 }
 
-                if (keInfListSpan.Contains("sK"))
+                if (kanjiElement.KeInfArray.Contains("sK"))
                 {
                     Debug.Assert(firstPrimarySpellingInHiragana is not null);
                     if (JapaneseUtils.NormalizeLongVowelMark(key).AsReadOnlySpan().Contains(firstPrimarySpellingInHiragana))
@@ -157,13 +156,13 @@ internal static class JmdictRecordBuilder
 
                 foreach (ref readonly ReadingElement readingElement in readingElementsSpan)
                 {
-                    if (!readingElement.ReInfList.AsReadOnlySpan().Contains("sk"))
+                    if (!readingElement.ReInfArray.Contains("sk"))
                     {
                         ReadOnlySpan<string> reRestrListSpan = readingElement.ReRestrList.AsReadOnlySpan();
                         if (reRestrListSpan.Length is 0 || reRestrListSpan.Contains(kanjiElement.Keb))
                         {
                             readingList.Add(readingElement.Reb);
-                            readingsOrthographyInfoList.Add(readingElement.ReInfList.TrimToArray());
+                            readingsOrthographyInfoList.Add(readingElement.ReInfArray);
                         }
                     }
                 }
@@ -183,24 +182,21 @@ internal static class JmdictRecordBuilder
                 ReadOnlySpan<string> readingListSpan = readingList.AsReadOnlySpan();
                 foreach (ref readonly Sense sense in senseListSpan)
                 {
-                    ReadOnlySpan<string> stagKListSpan = sense.StagKList.AsReadOnlySpan();
-                    ReadOnlySpan<string> stagRListSpan = sense.StagRList.AsReadOnlySpan();
-
-                    if ((stagKListSpan.Length is 0 && stagRListSpan.Length is 0)
-                        || stagKListSpan.Contains(kanjiElement.Keb)
-                        || stagRListSpan.ContainsAny(readingListSpan))
+                    if ((sense.StagKArray is null && sense.StagRArray is null)
+                        || sense.StagKArray.Contains(kanjiElement.Keb)
+                        || sense.StagRArray.ContainsAny(readingListSpan))
                     {
-                        definitionList.Add(sense.GlossList.ToArray());
-                        wordClassList.Add(sense.PosList.TrimToArray());
-                        readingRestrictionList.Add(sense.StagRList.TrimToArray());
-                        spellingRestrictionList.Add(sense.StagKList.TrimToArray());
-                        fieldList.Add(sense.FieldList.TrimToArray());
-                        miscList.Add(sense.MiscList.TrimToArray());
-                        dialectList.Add(sense.DialList.TrimToArray());
+                        definitionList.Add(sense.GlossArray);
+                        wordClassList.Add(sense.PosArray);
+                        readingRestrictionList.Add(sense.StagRArray);
+                        spellingRestrictionList.Add(sense.StagKArray);
+                        fieldList.Add(sense.FieldArray);
+                        miscList.Add(sense.MiscArray);
+                        dialectList.Add(sense.DialArray);
                         definitionInfoList.Add(sense.SInf);
-                        relatedTermList.Add(sense.XRefList.TrimToArray());
-                        antonymList.Add(sense.AntList.TrimToArray());
-                        loanwordSourceList.Add(sense.LSourceList.TrimToArray());
+                        relatedTermList.Add(sense.XRefArray);
+                        antonymList.Add(sense.AntArray);
+                        loanwordSourceList.Add(sense.LSourceArray);
                     }
                 }
 
@@ -241,7 +237,7 @@ internal static class JmdictRecordBuilder
 
     private static void ProcessReadingElements(in JmdictEntry entry, Dictionary<string, JmdictRecord> recordDictionary, string[] allSpellingsWithoutSearchOnlyForms, string? firstPrimarySpelling, string[]? alternativeSpellingsForFirstPrimarySpelling, bool spellingsWithoutSearchOnlyFormsExist)
     {
-        ReadOnlySpan<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => !ke.ReInfList.AsReadOnlySpan().Contains("sk")).ToList().AsReadOnlySpan();
+        ReadOnlySpan<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => !ke.ReInfArray.Contains("sk")).ToList().AsReadOnlySpan();
         bool readingElementsWithoutSearchOnlyFormsExist = readingElementsWithoutSearchOnlyForms.Length > 0;
         if (readingElementsWithoutSearchOnlyFormsExist)
         {
@@ -251,7 +247,7 @@ internal static class JmdictRecordBuilder
             {
                 ref readonly ReadingElement readingElement = ref readingElementsWithoutSearchOnlyForms[i];
                 allReadingsWithoutSearchOnlyForms[i] = readingElement.Reb;
-                allROrthographyInfoWithoutSearchOnlyForms[i] = readingElement.ReInfList.TrimToArray();
+                allROrthographyInfoWithoutSearchOnlyForms[i] = readingElement.ReInfArray;
             }
 
             string firstReadingInHiragana = JapaneseUtils.NormalizeText(allReadingsWithoutSearchOnlyForms[0]);
@@ -267,11 +263,10 @@ internal static class JmdictRecordBuilder
             {
                 ref readonly ReadingElement readingElement = ref readingElementsSpan[i];
 
-                ReadOnlySpan<string> reInfListSpan = readingElement.ReInfList.AsReadOnlySpan();
                 string key = JapaneseUtils.NormalizeText(readingElement.Reb).GetPooledString();
                 if (recordDictionary.ContainsKey(key))
                 {
-                    if (!reInfListSpan.Contains("sk"))
+                    if (!readingElement.ReInfArray.Contains("sk"))
                     {
                         ++index;
                     }
@@ -279,7 +274,7 @@ internal static class JmdictRecordBuilder
                     continue;
                 }
 
-                if (reInfListSpan.Contains("sk"))
+                if (readingElement.ReInfArray.Contains("sk"))
                 {
                     if (JapaneseUtils.NormalizeLongVowelMark(key).AsReadOnlySpan().Contains(firstReadingInHiragana))
                     {
@@ -315,14 +310,14 @@ internal static class JmdictRecordBuilder
                 string[]? alternativeSpellings;
                 string[]?[]? alternativeSpellingsOrthographyInfo = null;
 
-                if (readingElement.ReRestrList.Count > 0 || spellingsWithoutSearchOnlyFormsExist)
+                if (readingElement.ReRestrList is not null || spellingsWithoutSearchOnlyFormsExist)
                 {
-                    if (readingElement.ReRestrList.Count > 0)
+                    if (readingElement.ReRestrList is not null)
                     {
+                        Debug.Assert(readingElement.ReRestrList.Count > 0);
                         primarySpelling = readingElement.ReRestrList[0];
                         alternativeSpellings = readingElement.ReRestrList.RemoveAtToArray(0);
                     }
-
                     else
                     {
                         Debug.Assert(firstPrimarySpelling is not null);
@@ -363,25 +358,22 @@ internal static class JmdictRecordBuilder
                 bool alternativeSpellingsExist = alternativeSpellings is not null;
                 foreach (ref readonly Sense sense in senseListSpan)
                 {
-                    ReadOnlySpan<string> stagKListSpan = sense.StagKList.AsReadOnlySpan();
-                    ReadOnlySpan<string> stagRListSpan = sense.StagRList.AsReadOnlySpan();
-
-                    if ((stagKListSpan.Length is 0 && stagRListSpan.Length is 0)
-                        || stagRListSpan.Contains(readingElement.Reb)
-                        || stagKListSpan.Contains(primarySpelling)
-                        || (alternativeSpellingsExist && stagKListSpan.ContainsAny(alternativeSpellings)))
+                    if ((sense.StagKArray is null && sense.StagRArray is null)
+                        || sense.StagRArray.Contains(readingElement.Reb)
+                        || sense.StagKArray.Contains(primarySpelling)
+                        || (alternativeSpellingsExist && sense.StagKArray.ContainsAny(alternativeSpellings)))
                     {
-                        definitionList.Add(sense.GlossList.ToArray());
-                        wordClassList.Add(sense.PosList.TrimToArray());
-                        readingRestrictionList.Add(sense.StagRList.TrimToArray());
-                        spellingRestrictionList.Add(sense.StagKList.TrimToArray());
-                        fieldList.Add(sense.FieldList.TrimToArray());
-                        miscList.Add(sense.MiscList.TrimToArray());
-                        dialectList.Add(sense.DialList.TrimToArray());
+                        definitionList.Add(sense.GlossArray);
+                        wordClassList.Add(sense.PosArray);
+                        readingRestrictionList.Add(sense.StagRArray);
+                        spellingRestrictionList.Add(sense.StagKArray);
+                        fieldList.Add(sense.FieldArray);
+                        miscList.Add(sense.MiscArray);
+                        dialectList.Add(sense.DialArray);
                         definitionInfoList.Add(sense.SInf);
-                        relatedTermList.Add(sense.XRefList.TrimToArray());
-                        antonymList.Add(sense.AntList.TrimToArray());
-                        loanwordSourceList.Add(sense.LSourceList.TrimToArray());
+                        relatedTermList.Add(sense.XRefArray);
+                        antonymList.Add(sense.AntArray);
+                        loanwordSourceList.Add(sense.LSourceArray);
                     }
                 }
 

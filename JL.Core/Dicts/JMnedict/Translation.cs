@@ -1,29 +1,35 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMnedict;
 
 [method: JsonConstructor]
-internal readonly struct Translation(List<string> nameTypeList, List<string> transDetList) : IEquatable<Translation>
+internal readonly struct Translation(string[] transDetArray, string[]? nameTypeArray) : IEquatable<Translation>
 {
-    public List<string> NameTypeList { get; } = nameTypeList;
-    public List<string> TransDetList { get; } = transDetList;
-    //public List<string> XRefList { get; }
+    public string[] TransDetArray { get; } = transDetArray;
+    public string[]? NameTypeArray { get; } = nameTypeArray;
+    //public List<string> XRefList { get; } = xRefList;
 
     public override int GetHashCode()
     {
         unchecked
         {
             int hash = 17 * 37;
-            foreach (ref readonly string nameType in NameTypeList.AsReadOnlySpan())
-            {
-                hash = (hash * 37) + nameType.GetHashCode(StringComparison.Ordinal);
-            }
-
-            foreach (ref readonly string transDet in TransDetList.AsReadOnlySpan())
+            foreach (string transDet in TransDetArray)
             {
                 hash = (hash * 37) + transDet.GetHashCode(StringComparison.Ordinal);
+            }
+
+            if (NameTypeArray is not null)
+            {
+                foreach (string nameType in NameTypeArray)
+                {
+                    hash = (hash * 37) + nameType.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
             }
 
             return hash;
@@ -37,7 +43,10 @@ internal readonly struct Translation(List<string> nameTypeList, List<string> tra
 
     public bool Equals(Translation other)
     {
-        return NameTypeList.AsReadOnlySpan().SequenceEqual(other.NameTypeList.AsReadOnlySpan()) && TransDetList.AsReadOnlySpan().SequenceEqual(other.TransDetList.AsReadOnlySpan());
+        return TransDetArray.SequenceEqual(other.TransDetArray)
+            && (NameTypeArray is null
+                ? other.NameTypeArray is null
+                : other.NameTypeArray is not null && NameTypeArray.SequenceEqual(other.NameTypeArray));
     }
 
     public static bool operator ==(Translation left, Translation right) => left.Equals(right);

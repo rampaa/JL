@@ -25,8 +25,8 @@ internal static class JmnedictRecordBuilder
         {
             ref readonly Translation translation = ref translationListSpan[j];
 
-            definitionsArray[j] = translation.TransDetList.ToArray();
-            nameTypesArray[j] = translation.NameTypeList.TrimToArray();
+            definitionsArray[j] = translation.TransDetArray;
+            nameTypesArray[j] = translation.NameTypeArray;
             // relatedTermsArray[j] = translation.XRefList.TrimListToArray();
         }
 
@@ -36,7 +36,7 @@ internal static class JmnedictRecordBuilder
             recordDictionary = new Dictionary<string, JmnedictRecord>(kebListSpanLength, StringComparer.Ordinal);
             for (int i = 0; i < kebListSpan.Length; i++)
             {
-                ref readonly string keb = ref kebListSpan[i];
+                string keb = kebListSpan[i];
                 string key = JapaneseUtils.NormalizeText(keb).GetPooledString();
 
                 if (recordDictionary.ContainsKey(key))
@@ -44,20 +44,18 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                JmnedictRecord record = new(entry.Id, keb, entry.KebList.RemoveAtToArray(i), entry.RebList.TrimToArray(), definitionsArray, nameTypesArray.TrimNullableArray());
+                JmnedictRecord record = new(entry.Id, keb, entry.KebList.RemoveAtToArray(i), entry.RebArray, definitionsArray, nameTypesArray.TrimNullableArray());
                 // record.RelatedTerms = relatedTermsArray;
 
                 recordDictionary.Add(key, record);
             }
         }
-
         else
         {
-            ReadOnlySpan<string> rebListSpan = entry.RebList.AsReadOnlySpan();
-            recordDictionary = new Dictionary<string, JmnedictRecord>(rebListSpan.Length, StringComparer.Ordinal);
-            for (int i = 0; i < rebListSpan.Length; i++)
+            recordDictionary = new Dictionary<string, JmnedictRecord>(entry.RebArray.Length, StringComparer.Ordinal);
+            for (int i = 0; i < entry.RebArray.Length; i++)
             {
-                ref readonly string reb = ref rebListSpan[i];
+                string reb = entry.RebArray[i];
                 string key = JapaneseUtils.NormalizeText(reb).GetPooledString();
 
                 if (recordDictionary.ContainsKey(key))
@@ -65,7 +63,7 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                JmnedictRecord record = new(entry.Id, reb, entry.RebList.RemoveAtToArray(i), null, definitionsArray, nameTypesArray.TrimNullableArray());
+                JmnedictRecord record = new(entry.Id, reb, entry.RebArray.RemoveAt(i), null, definitionsArray, nameTypesArray.TrimNullableArray());
                 // record.RelatedTerms = relatedTermsArray;
 
                 recordDictionary.Add(key, record);

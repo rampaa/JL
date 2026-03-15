@@ -120,7 +120,7 @@ internal static class JmnedictLoader
             }
         }
 
-        return new JmnedictEntry(id, kebList, rebList, translationList);
+        return new JmnedictEntry(id, kebList, rebList.ToArray(), translationList);
     }
 
     private static string ReadKEle(XmlTextReader xmlReader)
@@ -175,7 +175,7 @@ internal static class JmnedictLoader
             }
         }
 
-        return new Translation(nameTypeList, transDetList);
+        return new Translation(transDetList.ToArray(), nameTypeList.TrimToArray());
     }
 
     private static string ReadEntity(XmlTextReader xmlReader)

@@ -1,24 +1,30 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.JMdict;
 
 [method: JsonConstructor]
-internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEquatable<KanjiElement>
+internal readonly struct KanjiElement(string keb, string[]? keInfArray) : IEquatable<KanjiElement>
 {
     public string Keb { get; } = keb; // e.g. 娘
-    public List<string> KeInfList { get; } = keInfList; // e.g. Ateji.
-    // public List<string> KePriList { get; } // e.g. gai1
+    public string[]? KeInfArray { get; } = keInfArray; // e.g. Ateji.
+    // public List<string>? KePriList { get; } = kePriList; // e.g. gai1
 
     public override int GetHashCode()
     {
         unchecked
         {
             int hash = (17 * 37) + Keb.GetHashCode(StringComparison.Ordinal);
-            foreach (ref readonly string keInf in KeInfList.AsReadOnlySpan())
+            if (KeInfArray is not null)
             {
-                hash = (hash * 37) + keInf.GetHashCode(StringComparison.Ordinal);
+                foreach (string keInf in KeInfArray)
+                {
+                    hash = (hash * 37) + keInf.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
             }
 
             return hash;
@@ -32,7 +38,10 @@ internal readonly struct KanjiElement(string keb, List<string> keInfList) : IEqu
 
     public bool Equals(KanjiElement other)
     {
-        return Keb == other.Keb && KeInfList.AsReadOnlySpan().SequenceEqual(other.KeInfList.AsReadOnlySpan());
+        return Keb == other.Keb
+            && (KeInfArray is null
+                ? other.KeInfArray is null
+                : other.KeInfArray is not null && KeInfArray.SequenceEqual(other.KeInfArray));
     }
 
     public static bool operator ==(KanjiElement left, KanjiElement right) => left.Equals(right);
