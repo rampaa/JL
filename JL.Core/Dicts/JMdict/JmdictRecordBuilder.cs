@@ -16,7 +16,7 @@ internal static class JmdictRecordBuilder
             return;
         }
 
-        ReadOnlySpan<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfArray.Contains("sK")).ToList().AsReadOnlySpan();
+        ReadOnlySpan<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => ke.KeInfArray is null || !ke.KeInfArray.Contains("sK")).ToList().AsReadOnlySpan();
         string[] allSpellingsWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length];
         string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length][];
         for (int i = 0; i < kanjiElementsWithoutSearchOnlyForms.Length; i++)
@@ -113,7 +113,7 @@ internal static class JmdictRecordBuilder
                 string key = JapaneseUtils.NormalizeText(kanjiElement.Keb).GetPooledString();
                 if (recordDictionary.ContainsKey(key))
                 {
-                    if (!kanjiElement.KeInfArray.Contains("sK"))
+                    if (kanjiElement.KeInfArray is null || !kanjiElement.KeInfArray.Contains("sK"))
                     {
                         ++index;
                     }
@@ -121,7 +121,7 @@ internal static class JmdictRecordBuilder
                     continue;
                 }
 
-                if (kanjiElement.KeInfArray.Contains("sK"))
+                if (kanjiElement.KeInfArray is not null && kanjiElement.KeInfArray.Contains("sK"))
                 {
                     Debug.Assert(firstPrimarySpellingInHiragana is not null);
                     if (JapaneseUtils.NormalizeLongVowelMark(key).AsReadOnlySpan().Contains(firstPrimarySpellingInHiragana))
@@ -156,7 +156,7 @@ internal static class JmdictRecordBuilder
 
                 foreach (ref readonly ReadingElement readingElement in readingElementsSpan)
                 {
-                    if (!readingElement.ReInfArray.Contains("sk"))
+                    if (readingElement.ReInfArray is null || !readingElement.ReInfArray.Contains("sk"))
                     {
                         ReadOnlySpan<string> reRestrListSpan = readingElement.ReRestrList.AsReadOnlySpan();
                         if (reRestrListSpan.Length is 0 || reRestrListSpan.Contains(kanjiElement.Keb))
@@ -183,8 +183,8 @@ internal static class JmdictRecordBuilder
                 foreach (ref readonly Sense sense in senseListSpan)
                 {
                     if ((sense.StagKArray is null && sense.StagRArray is null)
-                        || sense.StagKArray.Contains(kanjiElement.Keb)
-                        || sense.StagRArray.ContainsAny(readingListSpan))
+                        || (sense.StagKArray is not null && sense.StagKArray.Contains(kanjiElement.Keb))
+                        || (sense.StagRArray is not null && sense.StagRArray.ContainsAny(readingListSpan)))
                     {
                         definitionList.Add(sense.GlossArray);
                         wordClassList.Add(sense.PosArray);
@@ -237,7 +237,7 @@ internal static class JmdictRecordBuilder
 
     private static void ProcessReadingElements(in JmdictEntry entry, Dictionary<string, JmdictRecord> recordDictionary, string[] allSpellingsWithoutSearchOnlyForms, string? firstPrimarySpelling, string[]? alternativeSpellingsForFirstPrimarySpelling, bool spellingsWithoutSearchOnlyFormsExist)
     {
-        ReadOnlySpan<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => !ke.ReInfArray.Contains("sk")).ToList().AsReadOnlySpan();
+        ReadOnlySpan<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => ke.ReInfArray is null || !ke.ReInfArray.Contains("sk")).ToList().AsReadOnlySpan();
         bool readingElementsWithoutSearchOnlyFormsExist = readingElementsWithoutSearchOnlyForms.Length > 0;
         if (readingElementsWithoutSearchOnlyFormsExist)
         {
@@ -266,7 +266,7 @@ internal static class JmdictRecordBuilder
                 string key = JapaneseUtils.NormalizeText(readingElement.Reb).GetPooledString();
                 if (recordDictionary.ContainsKey(key))
                 {
-                    if (!readingElement.ReInfArray.Contains("sk"))
+                    if (readingElement.ReInfArray is null || !readingElement.ReInfArray.Contains("sk"))
                     {
                         ++index;
                     }
@@ -274,7 +274,7 @@ internal static class JmdictRecordBuilder
                     continue;
                 }
 
-                if (readingElement.ReInfArray.Contains("sk"))
+                if (readingElement.ReInfArray is not null && readingElement.ReInfArray.Contains("sk"))
                 {
                     if (JapaneseUtils.NormalizeLongVowelMark(key).AsReadOnlySpan().Contains(firstReadingInHiragana))
                     {
@@ -359,9 +359,10 @@ internal static class JmdictRecordBuilder
                 foreach (ref readonly Sense sense in senseListSpan)
                 {
                     if ((sense.StagKArray is null && sense.StagRArray is null)
-                        || sense.StagRArray.Contains(readingElement.Reb)
-                        || sense.StagKArray.Contains(primarySpelling)
-                        || (alternativeSpellingsExist && sense.StagKArray.ContainsAny(alternativeSpellings)))
+                        || (sense.StagRArray is not null && sense.StagRArray.Contains(readingElement.Reb))
+                        || (sense.StagKArray is not null
+                            && (sense.StagKArray.Contains(primarySpelling)
+                                || (alternativeSpellingsExist && sense.StagKArray.ContainsAny(alternativeSpellings)))))
                     {
                         definitionList.Add(sense.GlossArray);
                         wordClassList.Add(sense.PosArray);

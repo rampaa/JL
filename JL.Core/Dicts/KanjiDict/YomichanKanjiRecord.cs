@@ -52,8 +52,8 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
                 definitionList.Add(definition);
             }
         }
-        Definitions = definitionList.TrimToArray();
 
+        Definitions = definitionList.TrimToArray();
 
         // Tags
         //string? tagsStr = jsonElement[3].GetString();
