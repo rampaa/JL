@@ -2262,18 +2262,21 @@ internal sealed partial class PopupWindow : IDisposable
         bool contextMenuBecameInvisible = !(bool)e.NewValue;
         if (contextMenuBecameInvisible)
         {
-            _listViewItemIndex = _listViewItemIndexAfterContextMenuIsClosed;
-            LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
-
-            if (!IsMouseOver
-                && !PopupContextMenu.IsVisible
-                && !DefinitionsTextBoxContextMenu.IsVisible
-                && !TitleBarContextMenu.IsVisible
-                && !DictTabButtonsItemsControlContextMenu.IsVisible
-                && !AddWordWindow.IsItVisible()
-                && !AddNameWindow.IsItVisible())
+            if (LastLookupResults.Length > _listViewItemIndexAfterContextMenuIsClosed)
             {
-                PopupWindowUtils.PopupAutoHideTimer.Start();
+                _listViewItemIndex = _listViewItemIndexAfterContextMenuIsClosed;
+                LastSelectedText = LastLookupResults[_listViewItemIndexAfterContextMenuIsClosed].PrimarySpelling;
+
+                if (!IsMouseOver
+                    && !PopupContextMenu.IsVisible
+                    && !DefinitionsTextBoxContextMenu.IsVisible
+                    && !TitleBarContextMenu.IsVisible
+                    && !DictTabButtonsItemsControlContextMenu.IsVisible
+                    && !AddWordWindow.IsItVisible()
+                    && !AddNameWindow.IsItVisible())
+                {
+                    PopupWindowUtils.PopupAutoHideTimer.Start();
+                }
             }
         }
     }
