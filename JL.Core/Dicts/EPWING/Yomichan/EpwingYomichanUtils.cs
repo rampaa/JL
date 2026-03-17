@@ -130,20 +130,20 @@ internal static class EpwingYomichanUtils
                         case "ul":
                         case "ol":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content.Trim()}\n");
+                            _ = stringBuilder.Append('\n').Append(content.AsSpan().Trim()).Append('\n');
                             break;
                         }
 
                         case "th":
                         case "td":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" | {content.TrimStart()}");
+                            _ = stringBuilder.Append(" | ").Append(content.AsSpan().TrimStart());
                             break;
                         }
 
                         case "tr":
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content.TrimStart()} |");
+                            _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart()).Append(" |");
                             break;
                         }
 
@@ -158,11 +158,11 @@ internal static class EpwingYomichanUtils
                         {
                             if (lastTag is "div" && stringBuilder.Length > 0 && stringBuilder[^1] is '\n')
                             {
-                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{content.Trim()}\n");
+                                _ = stringBuilder.Append(content.AsSpan().Trim()).Append('\n');
                             }
                             else
                             {
-                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content.Trim()}\n");
+                                _ = stringBuilder.Append('\n').Append(content.AsSpan().Trim()).Append('\n');
                             }
 
                             break;
@@ -171,7 +171,7 @@ internal static class EpwingYomichanUtils
                         // "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot"
                         default:
                         {
-                            _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content.TrimStart()}");
+                            _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart());
                             break;
                         }
                     }

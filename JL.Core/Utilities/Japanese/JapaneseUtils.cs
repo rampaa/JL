@@ -706,12 +706,12 @@ public static partial class JapaneseUtils
 
             if (i > 0)
             {
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{primarySpellingSegments[i - 1]}[{reading[(currentReadingPosition - 1)..index]}]");
+                _ = stringBuilder.Append(primarySpellingSegments[i - 1]).Append('[').Append(reading.AsSpan()[(currentReadingPosition - 1)..index]).Append(']');
             }
 
             if (hasKatakana)
             {
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{segment}[{reading[index..(index + segment.Length)]}]");
+                _ = stringBuilder.Append(segment).Append('[').Append(reading.AsSpan()[index..(index + segment.Length)]).Append(']');
             }
             else
             {
@@ -726,7 +726,7 @@ public static partial class JapaneseUtils
 
             if (i + 2 == primarySpellingSegments.Length)
             {
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{primarySpellingSegments[i + 1]}[{reading[currentReadingPosition..]}]");
+                _ = stringBuilder.Append(primarySpellingSegments[i + 1]).Append('[').Append(reading.AsSpan()[currentReadingPosition..]).Append(']');
             }
 
             ++currentReadingPosition;
