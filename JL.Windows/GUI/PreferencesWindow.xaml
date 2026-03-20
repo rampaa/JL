@@ -1904,6 +1904,51 @@
                                 </DockPanel>
                             </ListBoxItem>
 
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Makes the main window opaque, especially handy when you can’t locate it.">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="MakeMainWindowOpaqueKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Make main window opaque" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Brings the main window to the top manually, without waiting for text capture.">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="BringMainWindowToTopKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Bring main window to top" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         Cursor="Help"
+                                         ToolTip="Toggles the &quot;Text only visible on hover&quot; option for main window.">
+                                <DockPanel Margin="10,0,10,0">
+                                    <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"
+                                    Click="ClearKeyGestureButton_Click" />
+                                    <TextBox x:Name="ToggleTextOnlyVisibleOnHoverKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                    <TextBlock Text="Toggle &quot;Text only visible on hover&quot; option for main window" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                                </DockPanel>
+                            </ListBoxItem>
+
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9"

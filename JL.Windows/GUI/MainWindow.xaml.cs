@@ -479,8 +479,15 @@ internal sealed partial class MainWindow : IDisposable
 
     public void BringToFront()
     {
-        if (ConfigManager.Instance.AlwaysOnTop
-            && FirstPopupWindow.Opacity is 0
+        if (ConfigManager.Instance.AlwaysOnTop)
+        {
+            BringToFrontWithoutAlwaysOnTopCheck();
+        }
+    }
+
+    private void BringToFrontWithoutAlwaysOnTopCheck()
+    {
+        if (FirstPopupWindow.Opacity is 0
             && !ManageDictionariesWindow.IsItVisible()
             && !ManageFrequenciesWindow.IsItVisible()
             && !ManageAudioSourcesWindow.IsItVisible()
@@ -1075,6 +1082,24 @@ internal sealed partial class MainWindow : IDisposable
         else if (keyGesture.IsEqual(configManager.ScrollDownKeyGesture))
         {
             MainTextBox.LineDown();
+        }
+
+        else if (keyGesture.IsEqual(configManager.MakeMainWindowOpaqueKeyGesture))
+        {
+            OpacitySlider.Value = 100;
+        }
+
+        else if (keyGesture.IsEqual(configManager.BringMainWindowToTopKeyGesture))
+        {
+            BringToFrontWithoutAlwaysOnTopCheck();
+        }
+
+        else if (keyGesture.IsEqual(configManager.ToggleTextOnlyVisibleOnHoverKeyGesture))
+        {
+            configManager.TextOnlyVisibleOnHover = !configManager.TextOnlyVisibleOnHover;
+            MainGrid.Opacity = configManager.TextOnlyVisibleOnHover && !IsMouseOver
+                ? 0
+                : 1;
         }
 
         else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))

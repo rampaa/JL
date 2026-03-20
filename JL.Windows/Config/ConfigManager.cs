@@ -213,6 +213,9 @@ internal sealed class ConfigManager
     public KeyGesture ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ScrollUpKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ScrollDownKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture MakeMainWindowOpaqueKeyGesture { get; private set; } = new(Key.F6, ModifierKeys.Alt);
+    public KeyGesture BringMainWindowToTopKeyGesture { get; private set; } = new(Key.F7, ModifierKeys.Alt);
+    public KeyGesture ToggleTextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     #endregion
 
     #region Advanced
@@ -612,6 +615,9 @@ internal sealed class ConfigManager
         ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture), ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
         ScrollUpKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ScrollUpKeyGesture), ScrollUpKeyGesture);
         ScrollDownKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ScrollDownKeyGesture), ScrollDownKeyGesture);
+        MakeMainWindowOpaqueKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(MakeMainWindowOpaqueKeyGesture), MakeMainWindowOpaqueKeyGesture);
+        BringMainWindowToTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(BringMainWindowToTopKeyGesture), BringMainWindowToTopKeyGesture);
+        ToggleTextOnlyVisibleOnHoverKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleTextOnlyVisibleOnHoverKeyGesture), ToggleTextOnlyVisibleOnHoverKeyGesture);
         AlwaysOnTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
         TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
         ToggleAlwaysShowMainTextBoxCaretKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture), ToggleAlwaysShowMainTextBoxCaretKeyGesture);
@@ -966,6 +972,12 @@ internal sealed class ConfigManager
             ScrollUpKeyGesture.ToFormattedString();
         preferenceWindow.ScrollDownKeyGestureTextBox.Text =
             ScrollDownKeyGesture.ToFormattedString();
+        preferenceWindow.MakeMainWindowOpaqueKeyGestureTextBox.Text =
+            MakeMainWindowOpaqueKeyGesture.ToFormattedString();
+        preferenceWindow.BringMainWindowToTopKeyGestureTextBox.Text =
+            BringMainWindowToTopKeyGesture.ToFormattedString();
+        preferenceWindow.ToggleTextOnlyVisibleOnHoverKeyGestureTextBox.Text =
+            ToggleTextOnlyVisibleOnHoverKeyGesture.ToFormattedString();
         preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
             AlwaysOnTopKeyGesture.ToFormattedString();
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
@@ -1294,6 +1306,12 @@ internal sealed class ConfigManager
                 preferenceWindow.ScrollUpKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(ScrollDownKeyGesture),
                 preferenceWindow.ScrollDownKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(MakeMainWindowOpaqueKeyGesture),
+                preferenceWindow.MakeMainWindowOpaqueKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(BringMainWindowToTopKeyGesture),
+                preferenceWindow.BringMainWindowToTopKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(ToggleTextOnlyVisibleOnHoverKeyGesture),
+                preferenceWindow.ToggleTextOnlyVisibleOnHoverKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(AlwaysOnTopKeyGesture),
                 preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(TextBoxIsReadOnlyKeyGesture),
