@@ -135,10 +135,12 @@ internal static class EpwingYomichanLoader
         }
 
         definitions?.DeduplicateStringsInArray();
+        if (definitions is null && imagePaths is null)
+        {
+            return null;
+        }
 
-        if (definitions is null
-            ? imagePaths is null
-            : !EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
+        if (!EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
         {
             return null;
         }

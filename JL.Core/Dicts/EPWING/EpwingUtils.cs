@@ -8,13 +8,13 @@ internal static class EpwingUtils
 {
     private static readonly SearchValues<char> s_invalidCharacters = SearchValues.Create('�', '〓', '\n');
 
-    public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[] definitions, Dict dict)
+    public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[]? definitions, Dict dict)
     {
         return !primarySpelling.ContainsAny(s_invalidCharacters)
             && FilterDuplicateEntries(primarySpelling, reading, definitions, dict);
     }
 
-    private static bool FilterDuplicateEntries(string primarySpelling, string? reading, string[] definitions, Dict dict)
+    private static bool FilterDuplicateEntries(string primarySpelling, string? reading, string[]? definitions, Dict dict)
     {
         if (dict.Contents.TryGetValue(JapaneseUtils.NormalizeText(primarySpelling), out IList<IDictRecord>? previousResults))
         {
@@ -23,7 +23,9 @@ internal static class EpwingUtils
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
-                if (previousResult.Definitions.SequenceEqual(definitions))
+                if (previousResult.Definitions is not null
+                    ? (definitions is not null && previousResult.Definitions.SequenceEqual(definitions))
+                    : definitions is null)
                 {
                     // If an entry has reading info while others don't, keep the one with the reading info.
                     if (previousResult.Reading is null && reading is not null)
