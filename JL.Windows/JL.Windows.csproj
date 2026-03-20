@@ -22,7 +22,6 @@
     <PackageReference Include="NAudio.WinForms" Version="2.3.0" />
     <PackageReference Include="NVorbis" Version="0.10.5" />
     <PackageReference Include="System.Speech" Version="10.0.5" />
-    <PackageReference Include="Tategaki" Version="3.3.0" />
   </ItemGroup>
 
   <ItemGroup>

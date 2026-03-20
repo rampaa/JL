@@ -58,12 +58,6 @@
         "resolved": "10.0.5",
         "contentHash": "MYkGiMGWYc9rhyvsmf2UGIHD4RVJ3+uNgllFPP1YW6ILJJDXpDN8jMcy++0E/KrG507kTPCo5EOW4tEwUOCKhQ=="
       },
-      "Tategaki": {
-        "type": "Direct",
-        "requested": "[3.3.0, )",
-        "resolved": "3.3.0",
-        "contentHash": "hbGxGh7+Ha8ue89X7PoBAGrA7EK+QF7rhsbWLs06KyD5Z0LYrbzrp+heSaUmgUMESW9uNlillO74M1nuQlx1tA=="
-      },
       "CommunityToolkit.HighPerformance": {
         "type": "Transitive",
         "resolved": "8.4.0",
