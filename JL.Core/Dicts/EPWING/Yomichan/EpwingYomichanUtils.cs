@@ -201,17 +201,20 @@ internal static class EpwingYomichanUtils
                     ? listStyleTypeElement.GetString()
                     : null;
 
-            marker = marker switch
+            if (marker is not null)
             {
-                "disc" => "•",
-                "circle" => "◦",
-                "square" => "▪",
-                _ => marker
-            };
+                marker = marker switch
+                {
+                    "disc" => "•",
+                    "circle" => "◦",
+                    "square" => "▪",
+                    _ => marker
+                };
 
-            if (marker?.Length > 2 && marker[0] is '"' && marker[^1] is '"')
-            {
-                marker = marker[1..^1];
+                if (marker.Length > 2 && marker[0] is '"' && marker[^1] is '"')
+                {
+                    marker = marker[1..^1];
+                }
             }
 
             if (marker is not null
