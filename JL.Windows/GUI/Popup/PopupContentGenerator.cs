@@ -487,9 +487,10 @@ internal sealed class PopupContentGenerator : Decorator
 
         PopupWindow ownerWindow = lookupDisplayResult.OwnerWindow;
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+
+        bool doNotCheckForDuplicatesWhenMiningModeIsNotActive = coreConfigManager is not { DuplicateCheckIndependentOfMiningMode: true, CheckForDuplicateCards: true, AnkiIntegration: true };
         if (!ownerWindow.MiningMode
-            && ((coreConfigManager is not { DuplicateCheckIndependentOfMiningMode: true, CheckForDuplicateCards: true, AnkiIntegration: true })
-                || !configManager.MineToFileInsteadOfAnki))
+            && (configManager.MineToFileInsteadOfAnki || doNotCheckForDuplicatesWhenMiningModeIsNotActive))
         {
             return;
         }
