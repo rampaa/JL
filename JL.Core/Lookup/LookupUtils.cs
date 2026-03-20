@@ -66,7 +66,7 @@ public static class LookupUtils
         bool dbIsUsedAtLeastForOneDict = DictUtils.DBIsUsedForAtLeastOneDict;
         _ = Parallel.ForEach(dicts, dict =>
         {
-            bool useDB = dbIsUsedAtLeastForOneDict && dict.Options.UseDB.Value && dict.Ready;
+            bool useDB = dbIsUsedAtLeastForOneDict && dict is { Options.UseDB.Value: true, Ready: true, Active: true };
             switch (dict.Type)
             {
                 case DictType.JMdict:
@@ -280,7 +280,7 @@ public static class LookupUtils
             int validFreqCount = 0;
             foreach (Freq freq in wordFreqs)
             {
-                if (freq.Options.UseDB.Value && freq.Ready)
+                if (freq is { Options.UseDB.Value: true, Ready: true, Active: true })
                 {
                     ++validFreqCount;
                 }
@@ -292,7 +292,7 @@ public static class LookupUtils
                 int currentIndex = 0;
                 foreach (Freq freq in wordFreqs)
                 {
-                    if (freq.Options.UseDB.Value && freq.Ready)
+                    if (freq is { Options.UseDB.Value: true, Ready: true, Active: true })
                     {
                         dbWordFreqs[currentIndex] = freq;
                         ++currentIndex;
