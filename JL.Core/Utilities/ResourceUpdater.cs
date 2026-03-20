@@ -821,6 +821,7 @@ public static class ResourceUpdater
                     {
                         LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{FreqType}'-'{FreqName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                         FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {freq.Name}, deactivating it");
+
                         freq.Active = false;
                         freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                     }

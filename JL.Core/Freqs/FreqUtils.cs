@@ -125,14 +125,13 @@ public static class FreqUtils
                 {
                     foreach (Freq freq in freqNamesToBeRemoved)
                     {
-                        freq.Active = false;
-
                         //_ = FreqDicts.Remove(freq.Name);
-                        //string dbPath = DBUtils.GetFreqDBPath(freq.Name);
-                        //if (File.Exists(dbPath))
-                        //{
-                        //    DBUtils.DeleteDB(dbPath);
-                        //}
+
+                        string dbPath = DBUtils.GetFreqDBPath(freq.Name);
+                        if (File.Exists(dbPath))
+                        {
+                            DBUtils.DeleteDB(dbPath);
+                        }
                     }
 
                     //IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
@@ -251,6 +250,8 @@ public static class FreqUtils
                     string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+
+                    freq.Active = false;
                     freqNamesToBeRemoved.Add(freq);
                 }
                 finally
@@ -344,6 +345,8 @@ public static class FreqUtils
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+
+                    freq.Active = false;
                     freqNamesToBeRemoved.Add(freq);
                 }
                 finally

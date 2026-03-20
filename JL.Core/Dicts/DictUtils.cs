@@ -655,7 +655,6 @@ public static class DictUtils
                     {
                         foreach (Dict dict in dictsToBeRemoved)
                         {
-                            dict.Active = false;
                             //_ = Dicts.Remove(dict.Name);
                             //_ = SingleDictTypeDicts.Remove(dict.Type);
 
@@ -704,6 +703,8 @@ public static class DictUtils
 
     private static DBState PrepareDictDB(Dict dict, Dictionary<string, string> dictDBPaths, int dbVersion, ref bool rebuildingAnyDB)
     {
+        dict.Ready = false;
+
         bool useDB = dict.Options.UseDB.Value;
         string dbPath = DBUtils.GetDictDBPath(dict.Name);
         string dbJournalPath = $"{dbPath}-journal";
@@ -729,8 +730,6 @@ public static class DictUtils
                 dbExists = false;
             }
         }
-
-        dict.Ready = false;
 
         if (useDB && !DBUtils.DictDBPaths.ContainsKey(dict.Name))
         {
@@ -801,8 +800,10 @@ public static class DictUtils
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                    File.Delete(fullDictPath);
+
+                    dict.Active = false;
                     dictsToBeRemoved.Add(dict);
+                    File.Delete(fullDictPath);
                 }
                 finally
                 {
@@ -885,8 +886,10 @@ public static class DictUtils
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                    File.Delete(fullDictPath);
+
+                    dict.Active = false;
                     dictsToBeRemoved.Add(dict);
+                    File.Delete(fullDictPath);
                 }
                 finally
                 {
@@ -976,8 +979,10 @@ public static class DictUtils
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                    File.Delete(fullDictPath);
+
+                    dict.Active = false;
                     dictsToBeRemoved.Add(dict);
+                    File.Delete(fullDictPath);
                 }
                 finally
                 {
@@ -1055,6 +1060,8 @@ public static class DictUtils
                         {
                             LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
                             FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {dict.Name}");
+
+                            dict.Active = false;
                             dictsToBeRemoved.Add(dict);
                         }
                         else if (!dbExists && (useDB || dbExisted))
@@ -1074,6 +1081,8 @@ public static class DictUtils
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+
+                    dict.Active = false;
                     dictsToBeRemoved.Add(dict);
                 }
                 finally
@@ -1161,6 +1170,8 @@ public static class DictUtils
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+
+                    dict.Active = false;
                     dictsToBeRemoved.Add(dict);
                 }
                 finally
@@ -1336,6 +1347,8 @@ public static class DictUtils
                     string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+
+                    dict.Active = false;
                     dictsToBeRemoved.Add(dict);
                 }
                 finally
@@ -1422,6 +1435,8 @@ public static class DictUtils
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+
+                    dict.Active = false;
                     dictsToBeRemoved.Add(dict);
                 }
                 finally
