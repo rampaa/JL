@@ -18,18 +18,6 @@ internal static class EpwingYomichanUtils
             {
                 definition = definitionElement.GetString();
             }
-            else if (definitionElement.ValueKind is JsonValueKind.Array)
-            {
-                StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
-
-                AppendDefinitionsFromJsonArray(sb, definitionElement, dict, ref imagePaths, null);
-                if (sb.Length > 0)
-                {
-                    definition = sb.ToString();
-                }
-
-                ObjectPoolManager.StringBuilderPool.Return(sb);
-            }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
             {
                 YomichanContent objContent = GetDefinitionsFromJsonObject(definitionElement, dict, ref imagePaths, null);
@@ -46,6 +34,7 @@ internal static class EpwingYomichanUtils
                     definition = objContent.Content;
                 }
             }
+            // else if (definitionElement.ValueKind is JsonValueKind.Array) {} // Deconjugation info, we don't need it, so we can skip it.
 
             if (definition is not null)
             {
@@ -60,10 +49,11 @@ internal static class EpwingYomichanUtils
         return definitions.TrimToArray();
     }
 
-    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict, ref List<string>? imagePaths, string? parentTag)
+    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict, ref List<string>? imagePaths, string? parentTag, bool isOrderedList, int orderedListIndex)
     {
         bool first = true;
         string? lastTag = null;
+
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
         {
             if (definitionElement.ValueKind is JsonValueKind.String)
@@ -73,7 +63,7 @@ internal static class EpwingYomichanUtils
             }
             else if (definitionElement.ValueKind is JsonValueKind.Array)
             {
-                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, ref imagePaths, null);
+                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, ref imagePaths, null, isOrderedList, orderedListIndex);
                 lastTag = null;
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
@@ -107,6 +97,10 @@ internal static class EpwingYomichanUtils
                             break;
                         }
 
+                        case "rp":
+                            // Already handled by the "rt" case.
+                            break;
+
                         case "rt":
                         {
                             _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"[{content}]");
@@ -116,13 +110,24 @@ internal static class EpwingYomichanUtils
                         case "li":
                         {
                             content = content.TrimStart();
-                            if (!content.StartsWith('•'))
+                            string? marker = contentResult.Marker;
+                            if (isOrderedList)
                             {
-                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n• {content}");
+                                ++orderedListIndex;
+                                marker = $"{orderedListIndex}.";
                             }
                             else
                             {
-                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{content}");
+                                marker ??= "•";
+                            }
+
+                            if (content.StartsWith('•') || content.StartsWith(marker, StringComparison.Ordinal))
+                            {
+                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{marker}\n{content}");
+                            }
+                            else
+                            {
+                                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{marker} {content}");
                             }
                             break;
                         }
@@ -168,7 +173,7 @@ internal static class EpwingYomichanUtils
                             break;
                         }
 
-                        // "p" or "summary" or "details" or "br" or "rp" or "table" or "thead" or "tbody" or "tfoot"
+                        // "summary" or "details" or "table" or "thead" or "tbody" or "tfoot"
                         default:
                         {
                             _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart());
@@ -178,14 +183,44 @@ internal static class EpwingYomichanUtils
 
                     lastTag = contentResult.Tag;
                 }
+                else if (contentResult.Tag is "br")
+                {
+                    _ = stringBuilder.Append('\n');
+                    lastTag = contentResult.Tag;
+                }
             }
         }
     }
 
     private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict, ref List<string>? imagePaths, string? parentTag)
     {
+        string? marker;
         while (true)
         {
+            marker = jsonElement.TryGetProperty("style", out JsonElement styleElement) && styleElement.TryGetProperty("listStyleType", out JsonElement listStyleTypeElement)
+                    ? listStyleTypeElement.GetString()
+                    : null;
+
+            marker = marker switch
+            {
+                "disc" => "•",
+                "circle" => "◦",
+                "square" => "▪",
+                _ => marker
+            };
+
+            if (marker?.Length > 2 && marker[0] is '"' && marker[^1] is '"')
+            {
+                marker = marker[1..^1];
+            }
+
+            if (marker is not null
+                && (marker.Length is 0
+                    || char.IsAsciiLetter(marker[0])))
+            {
+                marker = null;
+            }
+
             if (jsonElement.TryGetProperty("content", out JsonElement contentElement))
             {
                 string? tag = null;
@@ -216,19 +251,19 @@ internal static class EpwingYomichanUtils
                     Debug.Assert(contentText is not null);
 
                     bool appendWhitespace = tag is "span"
-                        && (jsonElement.TryGetProperty("style", out JsonElement styleElement)
+                        && (jsonElement.TryGetProperty("style", out styleElement)
                             ? styleElement.TryGetProperty("marginRight", out _)
                             // Heuristic for Japanese-English dictionaries whose CSS is stored in a separate file and thus cannot be parsed currently
                             : jsonElement.TryGetProperty("data", out JsonElement dataElement) && dataElement.TryGetProperty("class", out _) && char.IsAscii(contentText[0]));
 
-                    return new YomichanContent(parentTag ?? tag, contentText, appendWhitespace);
+                    return new YomichanContent(parentTag ?? tag, contentText, appendWhitespace, marker);
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Array)
                 {
                     StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
 
-                    AppendDefinitionsFromJsonArray(sb, contentElement, dict, ref imagePaths, tag);
+                    AppendDefinitionsFromJsonArray(sb, contentElement, dict, ref imagePaths, tag, tag is "ol", 0);
                     string? content = null;
                     if (sb.Length > 0)
                     {
@@ -236,7 +271,7 @@ internal static class EpwingYomichanUtils
                     }
 
                     ObjectPoolManager.StringBuilderPool.Return(sb);
-                    return new YomichanContent(parentTag ?? tag, content, false);
+                    return new YomichanContent(parentTag ?? tag, content, false, marker);
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Object)
@@ -251,59 +286,81 @@ internal static class EpwingYomichanUtils
                 string? tag = tagElement.GetString();
                 if (tag is "th")
                 {
-                    return new YomichanContent("th", "×", false);
+                    return new YomichanContent("th", "×", false, null);
                 }
 
                 if (tag is "img" && jsonElement.TryGetProperty("path", out JsonElement imagePathJsonElement))
                 {
-                    if (jsonElement.TryGetProperty("height", out JsonElement heightProperty))
+                    if ((jsonElement.TryGetProperty("height", out JsonElement heightProperty) && heightProperty.GetDouble() <= 5)
+                        || (jsonElement.TryGetProperty("width", out JsonElement widthProperty) && widthProperty.GetDouble() <= 5))
                     {
-                        if (heightProperty.GetDouble() <= 5)
-                        {
-                            return default;
-                        }
-                    }
-                    else if (jsonElement.TryGetProperty("width", out JsonElement widthProperty))
-                    {
-                        if (widthProperty.GetDouble() <= 5)
-                        {
-                            return default;
-                        }
+                        //if (jsonElement.TryGetProperty("alt", out JsonElement altelement))
+                        //{
+                        //    string? altText = altelement.GetString();
+                        //    if (!string.IsNullOrEmpty(altText))
+                        //    {
+                        //        return new YomichanContent("span", $"[{altText}]", false, null);
+                        //    }
+                        //}
+                        //else if (jsonElement.TryGetProperty("description", out JsonElement descElement))
+                        //{
+                        //    string? descText = descElement.GetString();
+                        //    if (!string.IsNullOrEmpty(descText))
+                        //    {
+                        //        return new YomichanContent("span", $"[{descText}]", false, null);
+                        //    }
+                        //}
+
+                        return default;
                     }
 
                     string? imagePath = imagePathJsonElement.GetString();
                     Debug.Assert(imagePath is not null);
 
-                    return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false);
+                    return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false, null);
                 }
 
                 if (jsonElement.TryGetProperty("title", out JsonElement titleJsonElement))
                 {
-                    return new YomichanContent(parentTag ?? tag, titleJsonElement.GetString(), false);
+                    return new YomichanContent(parentTag ?? tag, titleJsonElement.GetString(), false, null);
                 }
             }
             else if (jsonElement.TryGetProperty("type", out JsonElement typeJsonElement))
             {
-                if (typeJsonElement.GetString() is "image" && jsonElement.TryGetProperty("path", out JsonElement imagePathJsonElement))
+                string? type = typeJsonElement.GetString();
+                if (type is "text" && jsonElement.TryGetProperty("text", out JsonElement textElement))
                 {
-                    if (jsonElement.TryGetProperty("height", out JsonElement heightProperty))
+                    return new YomichanContent("span", textElement.GetString(), false, null);
+                }
+
+                if (type is "image" && jsonElement.TryGetProperty("path", out JsonElement imagePathJsonElement))
+                {
+                    if ((jsonElement.TryGetProperty("height", out JsonElement heightProperty) && heightProperty.GetDouble() <= 5)
+                        || (jsonElement.TryGetProperty("width", out JsonElement widthProperty) && widthProperty.GetDouble() <= 5))
                     {
-                        if (heightProperty.GetDouble() <= 5)
-                        {
-                            return default;
-                        }
-                    }
-                    else if (jsonElement.TryGetProperty("width", out JsonElement widthProperty))
-                    {
-                        if (widthProperty.GetDouble() <= 5)
-                        {
-                            return default;
-                        }
+                        //if (jsonElement.TryGetProperty("alt", out JsonElement altElement))
+                        //{
+                        //    string? altText = altElement.GetString();
+                        //    if (!string.IsNullOrWhiteSpace(altText))
+                        //    {
+                        //        return new YomichanContent("span", $"[{altText}]", false, null);
+                        //    }
+                        //}
+                        //else if (jsonElement.TryGetProperty("description", out JsonElement descElement))
+                        //{
+                        //    string? descText = descElement.GetString();
+                        //    if (!string.IsNullOrWhiteSpace(descText))
+                        //    {
+                        //        return new YomichanContent("span", $"[{descText}]", false, null);
+                        //    }
+                        //}
+
+                        return default;
                     }
 
                     string? imagePath = imagePathJsonElement.GetString();
                     Debug.Assert(imagePath is not null);
-                    return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false);
+                    return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false, null);
                 }
             }
 
