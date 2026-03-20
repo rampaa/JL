@@ -70,7 +70,6 @@ internal static class OkuriganaVariantGenerator
                         return false;
                     }
 
-                    // Efficient uniqueness check (Single scan with forward slice)
                     ReadOnlySpan<char> readingSlice = reading[searchStartIndex..];
                     int firstMatch = readingSlice.IndexOf(anchor);
 
