@@ -4,9 +4,9 @@
     "net9.0": {
       "CommunityToolkit.HighPerformance": {
         "type": "Direct",
-        "requested": "[8.4.0, )",
-        "resolved": "8.4.0",
-        "contentHash": "flxspiBs0G/0GMp7IK2J2ijV9bTG6hEwFc/z6ekHqB6nwRJ4Ry2yLdx+TkbCUYFCl4XhABkAwomeKbT6zM2Zlg=="
+        "requested": "[8.4.1, )",
+        "resolved": "8.4.1",
+        "contentHash": "BqHc86nn0Dop4zVvA6kDHrREd9Xv+k+qJUpAtxq3VVAdGaCj6xNshIM3FMGynGYxFJc7V2I+HiU3XerLBYwXgA=="
       },
       "MessagePack": {
         "type": "Direct",
