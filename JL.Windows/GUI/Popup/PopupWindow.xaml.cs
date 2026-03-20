@@ -843,7 +843,12 @@ internal sealed partial class PopupWindow : IDisposable
     private async Task CheckResultForDuplicates(LookupDisplayResult[] lookupDisplayResults)
     {
         LookupResult[] lastLookupResults = LastLookupResults;
-        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(lastLookupResults, _currentSourceText, CurrentSourceTextCharPosition).ConfigureAwait(true);
+
+        Debug.Assert(MiningMode
+            ? LastLookupResults.Length == lookupDisplayResults.Length
+            : LastLookupResults.Length >= lookupDisplayResults.Length);
+
+        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(lastLookupResults, lookupDisplayResults.Length, _currentSourceText, CurrentSourceTextCharPosition).ConfigureAwait(true);
         if (duplicateCard is not null)
         {
             Debug.Assert(lookupDisplayResults.Length == duplicateCard.Length);

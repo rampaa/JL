@@ -1483,7 +1483,7 @@ public static class MiningUtils
         }
     }
 
-    public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, string currentText, int currentCharPosition)
+    public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, int displayedLookupResultLength, string currentText, int currentCharPosition)
     {
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig().ConfigureAwait(false);
         if (ankiConfigDict is null)
@@ -1491,11 +1491,11 @@ public static class MiningUtils
             return null;
         }
 
-        List<Note> notes = new(lookupResults.Length);
-        List<int> positions = new(lookupResults.Length);
-        bool[] results = new bool[lookupResults.Length];
+        List<Note> notes = new(displayedLookupResultLength);
+        List<int> positions = new(displayedLookupResultLength);
+        bool[] results = new bool[displayedLookupResultLength];
 
-        for (int i = 0; i < lookupResults.Length; i++)
+        for (int i = 0; i < displayedLookupResultLength; i++)
         {
             LookupResult lookupResult = lookupResults[i];
             DictType dictType = lookupResult.Dict.Type;
@@ -1605,6 +1605,13 @@ public static class MiningUtils
         Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResults, currentLookupResultIndex, currentText, sentence, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, true, ankiConfig.UsedJLFields);
         OrderedDictionary<string, JLField> userFields = ankiConfig.Fields;
         Dictionary<string, string> fields = ConvertFields(userFields, miningParams);
+
+        if (fields.Count is 0)
+        {
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Cannot mine {selectedSpelling} because there is nothing to mine");
+            LoggerManager.Logger.Information("Cannot mine {SelectedSpelling} because there is nothing to mine", selectedSpelling);
+            return;
+        }
 
         // Audio/Picture/Video shouldn't be set here
         // Otherwise AnkiConnect will place them under the "collection.media" folder even when it's a duplicate note
