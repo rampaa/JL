@@ -57,7 +57,7 @@ public static class AnkiConfigUtils
             FileStream ankiConfigStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncReadFso);
             await using (ankiConfigStream.ConfigureAwait(false))
             {
-                s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter, cancellationToken).ConfigureAwait(false);
+                s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter, CancellationToken.None).ConfigureAwait(false);
             }
 
             Debug.Assert(s_ankiConfigDict is not null);
@@ -92,10 +92,6 @@ public static class AnkiConfigUtils
             }
 
             return s_ankiConfigDict;
-        }
-        catch (OperationCanceledException)
-        {
-            return null;
         }
         catch (Exception ex)
         {

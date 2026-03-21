@@ -804,13 +804,15 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (checkForDuplicateCards)
         {
-            if (_duplicateCheckCancelationTokenSource is not null)
+            CancellationTokenSource? duplicateCheckCancelationTokenSource = _duplicateCheckCancelationTokenSource;
+            _duplicateCheckCancelationTokenSource = new CancellationTokenSource();
+
+            if (duplicateCheckCancelationTokenSource is not null)
             {
-                _duplicateCheckCancelationTokenSource.Cancel();
-                _duplicateCheckCancelationTokenSource.Dispose();
+                duplicateCheckCancelationTokenSource.Cancel();
+                duplicateCheckCancelationTokenSource.Dispose();
             }
 
-            _duplicateCheckCancelationTokenSource = new CancellationTokenSource();
             CheckResultForDuplicates(popupItemSource, _duplicateCheckCancelationTokenSource.Token).SafeFireAndForget("Unexpected error while checking results for duplicates");
         }
 
@@ -2391,6 +2393,14 @@ internal sealed partial class PopupWindow : IDisposable
         _firstVisibleListViewItemIndex = 0;
         CurrentSourceTextCharPosition = 0;
         _lastInteractedTextBox = null;
+
+        if (_duplicateCheckCancelationTokenSource is not null)
+        {
+            CancellationTokenSource duplicateCheckCancelationTokenSource = _duplicateCheckCancelationTokenSource;
+            _duplicateCheckCancelationTokenSource = null;
+            duplicateCheckCancelationTokenSource.Cancel();
+            duplicateCheckCancelationTokenSource.Dispose();
+        }
 
         PopupWindowUtils.PopupAutoHideTimer.Stop();
 
