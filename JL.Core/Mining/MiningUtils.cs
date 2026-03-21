@@ -1483,9 +1483,9 @@ public static class MiningUtils
         }
     }
 
-    public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, int displayedLookupResultLength, string currentText, int currentCharPosition)
+    public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, int displayedLookupResultLength, string currentText, int currentCharPosition, CancellationToken cancellationToken)
     {
-        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig().ConfigureAwait(false);
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig(cancellationToken).ConfigureAwait(false);
         if (ankiConfigDict is null)
         {
             return null;
@@ -1545,7 +1545,7 @@ public static class MiningUtils
             return null;
         }
 
-        bool[]? canAddNoteList = await AnkiConnectUtils.CanAddNotes(notes).ConfigureAwait(false);
+        bool[]? canAddNoteList = await AnkiConnectUtils.CanAddNotes(notes, cancellationToken).ConfigureAwait(false);
         if (canAddNoteList is null)
         {
             return null;
@@ -1569,7 +1569,7 @@ public static class MiningUtils
             return;
         }
 
-        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig().ConfigureAwait(false);
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig(CancellationToken.None).ConfigureAwait(false);
         if (ankiConfigDict is null)
         {
             FrontendManager.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");

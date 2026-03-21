@@ -286,8 +286,7 @@ internal sealed partial class PreferencesWindow
 
     private async Task SetPreviousMiningConfig()
     {
-        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig().ConfigureAwait(true);
-
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig(CancellationToken.None).ConfigureAwait(true);
         if (ankiConfigDict is null)
         {
             return;
@@ -385,7 +384,7 @@ internal sealed partial class PreferencesWindow
             return;
         }
 
-        string[]? fieldNames = await AnkiConnectUtils.GetFieldNames(modelName).ConfigureAwait(true);
+        string[]? fieldNames = await AnkiConnectUtils.GetFieldNames(modelName, CancellationToken.None).ConfigureAwait(true);
         if (fieldNames is not null)
         {
             OrderedDictionary<string, JLField> fields = new(fieldNames.Length, StringComparer.Ordinal);

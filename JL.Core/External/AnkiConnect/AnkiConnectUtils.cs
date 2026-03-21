@@ -53,9 +53,9 @@ public static class AnkiConnectUtils
         return modelNames;
     }
 
-    public static async ValueTask<string[]?> GetFieldNames(string modelName)
+    public static async ValueTask<string[]?> GetFieldNames(string modelName, CancellationToken cancellationToken)
     {
-        Response? response = await AnkiConnectClient.GetModelFieldNamesResponse(modelName).ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.GetModelFieldNamesResponse(modelName, cancellationToken).ConfigureAwait(false);
         if (response is null)
         {
             return null;
@@ -78,7 +78,7 @@ public static class AnkiConnectUtils
 
     internal static async Task<bool?> CanAddNote(Note note)
     {
-        Response? response = await AnkiConnectClient.GetCanAddNotesResponse([note]).ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.GetCanAddNotesResponse([note], CancellationToken.None).ConfigureAwait(false);
         if (response is null)
         {
             return null;
@@ -93,9 +93,9 @@ public static class AnkiConnectUtils
         return null;
     }
 
-    internal static async ValueTask<bool[]?> CanAddNotes(List<Note> notes)
+    internal static async ValueTask<bool[]?> CanAddNotes(List<Note> notes, CancellationToken cancellationToken)
     {
-        Response? response = await AnkiConnectClient.GetCanAddNotesResponse(notes).ConfigureAwait(false);
+        Response? response = await AnkiConnectClient.GetCanAddNotesResponse(notes, cancellationToken).ConfigureAwait(false);
         if (response is null)
         {
             return null;

@@ -87,6 +87,8 @@ internal sealed partial class PopupWindow : IDisposable
 
     public int PopupIndex { get; }
 
+    private CancellationTokenSource? _duplicateCheckCancelationTokenSource;
+
     public PopupWindow(int popupIndex)
     {
         InitializeComponent();
@@ -802,7 +804,14 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (checkForDuplicateCards)
         {
-            CheckResultForDuplicates(popupItemSource).SafeFireAndForget("Unexpected error while checking results for duplicates");
+            if (_duplicateCheckCancelationTokenSource is not null)
+            {
+                _duplicateCheckCancelationTokenSource.Cancel();
+                _duplicateCheckCancelationTokenSource.Dispose();
+            }
+
+            _duplicateCheckCancelationTokenSource = new CancellationTokenSource();
+            CheckResultForDuplicates(popupItemSource, _duplicateCheckCancelationTokenSource.Token).SafeFireAndForget("Unexpected error while checking results for duplicates");
         }
 
         GenerateDictTypeButtons();
@@ -840,7 +849,7 @@ internal sealed partial class PopupWindow : IDisposable
         textBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
     }
 
-    private async Task CheckResultForDuplicates(LookupDisplayResult[] lookupDisplayResults)
+    private async Task CheckResultForDuplicates(LookupDisplayResult[] lookupDisplayResults, CancellationToken cancellationToken)
     {
         LookupResult[] lastLookupResults = LastLookupResults;
 
@@ -848,7 +857,7 @@ internal sealed partial class PopupWindow : IDisposable
             ? LastLookupResults.Length == lookupDisplayResults.Length
             : LastLookupResults.Length >= lookupDisplayResults.Length);
 
-        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(lastLookupResults, lookupDisplayResults.Length, _currentSourceText, CurrentSourceTextCharPosition).ConfigureAwait(true);
+        bool[]? duplicateCard = await MiningUtils.CheckDuplicates(lastLookupResults, lookupDisplayResults.Length, _currentSourceText, CurrentSourceTextCharPosition, cancellationToken).ConfigureAwait(true);
         if (duplicateCard is not null)
         {
             Debug.Assert(lookupDisplayResults.Length == duplicateCard.Length);
@@ -2595,6 +2604,13 @@ internal sealed partial class PopupWindow : IDisposable
 
         _enableMiningModeTimer.Elapsed -= EnableMiningModeTimer_Elapsed;
         _enableMiningModeTimer.Dispose();
+
+        if (_duplicateCheckCancelationTokenSource is not null)
+        {
+            _duplicateCheckCancelationTokenSource.Cancel();
+            _duplicateCheckCancelationTokenSource.Dispose();
+            _duplicateCheckCancelationTokenSource = null;
+        }
     }
 
     private void Window_LostFocus(object sender, RoutedEventArgs e)

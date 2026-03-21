@@ -38,7 +38,7 @@ public static class AnkiConfigUtils
         }
     }
 
-    public static async ValueTask<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig()
+    public static async ValueTask<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig(CancellationToken cancellationToken)
     {
         if (s_ankiConfigDict is not null)
         {
@@ -57,7 +57,7 @@ public static class AnkiConfigUtils
             FileStream ankiConfigStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncReadFso);
             await using (ankiConfigStream.ConfigureAwait(false))
             {
-                s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter).ConfigureAwait(false);
+                s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter, cancellationToken).ConfigureAwait(false);
             }
 
             Debug.Assert(s_ankiConfigDict is not null);
@@ -65,7 +65,7 @@ public static class AnkiConfigUtils
             await Parallel.ForEachAsync(s_ankiConfigDict.Values, async (ankiConfig, _) =>
             {
                 Debug.Assert(ankiConfig.Fields.Count > 0);
-                string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName).ConfigureAwait(false);
+                string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName, cancellationToken).ConfigureAwait(false);
                 if (fields is not null)
                 {
                     ReadOnlySpan<string> fieldsSpan = fields;
@@ -93,7 +93,10 @@ public static class AnkiConfigUtils
 
             return s_ankiConfigDict;
         }
-
+        catch (OperationCanceledException)
+        {
+            return null;
+        }
         catch (Exception ex)
         {
             FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");

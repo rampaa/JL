@@ -17,22 +17,22 @@ internal static class AnkiConnectClient
                 "note", note
             }
         });
-        return Send(req);
+        return Send(req, CancellationToken.None);
     }
 
     public static ValueTask<Response?> GetDeckNamesResponse()
     {
         Request req = new("deckNames", 6);
-        return Send(req);
+        return Send(req, CancellationToken.None);
     }
 
     public static ValueTask<Response?> GetModelNamesResponse()
     {
         Request req = new("modelNames", 6);
-        return Send(req);
+        return Send(req, CancellationToken.None);
     }
 
-    public static ValueTask<Response?> GetModelFieldNamesResponse(string modelName)
+    public static ValueTask<Response?> GetModelFieldNamesResponse(string modelName, CancellationToken cancellationToken)
     {
         RequestWithParameters<string> req = new("modelFieldNames", 6, new Dictionary<string, string>(1, StringComparer.Ordinal)
         {
@@ -40,10 +40,10 @@ internal static class AnkiConnectClient
                 "modelName", modelName
             }
         });
-        return Send(req);
+        return Send(req, cancellationToken);
     }
 
-    public static ValueTask<Response?> GetCanAddNotesResponse(List<Note> notes)
+    public static ValueTask<Response?> GetCanAddNotesResponse(List<Note> notes, CancellationToken cancellationToken)
     {
         RequestWithParameters<List<Note>> req = new("canAddNotes", 6, new Dictionary<string, List<Note>>(1, StringComparer.Ordinal)
         {
@@ -52,7 +52,7 @@ internal static class AnkiConnectClient
             }
         });
 
-        return Send(req);
+        return Send(req, cancellationToken);
     }
 
     //public static ValueTask<Response?> StoreMediaFile(string filename, string data)
@@ -73,10 +73,10 @@ internal static class AnkiConnectClient
     public static async Task Sync()
     {
         Request req = new("sync", 6);
-        _ = await Send(req).ConfigureAwait(false);
+        _ = await Send(req, CancellationToken.None).ConfigureAwait(false);
     }
 
-    private static async ValueTask<Response?> Send<T>(T request) where T : Request
+    private static async ValueTask<Response?> Send<T>(T request, CancellationToken cancellationToken) where T : Request
     {
         try
         {
@@ -84,16 +84,16 @@ internal static class AnkiConnectClient
             using JsonContent content = JsonContent.Create(request, options: JsonOptions.s_jsoIgnoringWhenWritingNull);
 
             // AnkiConnect expects the content to be buffered
-            await content.LoadIntoBufferAsync().ConfigureAwait(false);
+            await content.LoadIntoBufferAsync(cancellationToken).ConfigureAwait(false);
 
-            using HttpResponseMessage postResponse = await NetworkUtils.Client.PostAsync(CoreConfigManager.Instance.AnkiConnectUri, content).ConfigureAwait(false);
+            using HttpResponseMessage postResponse = await NetworkUtils.Client.PostAsync(CoreConfigManager.Instance.AnkiConnectUri, content, cancellationToken).ConfigureAwait(false);
 
             if (!postResponse.IsSuccessStatusCode)
             {
                 return null;
             }
 
-            Response? response = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
+            Response? response = await postResponse.Content.ReadFromJsonAsync<Response>(cancellationToken).ConfigureAwait(false);
             Debug.Assert(response is not null);
             if (response.Error is null)
             {
@@ -103,6 +103,10 @@ internal static class AnkiConnectClient
             FrontendManager.Frontend.Alert(AlertLevel.Error, response.Error);
             LoggerManager.Logger.Error("{JsonError}", response.Error);
 
+            return null;
+        }
+        catch (OperationCanceledException)
+        {
             return null;
         }
         catch (HttpRequestException ex)
