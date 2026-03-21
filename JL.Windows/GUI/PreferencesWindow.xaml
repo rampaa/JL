@@ -1660,7 +1660,7 @@
                                              Cursor="Help"
                                              ToolTip="Only takes effect if &quot;Enable duplicate card checking&quot; is enabled.
                                              &#10;Shows the mining button even when mining mode is not enabled.
-                                             &#10;May affect the performance of &quot;Mouse move&quot; lookup mode.">
+                                             &#10;May affect the performance of &quot;Mouse move&quot; lookup mode so enabling it is not recommended.">
                                     <DockPanel Margin="10,0,10,0">
                                         <TextBlock HorizontalAlignment="Left" Text="Show duplicate status even when mining mode is not enabled"
                                             Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
