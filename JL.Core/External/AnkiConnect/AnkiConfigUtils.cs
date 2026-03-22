@@ -64,24 +64,26 @@ public static class AnkiConfigUtils
             AtomicBool firstFieldChanged = new(false);
             await Parallel.ForEachAsync(s_ankiConfigDict.Values, async (ankiConfig, _) =>
             {
-                Debug.Assert(ankiConfig.Fields.Count > 0);
-                string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName, cancellationToken).ConfigureAwait(false);
-                if (fields is not null)
+                if (ankiConfig.Fields.Count > 0)
                 {
-                    ReadOnlySpan<string> fieldsSpan = fields;
-                    if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
+                    string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName, cancellationToken).ConfigureAwait(false);
+                    if (fields?.Length > 0)
                     {
-                        firstFieldChanged.SetTrue();
-
-                        OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length, StringComparer.Ordinal);
-                        for (int i = 0; i < fieldsSpan.Length; i++)
+                        ReadOnlySpan<string> fieldsSpan = fields;
+                        if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
                         {
-                            string fieldName = fieldsSpan[i];
-                            upToDateFields.Add(fieldName, ankiConfig.Fields.GetValueOrDefault(fieldName, JLField.Nothing));
-                        }
+                            firstFieldChanged.SetTrue();
 
-                        ankiConfig.Fields = upToDateFields;
-                        ankiConfig.UsedJLFields = upToDateFields.Values.Where(static f => f is not JLField.Nothing).ToFrozenSet();
+                            OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length, StringComparer.Ordinal);
+                            for (int i = 0; i < fieldsSpan.Length; i++)
+                            {
+                                string fieldName = fieldsSpan[i];
+                                upToDateFields.Add(fieldName, ankiConfig.Fields.GetValueOrDefault(fieldName, JLField.Nothing));
+                            }
+
+                            ankiConfig.Fields = upToDateFields;
+                            ankiConfig.UsedJLFields = upToDateFields.Values.Where(static f => f is not JLField.Nothing).ToFrozenSet();
+                        }
                     }
                 }
             }).ConfigureAwait(false);
