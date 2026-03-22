@@ -874,30 +874,21 @@ internal static class WindowsUtils
         return HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
     }
 
-    public static async Task<bool> ShowYesNoDialogAsync(string text, string caption, Window owner)
+    public static async Task<bool> ShowYesNoDialogAsync(string text, string caption, Window? owner)
     {
         await s_dialogSemaphore.WaitAsync().ConfigureAwait(false);
 
         try
         {
-            return await owner.Dispatcher.InvokeAsync(() => HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes);
-        }
-        finally
-        {
-            _ = s_dialogSemaphore.Release();
-        }
-    }
-
-    public static async Task ShowOkDialogAsync(string text, string caption, Window owner)
-    {
-        await s_dialogSemaphore.WaitAsync().ConfigureAwait(false);
-
-        try
-        {
-            await owner.Dispatcher.InvokeAsync(() =>
+            if (owner is not null)
             {
-                _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-            });
+                return await owner.Dispatcher.InvokeAsync(() => HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes);
+            }
+            else
+            {
+                Application? application = Application.Current;
+                return application is not null && await application.Dispatcher.InvokeAsync(() => HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes);
+            }
         }
         finally
         {
@@ -905,9 +896,54 @@ internal static class WindowsUtils
         }
     }
 
-    public static Window GetVisibleOwnedWindowOrOwner(Window owner)
+    public static async Task ShowOkDialogAsync(string text, string caption, Window? owner)
     {
-        return owner.Dispatcher.Invoke(() => Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Owner == owner && w is { IsVisible: true, Opacity: > 0 }, owner));
+        await s_dialogSemaphore.WaitAsync().ConfigureAwait(false);
+
+        try
+        {
+            if (owner is not null)
+            {
+                await owner.Dispatcher.InvokeAsync(() =>
+                {
+                    _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+                });
+            }
+            else
+            {
+                Application? application = Application.Current;
+                if (application is not null)
+                {
+                    await application.Dispatcher.InvokeAsync(() =>
+                    {
+                        _ = HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+                    });
+                }
+            }
+        }
+        finally
+        {
+            _ = s_dialogSemaphore.Release();
+        }
+    }
+
+    public static Window? GetVisibleOwnedWindowOrOwner(Window owner)
+    {
+        return Application.Current?.Dispatcher.Invoke(() =>
+        {
+            Window? candidate = Application.Current.Windows.OfType<Window>()
+            .FirstOrDefault(w => w.Owner == owner
+                && w.IsVisible
+                && w.Opacity > 0
+                && w.WindowState is not WindowState.Minimized
+                && !w.Dispatcher.HasShutdownStarted);
+
+            return candidate is not null
+                ? candidate
+                : !owner.Dispatcher.HasShutdownStarted
+                    ? owner
+                    : null;
+        });
     }
 
     public static void UpdatePositionForSelectionWindows(Window window, nint windowHandle, Point cursorPosition)
