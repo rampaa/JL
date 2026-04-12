@@ -47,7 +47,7 @@ public static class LookupUtils
             ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
             : default;
 
-        (SqliteConnection[]? freqConnectionsForJmdict, SqliteConnection[]? freqConnectionsForCustomWordDict) = GetFreqSqliteConnections(sqliteFreqConnectionsForJmdict.Items, sqliteFreqConnectionsForCustomWordDict.Items, dbWordFreqs);
+        (SqliteConnection?[]? freqConnectionsForJmdict, SqliteConnection?[]? freqConnectionsForCustomWordDict) = GetFreqSqliteConnections(sqliteFreqConnectionsForJmdict.Items, sqliteFreqConnectionsForCustomWordDict.Items, dbWordFreqs);
 
         TextInfo textInfo = GetTextInfo(text, wordFreqs is not null, dbIsUsedForPitchDict, dbWordFreqs, pitchDict);
         DBParameters dbParameters = GetDBParameters(textInfo);
@@ -325,13 +325,13 @@ public static class LookupUtils
         return (kanji, kanjiCompositions, kanjiFrequencyResults);
     }
 
-    private static (SqliteConnection[]? freqConnectionsForJmdict, SqliteConnection[]? freqConnectionsForCustomWordDict) GetFreqSqliteConnections(SqliteConnection[]? sqliteFreqConnectionsForJmdict, SqliteConnection[]? sqliteFreqConnectionsForCustomWordDict, Freq[]? dbWordFreqs)
+    private static (SqliteConnection?[]? freqConnectionsForJmdict, SqliteConnection?[]? freqConnectionsForCustomWordDict) GetFreqSqliteConnections(SqliteConnection[]? sqliteFreqConnectionsForJmdict, SqliteConnection[]? sqliteFreqConnectionsForCustomWordDict, Freq[]? dbWordFreqs)
     {
         bool sqliteFreqConnectionsForJmdictExist = sqliteFreqConnectionsForJmdict is not null;
         bool sqliteFreqConnectionsForCustomWordDictExist = sqliteFreqConnectionsForCustomWordDict is not null;
 
-        SqliteConnection[]? freqConnectionsForJmdict = null;
-        SqliteConnection[]? freqConnectionsForCustomWordDict = null;
+        SqliteConnection?[]? freqConnectionsForJmdict = null;
+        SqliteConnection?[]? freqConnectionsForCustomWordDict = null;
         if (sqliteFreqConnectionsForJmdictExist || sqliteFreqConnectionsForCustomWordDictExist)
         {
             Debug.Assert(dbWordFreqs is not null);
@@ -920,18 +920,21 @@ public static class LookupUtils
             : null;
     }
 
-    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, SqliteConnection[] connections, HashSet<string> searchKeys)
+    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, SqliteConnection?[] connections, HashSet<string> searchKeys)
     {
         ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Length, StringComparer.Ordinal);
         _ = Parallel.For(0, dbFreqs.Length, i =>
         {
             Freq freq = dbFreqs[i];
-            SqliteConnection connection = connections[i];
+            SqliteConnection? connection = connections[i];
 
-            Dictionary<string, List<FrequencyRecord>>? freqRecords = FreqDBManager.GetRecordsFromDB(connection, searchKeys);
-            if (freqRecords is not null)
+            if (connection is not null)
             {
-                _ = frequencyDicts.TryAdd(freq.Name, freqRecords);
+                Dictionary<string, List<FrequencyRecord>>? freqRecords = FreqDBManager.GetRecordsFromDB(connection, searchKeys);
+                if (freqRecords is not null)
+                {
+                    _ = frequencyDicts.TryAdd(freq.Name, freqRecords);
+                }
             }
         });
 
@@ -954,7 +957,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildJmdictResult(
-        Dictionary<string, IntermediaryResult> jmdictResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, SqliteConnection[]? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchDictConnection, Dict? pitchDict)
+        Dictionary<string, IntermediaryResult> jmdictResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, SqliteConnection?[]? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchDictConnection, Dict? pitchDict)
     {
         bool wordFreqsExist = wordFreqs is not null;
         bool dbWordFreqsExist = dbWordFreqs is not null;
@@ -1336,7 +1339,7 @@ public static class LookupUtils
     }
 
     private static List<LookupResult> BuildCustomWordResult(
-        Dictionary<string, IntermediaryResult> customWordResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, SqliteConnection[]? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchConnection, Dict? pitchDict)
+        Dictionary<string, IntermediaryResult> customWordResults, Freq[]? wordFreqs, Freq[]? dbWordFreqs, SqliteConnection?[]? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchConnection, Dict? pitchDict)
     {
         bool wordFreqsExist = wordFreqs is not null;
         bool dbWordFreqsExist = dbWordFreqs is not null;

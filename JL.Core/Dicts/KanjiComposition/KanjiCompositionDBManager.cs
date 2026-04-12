@@ -1,3 +1,5 @@
+using JL.Core.Frontend;
+using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using MessagePack;
 using Microsoft.Data.Sqlite;
@@ -10,7 +12,14 @@ internal static class KanjiCompositionDBManager
 
     public static string[]? GetRecordsFromDB(string kanji)
     {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(s_dbPath);
+        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(s_dbPath);
+        if (connection is null)
+        {
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict: {DBPath}.", s_dbPath);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict: {s_dbPath}.");
+            return null;
+        }
+
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 

@@ -1,10 +1,11 @@
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
+using JL.Core.Utilities.Japanese;
 using MessagePack;
 using Microsoft.Data.Sqlite;
-using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Dicts.JMnedict;
 
@@ -138,7 +139,14 @@ internal static class JmnedictDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
     {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        if (connection is null)
+        {
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DbName}.", dbName);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
+            return null;
+        }
+
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 

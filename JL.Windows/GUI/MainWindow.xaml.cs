@@ -114,7 +114,8 @@ internal sealed partial class MainWindow : IDisposable
 
         ConfigDBManager.CreateDB();
 
-        SqliteConnection readOnlyConnection = ConfigDBManager.CreateReadOnlyDBConnection();
+        SqliteConnection? readOnlyConnection = ConfigDBManager.CreateReadOnlyDBConnection();
+        Debug.Assert(readOnlyConnection is not null);
         await using (readOnlyConnection.ConfigureAwait(true))
         {
             ProfileDBUtils.SetCurrentProfileFromDB(readOnlyConnection);

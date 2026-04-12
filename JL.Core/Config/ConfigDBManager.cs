@@ -224,7 +224,7 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static SqliteConnection CreateReadOnlyDBConnection()
+    public static SqliteConnection? CreateReadOnlyDBConnection()
     {
         return DBUtils.CreateReadOnlyDBConnection(s_configsPath);
     }

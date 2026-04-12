@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -1223,7 +1224,8 @@ internal sealed class ConfigManager
         preferenceWindow.MainWindowTextVerticalAlignmentComboBox.SelectedValue = MainWindowTextVerticalAlignment;
         preferenceWindow.MainTextBoxEffectComboBox.SelectedValue = MainTextBoxEffect;
 
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        using SqliteConnection? connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        Debug.Assert(connection is not null);
         preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
         preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
 

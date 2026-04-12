@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using Microsoft.Data.Sqlite;
@@ -179,13 +180,27 @@ internal static class FreqDBManager
 
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
     {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
+        if (connection is null)
+        {
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DbName}.", dbName);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for freq dict {dbName}.");
+            return null;
+        }
+
         return GetRecordsFromDB(connection, terms);
     }
 
     public static List<FrequencyRecord>? GetRecordsFromDB(string dbName, string term)
     {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
+        if (connection is null)
+        {
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DbName}.", dbName);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for freq dict {dbName}.");
+            return null;
+        }
+
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
@@ -215,7 +230,9 @@ internal static class FreqDBManager
 
     public static void SetMaxFrequencyValue(Freq freq)
     {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        Debug.Assert(connection is not null);
+
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
@@ -236,7 +253,9 @@ internal static class FreqDBManager
     {
         SetMaxFrequencyValue(freq);
 
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        Debug.Assert(connection is not null);
+
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 

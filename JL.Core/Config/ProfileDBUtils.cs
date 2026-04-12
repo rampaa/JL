@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
@@ -72,7 +73,8 @@ public static class ProfileDBUtils
 
     public static ReadOnlySpan<string> GetProfileNames()
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        using SqliteConnection? connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        Debug.Assert(connection is not null);
         return GetProfileNames(connection).AsReadOnlySpan();
     }
 
@@ -183,7 +185,8 @@ public static class ProfileDBUtils
 
     public static bool ProfileExists(string profileName)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        using SqliteConnection? connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        Debug.Assert(connection is not null);
         return ProfileExists(connection, profileName);
     }
 

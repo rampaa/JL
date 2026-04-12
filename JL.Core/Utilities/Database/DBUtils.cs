@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using JL.Core.Config;
@@ -91,7 +92,9 @@ public static class DBUtils
 
     private static int GetVersionFromDB(string dbPath)
     {
-        using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
+        using SqliteConnection? connection = CreateReadOnlyDBConnection(dbPath);
+        Debug.Assert(connection is not null);
+
         EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
@@ -162,11 +165,20 @@ public static class DBUtils
         return connection;
     }
 
-    internal static SqliteConnection CreateReadOnlyDBConnection(string path)
+    internal static SqliteConnection? CreateReadOnlyDBConnection(string path)
     {
         SqliteConnection connection = new($"Data Source={path};Mode=ReadOnly;");
-        connection.Open();
-        return connection;
+        try
+        {
+            connection.Open();
+            return connection;
+        }
+        catch (SqliteException ex)
+        {
+            LoggerManager.Logger.Error(ex, "Failed to open DB connection in read-only mode for path: {DBPath}", path);
+            connection.Dispose();
+            return null;
+        }
     }
 
     internal static SqliteConnection CreateReadWriteDBConnection(string path)
@@ -178,10 +190,12 @@ public static class DBUtils
 
     internal static bool RecordExists(string dbPath)
     {
-        using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
-        EnableMemoryMapping(connection);
-        using SqliteCommand command = connection.CreateCommand();
+        using SqliteConnection? connection = CreateReadOnlyDBConnection(dbPath);
+        Debug.Assert(connection is not null);
 
+        EnableMemoryMapping(connection);
+
+        using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             """
             SELECT EXISTS

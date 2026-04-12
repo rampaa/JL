@@ -1,6 +1,9 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Frontend;
+using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using MessagePack;
 using Microsoft.Data.Sqlite;
@@ -128,7 +131,14 @@ internal static class KanjidicDBManager
 
     public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
     {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        if (connection is null)
+        {
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DbName}.", dbName);
+            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
+            return null;
+        }
+
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
@@ -148,7 +158,9 @@ internal static class KanjidicDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        Debug.Assert(connection is not null);
+
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
