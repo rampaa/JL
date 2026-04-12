@@ -60,8 +60,8 @@
       },
       "CommunityToolkit.HighPerformance": {
         "type": "Transitive",
-        "resolved": "8.4.1",
-        "contentHash": "BqHc86nn0Dop4zVvA6kDHrREd9Xv+k+qJUpAtxq3VVAdGaCj6xNshIM3FMGynGYxFJc7V2I+HiU3XerLBYwXgA=="
+        "resolved": "8.4.2",
+        "contentHash": "2hmtrrU18x6NL3mbuAqwy0KpnoEEJOuK6sH5RKQfD/jHijn2pqvqBUC7WGy9dgNBL9BDA7eOC0kirsNPMp2f4Q=="
       },
       "MessagePack": {
         "type": "Transitive",
@@ -197,7 +197,7 @@
       "jl.core": {
         "type": "Project",
         "dependencies": {
-          "CommunityToolkit.HighPerformance": "[8.4.1, )",
+          "CommunityToolkit.HighPerformance": "[8.4.2, )",
           "MessagePack": "[3.1.4, )",
           "Microsoft.Data.Sqlite": "[10.0.5, )",
           "Microsoft.Extensions.ObjectPool": "[10.0.5, )",
