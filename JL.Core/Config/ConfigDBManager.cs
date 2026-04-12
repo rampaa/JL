@@ -231,7 +231,9 @@ public static class ConfigDBManager
 
     public static SqliteConnection CreateReadWriteDBConnection()
     {
-        return DBUtils.CreateReadWriteDBConnection(s_configsPath);
+        SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(s_configsPath);
+        Debug.Assert(connection is not null);
+        return connection;
     }
 
     public static void InsertSetting(SqliteConnection connection, string settingName, string value, int? profileId = null)

@@ -57,8 +57,11 @@ public static class DBUtils
 
     internal static void SendOptimizePragma(string path)
     {
-        using SqliteConnection connection = CreateReadWriteDBConnection(path);
-        SendOptimizePragma(connection);
+        using SqliteConnection? connection = CreateReadWriteDBConnection(path);
+        if (connection is not null)
+        {
+            SendOptimizePragma(connection);
+        }
     }
 
     private static void SendOptimizePragma(SqliteConnection connection)
@@ -181,11 +184,20 @@ public static class DBUtils
         }
     }
 
-    internal static SqliteConnection CreateReadWriteDBConnection(string path)
+    internal static SqliteConnection? CreateReadWriteDBConnection(string path)
     {
         SqliteConnection connection = new($"Data Source={path};Mode=ReadWrite;");
-        connection.Open();
-        return connection;
+        try
+        {
+            connection.Open();
+            return connection;
+        }
+        catch (SqliteException ex)
+        {
+            LoggerManager.Logger.Error(ex, "Failed to open DB connection in ReadWrite mode for path: {DBPath}", path);
+            connection.Dispose();
+            return null;
+        }
     }
 
     internal static bool RecordExists(string dbPath)

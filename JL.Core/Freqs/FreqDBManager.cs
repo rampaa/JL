@@ -56,7 +56,9 @@ internal static class FreqDBManager
     {
         ulong rowId = 1;
 
-        using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        Debug.Assert(connection is not null);
+
         DBUtils.SetSynchronousModeToNormal(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 

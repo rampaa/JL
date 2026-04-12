@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
@@ -75,7 +76,9 @@ internal static class JmnedictDBManager
 
         ulong rowId = 1;
 
-        using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        Debug.Assert(connection is not null);
+
         DBUtils.SetSynchronousModeToNormal(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
