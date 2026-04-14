@@ -11,7 +11,7 @@ namespace JL.Core.Audio;
 
 public static class AudioUtils
 {
-    internal static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json");
+    private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json");
 
     internal static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
 

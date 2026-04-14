@@ -2,7 +2,7 @@ namespace JL.Core.Utilities;
 
 public static class PathUtils
 {
-    public const string TempFileExtension = ".tmp";
+    private const string TempFileExtension = ".tmp";
 
     public static string GetPortablePath(string path)
     {
@@ -12,7 +12,7 @@ public static class PathUtils
             : fullPath;
     }
 
-    public static string GetTempPath(string path)
+    internal static string GetTempPath(string path)
     {
         return $"{path}{TempFileExtension}";
     }

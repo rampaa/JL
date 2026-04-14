@@ -9,7 +9,7 @@ using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 
-internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency, IEquatable<EpwingNazekaRecord>
+internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatable<EpwingNazekaRecord>
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }

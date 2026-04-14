@@ -194,12 +194,11 @@ internal static class EpwingYomichanUtils
 
     private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict, ref List<string>? imagePaths, string? parentTag)
     {
-        string? marker;
         while (true)
         {
-            marker = jsonElement.TryGetProperty("style", out JsonElement styleElement) && styleElement.TryGetProperty("listStyleType", out JsonElement listStyleTypeElement)
-                    ? listStyleTypeElement.GetString()
-                    : null;
+            string? marker = jsonElement.TryGetProperty("style", out JsonElement styleElement) && styleElement.TryGetProperty("listStyleType", out JsonElement listStyleTypeElement)
+                ? listStyleTypeElement.GetString()
+                : null;
 
             if (marker is not null)
             {
@@ -297,9 +296,9 @@ internal static class EpwingYomichanUtils
                     if ((jsonElement.TryGetProperty("height", out JsonElement heightProperty) && heightProperty.GetDouble() <= 5)
                         || (jsonElement.TryGetProperty("width", out JsonElement widthProperty) && widthProperty.GetDouble() <= 5))
                     {
-                        //if (jsonElement.TryGetProperty("alt", out JsonElement altelement))
+                        //if (jsonElement.TryGetProperty("alt", out JsonElement altElement))
                         //{
-                        //    string? altText = altelement.GetString();
+                        //    string? altText = altElement.GetString();
                         //    if (!string.IsNullOrEmpty(altText))
                         //    {
                         //        return new YomichanContent("span", $"[{altText}]", false, null);

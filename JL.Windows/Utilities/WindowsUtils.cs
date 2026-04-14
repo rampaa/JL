@@ -931,18 +931,12 @@ internal static class WindowsUtils
     {
         return Application.Current?.Dispatcher.Invoke(() =>
         {
-            Window? candidate = Application.Current.Windows.OfType<Window>()
-            .FirstOrDefault(w => w.Owner == owner
-                && w.IsVisible
-                && w.Opacity > 0
-                && w.WindowState is not WindowState.Minimized
-                && !w.Dispatcher.HasShutdownStarted);
+            Window? candidate = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Owner == owner
+                && w is { IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false });
 
-            return candidate is not null
-                ? candidate
-                : !owner.Dispatcher.HasShutdownStarted
-                    ? owner
-                    : null;
+            return candidate ?? (owner.Dispatcher.HasShutdownStarted
+                ? null
+                : owner);
         });
     }
 

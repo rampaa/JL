@@ -87,7 +87,7 @@ internal sealed partial class PopupWindow : IDisposable
 
     public int PopupIndex { get; }
 
-    private CancellationTokenSource? _duplicateCheckCancelationTokenSource;
+    private CancellationTokenSource? _duplicateCheckCancellationTokenSource;
 
     public PopupWindow(int popupIndex)
     {
@@ -804,16 +804,16 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (checkForDuplicateCards)
         {
-            CancellationTokenSource? duplicateCheckCancelationTokenSource = _duplicateCheckCancelationTokenSource;
-            _duplicateCheckCancelationTokenSource = new CancellationTokenSource();
+            CancellationTokenSource? duplicateCheckCancellationTokenSource = _duplicateCheckCancellationTokenSource;
+            _duplicateCheckCancellationTokenSource = new CancellationTokenSource();
 
-            if (duplicateCheckCancelationTokenSource is not null)
+            if (duplicateCheckCancellationTokenSource is not null)
             {
-                duplicateCheckCancelationTokenSource.Cancel();
-                duplicateCheckCancelationTokenSource.Dispose();
+                duplicateCheckCancellationTokenSource.Cancel();
+                duplicateCheckCancellationTokenSource.Dispose();
             }
 
-            CheckResultForDuplicates(popupItemSource, _duplicateCheckCancelationTokenSource.Token).SafeFireAndForget("Unexpected error while checking results for duplicates");
+            CheckResultForDuplicates(popupItemSource, _duplicateCheckCancellationTokenSource.Token).SafeFireAndForget("Unexpected error while checking results for duplicates");
         }
 
         GenerateDictTypeButtons();
@@ -2394,12 +2394,12 @@ internal sealed partial class PopupWindow : IDisposable
         CurrentSourceTextCharPosition = 0;
         _lastInteractedTextBox = null;
 
-        if (_duplicateCheckCancelationTokenSource is not null)
+        if (_duplicateCheckCancellationTokenSource is not null)
         {
-            CancellationTokenSource duplicateCheckCancelationTokenSource = _duplicateCheckCancelationTokenSource;
-            _duplicateCheckCancelationTokenSource = null;
-            duplicateCheckCancelationTokenSource.Cancel();
-            duplicateCheckCancelationTokenSource.Dispose();
+            CancellationTokenSource duplicateCheckCancellationTokenSource = _duplicateCheckCancellationTokenSource;
+            _duplicateCheckCancellationTokenSource = null;
+            duplicateCheckCancellationTokenSource.Cancel();
+            duplicateCheckCancellationTokenSource.Dispose();
         }
 
         PopupWindowUtils.PopupAutoHideTimer.Stop();
@@ -2615,11 +2615,11 @@ internal sealed partial class PopupWindow : IDisposable
         _enableMiningModeTimer.Elapsed -= EnableMiningModeTimer_Elapsed;
         _enableMiningModeTimer.Dispose();
 
-        if (_duplicateCheckCancelationTokenSource is not null)
+        if (_duplicateCheckCancellationTokenSource is not null)
         {
-            _duplicateCheckCancelationTokenSource.Cancel();
-            _duplicateCheckCancelationTokenSource.Dispose();
-            _duplicateCheckCancelationTokenSource = null;
+            _duplicateCheckCancellationTokenSource.Cancel();
+            _duplicateCheckCancellationTokenSource.Dispose();
+            _duplicateCheckCancellationTokenSource = null;
         }
     }
 

@@ -15,7 +15,7 @@ namespace JL.Core.Freqs;
 
 public static class FreqUtils
 {
-    internal static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "freqs.json");
+    private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "freqs.json");
     public static bool FreqsReady { get; private set; } // = false;
 
     public static readonly Dictionary<string, Freq> FreqDicts = new(StringComparer.OrdinalIgnoreCase);

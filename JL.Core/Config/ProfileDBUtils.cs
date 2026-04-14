@@ -101,7 +101,7 @@ public static class ProfileDBUtils
         return profiles;
     }
 
-    public static List<int> GetProfileIds(SqliteConnection connection)
+    internal static List<int> GetProfileIds(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
 
@@ -162,7 +162,7 @@ public static class ProfileDBUtils
         return reader.GetBoolean(0);
     }
 
-    public static bool ProfileExists(SqliteConnection connection, string profileName)
+    internal static bool ProfileExists(SqliteConnection connection, string profileName)
     {
         using SqliteCommand command = connection.CreateCommand();
 
