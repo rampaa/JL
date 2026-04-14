@@ -140,7 +140,7 @@ internal static class EpwingYomichanLoader
             return null;
         }
 
-        if (!EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
+        if (primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
         {
             return null;
         }

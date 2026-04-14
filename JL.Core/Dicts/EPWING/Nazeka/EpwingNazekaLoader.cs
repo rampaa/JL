@@ -72,7 +72,7 @@ internal static class EpwingNazekaLoader
                     if (spellingList is not null)
                     {
                         string primarySpelling = spellingList[0];
-                        if (!EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
+                        if (primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
                         {
                             continue;
                         }
@@ -117,7 +117,7 @@ internal static class EpwingNazekaLoader
                         for (int j = 1; j < spellingListSpan.Length; j++)
                         {
                             ref readonly string alternativeSpelling = ref spellingListSpan[j];
-                            if (!EpwingUtils.IsValidEpwingResultForDictType(alternativeSpelling, reading, definitions, dict))
+                            if (alternativeSpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
                             {
                                 continue;
                             }
@@ -133,7 +133,7 @@ internal static class EpwingNazekaLoader
                         }
                     }
 
-                    else if (EpwingUtils.IsValidEpwingResultForDictType(reading, null, definitions, dict))
+                    else if (!reading.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
                     {
                         string? imagePath = null;
                         if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))

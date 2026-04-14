@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
@@ -37,6 +38,8 @@ public static class DictUtils
     private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
     private static readonly SemaphoreSlim s_loadDictionariesSemaphoreSlim = new(1, 1);
+
+    internal static readonly SearchValues<char> s_invalidCharactersForPrimarySpellings = SearchValues.Create('�', '〓', '\n');
 
     internal static bool DBIsUsedForAtLeastOneDict { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; } = true;
