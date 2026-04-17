@@ -16,7 +16,7 @@ internal static class KanjiCompositionDBManager
         if (connection is null)
         {
             LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict: {DBPath}.", s_dbPath);
-            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict: {s_dbPath}.");
+            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict: {s_dbPath}.");
             return null;
         }
 

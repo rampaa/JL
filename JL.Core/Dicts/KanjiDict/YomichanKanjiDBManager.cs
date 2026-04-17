@@ -131,7 +131,7 @@ internal static class YomichanKanjiDBManager
         if (connection is null)
         {
             LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DbName}.", dbName);
-            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
+            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
             return null;
         }
 
