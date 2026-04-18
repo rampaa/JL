@@ -2,7 +2,6 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using JL.Core.Dicts.Interfaces;
-using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using MessagePack;
