@@ -22,7 +22,7 @@ public sealed class LookupResult
         string[]? imagePaths = null,
         JmdictLookupResult? jmdictLookupResult = null,
         KanjiLookupResult? kanjiLookupResult = null
-    ) : IEquatable<LookupResult>, IComparable<LookupResult>
+    ) : IEquatable<LookupResult>, IComparable<LookupResult>, IComparable
 {
     // common (required for sorting)
     public string PrimarySpelling { get; } = primarySpelling;
@@ -199,6 +199,13 @@ public sealed class LookupResult
 
         // 10. ThenBy: EntryId
         // EntryId.CompareTo(other.EntryId);
+    }
+
+    public int CompareTo(object? obj)
+    {
+        return obj is LookupResult lookupResult
+            ? CompareTo(lookupResult)
+            : -1;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
