@@ -16,8 +16,8 @@ public static class LoggerManager
         .MinimumLevel.ControlledBy(s_loggingLevelSwitch)
         .WriteTo.File(Path.Join(AppInfo.ApplicationPath, "Logs", "log.txt"),
             formatProvider: CultureInfo.InvariantCulture,
+            shared: true,
             rollingInterval: RollingInterval.Day,
-            retainedFileTimeLimit: TimeSpan.FromDays(30),
-            shared: true)
+            retainedFileTimeLimit: TimeSpan.FromDays(30))
         .CreateLogger();
 }

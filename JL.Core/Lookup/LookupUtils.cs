@@ -1017,18 +1017,18 @@ public static class LookupUtils
                     LookupResult result = new
                     (
                         primarySpelling: jmdictResult.PrimarySpelling,
-                        readings: jmdictResult.Readings,
                         matchedText: wordResult.MatchedText,
-                        entryId: jmdictResult.Id,
+                        dict: wordResult.Dict,
+                        readings: jmdictResult.Readings,
+                        formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                        frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
-                        frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
-                        jmdictLookupResult: new JmdictLookupResult(jmdictResult.PrimarySpellingOrthographyInfo, jmdictResult.ReadingsOrthographyInfo, jmdictResult.AlternativeSpellingsOrthographyInfo, jmdictResult.MiscSharedByAllSenses, jmdictResult.Misc, jmdictResult.WordClasses),
-                        dict: wordResult.Dict,
-                        formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                        entryId: jmdictResult.Id,
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null,
-                        wordClasses: jmdictResult.WordClassesSharedByAllSenses
+                        wordClasses: jmdictResult.WordClassesSharedByAllSenses,
+                        jmdictLookupResult: new JmdictLookupResult(jmdictResult.PrimarySpellingOrthographyInfo, jmdictResult.ReadingsOrthographyInfo, jmdictResult.AlternativeSpellingsOrthographyInfo, jmdictResult.MiscSharedByAllSenses, jmdictResult.Misc, jmdictResult.WordClasses)
                     );
 
                     if (!results.Contains(result))
@@ -1084,13 +1084,13 @@ public static class LookupUtils
 
                     LookupResult result = new
                     (
-                        entryId: jmnedictRecord.Id,
                         primarySpelling: jmnedictRecord.PrimarySpelling,
-                        alternativeSpellings: jmnedictRecord.AlternativeSpellings,
-                        readings: jmnedictRecord.Readings,
                         matchedText: nameResult.MatchedText,
                         dict: nameResult.Dict,
+                        readings: jmnedictRecord.Readings,
                         formattedDefinitions: jmnedictRecord.BuildFormattedDefinition(nameResult.Dict.Options),
+                        alternativeSpellings: jmnedictRecord.AlternativeSpellings,
+                        entryId: jmnedictRecord.Id,
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmnedictRecord.PrimarySpelling, jmnedictRecord.Readings, pitchAccentDict!) : null
                     );
 
@@ -1112,13 +1112,13 @@ public static class LookupUtils
         LookupResult result = new
         (
             primarySpelling: kanji,
-            readings: allReadings,
-            kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings, kanjiRecord.RadicalNames, kanjiRecord.StrokeCount, kanjiRecord.Grade),
-            frequencies: GetKanjidicFrequencies(kanjiRecord.Frequency, kanjiFrequencyResults),
             matchedText: intermediaryResult.MatchedText,
             dict: intermediaryResult.Dict,
+            readings: allReadings,
             formattedDefinitions: kanjiRecord.BuildFormattedDefinition(),
-            pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null
+            frequencies: GetKanjidicFrequencies(kanjiRecord.Frequency, kanjiFrequencyResults),
+            pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null,
+            kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings, kanjiRecord.RadicalNames, kanjiRecord.StrokeCount, kanjiRecord.Grade)
         );
 
         return result;
@@ -1141,13 +1141,13 @@ public static class LookupUtils
                 LookupResult result = new
                 (
                     primarySpelling: kanji,
-                    readings: allReadings,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats()),
-                    frequencies: kanjiFrequencyResults,
                     matchedText: intermediaryResult.MatchedText,
                     dict: intermediaryResult.Dict,
+                    readings: allReadings,
                     formattedDefinitions: yomichanKanjiDictResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
-                    pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null
+                    frequencies: kanjiFrequencyResults,
+                    pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null,
+                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats())
                 );
                 results.Add(result);
             }
@@ -1184,12 +1184,12 @@ public static class LookupUtils
                     (
                         primarySpelling: epwingResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
-                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: deconjugationProcess,
-                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
+                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
+                        deconjugationProcess: deconjugationProcess,
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                         wordClasses: epwingResult.WordClasses,
                         imagePaths: epwingResult.ImagePaths
@@ -1219,13 +1219,13 @@ public static class LookupUtils
                 (
                     primarySpelling: epwingResult.PrimarySpelling,
                     matchedText: intermediaryResult.MatchedText,
-                    frequencies: kanjiFrequencyResults,
                     dict: intermediaryResult.Dict,
                     readings: readings,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions),
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
+                    frequencies: kanjiFrequencyResults,
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                    imagePaths: epwingResult.ImagePaths
+                    imagePaths: epwingResult.ImagePaths,
+                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions)
                 );
 
                 results.Add(result);
@@ -1262,14 +1262,14 @@ public static class LookupUtils
                     LookupResult result = new
                     (
                         primarySpelling: epwingResult.PrimarySpelling,
-                        alternativeSpellings: epwingResult.AlternativeSpellings,
                         matchedText: wordResult.MatchedText,
-                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: deconjugationProcess,
-                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
+                        alternativeSpellings: epwingResult.AlternativeSpellings,
+                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
+                        deconjugationProcess: deconjugationProcess,
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                         imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
                     );
@@ -1320,16 +1320,16 @@ public static class LookupUtils
                 LookupResult result = new
                 (
                     primarySpelling: epwingResult.PrimarySpelling,
-                    alternativeSpellings: epwingResult.AlternativeSpellings,
                     matchedText: intermediaryResult.MatchedText,
-                    frequencies: kanjiFrequencyResults,
                     dict: intermediaryResult.Dict,
                     readings: readings,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions),
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
+                    frequencies: kanjiFrequencyResults,
+                    alternativeSpellings: epwingResult.AlternativeSpellings,
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                     imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
-                );
+,
+                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions));
 
                 results.Add(result);
             }
@@ -1401,14 +1401,14 @@ public static class LookupUtils
                     (
                         primarySpelling: customWordDictResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
-                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: customWordDictResult.HasUserDefinedWordClass ? deconjugationProcess : null,
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
-                        alternativeSpellings: customWordDictResult.AlternativeSpellings,
                         formattedDefinitions: customWordDictResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
                         frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
+                        alternativeSpellings: customWordDictResult.AlternativeSpellings,
+                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
+                        deconjugationProcess: customWordDictResult.HasUserDefinedWordClass ? deconjugationProcess : null,
+                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
                         wordClasses: customWordDictResult.WordClasses
                     );
 
@@ -1439,10 +1439,10 @@ public static class LookupUtils
                     (
                         primarySpelling: customNameDictResult.PrimarySpelling,
                         matchedText: customNameResult.MatchedText,
-                        frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
                         dict: customNameResult.Dict,
                         readings: readings,
                         formattedDefinitions: customNameDictResult.BuildFormattedDefinition(),
+                        frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(customNameDictResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                         imagePaths: customNameDictResult.ImagePath is not null ? [customNameDictResult.ImagePath] : null
                     );
