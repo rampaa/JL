@@ -533,7 +533,7 @@ public static class MiningUtils
             JLField.PitchAccentCategoryForFirstReading => GetPitchAccentCategoryForFirstReading(lookupResults[currentLookupResultIndex]),
             JLField.SelectedSpelling or JLField.PrimarySpelling => lookupResults[currentLookupResultIndex].PrimarySpelling,
             JLField.SelectedDefinitions or JLField.Definitions => lookupResults[currentLookupResultIndex].FormattedDefinitions?.ReplaceLineEndings("<br/>"),
-            JLField.Nothing or JLField.Audio or JLField.SentenceAudio or JLField.SourceTextAudio or JLField.MonitorScreenshot or JLField.Image or JLField.DefinitionsImages or JLField.LocalTime => null,
+            JLField.Nothing or JLField.Audio or JLField.SentenceAudio or JLField.SourceTextAudio or JLField.MonitorScreenshot or JLField.Image or JLField.ImageClipboardOverMonitorScreenshot or JLField.DefinitionsImages or JLField.LocalTime => null,
             _ => null
         };
     }
@@ -543,7 +543,7 @@ public static class MiningUtils
         LookupResult lookupResult = lookupResults[currentLookupResultIndex];
 
         bool mineAllFields = jlFields is null;
-        Dictionary<JLField, string> miningParams = new(mineAllFields ? JLFieldUtils.JLFieldsForWordDicts.Length - JLFieldUtils.s_jlFieldsToExcludeFromWhenMiningToFile.Count : jlFields!.Count);
+        Dictionary<JLField, string> miningParams = new(mineAllFields ? JLFieldUtils.JLFieldsForWordDicts.Length - JLFieldUtils.s_jlFieldsToExcludeWhenMiningToFile.Count : jlFields!.Count);
         if (mineAllFields || jlFields!.Contains(JLField.LocalTime))
         {
             miningParams[JLField.LocalTime] = DateTimeOffset.Now.ToString("O", CultureInfo.InvariantCulture);
@@ -1457,7 +1457,7 @@ public static class MiningUtils
         for (int i = 1; i < jlFields.Length; i++)
         {
             JLField jlField = jlFields[i];
-            if (JLFieldUtils.s_jlFieldsToExcludeFromWhenMiningToFile.Contains(jlField))
+            if (JLFieldUtils.s_jlFieldsToExcludeWhenMiningToFile.Contains(jlField))
             {
                 continue;
             }
@@ -1639,13 +1639,25 @@ public static class MiningUtils
             : selectedSpelling;
 
         List<Dictionary<string, object>>? imageDictionaries = null;
+
+        List<string> imageClipboardOverMonitorScreenshotFields = FindFields(JLField.ImageClipboardOverMonitorScreenshot, userFields);
+        bool imageClipboardOverMonitorScreenshotFieldsExist = imageClipboardOverMonitorScreenshotFields.Count > 0;
+
         List<string> screenshotFields = FindFields(JLField.MonitorScreenshot, userFields);
-        byte[]? screenshotBytes = screenshotFields.Count > 0
+        bool screenshotFieldsExist = screenshotFields.Count > 0;
+
+        byte[]? screenshotBytes = screenshotFieldsExist || imageClipboardOverMonitorScreenshotFieldsExist
             ? FrontendManager.Frontend.GetMonitorScreenshotAsByteArray()
             : null;
 
         if (screenshotBytes is not null)
         {
+            List<string> imageFields = screenshotFieldsExist && imageClipboardOverMonitorScreenshotFieldsExist
+                ? [.. screenshotFields, .. imageClipboardOverMonitorScreenshotFields]
+                : imageClipboardOverMonitorScreenshotFieldsExist
+                    ? imageClipboardOverMonitorScreenshotFields
+                    : screenshotFields;
+
             Dictionary<string, object> screenshotDictionary = new(3, StringComparer.Ordinal)
             {
                 {
@@ -1655,7 +1667,7 @@ public static class MiningUtils
                     "filename", $"JL_SS_{selectedReading}_{lookupResult.PrimarySpelling}.jpg"
                 },
                 {
-                    "fields", screenshotFields
+                    "fields", imageFields
                 }
             };
 
@@ -1698,12 +1710,21 @@ public static class MiningUtils
         }
 
         List<string> clipboardImageFields = FindFields(JLField.Image, userFields);
-        byte[]? clipboardImageBytes = clipboardImageFields.Count > 0
+        bool clipboardImageFieldsExist = clipboardImageFields.Count > 0;
+        bool fallbackToClipboardImage = imageClipboardOverMonitorScreenshotFieldsExist && screenshotBytes is null;
+
+        byte[]? clipboardImageBytes = clipboardImageFieldsExist || fallbackToClipboardImage
             ? await FrontendManager.Frontend.GetImageFromClipboardAsByteArray().ConfigureAwait(false)
             : null;
 
         if (clipboardImageBytes is not null)
         {
+            List<string> imageFields = clipboardImageFieldsExist && fallbackToClipboardImage
+                ? [.. clipboardImageFields, .. imageClipboardOverMonitorScreenshotFields]
+                : clipboardImageFieldsExist
+                    ? clipboardImageFields
+                    : imageClipboardOverMonitorScreenshotFields;
+
             Dictionary<string, object> clipboardImageDictionary = new(3, StringComparer.Ordinal)
             {
                 {
@@ -1713,7 +1734,7 @@ public static class MiningUtils
                     "filename", $"JL_image_{selectedReading}_{lookupResult.PrimarySpelling}.png"
                 },
                 {
-                    "fields", clipboardImageFields
+                    "fields", imageFields
                 }
             };
 

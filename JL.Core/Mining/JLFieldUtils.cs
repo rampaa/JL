@@ -26,6 +26,7 @@ public static class JLFieldUtils
         JLField.SourceTextAudio,
         JLField.MonitorScreenshot,
         JLField.Image,
+        JLField.ImageClipboardOverMonitorScreenshot,
         JLField.DefinitionsImages,
         JLField.SourceText,
         JLField.LeadingSourceTextPart,
@@ -72,6 +73,7 @@ public static class JLFieldUtils
         JLField.SourceTextAudio,
         JLField.MonitorScreenshot,
         JLField.Image,
+        JLField.ImageClipboardOverMonitorScreenshot,
         JLField.DefinitionsImages,
         JLField.SourceText,
         JLField.LeadingSourceTextPart,
@@ -108,6 +110,7 @@ public static class JLFieldUtils
         JLField.SourceTextAudio,
         JLField.MonitorScreenshot,
         JLField.Image,
+        JLField.ImageClipboardOverMonitorScreenshot,
         JLField.DefinitionsImages,
         JLField.SourceText,
         JLField.LeadingSourceTextPart,
@@ -125,7 +128,7 @@ public static class JLFieldUtils
         JLField.LocalTime
     ];
 
-    internal static readonly FrozenSet<JLField> s_jlFieldsToExcludeFromWhenMiningToFile =
+    internal static readonly FrozenSet<JLField> s_jlFieldsToExcludeWhenMiningToFile =
     [
         JLField.Nothing,
         JLField.Audio,
@@ -133,6 +136,7 @@ public static class JLFieldUtils
         JLField.SourceTextAudio,
         JLField.MonitorScreenshot,
         JLField.Image,
+        JLField.ImageClipboardOverMonitorScreenshot,
         JLField.DefinitionsImages,
         JLField.PitchAccents,
         JLField.PitchAccentForFirstReading

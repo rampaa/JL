@@ -21,6 +21,7 @@ public enum JLField
     [Description("Source Text Audio")] SourceTextAudio,
     [Description("Monitor Screenshot")] MonitorScreenshot,
     [Description("Image (Clipboard)")] Image,
+    [Description("Image (Clipboard > Monitor Screenshot)")] ImageClipboardOverMonitorScreenshot,
     [Description("Images (Definitions)")] DefinitionsImages,
     [Description("Source Text")] SourceText,
     [Description("Leading Source Text Part")] LeadingSourceTextPart,
