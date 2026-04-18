@@ -201,7 +201,7 @@ internal static class EpwingNazekaDBManager
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DbName}.", dbName);
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", dbName);
             // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
             return null;
         }
@@ -247,7 +247,7 @@ internal static class EpwingNazekaDBManager
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DbName}.", dbName);
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", dbName);
             // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
             return null;
         }

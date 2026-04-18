@@ -185,7 +185,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DbName}.", dbName);
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DBName}.", dbName);
             // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for freq dict {dbName}.");
             return null;
         }
@@ -198,7 +198,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DbName}.", dbName);
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DBName}.", dbName);
             // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for freq dict {dbName}.");
             return null;
         }
