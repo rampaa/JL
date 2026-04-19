@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
@@ -23,19 +24,15 @@ internal static class EpwingYomichanDBManager
         WHERE rsk.search_key = @term;
         """;
 
-    public static string GetQuery(string parameter)
-    {
-        return
-            $"""
-            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_paths, rsk.search_key
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            WHERE rsk.search_key IN {parameter}
-            """;
-    }
+    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
     public static string GetQuery(int termCount)
     {
+        if (s_queryCache.TryGetValue(termCount, out string? query))
+        {
+            return query;
+        }
+
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             """
             SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_paths, rsk.search_key
@@ -49,8 +46,9 @@ internal static class EpwingYomichanDBManager
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
 
-        string query = queryBuilder.Append(");").ToString();
+        query = queryBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
+        _ = s_queryCache.TryAdd(termCount, query);
         return query;
     }
 
@@ -200,7 +198,7 @@ internal static class EpwingYomichanDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms)
     {
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         if (connection is null)
@@ -214,7 +212,7 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand command = connection.CreateCommand();
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = query;
+        command.CommandText = GetQuery(terms.Length);
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         for (int i = 0; i < terms.Length; i++)

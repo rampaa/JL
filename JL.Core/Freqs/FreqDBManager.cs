@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
@@ -12,6 +13,42 @@ namespace JL.Core.Freqs;
 internal static class FreqDBManager
 {
     public const int Version = 10;
+
+    private const string SingleTermQuery =
+        """
+        SELECT r.spelling, r.frequency
+        FROM record r
+        JOIN record_search_key rsk ON r.rowid = rsk.record_id
+        WHERE rsk.search_key = @term;
+        """;
+
+    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
+
+    public static string GetQuery(int termCount)
+    {
+        if (s_queryCache.TryGetValue(termCount, out string? query))
+        {
+            return query;
+        }
+
+        StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
+            """
+            SELECT r.spelling, r.frequency, rsk.search_key
+            FROM record r
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
+            WHERE rsk.search_key IN (@1
+            """);
+
+        for (int i = 1; i < termCount; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+        }
+
+        query = queryBuilder.Append(");").ToString();
+        ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
+        _ = s_queryCache.TryAdd(termCount, query);
+        return query;
+    }
 
     private enum ColumnIndex
     {
@@ -126,27 +163,9 @@ internal static class FreqDBManager
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
-        StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
-            """
-            SELECT r.spelling, r.frequency, rsk.search_key
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            WHERE rsk.search_key IN (@1
-            """);
-
-        int termsCount = terms.Count;
-        for (int i = 1; i < termsCount; i++)
-        {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
-        }
-
-        _ = queryBuilder.Append(");");
-
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = queryBuilder.ToString();
+        command.CommandText = GetQuery(terms.Count);
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
-
-        ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
 
         int index = 1;
         foreach (string term in terms)
@@ -205,14 +224,7 @@ internal static class FreqDBManager
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText =
-            """
-            SELECT r.spelling, r.frequency
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            WHERE rsk.search_key = @term;
-            """;
-
+        command.CommandText = SingleTermQuery;
         _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();

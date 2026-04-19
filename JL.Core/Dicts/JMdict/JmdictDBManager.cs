@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -13,6 +14,57 @@ namespace JL.Core.Dicts.JMdict;
 internal static class JmdictDBManager
 {
     public const int Version = 17;
+
+    private static readonly Dictionary<int, string> s_queryCache = [];
+
+    private static string GetQuery(int termCount)
+    {
+        if (s_queryCache.TryGetValue(termCount, out string? query))
+        {
+            return query;
+        }
+
+        StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
+            $"""
+            SELECT r.rowid,
+                   r.edict_id,
+                   r.primary_spelling,
+                   r.primary_spelling_orthography_info,
+                   r.spelling_restrictions,
+                   r.alternative_spellings,
+                   r.alternative_spellings_orthography_info,
+                   r.readings,
+                   r.readings_orthography_info,
+                   r.reading_restrictions,
+                   r.glossary,
+                   r.glossary_info,
+                   r.part_of_speech_shared_by_all_senses,
+                   r.part_of_speech,
+                   r.fields_shared_by_all_senses,
+                   r.fields,
+                   r.misc_shared_by_all_senses,
+                   r.misc,
+                   r.dialects_shared_by_all_senses,
+                   r.dialects,
+                   r.loanword_etymology,
+                   r.cross_references,
+                   r.antonyms,
+                   rsk.search_key
+            FROM record r
+            JOIN record_search_key rsk ON r.rowid = rsk.record_id
+            WHERE rsk.search_key IN (@1
+            """);
+
+        for (int i = 1; i < termCount; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+        }
+
+        query = queryBuilder.Append(");").ToString();
+        ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
+        _ = s_queryCache.TryAdd(termCount, query);
+        return query;
+    }
 
     private enum ColumnIndex
     {
@@ -240,7 +292,7 @@ internal static class JmdictDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms)
     {
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         if (connection is null)
@@ -255,36 +307,7 @@ internal static class JmdictDBManager
 
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText =
-            $"""
-            SELECT r.rowid,
-                   r.edict_id,
-                   r.primary_spelling,
-                   r.primary_spelling_orthography_info,
-                   r.spelling_restrictions,
-                   r.alternative_spellings,
-                   r.alternative_spellings_orthography_info,
-                   r.readings,
-                   r.readings_orthography_info,
-                   r.reading_restrictions,
-                   r.glossary,
-                   r.glossary_info,
-                   r.part_of_speech_shared_by_all_senses,
-                   r.part_of_speech,
-                   r.fields_shared_by_all_senses,
-                   r.fields,
-                   r.misc_shared_by_all_senses,
-                   r.misc,
-                   r.dialects_shared_by_all_senses,
-                   r.dialects,
-                   r.loanword_etymology,
-                   r.cross_references,
-                   r.antonyms,
-                   rsk.search_key
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            WHERE rsk.search_key IN {parameter}
-            """;
+        command.CommandText = GetQuery(terms.Length);
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         for (int i = 0; i < terms.Length; i++)

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
@@ -12,6 +13,33 @@ namespace JL.Core.Dicts.JMnedict;
 internal static class JmnedictDBManager
 {
     public const int Version = 7;
+
+    private static readonly Dictionary<int, string> s_queryCache = [];
+
+    public static string GetQuery(int termCount)
+    {
+        if (s_queryCache.TryGetValue(termCount, out string? query))
+        {
+            return query;
+        }
+
+        StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
+            """
+            SELECT r.rowid, r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
+            FROM record r
+            WHERE r.primary_spelling_in_hiragana IN (@1
+            """);
+
+        for (int i = 1; i < termCount; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+        }
+
+        query = queryBuilder.Append(");").ToString();
+        ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
+        _ = s_queryCache.TryAdd(termCount, query);
+        return query;
+    }
 
     private enum ColumnIndex
     {
@@ -139,7 +167,7 @@ internal static class JmnedictDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string parameter)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms)
     {
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         if (connection is null)
@@ -153,12 +181,7 @@ internal static class JmnedictDBManager
         using SqliteCommand command = connection.CreateCommand();
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText =
-            $"""
-            SELECT r.rowid, r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
-            FROM record r
-            WHERE r.primary_spelling_in_hiragana IN {parameter}
-            """;
+        command.CommandText = GetQuery(terms.Length);
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         for (int i = 0; i < terms.Length; i++)

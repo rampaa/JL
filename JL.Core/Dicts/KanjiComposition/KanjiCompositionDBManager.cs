@@ -9,6 +9,13 @@ internal static class KanjiCompositionDBManager
 {
     private static readonly string s_dbPath = Path.Join(AppInfo.ResourcesPath, "Kanji Compositions.sqlite");
 
+    private const string SingleTermQuery =
+        """
+        SELECT compositions
+        FROM record
+        WHERE kanji = @kanji;
+        """;
+
     public static string[]? GetRecordsFromDB(string kanji)
     {
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(s_dbPath);
@@ -22,13 +29,7 @@ internal static class KanjiCompositionDBManager
         DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText =
-            """
-            SELECT compositions
-            FROM record
-            WHERE kanji = @kanji;
-            """;
-
+        command.CommandText = SingleTermQuery;
         _ = command.Parameters.AddWithValue("@kanji", kanji);
 
         using SqliteDataReader dataReader = command.ExecuteReader();

@@ -144,7 +144,6 @@ internal static class KanjidicDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText = SingleTermQuery;
-
         _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
