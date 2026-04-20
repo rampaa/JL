@@ -145,7 +145,6 @@ public static class DBUtils
     //    return nonDigitChars + digitChars;
     //}
 
-
     internal static string GetParameter(int parameterCount)
     {
         StringBuilder parameterBuilder = ObjectPoolManager.StringBuilderPool.Get();

@@ -198,7 +198,7 @@ internal static class EpwingYomichanDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query)
     {
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
         if (connection is null)
@@ -212,7 +212,7 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand command = connection.CreateCommand();
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = GetQuery(terms.Length);
+        command.CommandText = query;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         for (int i = 0; i < terms.Length; i++)

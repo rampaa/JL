@@ -45,6 +45,7 @@ public static class DictUtils
     internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; } = true;
     internal static bool DBIsUsedForJmdict { get; private set; } = true;
+    internal static bool DBIsUsedForJmnedict { get; private set; } = true;
     internal static bool JmdictIsActive { get; private set; } = true;
     internal static bool AnyCustomWordDictIsActive { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; } = true;
@@ -1689,6 +1690,7 @@ public static class DictUtils
         bool dbIsUsedForAtLeastOneYomichanOrNazekaWordDict = false;
         bool atLeastOneKanjiDictIsActive = false;
         bool dbIsUsedForJmdict = false;
+        bool dbIsUsedForJmnedict = false;
 
         foreach (Dict dict in dicts)
         {
@@ -1706,6 +1708,10 @@ public static class DictUtils
                     if (dict.Type is DictType.JMdict)
                     {
                         dbIsUsedForJmdict = true;
+                    }
+                    else if (dict.Type is DictType.JMnedict)
+                    {
+                        dbIsUsedForJmnedict = true;
                     }
 
                     if (dict.Type is DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificWordNazeka)
@@ -1735,7 +1741,8 @@ public static class DictUtils
                     && dbIsUsedForAtLeastOneNazekaDict
                     && dbIsUsedForAtLeastOneYomichanOrNazekaWordDict
                     && atLeastOneKanjiDictIsActive
-                    && dbIsUsedForJmdict)
+                    && dbIsUsedForJmdict
+                    && dbIsUsedForJmnedict)
                 {
                     break;
                 }
