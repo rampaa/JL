@@ -55,6 +55,18 @@ internal static class AnkiConnectClient
         return Send(req, cancellationToken);
     }
 
+    public static async Task GuiBrowse(string query)
+    {
+        RequestWithParameters<string> req = new("guiBrowse", 6, new Dictionary<string, string>(1, StringComparer.Ordinal)
+        {
+            {
+                "query", query
+            }
+        });
+
+        _ = await Send(req, CancellationToken.None).ConfigureAwait(false);
+    }
+
     //public static ValueTask<Response?> StoreMediaFile(string filename, string data)
     //{
     //    Request<string> req = new("storeMediaFile", 6, new Dictionary<string, string>(2, StringComparer.Ordinal)

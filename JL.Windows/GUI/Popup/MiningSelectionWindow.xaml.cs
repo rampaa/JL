@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using JL.Core.External.AnkiConnect;
 using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Windows.Config;
@@ -147,7 +148,7 @@ internal sealed partial class MiningSelectionWindow
 
         return ConfigManager.Instance.MineToFileInsteadOfAnki
             ? MiningUtils.MineToFile(lookupResults, currentLookupResultIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, selectedSpelling)
-            : MiningUtils.Mine(lookupResults, currentLookupResultIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, selectedSpelling);
+            : AnkiConnectUtils.Mine(lookupResults, currentLookupResultIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, selectedSpelling);
     }
 
     public static void CloseWindow()

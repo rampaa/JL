@@ -14,6 +14,7 @@ using HandyControl.Tools;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
+using JL.Core.External.AnkiConnect;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Network.WebSocket;
@@ -1101,6 +1102,11 @@ internal sealed partial class MainWindow : IDisposable
             MainGrid.Opacity = configManager.TextOnlyVisibleOnHover && !IsMouseOver
                 ? 0
                 : 1;
+        }
+
+        else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeygesture))
+        {
+            return AnkiConnectUtils.OpenLastestNoteInAnki();
         }
 
         else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))

@@ -10,6 +10,7 @@ using System.Windows.Media;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
+using JL.Core.External.AnkiConnect;
 using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Core.Statistics;
@@ -1245,7 +1246,7 @@ internal sealed partial class PopupWindow : IDisposable
 
             return configManager.MineToFileInsteadOfAnki
                 ? MiningUtils.MineToFile(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling)
-                : MiningUtils.Mine(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling);
+                : AnkiConnectUtils.Mine(lookupResults, listViewItemIndex, currentSourceText, formattedDefinitions, selectedDefinitions, currentSourceTextCharPosition, lookupResult.PrimarySpelling);
         }
 
         Point position;
@@ -1525,6 +1526,11 @@ internal sealed partial class PopupWindow : IDisposable
                     _popupListViewScrollViewer.LineDown();
                 }
             }
+        }
+
+        else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeygesture))
+        {
+            return AnkiConnectUtils.OpenLastestNoteInAnki();
         }
 
         else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))

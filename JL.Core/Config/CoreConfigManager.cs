@@ -16,6 +16,7 @@ public sealed class CoreConfigManager
     public Uri AnkiConnectUri { get; set; } = new("http://127.0.0.1:8765");
     public bool AnkiIntegration { get; set; } // = false;
     public bool ForceSyncAnki { get; private set; } // = false;
+    public bool AutoShowAnkiNoteAfterMining { get; set; } // = false;
     public bool AllowDuplicateCards { get; private set; } // = false;
     public bool CheckForDuplicateCards { get; private set; } // = false;
     public bool DuplicateCheckIndependentOfMiningMode { get; private set; } // = false;
@@ -201,6 +202,7 @@ public sealed class CoreConfigManager
         }
 
         AnkiIntegration = ConfigDBManager.GetValueFromConfig(connection, configs, AnkiIntegration, nameof(AnkiIntegration));
+        AutoShowAnkiNoteAfterMining = ConfigDBManager.GetValueFromConfig(connection, configs, AutoShowAnkiNoteAfterMining, nameof(AutoShowAnkiNoteAfterMining));
         ForceSyncAnki = ConfigDBManager.GetValueFromConfig(connection, configs, ForceSyncAnki, nameof(ForceSyncAnki));
         AllowDuplicateCards = ConfigDBManager.GetValueFromConfig(connection, configs, AllowDuplicateCards, nameof(AllowDuplicateCards));
         CheckEntireCollectionForDuplicates = ConfigDBManager.GetValueFromConfig(connection, configs, CheckEntireCollectionForDuplicates, nameof(CheckEntireCollectionForDuplicates));

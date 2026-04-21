@@ -217,6 +217,7 @@ internal sealed class ConfigManager
     public KeyGesture MakeMainWindowOpaqueKeyGesture { get; private set; } = new(Key.F6, ModifierKeys.Alt);
     public KeyGesture BringMainWindowToTopKeyGesture { get; private set; } = new(Key.F7, ModifierKeys.Alt);
     public KeyGesture ToggleTextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture OpenLastCreatedNoteInAnkiKeygesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     #endregion
 
     #region Advanced
@@ -619,6 +620,7 @@ internal sealed class ConfigManager
         MakeMainWindowOpaqueKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(MakeMainWindowOpaqueKeyGesture), MakeMainWindowOpaqueKeyGesture);
         BringMainWindowToTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(BringMainWindowToTopKeyGesture), BringMainWindowToTopKeyGesture);
         ToggleTextOnlyVisibleOnHoverKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleTextOnlyVisibleOnHoverKeyGesture), ToggleTextOnlyVisibleOnHoverKeyGesture);
+        OpenLastCreatedNoteInAnkiKeygesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(OpenLastCreatedNoteInAnkiKeygesture), OpenLastCreatedNoteInAnkiKeygesture);
         AlwaysOnTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
         TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
         ToggleAlwaysShowMainTextBoxCaretKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture), ToggleAlwaysShowMainTextBoxCaretKeyGesture);
@@ -979,6 +981,8 @@ internal sealed class ConfigManager
             BringMainWindowToTopKeyGesture.ToFormattedString();
         preferenceWindow.ToggleTextOnlyVisibleOnHoverKeyGestureTextBox.Text =
             ToggleTextOnlyVisibleOnHoverKeyGesture.ToFormattedString();
+        preferenceWindow.OpenLastCreatedNoteInAnkiKeygestureTextBox.Text =
+            OpenLastCreatedNoteInAnkiKeygesture.ToFormattedString();
         preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
             AlwaysOnTopKeyGesture.ToFormattedString();
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
@@ -1077,6 +1081,7 @@ internal sealed class ConfigManager
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
         preferenceWindow.AutoPauseOrResumeMpvOnHoverChangeCheckBox.IsChecked = AutoPauseOrResumeMpvOnHoverChange;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = coreConfigManager.AnkiIntegration;
+        preferenceWindow.AutoShowAnkiNoteAfterMiningCheckBox.IsChecked = coreConfigManager.AutoShowAnkiNoteAfterMining;
 
         preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked = MainWindowDynamicWidth;
         preferenceWindow.MainWindowDynamicHeightCheckBox.IsChecked = MainWindowDynamicHeight;
@@ -1314,6 +1319,8 @@ internal sealed class ConfigManager
                 preferenceWindow.BringMainWindowToTopKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(ToggleTextOnlyVisibleOnHoverKeyGesture),
                 preferenceWindow.ToggleTextOnlyVisibleOnHoverKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(OpenLastCreatedNoteInAnkiKeygesture),
+                preferenceWindow.OpenLastCreatedNoteInAnkiKeygestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(AlwaysOnTopKeyGesture),
                 preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(TextBoxIsReadOnlyKeyGesture),
@@ -1576,6 +1583,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiIntegration),
                 preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AutoShowAnkiNoteAfterMining),
+                preferenceWindow.AutoShowAnkiNoteAfterMiningCheckBox.IsChecked.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(HighlightColor),
                 preferenceWindow.HighlightColorButton.Tag.ToString());
