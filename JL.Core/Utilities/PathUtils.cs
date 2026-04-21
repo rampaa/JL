@@ -14,7 +14,7 @@ public static class PathUtils
 
     internal static string GetTempPath(string path)
     {
-        return $"{path}{TempFileExtension}";
+        return path + TempFileExtension;
     }
 
     public static void CreateFileIfNotExists(string path)

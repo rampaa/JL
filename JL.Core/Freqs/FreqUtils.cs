@@ -492,12 +492,9 @@ public static class FreqUtils
             {
                 freqResult.Add(record);
             }
-            else
+            else if (freqResult[index].Frequency > record.Frequency)
             {
-                if (freqResult[index].Frequency > record.Frequency)
-                {
-                    freqResult[index] = record;
-                }
+                freqResult[index] = record;
             }
         }
         else
