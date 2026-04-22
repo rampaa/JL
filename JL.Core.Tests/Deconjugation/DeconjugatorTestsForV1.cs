@@ -152,6 +152,15 @@ internal sealed class DeconjugatorTestsForV1
     }
 
     [Test]
+    public void Deconjugate_PlainNonPastPassivePotentialHonorificSlurredNegative_V1()
+    {
+        const string termToDeconjugate = "生きらんない";
+        const string expected = "～passive/potential/honorific→negative→slurred";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "生きる" && form.Tags[^1] is "v1").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainPastPassivePotentialHonorificAffirmative_V1()
     {
         const string termToDeconjugate = "生きられた";

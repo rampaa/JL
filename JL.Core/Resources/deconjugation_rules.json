@@ -541,7 +541,8 @@
       "する",
       "する",
       "る",
-      "ずる"
+      "ずる",
+      "い"
     ],
     "con_end": [
       "こう",
@@ -568,7 +569,8 @@
       "しよう",
       "そう",
       "ろう",
-      "じよう"
+      "じよう",
+      "かろう"
     ],
     "dec_tag": [
       "v5k",
@@ -595,7 +597,8 @@
       "vs-s",
       "vs-s",
       "v4r",
-      "vz"
+      "vz",
+      "adj-i"
     ],
     "con_tag": [ "form-volition" ],
     "detail": "volitional"
@@ -713,11 +716,11 @@
     "detail": "garu"
   },
   {
-    "type": "onlyfinalrule",
-    "dec_end": [ "" ],
+    "type": "stdrule",
+    "dec_end": [ "い" ],
     "con_end": [ "さ" ],
-    "dec_tag": [ "stem-adj-base" ],
-    "con_tag": [ "n" ],
+    "dec_tag": [ "adj-i" ],
+    "con_tag": [ "stem-adj-base" ],
     "detail": "noun form"
   },
   {
@@ -1590,6 +1593,14 @@
     "detail": "slurred"
   },
   {
+    "type": "stdrule",
+    "dec_end": [ "られない" ],
+    "con_end": [ "らんない" ],
+    "dec_tag": [ "adj-i" ],
+    "con_tag": [ "adj-i" ],
+    "detail": "slurred"
+  },
+  {
     "type": "onlyfinalrule",
     "dec_end": [ "" ],
     "con_end": [ "ねば" ],
@@ -1604,14 +1615,6 @@
     "dec_tag": [ "stem-mizenkei" ],
     "con_tag": [ "uninflectable" ],
     "detail": "colloquial negative conditional"
-  },
-  {
-    "type": "onlyfinalrule",
-    "dec_end": [ "す" ],
-    "con_end": [ "せば" ],
-    "dec_tag": [ "vs-c" ],
-    "con_tag": [ "uninflectable" ],
-    "detail": "classical hypothetical conditional"
   },
   {
     "type": "onlyfinalrule",

@@ -240,4 +240,22 @@ internal sealed class DeconjugatorTestsForAdjI
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "怪しい" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void Deconjugate_NounForm_Seemingness_AdjI()
+    {
+        const string termToDeconjugate = "良さそう";
+        const string expected = "～noun form→seemingness";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "良い" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Volitional_AdjI()
+    {
+        const string termToDeconjugate = "良かろう";
+        const string expected = "～volitional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "良い" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }
