@@ -54,9 +54,9 @@
       },
       "System.Speech": {
         "type": "Direct",
-        "requested": "[10.0.6, )",
-        "resolved": "10.0.6",
-        "contentHash": "dQR/vf+NqXXoDL7hC+PjIauOUKD+JWGQisFfjMW1LxHmWhKTx+GGBjA6ZORztj3ABeKyK2RUVFbDFdfnOSB+ag=="
+        "requested": "[10.0.7, )",
+        "resolved": "10.0.7",
+        "contentHash": "NuWzqrK33827U2DBwoHTuFGpAIKZSodhlOxPdAKM17DkyUcTT3NUZgqvwkw1XyLR+WGcINpA2BdB7fVTv8vaaQ=="
       },
       "CommunityToolkit.HighPerformance": {
         "type": "Transitive",
@@ -85,26 +85,26 @@
       },
       "Microsoft.Data.Sqlite": {
         "type": "Transitive",
-        "resolved": "10.0.6",
-        "contentHash": "hlwbTByzt2tPyRHlG1SzMrnHdO7GE9dG945456rOu2s0Tv6PBgN7ykidAfsnOn6fhDdmbCMoU+pq7+6CbCneSg==",
+        "resolved": "10.0.7",
+        "contentHash": "DZ6G2QuyPrsh5VS+wfiZbNBtYT6p+CkxXjD0aZHF04xso7QsG/uk0JpG30hzYlK6u/wtTzta1Dqfgbc/Sl2sDA==",
         "dependencies": {
-          "Microsoft.Data.Sqlite.Core": "10.0.6",
+          "Microsoft.Data.Sqlite.Core": "10.0.7",
           "SQLitePCLRaw.bundle_e_sqlite3": "2.1.11",
           "SQLitePCLRaw.core": "2.1.11"
         }
       },
       "Microsoft.Data.Sqlite.Core": {
         "type": "Transitive",
-        "resolved": "10.0.6",
-        "contentHash": "OqZDg2/SROHR33XJLaf3kIU2zEbxcZ2ef+O/HIyZWfiKenp/B2qgy/jv6wJmmsBgh4ETaRKdlcLyJ9es2woKCg==",
+        "resolved": "10.0.7",
+        "contentHash": "xVrtBg3M1wJlBDkoT0dXEYB/wSc8bIHJPYtw/bu1AqpWgF79uPSs87DAhERR/Ilumre6TKZa1cjMg3VUUObVLA==",
         "dependencies": {
           "SQLitePCLRaw.core": "2.1.11"
         }
       },
       "Microsoft.Extensions.ObjectPool": {
         "type": "Transitive",
-        "resolved": "10.0.6",
-        "contentHash": "2Jafd4fdxxiwiQ08mcF+Lf3vqikkQZusGVThOKZNSmPDceGk4IwkjeHL7OEb9Ov8q9ICY5wofL98CS153K5VvQ=="
+        "resolved": "10.0.7",
+        "contentHash": "flWxDEhfc7fueGP+mvNp8Avrm5YcZVfcpyI96MkJEnGu+1X/eH8XcHfx6deBAdCU3ZPpmQ7AVp/9t4aikKP07w=="
       },
       "Microsoft.NET.StringTools": {
         "type": "Transitive",
@@ -199,8 +199,8 @@
         "dependencies": {
           "CommunityToolkit.HighPerformance": "[8.4.2, )",
           "MessagePack": "[3.1.4, )",
-          "Microsoft.Data.Sqlite": "[10.0.6, )",
-          "Microsoft.Extensions.ObjectPool": "[10.0.6, )",
+          "Microsoft.Data.Sqlite": "[10.0.7, )",
+          "Microsoft.Extensions.ObjectPool": "[10.0.7, )",
           "Microsoft.NET.StringTools": "[18.4.0, )",
           "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.2, )",
           "Serilog": "[4.3.1, )",
