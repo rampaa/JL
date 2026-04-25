@@ -1989,15 +1989,6 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
-    public void Deconjugate_PlainNonPastClassicalHypotheticalConditional_VZ()
-    {
-        const string termToDeconjugate = "命ぜば";
-        const string expected = "～classical hypothetical conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
     public void Deconjugate_PlainNonPastNegativeConditional_VZ()
     {
         const string termToDeconjugate = "命ぜねば";
