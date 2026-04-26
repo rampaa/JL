@@ -25,13 +25,18 @@ internal static class YomichanKanjiLoader
                 await foreach (JsonElement[]? jsonObj in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
                 {
                     Debug.Assert(jsonObj is not null);
-
-                    YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
                     string kanji = jsonObj[0].GetString()!.GetPooledString();
                     if (string.IsNullOrWhiteSpace(kanji))
                     {
                         continue;
                     }
+
+                    YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
+                    Debug.Assert(yomichanKanjiRecord is not { Definitions: null, KunReadings: null, OnReadings: null, Stats: null });
+                    //if (yomichanKanjiRecord is { Definitions: null, KunReadings: null, OnReadings: null, Stats: null })
+                    //{
+                    //    continue;
+                    //}
 
                     if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
                     {
