@@ -245,6 +245,17 @@ public sealed class LookupResult
         if (jmdictLookupResultExists)
         {
             Debug.Assert(jmdictLookupResult is not null);
+            string[]? readingsOrthographyInfo = jmdictLookupResult.ReadingsOrthographyInfoList?[readingIndexOfMatchedText];
+            if (readingsOrthographyInfo is not null)
+            {
+                foreach (string readingsOrthographyInfoItem in readingsOrthographyInfo)
+                {
+                    if (readingsOrthographyInfoItem is "ok" or "ik" or "rk")
+                    {
+                        return 3;
+                    }
+                }
+            }
 
             string[]? miscSharedByAllSenses = jmdictLookupResult.MiscSharedByAllSenses;
             if (miscSharedByAllSenses is not null && miscSharedByAllSenses.Contains("uk"))
@@ -260,18 +271,6 @@ public sealed class LookupResult
                     if (misc is not null && misc.Contains("uk"))
                     {
                         return 0;
-                    }
-                }
-            }
-
-            string[]? readingsOrthographyInfo = jmdictLookupResult.ReadingsOrthographyInfoList?[readingIndexOfMatchedText];
-            if (readingsOrthographyInfo is not null)
-            {
-                foreach (string readingsOrthographyInfoItem in readingsOrthographyInfo)
-                {
-                    if (readingsOrthographyInfoItem is "ok" or "ik" or "rk")
-                    {
-                        return 3;
                     }
                 }
             }
