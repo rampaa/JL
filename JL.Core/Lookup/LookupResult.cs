@@ -145,9 +145,9 @@ public sealed class LookupResult
             return cmpResult;
         }
 
-        // 4. ThenBy the length of the deconjugation process
-        int deconjugationScore = DeconjugationProcess?.Length ?? 0;
-        int otherDeconjugationScore = other.DeconjugationProcess?.Length ?? 0;
+        // 4. ThenBy the length of the deconjugation process steps
+        int deconjugationScore = DeconjugationProcess.Count('→');
+        int otherDeconjugationScore = other.DeconjugationProcess.Count('→');
         cmpResult = deconjugationScore.CompareTo(otherDeconjugationScore);
         if (cmpResult is not 0)
         {
