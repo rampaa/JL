@@ -1287,6 +1287,15 @@ internal sealed class DeconjugatorTestsForVSC
     }
 
     [Test]
+    public void Deconjugate_PlainNonPastSugiruAffirmative2_VSC()
+    {
+        const string termToDeconjugate = "御座し過ぎる";
+        const string expected = "～too much";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastSouAffirmative_VSC()
     {
         const string termToDeconjugate = "御座しそう";

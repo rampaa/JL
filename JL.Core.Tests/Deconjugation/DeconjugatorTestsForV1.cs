@@ -1323,6 +1323,15 @@ internal sealed class DeconjugatorTestsForV1
     }
 
     [Test]
+    public void Deconjugate_PlainNonPastSugiruAffirmative2_V1()
+    {
+        const string termToDeconjugate = "生き過ぎる";
+        const string expected = "～too much";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "生きる" && form.Tags[^1] is "v1").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastSouAffirmative_V1()
     {
         const string termToDeconjugate = "生きそう";

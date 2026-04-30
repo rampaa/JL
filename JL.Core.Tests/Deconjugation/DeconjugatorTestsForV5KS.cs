@@ -1386,6 +1386,15 @@ internal sealed class DeconjugatorTestsForV5KS
     }
 
     [Test]
+    public void Deconjugate_PlainNonPastSugiruAffirmative2_V5KS()
+    {
+        const string termToDeconjugate = "行き過ぎる";
+        const string expected = "～too much";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "行く" && form.Tags[^1] is "v5k-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastSouAffirmative_V5KS()
     {
         const string termToDeconjugate = "行きそう";

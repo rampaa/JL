@@ -125,6 +125,15 @@ internal sealed class DeconjugatorTestsForAdjI
     }
 
     [Test]
+    public void Deconjugate_PlainNonPastSugiruAffirmative2_AdjI()
+    {
+        const string termToDeconjugate = "小さ過ぎる";
+        const string expected = "～excess";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "小さい" && form.Tags[^1] is "adj-i").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainNonPastSugiruAffirmative_2_AdjI()
     {
         const string termToDeconjugate = "小さ過ぎる";
