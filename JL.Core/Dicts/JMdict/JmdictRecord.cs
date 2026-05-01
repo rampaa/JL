@@ -32,7 +32,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
     public string?[]? DefinitionInfo { get; } // e.g. "often derog" +
     public string[]?[]? Dialects { get; } // e.g. ksb
     public string[]? DialectsSharedByAllSenses { get; }
-    public LoanwordSource[]?[]? LoanwordEtymology { get; }
+    public LoanwordSource[]? LoanwordEtymology { get; }
     public string[]?[]? RelatedTerms { get; }
     public string[]?[]? Antonyms { get; }
     //public string[] Priorities { get; } // e.g. gai1
@@ -56,7 +56,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         string?[]? definitionInfo,
         string[]?[]? dialects,
         string[]? dialectsSharedByAllSenses,
-        LoanwordSource[]?[]? loanwordEtymology,
+        LoanwordSource[]? loanwordEtymology,
         string[]?[]? relatedTerms,
         string[]?[]? antonyms)
     {
@@ -93,27 +93,32 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         bool multipleDefinitions = Definitions.Length > 1;
 
         Debug.Assert(options.WordClassInfo is not null);
+        string[]?[]? wordClasses = WordClasses;
         bool showWordClassInfoOptionValue = options.WordClassInfo.Value;
-        bool showWordClassInfo = showWordClassInfoOptionValue && WordClasses is not null;
+        bool showWordClassInfo = showWordClassInfoOptionValue && wordClasses is not null;
         bool showWordClassesSharedByAllSenses = showWordClassInfoOptionValue && WordClassesSharedByAllSenses is not null;
 
         Debug.Assert(options.MiscInfo is not null);
+        string[]?[]? misc = Misc;
         bool showMiscInfoOptionValue = options.MiscInfo.Value;
-        bool showMiscInfo = showMiscInfoOptionValue && Misc is not null;
+        bool showMiscInfo = showMiscInfoOptionValue && misc is not null;
         bool showMiscSharedByAllSenses = showMiscInfoOptionValue && MiscSharedByAllSenses is not null;
 
         Debug.Assert(options.DialectInfo is not null);
+        string[]?[]? dialects = Dialects;
         bool showDialectInfoOptionValue = options.DialectInfo.Value;
-        bool showDialectInfo = showDialectInfoOptionValue && Dialects is not null;
+        bool showDialectInfo = showDialectInfoOptionValue && dialects is not null;
         bool showDialectsSharedByAllSenses = showDialectInfoOptionValue && DialectsSharedByAllSenses is not null;
 
         Debug.Assert(options.WordTypeInfo is not null);
+        string[]?[]? fields = Fields;
         bool showFieldInfoOptionValue = options.WordTypeInfo.Value;
-        bool showFieldsInfo = showFieldInfoOptionValue && Fields is not null;
+        bool showFieldsInfo = showFieldInfoOptionValue && fields is not null;
         bool showFieldsSharedByAllSenses = showFieldInfoOptionValue && FieldsSharedByAllSenses is not null;
 
         Debug.Assert(options.ExtraDefinitionInfo is not null);
-        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo.Value && DefinitionInfo is not null;
+        string?[]? definitionInfo = DefinitionInfo;
+        bool showExtraDefinitionInfo = options.ExtraDefinitionInfo.Value && definitionInfo is not null;
 
         Debug.Assert(options.SpellingRestrictionInfo is not null);
         bool showSpellingRestrictionInfo = options.SpellingRestrictionInfo.Value;
@@ -121,16 +126,19 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         bool showReadingRestrictionss = showSpellingRestrictionInfo && ReadingRestrictions is not null;
 
         Debug.Assert(options.LoanwordEtymology is not null);
-        bool showLoanwordEtymology = options.LoanwordEtymology.Value && LoanwordEtymology is not null;
+        LoanwordSource[]? loanwordEtymology = LoanwordEtymology;
+        bool showLoanwordEtymology = options.LoanwordEtymology.Value && loanwordEtymology is not null;
 
         Debug.Assert(options.RelatedTerm is not null);
-        bool showRelatedTerms = options.RelatedTerm.Value && RelatedTerms is not null;
+        string[]?[]? relatedTerms = RelatedTerms;
+        bool showRelatedTerms = options.RelatedTerm.Value && relatedTerms is not null;
 
         Debug.Assert(options.Antonym is not null);
-        bool showAntonyms = options.Antonym.Value && Antonyms is not null;
+        string[]?[]? antonyms = Antonyms;
+        bool showAntonyms = options.Antonym.Value && antonyms is not null;
 
         StringBuilder defBuilder = ObjectPoolManager.StringBuilderPool.Get();
-        if (showWordClassesSharedByAllSenses || showMiscSharedByAllSenses || showDialectsSharedByAllSenses || showFieldsSharedByAllSenses)
+        if (showWordClassesSharedByAllSenses || showMiscSharedByAllSenses || showDialectsSharedByAllSenses || showFieldsSharedByAllSenses || showLoanwordEtymology)
         {
             if (showWordClassesSharedByAllSenses)
             {
@@ -156,6 +164,12 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 _ = defBuilder.Append('[').AppendJoin(", ", FieldsSharedByAllSenses).Append("] ");
             }
 
+            if (showLoanwordEtymology)
+            {
+                Debug.Assert(loanwordEtymology is not null);
+                AppendLoanwordEtymology(defBuilder, loanwordEtymology);
+            }
+
             if (multipleDefinitions && newlines)
             {
                 _ = defBuilder.Replace(" ", "\n", defBuilder.Length - 1, 1);
@@ -163,14 +177,6 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         }
 
         string[][] definitions = Definitions;
-        string[]?[]? wordClasses = WordClasses;
-        string[]?[]? misc = Misc;
-        string[]?[]? dialects = Dialects;
-        string[]?[]? fields = Fields;
-        string?[]? definitionInfo = DefinitionInfo;
-        LoanwordSource[]?[]? loanwordEtymology = LoanwordEtymology;
-        string[]?[]? relatedTerms = RelatedTerms;
-        string[]?[]? antonyms = Antonyms;
 
         for (int i = 0; i < definitions.Length; i++)
         {
@@ -234,12 +240,6 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             if (showSpellingRestrictionInfo)
             {
                 AppendSpellingRestrictionInfo(defBuilder, showSpellingRestrictions, SpellingRestrictions, showReadingRestrictionss, ReadingRestrictions, i);
-            }
-
-            if (showLoanwordEtymology)
-            {
-                Debug.Assert(loanwordEtymology is not null);
-                AppendLoanwordEtymology(defBuilder, loanwordEtymology[i]);
             }
 
             if (showRelatedTerms)
@@ -308,39 +308,36 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         }
     }
 
-    private static void AppendLoanwordEtymology(StringBuilder defBuilder, LoanwordSource[]? lSources)
+    private static void AppendLoanwordEtymology(StringBuilder defBuilder, LoanwordSource[] lSources)
     {
-        if (lSources is not null)
+        _ = defBuilder.Append('[');
+
+        for (int j = 0; j < lSources.Length; j++)
         {
-            _ = defBuilder.Append('(');
-
-            for (int j = 0; j < lSources.Length; j++)
+            ref readonly LoanwordSource lSource = ref lSources[j];
+            if (lSource.IsWasei)
             {
-                ref readonly LoanwordSource lSource = ref lSources[j];
-                if (lSource.IsWasei)
-                {
-                    _ = defBuilder.Append("wasei ");
-                }
-                else if (j is 0)
-                {
-                    _ = defBuilder.Append("from ");
-                }
-
-                _ = defBuilder.Append(lSource.Language);
-
-                if (lSource.OriginalWord is not null)
-                {
-                    _ = defBuilder.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
-                }
-
-                if (j + 1 < lSources.Length)
-                {
-                    _ = defBuilder.Append(lSource.IsPart ? " + " : ", ");
-                }
+                _ = defBuilder.Append("wasei ");
+            }
+            else if (j is 0)
+            {
+                _ = defBuilder.Append("from ");
             }
 
-            _ = defBuilder.Append(") ");
+            _ = defBuilder.Append(lSource.Language);
+
+            if (lSource.OriginalWord is not null)
+            {
+                _ = defBuilder.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
+            }
+
+            if (j + 1 < lSources.Length)
+            {
+                _ = defBuilder.Append(lSource.IsPart ? " + " : ", ");
+            }
         }
+
+        _ = defBuilder.Append("] ");
     }
 
     private static void AppendRelatedTerms(StringBuilder defBuilder, string[]? relatedTermsElement)

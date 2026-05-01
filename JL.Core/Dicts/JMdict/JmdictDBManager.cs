@@ -13,7 +13,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 17;
+    public const int Version = 18;
 
     private static readonly Dictionary<int, string> s_queryCache = [];
 
@@ -422,7 +422,7 @@ internal static class JmdictDBManager
         string[]?[]? misc = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Misc);
         string[]? dialectsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.DialectsSharedByAllSenses);
         string[]?[]? dialects = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Dialects);
-        LoanwordSource[]?[]? loanwordEtymology = dataReader.GetNullableValueFromBlobStream<LoanwordSource[]?[]>((int)ColumnIndex.LoanwordEtymology);
+        LoanwordSource[]? loanwordEtymology = dataReader.GetNullableValueFromBlobStream<LoanwordSource[]>((int)ColumnIndex.LoanwordEtymology);
         string[]?[]? relatedTerms = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.CrossReferences);
         string[]?[]? antonyms = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Antonyms);
 

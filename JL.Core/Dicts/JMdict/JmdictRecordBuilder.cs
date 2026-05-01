@@ -101,6 +101,7 @@ internal static class JmdictRecordBuilder
             ReadOnlySpan<Sense> senseListSpan = entry.SenseList.AsReadOnlySpan();
             int readingElementsLength = readingElementsSpan.Length;
             int senseListSpanLength = senseListSpan.Length;
+            Debug.Assert(senseListSpanLength > 0);
 
             string? firstPrimarySpellingInHiragana = firstPrimarySpelling is not null
                 ? JapaneseUtils.NormalizeText(firstPrimarySpelling)
@@ -177,7 +178,8 @@ internal static class JmdictRecordBuilder
                 List<string?> definitionInfoList = new(senseListSpanLength);
                 List<string[]?> relatedTermList = new(senseListSpanLength);
                 List<string[]?> antonymList = new(senseListSpanLength);
-                List<LoanwordSource[]?> loanwordSourceList = new(senseListSpanLength);
+
+                LoanwordSource[]? loanwordSourceArray = senseListSpan[0].LSourceArray;
 
                 ReadOnlySpan<string> readingListSpan = readingList.AsReadOnlySpan();
                 foreach (ref readonly Sense sense in senseListSpan)
@@ -196,7 +198,6 @@ internal static class JmdictRecordBuilder
                         definitionInfoList.Add(sense.SInf);
                         relatedTermList.Add(sense.XRefArray);
                         antonymList.Add(sense.AntArray);
-                        loanwordSourceList.Add(sense.LSourceArray);
                     }
                 }
 
@@ -224,7 +225,7 @@ internal static class JmdictRecordBuilder
                     definitionInfoList.TrimListOfNullableElementsToArray(),
                     exclusiveDialectValues,
                     dialectValuesSharedByAllSenses,
-                    loanwordSourceList.TrimListOfNullableElementsToArray(),
+                    loanwordSourceArray,
                     relatedTermList.TrimListOfNullableElementsToArray(),
                     antonymList.TrimListOfNullableElementsToArray());
 
@@ -258,6 +259,7 @@ internal static class JmdictRecordBuilder
             ReadOnlySpan<Sense> senseListSpan = entry.SenseList.AsReadOnlySpan();
             ReadOnlySpan<KanjiElement> kanjiElementsSpan = entry.KanjiElements.AsReadOnlySpan();
             int senseListSpanLength = senseListSpan.Length;
+            Debug.Assert(senseListSpanLength > 0);
 
             for (int i = 0; i < readingElementsSpan.Length; i++)
             {
@@ -353,7 +355,8 @@ internal static class JmdictRecordBuilder
                 List<string?> definitionInfoList = new(senseListSpanLength);
                 List<string[]?> relatedTermList = new(senseListSpanLength);
                 List<string[]?> antonymList = new(senseListSpanLength);
-                List<LoanwordSource[]?> loanwordSourceList = new(senseListSpanLength);
+
+                LoanwordSource[]? loanwordSourceArray = senseListSpan[0].LSourceArray;
 
                 bool alternativeSpellingsExist = alternativeSpellings is not null;
                 foreach (ref readonly Sense sense in senseListSpan)
@@ -374,7 +377,6 @@ internal static class JmdictRecordBuilder
                         definitionInfoList.Add(sense.SInf);
                         relatedTermList.Add(sense.XRefArray);
                         antonymList.Add(sense.AntArray);
-                        loanwordSourceList.Add(sense.LSourceArray);
                     }
                 }
 
@@ -402,7 +404,7 @@ internal static class JmdictRecordBuilder
                     definitionInfoList.TrimListOfNullableElementsToArray(),
                     exclusiveDialectValues,
                     dialectValuesSharedByAllSenses,
-                    loanwordSourceList.TrimListOfNullableElementsToArray(),
+                    loanwordSourceArray,
                     relatedTermList.TrimListOfNullableElementsToArray(),
                     antonymList.TrimListOfNullableElementsToArray());
 
