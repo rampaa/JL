@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Freqs;
@@ -26,12 +27,12 @@ internal sealed class TextInfo(List<string> textList,
     public ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? FrequencyDicts { get; } = frequencyDicts;
     public IDictionary<string, IList<IDictRecord>>? PitchAccentDict { get; } = pitchAccentDict;
 
-    public bool Equals(TextInfo? other)
+    public bool Equals([NotNullWhen(true)] TextInfo? other)
     {
         return other is not null && other.TextList.AsReadOnlySpan().SequenceEqual(TextList.AsReadOnlySpan());
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is TextInfo other && Equals(other);
     }

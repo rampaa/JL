@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace JL.Windows.Interop;
@@ -14,7 +15,7 @@ internal readonly struct Point : IEquatable<Point>
         Y = y;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is Point other && Equals(other);
     }

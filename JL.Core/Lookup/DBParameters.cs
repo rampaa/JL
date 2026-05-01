@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using JL.Core.Utilities;
 
 namespace JL.Core.Lookup;
@@ -26,12 +27,12 @@ internal sealed class DBParameters(List<string>? allTextWithoutLongVowelMark,
     public string? YomichanTextWithoutLongVowelMarkQuery { get; } = yomichanTextWithoutLongVowelMarkQuery;
     public string? JmdictTextWithoutLongVowelMarkParameter { get; } = jmdictTextWithoutLongVowelMarkParameter;
 
-    public bool Equals(DBParameters? other)
+    public bool Equals([NotNullWhen(true)] DBParameters? other)
     {
         return other is not null && other.AllTextWithoutLongVowelMark.AsReadOnlySpan().SequenceEqual(AllTextWithoutLongVowelMark.AsReadOnlySpan());
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is DBParameters other && Equals(other);
     }

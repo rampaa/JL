@@ -494,7 +494,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             && Definitions.SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
     }
 
-    public bool Equals(JmdictRecord? other)
+    public bool Equals([NotNullWhen(true)] JmdictRecord? other)
     {
         return other is not null
             && (ReferenceEquals(this, other) || (Id == other.Id
