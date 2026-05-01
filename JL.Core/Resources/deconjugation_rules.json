@@ -1342,6 +1342,14 @@
   {
     "type": "onlyfinalrule",
     "dec_end": [ "" ],
+    "con_end": [ "つつ" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "while/although"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
     "con_end": [ "ます" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
@@ -1354,14 +1362,6 @@
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
     "detail": "polite negative conjectural"
-  },
-  {
-    "type": "onlyfinalrule",
-    "dec_end": [ "" ],
-    "con_end": [ "つつ" ],
-    "dec_tag": [ "stem-ren" ],
-    "con_tag": [ "uninflectable" ],
-    "detail": "while/although"
   },
   {
     "type": "onlyfinalrule",
@@ -1390,6 +1390,30 @@
   {
     "type": "onlyfinalrule",
     "dec_end": [ "" ],
+    "con_end": [ "ませんで" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "polite negative te"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
+    "con_end": [ "ませんでしたら" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "polite past negative conditional"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
+    "con_end": [ "ませんでしたり" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "polite past negative tari"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
     "con_end": [ "ませんでした" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
@@ -1398,10 +1422,34 @@
   {
     "type": "onlyfinalrule",
     "dec_end": [ "" ],
+    "con_end": [ "ませんでして" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "polite negative te"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
     "con_end": [ "ましょう" ],
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
     "detail": "polite volitional"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
+    "con_end": [ "ますれば" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "polite provisional conditional"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
+    "con_end": [ "ませ" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "polite imperative"
   },
   {
     "type": "onlyfinalrule",
@@ -1525,8 +1573,8 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "れば" ],
-    "con_end": [ "りゃ" ],
+    "dec_end": [ "れば", "めば", "べば", "ねば", "てば", "せば", "げば", "えば", "けば" ],
+    "con_end": [ "りゃ", "みゃ", "びゃ", "にゃ", "ちゃ", "しゃ", "ぎゃ", "や", "きゃ" ],
     "dec_tag": [ "form-provisional-conditional" ],
     "con_tag": [ "uninflectable" ],
     "detail": "contracted"
@@ -1601,6 +1649,14 @@
     "con_end": [ "さす", "さす", "さす", "しさす", "さす", "さす", "らす", "ばす", "がす", "かす", "かす", "ます", "なす", "らす", "たす", "わす", "わす", "じさす", "らす", "らす", "さす", "さす" ],
     "dec_tag": [ "v1", "v1-s", "vs-s", "vs-s", "vk", "v5s", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m", "v5n", "v5r", "v5t", "v5u", "v5u-s", "vz", "v4r", "v5r-i", "vs-i", "vs-c" ],
     "con_tag": [ "v5s" ],
+    "detail": "short causative"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "くる" ],
+    "con_end": [ "こさす" ],
+    "dec_tag": [ "vk" ],
+    "con_tag": [ "5vs" ],
     "detail": "short causative"
   },
   {
@@ -1923,5 +1979,37 @@
     "dec_tag": [ "stem-a" ],
     "con_tag": [ "uninflectable" ],
     "detail": "classical hypothetical conditional"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "んとする" ],
+    "dec_tag": [ "stem-mizenkei" ],
+    "con_tag": [ "v1" ],
+    "detail": "about to"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "んばかり" ],
+    "dec_tag": [ "stem-mizenkei" ],
+    "con_tag": [ "v1" ],
+    "detail": "as if to"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "", "", "" ],
+    "con_end": [ "得る", "える", "うる" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "v1" ],
+    "detail": "be able to"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "", "" ],
+    "con_end": [ "致す", "いたす" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "v5s" ],
+    "detail": "humble"
   }
 ]

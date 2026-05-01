@@ -1827,7 +1827,7 @@ internal sealed class DeconjugatorTestsForVSC
     }
 
     [Test]
-    public void Deconjugate_ContractedProvisionalConditionalRya_VSC()
+    public void Deconjugate_ContractedProvisionalConditional_VSC()
     {
         const string termToDeconjugate = "御座すりゃ";
         const string expected = "～provisional conditional→contracted";
@@ -1912,6 +1912,132 @@ internal sealed class DeconjugatorTestsForVSC
     {
         const string termToDeconjugate = "御座せにゃ";
         const string expected = "～colloquial negative conditional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Ntosuru_VSC()
+    {
+        const string termToDeconjugate = "御座せんとする";
+        const string expected = "～about to";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Nbakari_VSC()
+    {
+        const string termToDeconjugate = "御座せんばかり";
+        const string expected = "～as if to";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Eru_VSC()
+    {
+        const string termToDeconjugate = "御座し得る";
+        const string expected = "～be able to";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Eru2_VSC()
+    {
+        const string termToDeconjugate = "御座しえる";
+        const string expected = "～be able to";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Uru_VSC()
+    {
+        const string termToDeconjugate = "御座しうる";
+        const string expected = "～be able to";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Masende_VSC()
+    {
+        const string termToDeconjugate = "御座しませんで";
+        const string expected = "～polite negative te";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Masendeshite_VSC()
+    {
+        const string termToDeconjugate = "御座しませんでして";
+        const string expected = "～polite negative te";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Masereba_VSC()
+    {
+        const string termToDeconjugate = "御座しますれば";
+        const string expected = "～polite provisional conditional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Mase_VSC()
+    {
+        const string termToDeconjugate = "御座しませ";
+        const string expected = "～polite imperative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Masendeshitara_VSC()
+    {
+        const string termToDeconjugate = "御座しませんでしたら";
+        const string expected = "～polite past negative conditional";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Itasu_VSC()
+    {
+        const string termToDeconjugate = "御座し致す";
+        const string expected = "～humble";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Itashimasen_VSC()
+    {
+        const string termToDeconjugate = "御座し致しません";
+        const string expected = "～humble→polite negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Itasu2_VSC()
+    {
+        const string termToDeconjugate = "御座しいたす";
+        const string expected = "～humble";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Itashimasen2_VSC()
+    {
+        const string termToDeconjugate = "御座しいたしません";
+        const string expected = "～humble→polite negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "御座す" && form.Tags[^1] is "vs-c").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
