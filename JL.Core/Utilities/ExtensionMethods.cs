@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -61,14 +60,6 @@ public static class ExtensionMethods
         }
 
         return textBlocks.AsReadOnlySpan();
-    }
-
-    internal static void AddRange<T>(this ConcurrentBag<T> source, List<T> items) where T : notnull
-    {
-        foreach (T item in items.AsReadOnlySpan())
-        {
-            source.Add(item);
-        }
     }
 
     internal static T[]? RemoveAt<T>(this T[] source, int index) where T : notnull
