@@ -120,43 +120,17 @@ public static class CustomWordLoader
             string[]? alternativeSpellings = spellings.RemoveAt(i);
             string spelling = spellings[i];
 
-            CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
-
-            if (!AddRecordToDictionary(spelling, newWordRecord, customWordDictionary))
+            CustomWordRecord record = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
+            if (DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(spelling), record, customWordDictionary))
             {
-                return;
-            }
-
-            if (i is 0 && readings is not null)
-            {
-                foreach (string reading in readings)
+                if (i is 0 && readings is not null)
                 {
-                    if (!AddRecordToDictionary(reading, newWordRecord, customWordDictionary))
+                    foreach (string reading in readings)
                     {
-                        return;
+                        _ = DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(reading), record, customWordDictionary);
                     }
                 }
             }
         }
-    }
-
-    private static bool AddRecordToDictionary(string spelling, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
-    {
-        string spellingInHiragana = JapaneseUtils.NormalizeText(spelling);
-        if (dictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
-        {
-            if (result.Contains(record))
-            {
-                return false;
-            }
-
-            result.Add(record);
-        }
-        else
-        {
-            dictionary[spellingInHiragana] = [record];
-        }
-
-        return true;
     }
 }

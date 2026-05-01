@@ -38,17 +38,7 @@ internal static class YomichanKanjiLoader
                     //    continue;
                     //}
 
-                    if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
-                    {
-                        if (!kanjiResult.Contains(yomichanKanjiRecord))
-                        {
-                            kanjiResult.Add(yomichanKanjiRecord);
-                        }
-                    }
-                    else
-                    {
-                        dict.Contents[kanji] = [yomichanKanjiRecord];
-                    }
+                    _ = DictUtils.AddRecordToDictionary(kanji, yomichanKanjiRecord, dict.Contents);
                 }
             }
         }

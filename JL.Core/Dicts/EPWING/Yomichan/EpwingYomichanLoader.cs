@@ -40,16 +40,18 @@ internal static class EpwingYomichanLoader
                             ? JapaneseUtils.NormalizeText(record.PrimarySpelling).GetPooledString()
                             : record.PrimarySpelling.GetPooledString();
 
-                        EpwingUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dictContents);
-                        if (nonKanjiDict && nonNameDict && record.Reading is not null)
+                        if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dictContents))
                         {
-                            string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
-                            if (primarySpellingInHiragana != readingInHiragana)
+                            if (nonKanjiDict && nonNameDict && record.Reading is not null)
                             {
-                                EpwingUtils.AddRecordToDictionary(readingInHiragana, record, dictContents);
-                                foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
+                                string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
+                                if (primarySpellingInHiragana != readingInHiragana)
                                 {
-                                    EpwingUtils.AddRecordToDictionary(variant, record, dictContents);
+                                    _ = DictUtils.AddRecordToDictionary(readingInHiragana, record, dictContents);
+                                    foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
+                                    {
+                                        _ = DictUtils.AddRecordToDictionary(variant, record, dictContents);
+                                    }
                                 }
                             }
                         }

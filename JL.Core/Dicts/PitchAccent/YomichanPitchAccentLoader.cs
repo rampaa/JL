@@ -30,55 +30,26 @@ internal static class YomichanPitchAccentLoader
                 {
                     Debug.Assert(jsonObject is not null);
 
-                    PitchAccentRecord newEntry = new(jsonObject);
-                    if (newEntry.Position is byte.MaxValue || string.IsNullOrWhiteSpace(newEntry.Spelling))
+                    PitchAccentRecord record = new(jsonObject);
+                    if (record.Position is byte.MaxValue || string.IsNullOrWhiteSpace(record.Spelling))
                     {
                         continue;
                     }
 
-                    string spellingInHiragana = JapaneseUtils.NormalizeText(newEntry.Spelling).GetPooledString();
-                    if (pitchDict.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
+                    string spellingInHiragana = JapaneseUtils.NormalizeText(record.Spelling).GetPooledString();
+                    if (DictUtils.AddRecordToDictionary(spellingInHiragana, record, pitchDict))
                     {
-                        if (!result.Contains(newEntry))
+                        if (record.Reading is not null)
                         {
-                            result.Add(newEntry);
-                        }
-                    }
-                    else
-                    {
-                        pitchDict[spellingInHiragana] = [newEntry];
-                    }
+                            string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
+                            if (spellingInHiragana != readingInHiragana)
+                            {
+                                _ = DictUtils.AddRecordToDictionary(readingInHiragana, record, pitchDict);
+                            }
 
-                    if (newEntry.Reading is not null)
-                    {
-                        string readingInHiragana = JapaneseUtils.NormalizeText(newEntry.Reading).GetPooledString();
-                        if (spellingInHiragana != readingInHiragana)
-                        {
-                            if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))
+                            foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(spellingInHiragana, readingInHiragana))
                             {
-                                if (!readingResult.Contains(newEntry))
-                                {
-                                    readingResult.Add(newEntry);
-                                }
-                            }
-                            else
-                            {
-                                pitchDict[readingInHiragana] = [newEntry];
-                            }
-                        }
-
-                        foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(spellingInHiragana, readingInHiragana))
-                        {
-                            if (pitchDict.TryGetValue(variant, out IList<IDictRecord>? tempRecordList))
-                            {
-                                if (!tempRecordList.Contains(newEntry))
-                                {
-                                    tempRecordList.Add(newEntry);
-                                }
-                            }
-                            else
-                            {
-                                pitchDict[variant] = [newEntry];
+                                _ = DictUtils.AddRecordToDictionary(variant, record, pitchDict);
                             }
                         }
                     }

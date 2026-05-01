@@ -1757,4 +1757,23 @@ public static class DictUtils
         AtLeastOneKanjiDictIsActive = atLeastOneKanjiDictIsActive;
         DBIsUsedForJmdict = dbIsUsedForJmdict;
     }
+
+    public static bool AddRecordToDictionary(string normalizedKey, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
+    {
+        if (dictionary.TryGetValue(normalizedKey, out IList<IDictRecord>? records))
+        {
+            if (records.Contains(record))
+            {
+                return false;
+            }
+
+            records.Add(record);
+        }
+        else
+        {
+            dictionary[normalizedKey] = [record];
+        }
+
+        return true;
+    }
 }

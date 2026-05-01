@@ -63,28 +63,7 @@ public static class CustomNameLoader
 
     public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, string? imagePath, IDictionary<string, IList<IDictRecord>> customNameDictionary)
     {
-        CustomNameRecord newNameRecord = new(spelling, reading, nameType, extraInfo, imagePath);
-
-        string spellingInHiragana = JapaneseUtils.NormalizeText(spelling);
-        if (customNameDictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? entry))
-        {
-            //int entryIndex = entry.IndexOf(newNameRecord);
-            //if (entryIndex >= 0)
-            //{
-            //    entry.RemoveAt(entryIndex);
-            //}
-
-            //entry.Add(newNameRecord);
-
-            if (!entry.Contains(newNameRecord))
-            {
-                entry.Add(newNameRecord);
-            }
-        }
-
-        else
-        {
-            customNameDictionary[spellingInHiragana] = [newNameRecord];
-        }
+        CustomNameRecord record = new(spelling, reading, nameType, extraInfo, imagePath);
+        _ = DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(spelling), record, customNameDictionary);
     }
 }
