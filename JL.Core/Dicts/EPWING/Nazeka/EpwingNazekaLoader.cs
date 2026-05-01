@@ -88,28 +88,18 @@ internal static class EpwingNazekaLoader
                         }
 
                         EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions, imagePath);
-                        AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict);
+                        EpwingUtils.AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict);
                         if (nonKanjiDict && nonNameDict)
                         {
                             string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
                             if (primarySpellingInHiragana != readingInHiragana)
                             {
-                                AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict);
+                                EpwingUtils.AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict);
                             }
 
                             foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
                             {
-                                if (dict.Contents.TryGetValue(variant, out IList<IDictRecord>? tempRecordList))
-                                {
-                                    if (!tempRecordList.Contains(record))
-                                    {
-                                        tempRecordList.Add(record);
-                                    }
-                                }
-                                else
-                                {
-                                    dict.Contents[variant] = [record];
-                                }
+                                EpwingUtils.AddRecordToDictionary(variant, record, nazekaEpwingDict);
                             }
                         }
 
@@ -128,7 +118,7 @@ internal static class EpwingNazekaLoader
 
                             if (primarySpellingInHiragana != alternativeSpellingInHiragana)
                             {
-                                AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imagePath), nazekaEpwingDict);
+                                EpwingUtils.AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imagePath), nazekaEpwingDict);
                             }
                         }
                     }
@@ -142,24 +132,12 @@ internal static class EpwingNazekaLoader
                         }
 
                         EpwingNazekaRecord record = new(reading, null, null, definitions, imagePath);
-                        AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.NormalizeText(reading).GetPooledString() : reading, record, nazekaEpwingDict);
+                        EpwingUtils.AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.NormalizeText(reading).GetPooledString() : reading, record, nazekaEpwingDict);
                     }
                 }
             }
         }
 
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
-    }
-
-    private static void AddRecordToDictionary(string keyInHiragana, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
-    {
-        if (dictionary.TryGetValue(keyInHiragana, out IList<IDictRecord>? result))
-        {
-            result.Add(record);
-        }
-        else
-        {
-            dictionary[keyInHiragana] = [record];
-        }
     }
 }

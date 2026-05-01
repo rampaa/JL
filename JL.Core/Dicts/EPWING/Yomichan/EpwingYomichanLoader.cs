@@ -22,6 +22,7 @@ internal static class EpwingYomichanLoader
 
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiWithWordSchemaYomichan;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameYomichan;
+        IDictionary<string, IList<IDictRecord>> dictContents = dict.Contents;
 
         foreach (string jsonFile in jsonFiles)
         {
@@ -35,7 +36,23 @@ internal static class EpwingYomichanLoader
                     EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElements, dict);
                     if (record is not null)
                     {
-                        AddToDictionary(record, dict, nonKanjiDict, nonNameDict);
+                        string primarySpellingInHiragana = nonKanjiDict
+                            ? JapaneseUtils.NormalizeText(record.PrimarySpelling).GetPooledString()
+                            : record.PrimarySpelling.GetPooledString();
+
+                        EpwingUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dictContents);
+                        if (nonKanjiDict && nonNameDict && record.Reading is not null)
+                        {
+                            string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
+                            if (primarySpellingInHiragana != readingInHiragana)
+                            {
+                                EpwingUtils.AddRecordToDictionary(readingInHiragana, record, dictContents);
+                                foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
+                                {
+                                    EpwingUtils.AddRecordToDictionary(variant, record, dictContents);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -180,52 +197,5 @@ internal static class EpwingYomichanLoader
         //string[] termTags = jsonElements[7].ToString();
 
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imagePaths?.ToArray());
-    }
-
-    private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict, bool nonKanjiDict, bool nonNameDict)
-    {
-        string primarySpellingInHiragana = nonKanjiDict
-            ? JapaneseUtils.NormalizeText(yomichanRecord.PrimarySpelling).GetPooledString()
-            : yomichanRecord.PrimarySpelling.GetPooledString();
-
-        if (dict.Contents.TryGetValue(primarySpellingInHiragana, out IList<IDictRecord>? records))
-        {
-            records.Add(yomichanRecord);
-        }
-        else
-        {
-            dict.Contents[primarySpellingInHiragana] = [yomichanRecord];
-        }
-
-        if (nonKanjiDict && nonNameDict && yomichanRecord.Reading is not null)
-        {
-            string readingInHiragana = JapaneseUtils.NormalizeText(yomichanRecord.Reading).GetPooledString();
-            if (primarySpellingInHiragana != readingInHiragana)
-            {
-                if (dict.Contents.TryGetValue(readingInHiragana, out records))
-                {
-                    records.Add(yomichanRecord);
-                }
-                else
-                {
-                    dict.Contents[readingInHiragana] = [yomichanRecord];
-                }
-
-                foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
-                {
-                    if (dict.Contents.TryGetValue(variant, out IList<IDictRecord>? tempRecordList))
-                    {
-                        if (!tempRecordList.Contains(yomichanRecord))
-                        {
-                            tempRecordList.Add(yomichanRecord);
-                        }
-                    }
-                    else
-                    {
-                        dict.Contents[variant] = [yomichanRecord];
-                    }
-                }
-            }
-        }
     }
 }
