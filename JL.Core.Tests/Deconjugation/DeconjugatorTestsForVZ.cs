@@ -359,9 +359,27 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_PlainCausativeAffirmative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせる";
+        const string expected = "～causative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainCausativeNegative_VZ()
     {
         const string termToDeconjugate = "命じさせない";
+        const string expected = "～causative→negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PlainCausativeNegative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせない";
         const string expected = "～causative→negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -377,9 +395,27 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_PlainCausativeSlurred2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせん";
+        const string expected = "～causative→slurred; causative→slurred negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PoliteCausativeAffirmative_VZ()
     {
         const string termToDeconjugate = "命じさせます";
+        const string expected = "～causative→polite";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PoliteCausativeAffirmative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせます";
         const string expected = "～causative→polite";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -395,9 +431,27 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_PoliteShortCausativeAffirmative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさします";
+        const string expected = "～short causative→polite";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PoliteCausativeNegative_VZ()
     {
         const string termToDeconjugate = "命じさせません";
+        const string expected = "～causative→polite negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PoliteCausativeNegative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせません";
         const string expected = "～causative→polite negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -413,9 +467,27 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_PlainCausativePast2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせた";
+        const string expected = "～causative→past";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PlainCausativePastNegative_VZ()
     {
         const string termToDeconjugate = "命じさせなかった";
+        const string expected = "～causative→negative→past";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PlainCausativePastNegative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせなかった";
         const string expected = "～causative→negative→past";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -431,9 +503,27 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_PoliteCausativePast2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせました";
+        const string expected = "～causative→polite past";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_PoliteCausativePastNegative_VZ()
     {
         const string termToDeconjugate = "命じさせませんでした";
+        const string expected = "～causative→polite past negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PoliteCausativePastNegative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせませんでした";
         const string expected = "～causative→polite past negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -449,9 +539,27 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_CausativePassivePotentialHonorificPlainAffirmative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせられる";
+        const string expected = "～causative→passive/potential/honorific";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_CausativePassivePotentialHonorificPlainNegative_VZ()
     {
         const string termToDeconjugate = "命じさせられない";
+        const string expected = "～causative→passive/potential/honorific→negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_CausativePassivePotentialHonorificPlainNegative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせられない";
         const string expected = "～causative→passive/potential/honorific→negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -467,9 +575,27 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_CausativePassivePotentialHonorificPoliteAffirmative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせられます";
+        const string expected = "～causative→passive/potential/honorific→polite";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_CausativePassivePotentialHonorificPoliteNegative_VZ()
     {
         const string termToDeconjugate = "命じさせられません";
+        const string expected = "～causative→passive/potential/honorific→polite negative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_CausativePassivePotentialHonorificPoliteNegative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさせられません";
         const string expected = "～causative→passive/potential/honorific→polite negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -1758,6 +1884,15 @@ internal sealed class DeconjugatorTestsForVZ
     public void Deconjugate_PlainShortCausativeAffirmative_VZ()
     {
         const string termToDeconjugate = "命じさす";
+        const string expected = "～short causative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_PlainShortCausativeAffirmative2_VZ()
+    {
+        const string termToDeconjugate = "命ぜさす";
         const string expected = "～short causative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
