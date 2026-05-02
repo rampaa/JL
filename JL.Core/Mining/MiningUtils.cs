@@ -476,7 +476,7 @@ public static class MiningUtils
             : null;
     }
 
-    private static string? GetDefinitionsFromMultipleDictionaries(LookupResult[] lookupResults, int currentLookupResultIndex, LookupResult lookupResult)
+    private static string? GetDefinitionsFromMultipleDictionaries(ReadOnlySpan<LookupResult> lookupResults, int currentLookupResultIndex, LookupResult lookupResult)
     {
         return GetDefinitionsFromAllDictionaries(lookupResults, currentLookupResultIndex, lookupResult.PrimarySpelling, lookupResult.FormattedDefinitions, true);
     }
@@ -486,7 +486,7 @@ public static class MiningUtils
         return lookupResult.DeconjugatedMatchedText ?? lookupResult.MatchedText;
     }
 
-    private static string? GetMiningParameter(JLField field, LookupResult[] lookupResults, int currentLookupResultIndex, ReadOnlySpan<char> currentText, int currentCharPosition)
+    private static string? GetMiningParameter(JLField field, ReadOnlySpan<LookupResult> lookupResults, int currentLookupResultIndex, ReadOnlySpan<char> currentText, int currentCharPosition)
     {
         return field switch
         {
@@ -536,7 +536,7 @@ public static class MiningUtils
         };
     }
 
-    internal static Dictionary<JLField, string> GetMiningParameters(LookupResult[] lookupResults, int currentLookupResultIndex, string currentText, string sentence, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling, bool useHtmlTags, FrozenSet<JLField>? jlFields)
+    internal static Dictionary<JLField, string> GetMiningParameters(ReadOnlySpan<LookupResult> lookupResults, int currentLookupResultIndex, string currentText, string sentence, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling, bool useHtmlTags, FrozenSet<JLField>? jlFields)
     {
         LookupResult lookupResult = lookupResults[currentLookupResultIndex];
 
@@ -824,7 +824,7 @@ public static class MiningUtils
         }
     }
 
-    private static void AddDefinitionFields(Dictionary<JLField, string> miningParams, FrozenSet<JLField>? jlFields, LookupResult[] lookupResults, string? formattedDefinitions, string? selectedDefinitions, int currentLookupResultIndex, string selectedSpelling, bool useHtmlTags)
+    private static void AddDefinitionFields(Dictionary<JLField, string> miningParams, FrozenSet<JLField>? jlFields, ReadOnlySpan<LookupResult> lookupResults, string? formattedDefinitions, string? selectedDefinitions, int currentLookupResultIndex, string selectedSpelling, bool useHtmlTags)
     {
         bool mineAllFields = jlFields is null;
         if (formattedDefinitions is not null)
@@ -1033,7 +1033,7 @@ public static class MiningUtils
         }
     }
 
-    private static string? GetDefinitionsFromAllDictionaries(LookupResult[] lookupResults, int currentLookupResultsIndex, string selectedSpelling, string? formattedDefinitions, bool useHtmlTags)
+    private static string? GetDefinitionsFromAllDictionaries(ReadOnlySpan<LookupResult> lookupResults, int currentLookupResultsIndex, string selectedSpelling, string? formattedDefinitions, bool useHtmlTags)
     {
         LookupResult selectedLookupResult = lookupResults[currentLookupResultsIndex];
         bool readingIsSelected = selectedLookupResult.PrimarySpelling != selectedSpelling;
@@ -1422,11 +1422,12 @@ public static class MiningUtils
         return expressionWithPitchAccentStringBuilder;
     }
 
-    public static async Task MineToFile(LookupResult[] lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
+    public static async Task MineToFile(List<LookupResult> lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
     {
         string filePath;
         JLField[] jlFields;
-        LookupResult lookupResult = lookupResults[currentLookupResultIndex];
+        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults.AsReadOnlySpan();
+        LookupResult lookupResult = lookupResultsSpan[currentLookupResultIndex];
         if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {
             filePath = Path.Join(AppInfo.ResourcesPath, "mined_words.txt");
@@ -1449,7 +1450,7 @@ public static class MiningUtils
         }
 
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
-        Dictionary<JLField, string> miningParameters = GetMiningParameters(lookupResults, currentLookupResultIndex, currentText, sentence, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, false, null);
+        Dictionary<JLField, string> miningParameters = GetMiningParameters(lookupResultsSpan, currentLookupResultIndex, currentText, sentence, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, false, null);
 
         StringBuilder lineToMine = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 1; i < jlFields.Length; i++)
@@ -1481,7 +1482,7 @@ public static class MiningUtils
         }
     }
 
-    public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, int displayedLookupResultLength, string currentText, int currentCharPosition, CancellationToken cancellationToken)
+    public static async ValueTask<bool[]?> CheckDuplicates(List<LookupResult> lookupResults, int displayedLookupResultLength, string currentText, int currentCharPosition, CancellationToken cancellationToken)
     {
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig(cancellationToken).ConfigureAwait(false);
         if (ankiConfigDict is null)
@@ -1493,9 +1494,11 @@ public static class MiningUtils
         List<int> positions = new(displayedLookupResultLength);
         bool[] results = new bool[displayedLookupResultLength];
 
+        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults.AsReadOnlySpan();
+
         for (int i = 0; i < displayedLookupResultLength; i++)
         {
-            LookupResult lookupResult = lookupResults[i];
+            LookupResult lookupResult = lookupResultsSpan[i];
             DictType dictType = lookupResult.Dict.Type;
 
             AnkiConfig? ankiConfig;
@@ -1522,7 +1525,7 @@ public static class MiningUtils
             }
 
             (string firstFieldName, JLField firstField) = ankiConfig.Fields.GetAt(0);
-            string? firstFieldValue = GetMiningParameter(firstField, lookupResults, i, currentText, currentCharPosition);
+            string? firstFieldValue = GetMiningParameter(firstField, lookupResultsSpan, i, currentText, currentCharPosition);
             if (firstFieldValue is null)
             {
                 continue;

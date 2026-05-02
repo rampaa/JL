@@ -135,7 +135,7 @@ public static class AnkiConnectUtils
         }
     }
 
-    public static async Task Mine(LookupResult[] lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
+    public static async Task Mine(List<LookupResult> lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
     {
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (!coreConfigManager.AnkiIntegration)
@@ -152,7 +152,8 @@ public static class AnkiConnectUtils
         }
 
         AnkiConfig? ankiConfig;
-        LookupResult lookupResult = lookupResults[currentLookupResultIndex];
+        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults.AsReadOnlySpan();
+        LookupResult lookupResult = lookupResultsSpan[currentLookupResultIndex];
         if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
@@ -177,7 +178,7 @@ public static class AnkiConnectUtils
         }
 
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
-        Dictionary<JLField, string> miningParams = MiningUtils.GetMiningParameters(lookupResults, currentLookupResultIndex, currentText, sentence, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, true, ankiConfig.UsedJLFields);
+        Dictionary<JLField, string> miningParams = MiningUtils.GetMiningParameters(lookupResultsSpan, currentLookupResultIndex, currentText, sentence, formattedDefinitions, selectedDefinitions, currentCharPosition, selectedSpelling, true, ankiConfig.UsedJLFields);
         OrderedDictionary<string, JLField> userFields = ankiConfig.Fields;
         Dictionary<string, string> fields = ConvertFields(userFields, miningParams);
 

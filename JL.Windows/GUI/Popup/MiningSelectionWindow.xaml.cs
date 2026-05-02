@@ -18,7 +18,7 @@ namespace JL.Windows.GUI.Popup;
 internal sealed partial class MiningSelectionWindow
 {
     private readonly PopupWindow _popupWindow;
-    private readonly LookupResult[] _lookupResults;
+    private readonly List<LookupResult> _lookupResults;
     private readonly int _currentLookupResultIndex;
     private readonly string _currentSourceText;
     private readonly int _currentSourceTextCharPosition;
@@ -27,7 +27,7 @@ internal sealed partial class MiningSelectionWindow
 
     private static MiningSelectionWindow? s_instance;
 
-    private MiningSelectionWindow(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition)
+    private MiningSelectionWindow(PopupWindow owner, List<LookupResult> lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition)
     {
         InitializeComponent();
         Owner = owner;
@@ -43,7 +43,7 @@ internal sealed partial class MiningSelectionWindow
         return s_instance?.IsVisible ?? false;
     }
 
-    internal static void Show(PopupWindow owner, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition, Point position)
+    internal static void Show(PopupWindow owner, List<LookupResult> lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition, Point position)
     {
         if (s_instance is null || !s_instance.IsLoaded)
         {
@@ -125,7 +125,7 @@ internal sealed partial class MiningSelectionWindow
         return MineSelectedSpelling(s_instance._popupWindow, s_instance._lookupResults, s_instance._currentLookupResultIndex, s_instance._currentSourceText, s_instance._currentSourceTextCharPosition, selectedSpelling);
     }
 
-    private static Task MineSelectedSpelling(PopupWindow popupWindow, LookupResult[] lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition, string selectedSpelling)
+    private static Task MineSelectedSpelling(PopupWindow popupWindow, List<LookupResult> lookupResults, int currentLookupResultIndex, string currentSourceText, int currentSourceTextCharPosition, string selectedSpelling)
     {
         TextBox? definitionsTextBox = popupWindow.GetDefinitionTextBox(currentLookupResultIndex);
         string? formattedDefinitions = definitionsTextBox?.Text;

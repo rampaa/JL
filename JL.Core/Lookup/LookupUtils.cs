@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using JL.Core.Config;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -19,9 +20,9 @@ using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Array;
 using JL.Core.Utilities.Database;
+using JL.Core.Utilities.Japanese;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
-using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Lookup;
 
@@ -32,7 +33,7 @@ public static class LookupUtils
 
     private static readonly Lock s_lookupResultsLock = new();
 
-    public static LookupResult[]? LookupText(string text)
+    public static List<LookupResult>? LookupText(string text)
     {
         bool dbIsUsedForPitchDict = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict)
             && pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
@@ -269,9 +270,8 @@ public static class LookupUtils
             return null;
         }
 
-        LookupResult[] sortedLookupResults = lookupResults.ToArray();
-        Array.Sort(sortedLookupResults);
-        return sortedLookupResults;
+        CollectionsMarshal.AsSpan(lookupResults).Sort();
+        return lookupResults;
     }
 
     private static DBParameters GetDBParameters(TextInfo textInfo)

@@ -70,7 +70,7 @@ internal sealed partial class PopupWindow : IDisposable
 
     public nint WindowHandle { get; private set; }
 
-    public LookupResult[] LastLookupResults { get; private set; } = [];
+    public List<LookupResult> LastLookupResults { get; private set; } = [];
 
     private readonly List<Dict> _dictsWithResults = [];
 
@@ -388,9 +388,9 @@ internal sealed partial class PopupWindow : IDisposable
 
         _lastLookedUpText = textToLookUp;
 
-        LookupResult[]? lookupResults = LookupUtils.LookupText(textToLookUp);
+        List<LookupResult>? lookupResults = LookupUtils.LookupText(textToLookUp);
 
-        if (lookupResults is not null && lookupResults.Length > 0)
+        if (lookupResults is not null && lookupResults.Count > 0)
         {
             PreviousTextBox = textBox;
             LookupResult firstLookupResult = lookupResults[0];
@@ -410,7 +410,7 @@ internal sealed partial class PopupWindow : IDisposable
                     : PopupWindowUtils.PopupWindows[PopupIndex - 1]!.WindowHandle);
 
                 _ = textBox.Focus();
-                textBox.Select(charPosition, lookupResults[0].MatchedText.Length);
+                textBox.Select(charPosition, firstLookupResult.MatchedText.Length);
             }
 
             LastLookupResults = lookupResults;
@@ -562,9 +562,9 @@ internal sealed partial class PopupWindow : IDisposable
 
         _lastLookedUpText = selectedText;
 
-        LookupResult[]? lookupResults = LookupUtils.LookupText(textBox.SelectedText);
+        List<LookupResult>? lookupResults = LookupUtils.LookupText(textBox.SelectedText);
 
-        if (lookupResults is not null && lookupResults.Length > 0)
+        if (lookupResults is not null && lookupResults.Count > 0)
         {
             PreviousTextBox = textBox;
             LookupResult firstLookupResult = lookupResults[0];
@@ -776,14 +776,16 @@ internal sealed partial class PopupWindow : IDisposable
 
         int resultCount;
         bool checkForDuplicateCards;
+
+        ReadOnlySpan<LookupResult> lastLookupResultsSpan = LastLookupResults.AsReadOnlySpan();
         if (MiningMode)
         {
-            resultCount = LastLookupResults.Length;
+            resultCount = lastLookupResultsSpan.Length;
             checkForDuplicateCards = coreConfigManager is { CheckForDuplicateCards: true, AnkiIntegration: true } && !configManager.MineToFileInsteadOfAnki;
         }
         else
         {
-            resultCount = Math.Min(LastLookupResults.Length, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
+            resultCount = Math.Min(lastLookupResultsSpan.Length, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
             checkForDuplicateCards = coreConfigManager is { DuplicateCheckIndependentOfMiningMode: true, CheckForDuplicateCards: true, AnkiIntegration: true } && !configManager.MineToFileInsteadOfAnki;
         }
 
@@ -791,7 +793,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         for (int i = 0; i < resultCount; i++)
         {
-            LookupResult lookupResult = LastLookupResults[i];
+            LookupResult lookupResult = lastLookupResultsSpan[i];
 
             if (!_dictsWithResults.Contains(lookupResult.Dict))
             {
@@ -854,11 +856,11 @@ internal sealed partial class PopupWindow : IDisposable
 
     private async Task CheckResultForDuplicates(LookupDisplayResult[] lookupDisplayResults, CancellationToken cancellationToken)
     {
-        LookupResult[] lastLookupResults = LastLookupResults;
+        List<LookupResult> lastLookupResults = LastLookupResults;
 
         Debug.Assert(MiningMode
-            ? LastLookupResults.Length == lookupDisplayResults.Length
-            : LastLookupResults.Length >= lookupDisplayResults.Length);
+            ? LastLookupResults.Count == lookupDisplayResults.Length
+            : LastLookupResults.Count >= lookupDisplayResults.Length);
 
         bool[]? duplicateCard = await MiningUtils.CheckDuplicates(lastLookupResults, lookupDisplayResults.Length, _currentSourceText, CurrentSourceTextCharPosition, cancellationToken).ConfigureAwait(true);
         if (duplicateCard is not null)
@@ -1119,7 +1121,7 @@ internal sealed partial class PopupWindow : IDisposable
 
     private Task HandleAudioButtonClick(bool useSelectedListViewItemIfItExists)
     {
-        if (LastLookupResults.Length is 0)
+        if (LastLookupResults.Count is 0)
         {
             return Task.CompletedTask;
         }
@@ -1182,7 +1184,7 @@ internal sealed partial class PopupWindow : IDisposable
 
     private Task HandleMining(bool minePrimarySpelling, bool useSelectedListViewItemIfItExists)
     {
-        if (LastLookupResults.Length is 0 || PopupListView.Items.Count is 0)
+        if (LastLookupResults.Count is 0 || PopupListView.Items.Count is 0)
         {
             return Task.CompletedTask;
         }
@@ -1210,7 +1212,7 @@ internal sealed partial class PopupWindow : IDisposable
             }
         }
 
-        LookupResult[] lookupResults = LastLookupResults;
+        List<LookupResult> lookupResults = LastLookupResults;
         LookupResult lookupResult = lookupResults[listViewItemIndex];
         string currentSourceText = _currentSourceText;
         int currentSourceTextCharPosition = CurrentSourceTextCharPosition;
@@ -1988,7 +1990,7 @@ internal sealed partial class PopupWindow : IDisposable
 
     private Task PlayAudio(bool useSelectedListViewItemIfItExists)
     {
-        if (LastLookupResults.Length is 0)
+        if (LastLookupResults.Count is 0)
         {
             return Task.CompletedTask;
         }
@@ -2284,7 +2286,7 @@ internal sealed partial class PopupWindow : IDisposable
         bool contextMenuBecameInvisible = !(bool)e.NewValue;
         if (contextMenuBecameInvisible)
         {
-            if (LastLookupResults.Length > _listViewItemIndexAfterContextMenuIsClosed)
+            if (LastLookupResults.Count > _listViewItemIndexAfterContextMenuIsClosed)
             {
                 _listViewItemIndex = _listViewItemIndexAfterContextMenuIsClosed;
                 LastSelectedText = LastLookupResults[_listViewItemIndexAfterContextMenuIsClosed].PrimarySpelling;
@@ -2466,7 +2468,7 @@ internal sealed partial class PopupWindow : IDisposable
             && !DefinitionsTextBoxContextMenu.IsVisible
             && !TitleBarContextMenu.IsVisible
             && !DictTabButtonsItemsControlContextMenu.IsVisible
-            && LastLookupResults.Length > 0)
+            && LastLookupResults.Count > 0)
         {
             _listViewItemIndex = _firstVisibleListViewItemIndex;
             LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
@@ -2611,7 +2613,7 @@ internal sealed partial class PopupWindow : IDisposable
         DictTabButtonsItemsControl.ItemsSource = null;
         PopupListView.ItemsSource = null;
         _lastInteractedTextBox = null;
-        LastLookupResults = [];
+        LastLookupResults.Clear();
         _dictsWithResults.Clear();
         AllDictionaryTabButton.Click -= DictTypeButtonOnClick;
 
