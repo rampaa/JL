@@ -882,7 +882,25 @@ internal static class WindowsUtils
         {
             if (owner is not null)
             {
-                return await owner.Dispatcher.InvokeAsync(() => HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes);
+                return await owner.Dispatcher.InvokeAsync(() =>
+                {
+                    if (owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false } && PresentationSource.FromVisual(owner) is not null)
+                    {
+                        try
+                        {
+                            return HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            LoggerManager.Logger.Error(ex, "Could not assign {OwnerName} as the owner of message box", owner.Name);
+                            return HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
+                        }
+                    }
+                    else
+                    {
+                        return HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
+                    }
+                });
             }
             else
             {
@@ -906,7 +924,22 @@ internal static class WindowsUtils
             {
                 await owner.Dispatcher.InvokeAsync(() =>
                 {
-                    _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false } && PresentationSource.FromVisual(owner) is not null)
+                    {
+                        try
+                        {
+                            _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            LoggerManager.Logger.Error(ex, "Could not assign {OwnerName} as the owner of message box", owner.Name);
+                            _ = HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                    else
+                    {
+                        _ = HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 });
             }
             else
@@ -932,11 +965,13 @@ internal static class WindowsUtils
         return Application.Current?.Dispatcher.Invoke(() =>
         {
             Window? candidate = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Owner == owner
-                && w is { IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false });
+                && w is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
+                && PresentationSource.FromVisual(w) is not null);
 
-            return candidate ?? (owner.Dispatcher.HasShutdownStarted
-                ? null
-                : owner);
+            return candidate ?? ((owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
+                && PresentationSource.FromVisual(owner) is not null)
+                ? owner
+                : null);
         });
     }
 
