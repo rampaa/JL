@@ -48,7 +48,12 @@ internal sealed class PopupContentGenerator : Decorator
         CreatePrimarySpelling(lookupDisplayResult, top);
         CreatePrimarySpellingOrthographyInfo(result, top);
         CreateReadings(lookupDisplayResult, top);
-        CreateAudioButton(ownerWindow, top);
+
+        if (ownerWindow.MiningMode)
+        {
+            CreateAudioButton(ownerWindow, top);
+        }
+
         CreateAlternativeSpellings(lookupDisplayResult, top);
         CreateDeconjugationInfo(lookupDisplayResult, top);
         CreateFrequencies(result, top);
@@ -69,14 +74,25 @@ internal sealed class PopupContentGenerator : Decorator
         }
 
         CreateFormattedDefinition(lookupDisplayResult, bottom);
-        CreateKanjiText(ownerWindow, result.KanjiLookupResult, bottom);
+
+        if (result.KanjiLookupResult is not null)
+        {
+            string? kanjiText = GetKanjiText(result.KanjiLookupResult);
+            if (kanjiText is not null)
+            {
+                CreateKanjiText(ownerWindow, kanjiText, bottom);
+            }
+        }
 
         if (imagesExist && showImagesAtBottom)
         {
             CreateImages(lookupDisplayResult, bottom);
         }
 
-        CreateSeparator(lookupDisplayResult.NonLastItem, bottom);
+        if (lookupDisplayResult.NonLastItem)
+        {
+            CreateSeparator(bottom);
+        }
 
         StackPanel stackPanel = new()
         {
@@ -264,11 +280,6 @@ internal sealed class PopupContentGenerator : Decorator
 
     private static void CreateAudioButton(PopupWindow ownerWindow, WrapPanel top)
     {
-        if (!ownerWindow.MiningMode)
-        {
-            return;
-        }
-
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.AudioButtonFontSize is 0)
         {
@@ -562,19 +573,8 @@ internal sealed class PopupContentGenerator : Decorator
         }
     }
 
-    private static void CreateKanjiText(PopupWindow ownerWindow, KanjiLookupResult? kanjiLookupResult, StackPanel bottom)
+    private static void CreateKanjiText(PopupWindow ownerWindow, string kanjiText, StackPanel bottom)
     {
-        if (kanjiLookupResult is null)
-        {
-            return;
-        }
-
-        string? kanjiText = GetKanjiText(kanjiLookupResult);
-        if (kanjiText is null)
-        {
-            return;
-        }
-
         ConfigManager configManager = ConfigManager.Instance;
         if (ownerWindow.MiningMode)
         {
@@ -746,13 +746,8 @@ internal sealed class PopupContentGenerator : Decorator
         }
     }
 
-    private static void CreateSeparator(bool nonLastItem, StackPanel bottom)
+    private static void CreateSeparator(StackPanel bottom)
     {
-        if (!nonLastItem)
-        {
-            return;
-        }
-
         ConfigManager configManager = ConfigManager.Instance;
         _ = bottom.Children.Add(new Separator
         {
