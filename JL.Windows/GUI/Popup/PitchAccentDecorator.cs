@@ -11,9 +11,8 @@ namespace JL.Windows.GUI.Popup;
 internal sealed class PitchAccentDecorator : Decorator
 {
     private readonly StreamGeometry _geometry;
-    private readonly Pen _pen;
 
-    public PitchAccentDecorator(FrameworkElement child, string[] readings, string[] splitReadingsWithRInfo, byte[] pitchPositions, Pen pen)
+    public PitchAccentDecorator(FrameworkElement child, string[] readings, string[] splitReadingsWithRInfo, byte[] pitchPositions)
     {
         Child = child;
         VerticalAlignment = child.VerticalAlignment;
@@ -21,14 +20,13 @@ internal sealed class PitchAccentDecorator : Decorator
         Margin = child.Margin;
         UseLayoutRounding = true;
 
-        _pen = pen;
         _geometry = CreatePitchAccentGeometry(child, readings, splitReadingsWithRInfo, pitchPositions);
     }
 
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
-        drawingContext.DrawGeometry(null, _pen, _geometry);
+        drawingContext.DrawGeometry(null, PopupWindowUtils.PitchAccentMarkerPen, _geometry);
     }
 
     private static StreamGeometry CreatePitchAccentGeometry(FrameworkElement childElement, string[] readings, string[] splitReadingsWithRInfo, byte[] pitchPositions)

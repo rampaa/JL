@@ -128,8 +128,7 @@ internal sealed class PopupContentGenerator : Decorator
         {
             PitchAccentDecorator pitchAccentDecorator = new(primarySpellingFrameworkElement, [result.PrimarySpelling],
                         [result.PrimarySpelling],
-                        result.PitchPositions,
-                        PopupWindowUtils.PitchAccentMarkerPen);
+                        result.PitchPositions);
 
             _ = top.Children.Add(pitchAccentDecorator);
         }
@@ -223,8 +222,7 @@ internal sealed class PopupContentGenerator : Decorator
 
                 PitchAccentDecorator pitchAccentDecorator = new(readingTextBox, result.Readings,
                     readingTextBox.Text.Split('、'),
-                    result.PitchPositions,
-                    PopupWindowUtils.PitchAccentMarkerPen);
+                    result.PitchPositions);
 
                 _ = top.Children.Add(pitchAccentDecorator);
             }
@@ -252,8 +250,7 @@ internal sealed class PopupContentGenerator : Decorator
 
                 PitchAccentDecorator pitchAccentDecorator = new(readingTextBlock, result.Readings,
                     readingTextBlock.Text.Split('、'),
-                    result.PitchPositions,
-                    PopupWindowUtils.PitchAccentMarkerPen);
+                    result.PitchPositions);
 
                 _ = top.Children.Add(pitchAccentDecorator);
             }
