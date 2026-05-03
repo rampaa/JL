@@ -1089,9 +1089,40 @@ public static class LookupUtils
             ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
-                string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsReadOnlySpan())
-                    : null;
+                int minDeconjugationProcessStepCount;
+                string? deconjugationProcess;
+                if (deconjugatedWord)
+                {
+                    ReadOnlySpan<List<string>> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
+                    deconjugationProcess = LookupResultUtils.DeconjugationProcessesToText(currentProcessSpan);
+                    if (deconjugationProcess is not null)
+                    {
+                        if (currentProcessSpan.Length is 1)
+                        {
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].Count;
+                        }
+                        else
+                        {
+                            minDeconjugationProcessStepCount = int.MaxValue;
+                            foreach (List<string> process in currentProcessSpan)
+                            {
+                                if (minDeconjugationProcessStepCount > process.Count)
+                                {
+                                    minDeconjugationProcessStepCount = process.Count;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        minDeconjugationProcessStepCount = 0;
+                    }
+                }
+                else
+                {
+                    deconjugationProcess = null;
+                    minDeconjugationProcessStepCount = 0;
+                }
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
                 int dictRecordsCount = dictRecords.Count;
@@ -1109,6 +1140,7 @@ public static class LookupUtils
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
+                        minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
                         entryId: jmdictResult.Id,
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null,
                         wordClasses: jmdictResult.WordClassesSharedByAllSenses,
@@ -1253,9 +1285,40 @@ public static class LookupUtils
             ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
-                string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsReadOnlySpan())
-                    : null;
+                int minDeconjugationProcessStepCount;
+                string? deconjugationProcess;
+                if (deconjugatedWord)
+                {
+                    ReadOnlySpan<List<string>> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
+                    deconjugationProcess = LookupResultUtils.DeconjugationProcessesToText(currentProcessSpan);
+                    if (deconjugationProcess is not null)
+                    {
+                        if (currentProcessSpan.Length is 1)
+                        {
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].Count;
+                        }
+                        else
+                        {
+                            minDeconjugationProcessStepCount = int.MaxValue;
+                            foreach (List<string> process in currentProcessSpan)
+                            {
+                                if (minDeconjugationProcessStepCount > process.Count)
+                                {
+                                    minDeconjugationProcessStepCount = process.Count;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        minDeconjugationProcessStepCount = 0;
+                    }
+                }
+                else
+                {
+                    deconjugationProcess = null;
+                    minDeconjugationProcessStepCount = 0;
+                }
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
                 int dictRecordsCount = dictRecords.Count;
@@ -1274,6 +1337,7 @@ public static class LookupUtils
                         frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
+                        minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                         wordClasses: epwingResult.WordClasses,
                         imagePaths: epwingResult.ImagePaths
@@ -1332,9 +1396,40 @@ public static class LookupUtils
             ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
-                string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsReadOnlySpan())
-                    : null;
+                int minDeconjugationProcessStepCount;
+                string? deconjugationProcess;
+                if (deconjugatedWord)
+                {
+                    ReadOnlySpan<List<string>> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
+                    deconjugationProcess = LookupResultUtils.DeconjugationProcessesToText(currentProcessSpan);
+                    if (deconjugationProcess is not null)
+                    {
+                        if (currentProcessSpan.Length is 1)
+                        {
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].Count;
+                        }
+                        else
+                        {
+                            minDeconjugationProcessStepCount = int.MaxValue;
+                            foreach (List<string> process in currentProcessSpan)
+                            {
+                                if (minDeconjugationProcessStepCount > process.Count)
+                                {
+                                    minDeconjugationProcessStepCount = process.Count;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        minDeconjugationProcessStepCount = 0;
+                    }
+                }
+                else
+                {
+                    deconjugationProcess = null;
+                    minDeconjugationProcessStepCount = 0;
+                }
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
                 int dictRecordsCount = dictRecords.Count;
@@ -1354,6 +1449,7 @@ public static class LookupUtils
                         alternativeSpellings: epwingResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
+                        minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                         imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
                     );
@@ -1471,9 +1567,40 @@ public static class LookupUtils
             ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
-                string? deconjugationProcess = deconjugatedWord
-                    ? LookupResultUtils.DeconjugationProcessesToText(processesSpan[i].AsReadOnlySpan())
-                    : null;
+                int minDeconjugationProcessStepCount;
+                string? deconjugationProcess;
+                if (deconjugatedWord)
+                {
+                    ReadOnlySpan<List<string>> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
+                    deconjugationProcess = LookupResultUtils.DeconjugationProcessesToText(currentProcessSpan);
+                    if (deconjugationProcess is not null)
+                    {
+                        if (currentProcessSpan.Length is 1)
+                        {
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].Count;
+                        }
+                        else
+                        {
+                            minDeconjugationProcessStepCount = int.MaxValue;
+                            foreach (List<string> process in currentProcessSpan)
+                            {
+                                if (minDeconjugationProcessStepCount > process.Count)
+                                {
+                                    minDeconjugationProcessStepCount = process.Count;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        minDeconjugationProcessStepCount = 0;
+                    }
+                }
+                else
+                {
+                    deconjugationProcess = null;
+                    minDeconjugationProcessStepCount = 0;
+                }
 
                 ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
                 int dictRecordsCount = dictRecords.Count;
@@ -1492,6 +1619,7 @@ public static class LookupUtils
                         alternativeSpellings: customWordDictResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: customWordDictResult.HasUserDefinedWordClass ? deconjugationProcess : null,
+                        minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
                         wordClasses: customWordDictResult.WordClasses
                     );

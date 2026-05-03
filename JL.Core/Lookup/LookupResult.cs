@@ -16,6 +16,7 @@ public sealed class LookupResult
         string[]? alternativeSpellings = null,
         string? deconjugatedMatchedText = null,
         string? deconjugationProcess = null,
+        int minDeconjugationProcessStepCount = 0,
         int entryId = 0,
         byte[]? pitchPositions = null,
         string[]? wordClasses = null,
@@ -38,6 +39,7 @@ public sealed class LookupResult
     // Word dictionaries
     public string? DeconjugatedMatchedText { get; } = deconjugatedMatchedText;
     public string? DeconjugationProcess { get; } = deconjugationProcess;
+    internal int MinDeconjugationProcessStepCount { get; } = minDeconjugationProcessStepCount;
     internal string[]? WordClasses { get; } = wordClasses;
 
     // Yomichan dictionaries
@@ -145,10 +147,8 @@ public sealed class LookupResult
             return cmpResult;
         }
 
-        // 4. ThenBy the length of the deconjugation process steps
-        int deconjugationScore = DeconjugationProcess.Count('→');
-        int otherDeconjugationScore = other.DeconjugationProcess.Count('→');
-        cmpResult = deconjugationScore.CompareTo(otherDeconjugationScore);
+        // 4. ThenBy the minimum deconjugation process step count
+        cmpResult = MinDeconjugationProcessStepCount.CompareTo(other.MinDeconjugationProcessStepCount);
         if (cmpResult is not 0)
         {
             return cmpResult;
