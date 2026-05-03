@@ -59,7 +59,9 @@ internal sealed class PopupContentGenerator : Decorator
 
         bool imagesExist = result.ImagePaths is not null;
         Debug.Assert(!imagesExist || (result.Dict.Options.ShowImages is not null && result.Dict.Options.ShowImageAtBottom is not null));
-        bool showImagesAtBottom = imagesExist && result.Dict.Options.ShowImageAtBottom!.Value;
+        bool showImagesAtBottom = imagesExist
+                                  // ReSharper disable once NullableWarningSuppressionIsUsed
+                                  && result.Dict.Options.ShowImageAtBottom!.Value;
 
         if (imagesExist && !showImagesAtBottom)
         {
@@ -198,7 +200,10 @@ internal sealed class PopupContentGenerator : Decorator
             showROrthographyInfo = jmdictOptions.ROrthographyInfo.Value;
         }
 
-        string readingsText = showROrthographyInfo && jmdictLookupResult!.ReadingsOrthographyInfoList is not null
+        string readingsText = showROrthographyInfo
+                              // ReSharper disable once NullableWarningSuppressionIsUsed
+                              && jmdictLookupResult!.ReadingsOrthographyInfoList is not null
+
             ? LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, jmdictLookupResult.ReadingsOrthographyInfoList)
             : string.Join('、', result.Readings);
 
@@ -321,7 +326,9 @@ internal sealed class PopupContentGenerator : Decorator
             showAOrthographyInfo = jmdictOptions.AOrthographyInfo.Value;
         }
 
-        string alternativeSpellingsText = showAOrthographyInfo && jmdictLookupResult!.AlternativeSpellingsOrthographyInfoList is not null
+        string alternativeSpellingsText = showAOrthographyInfo
+                                          // ReSharper disable once NullableWarningSuppressionIsUsed
+                                          && jmdictLookupResult!.AlternativeSpellingsOrthographyInfoList is not null
             ? LookupResultUtils.ElementWithOrthographyInfoToTextWithParentheses(result.AlternativeSpellings, jmdictLookupResult.AlternativeSpellingsOrthographyInfoList)
             : $"[{string.Join('、', result.AlternativeSpellings)}]";
 

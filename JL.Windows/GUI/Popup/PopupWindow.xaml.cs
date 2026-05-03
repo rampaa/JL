@@ -407,6 +407,7 @@ internal sealed partial class PopupWindow : IDisposable
                 Debug.Assert(isFirstPopupWindow || PopupWindowUtils.PopupWindows[PopupIndex - 1] is not null);
                 WinApi.ActivateWindow(isFirstPopupWindow
                     ? MainWindow.Instance.WindowHandle
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
                     : PopupWindowUtils.PopupWindows[PopupIndex - 1]!.WindowHandle);
 
                 _ = textBox.Focus();

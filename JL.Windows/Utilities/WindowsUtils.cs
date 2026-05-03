@@ -45,6 +45,7 @@ internal static class WindowsUtils
 {
     public static readonly Version JLVersion =
         Version.Parse(Assembly.GetExecutingAssembly()
+            // ReSharper disable once NullableWarningSuppressionIsUsed
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
             .InformationalVersion.Split('-', '+')[0]);
 
@@ -896,10 +897,8 @@ internal static class WindowsUtils
                             return HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
                         }
                     }
-                    else
-                    {
-                        return HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
-                    }
+
+                    return HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
                 });
             }
             else
@@ -968,8 +967,8 @@ internal static class WindowsUtils
                 && w is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
                 && PresentationSource.FromVisual(w) is not null);
 
-            return candidate ?? ((owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
-                && PresentationSource.FromVisual(owner) is not null)
+            return candidate ?? (owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
+                                 && PresentationSource.FromVisual(owner) is not null
                 ? owner
                 : null);
         });

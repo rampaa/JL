@@ -30,7 +30,9 @@ internal static class FrequencyNazekaLoader
             foreach (JsonElement[] elementList in value)
             {
                 int frequencyRank = elementList[1].GetInt32();
-                string exactSpelling = elementList[0].GetString()!.GetPooledString();
+                string exactSpelling = elementList[0]
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    .GetString()!.GetPooledString();
 
                 if (frequencyRank > freq.MaxValue)
                 {

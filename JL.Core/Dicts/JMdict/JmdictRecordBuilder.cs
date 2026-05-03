@@ -24,13 +24,12 @@ internal static class JmdictRecordBuilder
         bool spellingsWithoutSearchOnlyFormsExist = kanjiElementsWithoutSearchOnlyForms.Length > 0;
 
         string[]? allSpellingsWithoutSearchOnlyForms;
-        string[]?[]? allKanjiOrthographyInfoWithoutSearchOnlyForms;
         string? firstPrimarySpelling;
         string[]? alternativeSpellingsForFirstPrimarySpelling;
         if (spellingsWithoutSearchOnlyFormsExist)
         {
             allSpellingsWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length];
-            allKanjiOrthographyInfoWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length][];
+            string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms = new string[kanjiElementsWithoutSearchOnlyForms.Length][];
 
             for (int i = 0; i < kanjiElementsWithoutSearchOnlyForms.Length; i++)
             {
@@ -46,7 +45,6 @@ internal static class JmdictRecordBuilder
         else
         {
             allSpellingsWithoutSearchOnlyForms = null;
-            allKanjiOrthographyInfoWithoutSearchOnlyForms = null;
             firstPrimarySpelling = null;
             alternativeSpellingsForFirstPrimarySpelling = null;
         }
@@ -437,7 +435,10 @@ internal static class JmdictRecordBuilder
         string[]? firstSensesArray = senseFieldSpan[0];
         Debug.Assert(firstSensesArray is not null);
         List<string> sharedSenseCandidates = firstSensesArray.ToList();
-        return GetExclusiveAndSharedValuesForSenseField(senseField!, sharedSenseCandidates);
+        return GetExclusiveAndSharedValuesForSenseField(
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            senseField!,
+            sharedSenseCandidates);
     }
 
     private static (string[]?[]? exclusiveSenseFieldValues, string[]? senseFieldValuesSharedByAllSenses) GetExclusiveAndSharedValuesForSenseField(List<string[]> senseField, List<string> sharedSenseCandidates)

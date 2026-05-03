@@ -79,7 +79,6 @@ public static class LookupUtils
         bool dbIsUsedAtLeastForOneDict = DictUtils.DBIsUsedForAtLeastOneDict;
 
         List<LookupResult> lookupResults = [];
-
         _ = Parallel.ForEach(dicts, dict =>
         {
             bool useDB = dbIsUsedAtLeastForOneDict && dict is { Options.UseDB.Value: true, Ready: true, Active: true };
@@ -1136,12 +1135,14 @@ public static class LookupUtils
                         dict: wordResult.Dict,
                         readings: jmdictResult.Readings,
                         formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
                         minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
                         entryId: jmdictResult.Id,
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null,
                         wordClasses: jmdictResult.WordClassesSharedByAllSenses,
                         jmdictLookupResult: new JmdictLookupResult(jmdictResult.PrimarySpellingOrthographyInfo, jmdictResult.ReadingsOrthographyInfo, jmdictResult.AlternativeSpellingsOrthographyInfo, jmdictResult.MiscSharedByAllSenses, jmdictResult.Misc, jmdictResult.WordClasses)
@@ -1207,6 +1208,7 @@ public static class LookupUtils
                         formattedDefinitions: jmnedictRecord.BuildFormattedDefinition(nameResult.Dict.Options),
                         alternativeSpellings: jmnedictRecord.AlternativeSpellings,
                         entryId: jmnedictRecord.Id,
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmnedictRecord.PrimarySpelling, jmnedictRecord.Readings, pitchAccentDict!) : null
                     );
 
@@ -1233,6 +1235,7 @@ public static class LookupUtils
             readings: allReadings,
             formattedDefinitions: kanjiRecord.BuildFormattedDefinition(),
             frequencies: GetKanjidicFrequencies(kanjiRecord.Frequency, kanjiFrequencyResults),
+            // ReSharper disable once NullableWarningSuppressionIsUsed
             pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null,
             kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings, kanjiRecord.RadicalNames, kanjiRecord.StrokeCount, kanjiRecord.Grade)
         );
@@ -1262,6 +1265,7 @@ public static class LookupUtils
                     readings: allReadings,
                     formattedDefinitions: yomichanKanjiDictResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
                     frequencies: kanjiFrequencyResults,
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null,
                     kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats())
                 );
@@ -1334,10 +1338,12 @@ public static class LookupUtils
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
                         minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                         wordClasses: epwingResult.WordClasses,
                         imagePaths: epwingResult.ImagePaths
@@ -1371,6 +1377,7 @@ public static class LookupUtils
                     readings: readings,
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
                     frequencies: kanjiFrequencyResults,
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                     imagePaths: epwingResult.ImagePaths,
                     kanjiLookupResult: new KanjiLookupResult(kanjiCompositions)
@@ -1445,11 +1452,13 @@ public static class LookupUtils
                         dict: wordResult.Dict,
                         readings: readings,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                         alternativeSpellings: epwingResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: deconjugationProcess,
                         minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                         imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
                     );
@@ -1506,6 +1515,7 @@ public static class LookupUtils
                     formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
                     frequencies: kanjiFrequencyResults,
                     alternativeSpellings: epwingResult.AlternativeSpellings,
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                     imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
 ,
@@ -1615,11 +1625,13 @@ public static class LookupUtils
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
                         formattedDefinitions: customWordDictResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
                         alternativeSpellings: customWordDictResult.AlternativeSpellings,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: customWordDictResult.HasUserDefinedWordClass ? deconjugationProcess : null,
                         minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
                         wordClasses: customWordDictResult.WordClasses
                     );
@@ -1655,6 +1667,7 @@ public static class LookupUtils
                         readings: readings,
                         formattedDefinitions: customNameDictResult.BuildFormattedDefinition(),
                         frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
                         pitchPositions: pitchAccentDictExists ? GetPitchPosition(customNameDictResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                         imagePaths: customNameDictResult.ImagePath is not null ? [customNameDictResult.ImagePath] : null
                     );
@@ -1742,6 +1755,7 @@ public static class LookupUtils
                 ? frequencyResults
                 : kanjidicFreqExists && !freqsExist
                     ? [new LookupFrequencyResult("KANJIDIC2", frequency, false)]
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
                     : [new LookupFrequencyResult("KANJIDIC2", frequency, false), .. frequencyResults!];
     }
 

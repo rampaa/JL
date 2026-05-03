@@ -32,7 +32,9 @@ internal static class EpwingNazekaLoader
                 while (await enumerator.MoveNextAsync().ConfigureAwait(false))
                 {
                     JsonElement jsonObj = enumerator.Current;
-                    string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
+                    string reading = jsonObj.GetProperty("r")
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
+                        .GetString()!.GetPooledString();
 
                     JsonElement spellingJsonArray = jsonObj.GetProperty("s");
                     List<string>? spellingList = new(spellingJsonArray.GetArrayLength());

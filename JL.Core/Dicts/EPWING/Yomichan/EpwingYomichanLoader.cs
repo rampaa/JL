@@ -68,7 +68,9 @@ internal static class EpwingYomichanLoader
         string primarySpelling;
         try
         {
-            primarySpelling = jsonElements[0].GetString()!.GetPooledString();
+            primarySpelling = jsonElements[0]
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                .GetString()!.GetPooledString();
         }
         catch (InvalidOperationException ex)
         {

@@ -18,6 +18,7 @@ internal static class DeconjugatorUtils
             Deconjugator.Rules = rules;
         }
 
+        // ReSharper disable once ForCanBeConvertedToForeach
         for (int i = 0; i < rules.Length; i++)
         {
             ref readonly Rule rule = ref rules[i];

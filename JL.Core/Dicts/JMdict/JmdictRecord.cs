@@ -390,10 +390,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         else if (readingsExist)
         {
             Debug.Assert(Readings is not null);
-            string[] readings = Readings;
-            for (int i = 0; i < readings.Length; i++)
+            foreach (string reading in Readings)
             {
-                string reading = readings[i];
                 if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(reading), out IList<FrequencyRecord>? readingFreqResults))
                 {
                     int readingFreqResultsCount = readingFreqResults.Count;
@@ -431,10 +429,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         else if (readingsExist)
         {
             Debug.Assert(Readings is not null);
-            string[] readings = Readings;
-            for (int i = 0; i < readings.Length; i++)
+            foreach (string reading in Readings)
             {
-                string reading = readings[i];
                 if (freqDict.TryGetValue(JapaneseUtils.NormalizeText(reading), out List<FrequencyRecord>? readingFreqResults))
                 {
                     foreach (ref readonly FrequencyRecord readingFreqResult in readingFreqResults.AsReadOnlySpan())

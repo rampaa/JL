@@ -126,13 +126,12 @@ public static class AnkiConnectUtils
         return canAddNotesArray;
     }
 
-    public static async Task OpenLastestNoteInAnki()
+    public static Task OpenLastestNoteInAnki()
     {
         long noteId = s_lastAddedNoteId;
-        if (noteId is not 0)
-        {
-            await AnkiConnectClient.GuiBrowse($"nid:{noteId}").ConfigureAwait(false);
-        }
+        return noteId is not 0
+            ? AnkiConnectClient.GuiBrowse($"nid:{noteId}")
+            : Task.CompletedTask;
     }
 
     public static async Task Mine(List<LookupResult> lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
@@ -405,6 +404,7 @@ public static class AnkiConnectUtils
             {
                 Debug.Assert(!sentenceAudioIsSameAsAudio || audioResponse is not null);
                 sentenceAudioFormat = sentenceAudioIsSameAsAudio
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
                     ? audioResponse!.AudioFormat
                     : AudioUtils.s_textToSpeechAudioResponse.AudioFormat;
 
@@ -431,6 +431,7 @@ public static class AnkiConnectUtils
             {
                 Debug.Assert(!sourceTextAudioIsSameAsSentenceAudio || sentenceAudioFormat is not null);
                 string sourceTextAudioFormat = sourceTextAudioIsSameAsSentenceAudio
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
                     ? sentenceAudioFormat!
                     : AudioUtils.s_textToSpeechAudioResponse.AudioFormat;
 

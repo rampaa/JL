@@ -39,7 +39,7 @@ public sealed class LookupResult
     // Word dictionaries
     public string? DeconjugatedMatchedText { get; } = deconjugatedMatchedText;
     public string? DeconjugationProcess { get; } = deconjugationProcess;
-    internal int MinDeconjugationProcessStepCount { get; } = minDeconjugationProcessStepCount;
+    private int MinDeconjugationProcessStepCount { get; } = minDeconjugationProcessStepCount;
     internal string[]? WordClasses { get; } = wordClasses;
 
     // Yomichan dictionaries

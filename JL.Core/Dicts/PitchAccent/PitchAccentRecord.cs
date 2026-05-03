@@ -22,7 +22,9 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
     public PitchAccentRecord(JsonElement[] jsonElements)
     {
         Position = byte.MaxValue;
-        Spelling = jsonElements[0].GetString()!.GetPooledString();
+        Spelling = jsonElements[0]
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            .GetString()!.GetPooledString();
 
         JsonElement thirdJsonElement = jsonElements[2];
         Reading = thirdJsonElement.GetProperty("reading").GetString();
@@ -71,6 +73,7 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
 
         Reading = Spelling == Reading
             ? null
+            // ReSharper disable once NullableWarningSuppressionIsUsed
             : Reading!.GetPooledString();
 
         if (string.IsNullOrWhiteSpace(Spelling) && !string.IsNullOrWhiteSpace(Reading))

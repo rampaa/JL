@@ -27,7 +27,9 @@ internal static class FrequencyYomichanLoader
                 {
                     Debug.Assert(jsonElements is not null);
 
-                    string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
+                    string primarySpelling = jsonElements[0]
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
+                        .GetString()!.GetPooledString();
                     string primarySpellingInHiragana = JapaneseUtils.NormalizeText(primarySpelling).GetPooledString();
                     string? reading = null;
                     int frequency = -1;
@@ -49,7 +51,9 @@ internal static class FrequencyYomichanLoader
                         }
                         else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
                         {
-                            reading = readingValue.GetString()!.GetPooledString();
+                            reading = readingValue
+                                // ReSharper disable once NullableWarningSuppressionIsUsed
+                                .GetString()!.GetPooledString();
                             JsonElement frequencyElement = thirdElement.GetProperty("frequency");
 
                             if (frequencyElement.ValueKind is JsonValueKind.Number)

@@ -541,48 +541,69 @@ public static class MiningUtils
         LookupResult lookupResult = lookupResults[currentLookupResultIndex];
 
         bool mineAllFields = jlFields is null;
+        // ReSharper disable once NullableWarningSuppressionIsUsed
         Dictionary<JLField, string> miningParams = new(mineAllFields ? JLFieldUtils.JLFieldsForWordDicts.Length - JLFieldUtils.s_jlFieldsToExcludeWhenMiningToFile.Count : jlFields!.Count);
-        if (mineAllFields || jlFields!.Contains(JLField.LocalTime))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.LocalTime))
         {
             miningParams[JLField.LocalTime] = DateTimeOffset.Now.ToString("O", CultureInfo.InvariantCulture);
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.DictionaryName))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.DictionaryName))
         {
             miningParams[JLField.DictionaryName] = lookupResult.Dict.Name;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.MatchedText))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.MatchedText))
         {
             miningParams[JLField.MatchedText] = lookupResult.MatchedText;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.DeconjugatedMatchedText))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.DeconjugatedMatchedText))
         {
             miningParams[JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText ?? lookupResult.MatchedText;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.PrimarySpelling))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.PrimarySpelling))
         {
             miningParams[JLField.PrimarySpelling] = lookupResult.PrimarySpelling;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.PrimarySpellingWithOrthographyInfo))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.PrimarySpellingWithOrthographyInfo))
         {
             miningParams[JLField.PrimarySpellingWithOrthographyInfo] = GetPrimarySpellingWithOrthographyInfo(lookupResult);
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.SelectedSpelling))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.SelectedSpelling))
         {
             miningParams[JLField.SelectedSpelling] = selectedSpelling;
         }
 
-        if (lookupResult.EntryId > 0 && (mineAllFields || jlFields!.Contains(JLField.EdictId)))
+        if (lookupResult.EntryId > 0
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.EdictId)))
         {
             miningParams[JLField.EdictId] = lookupResult.EntryId.ToString(CultureInfo.InvariantCulture);
         }
 
-        if (lookupResult.DeconjugationProcess is not null && (mineAllFields || jlFields!.Contains(JLField.DeconjugationProcess)))
+        if (lookupResult.DeconjugationProcess is not null
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.DeconjugationProcess)))
         {
             miningParams[JLField.DeconjugationProcess] = lookupResult.DeconjugationProcess;
         }
@@ -610,7 +631,11 @@ public static class MiningUtils
     private static void AddSourceTextFields(Dictionary<JLField, string> miningParams, FrozenSet<JLField>? jlFields, LookupResult lookupResult, string currentText, int currentCharPosition, bool useHtmlTags)
     {
         bool mineAllFields = jlFields is null;
-        if (!mineAllFields && !jlFields!.Contains(JLField.SourceText) && !jlFields.Contains(JLField.LeadingSourceTextPart) && !jlFields.Contains(JLField.TrailingSourceTextPart))
+        if (!mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && !jlFields!.Contains(JLField.SourceText)
+            && !jlFields.Contains(JLField.LeadingSourceTextPart)
+            && !jlFields.Contains(JLField.TrailingSourceTextPart))
         {
             return;
         }
@@ -624,17 +649,23 @@ public static class MiningUtils
             trailingSourcePart = trailingSourcePart.ReplaceLineEndings("<br/>");
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.LeadingSourceTextPart))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.LeadingSourceTextPart))
         {
             miningParams[JLField.LeadingSourceTextPart] = leadingSourcePart;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.TrailingSourceTextPart))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.TrailingSourceTextPart))
         {
             miningParams[JLField.TrailingSourceTextPart] = trailingSourcePart;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.SourceText))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.SourceText))
         {
             miningParams[JLField.SourceText] = useHtmlTags
                 ? $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}"
@@ -645,7 +676,11 @@ public static class MiningUtils
     private static void AddSentenceFields(Dictionary<JLField, string> miningParams, FrozenSet<JLField>? jlFields, LookupResult lookupResult, string sentence, string currentText, int currentCharPosition, bool useHtmlTags)
     {
         bool mineAllFields = jlFields is null;
-        if (!mineAllFields && !jlFields!.Contains(JLField.Sentence) && !jlFields.Contains(JLField.LeadingSentencePart) && !jlFields.Contains(JLField.TrailingSentencePart))
+        if (!mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && !jlFields!.Contains(JLField.Sentence)
+            && !jlFields.Contains(JLField.LeadingSentencePart)
+            && !jlFields.Contains(JLField.TrailingSentencePart))
         {
             return;
         }
@@ -660,18 +695,24 @@ public static class MiningUtils
         int sentenceStartIndex = currentTextSpan.IndexOf(sentence, searchStartIndex);
 
         ReadOnlySpan<char> leadingSentencePart = currentTextSpan[sentenceStartIndex..currentCharPosition];
-        if (mineAllFields || jlFields!.Contains(JLField.LeadingSentencePart))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.LeadingSentencePart))
         {
             miningParams[JLField.LeadingSentencePart] = leadingSentencePart.ToString();
         }
 
         ReadOnlySpan<char> trailingSentencePart = currentTextSpan[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
-        if (mineAllFields || jlFields!.Contains(JLField.TrailingSentencePart))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.TrailingSentencePart))
         {
             miningParams[JLField.TrailingSentencePart] = trailingSentencePart.ToString();
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.Sentence))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.Sentence))
         {
             miningParams[JLField.Sentence] = useHtmlTags
                 ? $"{leadingSentencePart}<b>{lookupResult.MatchedText}</b>{trailingSentencePart}"
@@ -688,15 +729,22 @@ public static class MiningUtils
 
         bool mineAllFields = jlFields is null;
 
-        if (mineAllFields || jlFields!.Contains(JLField.Readings) || jlFields.Contains(JLField.ReadingsWithOrthographyInfo))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.Readings)
+            || jlFields.Contains(JLField.ReadingsWithOrthographyInfo))
         {
             string readings = string.Join('、', lookupResult.Readings);
-            if (mineAllFields || jlFields!.Contains(JLField.Readings))
+            if (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.Readings))
             {
                 miningParams[JLField.Readings] = readings;
             }
 
-            if (mineAllFields || jlFields!.Contains(JLField.ReadingsWithOrthographyInfo))
+            if (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.ReadingsWithOrthographyInfo))
             {
                 miningParams[JLField.ReadingsWithOrthographyInfo] = lookupResult.JmdictLookupResult?.ReadingsOrthographyInfoList is not null
                     ? LookupResultUtils.ElementWithOrthographyInfoToText(lookupResult.Readings, lookupResult.JmdictLookupResult.ReadingsOrthographyInfoList)
@@ -705,17 +753,23 @@ public static class MiningUtils
         }
 
         string firstReading = lookupResult.Readings[selectedSpellingIndex];
-        if (mineAllFields || jlFields!.Contains(JLField.FirstReading))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.FirstReading))
         {
             miningParams[JLField.FirstReading] = firstReading;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.PrimarySpellingAndFirstReading))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.PrimarySpellingAndFirstReading))
         {
             miningParams[JLField.PrimarySpellingAndFirstReading] = JapaneseUtils.GetPrimarySpellingAndReadingMapping(lookupResult.PrimarySpelling, firstReading);
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.PrimarySpellingAndReadings))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.PrimarySpellingAndReadings))
         {
             StringBuilder primarySpellingAndReadingStringBuilder = ObjectPoolManager.StringBuilderPool.Get();
             for (int i = 0; i < lookupResult.Readings.Length; i++)
@@ -754,18 +808,25 @@ public static class MiningUtils
         }
 
         bool mineAllFields = jlFields is null;
-        if (!mineAllFields && !jlFields!.Contains(JLField.AlternativeSpellings) && !jlFields.Contains(JLField.AlternativeSpellingsWithOrthographyInfo))
+        if (!mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && !jlFields!.Contains(JLField.AlternativeSpellings)
+            && !jlFields.Contains(JLField.AlternativeSpellingsWithOrthographyInfo))
         {
             return;
         }
 
         string alternativeSpellings = string.Join('、', lookupResult.AlternativeSpellings);
-        if (mineAllFields || jlFields!.Contains(JLField.AlternativeSpellings))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.AlternativeSpellings))
         {
             miningParams[JLField.AlternativeSpellings] = alternativeSpellings;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.AlternativeSpellingsWithOrthographyInfo))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.AlternativeSpellingsWithOrthographyInfo))
         {
             miningParams[JLField.AlternativeSpellingsWithOrthographyInfo] = lookupResult.JmdictLookupResult?.AlternativeSpellingsOrthographyInfoList is not null
                 ? LookupResultUtils.ElementWithOrthographyInfoToText(lookupResult.AlternativeSpellings, lookupResult.JmdictLookupResult.AlternativeSpellingsOrthographyInfoList)
@@ -781,7 +842,12 @@ public static class MiningUtils
         }
 
         bool mineAllFields = jlFields is null;
-        if (!mineAllFields && !jlFields!.Contains(JLField.Frequencies) && !jlFields.Contains(JLField.RawFrequencies) && !jlFields.Contains(JLField.FrequencyHarmonicMean) && !jlFields.Contains(JLField.PreferredFrequency))
+        if (!mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && !jlFields!.Contains(JLField.Frequencies)
+            && !jlFields.Contains(JLField.RawFrequencies)
+            && !jlFields.Contains(JLField.FrequencyHarmonicMean)
+            && !jlFields.Contains(JLField.PreferredFrequency))
         {
             return;
         }
@@ -802,23 +868,32 @@ public static class MiningUtils
             return;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.Frequencies))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.Frequencies))
         {
             miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsReadOnlySpan(), true, lookupResult.Frequencies.Count is 1);
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.RawFrequencies))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.RawFrequencies))
         {
             miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencyValues);
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.FrequencyHarmonicMean))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.FrequencyHarmonicMean))
         {
             miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies.AsReadOnlySpan()).ToString(CultureInfo.InvariantCulture);
         }
 
         int firstFrequency = lookupResult.Frequencies[0].Freq;
-        if (firstFrequency is > 0 and < int.MaxValue && (mineAllFields || jlFields!.Contains(JLField.PreferredFrequency)))
+        if (firstFrequency is > 0 and < int.MaxValue
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.PreferredFrequency)))
         {
             miningParams[JLField.PreferredFrequency] = firstFrequency.ToString(CultureInfo.InvariantCulture);
         }
@@ -829,32 +904,45 @@ public static class MiningUtils
         bool mineAllFields = jlFields is null;
         if (formattedDefinitions is not null)
         {
-            if (mineAllFields || jlFields!.Contains(JLField.Definitions) || jlFields.Contains(JLField.SelectedDefinitions))
+            if (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.Definitions)
+                || jlFields.Contains(JLField.SelectedDefinitions))
             {
                 formattedDefinitions = useHtmlTags
                     ? formattedDefinitions.ReplaceLineEndings("<br/>")
                     : formattedDefinitions;
 
-                if (mineAllFields || jlFields!.Contains(JLField.Definitions))
+                if (mineAllFields
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    || jlFields!.Contains(JLField.Definitions))
                 {
                     miningParams[JLField.Definitions] = formattedDefinitions;
                 }
 
-                if (selectedDefinitions is null && (mineAllFields || jlFields!.Contains(JLField.SelectedDefinitions)))
+                if (selectedDefinitions is null
+                    && (mineAllFields
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
+                        || jlFields!.Contains(JLField.SelectedDefinitions)))
                 {
                     miningParams[JLField.SelectedDefinitions] = formattedDefinitions;
                 }
             }
         }
 
-        if (selectedDefinitions is not null && (mineAllFields || jlFields!.Contains(JLField.SelectedDefinitions)))
+        if (selectedDefinitions is not null
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.SelectedDefinitions)))
         {
             miningParams[JLField.SelectedDefinitions] = useHtmlTags
                 ? selectedDefinitions.ReplaceLineEndings("<br/>")
                 : selectedDefinitions;
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.DefinitionsFromMultipleDictionaries))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.DefinitionsFromMultipleDictionaries))
         {
             string? definitionsFromAllDictionaries = GetDefinitionsFromAllDictionaries(lookupResults, currentLookupResultIndex, selectedSpelling, formattedDefinitions, useHtmlTags);
             if (definitionsFromAllDictionaries is not null)
@@ -872,44 +960,68 @@ public static class MiningUtils
         }
 
         bool mineAllFields = jlFields is null;
-        if (kanjiLookupResult.KanjiComposition is not null && (mineAllFields || jlFields!.Contains(JLField.KanjiComposition)))
+        if (kanjiLookupResult.KanjiComposition is not null
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.KanjiComposition)))
         {
             miningParams[JLField.KanjiComposition] = string.Join('、', kanjiLookupResult.KanjiComposition);
         }
 
-        if (kanjiLookupResult.KanjiStats is not null && (mineAllFields || jlFields!.Contains(JLField.KanjiStats)))
+        if (kanjiLookupResult.KanjiStats is not null
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.KanjiStats)))
         {
             miningParams[JLField.KanjiStats] = useHtmlTags
                 ? kanjiLookupResult.KanjiStats.ReplaceLineEndings("<br/>")
                 : kanjiLookupResult.KanjiStats;
         }
 
-        if (kanjiLookupResult.StrokeCount > 0 && (mineAllFields || jlFields!.Contains(JLField.StrokeCount)))
+        if (kanjiLookupResult.StrokeCount > 0
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.StrokeCount)))
         {
             miningParams[JLField.StrokeCount] = kanjiLookupResult.StrokeCount.ToString(CultureInfo.InvariantCulture);
         }
 
-        if (kanjiLookupResult.KanjiGrade is not byte.MaxValue && (mineAllFields || jlFields!.Contains(JLField.KanjiGrade)))
+        if (kanjiLookupResult.KanjiGrade is not byte.MaxValue
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.KanjiGrade)))
         {
             miningParams[JLField.KanjiGrade] = kanjiLookupResult.KanjiGrade.ToString(CultureInfo.InvariantCulture);
         }
 
-        if (kanjiLookupResult.OnReadings is not null && (mineAllFields || jlFields!.Contains(JLField.OnReadings)))
+        if (kanjiLookupResult.OnReadings is not null
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.OnReadings)))
         {
             miningParams[JLField.OnReadings] = string.Join('、', kanjiLookupResult.OnReadings);
         }
 
-        if (kanjiLookupResult.KunReadings is not null && (mineAllFields || jlFields!.Contains(JLField.KunReadings)))
+        if (kanjiLookupResult.KunReadings is not null
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.KunReadings)))
         {
             miningParams[JLField.KunReadings] = string.Join('、', kanjiLookupResult.KunReadings);
         }
 
-        if (kanjiLookupResult.NanoriReadings is not null && (mineAllFields || jlFields!.Contains(JLField.NanoriReadings)))
+        if (kanjiLookupResult.NanoriReadings is not null
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.NanoriReadings)))
         {
             miningParams[JLField.NanoriReadings] = string.Join('、', kanjiLookupResult.NanoriReadings);
         }
 
-        if (kanjiLookupResult.RadicalNames is not null && (mineAllFields || jlFields!.Contains(JLField.RadicalNames)))
+        if (kanjiLookupResult.RadicalNames is not null
+            && (mineAllFields
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                || jlFields!.Contains(JLField.RadicalNames)))
         {
             miningParams[JLField.RadicalNames] = string.Join('、', kanjiLookupResult.RadicalNames);
         }
@@ -923,16 +1035,31 @@ public static class MiningUtils
         }
 
         bool mineAllFields = jlFields is null;
-        if (!mineAllFields && !jlFields!.Contains(JLField.PitchAccents) && !jlFields.Contains(JLField.NumericPitchAccents) && !jlFields.Contains(JLField.PitchAccentCategories) && !jlFields.Contains(JLField.PitchAccentForFirstReading) && !jlFields.Contains(JLField.NumericPitchAccentForFirstReading) && !jlFields.Contains(JLField.PitchAccentCategoryForFirstReading))
+        if (!mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && !jlFields!.Contains(JLField.PitchAccents)
+            && !jlFields.Contains(JLField.NumericPitchAccents)
+            && !jlFields.Contains(JLField.PitchAccentCategories)
+            && !jlFields.Contains(JLField.PitchAccentForFirstReading)
+            && !jlFields.Contains(JLField.NumericPitchAccentForFirstReading)
+            && !jlFields.Contains(JLField.PitchAccentCategoryForFirstReading))
         {
             return;
         }
 
         string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
 
-        bool addPitchAccents = mineAllFields || jlFields!.Contains(JLField.PitchAccents);
-        bool addNumericPitchAccents = mineAllFields || jlFields!.Contains(JLField.NumericPitchAccents);
-        bool addPitchAccentCategories = mineAllFields || jlFields!.Contains(JLField.PitchAccentCategories);
+        bool addPitchAccents = mineAllFields
+                               // ReSharper disable once NullableWarningSuppressionIsUsed
+                               || jlFields!.Contains(JLField.PitchAccents);
+
+        bool addNumericPitchAccents = mineAllFields
+                                      // ReSharper disable once NullableWarningSuppressionIsUsed
+                                      || jlFields!.Contains(JLField.NumericPitchAccents);
+
+        bool addPitchAccentCategories = mineAllFields
+                                        // ReSharper disable once NullableWarningSuppressionIsUsed
+                                        || jlFields!.Contains(JLField.PitchAccentCategories);
 
         if (addPitchAccents || addNumericPitchAccents || addPitchAccentCategories)
         {
@@ -1015,19 +1142,25 @@ public static class MiningUtils
         }
 
         string firstExpression = expressions[selectedSpellingIndex];
-        if (mineAllFields || jlFields!.Contains(JLField.PitchAccentForFirstReading))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.PitchAccentForFirstReading))
         {
             StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
             miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstExpression, sb, firstPitchPosition)}");
             ObjectPoolManager.StringBuilderPool.Return(sb);
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.NumericPitchAccentForFirstReading))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.NumericPitchAccentForFirstReading))
         {
             miningParams[JLField.NumericPitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{firstExpression}: {firstPitchPosition}");
         }
 
-        if (mineAllFields || jlFields!.Contains(JLField.PitchAccentCategoryForFirstReading))
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.PitchAccentCategoryForFirstReading))
         {
             miningParams[JLField.PitchAccentCategoryForFirstReading] = $"{firstExpression}: {GetPitchAccentCategory(firstExpression, firstPitchPosition)}";
         }

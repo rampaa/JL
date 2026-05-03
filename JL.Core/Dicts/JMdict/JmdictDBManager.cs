@@ -25,7 +25,7 @@ internal static class JmdictDBManager
         }
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
-            $"""
+            """
             SELECT r.rowid,
                    r.edict_id,
                    r.primary_spelling,

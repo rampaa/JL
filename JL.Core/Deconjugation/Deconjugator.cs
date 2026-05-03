@@ -93,8 +93,14 @@ internal static class Deconjugator
             (
                 myRule.DecEnds[i],
                 myRule.ConEnds[i],
-                multiDecTag ? myRule.DecTags[i] : singleDecTag!,
-                multiConTag ? myRule.ConTags[i] : singleConTag!,
+                multiDecTag
+                    ? myRule.DecTags[i]
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    : singleDecTag!,
+                multiConTag
+                    ? myRule.ConTags[i]
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    : singleConTag!,
                 myRule.Detail
             );
             Form? ret = StandardRuleDeconjugateInner(myForm, virtualRule);
@@ -174,6 +180,7 @@ internal static class Deconjugator
             List<Form> newNovel = [];
             foreach (ref readonly Form form in novel.AsReadOnlySpan())
             {
+                // ReSharper disable once ForCanBeConvertedToForeach
                 for (int j = 0; j < rules.Length; j++)
                 {
                     ref readonly Rule rule = ref rules[j];
