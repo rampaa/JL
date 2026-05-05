@@ -1845,6 +1845,22 @@
     "detail": "topic/condition"
   },
   {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "やすい" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "adj-i" ],
+    "detail": "easy"
+  },
+  {
+    "type": "stdrule",
+    "dec_end": [ "" ],
+    "con_end": [ "にくい" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "adj-i" ],
+    "detail": "difficult"
+  },
+  {
     "type": "onlyfinalrule",
     "dec_end": [ "" ],
     "con_end": [ "なさい" ],
@@ -1867,22 +1883,6 @@
     "dec_tag": [ "stem-ren" ],
     "con_tag": [ "uninflectable" ],
     "detail": "while"
-  },
-  {
-    "type": "onlyfinalrule",
-    "dec_end": [ "" ],
-    "con_end": [ "やすい" ],
-    "dec_tag": [ "stem-ren" ],
-    "con_tag": [ "uninflectable" ],
-    "detail": "easy"
-  },
-  {
-    "type": "onlyfinalrule",
-    "dec_end": [ "" ],
-    "con_end": [ "にくい" ],
-    "dec_tag": [ "stem-ren" ],
-    "con_tag": [ "uninflectable" ],
-    "detail": "difficult"
   },
   {
     "type": "onlyfinalrule",
