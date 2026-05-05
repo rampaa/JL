@@ -2203,4 +2203,31 @@ internal sealed class DeconjugatorTestsForV5G
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "繋ぐ" && form.Tags[^1] is "v5g").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void Deconjugate_Temiru_V5G()
+    {
+        const string termToDeconjugate = "繋いでみる";
+        const string expected = "～try doing";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "繋ぐ" && form.Tags[^1] is "v5g").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Yasui_V5G()
+    {
+        const string termToDeconjugate = "繋ぎやすい";
+        const string expected = "～easy";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "繋ぐ" && form.Tags[^1] is "v5g").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Nikui_V5G()
+    {
+        const string termToDeconjugate = "繋ぎにくい";
+        const string expected = "～difficult";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "繋ぐ" && form.Tags[^1] is "v5g").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }
