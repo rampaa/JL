@@ -1641,7 +1641,7 @@ internal sealed class DeconjugatorTestsForVZ
     public void Deconjugate_PlainNonPastAgeruPassive_VZ()
     {
         const string termToDeconjugate = "命じてあげられる";
-        const string expected = "～do for someone→passive";
+        const string expected = "～do for someone→passive/potential/honorific";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
@@ -2308,6 +2308,33 @@ internal sealed class DeconjugatorTestsForVZ
     {
         const string termToDeconjugate = "命じにくい";
         const string expected = "～difficult";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Morau_VZ()
+    {
+        const string termToDeconjugate = "命じてもらう";
+        const string expected = "～get someone do";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Yaru_VZ()
+    {
+        const string termToDeconjugate = "命じてやる";
+        const string expected = "～do for someone";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Sashiageru_VZ()
+    {
+        const string termToDeconjugate = "命じてさしあげる";
+        const string expected = "～do for someone";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "命ずる" && form.Tags[^1] is "vz").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }

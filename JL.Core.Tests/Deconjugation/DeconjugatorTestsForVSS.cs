@@ -1569,7 +1569,7 @@ internal sealed class DeconjugatorTestsForVSS
     public void Deconjugate_PlainNonPastAgeruPassive_VSS()
     {
         const string termToDeconjugate = "愛してあげられる";
-        const string expected = "～do for someone→passive";
+        const string expected = "～do for someone→passive/potential/honorific";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "愛する" && form.Tags[^1] is "vs-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
@@ -2227,6 +2227,33 @@ internal sealed class DeconjugatorTestsForVSS
     {
         const string termToDeconjugate = "愛しにくい";
         const string expected = "～difficult";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "愛する" && form.Tags[^1] is "vs-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Morau_VSS()
+    {
+        const string termToDeconjugate = "愛してもらう";
+        const string expected = "～get someone do";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "愛する" && form.Tags[^1] is "vs-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Yaru_VSS()
+    {
+        const string termToDeconjugate = "愛してやる";
+        const string expected = "～do for someone";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "愛する" && form.Tags[^1] is "vs-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Deconjugate_Sashiageru_VSS()
+    {
+        const string termToDeconjugate = "愛してさしあげる";
+        const string expected = "～do for someone";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "愛する" && form.Tags[^1] is "vs-s").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
