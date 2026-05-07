@@ -72,35 +72,29 @@ internal static partial class WinApi
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
+#if X86
         [LibraryImport("user32.dll", EntryPoint = "SetWindowLongW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static partial int SetWindowLongPtr32(nint hWnd, int nIndex, int dwNewLong);
 
-        [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static partial nint SetWindowLongPtr64(nint hWnd, int nIndex, nint dwNewLong);
-
         internal static nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong)
         {
-            return AppInfo.Is64BitProcess
-                ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
-                : SetWindowLongPtr32(hWnd, nIndex, (int)dwNewLong);
+            return SetWindowLongPtr32(hWnd, nIndex, (int)dwNewLong);
         }
 
         [LibraryImport("user32.dll", EntryPoint = "GetWindowLongW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static partial int GetWindowLongPtr32(nint hWnd, int nIndex);
+        internal static partial int GetWindowLongPtr(nint hWnd, int nIndex);
+
+#elif X64 || ARM64
+        [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
 
         [LibraryImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static partial nint GetWindowLongPtr64(nint hWnd, int nIndex);
-
-        internal static nint GetWindowLongPtr(nint hWnd, int nIndex)
-        {
-            return AppInfo.Is64BitProcess
-                ? GetWindowLongPtr64(hWnd, nIndex)
-                : GetWindowLongPtr32(hWnd, nIndex);
-        }
+        internal static partial nint GetWindowLongPtr(nint hWnd, int nIndex);
+#endif
 
         [LibraryImport("user32.dll", EntryPoint = "RegisterHotKey", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]

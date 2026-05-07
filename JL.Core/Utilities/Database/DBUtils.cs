@@ -234,11 +234,10 @@ public static class DBUtils
         command.CommandText = "PRAGMA cache_size = 0;";
         _ = command.ExecuteNonQuery();
 
-        if (AppInfo.Is64BitProcess)
-        {
-            command.CommandText = "PRAGMA mmap_size = 2097152000;"; // 1024L * 1024L * 2000L = 2097152000 bytes ≈ 1.953 GiB. Max allowed value is 2147418112 bytes (≈1.999 GiB)
-            _ = command.ExecuteNonQuery();
-        }
+#if X64 || ARM64
+        command.CommandText = "PRAGMA mmap_size = 2097152000;"; // 1024L * 1024L * 2000L = 2097152000 bytes ≈ 1.953 GiB. Max allowed value is 2147418112 bytes (≈1.999 GiB)
+        _ = command.ExecuteNonQuery();
+#endif
     }
 
     //internal static bool IsDBCorrupt(SqliteConnection connection)

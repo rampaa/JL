@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Timers;
 using JL.Core.Config;
@@ -58,12 +57,14 @@ public static class NetworkUtils
                     if (latestJLVersion > FrontendManager.Frontend.JLVersion)
                     {
                         bool foundRelease = false;
-                        string architecture = RuntimeInformation.ProcessArchitecture is Architecture.Arm64
-                            ? "arm64"
-                            : AppInfo.Is64BitProcess
-                                ? "x64"
-                                : "x86";
-
+                        const string architecture =
+#if AMD64
+                                                    "arm64";
+#elif X64
+                                                    "x64";
+#elif X86
+                                                    "x86";
+#endif
                         JsonElement assets = rootElement.GetProperty("assets");
 
                         foreach (JsonElement asset in assets.EnumerateArray())
