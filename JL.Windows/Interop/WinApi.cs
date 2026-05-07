@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using JL.Core;
 using JL.Core.Utilities;
 using JL.Windows.Config;
 using JL.Windows.External.Magpie;

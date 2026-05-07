@@ -58,7 +58,7 @@ public static class NetworkUtils
                     {
                         bool foundRelease = false;
                         const string architecture =
-#if AMD64
+#if ARM64
                                                     "arm64";
 #elif X64
                                                     "x64";
