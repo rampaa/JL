@@ -27,7 +27,7 @@ public static class PathUtils
 
     public static void ReplaceFileAtomicallyOnSameVolume(string fileToBeReplaced, string tempFile)
     {
-        if (OperatingSystem.IsWindows() && File.Exists(fileToBeReplaced))
+        if (File.Exists(fileToBeReplaced))
         {
             File.Replace(tempFile, fileToBeReplaced, null, true);
         }
