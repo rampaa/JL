@@ -3,7 +3,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
 
-internal sealed class Form(
+internal readonly struct Form(
     string text,
     string originalText,
     string lastTag,
@@ -17,19 +17,18 @@ internal sealed class Form(
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is Form other
-               && (ReferenceEquals(this, other) || (Text == other.Text
+               && Text == other.Text
                && OriginalText == other.OriginalText
                && LastTag == other.LastTag
-               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan())));
+               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan());
     }
 
-    public bool Equals([NotNullWhen(true)] Form? other)
+    public bool Equals([NotNullWhen(true)] Form other)
     {
-        return other is not null
-               && (ReferenceEquals(this, other) || (Text == other.Text
+        return Text == other.Text
                && OriginalText == other.OriginalText
                && LastTag == other.LastTag
-               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan())));
+               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan());
     }
 
     public override int GetHashCode()

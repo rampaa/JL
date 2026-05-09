@@ -5,14 +5,14 @@ using JL.Core.Utilities;
 namespace JL.Core.Deconjugation;
 
 [method: JsonConstructor]
-internal readonly struct Rule(RuleType type, string[] decEnds, string[] conEnds, string detail, string[]? decTags = null, string[]? conTags = null) : IEquatable<Rule>
+internal readonly struct Rule(RuleType type, string[] decEnds, string[] conEnds, string detail, string[] decTags, string[] conTags) : IEquatable<Rule>
 {
     [JsonPropertyName("type")] public RuleType Type { get; } = type;
     [JsonPropertyName("dec_end")] public string[] DecEnds { get; } = decEnds;
     [JsonPropertyName("con_end")] public string[] ConEnds { get; } = conEnds;
     [JsonPropertyName("detail")] public string Detail { get; } = detail.GetPooledString();
-    [JsonPropertyName("dec_tag")] public string[]? DecTags { get; } = decTags;
-    [JsonPropertyName("con_tag")] public string[]? ConTags { get; } = conTags;
+    [JsonPropertyName("dec_tag")] public string[] DecTags { get; } = decTags;
+    [JsonPropertyName("con_tag")] public string[] ConTags { get; } = conTags;
 
     public override int GetHashCode()
     {
@@ -33,30 +33,16 @@ internal readonly struct Rule(RuleType type, string[] decEnds, string[] conEnds,
                 hash = (hash * 37) + conEnd.GetHashCode(StringComparison.Ordinal);
             }
 
-            string[]? decTags = DecTags;
-            if (decTags is not null)
+            string[] decTags = DecTags;
+            foreach (string decTag in decTags)
             {
-                foreach (string decTag in decTags)
-                {
-                    hash = (hash * 37) + decTag.GetHashCode(StringComparison.Ordinal);
-                }
-            }
-            else
-            {
-                hash *= 37;
+                hash = (hash * 37) + decTag.GetHashCode(StringComparison.Ordinal);
             }
 
-            string[]? conTags = ConTags;
-            if (conTags is not null)
+            string[] conTags = ConTags;
+            foreach (string conTag in conTags)
             {
-                foreach (string conTag in conTags)
-                {
-                    hash = (hash * 37) + conTag.GetHashCode(StringComparison.Ordinal);
-                }
-            }
-            else
-            {
-                hash *= 37;
+                hash = (hash * 37) + conTag.GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;
@@ -74,8 +60,8 @@ internal readonly struct Rule(RuleType type, string[] decEnds, string[] conEnds,
                && Detail == other.Detail
                && DecEnds.SequenceEqual(other.DecEnds)
                && ConEnds.SequenceEqual(other.ConEnds)
-               && (other.DecTags is not null ? DecTags?.SequenceEqual(other.DecTags) ?? false : DecTags is null)
-               && (other.ConTags is not null ? ConTags?.SequenceEqual(other.ConTags) ?? false : ConTags is null);
+               && DecTags.SequenceEqual(other.DecTags)
+               && ConTags.SequenceEqual(other.ConTags);
     }
 
     public static bool operator ==(Rule left, Rule right) => left.Equals(right);

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using System.Collections.Frozen;
 using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
@@ -6,168 +6,146 @@ namespace JL.Core.Deconjugation;
 // Modified from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
-    public static Rule[] Rules { get; set; } = [];
+    internal static FrozenDictionary<char, VirtualRule[]> s_index = FrozenDictionary<char, VirtualRule[]>.Empty;
+    internal static VirtualRule[] s_universalRules = [];
 
-    private static Form? StandardRuleDeconjugateInner(Form form, in VirtualRule virtualRule)
+    private static void ApplyRule(in Form form, in VirtualRule rule, List<Form> discoveredForms, ReadOnlySpan<char> textSpan)
     {
-        // tag doesn't match
-        if (form.Process.Count > 0 && form.LastTag != virtualRule.ConTag)
+        if (rule.Type is RuleType.OnlyFinal)
         {
-            return null;
+            if (form.Process.Count is not 0)
+            {
+                return;
+            }
+        }
+        else if (rule.Type is RuleType.Rewrite)
+        {
+            if (form.Text != rule.ConEnd)
+            {
+                return;
+            }
+        }
+        else if (rule.Type is RuleType.NeverFinal)
+        {
+            if (form.Process.Count is 0)
+            {
+                return;
+            }
         }
 
-        // ending doesn't match
-        if (!form.Text.AsSpan().EndsWith(virtualRule.ConEnd, StringComparison.Ordinal))
-        {
-            return null;
-        }
-
-        if (form.Text.Length == virtualRule.ConEnd.Length && virtualRule.DecEnd.Length is 0)
-        {
-            return null;
-        }
-
-        string newText = string.Concat(form.Text.AsSpan(0, form.Text.Length - virtualRule.ConEnd.Length), virtualRule.DecEnd);
-        return new Form(newText, form.OriginalText, virtualRule.DecTag, [.. form.Process, virtualRule.Detail]);
-    }
-
-    private static List<Form>? StandardRuleDeconjugate(Form form, in Rule rule)
-    {
         // can't deconjugate nothingness
-        if (form.Text.Length is 0)
+        if (textSpan.Length is 0)
         {
-            return null;
+            return;
         }
 
         // deconjugated form too much longer than conjugated form
-        if (form.Text.Length > form.OriginalText.Length + 10)
+        if (textSpan.Length > form.OriginalText.Length + 10)
         {
-            return null;
+            return;
         }
 
         // impossibly information-dense
         if (form.Process.Count > form.OriginalText.Length + 5)
         {
-            return null;
+            return;
+        }
+
+        if (textSpan.Length == rule.ConEnd.Length && rule.DecEnd.Length is 0)
+        {
+            return;
         }
 
         // blank detail mean it can't be the last (first applied, but rightmost) rule
         if (rule.Detail.Length is 0 && form.LastTag.Length is 0)
         {
-            return null;
+            return;
         }
 
-        Debug.Assert(rule.ConTags is not null);
-        Debug.Assert(rule.DecTags is not null);
-        string[] decEnds = rule.DecEnds;
-        if (decEnds.Length is 1)
+        // tag doesn't match
+        if (form.Process.Count > 0 && form.LastTag != rule.ConTag)
         {
-            VirtualRule virtualRule = new
-            (
-                rule.DecEnds[0],
-                rule.ConEnds[0],
-                rule.DecTags[0],
-                rule.ConTags[0],
-                rule.Detail
-            );
-
-            Form? result = StandardRuleDeconjugateInner(form, virtualRule);
-            return result is not null
-                ? [result]
-                : null;
+            return;
         }
 
-        List<Form> forms = new(decEnds.Length);
-        bool multiDecTag = rule.DecTags.Length > 1;
-        string? singleDecTag = multiDecTag ? null : rule.DecTags[0];
-        bool multiConTag = rule.ConTags.Length > 1;
-        string? singleConTag = multiConTag ? null : rule.ConTags[0];
-
-        for (int i = 0; i < decEnds.Length; i++)
+        // ending doesn't match
+        if (!textSpan.EndsWith(rule.ConEnd.AsSpan(), StringComparison.Ordinal))
         {
-            VirtualRule virtualRule = new
-            (
-                rule.DecEnds[i],
-                rule.ConEnds[i],
-                multiDecTag
-                    ? rule.DecTags[i]
-                    // ReSharper disable once NullableWarningSuppressionIsUsed
-                    : singleDecTag!,
-                multiConTag
-                    ? rule.ConTags[i]
-                    // ReSharper disable once NullableWarningSuppressionIsUsed
-                    : singleConTag!,
-                rule.Detail
-            );
-            Form? newForm = StandardRuleDeconjugateInner(form, virtualRule);
-            if (newForm is not null)
+            return;
+        }
+
+        int stemLength = textSpan.Length - rule.ConEnd.Length;
+        ReadOnlySpan<char> stem = textSpan[..stemLength];
+
+        if (DiscoveredFormsContain(discoveredForms.AsReadOnlySpan(), stem, rule.DecEnd, rule.DecTag, form.Process, rule.Detail))
+        {
+            return;
+        }
+
+        string newText = string.Concat(stem, rule.DecEnd);
+        discoveredForms.Add(new Form(newText, form.OriginalText, rule.DecTag, [.. form.Process, rule.Detail]));
+    }
+
+    private static bool DiscoveredFormsContain(ReadOnlySpan<Form> discoveredForms, ReadOnlySpan<char> stem, string decEnd, string tag, List<string> parentProcess, string newDetail)
+    {
+        int targetTextLength = stem.Length + decEnd.Length;
+        int targetProcessLength = parentProcess.Count + 1;
+
+        for (int i = 0; i < discoveredForms.Length; i++)
+        {
+            ref readonly Form form = ref discoveredForms[i];
+            if (form.LastTag == tag && form.Text.Length == targetTextLength)
             {
-                forms.Add(newForm);
+                ReadOnlySpan<char> formText = form.Text.AsSpan();
+                if (formText.StartsWith(stem) && formText[stem.Length..].Equals(decEnd, StringComparison.Ordinal))
+                {
+                    if (form.Process.Count == targetProcessLength && form.Process[^1] == newDetail)
+                    {
+                        if (form.Process.AsReadOnlySpan()[..^1].SequenceEqual(parentProcess.AsReadOnlySpan()))
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
         }
 
-        return forms.Count > 0
-            ? forms
-            : null;
-    }
-
-    private static List<Form>? RewriteRuleDeconjugate(Form form, in Rule rule)
-    {
-        return form.Text != rule.ConEnds[0]
-            ? null
-            : StandardRuleDeconjugate(form, rule);
-    }
-
-    private static List<Form>? OnlyFinalRuleDeconjugate(Form form, in Rule rule)
-    {
-        return form.Process.Count is not 0
-            ? null
-            : StandardRuleDeconjugate(form, rule);
-    }
-
-    private static List<Form>? NeverFinalRuleDeconjugate(Form form, in Rule rule)
-    {
-        return form.Process.Count is 0
-            ? null
-            : StandardRuleDeconjugate(form, rule);
+        return false;
     }
 
     public static List<Form> Deconjugate(string text)
     {
         List<Form> processedForms = [];
         List<Form> formsToProcess = [new(text, text, "", [])];
+        List<Form> newFormsToProcess = [];
 
-        Rule[] rules = Rules;
         bool addFormToProcess = false;
         while (formsToProcess.Count > 0)
         {
-            List<Form> newFormsToProcess = [];
-            foreach (ref readonly Form form in formsToProcess.AsReadOnlySpan())
-            {
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (int j = 0; j < rules.Length; j++)
-                {
-                    ref readonly Rule rule = ref rules[j];
-                    List<Form>? newForms = rule.Type switch
-                    {
-                        RuleType.Standard => StandardRuleDeconjugate(form, rule),
-                        RuleType.Rewrite => RewriteRuleDeconjugate(form, rule),
-                        RuleType.OnlyFinal => OnlyFinalRuleDeconjugate(form, rule),
-                        RuleType.NeverFinal => NeverFinalRuleDeconjugate(form, rule),
-                        _ => null
-                    };
+            newFormsToProcess.Clear();
+            ReadOnlySpan<Form> formsToProcessSpan = formsToProcess.AsReadOnlySpan();
 
-                    if (newForms is null)
+            VirtualRule[] universalRules = s_universalRules;
+            int universalCount = universalRules.Length;
+
+            for (int k = 0; k < formsToProcessSpan.Length; k++)
+            {
+                ref readonly Form form = ref formsToProcessSpan[k];
+                ReadOnlySpan<char> textSpan = form.Text.AsSpan();
+
+                if (textSpan.Length is not 0)
+                {
+                    if (s_index.TryGetValue(textSpan[^1], out VirtualRule[]? bucket))
                     {
-                        continue;
+                        for (int j = 0; j < bucket.Length; j++)
+                        {
+                            ApplyRule(form, bucket[j], newFormsToProcess, textSpan);
+                        }
                     }
 
-                    foreach (ref readonly Form newForm in newForms.AsReadOnlySpan())
+                    for (int j = 0; j < universalCount; j++)
                     {
-                        if (!newFormsToProcess.AsReadOnlySpan().Contains(newForm))
-                        {
-                            newFormsToProcess.Add(newForm);
-                        }
+                        ApplyRule(form, universalRules[j], newFormsToProcess, textSpan);
                     }
                 }
 
@@ -177,9 +155,10 @@ internal static class Deconjugator
                     int formProcessCount = -1;
                     string formTag = form.LastTag;
 
+                    ReadOnlySpan<Form> processedFormsSpan = processedForms.AsReadOnlySpan();
                     for (int i = processedForms.Count - 1; i >= 0; i--)
                     {
-                        Form existingForm = processedForms[i];
+                        ref readonly Form existingForm = ref processedFormsSpan[i];
                         if (existingForm.Text == form.Text && existingForm.LastTag == formTag)
                         {
                             int existingFormProcessCount = 1;
@@ -214,6 +193,7 @@ internal static class Deconjugator
                             if (existingFormProcessCount > formProcessCount)
                             {
                                 processedForms.RemoveAt(i);
+                                processedFormsSpan = processedForms.AsReadOnlySpan();
                             }
                         }
                     }
@@ -229,7 +209,8 @@ internal static class Deconjugator
                 }
             }
 
-            formsToProcess = newFormsToProcess;
+            formsToProcess.Clear();
+            (newFormsToProcess, formsToProcess) = (formsToProcess, newFormsToProcess);
         }
 
         return processedForms;
