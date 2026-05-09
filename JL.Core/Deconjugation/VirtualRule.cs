@@ -11,12 +11,26 @@ internal readonly struct VirtualRule(RuleType type, string decEnd, string conEnd
 
     public bool Equals(VirtualRule other)
     {
-        return true;
+        return Type == other.Type
+            && DecEnd == other.DecEnd
+            && ConEnd == other.ConEnd
+            && DecTag == other.DecTag
+            && ConTag == other.ConTag
+            && Detail == other.Detail;
     }
 
     public override int GetHashCode()
     {
-        return 0;
+        unchecked
+        {
+            int hash = (17 * 37) + Type.GetHashCode();
+            hash = (hash * 37) + Detail.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + DecEnd.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + ConEnd.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + DecTag.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + ConTag.GetHashCode(StringComparison.Ordinal);
+            return hash;
+        }
     }
 
 
