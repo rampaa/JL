@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -6,6 +7,14 @@ namespace JL.Core.Deconjugation;
 
 internal static class DeconjugatorUtils
 {
+    private static readonly JsonSerializerOptions s_jso = new()
+    {
+        RespectNullableAnnotations = true,
+        RespectRequiredConstructorParameters = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        Converters = { new RuleTypeConverter() }
+    };
+
     public static async Task DeserializeRules()
     {
         Rule[]? rules;
@@ -13,7 +22,7 @@ internal static class DeconjugatorUtils
         FileStream fileStream = new(Path.Join(AppInfo.ResourcesPath, "deconjugation_rules.json"), FileStreamOptionsPresets.s_asyncReadFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+            rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, s_jso).ConfigureAwait(false);
             Debug.Assert(rules is not null);
             Deconjugator.Rules = rules;
         }

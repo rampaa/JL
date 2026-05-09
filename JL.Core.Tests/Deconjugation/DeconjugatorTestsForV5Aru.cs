@@ -21,7 +21,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰い";
         const string expected = "～imperative; masu stem";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -30,7 +30,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らない";
         const string expected = "～negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -39,7 +39,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰います";
         const string expected = "～polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -48,7 +48,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いましょう";
         const string expected = "～polite volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -57,7 +57,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いません";
         const string expected = "～polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -66,7 +66,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰った";
         const string expected = "～past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -75,7 +75,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らなかった";
         const string expected = "～negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -84,7 +84,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いました";
         const string expected = "～polite past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -93,7 +93,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いませんでした";
         const string expected = "～polite past negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -102,7 +102,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰って";
         const string expected = "～te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -111,7 +111,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らなくて";
         const string expected = "～negative→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -120,7 +120,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らないで";
         const string expected = "～negative→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -129,7 +129,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いまして";
         const string expected = "～polite te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -138,7 +138,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れる";
         const string expected = "～potential";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -147,7 +147,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰られる";
         const string expected = "～passive";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -156,7 +156,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れない";
         const string expected = "～potential→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -165,7 +165,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰られない";
         const string expected = "～passive→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -174,7 +174,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れた";
         const string expected = "～potential→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -183,7 +183,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れました";
         const string expected = "～potential→polite past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -192,7 +192,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れなかった";
         const string expected = "～potential→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -201,7 +201,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れませんでした";
         const string expected = "～potential→polite past negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -210,7 +210,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れます";
         const string expected = "～potential→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -219,7 +219,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れません";
         const string expected = "～potential→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -228,7 +228,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰るな";
         const string expected = "～imperative negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -237,7 +237,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いなさい";
         const string expected = "～polite imperative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -246,7 +246,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってください";
         const string expected = "～polite request";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -255,7 +255,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らないでください";
         const string expected = "～negative→polite request";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -264,7 +264,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ろう";
         const string expected = "～volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -273,7 +273,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ろ";
         const string expected = "～volitional→ksb";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -282,7 +282,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いましょう";
         const string expected = "～polite volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -291,7 +291,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れば";
         const string expected = "～provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -300,7 +300,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らなければ";
         const string expected = "～negative→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -309,7 +309,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ったら";
         const string expected = "～conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -318,7 +318,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ったらば";
         const string expected = "～formal conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -327,7 +327,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らなかったら";
         const string expected = "～negative→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -336,7 +336,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせる";
         const string expected = "～causative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -345,7 +345,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせない";
         const string expected = "～causative→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -354,7 +354,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせん";
         const string expected = "～causative→slurred; causative→slurred negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -363,7 +363,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせます";
         const string expected = "～causative→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -372,7 +372,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らします";
         const string expected = "～short causative→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -381,7 +381,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせません";
         const string expected = "～causative→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -390,7 +390,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせた";
         const string expected = "～causative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -399,7 +399,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせなかった";
         const string expected = "～causative→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -408,7 +408,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせました";
         const string expected = "～causative→polite past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -417,7 +417,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせませんでした";
         const string expected = "～causative→polite past negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -427,7 +427,7 @@ internal sealed class DeconjugatorTestsForV5Aru
         // ～causative→passive/potential/honorific; short causative→potential→passive/potential/honorific
         const string termToDeconjugate = "仰らせられる";
         const string expected = "～causative→passive/potential/honorific";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -436,7 +436,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせられない";
         const string expected = "～causative→passive/potential/honorific→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -445,7 +445,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせられます";
         const string expected = "～causative→passive/potential/honorific→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -454,7 +454,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らせられません";
         const string expected = "～causative→passive/potential/honorific→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -463,7 +463,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りたい";
         const string expected = "～want";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -472,7 +472,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りたくありません";
         const string expected = "～want→formal negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -481,7 +481,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りたくありませんでした";
         const string expected = "～want→formal negative past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -490,7 +490,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りたくない";
         const string expected = "～want→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -499,7 +499,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りたかった";
         const string expected = "～want→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -508,7 +508,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りたくなかった";
         const string expected = "～want→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -517,7 +517,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っている";
         const string expected = "～teiru";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -526,7 +526,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていない";
         const string expected = "～teiru→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -535,7 +535,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていた";
         const string expected = "～teiru→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -544,7 +544,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていなかった";
         const string expected = "～teiru→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -553,7 +553,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っています";
         const string expected = "～teiru→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -562,7 +562,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていません";
         const string expected = "～teiru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -571,7 +571,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていました";
         const string expected = "～teiru→polite past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -580,7 +580,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていませんでした";
         const string expected = "～teiru→polite past negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -589,7 +589,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってる";
         const string expected = "～teru";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -598,7 +598,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってない";
         const string expected = "～teru→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -607,7 +607,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってた";
         const string expected = "～teru→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -616,7 +616,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってなかった";
         const string expected = "～teru→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -625,7 +625,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってます";
         const string expected = "～teru→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -634,7 +634,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってません";
         const string expected = "～teru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -643,7 +643,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってました";
         const string expected = "～teru→polite past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -652,7 +652,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってません";
         const string expected = "～teru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -661,7 +661,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってませんでした";
         const string expected = "～teru→polite past negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -670,7 +670,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまう";
         const string expected = "～finish/completely/end up";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -679,7 +679,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってもう";
         const string expected = "～finish/completely/end up→ksb";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -688,7 +688,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまわない";
         const string expected = "～finish/completely/end up→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -697,7 +697,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまった";
         const string expected = "～finish/completely/end up→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -706,7 +706,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまわなかった";
         const string expected = "～finish/completely/end up→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -715,7 +715,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまって";
         const string expected = "～finish/completely/end up→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -724,7 +724,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまえば";
         const string expected = "～finish/completely/end up→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -733,7 +733,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまわなければ";
         const string expected = "～finish/completely/end up→negative→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -742,7 +742,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまわなかったら";
         const string expected = "～finish/completely/end up→negative→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -751,7 +751,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまったら";
         const string expected = "～finish/completely/end up→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -760,7 +760,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまおう";
         const string expected = "～finish/completely/end up→volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -769,7 +769,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまいます";
         const string expected = "～finish/completely/end up→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -778,7 +778,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまいません";
         const string expected = "～finish/completely/end up→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -787,7 +787,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまいました";
         const string expected = "～finish/completely/end up→polite past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -796,7 +796,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまいませんでした";
         const string expected = "～finish/completely/end up→polite past negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -805,7 +805,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまえる";
         const string expected = "～finish/completely/end up→potential";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -814,7 +814,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまわれる";
         const string expected = "～finish/completely/end up→passive";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -823,7 +823,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってしまわせる";
         const string expected = "～finish/completely/end up→causative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -832,7 +832,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃう";
         const string expected = "～finish/completely/end up→contracted";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -841,7 +841,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃわない";
         const string expected = "～finish/completely/end up→contracted→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -850,7 +850,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃった";
         const string expected = "～finish/completely/end up→contracted→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -859,7 +859,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃわなかった";
         const string expected = "～finish/completely/end up→contracted→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -868,7 +868,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃって";
         const string expected = "～finish/completely/end up→contracted→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -877,7 +877,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃえば";
         const string expected = "～finish/completely/end up→contracted→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -886,7 +886,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃわなければ";
         const string expected = "～finish/completely/end up→contracted→negative→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -895,7 +895,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃわなかったら";
         const string expected = "～finish/completely/end up→contracted→negative→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -904,7 +904,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃおう";
         const string expected = "～finish/completely/end up→contracted→volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -913,7 +913,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃえる";
         const string expected = "～finish/completely/end up→contracted→potential";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -923,7 +923,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておく";
         const string expected = "～for now";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -932,7 +932,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておかない";
         const string expected = "～for now→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -941,7 +941,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておいた";
         const string expected = "～for now→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -950,7 +950,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておかなかった";
         const string expected = "～for now→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -959,7 +959,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておいて";
         const string expected = "～for now→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -968,7 +968,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておけば";
         const string expected = "～for now→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -977,7 +977,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておいたら";
         const string expected = "～for now→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -986,7 +986,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておこう";
         const string expected = "～for now→volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -995,7 +995,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておける";
         const string expected = "～for now→potential";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1004,7 +1004,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておかれる";
         const string expected = "～for now→passive";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1013,7 +1013,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとく";
         const string expected = "～toku (for now)";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1022,7 +1022,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとかない";
         const string expected = "～toku (for now)→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1031,7 +1031,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っといた";
         const string expected = "～toku (for now)→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1040,7 +1040,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとかなかった";
         const string expected = "～toku (for now)→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1049,7 +1049,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っといて";
         const string expected = "～toku (for now)→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1058,7 +1058,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとけば";
         const string expected = "～toku (for now)→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1067,7 +1067,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っといたら";
         const string expected = "～toku (for now)→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1076,7 +1076,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとこう";
         const string expected = "～toku (for now)→volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1085,7 +1085,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとける";
         const string expected = "～toku (for now)→potential";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1094,7 +1094,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとかれる";
         const string expected = "～toku (for now)→passive";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1103,7 +1103,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってある";
         const string expected = "～tearu";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1112,7 +1112,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってあった";
         const string expected = "～tearu→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1121,7 +1121,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってあって";
         const string expected = "～tearu→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1130,7 +1130,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってあったら";
         const string expected = "～tearu→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1139,7 +1139,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってあれば";
         const string expected = "～tearu→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1148,7 +1148,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていく";
         const string expected = "～teiku";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1157,7 +1157,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていかない";
         const string expected = "～teiku→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1166,7 +1166,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていった";
         const string expected = "～teiku→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1175,7 +1175,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていかなかった";
         const string expected = "～teiku→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1184,7 +1184,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていって";
         const string expected = "～teiku→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1193,7 +1193,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていこう";
         const string expected = "～teiku→volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1202,7 +1202,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていける";
         const string expected = "～teiku→potential";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1211,7 +1211,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていかれる";
         const string expected = "～teiku→passive";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1220,7 +1220,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていかせる";
         const string expected = "～teiku→causative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1229,7 +1229,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってくる";
         const string expected = "～tekuru";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1238,7 +1238,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってこない";
         const string expected = "～tekuru→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1247,7 +1247,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってきた";
         const string expected = "～tekuru→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1256,7 +1256,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってこなかった";
         const string expected = "～tekuru→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1265,7 +1265,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってきて";
         const string expected = "～tekuru→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1274,7 +1274,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってくれば";
         const string expected = "～tekuru→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1283,7 +1283,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってきたら";
         const string expected = "～tekuru→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1292,7 +1292,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってこられる";
         const string expected = "～tekuru→passive/potential/honorific";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1301,7 +1301,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってこさせる";
         const string expected = "～tekuru→causative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1310,7 +1310,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いながら";
         const string expected = "～while";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1319,7 +1319,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いすぎる";
         const string expected = "～too much";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1328,7 +1328,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰い過ぎる";
         const string expected = "～too much";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1337,7 +1337,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いそう";
         const string expected = "～seemingness";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1346,7 +1346,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いぬ";
         const string expected = "～archaic negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1355,7 +1355,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いず";
         const string expected = "～adverbial negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1364,7 +1364,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いずに";
         const string expected = "～without doing so";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1373,7 +1373,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ったり";
         const string expected = "～tari";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1382,7 +1382,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らなかったり";
         const string expected = "～negative→tari";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1391,7 +1391,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らん";
         const string expected = "～slurred negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1400,7 +1400,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らんかった";
         const string expected = "～slurred negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1409,7 +1409,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いざる";
         const string expected = "～archaic attributive negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1418,7 +1418,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れよう";
         const string expected = "～potential→volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1427,7 +1427,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れよ";
         const string expected = "～potential→volitional→ksb";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1436,7 +1436,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れろ";
         const string expected = "～potential→imperative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1445,7 +1445,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れて";
         const string expected = "～potential→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1454,7 +1454,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れたら";
         const string expected = "～potential→conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1463,7 +1463,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れれば";
         const string expected = "～potential→provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1472,7 +1472,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れられる";
         const string expected = "～potential→passive/potential/honorific";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1481,7 +1481,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰れさせる";
         const string expected = "～potential→causative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1490,7 +1490,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってあげる";
         const string expected = "～do for someone";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1499,7 +1499,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってあげられる";
         const string expected = "～do for someone→passive/potential/honorific";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1508,7 +1508,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておる";
         const string expected = "～teoru";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1517,7 +1517,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておらない";
         const string expected = "～teoru→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1526,7 +1526,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておらん";
         const string expected = "～teoru→slurred negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1535,7 +1535,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておった";
         const string expected = "～teoru→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1544,7 +1544,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておらなかった";
         const string expected = "～teoru→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1553,7 +1553,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っております";
         const string expected = "～teoru→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1562,7 +1562,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておりません";
         const string expected = "～teoru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1571,7 +1571,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておりました";
         const string expected = "～teoru→polite past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1580,7 +1580,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておりませんでした";
         const string expected = "～teoru→polite past negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1589,7 +1589,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておって";
         const string expected = "～teoru→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1598,7 +1598,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておろう";
         const string expected = "～teoru→volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1607,7 +1607,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておれる";
         const string expected = "～teoru→potential";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1616,7 +1616,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っておられる";
         const string expected = "～teoru→passive";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1625,7 +1625,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとる";
         const string expected = "～toru";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1634,7 +1634,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとらない";
         const string expected = "～toru→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1643,7 +1643,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとらん";
         const string expected = "～toru→slurred negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1652,7 +1652,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとった";
         const string expected = "～toru→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1661,7 +1661,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとらなかった";
         const string expected = "～toru→negative→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1670,7 +1670,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとります";
         const string expected = "～toru→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1679,7 +1679,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとりません";
         const string expected = "～toru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1688,7 +1688,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとりました";
         const string expected = "～toru→polite past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1697,7 +1697,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとりませんでした";
         const string expected = "～toru→polite past negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1706,7 +1706,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとって";
         const string expected = "～toru→te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1715,7 +1715,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとろう";
         const string expected = "～toru→volitional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1724,7 +1724,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとれる";
         const string expected = "～toru→potential";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1733,7 +1733,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っとられる";
         const string expected = "～toru→passive";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1742,7 +1742,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らす";
         const string expected = "～short causative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1751,7 +1751,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っては";
         const string expected = "～topic/condition";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1760,7 +1760,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃ";
         const string expected = "～topic/condition→contracted";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1769,7 +1769,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らなきゃ";
         const string expected = "～negative→provisional conditional→contracted";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1778,7 +1778,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちまう";
         const string expected = "～finish/completely/end up→contracted";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1787,7 +1787,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っちゃう";
         const string expected = "～finish/completely/end up→contracted";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1796,7 +1796,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていらっしゃる";
         const string expected = "～honorific teiru";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1805,7 +1805,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰っていらっしゃらない";
         const string expected = "～honorific teiru→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1814,7 +1814,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いつつ";
         const string expected = "～while/although";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1823,7 +1823,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってくれる";
         const string expected = "～statement/request";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1832,7 +1832,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってくれない";
         const string expected = "～statement/request→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1841,7 +1841,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってくれます";
         const string expected = "～statement/request→polite";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1850,7 +1850,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってくれません";
         const string expected = "～statement/request→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1859,7 +1859,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってくれ";
         const string expected = "～statement/request→imperative; statement/request→masu stem";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1868,7 +1868,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らへん";
         const string expected = "～negative→ksb";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1877,7 +1877,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らへんかった";
         const string expected = "～negative→ksb→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1886,7 +1886,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らひん";
         const string expected = "～negative→ksb";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1895,7 +1895,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らひんかった";
         const string expected = "～negative→ksb→past";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1904,7 +1904,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りゃ";
         const string expected = "～provisional conditional→contracted";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1913,7 +1913,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らさない";
         const string expected = "～short causative→negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1922,7 +1922,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いましたら";
         const string expected = "～polite conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1931,7 +1931,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰るになる";
         const string expected = "～honorific";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1940,7 +1940,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いなさる";
         const string expected = "～honorific";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1949,7 +1949,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってはる";
         const string expected = "～teru→honorific (ksb)";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1958,7 +1958,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰いなさるな";
         const string expected = "～honorific→imperative negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1967,7 +1967,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰るまい";
         const string expected = "～negative conjectural";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1976,7 +1976,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りますまい";
         const string expected = "～polite negative conjectural";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1985,7 +1985,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らば";
         const string expected = "～classical hypothetical conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -1994,7 +1994,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らねば";
         const string expected = "～negative conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2003,7 +2003,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らにゃ";
         const string expected = "～colloquial negative conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2012,7 +2012,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らんとする";
         const string expected = "～about to";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2021,7 +2021,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰らんばかり";
         const string expected = "～as if to";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2030,7 +2030,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰り得る";
         const string expected = "～be able to";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2039,7 +2039,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りえる";
         const string expected = "～be able to";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2048,7 +2048,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りうる";
         const string expected = "～be able to";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2057,7 +2057,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りませんで";
         const string expected = "～polite negative te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2066,7 +2066,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りませんでして";
         const string expected = "～polite negative te";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2075,7 +2075,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りますれば";
         const string expected = "～polite provisional conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2084,7 +2084,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りませ";
         const string expected = "～polite imperative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2093,7 +2093,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りませんでしたら";
         const string expected = "～polite past negative conditional";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2102,7 +2102,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りませんでしたり";
         const string expected = "～polite past negative tari";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2111,7 +2111,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰り致す";
         const string expected = "～humble";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2120,7 +2120,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰り致しません";
         const string expected = "～humble→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2129,7 +2129,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りいたす";
         const string expected = "～humble";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2138,7 +2138,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りいたしません";
         const string expected = "～humble→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2147,7 +2147,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってみる";
         const string expected = "～try doing";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2156,7 +2156,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りやすい";
         const string expected = "～easy";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2165,7 +2165,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰りにくい";
         const string expected = "～difficult";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2174,7 +2174,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってもらう";
         const string expected = "～get someone do";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2183,7 +2183,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってやる";
         const string expected = "～do for someone";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
@@ -2192,7 +2192,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     {
         const string termToDeconjugate = "仰ってさしあげる";
         const string expected = "～do for someone";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.Tags[^1] is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form.Text is "仰る" && form.LastTag is "v5aru").Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 }

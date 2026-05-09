@@ -5,13 +5,12 @@ using JL.Core.Utilities;
 namespace JL.Core.Deconjugation;
 
 [method: JsonConstructor]
-internal readonly struct Rule(string type, string[] decEnds, string[] conEnds, string detail, string? contextRule = null, string[]? decTags = null, string[]? conTags = null) : IEquatable<Rule>
+internal readonly struct Rule(RuleType type, string[] decEnds, string[] conEnds, string detail, string[]? decTags = null, string[]? conTags = null) : IEquatable<Rule>
 {
-    [JsonPropertyName("type")] public string Type { get; } = type.GetPooledString();
+    [JsonPropertyName("type")] public RuleType Type { get; } = type;
     [JsonPropertyName("dec_end")] public string[] DecEnds { get; } = decEnds;
     [JsonPropertyName("con_end")] public string[] ConEnds { get; } = conEnds;
     [JsonPropertyName("detail")] public string Detail { get; } = detail.GetPooledString();
-    [JsonPropertyName("contextrule")] public string? ContextRule { get; } = contextRule?.GetPooledString();
     [JsonPropertyName("dec_tag")] public string[]? DecTags { get; } = decTags;
     [JsonPropertyName("con_tag")] public string[]? ConTags { get; } = conTags;
 
@@ -19,9 +18,8 @@ internal readonly struct Rule(string type, string[] decEnds, string[] conEnds, s
     {
         unchecked
         {
-            int hash = (17 * 37) + Type.GetHashCode(StringComparison.Ordinal);
+            int hash = (17 * 37) + Type.GetHashCode();
             hash = (hash * 37) + Detail.GetHashCode(StringComparison.Ordinal);
-            hash = (hash * 37) + (ContextRule?.GetHashCode(StringComparison.Ordinal) ?? 37);
 
             string[] decEnds = DecEnds;
             foreach (string decEnd in decEnds)
@@ -74,7 +72,6 @@ internal readonly struct Rule(string type, string[] decEnds, string[] conEnds, s
     {
         return Type == other.Type
                && Detail == other.Detail
-               && ContextRule == other.ContextRule
                && DecEnds.SequenceEqual(other.DecEnds)
                && ConEnds.SequenceEqual(other.ConEnds)
                && (other.DecTags is not null ? DecTags?.SequenceEqual(other.DecTags) ?? false : DecTags is null)

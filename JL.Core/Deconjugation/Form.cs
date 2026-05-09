@@ -6,12 +6,12 @@ namespace JL.Core.Deconjugation;
 internal sealed class Form(
     string text,
     string originalText,
-    List<string> tags,
+    string lastTag,
     List<string> process) : IEquatable<Form>
 {
     public string Text { get; } = text;
     public string OriginalText { get; } = originalText;
-    public List<string> Tags { get; } = tags;
+    public string LastTag { get; } = lastTag;
     public List<string> Process { get; } = process;
 
     public override bool Equals([NotNullWhen(true)] object? obj)
@@ -19,7 +19,7 @@ internal sealed class Form(
         return obj is Form other
                && (ReferenceEquals(this, other) || (Text == other.Text
                && OriginalText == other.OriginalText
-               && Tags.AsReadOnlySpan().SequenceEqual(other.Tags.AsReadOnlySpan())
+               && LastTag == other.LastTag
                && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan())));
     }
 
@@ -28,7 +28,7 @@ internal sealed class Form(
         return other is not null
                && (ReferenceEquals(this, other) || (Text == other.Text
                && OriginalText == other.OriginalText
-               && Tags.AsReadOnlySpan().SequenceEqual(other.Tags.AsReadOnlySpan())
+               && LastTag == other.LastTag
                && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan())));
     }
 
@@ -38,17 +38,7 @@ internal sealed class Form(
         {
             int hash = (17 * 37) + Text.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + OriginalText.GetHashCode(StringComparison.Ordinal);
-
-            foreach (ref readonly string tag in Tags.AsReadOnlySpan())
-            {
-                hash = (hash * 37) + tag.GetHashCode(StringComparison.Ordinal);
-            }
-
-            foreach (ref readonly string process in Process.AsReadOnlySpan())
-            {
-                hash = (hash * 37) + process.GetHashCode(StringComparison.Ordinal);
-            }
-
+            hash = (hash * 37) + LastTag.GetHashCode(StringComparison.Ordinal);
             return hash;
         }
     }

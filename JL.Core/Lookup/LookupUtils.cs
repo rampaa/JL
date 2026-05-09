@@ -838,7 +838,7 @@ public static class LookupUtils
 
     private static List<IDictRecord> GetValidDeconjugatedResults(Dict dict, Form deconjugationResult, IList<IDictRecord> dictResults)
     {
-        string lastTag = deconjugationResult.Tags[^1];
+        string lastTag = deconjugationResult.LastTag;
         List<IDictRecord> resultsList = new(dictResults.Count);
         switch (dict.Type)
         {

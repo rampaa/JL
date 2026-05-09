@@ -8,202 +8,165 @@ internal static class Deconjugator
 {
     public static Rule[] Rules { get; set; } = [];
 
-    private static Form? StandardRuleDeconjugateInner(Form myForm, in VirtualRule myRule)
+    private static Form? StandardRuleDeconjugateInner(Form form, in VirtualRule virtualRule)
     {
         // tag doesn't match
-        if (myForm.Tags.Count > 0 && myForm.Tags[^1] != myRule.ConTag)
+        if (form.Process.Count > 0 && form.LastTag != virtualRule.ConTag)
         {
             return null;
         }
 
         // ending doesn't match
-        if (!myForm.Text.AsSpan().EndsWith(myRule.ConEnd, StringComparison.Ordinal))
+        if (!form.Text.AsSpan().EndsWith(virtualRule.ConEnd, StringComparison.Ordinal))
         {
             return null;
         }
 
-        if (myForm.Text.Length == myRule.ConEnd.Length && myRule.DecEnd.Length is 0)
+        if (form.Text.Length == virtualRule.ConEnd.Length && virtualRule.DecEnd.Length is 0)
         {
             return null;
         }
 
-        string newText = string.Concat(myForm.Text.AsSpan(0, myForm.Text.Length - myRule.ConEnd.Length), myRule.DecEnd);
-        return new Form(newText, myForm.OriginalText,
-            myForm.Tags.Count is 0
-                ? [myRule.ConTag, myRule.DecTag]
-                : [.. myForm.Tags, myRule.DecTag],
-            [.. myForm.Process, myRule.Detail]);
+        string newText = string.Concat(form.Text.AsSpan(0, form.Text.Length - virtualRule.ConEnd.Length), virtualRule.DecEnd);
+        return new Form(newText, form.OriginalText, virtualRule.DecTag, [.. form.Process, virtualRule.Detail]);
     }
 
-    private static List<Form>? StandardRuleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? StandardRuleDeconjugate(Form form, in Rule rule)
     {
         // can't deconjugate nothingness
-        if (myForm.Text.Length is 0)
+        if (form.Text.Length is 0)
         {
             return null;
         }
 
         // deconjugated form too much longer than conjugated form
-        if (myForm.Text.Length > myForm.OriginalText.Length + 10)
+        if (form.Text.Length > form.OriginalText.Length + 10)
         {
             return null;
         }
 
         // impossibly information-dense
-        if (myForm.Tags.Count > myForm.OriginalText.Length + 6)
+        if (form.Process.Count > form.OriginalText.Length + 5)
         {
             return null;
         }
 
         // blank detail mean it can't be the last (first applied, but rightmost) rule
-        if (myRule.Detail.Length is 0 && myForm.Tags.Count is 0)
+        if (rule.Detail.Length is 0 && form.LastTag.Length is 0)
         {
             return null;
         }
 
-        Debug.Assert(myRule.ConTags is not null);
-        Debug.Assert(myRule.DecTags is not null);
-        string[] array = myRule.DecEnds;
-        if (array.Length is 1)
+        Debug.Assert(rule.ConTags is not null);
+        Debug.Assert(rule.DecTags is not null);
+        string[] decEnds = rule.DecEnds;
+        if (decEnds.Length is 1)
         {
             VirtualRule virtualRule = new
             (
-                myRule.DecEnds[0],
-                myRule.ConEnds[0],
-                myRule.DecTags[0],
-                myRule.ConTags[0],
-                myRule.Detail
+                rule.DecEnds[0],
+                rule.ConEnds[0],
+                rule.DecTags[0],
+                rule.ConTags[0],
+                rule.Detail
             );
 
-            Form? result = StandardRuleDeconjugateInner(myForm, virtualRule);
+            Form? result = StandardRuleDeconjugateInner(form, virtualRule);
             return result is not null
                 ? [result]
                 : null;
         }
 
-        List<Form> collection = new(array.Length);
-        bool multiDecTag = myRule.DecTags.Length > 1;
-        string? singleDecTag = multiDecTag ? null : myRule.DecTags[0];
-        bool multiConTag = myRule.ConTags.Length > 1;
-        string? singleConTag = multiConTag ? null : myRule.ConTags[0];
+        List<Form> forms = new(decEnds.Length);
+        bool multiDecTag = rule.DecTags.Length > 1;
+        string? singleDecTag = multiDecTag ? null : rule.DecTags[0];
+        bool multiConTag = rule.ConTags.Length > 1;
+        string? singleConTag = multiConTag ? null : rule.ConTags[0];
 
-        for (int i = 0; i < array.Length; i++)
+        for (int i = 0; i < decEnds.Length; i++)
         {
             VirtualRule virtualRule = new
             (
-                myRule.DecEnds[i],
-                myRule.ConEnds[i],
+                rule.DecEnds[i],
+                rule.ConEnds[i],
                 multiDecTag
-                    ? myRule.DecTags[i]
+                    ? rule.DecTags[i]
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     : singleDecTag!,
                 multiConTag
-                    ? myRule.ConTags[i]
+                    ? rule.ConTags[i]
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     : singleConTag!,
-                myRule.Detail
+                rule.Detail
             );
-            Form? ret = StandardRuleDeconjugateInner(myForm, virtualRule);
-            if (ret is not null)
+            Form? newForm = StandardRuleDeconjugateInner(form, virtualRule);
+            if (newForm is not null)
             {
-                collection.Add(ret);
+                forms.Add(newForm);
             }
         }
 
-        return collection.Count > 0
-            ? collection
+        return forms.Count > 0
+            ? forms
             : null;
     }
 
-    private static List<Form>? RewriteRuleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? RewriteRuleDeconjugate(Form form, in Rule rule)
     {
-        return myForm.Text != myRule.ConEnds[0]
+        return form.Text != rule.ConEnds[0]
             ? null
-            : StandardRuleDeconjugate(myForm, myRule);
+            : StandardRuleDeconjugate(form, rule);
     }
 
-    private static List<Form>? OnlyFinalRuleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? OnlyFinalRuleDeconjugate(Form form, in Rule rule)
     {
-        return myForm.Tags.Count is not 0
+        return form.Process.Count is not 0
             ? null
-            : StandardRuleDeconjugate(myForm, myRule);
+            : StandardRuleDeconjugate(form, rule);
     }
 
-    private static List<Form>? NeverFinalRuleDeconjugate(Form myForm, in Rule myRule)
+    private static List<Form>? NeverFinalRuleDeconjugate(Form form, in Rule rule)
     {
-        return myForm.Tags.Count is 0
+        return form.Process.Count is 0
             ? null
-            : StandardRuleDeconjugate(myForm, myRule);
-    }
-
-    private static List<Form>? ContextRuleDeconjugate(Form myForm, in Rule myRule)
-    {
-        bool result = myRule.ContextRule switch
-        {
-            "v1inftrap" => V1InfTrapCheck(myForm),
-            "saspecial" => SaSpecialCheck(myForm, myRule),
-            _ => false
-        };
-
-        return result
-            ? StandardRuleDeconjugate(myForm, myRule)
-            : null;
-    }
-
-    private static bool V1InfTrapCheck(Form myForm)
-    {
-        return myForm.Tags.Count is not 1 || myForm.Tags[0] is not "stem-ren";
-    }
-
-    private static bool SaSpecialCheck(Form myForm, in Rule myRule)
-    {
-        if (myForm.Text.Length is 0)
-        {
-            return false;
-        }
-
-        string conEnd = myRule.ConEnds[0];
-        ReadOnlySpan<char> textSpan = myForm.Text.AsSpan();
-        return textSpan.EndsWith(conEnd, StringComparison.Ordinal)
-            && !textSpan[..^conEnd.Length].EndsWith('さ');
+            : StandardRuleDeconjugate(form, rule);
     }
 
     public static List<Form> Deconjugate(string text)
     {
-        List<Form> processed = [];
-        List<Form> novel = [new(text, text, [], [])];
+        List<Form> processedForms = [];
+        List<Form> formsToProcess = [new(text, text, "", [])];
 
         Rule[] rules = Rules;
         bool addFormToProcess = false;
-        while (novel.Count > 0)
+        while (formsToProcess.Count > 0)
         {
-            List<Form> newNovel = [];
-            foreach (ref readonly Form form in novel.AsReadOnlySpan())
+            List<Form> newFormsToProcess = [];
+            foreach (ref readonly Form form in formsToProcess.AsReadOnlySpan())
             {
                 // ReSharper disable once ForCanBeConvertedToForeach
                 for (int j = 0; j < rules.Length; j++)
                 {
                     ref readonly Rule rule = ref rules[j];
-                    List<Form>? newForm = rule.Type switch
+                    List<Form>? newForms = rule.Type switch
                     {
-                        "stdrule" => StandardRuleDeconjugate(form, rule),
-                        "rewriterule" => RewriteRuleDeconjugate(form, rule),
-                        "onlyfinalrule" => OnlyFinalRuleDeconjugate(form, rule),
-                        "neverfinalrule" => NeverFinalRuleDeconjugate(form, rule),
-                        "contextrule" => ContextRuleDeconjugate(form, rule),
+                        RuleType.Standard => StandardRuleDeconjugate(form, rule),
+                        RuleType.Rewrite => RewriteRuleDeconjugate(form, rule),
+                        RuleType.OnlyFinal => OnlyFinalRuleDeconjugate(form, rule),
+                        RuleType.NeverFinal => NeverFinalRuleDeconjugate(form, rule),
                         _ => null
                     };
 
-                    if (newForm is null)
+                    if (newForms is null)
                     {
                         continue;
                     }
 
-                    foreach (ref readonly Form myForm in newForm.AsReadOnlySpan())
+                    foreach (ref readonly Form newForm in newForms.AsReadOnlySpan())
                     {
-                        if (!newNovel.AsReadOnlySpan().Contains(myForm))
+                        if (!newFormsToProcess.AsReadOnlySpan().Contains(newForm))
                         {
-                            newNovel.Add(myForm);
+                            newFormsToProcess.Add(newForm);
                         }
                     }
                 }
@@ -212,12 +175,12 @@ internal static class Deconjugator
                 {
                     bool add = true;
                     int formProcessCount = -1;
-                    string formTag = form.Tags[^1];
+                    string formTag = form.LastTag;
 
-                    for (int i = processed.Count - 1; i >= 0; i--)
+                    for (int i = processedForms.Count - 1; i >= 0; i--)
                     {
-                        Form existingForm = processed[i];
-                        if (existingForm.Text == form.Text && existingForm.Tags[^1] == formTag)
+                        Form existingForm = processedForms[i];
+                        if (existingForm.Text == form.Text && existingForm.LastTag == formTag)
                         {
                             int existingFormProcessCount = 1;
                             for (int j = existingForm.Process.Count - 1; j > 0; j--)
@@ -250,14 +213,14 @@ internal static class Deconjugator
 
                             if (existingFormProcessCount > formProcessCount)
                             {
-                                processed.RemoveAt(i);
+                                processedForms.RemoveAt(i);
                             }
                         }
                     }
 
                     if (add)
                     {
-                        processed.Add(form);
+                        processedForms.Add(form);
                     }
                 }
                 else
@@ -266,9 +229,9 @@ internal static class Deconjugator
                 }
             }
 
-            novel = newNovel;
+            formsToProcess = newFormsToProcess;
         }
 
-        return processed;
+        return processedForms;
     }
 }
