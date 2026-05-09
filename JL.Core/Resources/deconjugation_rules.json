@@ -606,7 +606,7 @@
   {
     "type": "stdrule",
     "dec_end": [ "よう", "ろう", "ぼう", "ごう", "こう", "もう", "のう", "そう", "とう", "おう" ],
-    "con_end": [ "よ", "ろ", "ぼ", "ご", "こ", "も", "の", "そ", "と", "お", "お" ],
+    "con_end": [ "よ", "ろ", "ぼ", "ご", "こ", "も", "の", "そ", "と", "お" ],
     "dec_tag": [ "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition", "form-volition" ],
     "con_tag": [ "v1", "v5aru", "v5b", "v5g", "v5k", "v5m", "v5n", "v5s", "v5t", "v5u" ],
     "detail": "ksb"
