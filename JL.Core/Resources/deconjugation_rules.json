@@ -1772,8 +1772,7 @@
     "detail": "teiru"
   },
   {
-    "type": "contextrule",
-    "contextrule": "v1inftrap",
+    "type": "stdrule",
     "dec_end": [ "" ],
     "con_end": [ "る" ],
     "dec_tag": [ "stem-te" ],
