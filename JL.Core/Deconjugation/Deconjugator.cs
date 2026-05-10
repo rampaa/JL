@@ -122,7 +122,6 @@ internal static class Deconjugator
         bool addFormToProcess = false;
         while (formsToProcess.Count > 0)
         {
-            newFormsToProcess.Clear();
             foreach (ref readonly Form form in formsToProcess.AsReadOnlySpan())
             {
                 ReadOnlySpan<char> textSpan = form.Text.AsSpan();
@@ -161,7 +160,13 @@ internal static class Deconjugator
 
                             if (existingFormProperStepCount > newFormProperStepCount)
                             {
-                                processedForms.RemoveAt(i);
+                                int lastIndex = processedFormsSpan.Length - 1;
+                                if (i < lastIndex)
+                                {
+                                    (processedForms[i], processedForms[lastIndex]) = (processedForms[lastIndex], processedForms[i]);
+                                }
+
+                                processedForms.RemoveAt(lastIndex);
                                 processedFormsSpan = processedForms.AsReadOnlySpan();
                             }
                         }
