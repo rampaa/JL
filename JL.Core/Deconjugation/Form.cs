@@ -23,7 +23,7 @@ internal readonly struct Form(
         return Text == other.Text
                && OriginalText == other.OriginalText
                && LastTag == other.LastTag
-               && ReferenceEquals(Process, other.Process);
+               && Process == other.Process;
     }
 
     public override int GetHashCode()
@@ -33,6 +33,7 @@ internal readonly struct Form(
             int hash = (17 * 37) + Text.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + OriginalText.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + LastTag.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + (Process?.GetHashCode() ?? 0);
             return hash;
         }
     }

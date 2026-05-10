@@ -743,7 +743,7 @@ public static class LookupUtils
                                     bool addProcess = true;
                                     foreach (ref readonly ProcessNode process in processes.AsReadOnlySpan())
                                     {
-                                        if (ReferenceEquals(process, deconjugationResult.Process))
+                                        if (process.Equals(deconjugationResult.Process))
                                         {
                                             addProcess = false;
                                             break;
