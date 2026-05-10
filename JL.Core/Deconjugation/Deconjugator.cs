@@ -74,18 +74,16 @@ internal static class Deconjugator
     {
         if (form.Process is null)
         {
-            ReadOnlySpan<VirtualRule> rules = bucket.AllRules.AsSpan();
-            for (int i = 0; i < rules.Length; i++)
+            foreach (ref readonly VirtualRule rule in bucket.AllRules.AsSpan())
             {
-                ApplyRuleInternal(form, rules[i], discoveredForms, textSpan);
+                ApplyRuleInternal(form, rule, discoveredForms, textSpan);
             }
         }
         else if (bucket.RulesByTag.TryGetValue(form.LastTag, out VirtualRule[]? rules))
         {
-            ReadOnlySpan<VirtualRule> rulesSpan = rules.AsSpan();
-            for (int i = 0; i < rulesSpan.Length; i++)
+            foreach (ref readonly VirtualRule rule in rules.AsSpan())
             {
-                ApplyRuleInternal(form, rulesSpan[i], discoveredForms, textSpan);
+                ApplyRuleInternal(form, rule, discoveredForms, textSpan);
             }
         }
     }
@@ -95,9 +93,8 @@ internal static class Deconjugator
         int targetTextLength = stem.Length + decEnd.Length;
         int targetTotalCount = (parentProcessNode?.TotalStepCount ?? 0) + 1;
 
-        for (int i = 0; i < discoveredForms.Length; i++)
+        foreach (ref readonly Form form in discoveredForms)
         {
-            ref readonly Form form = ref discoveredForms[i];
             if (form.LastTag == tag && form.Text.Length == targetTextLength)
             {
                 ReadOnlySpan<char> formText = form.Text.AsSpan();
@@ -126,13 +123,9 @@ internal static class Deconjugator
         while (formsToProcess.Count > 0)
         {
             newFormsToProcess.Clear();
-            ReadOnlySpan<Form> formsToProcessSpan = formsToProcess.AsReadOnlySpan();
-
-            for (int k = 0; k < formsToProcessSpan.Length; k++)
+            foreach (ref readonly Form form in formsToProcess.AsReadOnlySpan())
             {
-                ref readonly Form form = ref formsToProcessSpan[k];
                 ReadOnlySpan<char> textSpan = form.Text.AsSpan();
-
                 if (textSpan.Length is not 0)
                 {
                     if (ruleBucketsByLastDecEndChar.TryGetValue(textSpan[^1], out RuleBucket bucket))

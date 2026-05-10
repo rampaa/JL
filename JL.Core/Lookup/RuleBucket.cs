@@ -41,18 +41,17 @@ internal readonly struct RuleBucket(VirtualRule[] allRules, FrozenDictionary<str
         unchecked
         {
             int hash = 17;
-            for (int i = 0; i < AllRules.Length; i++)
+            foreach (ref readonly VirtualRule rule in AllRules.AsSpan())
             {
-                hash = (hash * 37) + AllRules[i].GetHashCode();
+                hash = (hash * 37) + rule.GetHashCode();
             }
 
-            foreach (KeyValuePair<string, VirtualRule[]> entry in RulesByTag)
+            foreach ((string tag, VirtualRule[] rules) in RulesByTag)
             {
-                hash = (hash * 37) + entry.Key.GetHashCode(StringComparison.Ordinal);
-                VirtualRule[] rules = entry.Value;
-                for (int i = 0; i < rules.Length; i++)
+                hash = (hash * 37) + tag.GetHashCode(StringComparison.Ordinal);
+                foreach (ref readonly VirtualRule rule in rules.AsSpan())
                 {
-                    hash = (hash * 37) + rules[i].GetHashCode();
+                    hash = (hash * 37) + rule.GetHashCode();
                 }
             }
 

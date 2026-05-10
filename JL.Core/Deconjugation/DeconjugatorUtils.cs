@@ -47,9 +47,8 @@ internal static class DeconjugatorUtils
         Dictionary<char, List<VirtualRule>> rulesByLastConEndChar = new(59);
         List<VirtualRule> rulesWithEmptyConEnd = new(9);
 
-        for (int i = 0; i < rules.Length; i++)
+        foreach (ref readonly Rule rule in rules.AsSpan())
         {
-            ref readonly Rule rule = ref rules[i];
             string detail = rule.Detail;
             RuleType type = rule.Type;
             string[] conEnds = rule.ConEnds;
@@ -60,12 +59,12 @@ internal static class DeconjugatorUtils
             string? singleConTag = conTags.Length is 1 ? conTags[0] : null;
             string? singleDecTag = decTags.Length is 1 ? decTags[0] : null;
 
-            for (int j = 0; j < conEnds.Length; j++)
+            for (int i = 0; i < conEnds.Length; i++)
             {
-                string conEnd = conEnds[j];
-                string decEnd = decEnds[j];
-                string conTag = singleConTag ?? conTags[j];
-                string decTag = singleDecTag ?? decTags[j];
+                string conEnd = conEnds[i];
+                string decEnd = decEnds[i];
+                string conTag = singleConTag ?? conTags[i];
+                string decTag = singleDecTag ?? decTags[i];
 
                 VirtualRule virtualRule = new(type, decEnd, conEnd, decTag, conTag, detail);
                 if (conEnd.Length is 0)
@@ -87,7 +86,7 @@ internal static class DeconjugatorUtils
             }
         }
 
-        Deconjugator.RuleBucketsByLastDecEndChar = rulesByLastConEndChar.ToFrozenDictionary(static entry => entry.Key, static (entry) => CreateBucket(entry.Value.AsReadOnlySpan()));
+        Deconjugator.RuleBucketsByLastDecEndChar = rulesByLastConEndChar.ToFrozenDictionary(static entry => entry.Key, static entry => CreateBucket(entry.Value.AsReadOnlySpan()));
         Deconjugator.RulesWithEmptyConEnd = CreateBucket(rulesWithEmptyConEnd.AsReadOnlySpan());
     }
 
@@ -96,10 +95,8 @@ internal static class DeconjugatorUtils
         Dictionary<string, List<VirtualRule>> rulesByConTag = new(StringComparer.Ordinal);
         List<VirtualRule> allUniqueRules = new(rules.Length);
 
-        for (int i = 0; i < rules.Length; i++)
+        foreach (ref readonly VirtualRule rule in rules)
         {
-            ref readonly VirtualRule rule = ref rules[i];
-
             ref List<VirtualRule>? rulesForConTag = ref CollectionsMarshal.GetValueRefOrAddDefault(rulesByConTag, rule.ConTag, out bool exists);
             if (!exists)
             {
@@ -127,6 +124,6 @@ internal static class DeconjugatorUtils
             allUniqueRules.Add(rule);
         }
 
-        return new RuleBucket(allUniqueRules.ToArray(), rulesByConTag.ToFrozenDictionary(static entry => entry.Key, static (entry) => entry.Value.ToArray(), StringComparer.Ordinal));
+        return new RuleBucket(allUniqueRules.ToArray(), rulesByConTag.ToFrozenDictionary(static entry => entry.Key, static entry => entry.Value.ToArray(), StringComparer.Ordinal));
     }
 }
