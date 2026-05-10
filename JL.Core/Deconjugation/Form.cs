@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
 
@@ -7,28 +6,24 @@ internal readonly struct Form(
     string text,
     string originalText,
     string lastTag,
-    List<string> process) : IEquatable<Form>
+    ProcessNode? process) : IEquatable<Form>
 {
     public string Text { get; } = text;
     public string OriginalText { get; } = originalText;
     public string LastTag { get; } = lastTag;
-    public List<string> Process { get; } = process;
+    public ProcessNode? Process { get; } = process;
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        return obj is Form other
-               && Text == other.Text
-               && OriginalText == other.OriginalText
-               && LastTag == other.LastTag
-               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan());
+        return obj is Form other && Equals(other);
     }
 
-    public bool Equals([NotNullWhen(true)] Form other)
+    public bool Equals(Form other)
     {
         return Text == other.Text
                && OriginalText == other.OriginalText
                && LastTag == other.LastTag
-               && Process.AsReadOnlySpan().SequenceEqual(other.Process.AsReadOnlySpan());
+               && ReferenceEquals(Process, other.Process);
     }
 
     public override int GetHashCode()

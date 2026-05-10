@@ -1,4 +1,7 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using JL.Core.Lookup;
 using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
@@ -6,14 +9,14 @@ namespace JL.Core.Deconjugation;
 // Modified from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
-    internal static FrozenDictionary<char, VirtualRule[]> s_index = FrozenDictionary<char, VirtualRule[]>.Empty;
-    internal static VirtualRule[] s_universalRules = [];
+    internal static FrozenDictionary<char, RuleBucket> RuleBucketsByLastDecEndChar { get; set; } = FrozenDictionary<char, RuleBucket>.Empty;
+    internal static RuleBucket RulesWithEmptyConEnd { get; set; }
 
-    private static void ApplyRule(in Form form, in VirtualRule rule, List<Form> discoveredForms, ReadOnlySpan<char> textSpan)
+    private static void ApplyRuleInternal(in Form form, in VirtualRule rule, List<Form> discoveredForms, ReadOnlySpan<char> textSpan)
     {
         if (rule.Type is RuleType.OnlyFinal)
         {
-            if (form.Process.Count is not 0)
+            if (form.LastTag.Length is not 0)
             {
                 return;
             }
@@ -27,26 +30,14 @@ internal static class Deconjugator
         }
         else if (rule.Type is RuleType.NeverFinal)
         {
-            if (form.Process.Count is 0)
+            if (form.LastTag.Length is 0)
             {
                 return;
             }
         }
 
-        // can't deconjugate nothingness
-        if (textSpan.Length is 0)
-        {
-            return;
-        }
-
         // deconjugated form too much longer than conjugated form
         if (textSpan.Length > form.OriginalText.Length + 10)
-        {
-            return;
-        }
-
-        // impossibly information-dense
-        if (form.Process.Count > form.OriginalText.Length + 5)
         {
             return;
         }
@@ -56,14 +47,8 @@ internal static class Deconjugator
             return;
         }
 
-        // blank detail mean it can't be the last (first applied, but rightmost) rule
-        if (rule.Detail.Length is 0 && form.LastTag.Length is 0)
-        {
-            return;
-        }
-
-        // tag doesn't match
-        if (form.Process.Count > 0 && form.LastTag != rule.ConTag)
+        // impossibly information-dense
+        if ((form.Process?.TotalStepCount ?? 0) > form.OriginalText.Length + 6)
         {
             return;
         }
@@ -83,13 +68,33 @@ internal static class Deconjugator
         }
 
         string newText = string.Concat(stem, rule.DecEnd);
-        discoveredForms.Add(new Form(newText, form.OriginalText, rule.DecTag, [.. form.Process, rule.Detail]));
+        discoveredForms.Add(new Form(newText, form.OriginalText, rule.DecTag, new ProcessNode(rule.Detail, form.Process)));
     }
 
-    private static bool DiscoveredFormsContain(ReadOnlySpan<Form> discoveredForms, ReadOnlySpan<char> stem, string decEnd, string tag, List<string> parentProcess, string newDetail)
+    private static void ApplyBucket(in Form form, in RuleBucket bucket, List<Form> discoveredForms, ReadOnlySpan<char> textSpan)
+    {
+        if (form.Process is null)
+        {
+            ReadOnlySpan<VirtualRule> rules = bucket.AllRules.AsSpan();
+            for (int i = 0; i < rules.Length; i++)
+            {
+                ApplyRuleInternal(form, rules[i], discoveredForms, textSpan);
+            }
+        }
+        else if (bucket.RulesByTag.TryGetValue(form.LastTag, out VirtualRule[]? rules))
+        {
+            ReadOnlySpan<VirtualRule> rulesSpan = rules.AsSpan();
+            for (int i = 0; i < rulesSpan.Length; i++)
+            {
+                ApplyRuleInternal(form, rulesSpan[i], discoveredForms, textSpan);
+            }
+        }
+    }
+
+    private static bool DiscoveredFormsContain(ReadOnlySpan<Form> discoveredForms, ReadOnlySpan<char> stem, string decEnd, string tag, ProcessNode? parentProcessNode, string newDetail)
     {
         int targetTextLength = stem.Length + decEnd.Length;
-        int targetProcessLength = parentProcess.Count + 1;
+        int targetTotalCount = (parentProcessNode?.TotalStepCount ?? 0) + 1;
 
         for (int i = 0; i < discoveredForms.Length; i++)
         {
@@ -99,12 +104,10 @@ internal static class Deconjugator
                 ReadOnlySpan<char> formText = form.Text.AsSpan();
                 if (formText.StartsWith(stem) && formText[stem.Length..].Equals(decEnd, StringComparison.Ordinal))
                 {
-                    if (form.Process.Count == targetProcessLength && form.Process[^1] == newDetail)
+                    ProcessNode? currentProcess = form.Process;
+                    if (currentProcess is not null && currentProcess.TotalStepCount == targetTotalCount && currentProcess.Detail == newDetail && ReferenceEquals(currentProcess.Parent, parentProcessNode))
                     {
-                        if (form.Process.AsReadOnlySpan()[..^1].SequenceEqual(parentProcess.AsReadOnlySpan()))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
@@ -116,17 +119,15 @@ internal static class Deconjugator
     public static List<Form> Deconjugate(string text)
     {
         List<Form> processedForms = [];
-        List<Form> formsToProcess = [new(text, text, "", [])];
+        List<Form> formsToProcess = [new(text, text, "", null)];
         List<Form> newFormsToProcess = [];
+        FrozenDictionary<char, RuleBucket> ruleBucketsByLastDecEndChar = RuleBucketsByLastDecEndChar;
 
         bool addFormToProcess = false;
         while (formsToProcess.Count > 0)
         {
             newFormsToProcess.Clear();
             ReadOnlySpan<Form> formsToProcessSpan = formsToProcess.AsReadOnlySpan();
-
-            VirtualRule[] universalRules = s_universalRules;
-            int universalCount = universalRules.Length;
 
             for (int k = 0; k < formsToProcessSpan.Length; k++)
             {
@@ -135,62 +136,38 @@ internal static class Deconjugator
 
                 if (textSpan.Length is not 0)
                 {
-                    if (s_index.TryGetValue(textSpan[^1], out VirtualRule[]? bucket))
+                    if (ruleBucketsByLastDecEndChar.TryGetValue(textSpan[^1], out RuleBucket bucket))
                     {
-                        for (int j = 0; j < bucket.Length; j++)
-                        {
-                            ApplyRule(form, bucket[j], newFormsToProcess, textSpan);
-                        }
-                    }
-
-                    for (int j = 0; j < universalCount; j++)
-                    {
-                        ApplyRule(form, universalRules[j], newFormsToProcess, textSpan);
+                        ApplyBucket(form, bucket, newFormsToProcess, textSpan);
                     }
                 }
+
+                ApplyBucket(form, RulesWithEmptyConEnd, newFormsToProcess, textSpan);
 
                 if (addFormToProcess)
                 {
                     bool add = true;
-                    int formProcessCount = -1;
                     string formTag = form.LastTag;
 
+                    Debug.Assert(form.Process is not null);
+                    int newFormProperStepCount = form.Process.ProperStepCount;
+
                     ReadOnlySpan<Form> processedFormsSpan = processedForms.AsReadOnlySpan();
-                    for (int i = processedForms.Count - 1; i >= 0; i--)
+                    for (int i = processedFormsSpan.Length - 1; i >= 0; i--)
                     {
                         ref readonly Form existingForm = ref processedFormsSpan[i];
                         if (existingForm.Text == form.Text && existingForm.LastTag == formTag)
                         {
-                            int existingFormProcessCount = 1;
-                            for (int j = existingForm.Process.Count - 1; j > 0; j--)
-                            {
-                                string existingFormProcess = existingForm.Process[j];
-                                if (existingFormProcess.Length > 0 && existingFormProcess[0] is not '(')
-                                {
-                                    ++existingFormProcessCount;
-                                }
-                            }
+                            Debug.Assert(existingForm.Process is not null);
+                            int existingFormProperStepCount = existingForm.Process.ProperStepCount;
 
-                            if (formProcessCount is -1)
-                            {
-                                formProcessCount = 1;
-                                for (int j = form.Process.Count - 1; j > 0; j--)
-                                {
-                                    string formProcess = form.Process[j];
-                                    if (formProcess.Length > 0 && formProcess[0] is not '(')
-                                    {
-                                        ++formProcessCount;
-                                    }
-                                }
-                            }
-
-                            if (existingFormProcessCount < formProcessCount)
+                            if (existingFormProperStepCount < newFormProperStepCount)
                             {
                                 add = false;
                                 break;
                             }
 
-                            if (existingFormProcessCount > formProcessCount)
+                            if (existingFormProperStepCount > newFormProperStepCount)
                             {
                                 processedForms.RemoveAt(i);
                                 processedFormsSpan = processedForms.AsReadOnlySpan();

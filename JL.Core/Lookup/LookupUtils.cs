@@ -723,6 +723,8 @@ public static class LookupUtils
         {
             foreach (ref readonly Form deconjugationResult in deconjugationResults.AsReadOnlySpan())
             {
+                Debug.Assert(deconjugationResult.Process is not null);
+
                 if (verbDict.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
                     List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
@@ -736,13 +738,12 @@ public static class LookupUtils
                                 if (index >= 0)
                                 {
                                     Debug.Assert(result.Processes is not null);
-                                    List<List<string>> processes = result.Processes[index];
-                                    ReadOnlySpan<string> processSpan = deconjugationResult.Process.AsReadOnlySpan();
+                                    List<ProcessNode> processes = result.Processes[index];
 
                                     bool addProcess = true;
-                                    foreach (ref readonly List<string> process in processes.AsReadOnlySpan())
+                                    foreach (ref readonly ProcessNode process in processes.AsReadOnlySpan())
                                     {
-                                        if (process.AsReadOnlySpan().SequenceEqual(processSpan))
+                                        if (ReferenceEquals(process, deconjugationResult.Process))
                                         {
                                             addProcess = false;
                                             break;
@@ -1084,7 +1085,7 @@ public static class LookupUtils
         foreach (IntermediaryResult wordResult in jmdictResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
-            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsReadOnlySpan();
+            ReadOnlySpan<List<ProcessNode>> processesSpan = wordResult.Processes.AsReadOnlySpan();
             ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
@@ -1092,22 +1093,22 @@ public static class LookupUtils
                 string? deconjugationProcess;
                 if (deconjugatedWord)
                 {
-                    ReadOnlySpan<List<string>> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
+                    ReadOnlySpan<ProcessNode> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
                     deconjugationProcess = LookupResultUtils.DeconjugationProcessesToText(currentProcessSpan);
                     if (deconjugationProcess is not null)
                     {
                         if (currentProcessSpan.Length is 1)
                         {
-                            minDeconjugationProcessStepCount = currentProcessSpan[0].Count;
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].TotalStepCount;
                         }
                         else
                         {
                             minDeconjugationProcessStepCount = int.MaxValue;
-                            foreach (List<string> process in currentProcessSpan)
+                            foreach (ref readonly ProcessNode process in currentProcessSpan)
                             {
-                                if (minDeconjugationProcessStepCount > process.Count)
+                                if (minDeconjugationProcessStepCount > process.TotalStepCount)
                                 {
-                                    minDeconjugationProcessStepCount = process.Count;
+                                    minDeconjugationProcessStepCount = process.TotalStepCount;
                                 }
                             }
                         }
@@ -1285,7 +1286,7 @@ public static class LookupUtils
         foreach (IntermediaryResult wordResult in epwingResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
-            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsReadOnlySpan();
+            ReadOnlySpan<List<ProcessNode>> processesSpan = wordResult.Processes.AsReadOnlySpan();
             ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
@@ -1293,22 +1294,22 @@ public static class LookupUtils
                 string? deconjugationProcess;
                 if (deconjugatedWord)
                 {
-                    ReadOnlySpan<List<string>> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
+                    ReadOnlySpan<ProcessNode> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
                     deconjugationProcess = LookupResultUtils.DeconjugationProcessesToText(currentProcessSpan);
                     if (deconjugationProcess is not null)
                     {
                         if (currentProcessSpan.Length is 1)
                         {
-                            minDeconjugationProcessStepCount = currentProcessSpan[0].Count;
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].TotalStepCount;
                         }
                         else
                         {
                             minDeconjugationProcessStepCount = int.MaxValue;
-                            foreach (List<string> process in currentProcessSpan)
+                            foreach (ref readonly ProcessNode process in currentProcessSpan)
                             {
-                                if (minDeconjugationProcessStepCount > process.Count)
+                                if (minDeconjugationProcessStepCount > process.TotalStepCount)
                                 {
-                                    minDeconjugationProcessStepCount = process.Count;
+                                    minDeconjugationProcessStepCount = process.TotalStepCount;
                                 }
                             }
                         }
@@ -1399,7 +1400,7 @@ public static class LookupUtils
         foreach (IntermediaryResult wordResult in epwingNazekaResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
-            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsReadOnlySpan();
+            ReadOnlySpan<List<ProcessNode>> processesSpan = wordResult.Processes.AsReadOnlySpan();
             ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
@@ -1407,22 +1408,22 @@ public static class LookupUtils
                 string? deconjugationProcess;
                 if (deconjugatedWord)
                 {
-                    ReadOnlySpan<List<string>> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
+                    ReadOnlySpan<ProcessNode> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
                     deconjugationProcess = LookupResultUtils.DeconjugationProcessesToText(currentProcessSpan);
                     if (deconjugationProcess is not null)
                     {
                         if (currentProcessSpan.Length is 1)
                         {
-                            minDeconjugationProcessStepCount = currentProcessSpan[0].Count;
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].TotalStepCount;
                         }
                         else
                         {
                             minDeconjugationProcessStepCount = int.MaxValue;
-                            foreach (List<string> process in currentProcessSpan)
+                            foreach (ref readonly ProcessNode process in currentProcessSpan)
                             {
-                                if (minDeconjugationProcessStepCount > process.Count)
+                                if (minDeconjugationProcessStepCount > process.TotalStepCount)
                                 {
-                                    minDeconjugationProcessStepCount = process.Count;
+                                    minDeconjugationProcessStepCount = process.TotalStepCount;
                                 }
                             }
                         }
@@ -1470,7 +1471,6 @@ public static class LookupUtils
 
         return results;
     }
-
 
     private static bool WordClassDictionaryContainsTag(string primarySpelling, string? reading, string tag)
     {
@@ -1573,7 +1573,7 @@ public static class LookupUtils
         foreach (IntermediaryResult wordResult in customWordResults.Values)
         {
             bool deconjugatedWord = wordResult.Processes is not null;
-            ReadOnlySpan<List<List<string>>> processesSpan = wordResult.Processes.AsReadOnlySpan();
+            ReadOnlySpan<List<ProcessNode>> processesSpan = wordResult.Processes.AsReadOnlySpan();
             ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
             for (int i = 0; i < resultsSpan.Length; i++)
             {
@@ -1581,22 +1581,22 @@ public static class LookupUtils
                 string? deconjugationProcess;
                 if (deconjugatedWord)
                 {
-                    ReadOnlySpan<List<string>> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
+                    ReadOnlySpan<ProcessNode> currentProcessSpan = processesSpan[i].AsReadOnlySpan();
                     deconjugationProcess = LookupResultUtils.DeconjugationProcessesToText(currentProcessSpan);
                     if (deconjugationProcess is not null)
                     {
                         if (currentProcessSpan.Length is 1)
                         {
-                            minDeconjugationProcessStepCount = currentProcessSpan[0].Count;
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].TotalStepCount;
                         }
                         else
                         {
                             minDeconjugationProcessStepCount = int.MaxValue;
-                            foreach (List<string> process in currentProcessSpan)
+                            foreach (ref readonly ProcessNode process in currentProcessSpan)
                             {
-                                if (minDeconjugationProcessStepCount > process.Count)
+                                if (minDeconjugationProcessStepCount > process.TotalStepCount)
                                 {
-                                    minDeconjugationProcessStepCount = process.Count;
+                                    minDeconjugationProcessStepCount = process.TotalStepCount;
                                 }
                             }
                         }

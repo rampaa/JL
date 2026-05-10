@@ -1,71 +1,32 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using JL.Core.Deconjugation;
 using JL.Core.Utilities;
 
 namespace JL.Core.Lookup;
 
 public static class LookupResultUtils
 {
-    internal static string? DeconjugationProcessesToText(ReadOnlySpan<List<string>> processList)
+    internal static string? DeconjugationProcessesToText(ReadOnlySpan<ProcessNode?> processList)
     {
         StringBuilder deconjugationProcessBuilder = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 0; i < processList.Length; i++)
         {
-            ref readonly List<string> form = ref processList[i];
-
-            StringBuilder formTextBuilder = ObjectPoolManager.StringBuilderPool.Get();
-            bool added = false;
-
-            ReadOnlySpan<string> formSpan = form.AsReadOnlySpan();
-            for (int j = formSpan.Length - 1; j >= 0; j--)
-            {
-                string info = formSpan[j];
-                if (info.Length is 0)
-                {
-                    continue;
-                }
-
-                bool startsWithParentheses = info[0] is '(';
-                if (startsWithParentheses)
-                {
-                    if (j is not 0)
-                    {
-                        continue;
-                    }
-
-                    if (added)
-                    {
-                        _ = formTextBuilder.Append('→');
-                    }
-
-                    _ = formTextBuilder.Append(info.AsSpan(1, info.Length - 2));
-                }
-                else
-                {
-                    if (added)
-                    {
-                        _ = formTextBuilder.Append('→');
-                    }
-
-                    _ = formTextBuilder.Append(info);
-                }
-
-                added = true;
-            }
-
-            if (formTextBuilder.Length is not 0)
+            ProcessNode? process = processList[i];
+            Debug.Assert(process is not null);
+            string pathText = process.GetFormattedText();
+            if (pathText.Length is not 0)
             {
                 if (i is 0)
                 {
-                    _ = deconjugationProcessBuilder.Append(CultureInfo.InvariantCulture, $"～{formTextBuilder}");
+                    _ = deconjugationProcessBuilder.Append(CultureInfo.InvariantCulture, $"～{pathText}");
                 }
                 else
                 {
-                    _ = deconjugationProcessBuilder.Append(CultureInfo.InvariantCulture, $"; {formTextBuilder}");
+                    _ = deconjugationProcessBuilder.Append(CultureInfo.InvariantCulture, $"; {pathText}");
                 }
             }
-
-            ObjectPoolManager.StringBuilderPool.Return(formTextBuilder);
         }
 
         string? deconjugationProcess = deconjugationProcessBuilder.Length is 0
