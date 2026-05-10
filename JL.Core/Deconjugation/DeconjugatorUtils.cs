@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
 
@@ -110,25 +109,22 @@ internal static class DeconjugatorUtils
             Debug.Assert(rulesForConTag is not null);
             rulesForConTag.Add(rule);
 
-            bool isDuplicate = false;
-            for (int j = 0; j < allUniqueRules.Count; j++)
-            {
-                VirtualRule existing = allUniqueRules[j];
-                if (rule.Type == existing.Type
-                    && rule.DecEnd == existing.DecEnd
-                    && rule.ConEnd == existing.ConEnd
-                    && rule.DecTag == existing.DecTag
-                    && rule.Detail == existing.Detail)
-                {
-                    isDuplicate = true;
-                    break;
-                }
-            }
+            //bool isDuplicate = false;
+            //for (int j = 0; j < allUniqueRules.Count; j++)
+            //{
+            //    VirtualRule existing = allUniqueRules[j];
+            //    if (rule.Type == existing.Type
+            //        && rule.DecEnd == existing.DecEnd
+            //        && rule.ConEnd == existing.ConEnd
+            //        && rule.DecTag == existing.DecTag
+            //        && rule.Detail == existing.Detail)
+            //    {
+            //        isDuplicate = true;
+            //        break;
+            //    }
+            //}
 
-            if (!isDuplicate)
-            {
-                allUniqueRules.Add(rule);
-            }
+            allUniqueRules.Add(rule);
         }
 
         return new RuleBucket(allUniqueRules.ToArray(), rulesByConTag.ToFrozenDictionary(static entry => entry.Key, static (entry) => entry.Value.ToArray(), StringComparer.Ordinal));
