@@ -11,7 +11,13 @@ internal static class Deconjugator
     internal static FrozenDictionary<char, RuleBucket> RuleBucketsByLastDecEndChar { get; set; } = FrozenDictionary<char, RuleBucket>.Empty;
     internal static RuleBucket RulesWithEmptyConEnd { get; set; }
 
-    private static void ApplyRuleInternal(in Form form, in VirtualRule rule, List<Form> discoveredForms, ReadOnlySpan<char> textSpan)
+    [ThreadStatic]
+    private static List<Form>? s_formsToProcess;
+
+    [ThreadStatic]
+    private static List<Form>? s_newFormsToProcess;
+
+    private static void ApplyRuleInternal(in Form form, in VirtualRule rule, List<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
     {
         if (rule.Type is RuleType.OnlyFinal)
         {
@@ -35,25 +41,19 @@ internal static class Deconjugator
             }
         }
 
-        // deconjugated form too much longer than conjugated form
-        if (textSpan.Length > form.OriginalText.Length + 10)
-        {
-            return;
-        }
-
         if (textSpan.Length == rule.ConEnd.Length && rule.DecEnd.Length is 0)
         {
             return;
         }
 
-        // impossibly information-dense
-        if ((form.Process?.TotalStepCount ?? 0) > form.OriginalText.Length + 6)
+        // Too many proper deconjugation steps
+        if ((form.Process?.ProperStepCount ?? 0) > 7)
         {
             return;
         }
 
         // ending doesn't match
-        if (!textSpan.EndsWith(rule.ConEnd.AsSpan(), StringComparison.Ordinal))
+        if (!textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
         {
             return;
         }
@@ -61,29 +61,29 @@ internal static class Deconjugator
         int stemLength = textSpan.Length - rule.ConEnd.Length;
         ReadOnlySpan<char> stem = textSpan[..stemLength];
 
-        if (DiscoveredFormsContain(discoveredForms.AsReadOnlySpan(), stem, rule.DecEnd, rule.DecTag, form.Process, rule.Detail))
+        if (DiscoveredFormsContain(newFormsToProcess.AsReadOnlySpan(), stem, rule.DecEnd, rule.DecTag, form.Process, rule.Detail))
         {
             return;
         }
 
         string newText = string.Concat(stem, rule.DecEnd);
-        discoveredForms.Add(new Form(newText, form.OriginalText, rule.DecTag, new ProcessNode(rule.Detail, form.Process)));
+        newFormsToProcess.Add(new Form(newText, form.OriginalText, rule.DecTag, new ProcessNode(rule.Detail, form.Process)));
     }
 
-    private static void ApplyBucket(in Form form, in RuleBucket bucket, List<Form> discoveredForms, ReadOnlySpan<char> textSpan)
+    private static void ApplyBucket(in Form form, in RuleBucket bucket, List<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
     {
         if (form.Process is null)
         {
             foreach (ref readonly VirtualRule rule in bucket.AllRules.AsSpan())
             {
-                ApplyRuleInternal(form, rule, discoveredForms, textSpan);
+                ApplyRuleInternal(form, rule, newFormsToProcess, textSpan);
             }
         }
         else if (bucket.RulesByTag.TryGetValue(form.LastTag, out VirtualRule[]? rules))
         {
             foreach (ref readonly VirtualRule rule in rules.AsSpan())
             {
-                ApplyRuleInternal(form, rule, discoveredForms, textSpan);
+                ApplyRuleInternal(form, rule, newFormsToProcess, textSpan);
             }
         }
     }
@@ -115,11 +115,14 @@ internal static class Deconjugator
     public static List<Form> Deconjugate(string text)
     {
         List<Form> processedForms = [];
-        List<Form> formsToProcess = [new(text, text, "", null)];
-        List<Form> newFormsToProcess = [];
-        FrozenDictionary<char, RuleBucket> ruleBucketsByLastDecEndChar = RuleBucketsByLastDecEndChar;
+        List<Form> newFormsToProcess = s_newFormsToProcess ??= [];
+        List<Form> formsToProcess = s_formsToProcess ??= [];
 
-        bool addFormToProcess = false;
+        formsToProcess.Clear();
+        formsToProcess.Add(new(text, text, "", null));
+
+        FrozenDictionary<char, RuleBucket> ruleBucketsByLastDecEndChar = RuleBucketsByLastDecEndChar;
+        FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
         while (formsToProcess.Count > 0)
         {
             foreach (ref readonly Form form in formsToProcess.AsReadOnlySpan())
@@ -135,10 +138,10 @@ internal static class Deconjugator
 
                 ApplyBucket(form, RulesWithEmptyConEnd, newFormsToProcess, textSpan);
 
-                if (addFormToProcess)
+                string formTag = form.LastTag;
+                if (validWordClasses.Contains(formTag))
                 {
                     bool add = true;
-                    string formTag = form.LastTag;
 
                     Debug.Assert(form.Process is not null);
                     int newFormProperStepCount = form.Process.ProperStepCount;
@@ -176,10 +179,6 @@ internal static class Deconjugator
                     {
                         processedForms.Add(form);
                     }
-                }
-                else
-                {
-                    addFormToProcess = true;
                 }
             }
 

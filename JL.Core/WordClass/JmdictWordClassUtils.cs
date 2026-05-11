@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
+using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.JMdict;
@@ -13,12 +14,6 @@ namespace JL.Core.WordClass;
 internal static class JmdictWordClassUtils
 {
     private static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
-
-    private static readonly FrozenSet<string> s_usedWordClasses =
-        [
-            "adj-i", "cop", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
-            "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
-        ];
 
     internal static async Task Load()
     {
@@ -70,6 +65,7 @@ internal static class JmdictWordClassUtils
     internal static async Task Serialize()
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new(StringComparer.Ordinal);
+        FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         foreach ((string key, IList<IDictRecord> jmdictRecordList) in dict.Contents)
@@ -87,7 +83,7 @@ internal static class JmdictWordClassUtils
                         {
                             foreach (string wordClass in wordClassArray)
                             {
-                                if (s_usedWordClasses.Contains(wordClass))
+                                if (validWordClasses.Contains(wordClass))
                                 {
                                     wordClassList.Add(wordClass);
                                 }
@@ -100,7 +96,7 @@ internal static class JmdictWordClassUtils
                 {
                     foreach (string wordClass in jmdictRecord.WordClassesSharedByAllSenses)
                     {
-                        if (s_usedWordClasses.Contains(wordClass))
+                        if (validWordClasses.Contains(wordClass))
                         {
                             wordClassList.Add(wordClass);
                         }
