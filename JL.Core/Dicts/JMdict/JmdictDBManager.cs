@@ -13,7 +13,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 18;
+    public const int Version = 19;
 
     private static readonly Dictionary<int, string> s_queryCache = [];
 

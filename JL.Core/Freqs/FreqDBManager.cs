@@ -12,7 +12,7 @@ namespace JL.Core.Freqs;
 
 internal static class FreqDBManager
 {
-    public const int Version = 10;
+    public const int Version = 11;
 
     private const string SingleTermQuery =
         """

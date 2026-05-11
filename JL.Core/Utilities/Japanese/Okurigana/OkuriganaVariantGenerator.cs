@@ -1,9 +1,13 @@
+using System.Buffers;
 using System.Runtime.CompilerServices;
 
 namespace JL.Core.Utilities.Japanese.Okurigana;
 
 internal static class OkuriganaVariantGenerator
 {
+    private const int StackAllocBytesThreshold = 2048;
+    private const int MaxStackRuns = 128;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsBitSet(ulong mask, int index)
     {
@@ -20,85 +24,160 @@ internal static class OkuriganaVariantGenerator
         count = 0;
         kanjiCount = 0;
 
-        int expressionIndex = 0;
-        int readingIndex = 0;
+        ExpressionRun[]? rentedRuns = null;
+        byte[]? rentedWays = null;
 
-        while (expressionIndex < expression.Length)
+        try
         {
-            int startIndex = expressionIndex;
-            if (!IsKanji(expression, expressionIndex, out int consumedCharCount))
+            Span<ExpressionRun> runs = expression.Length <= MaxStackRuns
+                ? stackalloc ExpressionRun[expression.Length]
+                : (rentedRuns = ArrayPool<ExpressionRun>.Shared.Rent(expression.Length));
+
+            int runCount = ParseRuns(expression, runs);
+            ReadOnlySpan<ExpressionRun> activeRuns = runs[..runCount];
+
+            int readingLength = reading.Length;
+            int cols = readingLength + 1;
+            int waysSize = (runCount + 1) * cols;
+
+            Span<byte> ways = waysSize <= StackAllocBytesThreshold
+                ? stackalloc byte[waysSize]
+                : (rentedWays = ArrayPool<byte>.Shared.Rent(waysSize));
+
+            return TryProcessIterative(expression, reading, activeRuns, ways, segments, out count, out kanjiCount);
+        }
+        finally
+        {
+            if (rentedRuns is not null)
             {
-                do
-                {
-                    expressionIndex += consumedCharCount;
-                } while (expressionIndex < expression.Length && !IsKanji(expression, expressionIndex, out consumedCharCount));
+                ArrayPool<ExpressionRun>.Shared.Return(rentedRuns);
+            }
 
-                int length = expressionIndex - startIndex;
-                if (readingIndex + length > reading.Length
-                    || !reading.Slice(readingIndex, length).SequenceEqual(expression.Slice(startIndex, length)))
+            if (rentedWays is not null)
+            {
+                ArrayPool<byte>.Shared.Return(rentedWays);
+            }
+        }
+    }
+
+    private static bool TryProcessIterative(
+        ReadOnlySpan<char> expression,
+        ReadOnlySpan<char> reading,
+        ReadOnlySpan<ExpressionRun> runs,
+        Span<byte> ways,
+        Span<OkuriganaSegment> segments,
+        out int segmentCount,
+        out int kanjiCount)
+    {
+        segmentCount = 0;
+        kanjiCount = 0;
+
+        int runCount = runs.Length;
+        int readingLength = reading.Length;
+        int cols = readingLength + 1;
+
+        int lastRowOffset = runCount * cols;
+        ways.Slice(lastRowOffset, readingLength).Clear();
+        ways[lastRowOffset + readingLength] = 1;
+
+        for (int i = runCount - 1; i >= 0; i--)
+        {
+            ExpressionRun run = runs[i];
+
+            Span<byte> currentRow = ways.Slice(i * cols, cols);
+            Span<byte> nextRow = ways.Slice((i + 1) * cols, cols);
+
+            if (run.IsKanji)
+            {
+                int runningSum = 0;
+                for (int j = readingLength; j >= 0; j--)
                 {
-                    return false;
+                    currentRow[j] = (byte)Math.Min(2, runningSum);
+
+                    runningSum += nextRow[j];
+                    if (runningSum > 2)
+                    {
+                        runningSum = 2;
+                    }
                 }
-
-                segments[count] = new OkuriganaSegment(startIndex, length, readingIndex, length, false);
-                ++count;
-                readingIndex += length;
             }
             else
             {
-                do
+                ReadOnlySpan<char> runText = expression.Slice(run.Start, run.Length);
+                for (int j = 0; j <= readingLength; j++)
                 {
-                    expressionIndex += consumedCharCount;
-                } while (expressionIndex < expression.Length && IsKanji(expression, expressionIndex, out consumedCharCount));
-
-                int expressionLength = expressionIndex - startIndex;
-                int readingStartIndex = readingIndex;
-
-                if (expression.Length > expressionIndex)
-                {
-                    int anchorStartIndex = expressionIndex;
-                    while (expressionIndex < expression.Length && !IsKanji(expression, expressionIndex, out consumedCharCount))
-                    {
-                        expressionIndex += consumedCharCount;
-                    }
-
-                    ReadOnlySpan<char> anchor = expression[anchorStartIndex..expressionIndex];
-                    int searchStartIndex = readingStartIndex + 1;
-
-                    if (searchStartIndex >= reading.Length)
-                    {
-                        return false;
-                    }
-
-                    ReadOnlySpan<char> readingSlice = reading[searchStartIndex..];
-                    int firstMatch = readingSlice.IndexOf(anchor);
-
-                    if (firstMatch is -1 || readingSlice[(firstMatch + 1)..].IndexOf(anchor) is not -1)
-                    {
-                        return false;
-                    }
-
-                    readingIndex = searchStartIndex + firstMatch;
-                    expressionIndex = anchorStartIndex;
+                    int matchIdx = j + run.Length;
+                    currentRow[j] = (matchIdx <= readingLength && reading[j..].StartsWith(runText))
+                        ? nextRow[matchIdx]
+                        : (byte)0;
                 }
-                else
-                {
-                    readingIndex = reading.Length;
-                }
-
-                int readingLength = readingIndex - readingStartIndex;
-                if (readingLength <= 0)
-                {
-                    return false;
-                }
-
-                segments[count] = new OkuriganaSegment(startIndex, expressionLength, readingStartIndex, readingLength, true);
-                ++count;
-                ++kanjiCount;
             }
         }
 
-        return readingIndex == reading.Length;
+        if (ways[0] is not 1)
+        {
+            return false;
+        }
+
+        int currentReadingIndex = 0;
+        for (int i = 0; i < runCount; i++)
+        {
+            ExpressionRun run = runs[i];
+            Span<byte> nextRow = ways.Slice((i + 1) * cols, cols);
+
+            if (run.IsKanji)
+            {
+                for (int readingEnd = currentReadingIndex + 1; readingEnd <= readingLength; readingEnd++)
+                {
+                    if (nextRow[readingEnd] is 1)
+                    {
+                        segments[segmentCount] = new OkuriganaSegment(run.Start, run.Length, currentReadingIndex, readingEnd - currentReadingIndex, true);
+
+                        ++segmentCount;
+                        currentReadingIndex = readingEnd;
+                        ++kanjiCount;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                segments[segmentCount] = new OkuriganaSegment(run.Start, run.Length, currentReadingIndex, run.Length, false);
+                ++segmentCount;
+                currentReadingIndex += run.Length;
+            }
+        }
+
+        return true;
+    }
+
+    private static int ParseRuns(ReadOnlySpan<char> expression, Span<ExpressionRun> runs)
+    {
+        int runCount = 0;
+        int i = 0;
+        int expressionLength = expression.Length;
+
+        while (i < expressionLength)
+        {
+            int start = i;
+            bool isKanji = IsKanji(expression, i, out int consumed);
+            i += consumed;
+
+            while (i < expressionLength)
+            {
+                if (IsKanji(expression, i, out int nextConsumed) != isKanji)
+                {
+                    break;
+                }
+
+                i += nextConsumed;
+            }
+
+            runs[runCount] = new ExpressionRun(start, i - start, isKanji);
+            ++runCount;
+        }
+
+        return runCount;
     }
 
     public static string Assemble(string expression, string reading, OkuriganaSegment[] segments, int segmentCount, ulong mask)
@@ -135,12 +214,11 @@ internal static class OkuriganaVariantGenerator
 
                 if (segment.IsKanji)
                 {
-                    bool useReading = IsBitSet(state.mask, bitIndex);
-                    ++bitIndex;
-
-                    source = useReading
+                    source = IsBitSet(state.mask, bitIndex)
                         ? state.reading.AsSpan(segment.ReadingStart, segment.ReadingLength)
                         : state.expression.AsSpan(segment.ExpressionStart, segment.ExpressionLength);
+
+                    ++bitIndex;
                 }
                 else
                 {
@@ -153,18 +231,25 @@ internal static class OkuriganaVariantGenerator
         });
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsKanji(ReadOnlySpan<char> span, int index, out int consumedCharCount)
     {
         char character = span[index];
+
         if (!char.IsHighSurrogate(character))
         {
             consumedCharCount = 1;
             int codePoint = character;
             return codePoint is (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
+                    or (>= 0x3400 and <= 0x4DBF) // CJK Unified Ideographs Extension A (3400–4DBF)
                     or (>= 0x2E80 and <= 0x2FDF) // CJK Radicals Supplement (2E80–2EFF), Kangxi Radicals (2F00–2FDF)
+                    or (>= 0x3005 and <= 0x3007) // Iteration marks, etc. (々 〆 〇)
+                    or (>= 0x3031 and <= 0x303B) // Vertical Kana Repeat Marks (〱–〺, 〻)
+                    or (>= 0x309D and <= 0x309E) // Hiragana Iteration Marks (ゝ ゞ)
+                    or (>= 0x30F5 and <= 0x30F6) // Small Ke/Ka (ヵ ヶ)
+                    or (>= 0x30FD and <= 0x30FE) // Katakana Iteration Marks (ヽ ヾ)
                     or (>= 0x3190 and <= 0x319F) // Kanbun (3190–319F)
                     or (>= 0x31C0 and <= 0x31EF) // CJK Strokes (31C0–31EF)
-                    or (>= 0x3400 and <= 0x4DBF) // CJK Unified Ideographs Extension A (3400–4DBF)
                     or (>= 0xF900 and <= 0xFAFF) // CJK Compatibility Ideographs(F900–FAFF)
                     or (>= 0xFE30 and <= 0xFE4F); // CJK Compatibility Forms (FE30–FE4F)
         }

@@ -13,7 +13,7 @@ namespace JL.Core.Dicts.PitchAccent;
 
 internal static class YomichanPitchAccentDBManager
 {
-    public const int Version = 9;
+    public const int Version = 10;
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
