@@ -88,7 +88,7 @@ internal static class Deconjugator
     private static bool DiscoveredFormsContain(ReadOnlySpan<Form> discoveredForms, ReadOnlySpan<char> stem, string decEnd, string tag, ProcessNode? parentProcessNode, string newDetail)
     {
         int targetTextLength = stem.Length + decEnd.Length;
-        int targetTotalCount = (parentProcessNode?.TotalStepCount ?? 0) + 1;
+        int targetProperStepCount = parentProcessNode?.ProperStepCount ?? 0;
 
         foreach (ref readonly Form form in discoveredForms)
         {
@@ -98,7 +98,7 @@ internal static class Deconjugator
                 if (formText.StartsWith(stem) && formText[stem.Length..].Equals(decEnd, StringComparison.Ordinal))
                 {
                     ProcessNode? currentProcess = form.Process;
-                    if (currentProcess is not null && currentProcess.TotalStepCount == targetTotalCount && currentProcess.Detail == newDetail && ReferenceEquals(currentProcess.Parent, parentProcessNode))
+                    if (currentProcess is not null && currentProcess.ProperStepCount == targetProperStepCount && currentProcess.Detail == newDetail && ReferenceEquals(currentProcess.Parent, parentProcessNode))
                     {
                         return true;
                     }

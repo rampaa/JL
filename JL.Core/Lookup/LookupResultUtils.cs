@@ -10,21 +10,28 @@ public static class LookupResultUtils
 {
     internal static string? DeconjugationProcessesToText(ReadOnlySpan<ProcessNode?> processList)
     {
+        if (processList.Length is 1)
+        {
+            ProcessNode? processNode = processList[0];
+            Debug.Assert(processNode is not null);
+            return processNode.GetCachedDeconjugationProcessText();
+        }
+
         StringBuilder deconjugationProcessBuilder = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 0; i < processList.Length; i++)
         {
             ProcessNode? process = processList[i];
             Debug.Assert(process is not null);
-            string pathText = process.GetFormattedText();
-            if (pathText.Length is not 0)
+            string? pathText = process.GetFormattedText();
+            if (pathText is not null)
             {
                 if (i is 0)
                 {
-                    _ = deconjugationProcessBuilder.Append(CultureInfo.InvariantCulture, $"～{pathText}");
+                    _ = deconjugationProcessBuilder.Append('～').Append(pathText);
                 }
                 else
                 {
-                    _ = deconjugationProcessBuilder.Append(CultureInfo.InvariantCulture, $"; {pathText}");
+                    _ = deconjugationProcessBuilder.Append("; ").Append(pathText);
                 }
             }
         }

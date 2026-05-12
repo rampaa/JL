@@ -1099,16 +1099,16 @@ public static class LookupUtils
                     {
                         if (currentProcessSpan.Length is 1)
                         {
-                            minDeconjugationProcessStepCount = currentProcessSpan[0].TotalStepCount;
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].ProperStepCount;
                         }
                         else
                         {
                             minDeconjugationProcessStepCount = int.MaxValue;
                             foreach (ref readonly ProcessNode process in currentProcessSpan)
                             {
-                                if (minDeconjugationProcessStepCount > process.TotalStepCount)
+                                if (minDeconjugationProcessStepCount > process.ProperStepCount)
                                 {
-                                    minDeconjugationProcessStepCount = process.TotalStepCount;
+                                    minDeconjugationProcessStepCount = process.ProperStepCount;
                                 }
                             }
                         }
@@ -1300,16 +1300,16 @@ public static class LookupUtils
                     {
                         if (currentProcessSpan.Length is 1)
                         {
-                            minDeconjugationProcessStepCount = currentProcessSpan[0].TotalStepCount;
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].ProperStepCount;
                         }
                         else
                         {
                             minDeconjugationProcessStepCount = int.MaxValue;
                             foreach (ref readonly ProcessNode process in currentProcessSpan)
                             {
-                                if (minDeconjugationProcessStepCount > process.TotalStepCount)
+                                if (minDeconjugationProcessStepCount > process.ProperStepCount)
                                 {
-                                    minDeconjugationProcessStepCount = process.TotalStepCount;
+                                    minDeconjugationProcessStepCount = process.ProperStepCount;
                                 }
                             }
                         }
@@ -1414,16 +1414,16 @@ public static class LookupUtils
                     {
                         if (currentProcessSpan.Length is 1)
                         {
-                            minDeconjugationProcessStepCount = currentProcessSpan[0].TotalStepCount;
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].ProperStepCount;
                         }
                         else
                         {
                             minDeconjugationProcessStepCount = int.MaxValue;
                             foreach (ref readonly ProcessNode process in currentProcessSpan)
                             {
-                                if (minDeconjugationProcessStepCount > process.TotalStepCount)
+                                if (minDeconjugationProcessStepCount > process.ProperStepCount)
                                 {
-                                    minDeconjugationProcessStepCount = process.TotalStepCount;
+                                    minDeconjugationProcessStepCount = process.ProperStepCount;
                                 }
                             }
                         }
@@ -1587,16 +1587,16 @@ public static class LookupUtils
                     {
                         if (currentProcessSpan.Length is 1)
                         {
-                            minDeconjugationProcessStepCount = currentProcessSpan[0].TotalStepCount;
+                            minDeconjugationProcessStepCount = currentProcessSpan[0].ProperStepCount;
                         }
                         else
                         {
                             minDeconjugationProcessStepCount = int.MaxValue;
                             foreach (ref readonly ProcessNode process in currentProcessSpan)
                             {
-                                if (minDeconjugationProcessStepCount > process.TotalStepCount)
+                                if (minDeconjugationProcessStepCount > process.ProperStepCount)
                                 {
-                                    minDeconjugationProcessStepCount = process.TotalStepCount;
+                                    minDeconjugationProcessStepCount = process.ProperStepCount;
                                 }
                             }
                         }
