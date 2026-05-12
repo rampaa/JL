@@ -60,7 +60,7 @@ jobs:
           rm "${pfxCertFilePath}"
           
           # Pack files
-          7z a -tzip "${release_name}.zip" "./${release_name}/*"
+          7z a -tzip -mx=9 "${release_name}.zip" "./${release_name}/*"
           
           # Delete output directory
           rm -r "$release_name"
