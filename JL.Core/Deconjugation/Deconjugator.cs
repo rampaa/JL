@@ -11,11 +11,8 @@ internal static class Deconjugator
     internal static FrozenDictionary<char, RuleBucket> RuleBucketsByLastDecEndChar { get; set; } = FrozenDictionary<char, RuleBucket>.Empty;
     internal static RuleBucket RulesWithEmptyConEnd { get; set; }
 
-    [ThreadStatic]
-    private static List<Form>? s_formsToProcess;
-
-    [ThreadStatic]
-    private static List<Form>? s_newFormsToProcess;
+    private static readonly List<Form> s_formsToProcess = new(4);
+    private static readonly List<Form> s_newFormsToProcess = new(4);
 
     private static void ApplyRuleInternal(in Form form, in VirtualRule rule, List<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
     {
@@ -114,10 +111,10 @@ internal static class Deconjugator
 
     public static List<Form> Deconjugate(string text)
     {
-        List<Form> processedForms = [];
-        List<Form> newFormsToProcess = s_newFormsToProcess ??= [];
-        List<Form> formsToProcess = s_formsToProcess ??= [];
+        List<Form> processedForms = new(4);
+        List<Form> newFormsToProcess = s_newFormsToProcess;
 
+        List<Form> formsToProcess = s_formsToProcess;
         formsToProcess.Clear();
         formsToProcess.Add(new(text, text, "", null));
 
