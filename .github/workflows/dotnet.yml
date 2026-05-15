@@ -26,11 +26,11 @@ jobs:
         cache-dependency-path: "**/packages.lock.json"
 
     - name: Restore and validate lock files
-      run: dotnet restore --use-lock-file --force-evaluate --locked-mode
+      run: dotnet restore --use-lock-file --force-evaluate --locked-mode -p:Platform=${{ matrix.platform }}
 
     - name: Build
       run: dotnet build --no-restore -p:Platform=${{ matrix.platform }}
 
     - name: Test (x64 only)
       if: matrix.platform == 'x64'
-      run: dotnet test --no-build -p:Platform=x64 --verbosity normal
+      run: dotnet test --no-build -p:Platform=${{ matrix.platform }} --verbosity normal
