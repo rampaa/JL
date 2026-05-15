@@ -103,8 +103,8 @@
       },
       "Microsoft.NET.StringTools": {
         "type": "Transitive",
-        "resolved": "18.4.0",
-        "contentHash": "iQWOKi3L5QStmWqDjDubcr1KlTDy88qBTe88I0etlUUo1l0zSNebGJXl1Xetyl+ACA+ujP3YUtxo3Nz54JPriw==",
+        "resolved": "18.6.3",
+        "contentHash": "meWX/k62HeaQ+7zxcJBcGo2EccmLZiaHYwJJ9wAO6ZX3Ujeht5XNetVZWU7nW2vKbDB+88X1lQkLafVkOUrtgQ==",
         "dependencies": {
           "System.Memory": "4.6.3",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
@@ -183,22 +183,22 @@
       },
       "OpusSharp": {
         "type": "Transitive",
-        "resolved": "1.6.6",
-        "contentHash": "w0odJfZ4/MRK3DUih/M/Z3EAvl9I6PPHFPS/3lovynrJWMpbGLW0N+Iv1uIlCvQpiX8Ba5e5bk93OdhPU0gRug==",
+        "resolved": "1.6.7",
+        "contentHash": "nTYvrNARdRCqItV44MI5AcJBQ6/XqZJXl3LfJprbnluFyRzH5qHSS3rlEZEQKPOCByK+jpN22/zNi3j7V03F3w==",
         "dependencies": {
-          "OpusSharp.Core": "1.6.1.2",
-          "OpusSharp.Natives": "1.6.1.2"
+          "OpusSharp.Core": "1.6.1.3",
+          "OpusSharp.Natives": "1.6.1.3"
         }
       },
       "OpusSharp.Core": {
         "type": "Transitive",
-        "resolved": "1.6.1.2",
-        "contentHash": "NEfqwikrYSsZFJxSkmOnPW76ySuqQRiHqQGbvfVa9HhzrQHNTVeSzXCDEF2AiXmpJPCCxMjrvL5d5jbRlxGYlQ=="
+        "resolved": "1.6.1.3",
+        "contentHash": "4cbbF6oK5yi2N4BBlOdNitl3V3GKY0F/LY5qxsUgVUKXuPg0pNo6eywIK+gTUYx/r8uzoiZbS3o6qolizxk4AQ=="
       },
       "OpusSharp.Natives": {
         "type": "Transitive",
-        "resolved": "1.6.1.2",
-        "contentHash": "zJ8rm+WXWF8emskj8HOSHqIKmXktYBX5BAdPiUTZX1KNdSP6MHaKp9htgK0x3rGEmYajx2eD5ftyhvq+qW11HA=="
+        "resolved": "1.6.1.3",
+        "contentHash": "ohS8ppBayHKeqfrFH3sxfwE+N9OvijVWfguY0oooRknTxXGcwGrai+8XmW3dydg+EsVjqvCi2/p1kuLcMsq/tg=="
       },
       "Serilog": {
         "type": "Transitive",
@@ -283,9 +283,9 @@
           "MessagePack": "[3.1.4, )",
           "Microsoft.Data.Sqlite": "[10.0.8, )",
           "Microsoft.Extensions.ObjectPool": "[10.0.8, )",
-          "Microsoft.NET.StringTools": "[18.4.0, )",
+          "Microsoft.NET.StringTools": "[18.6.3, )",
           "NAudio.Wasapi": "[2.3.0, )",
-          "OpusSharp": "[1.6.6, )",
+          "OpusSharp": "[1.6.7, )",
           "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.3, )",
           "Serilog": "[4.3.1, )",
           "Serilog.Sinks.File": "[7.0.0, )",
