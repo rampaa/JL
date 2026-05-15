@@ -63,7 +63,7 @@ public sealed class LookupResult
         {
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Dict.GetHashCode();
-            hash = ((hash * 37) + FormattedDefinitions?.GetHashCode(StringComparison.Ordinal)) ?? 37;
+            hash = (hash * 37) + (FormattedDefinitions?.GetHashCode(StringComparison.Ordinal) ?? 37);
 
             string[]? readings = Readings;
             if (readings is not null)
