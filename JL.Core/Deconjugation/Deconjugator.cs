@@ -116,7 +116,7 @@ internal static class Deconjugator
 
         List<Form> formsToProcess = s_formsToProcess;
         formsToProcess.Clear();
-        formsToProcess.Add(new(text, text, "", null));
+        formsToProcess.Add(new Form(text, text, "", null));
 
         FrozenDictionary<char, RuleBucket> ruleBucketsByLastDecEndChar = RuleBucketsByLastDecEndChar;
         FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
