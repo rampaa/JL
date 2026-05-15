@@ -416,9 +416,12 @@ internal static class WindowsUtils
             MemoryStream memoryStream = new(audio);
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
-            WaveStream waveProvider = audioFormat is "ogg" or "oga"
-                ? new VorbisWaveReader(memoryStream)
-                : new StreamMediaFoundationReader(memoryStream);
+            WaveStream waveProvider = audioFormat switch
+            {
+                "ogg" or "oga" => new VorbisWaveReader(memoryStream),
+                "opus" => new OpusWaveStream(memoryStream),
+                _ => new StreamMediaFoundationReader(memoryStream)
+            };
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
             WaveOutEvent audioPlayer = new();

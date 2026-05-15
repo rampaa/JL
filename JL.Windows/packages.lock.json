@@ -24,15 +24,6 @@
           "NVorbis": "0.10.4"
         }
       },
-      "NAudio.Wasapi": {
-        "type": "Direct",
-        "requested": "[2.3.0, )",
-        "resolved": "2.3.0",
-        "contentHash": "y5K2BxrLnvohgu5znzg5wRsai3YcuNXfrpo68i7PmCQqpK5MC/R24e5aO3OyN/XhfRr12e0QYV0OnUWEHi5SzA==",
-        "dependencies": {
-          "NAudio.Core": "2.3.0"
-        }
-      },
       "NAudio.WinForms": {
         "type": "Direct",
         "requested": "[2.3.0, )",
@@ -120,6 +111,14 @@
         "resolved": "2.3.0",
         "contentHash": "jMd7r6dB6tAtXhOYL58ntPqwERNm1/Rhw5MKOIYvsnXzuX+PTGsa2VMam6n0npZYSwlSidKa4GAm4bFcXFUlcg=="
       },
+      "NAudio.Wasapi": {
+        "type": "Transitive",
+        "resolved": "2.3.0",
+        "contentHash": "y5K2BxrLnvohgu5znzg5wRsai3YcuNXfrpo68i7PmCQqpK5MC/R24e5aO3OyN/XhfRr12e0QYV0OnUWEHi5SzA==",
+        "dependencies": {
+          "NAudio.Core": "2.3.0"
+        }
+      },
       "NAudio.WinMM": {
         "type": "Transitive",
         "resolved": "2.3.0",
@@ -127,6 +126,25 @@
         "dependencies": {
           "NAudio.Core": "2.3.0"
         }
+      },
+      "OpusSharp": {
+        "type": "Transitive",
+        "resolved": "1.6.6",
+        "contentHash": "w0odJfZ4/MRK3DUih/M/Z3EAvl9I6PPHFPS/3lovynrJWMpbGLW0N+Iv1uIlCvQpiX8Ba5e5bk93OdhPU0gRug==",
+        "dependencies": {
+          "OpusSharp.Core": "1.6.1.2",
+          "OpusSharp.Natives": "1.6.1.2"
+        }
+      },
+      "OpusSharp.Core": {
+        "type": "Transitive",
+        "resolved": "1.6.1.2",
+        "contentHash": "NEfqwikrYSsZFJxSkmOnPW76ySuqQRiHqQGbvfVa9HhzrQHNTVeSzXCDEF2AiXmpJPCCxMjrvL5d5jbRlxGYlQ=="
+      },
+      "OpusSharp.Natives": {
+        "type": "Transitive",
+        "resolved": "1.6.1.2",
+        "contentHash": "zJ8rm+WXWF8emskj8HOSHqIKmXktYBX5BAdPiUTZX1KNdSP6MHaKp9htgK0x3rGEmYajx2eD5ftyhvq+qW11HA=="
       },
       "Serilog": {
         "type": "Transitive",
@@ -199,6 +217,8 @@
           "Microsoft.Data.Sqlite": "[10.0.8, )",
           "Microsoft.Extensions.ObjectPool": "[10.0.8, )",
           "Microsoft.NET.StringTools": "[18.4.0, )",
+          "NAudio.Wasapi": "[2.3.0, )",
+          "OpusSharp": "[1.6.6, )",
           "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.3, )",
           "Serilog": "[4.3.1, )",
           "Serilog.Sinks.File": "[7.0.0, )",
