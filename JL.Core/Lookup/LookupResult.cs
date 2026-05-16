@@ -167,8 +167,14 @@ public sealed class LookupResult
         bool jmdictLookupResultExists = jmdictLookupResult is not null;
         bool otherJmdictLookupResultExists = otherJmdictLookupResult is not null;
 
-        int primarySpellingOrthographyScore = GetPrimarySpellingOrthographyScore(jmdictLookupResult, jmdictLookupResultExists, matchedPrimarySpelling);
-        int otherPrimarySpellingOrthographyScore = GetPrimarySpellingOrthographyScore(otherJmdictLookupResult, otherJmdictLookupResultExists, otherMatchedPrimarySpelling);
+        int primarySpellingOrthographyScore = jmdictLookupResultExists && matchedPrimarySpelling
+            ? GetPrimarySpellingOrthographyScore(jmdictLookupResult!)
+            : int.MaxValue;
+
+        int otherPrimarySpellingOrthographyScore = otherJmdictLookupResultExists && otherMatchedPrimarySpelling
+            ? GetPrimarySpellingOrthographyScore(otherJmdictLookupResult!)
+            : int.MaxValue;
+
         cmpResult = primarySpellingOrthographyScore.CompareTo(otherPrimarySpellingOrthographyScore);
         if (cmpResult is not 0)
         {
@@ -176,8 +182,14 @@ public sealed class LookupResult
         }
 
         // 7. ThenBy: Reading orthography info check (uk, ok, ik, rk)
-        int readingOrthographyScore = GetReadingOrthographyScore(jmdictLookupResult, jmdictLookupResultExists, readingsContainMatchedText, readingIndexOfMatchedText);
-        int otherReadingOrthographyScore = GetReadingOrthographyScore(otherJmdictLookupResult, otherJmdictLookupResultExists, otherReadingsContainMatchedText, otherReadingIndexOfMatchedText);
+        int readingOrthographyScore = jmdictLookupResultExists && readingsContainMatchedText
+            ? GetReadingOrthographyScore(jmdictLookupResult, readingIndexOfMatchedText)
+            : int.MaxValue;
+
+        int otherReadingOrthographyScore = otherJmdictLookupResultExists && otherReadingsContainMatchedText
+            ? GetReadingOrthographyScore(otherJmdictLookupResult, otherReadingIndexOfMatchedText)
+            : int.MaxValue;
+
         cmpResult = readingOrthographyScore.CompareTo(otherReadingOrthographyScore);
         if (cmpResult is not 0)
         {
@@ -194,11 +206,48 @@ public sealed class LookupResult
         }
 
         // 9. ThenBy: Index in Readings
-        return (readingIndexOfMatchedText >= 0 ? readingIndexOfMatchedText : int.MaxValue)
-            .CompareTo(otherReadingIndexOfMatchedText >= 0 ? otherReadingIndexOfMatchedText : int.MaxValue);
+        int readingIndexOfMatchedTextScore = readingsContainMatchedText
+            ? readingIndexOfMatchedText
+            : int.MaxValue;
+
+        int otherReadingIndexOfMatchedTextScore = otherReadingsContainMatchedText
+            ? otherReadingIndexOfMatchedText
+            : int.MaxValue;
+
+        cmpResult = readingIndexOfMatchedTextScore.CompareTo(otherReadingIndexOfMatchedTextScore);
+        if (cmpResult is not 0)
+        {
+            return cmpResult;
+        }
 
         // 10. ThenBy: EntryId
-        // EntryId.CompareTo(other.EntryId);
+        int idScore = EntryId > 0
+            ? EntryId
+            : int.MaxValue;
+
+        int otherIdScore = other.EntryId > 0
+            ? other.EntryId
+            : int.MaxValue;
+
+        cmpResult = idScore.CompareTo(otherIdScore);
+        if (cmpResult is not 0)
+        {
+            return cmpResult;
+        }
+
+        // 11. ThenBy: Primary spelling
+        cmpResult = PrimarySpelling.CompareTo(otherPrimarySpelling, StringComparison.Ordinal);
+        if (cmpResult is not 0)
+        {
+            return cmpResult;
+        }
+
+        // 12. ThenByDescending: FormattedDefinitions length
+        cmpResult = (other.FormattedDefinitions?.Length ?? 0).CompareTo(FormattedDefinitions?.Length ?? 0);
+        return cmpResult is not 0
+            ? cmpResult
+            // 13. ThenBy: FormattedDefinitions
+            : FormattedDefinitions.CompareTo(other.FormattedDefinitions, StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)
@@ -209,23 +258,16 @@ public sealed class LookupResult
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int GetPrimarySpellingOrthographyScore(JmdictLookupResult? jmdictResult, bool jmdictLookupResultExists, bool matchedPrimarySpelling)
+    private static int GetPrimarySpellingOrthographyScore(JmdictLookupResult jmdictResult)
     {
-        Debug.Assert((jmdictResult is not null) == jmdictLookupResultExists);
-
-        if (matchedPrimarySpelling && jmdictLookupResultExists)
+        string[]? primarySpellingOrthographyInfoList = jmdictResult.PrimarySpellingOrthographyInfoList;
+        if (primarySpellingOrthographyInfoList is not null)
         {
-            Debug.Assert(jmdictResult is not null);
-
-            string[]? primarySpellingOrthographyInfoList = jmdictResult.PrimarySpellingOrthographyInfoList;
-            if (primarySpellingOrthographyInfoList is not null)
+            foreach (string primarySpellingOrthographyInfo in primarySpellingOrthographyInfoList)
             {
-                foreach (string primarySpellingOrthographyInfo in primarySpellingOrthographyInfoList)
+                if (primarySpellingOrthographyInfo is "oK" or "iK" or "rK")
                 {
-                    if (primarySpellingOrthographyInfo is "oK" or "iK" or "rK")
-                    {
-                        return 1;
-                    }
+                    return 1;
                 }
             }
         }
@@ -234,44 +276,35 @@ public sealed class LookupResult
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int GetReadingOrthographyScore(JmdictLookupResult? jmdictLookupResult, bool jmdictLookupResultExists, bool readingsContainMatchedText, int readingIndexOfMatchedText)
+    private static int GetReadingOrthographyScore(JmdictLookupResult? jmdictLookupResult, int readingIndexOfMatchedText)
     {
-        if (!readingsContainMatchedText)
+        Debug.Assert(jmdictLookupResult is not null);
+        string[]? readingsOrthographyInfo = jmdictLookupResult.ReadingsOrthographyInfoList?[readingIndexOfMatchedText];
+        if (readingsOrthographyInfo is not null)
         {
-            return 2;
-        }
-
-        Debug.Assert((jmdictLookupResult is not null) == jmdictLookupResultExists);
-        if (jmdictLookupResultExists)
-        {
-            Debug.Assert(jmdictLookupResult is not null);
-            string[]? readingsOrthographyInfo = jmdictLookupResult.ReadingsOrthographyInfoList?[readingIndexOfMatchedText];
-            if (readingsOrthographyInfo is not null)
+            foreach (string readingsOrthographyInfoItem in readingsOrthographyInfo)
             {
-                foreach (string readingsOrthographyInfoItem in readingsOrthographyInfo)
+                if (readingsOrthographyInfoItem is "ok" or "ik" or "rk")
                 {
-                    if (readingsOrthographyInfoItem is "ok" or "ik" or "rk")
-                    {
-                        return 3;
-                    }
+                    return 2;
                 }
             }
+        }
 
-            string[]? miscSharedByAllSenses = jmdictLookupResult.MiscSharedByAllSenses;
-            if (miscSharedByAllSenses is not null && miscSharedByAllSenses.Contains("uk"))
-            {
-                return 0;
-            }
+        string[]? miscSharedByAllSenses = jmdictLookupResult.MiscSharedByAllSenses;
+        if (miscSharedByAllSenses is not null && miscSharedByAllSenses.Contains("uk"))
+        {
+            return 0;
+        }
 
-            string[]?[]? miscList = jmdictLookupResult.MiscList;
-            if (miscList is not null)
+        string[]?[]? miscList = jmdictLookupResult.MiscList;
+        if (miscList is not null)
+        {
+            foreach (string[]? misc in miscList)
             {
-                foreach (string[]? misc in miscList)
+                if (misc is not null && misc.Contains("uk"))
                 {
-                    if (misc is not null && misc.Contains("uk"))
-                    {
-                        return 0;
-                    }
+                    return 0;
                 }
             }
         }
