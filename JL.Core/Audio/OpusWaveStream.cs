@@ -111,7 +111,7 @@ public sealed class OpusWaveStream : WaveStream
     public override long Position
     {
         get => _position;
-        set => throw new NotSupportedException();
+        set => throw new NotSupportedException("Seeking is not supported.");
     }
 
     protected override void Dispose(bool disposing)
