@@ -716,7 +716,7 @@ public static class LookupUtils
         if (wordDict.TryGetValue(textInHiragana, out IList<IDictRecord>? tempResult))
         {
             _ = results.TryAdd(textInHiragana,
-                new IntermediaryResult(matchedText, dict, [tempResult]));
+                new IntermediaryResult(matchedText, dict, tempResult));
         }
 
         if (deconjugationResults is not null)
@@ -734,45 +734,53 @@ public static class LookupUtils
                         {
                             if (result.MatchedText == deconjugationResult.OriginalText)
                             {
-                                int index = result.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
-                                if (index >= 0)
+                                foreach (IDictRecord record in resultsList)
                                 {
-                                    Debug.Assert(result.Processes is not null);
-                                    List<ProcessNode> processes = result.Processes[index];
-
-                                    bool addProcess = true;
-                                    foreach (ref readonly ProcessNode process in processes.AsReadOnlySpan())
+                                    int index = result.Results.FastReferenceIndexOf(record);
+                                    if (index >= 0)
                                     {
-                                        if (process.Equals(deconjugationResult.Process))
+                                        Debug.Assert(result.Processes is not null);
+                                        List<ProcessNode> processes = result.Processes[index];
+
+                                        bool addProcess = true;
+                                        foreach (ref readonly ProcessNode process in processes.AsReadOnlySpan())
                                         {
-                                            addProcess = false;
-                                            break;
+                                            if (process.Equals(deconjugationResult.Process))
+                                            {
+                                                addProcess = false;
+                                                break;
+                                            }
+                                        }
+
+                                        if (addProcess)
+                                        {
+                                            processes.Add(deconjugationResult.Process);
                                         }
                                     }
-
-                                    if (addProcess)
+                                    else
                                     {
-                                        processes.Add(deconjugationResult.Process);
-                                    }
-                                }
-                                else
-                                {
-                                    result.Results.Add(resultsList);
+                                        result.Results.Add(record);
 
-                                    Debug.Assert(result.Processes is not null);
-                                    result.Processes.Add([deconjugationResult.Process]);
+                                        Debug.Assert(result.Processes is not null);
+                                        result.Processes.Add([deconjugationResult.Process]);
+                                    }
                                 }
                             }
                         }
                         else
                         {
+                            List<List<ProcessNode>> processNodes = new(resultsList.Count);
+                            for (int i = 0; i < resultsList.Count; i++)
+                            {
+                                processNodes.Add([deconjugationResult.Process]);
+                            }
+
                             results.Add(deconjugationResult.Text,
                                 new IntermediaryResult(matchedText,
                                     dict,
-                                    [resultsList],
+                                    resultsList,
                                     deconjugationResult.Text,
-                                    [[deconjugationResult.Process]])
-                            );
+                                    processNodes));
                         }
                     }
                 }
@@ -898,9 +906,9 @@ public static class LookupUtils
                     {
                         // It seems like instead of storing precise tags like v5r
                         // Yomichan dictionaries simply store the general v5 tag
-                        foreach (string wordClass in dictResult.WordClasses)
+                        foreach (ReadOnlySpan<char> wordClass in dictResult.WordClasses)
                         {
-                            if (lastTag.AsSpan().StartsWith(wordClass, StringComparison.Ordinal))
+                            if (lastTag.StartsWith(wordClass, StringComparison.Ordinal))
                             {
                                 resultsList.Add(dictResult);
                                 break;
@@ -979,7 +987,7 @@ public static class LookupUtils
             if (nameDict.TryGetValue(textInHiragana, out IList<IDictRecord>? result))
             {
                 nameResults.Add(textInHiragana,
-                    new IntermediaryResult(textList[i], dict, [result]));
+                    new IntermediaryResult(textList[i], dict, result));
             }
         }
 
@@ -991,7 +999,7 @@ public static class LookupUtils
     private static IntermediaryResult? GetKanjiResults(string kanji, Dict dict)
     {
         return dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result)
-            ? new IntermediaryResult(kanji, dict, [result])
+            ? new IntermediaryResult(kanji, dict, result)
             : null;
     }
 
@@ -1000,7 +1008,7 @@ public static class LookupUtils
         List<IDictRecord>? results = getKanjiRecordsFromDB(dict.Name, kanji);
 
         return results is not null && results.Count > 0
-            ? new IntermediaryResult(kanji, dict, [results])
+            ? new IntermediaryResult(kanji, dict, results)
             : null;
     }
 
@@ -1086,8 +1094,8 @@ public static class LookupUtils
         {
             bool deconjugatedWord = wordResult.Processes is not null;
             ReadOnlySpan<List<ProcessNode>> processesSpan = wordResult.Processes.AsReadOnlySpan();
-            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
-            for (int i = 0; i < resultsSpan.Length; i++)
+            IList<IDictRecord> resultsList = wordResult.Results;
+            for (int i = 0; i < resultsList.Count; i++)
             {
                 int minDeconjugationProcessStepCount;
                 string? deconjugationProcess;
@@ -1124,35 +1132,30 @@ public static class LookupUtils
                     minDeconjugationProcessStepCount = 0;
                 }
 
-                ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
-                int dictRecordsCount = dictRecords.Count;
-                for (int j = 0; j < dictRecordsCount; j++)
-                {
-                    JmdictRecord jmdictResult = (JmdictRecord)dictRecords[j];
-                    LookupResult result = new
-                    (
-                        primarySpelling: jmdictResult.PrimarySpelling,
-                        matchedText: wordResult.MatchedText,
-                        dict: wordResult.Dict,
-                        readings: jmdictResult.Readings,
-                        formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
-                        alternativeSpellings: jmdictResult.AlternativeSpellings,
-                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: deconjugationProcess,
-                        minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
-                        entryId: jmdictResult.Id,
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null,
-                        wordClasses: jmdictResult.WordClassesSharedByAllSenses,
-                        jmdictLookupResult: new JmdictLookupResult(jmdictResult.PrimarySpellingOrthographyInfo, jmdictResult.ReadingsOrthographyInfo, jmdictResult.AlternativeSpellingsOrthographyInfo, jmdictResult.MiscSharedByAllSenses, jmdictResult.Misc, jmdictResult.WordClasses)
-                    );
+                JmdictRecord jmdictResult = (JmdictRecord)resultsList[i];
+                LookupResult result = new
+                (
+                    primarySpelling: jmdictResult.PrimarySpelling,
+                    matchedText: wordResult.MatchedText,
+                    dict: wordResult.Dict,
+                    readings: jmdictResult.Readings,
+                    formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
+                    alternativeSpellings: jmdictResult.AlternativeSpellings,
+                    deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
+                    deconjugationProcess: deconjugationProcess,
+                    minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                    entryId: jmdictResult.Id,
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null,
+                    wordClasses: jmdictResult.WordClassesSharedByAllSenses,
+                    jmdictLookupResult: new JmdictLookupResult(jmdictResult.PrimarySpellingOrthographyInfo, jmdictResult.ReadingsOrthographyInfo, jmdictResult.AlternativeSpellingsOrthographyInfo, jmdictResult.MiscSharedByAllSenses, jmdictResult.Misc, jmdictResult.WordClasses)
+                );
 
-                    if (!results.Contains(result))
-                    {
-                        results.Add(result);
-                    }
+                if (!results.Contains(result))
+                {
+                    results.Add(result);
                 }
             }
         }
@@ -1165,19 +1168,15 @@ public static class LookupUtils
         HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
-            foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsReadOnlySpan())
+            foreach (IDictRecord dictRecord in intermediaryResult.Results)
             {
-                int dictRecordsCount = dictRecords.Count;
-                for (int j = 0; j < dictRecordsCount; j++)
+                IDictRecordWithMultipleReadings record = (IDictRecordWithMultipleReadings)dictRecord;
+                _ = searchKeys.Add(JapaneseUtils.NormalizeText(record.PrimarySpelling));
+                if (record.Readings is not null)
                 {
-                    IDictRecordWithMultipleReadings record = (IDictRecordWithMultipleReadings)dictRecords[j];
-                    _ = searchKeys.Add(JapaneseUtils.NormalizeText(record.PrimarySpelling));
-                    if (record.Readings is not null)
+                    foreach (string reading in record.Readings)
                     {
-                        foreach (string reading in record.Readings)
-                        {
-                            _ = searchKeys.Add(JapaneseUtils.NormalizeText(reading));
-                        }
+                        _ = searchKeys.Add(JapaneseUtils.NormalizeText(reading));
                     }
                 }
             }
@@ -1193,28 +1192,23 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         foreach (IntermediaryResult nameResult in jmnedictResults.Values)
         {
-            foreach (ref readonly IList<IDictRecord> dictRecords in nameResult.Results.AsReadOnlySpan())
+            foreach (IDictRecord dictRecord in nameResult.Results)
             {
-                int dictRecordsCount = dictRecords.Count;
-                for (int j = 0; j < dictRecordsCount; j++)
-                {
-                    JmnedictRecord jmnedictRecord = (JmnedictRecord)dictRecords[j];
+                JmnedictRecord jmnedictRecord = (JmnedictRecord)dictRecord;
+                LookupResult result = new
+                (
+                    primarySpelling: jmnedictRecord.PrimarySpelling,
+                    matchedText: nameResult.MatchedText,
+                    dict: nameResult.Dict,
+                    readings: jmnedictRecord.Readings,
+                    formattedDefinitions: jmnedictRecord.BuildFormattedDefinition(nameResult.Dict.Options),
+                    alternativeSpellings: jmnedictRecord.AlternativeSpellings,
+                    entryId: jmnedictRecord.Id,
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmnedictRecord.PrimarySpelling, jmnedictRecord.Readings, pitchAccentDict!) : null
+                );
 
-                    LookupResult result = new
-                    (
-                        primarySpelling: jmnedictRecord.PrimarySpelling,
-                        matchedText: nameResult.MatchedText,
-                        dict: nameResult.Dict,
-                        readings: jmnedictRecord.Readings,
-                        formattedDefinitions: jmnedictRecord.BuildFormattedDefinition(nameResult.Dict.Options),
-                        alternativeSpellings: jmnedictRecord.AlternativeSpellings,
-                        entryId: jmnedictRecord.Id,
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmnedictRecord.PrimarySpelling, jmnedictRecord.Readings, pitchAccentDict!) : null
-                    );
-
-                    results.Add(result);
-                }
+                results.Add(result);
             }
         }
 
@@ -1223,8 +1217,7 @@ public static class LookupUtils
 
     private static LookupResult BuildKanjidicResult(string kanji, string[]? kanjiCompositions, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
-        KanjidicRecord kanjiRecord = (KanjidicRecord)intermediaryResult.Results[0][0];
-
+        KanjidicRecord kanjiRecord = (KanjidicRecord)intermediaryResult.Results[0];
         string[]? allReadings = ArrayUtils.ConcatNullableArrays(kanjiRecord.OnReadings, kanjiRecord.KunReadings, kanjiRecord.NanoriReadings);
 
         bool pitchAccentDictExists = pitchAccentDict is not null;
@@ -1250,28 +1243,24 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsReadOnlySpan())
+        foreach (IDictRecord dictRecord in intermediaryResult.Results)
         {
-            int dictRecordsCount = dictRecords.Count;
-            for (int j = 0; j < dictRecordsCount; j++)
-            {
-                YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)dictRecords[j];
+            YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)dictRecord;
 
-                string[]? allReadings = ArrayUtils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
-                LookupResult result = new
-                (
-                    primarySpelling: kanji,
-                    matchedText: intermediaryResult.MatchedText,
-                    dict: intermediaryResult.Dict,
-                    readings: allReadings,
-                    formattedDefinitions: yomichanKanjiDictResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
-                    frequencies: kanjiFrequencyResults,
-                    // ReSharper disable once NullableWarningSuppressionIsUsed
-                    pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats())
-                );
-                results.Add(result);
-            }
+            string[]? allReadings = ArrayUtils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
+            LookupResult result = new
+            (
+                primarySpelling: kanji,
+                matchedText: intermediaryResult.MatchedText,
+                dict: intermediaryResult.Dict,
+                readings: allReadings,
+                formattedDefinitions: yomichanKanjiDictResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
+                frequencies: kanjiFrequencyResults,
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null,
+                kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats())
+            );
+            results.Add(result);
         }
 
         return results;
@@ -1287,8 +1276,8 @@ public static class LookupUtils
         {
             bool deconjugatedWord = wordResult.Processes is not null;
             ReadOnlySpan<List<ProcessNode>> processesSpan = wordResult.Processes.AsReadOnlySpan();
-            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
-            for (int i = 0; i < resultsSpan.Length; i++)
+            IList<IDictRecord> resultsList = wordResult.Results;
+            for (int i = 0; i < resultsList.Count; i++)
             {
                 int minDeconjugationProcessStepCount;
                 string? deconjugationProcess;
@@ -1325,33 +1314,28 @@ public static class LookupUtils
                     minDeconjugationProcessStepCount = 0;
                 }
 
-                ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
-                int dictRecordsCount = dictRecords.Count;
-                for (int j = 0; j < dictRecordsCount; j++)
-                {
-                    EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)dictRecords[j];
+                EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)resultsList[i];
 
-                    string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
-                    LookupResult result = new
-                    (
-                        primarySpelling: epwingResult.PrimarySpelling,
-                        matchedText: wordResult.MatchedText,
-                        dict: wordResult.Dict,
-                        readings: readings,
-                        formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
-                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: deconjugationProcess,
-                        minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                        wordClasses: epwingResult.WordClasses,
-                        imagePaths: epwingResult.ImagePaths
-                    );
+                string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
+                LookupResult result = new
+                (
+                    primarySpelling: epwingResult.PrimarySpelling,
+                    matchedText: wordResult.MatchedText,
+                    dict: wordResult.Dict,
+                    readings: readings,
+                    formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
+                    deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
+                    deconjugationProcess: deconjugationProcess,
+                    minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                    wordClasses: epwingResult.WordClasses,
+                    imagePaths: epwingResult.ImagePaths
+                );
 
-                    results.Add(result);
-                }
+                results.Add(result);
             }
         }
 
@@ -1363,29 +1347,25 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsReadOnlySpan())
+        foreach (IDictRecord dictRecords in intermediaryResult.Results)
         {
-            int dictRecordsCount = dictRecords.Count;
-            for (int j = 0; j < dictRecordsCount; j++)
-            {
-                EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)dictRecords[j];
-                string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
-                LookupResult result = new
-                (
-                    primarySpelling: epwingResult.PrimarySpelling,
-                    matchedText: intermediaryResult.MatchedText,
-                    dict: intermediaryResult.Dict,
-                    readings: readings,
-                    formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
-                    frequencies: kanjiFrequencyResults,
-                    // ReSharper disable once NullableWarningSuppressionIsUsed
-                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                    imagePaths: epwingResult.ImagePaths,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions)
-                );
+            EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)dictRecords;
+            string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
+            LookupResult result = new
+            (
+                primarySpelling: epwingResult.PrimarySpelling,
+                matchedText: intermediaryResult.MatchedText,
+                dict: intermediaryResult.Dict,
+                readings: readings,
+                formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
+                frequencies: kanjiFrequencyResults,
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                imagePaths: epwingResult.ImagePaths,
+                kanjiLookupResult: new KanjiLookupResult(kanjiCompositions)
+            );
 
-                results.Add(result);
-            }
+            results.Add(result);
         }
 
         return results;
@@ -1401,8 +1381,8 @@ public static class LookupUtils
         {
             bool deconjugatedWord = wordResult.Processes is not null;
             ReadOnlySpan<List<ProcessNode>> processesSpan = wordResult.Processes.AsReadOnlySpan();
-            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
-            for (int i = 0; i < resultsSpan.Length; i++)
+            IList<IDictRecord> resultsList = wordResult.Results;
+            for (int i = 0; i < resultsList.Count; i++)
             {
                 int minDeconjugationProcessStepCount;
                 string? deconjugationProcess;
@@ -1439,33 +1419,27 @@ public static class LookupUtils
                     minDeconjugationProcessStepCount = 0;
                 }
 
-                ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
-                int dictRecordsCount = dictRecords.Count;
-                for (int j = 0; j < dictRecordsCount; j++)
-                {
-                    EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)dictRecords[j];
+                EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)resultsList[i];
+                string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
+                LookupResult result = new
+                (
+                    primarySpelling: epwingResult.PrimarySpelling,
+                    matchedText: wordResult.MatchedText,
+                    dict: wordResult.Dict,
+                    readings: readings,
+                    formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
+                    alternativeSpellings: epwingResult.AlternativeSpellings,
+                    deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
+                    deconjugationProcess: deconjugationProcess,
+                    minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                    imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
+                );
 
-                    string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
-                    LookupResult result = new
-                    (
-                        primarySpelling: epwingResult.PrimarySpelling,
-                        matchedText: wordResult.MatchedText,
-                        dict: wordResult.Dict,
-                        readings: readings,
-                        formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
-                        alternativeSpellings: epwingResult.AlternativeSpellings,
-                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: deconjugationProcess,
-                        minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                        imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
-                    );
-
-                    results.Add(result);
-                }
+                results.Add(result);
             }
         }
 
@@ -1493,36 +1467,30 @@ public static class LookupUtils
 
         return false;
     }
-
     private static List<LookupResult> BuildEpwingNazekaResultForKanji(string[]? kanjiCompositions, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         List<LookupResult> results = [];
 
-        foreach (ref readonly IList<IDictRecord> dictRecords in intermediaryResult.Results.AsReadOnlySpan())
+        foreach (IDictRecord dictRecords in intermediaryResult.Results)
         {
-            int dictRecordsCount = dictRecords.Count;
-            for (int j = 0; j < dictRecordsCount; j++)
-            {
-                EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)dictRecords[j];
-                string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
-                LookupResult result = new
-                (
-                    primarySpelling: epwingResult.PrimarySpelling,
-                    matchedText: intermediaryResult.MatchedText,
-                    dict: intermediaryResult.Dict,
-                    readings: readings,
-                    formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
-                    frequencies: kanjiFrequencyResults,
-                    alternativeSpellings: epwingResult.AlternativeSpellings,
-                    // ReSharper disable once NullableWarningSuppressionIsUsed
-                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                    imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
-,
-                    kanjiLookupResult: new KanjiLookupResult(kanjiCompositions));
-
-                results.Add(result);
-            }
+            EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)dictRecords;
+            string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
+            LookupResult result = new
+            (
+                primarySpelling: epwingResult.PrimarySpelling,
+                matchedText: intermediaryResult.MatchedText,
+                dict: intermediaryResult.Dict,
+                readings: readings,
+                formattedDefinitions: epwingResult.BuildFormattedDefinition(intermediaryResult.Dict.Options),
+                frequencies: kanjiFrequencyResults,
+                alternativeSpellings: epwingResult.AlternativeSpellings,
+                // ReSharper disable once NullableWarningSuppressionIsUsed
+                pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null,
+                kanjiLookupResult: new KanjiLookupResult(kanjiCompositions)
+            );
+            results.Add(result);
         }
 
         return results;
@@ -1574,8 +1542,8 @@ public static class LookupUtils
         {
             bool deconjugatedWord = wordResult.Processes is not null;
             ReadOnlySpan<List<ProcessNode>> processesSpan = wordResult.Processes.AsReadOnlySpan();
-            ReadOnlySpan<IList<IDictRecord>> resultsSpan = wordResult.Results.AsReadOnlySpan();
-            for (int i = 0; i < resultsSpan.Length; i++)
+            IList<IDictRecord> resultsList = wordResult.Results;
+            for (int i = 0; i < resultsList.Count; i++)
             {
                 int minDeconjugationProcessStepCount;
                 string? deconjugationProcess;
@@ -1612,32 +1580,26 @@ public static class LookupUtils
                     minDeconjugationProcessStepCount = 0;
                 }
 
-                ref readonly IList<IDictRecord> dictRecords = ref resultsSpan[i];
-                int dictRecordsCount = dictRecords.Count;
-                for (int j = 0; j < dictRecordsCount; j++)
-                {
-                    CustomWordRecord customWordDictResult = (CustomWordRecord)dictRecords[j];
+                CustomWordRecord customWordDictResult = (CustomWordRecord)resultsList[i];
+                LookupResult result = new
+                (
+                    primarySpelling: customWordDictResult.PrimarySpelling,
+                    matchedText: wordResult.MatchedText,
+                    dict: wordResult.Dict,
+                    readings: customWordDictResult.Readings,
+                    formattedDefinitions: customWordDictResult.BuildFormattedDefinition(wordResult.Dict.Options),
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
+                    alternativeSpellings: customWordDictResult.AlternativeSpellings,
+                    deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
+                    deconjugationProcess: customWordDictResult.HasUserDefinedWordClass ? deconjugationProcess : null,
+                    minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
+                    wordClasses: customWordDictResult.WordClasses
+                );
 
-                    LookupResult result = new
-                    (
-                        primarySpelling: customWordDictResult.PrimarySpelling,
-                        matchedText: wordResult.MatchedText,
-                        dict: wordResult.Dict,
-                        readings: customWordDictResult.Readings,
-                        formattedDefinitions: customWordDictResult.BuildFormattedDefinition(wordResult.Dict.Options),
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
-                        alternativeSpellings: customWordDictResult.AlternativeSpellings,
-                        deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: customWordDictResult.HasUserDefinedWordClass ? deconjugationProcess : null,
-                        minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
-                        wordClasses: customWordDictResult.WordClasses
-                    );
-
-                    results.Add(result);
-                }
+                results.Add(result);
             }
         }
 
@@ -1652,29 +1614,25 @@ public static class LookupUtils
         foreach (IntermediaryResult customNameResult in customNameResults.Values)
         {
             int freq = 0;
-            foreach (ref readonly IList<IDictRecord> dictRecords in customNameResult.Results.AsReadOnlySpan())
+            foreach (IDictRecord dictRecord in customNameResult.Results)
             {
-                int dictRecordsCount = dictRecords.Count;
-                for (int j = 0; j < dictRecordsCount; j++)
-                {
-                    CustomNameRecord customNameDictResult = (CustomNameRecord)dictRecords[j];
-                    string[]? readings = customNameDictResult.Reading is not null ? [customNameDictResult.Reading] : null;
-                    LookupResult result = new
-                    (
-                        primarySpelling: customNameDictResult.PrimarySpelling,
-                        matchedText: customNameResult.MatchedText,
-                        dict: customNameResult.Dict,
-                        readings: readings,
-                        formattedDefinitions: customNameDictResult.BuildFormattedDefinition(),
-                        frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        pitchPositions: pitchAccentDictExists ? GetPitchPosition(customNameDictResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                        imagePaths: customNameDictResult.ImagePath is not null ? [customNameDictResult.ImagePath] : null
-                    );
+                CustomNameRecord customNameDictResult = (CustomNameRecord)dictRecord;
+                string[]? readings = customNameDictResult.Reading is not null ? [customNameDictResult.Reading] : null;
+                LookupResult result = new
+                (
+                    primarySpelling: customNameDictResult.PrimarySpelling,
+                    matchedText: customNameResult.MatchedText,
+                    dict: customNameResult.Dict,
+                    readings: readings,
+                    formattedDefinitions: customNameDictResult.BuildFormattedDefinition(),
+                    frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    pitchPositions: pitchAccentDictExists ? GetPitchPosition(customNameDictResult.PrimarySpelling, readings, pitchAccentDict!) : null,
+                    imagePaths: customNameDictResult.ImagePath is not null ? [customNameDictResult.ImagePath] : null
+                );
 
-                    ++freq;
-                    results.Add(result);
-                }
+                ++freq;
+                results.Add(result);
             }
         }
 
@@ -1847,5 +1805,22 @@ public static class LookupUtils
 
             return positions;
         }
+    }
+
+    private static int FastReferenceIndexOf(this IList<IDictRecord> list, IDictRecord record)
+    {
+        ReadOnlySpan<IDictRecord> span = list is List<IDictRecord> concreteList
+            ? concreteList.AsReadOnlySpan()
+            : (IDictRecord[])list;
+
+        for (int i = 0; i < span.Length; i++)
+        {
+            if (ReferenceEquals(span[i], record))
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
