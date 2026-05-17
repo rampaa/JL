@@ -115,6 +115,11 @@ public sealed class LookupResult
             return -1;
         }
 
+        if (ReferenceEquals(this, other))
+        {
+            return 0;
+        }
+
         string otherMatchedText = other.MatchedText;
 
         // 1. Order by MatchedText.Length descending
