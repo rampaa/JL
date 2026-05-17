@@ -83,7 +83,7 @@ internal static class JmdictWordClassUtils
                         {
                             foreach (string wordClass in wordClassArray)
                             {
-                                if (validWordClasses.Contains(wordClass))
+                                if (validWordClasses.Contains(wordClass) && !wordClassList.Contains(wordClass))
                                 {
                                     wordClassList.Add(wordClass);
                                 }
@@ -96,7 +96,7 @@ internal static class JmdictWordClassUtils
                 {
                     foreach (string wordClass in jmdictRecord.WordClassesSharedByAllSenses)
                     {
-                        if (validWordClasses.Contains(wordClass))
+                        if (validWordClasses.Contains(wordClass) && !wordClassList.Contains(wordClass))
                         {
                             wordClassList.Add(wordClass);
                         }
