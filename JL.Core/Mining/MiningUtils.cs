@@ -1555,11 +1555,11 @@ public static class MiningUtils
         return expressionWithPitchAccentStringBuilder;
     }
 
-    public static async Task MineToFile(List<LookupResult> lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
+    public static async Task MineToFile(LookupResult[] lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
     {
         string filePath;
         JLField[] jlFields;
-        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults.AsReadOnlySpan();
+        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults;
         LookupResult lookupResult = lookupResultsSpan[currentLookupResultIndex];
         if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {
@@ -1615,7 +1615,7 @@ public static class MiningUtils
         }
     }
 
-    public static async ValueTask<bool[]?> CheckDuplicates(List<LookupResult> lookupResults, int displayedLookupResultLength, string currentText, int currentCharPosition, CancellationToken cancellationToken)
+    public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, int displayedLookupResultLength, string currentText, int currentCharPosition, CancellationToken cancellationToken)
     {
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig(cancellationToken).ConfigureAwait(false);
         if (ankiConfigDict is null)
@@ -1627,8 +1627,7 @@ public static class MiningUtils
         List<int> positions = new(displayedLookupResultLength);
         bool[] results = new bool[displayedLookupResultLength];
 
-        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults.AsReadOnlySpan();
-
+        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults;
         for (int i = 0; i < displayedLookupResultLength; i++)
         {
             LookupResult lookupResult = lookupResultsSpan[i];

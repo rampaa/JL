@@ -134,7 +134,7 @@ public static class AnkiConnectUtils
             : Task.CompletedTask;
     }
 
-    public static async Task Mine(List<LookupResult> lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
+    public static async Task Mine(LookupResult[] lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
     {
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (!coreConfigManager.AnkiIntegration)
@@ -151,7 +151,7 @@ public static class AnkiConnectUtils
         }
 
         AnkiConfig? ankiConfig;
-        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults.AsReadOnlySpan();
+        ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults;
         LookupResult lookupResult = lookupResultsSpan[currentLookupResultIndex];
         if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {

@@ -33,7 +33,7 @@ public static class LookupUtils
 
     private static List<LookupResult>?[] s_resultSlots = [];
 
-    public static List<LookupResult>? LookupText(string text)
+    public static LookupResult[]? LookupText(string text)
     {
         bool dbIsUsedForPitchDict = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict)
             && pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
@@ -242,16 +242,20 @@ public static class LookupUtils
             return null;
         }
 
-        List<LookupResult> lookupResults = new(lookupResultCount);
+        LookupResult[] lookupResults = new LookupResult[lookupResultCount];
+        Span<LookupResult> lookupResultsSpan = lookupResults;
+
         foreach (List<LookupResult>? resultSlot in resultSlots)
         {
             if (resultSlot is not null)
             {
-                lookupResults.AddRange(resultSlot.AsReadOnlySpan());
+                ReadOnlySpan<LookupResult> resultSlotSpan = resultSlot.AsReadOnlySpan();
+                resultSlotSpan.CopyTo(lookupResultsSpan);
+                lookupResultsSpan = lookupResultsSpan[resultSlotSpan.Length..];
             }
         }
 
-        CollectionsMarshal.AsSpan(lookupResults).Sort();
+        Array.Sort(lookupResults);
         return lookupResults;
     }
 
