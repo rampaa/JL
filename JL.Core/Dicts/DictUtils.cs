@@ -17,6 +17,7 @@ using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.Options;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Frontend;
+using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Bool;
 using JL.Core.Utilities.Database;
@@ -51,6 +52,13 @@ public static class DictUtils
     internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; } = true;
     internal static bool AtLeastOneKanjiDictIsActive { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneYomichanOrNazekaWordDict { get; private set; } = true;
+
+
+    private static Dict[] s_allDicts = [];
+    private static Dict[] s_nameDicts = [];
+    private static Dict[] s_wordDicts = [];
+    private static Dict[] s_kanjiDicts = [];
+    private static Dict[] s_otherDicts = [];
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
@@ -562,6 +570,7 @@ public static class DictUtils
 
             Dict[] dicts = Dicts.Values.ToArray();
             CheckDBUsageForDicts(dicts);
+            PopulateDictTypeArrays(dicts);
 
             int customDictionaryTaskCount = 0;
             AtomicBool anyCustomDictionaryTaskIsActuallyUsed = new(false);
@@ -654,7 +663,6 @@ public static class DictUtils
                     }
 
                     await Task.WhenAll(tasks).ConfigureAwait(false);
-
                     if (!dictsToBeRemoved.IsEmpty)
                     {
                         foreach (Dict dict in dictsToBeRemoved)
@@ -683,6 +691,7 @@ public static class DictUtils
                 Dict[] dictsSnapshot = Dicts.Values.ToArray();
                 CheckSingleDictActiveness();
                 CheckDBUsageForDicts(dictsSnapshot);
+                PopulateDictTypeArrays(dictsSnapshot);
 
                 if (dictsSnapshot.All(static d => !d.Updating)
                     && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed.Read()))
@@ -1775,5 +1784,61 @@ public static class DictUtils
         }
 
         return true;
+    }
+
+    private static void PopulateDictTypeArrays(Dict[] dicts)
+    {
+        List<Dict> allDicts = new(dicts.Length);
+        List<Dict> wordDicts = [];
+        List<Dict> nameDicts = [];
+        List<Dict> kanjiDicts = [];
+        List<Dict> otherDicts = [];
+
+        foreach (Dict dict in dicts)
+        {
+            if (dict is { Active: true })
+            {
+                if (dict.Type is not DictType.PitchAccentYomichan)
+                {
+                    allDicts.Add(dict);
+
+                    if (dict.Active && s_wordDictTypes.Contains(dict.Type))
+                    {
+                        wordDicts.Add(dict);
+                    }
+                    else if (KanjiDictTypes.Contains(dict.Type))
+                    {
+                        kanjiDicts.Add(dict);
+                    }
+                    else if (s_nameDictTypes.Contains(dict.Type))
+                    {
+                        nameDicts.Add(dict);
+                    }
+                    else if (s_otherDictTypes.Contains(dict.Type))
+                    {
+                        otherDicts.Add(dict);
+                    }
+                }
+            }
+        }
+
+        s_allDicts = allDicts.ToArray();
+        s_wordDicts = wordDicts.ToArray();
+        s_nameDicts = nameDicts.ToArray();
+        s_kanjiDicts = kanjiDicts.ToArray();
+        s_otherDicts = otherDicts.ToArray();
+    }
+
+    internal static Dict[] GetDictForLookupCategoryType(LookupCategory lookupCategory)
+    {
+        return lookupCategory switch
+        {
+            LookupCategory.All => s_allDicts,
+            LookupCategory.Word => s_wordDicts,
+            LookupCategory.Kanji => s_kanjiDicts,
+            LookupCategory.Name => s_nameDicts,
+            LookupCategory.Other => s_otherDicts,
+            _ => s_allDicts
+        };
     }
 }

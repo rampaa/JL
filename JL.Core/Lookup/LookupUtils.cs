@@ -31,6 +31,8 @@ public static class LookupUtils
     private delegate Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query);
     private delegate List<IDictRecord>? GetKanjiRecordsFromDB(string dbName, string term);
 
+    private static List<LookupResult>?[] s_resultSlots = [];
+
     public static List<LookupResult>? LookupText(string text)
     {
         bool dbIsUsedForPitchDict = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict)
@@ -73,11 +75,22 @@ public static class LookupUtils
             ? DBUtils.CreateReadOnlyDBConnection(pitchDictPath)
             : null;
 
-        List<Dict> dicts = GetDicts();
+        Dict[] dicts = DictUtils.GetDictForLookupCategoryType(CoreConfigManager.Instance.LookupCategory);
         bool dbIsUsedAtLeastForOneDict = DictUtils.DBIsUsedForAtLeastOneDict;
 
-        List<LookupResult>?[] resultSlots = new List<LookupResult>?[dicts.Count];
-        _ = Parallel.For(0, dicts.Count, i =>
+        List<LookupResult>?[] resultSlots;
+        if (dicts.Length == s_resultSlots.Length)
+        {
+            resultSlots = s_resultSlots;
+            resultSlots.AsSpan().Clear();
+        }
+        else
+        {
+            resultSlots = new List<LookupResult>?[dicts.Length];
+            s_resultSlots = resultSlots;
+        }
+
+        _ = Parallel.For(0, dicts.Length, i =>
         {
             Dict dict = dicts[i];
             bool useDB = dbIsUsedAtLeastForOneDict && dict is { Options.UseDB.Value: true, Ready: true, Active: true };
@@ -333,67 +346,6 @@ public static class LookupUtils
         }
 
         return new DBParameters(allTextWithoutLongVowelMark, jmdictWordQuery, jmdictVerbQuery, jmnedictQuery, yomichanWordQuery, yomichanVerbQuery, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQuery, yomichanTextWithoutLongVowelMarkQuery, jmdictTextWithoutLongVowelMarkParameter);
-    }
-
-    private static List<Dict> GetDicts()
-    {
-        LookupCategory lookupType = CoreConfigManager.Instance.LookupCategory;
-        List<Dict> dicts = new(DictUtils.Dicts.Count);
-        if (lookupType is LookupCategory.All)
-        {
-            foreach (Dict dict in DictUtils.Dicts.Values)
-            {
-                if (dict is { Active: true, Type: not DictType.PitchAccentYomichan })
-                {
-                    dicts.Add(dict);
-                }
-            }
-        }
-        else if (lookupType is LookupCategory.Kanji)
-        {
-            if (DictUtils.AtLeastOneKanjiDictIsActive)
-            {
-                foreach (Dict dict in DictUtils.Dicts.Values)
-                {
-                    if (dict.Active && DictUtils.KanjiDictTypes.Contains(dict.Type))
-                    {
-                        dicts.Add(dict);
-                    }
-                }
-            }
-        }
-        else if (lookupType is LookupCategory.Name)
-        {
-            foreach (Dict dict in DictUtils.Dicts.Values)
-            {
-                if (dict.Active && DictUtils.s_nameDictTypes.Contains(dict.Type))
-                {
-                    dicts.Add(dict);
-                }
-            }
-        }
-        else if (lookupType is LookupCategory.Word)
-        {
-            foreach (Dict dict in DictUtils.Dicts.Values)
-            {
-                if (dict.Active && DictUtils.s_wordDictTypes.Contains(dict.Type))
-                {
-                    dicts.Add(dict);
-                }
-            }
-        }
-        else // if (lookupType is LookupCategory.Other)
-        {
-            foreach (Dict dict in DictUtils.Dicts.Values)
-            {
-                if (dict.Active && DictUtils.s_otherDictTypes.Contains(dict.Type))
-                {
-                    dicts.Add(dict);
-                }
-            }
-        }
-
-        return dicts;
     }
 
     private static Freq[]? GetDBWordFreqs()
