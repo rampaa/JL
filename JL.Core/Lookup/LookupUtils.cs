@@ -31,8 +31,6 @@ public static class LookupUtils
     private delegate Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query);
     private delegate List<IDictRecord>? GetKanjiRecordsFromDB(string dbName, string term);
 
-    private static readonly Lock s_lookupResultsLock = new();
-
     public static List<LookupResult>? LookupText(string text)
     {
         bool dbIsUsedForPitchDict = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict)
@@ -78,9 +76,10 @@ public static class LookupUtils
         List<Dict> dicts = GetDicts();
         bool dbIsUsedAtLeastForOneDict = DictUtils.DBIsUsedForAtLeastOneDict;
 
-        List<LookupResult> lookupResults = [];
-        _ = Parallel.ForEach(dicts, dict =>
+        List<LookupResult>?[] resultSlots = new List<LookupResult>?[dicts.Count];
+        _ = Parallel.For(0, dicts.Count, i =>
         {
+            Dict dict = dicts[i];
             bool useDB = dbIsUsedAtLeastForOneDict && dict is { Options.UseDB.Value: true, Ready: true, Active: true };
             switch (dict.Type)
             {
@@ -89,11 +88,7 @@ public static class LookupUtils
                     if (jmdictResults.Count > 0)
                     {
                         // ReSharper disable once AccessToDisposedClosure
-                        List<LookupResult> jmdictLookupResults = BuildJmdictResult(jmdictResults, wordFreqs, dbWordFreqs, freqConnectionsForJmdict, dbIsUsedForPitchDict, sqliteConnectionForJmdictPitch, pitchDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(jmdictLookupResults);
-                        }
+                        resultSlots[i] = BuildJmdictResult(jmdictResults, wordFreqs, dbWordFreqs, freqConnectionsForJmdict, dbIsUsedForPitchDict, sqliteConnectionForJmdictPitch, pitchDict);
                     }
                     break;
 
@@ -101,11 +96,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult>? jmnedictResults = GetNameResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), dict, useDB, JmnedictDBManager.GetRecordsFromDB, dbParameters.JmnedictQuery);
                     if (jmnedictResults is not null)
                     {
-                        List<LookupResult> jmnedictLookupResults = BuildJmnedictResult(jmnedictResults, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(jmnedictLookupResults);
-                        }
+                        resultSlots[i] = BuildJmnedictResult(jmnedictResults, textInfo.PitchAccentDict);
                     }
 
                     break;
@@ -117,11 +108,7 @@ public static class LookupUtils
 
                     if (kanjidicResult is not null)
                     {
-                        LookupResult kanjidicLookupResult = BuildKanjidicResult(kanji, kanjiCompositions, kanjidicResult, kanjiFrequencyResults, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.Add(kanjidicLookupResult);
-                        }
+                        resultSlots[i] = [BuildKanjidicResult(kanji, kanjiCompositions, kanjidicResult, kanjiFrequencyResults, textInfo.PitchAccentDict)];
                     }
 
                     break;
@@ -135,11 +122,7 @@ public static class LookupUtils
 
                     if (epwingYomichanKanjiWithWordSchemaResults is not null)
                     {
-                        List<LookupResult> epwingYomichanLookupResults = BuildEpwingYomichanResultForKanjiWithWordSchema(kanjiCompositions, epwingYomichanKanjiWithWordSchemaResults, kanjiFrequencyResults, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(epwingYomichanLookupResults);
-                        }
+                        resultSlots[i] = BuildEpwingYomichanResultForKanjiWithWordSchema(kanjiCompositions, epwingYomichanKanjiWithWordSchemaResults, kanjiFrequencyResults, textInfo.PitchAccentDict);
                     }
                     break;
 
@@ -149,11 +132,7 @@ public static class LookupUtils
                     if (customWordResults.Count > 0)
                     {
                         // ReSharper disable once AccessToDisposedClosure
-                        List<LookupResult> customWordLookupResults = BuildCustomWordResult(customWordResults, wordFreqs, dbWordFreqs, freqConnectionsForCustomWordDict, dbIsUsedForPitchDict, sqliteConnectionForCustomWordPitch, pitchDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(customWordLookupResults);
-                        }
+                        resultSlots[i] = BuildCustomWordResult(customWordResults, wordFreqs, dbWordFreqs, freqConnectionsForCustomWordDict, dbIsUsedForPitchDict, sqliteConnectionForCustomWordPitch, pitchDict);
                     }
                     break;
 
@@ -162,11 +141,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult>? customNameResults = GetNameResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), dict, false, null, null);
                     if (customNameResults is not null)
                     {
-                        List<LookupResult> customNameLookupResults = BuildCustomNameResult(customNameResults, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(customNameLookupResults);
-                        }
+                        resultSlots[i] = BuildCustomNameResult(customNameResults, textInfo.PitchAccentDict);
                     }
                     break;
 
@@ -177,11 +152,7 @@ public static class LookupUtils
 
                     if (epwingYomichanKanjiResults is not null)
                     {
-                        List<LookupResult> yomichanKanjiLookupResults = BuildYomichanKanjiResult(kanji, kanjiCompositions, epwingYomichanKanjiResults, kanjiFrequencyResults, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(yomichanKanjiLookupResults);
-                        }
+                        resultSlots[i] = BuildYomichanKanjiResult(kanji, kanjiCompositions, epwingYomichanKanjiResults, kanjiFrequencyResults, textInfo.PitchAccentDict);
                     }
                     break;
 
@@ -189,11 +160,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult>? epwingYomichanNameResults = GetNameResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, dbParameters.YomichanWordQuery);
                     if (epwingYomichanNameResults is not null)
                     {
-                        List<LookupResult> epwingYomichanNameLookupResults = BuildEpwingYomichanResult(epwingYomichanNameResults, null, null, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(epwingYomichanNameLookupResults);
-                        }
+                        resultSlots[i] = BuildEpwingYomichanResult(epwingYomichanNameResults, null, null, textInfo.PitchAccentDict);
                     }
 
                     break;
@@ -203,11 +170,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult> epwingYomichanWordResults = GetWordResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList, textInfo.DeconjugationResultsList, textInfo.DeconjugatedTexts, textInfo.DeconjugatedTextWithoutLongVowelMarksList, textInfo.TextWithoutLongVowelMarksList, dbParameters.AllTextWithoutLongVowelMark, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB, dbParameters.YomichanWordQuery, dbParameters.YomichanVerbQuery, dbParameters.YomichanTextWithoutLongVowelMarkQuery);
                     if (epwingYomichanWordResults.Count > 0)
                     {
-                        List<LookupResult> epwingYomichanWordLookupResults = BuildEpwingYomichanResult(epwingYomichanWordResults, wordFreqs, textInfo.FrequencyDicts, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(epwingYomichanWordLookupResults);
-                        }
+                        resultSlots[i] = BuildEpwingYomichanResult(epwingYomichanWordResults, wordFreqs, textInfo.FrequencyDicts, textInfo.PitchAccentDict);
                     }
 
                     break;
@@ -219,11 +182,7 @@ public static class LookupUtils
 
                     if (epwingNazekaKanjiResults is not null)
                     {
-                        List<LookupResult> epwingNazekaKanjiLookupResults = BuildEpwingNazekaResultForKanji(kanjiCompositions, epwingNazekaKanjiResults, kanjiFrequencyResults, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(epwingNazekaKanjiLookupResults);
-                        }
+                        resultSlots[i] = BuildEpwingNazekaResultForKanji(kanjiCompositions, epwingNazekaKanjiResults, kanjiFrequencyResults, textInfo.PitchAccentDict);
                     }
 
                     break;
@@ -232,11 +191,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult>? epwingNazekaNameResults = GetNameResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, dbParameters.NazekaWordQuery);
                     if (epwingNazekaNameResults is not null)
                     {
-                        List<LookupResult> epwingNazekaNameLookupResults = BuildEpwingNazekaResult(epwingNazekaNameResults, null, null, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(epwingNazekaNameLookupResults);
-                        }
+                        resultSlots[i] = BuildEpwingNazekaResult(epwingNazekaNameResults, null, null, textInfo.PitchAccentDict);
                     }
 
                     break;
@@ -246,11 +201,7 @@ public static class LookupUtils
                     Dictionary<string, IntermediaryResult> epwingNazekaWordResults = GetWordResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList, textInfo.DeconjugationResultsList, textInfo.DeconjugatedTexts, textInfo.DeconjugatedTextWithoutLongVowelMarksList, textInfo.TextWithoutLongVowelMarksList, dbParameters.AllTextWithoutLongVowelMark, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB, dbParameters.NazekaWordQuery, dbParameters.NazekaVerbQuery, dbParameters.NazekaTextWithoutLongVowelMarkQuery);
                     if (epwingNazekaWordResults.Count > 0)
                     {
-                        List<LookupResult> epwingNazekaWordLookupResults = BuildEpwingNazekaResult(epwingNazekaWordResults, wordFreqs, textInfo.FrequencyDicts, textInfo.PitchAccentDict);
-                        lock (s_lookupResultsLock)
-                        {
-                            lookupResults.AddRange(epwingNazekaWordLookupResults);
-                        }
+                        resultSlots[i] = BuildEpwingNazekaResult(epwingNazekaWordResults, wordFreqs, textInfo.FrequencyDicts, textInfo.PitchAccentDict);
                     }
                     break;
 
@@ -264,9 +215,27 @@ public static class LookupUtils
             }
         });
 
-        if (lookupResults.Count is 0)
+        int lookupResultCount = 0;
+        foreach (List<LookupResult>? resultSlot in resultSlots)
+        {
+            if (resultSlot is not null)
+            {
+                lookupResultCount += resultSlot.Count;
+            }
+        }
+
+        if (lookupResultCount is 0)
         {
             return null;
+        }
+
+        List<LookupResult> lookupResults = new(lookupResultCount);
+        foreach (List<LookupResult>? resultSlot in resultSlots)
+        {
+            if (resultSlot is not null)
+            {
+                lookupResults.AddRange(resultSlot.AsReadOnlySpan());
+            }
         }
 
         CollectionsMarshal.AsSpan(lookupResults).Sort();
