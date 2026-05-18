@@ -1802,7 +1802,7 @@ public static class DictUtils
                 {
                     allDicts.Add(dict);
 
-                    if (dict.Active && s_wordDictTypes.Contains(dict.Type))
+                    if (s_wordDictTypes.Contains(dict.Type))
                     {
                         wordDicts.Add(dict);
                     }
