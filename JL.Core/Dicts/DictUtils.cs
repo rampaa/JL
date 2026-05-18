@@ -1786,7 +1786,7 @@ public static class DictUtils
         return true;
     }
 
-    private static void PopulateDictTypeArrays(Dict[] dicts)
+    internal static void PopulateDictTypeArrays(Dict[] dicts)
     {
         List<Dict> allDicts = new(dicts.Length);
         List<Dict> wordDicts = [];

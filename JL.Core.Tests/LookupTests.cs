@@ -29,7 +29,7 @@ internal sealed class LookupTests
         jmdict.Ready = false;
 
         DictUtils.Dicts.Add(nameof(DictType.JMdict), jmdict);
-
+        DictUtils.PopulateDictTypeArrays(DictUtils.Dicts.Values.ToArray());
         Dict dict = DictUtils.Dicts[nameof(DictType.JMdict)];
         dict.Contents = new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
         DictUtils.SingleDictTypeDicts[DictType.JMdict] = dict;
