@@ -5,6 +5,7 @@ using System.Text;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
+using JL.Core.Utilities.ObjectPool;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Utilities.Database;

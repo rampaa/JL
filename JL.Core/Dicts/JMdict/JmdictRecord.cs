@@ -8,6 +8,7 @@ using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Array;
 using JL.Core.Utilities.Japanese;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Dicts.JMdict;
 

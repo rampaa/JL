@@ -10,6 +10,7 @@ using JL.Core;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
+using JL.Core.Utilities.ObjectPool;
 using JL.Windows.Config;
 using JL.Windows.Interop;
 using JL.Windows.Utilities;

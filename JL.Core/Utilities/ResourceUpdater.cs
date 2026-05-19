@@ -17,6 +17,7 @@ using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Utilities.Database;
+using JL.Core.Utilities.ObjectPool;
 using JL.Core.WordClass;
 
 namespace JL.Core.Utilities;

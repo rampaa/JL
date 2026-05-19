@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using JL.Core.Deconjugation;
-using JL.Core.Utilities;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Lookup;
 

@@ -3,6 +3,7 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Utilities.Japanese;
 

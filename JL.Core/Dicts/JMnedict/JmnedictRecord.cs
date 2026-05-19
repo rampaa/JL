@@ -4,8 +4,8 @@ using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
-using JL.Core.Utilities;
 using JL.Core.Utilities.Array;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Dicts.JMnedict;
 

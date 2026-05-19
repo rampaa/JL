@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using JL.Core.Config;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Utilities;
 

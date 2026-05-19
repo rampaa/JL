@@ -13,6 +13,7 @@ using JL.Core.Config;
 using JL.Core.Dicts.Options;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
+using JL.Core.Utilities.ObjectPool;
 using JL.Windows.Config;
 using JL.Windows.Utilities;
 

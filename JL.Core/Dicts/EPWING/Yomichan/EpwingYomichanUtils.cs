@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using JL.Core.Utilities;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
 

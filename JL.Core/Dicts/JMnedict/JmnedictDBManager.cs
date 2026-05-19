@@ -5,6 +5,7 @@ using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Core.Utilities.Japanese;
+using JL.Core.Utilities.ObjectPool;
 using MessagePack;
 using Microsoft.Data.Sqlite;
 

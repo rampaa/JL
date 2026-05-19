@@ -7,6 +7,7 @@ using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
+using JL.Core.Utilities.ObjectPool;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.PitchAccent;

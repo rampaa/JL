@@ -12,6 +12,7 @@ using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 using JL.Core.Utilities.Japanese;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Mining;
 

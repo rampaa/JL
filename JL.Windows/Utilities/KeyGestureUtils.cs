@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
 using JL.Core.Config;
-using JL.Core.Utilities;
+using JL.Core.Utilities.ObjectPool;
 using JL.Windows.Config;
 using JL.Windows.GUI;
 using JL.Windows.GUI.Popup;

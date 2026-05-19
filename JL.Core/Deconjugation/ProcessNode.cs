@@ -1,5 +1,5 @@
 using System.Text;
-using JL.Core.Utilities;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Deconjugation;
 

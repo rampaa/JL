@@ -6,6 +6,7 @@ using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Dicts.KanjiDict;
 

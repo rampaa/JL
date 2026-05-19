@@ -11,6 +11,7 @@ using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
+using JL.Core.Utilities.ObjectPool;
 using JL.Windows.Config;
 using JL.Windows.GUI.Info;
 using JL.Windows.Interop;
