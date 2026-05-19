@@ -41,6 +41,7 @@ public static class DictUtils
     private static readonly SemaphoreSlim s_loadDictionariesSemaphoreSlim = new(1, 1);
 
     internal static readonly SearchValues<char> s_invalidCharactersForPrimarySpellings = SearchValues.Create('�', '〓', '\n');
+    internal static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜');
 
     internal static bool DBIsUsedForAtLeastOneDict { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; } = true;

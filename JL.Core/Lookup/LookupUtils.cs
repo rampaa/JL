@@ -495,11 +495,17 @@ public static class LookupUtils
                 int longVowelMarkCount = 0;
                 if (countLongVowelMark)
                 {
-                    foreach (char hiragana in textInHiragana)
+                    int firstLongVowelMarkIndex = textInHiragana.IndexOfAny(DictUtils.s_longVowelMarkChars);
+                    if (firstLongVowelMarkIndex is not -1)
                     {
-                        if (hiragana is 'ー' or '〜')
+                        longVowelMarkCount = 1;
+                        for (int j = firstLongVowelMarkIndex + 1; j < textInHiragana.Length && longVowelMarkCount < 4; j++)
                         {
-                            ++longVowelMarkCount;
+                            char c = textInHiragana[j];
+                            if (c is 'ー' or '〜')
+                            {
+                                ++longVowelMarkCount;
+                            }
                         }
                     }
                 }
