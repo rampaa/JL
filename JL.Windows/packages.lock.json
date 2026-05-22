@@ -56,23 +56,23 @@
       },
       "MessagePack": {
         "type": "Transitive",
-        "resolved": "3.1.4",
-        "contentHash": "BH0wlHWmVoZpbAPyyt2Awbq30C+ZsS3eHSkYdnyUAbqVJ22fAJDzn2xTieBeoT5QlcBzp61vHcv878YJGfi3mg==",
+        "resolved": "3.1.6",
+        "contentHash": "c5M8C0Lrf6GdGiv01OCB86WEL5YDi7UdH5qsU+q7Q9WvqlhtE4kkJzzJpFufPbz+OULX8FGIB2qo/7CLQ6vizg==",
         "dependencies": {
-          "MessagePack.Annotations": "3.1.4",
-          "MessagePackAnalyzer": "3.1.4",
+          "MessagePack.Annotations": "3.1.6",
+          "MessagePackAnalyzer": "3.1.6",
           "Microsoft.NET.StringTools": "17.11.4"
         }
       },
       "MessagePack.Annotations": {
         "type": "Transitive",
-        "resolved": "3.1.4",
-        "contentHash": "aVWrDAkCdqxwQsz/q0ldPh2EFn48M99YUzE9OvZjMq2RNLKz4o2z88iGFvSvbMqOWRweRvKPHBJZe22PRqzslQ=="
+        "resolved": "3.1.6",
+        "contentHash": "d0r/B7v1frvN6ElIgp5J5/cHeLADOK21qieHutimUpCWGcjhzOJV9glrItZO4E3dUcriMKX3Swsee3rFx9ouOw=="
       },
       "MessagePackAnalyzer": {
         "type": "Transitive",
-        "resolved": "3.1.4",
-        "contentHash": "CTaSsN/liJ7MhLCAB7Z4ZLBNuVGCq9lt2BT/cbrc9vzGv89yK3CqIA+z9T19a11eQYl9etZHL6MQJgCqECRVpg=="
+        "resolved": "3.1.6",
+        "contentHash": "7Ewqh8D5dAnF4XWy0q76eYFdNLIpDvQqLQOTfrWAGA35ARUB65mrrIES+J5Kw2FVwZGTjudeWh2FB89TC4YMyg=="
       },
       "Microsoft.Data.Sqlite": {
         "type": "Transitive",
@@ -213,7 +213,7 @@
         "type": "Project",
         "dependencies": {
           "CommunityToolkit.HighPerformance": "[8.4.2, )",
-          "MessagePack": "[3.1.4, )",
+          "MessagePack": "[3.1.6, )",
           "Microsoft.Data.Sqlite": "[10.0.8, )",
           "Microsoft.Extensions.ObjectPool": "[10.0.8, )",
           "Microsoft.NET.StringTools": "[18.4.0, )",
