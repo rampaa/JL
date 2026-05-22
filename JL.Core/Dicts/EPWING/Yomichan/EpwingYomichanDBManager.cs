@@ -44,7 +44,7 @@ internal static class EpwingYomichanDBManager
 
         for (int i = 1; i < termCount; i++)
         {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", {DBUtils.GetParameterName(i + 1)}");
+            _ = queryBuilder.Append(',').Append(DBUtils.GetParameterName(i + 1));
         }
 
         query = queryBuilder.Append(");").ToString();
