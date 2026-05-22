@@ -35,6 +35,19 @@ public static class DBUtils
         DictType.NonspecificNazeka
     ];
 
+    private static readonly string[] s_parameterNames = CreateParameterNames();
+
+    private static string[] CreateParameterNames()
+    {
+        string[] parameterNames = new string[1024 * 2];
+        for (int i = 1; i < parameterNames.Length; i++)
+        {
+            parameterNames[i] = $"@{i}";
+        }
+
+        return parameterNames;
+    }
+
     public static string GetDictDBPath(string dbName)
     {
         return DictDBPaths.TryGetValue(dbName, out string? dbPath)
@@ -153,12 +166,20 @@ public static class DBUtils
         _ = parameterBuilder.Append("(@1");
         for (int i = 1; i < parameterCount; i++)
         {
-            _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+            _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", {GetParameterName(i + 1)}");
         }
 
         string parameter = parameterBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(parameterBuilder);
         return parameter;
+    }
+
+    public static string GetParameterName(int index)
+    {
+        Debug.Assert(index <= 32767);
+        return (uint)index < (uint)s_parameterNames.Length
+            ? s_parameterNames[index]
+            : string.Create(CultureInfo.InvariantCulture, $"@{index}");
     }
 
     internal static SqliteConnection CreateDBConnection(string path)

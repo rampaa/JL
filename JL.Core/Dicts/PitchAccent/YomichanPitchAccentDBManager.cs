@@ -35,7 +35,7 @@ internal static class YomichanPitchAccentDBManager
 
         for (int i = 1; i < termCount; i++)
         {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", {DBUtils.GetParameterName(i + 1)}");
         }
 
         query = queryBuilder.Append(");").ToString();
@@ -185,7 +185,7 @@ internal static class YomichanPitchAccentDBManager
         int index = 1;
         foreach (string term in terms)
         {
-            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{index}"), term);
+            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(index), term);
             ++index;
         }
 

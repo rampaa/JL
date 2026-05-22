@@ -33,7 +33,7 @@ internal static class JmnedictDBManager
 
         for (int i = 1; i < termCount; i++)
         {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", {DBUtils.GetParameterName(i + 1)}");
         }
 
         query = queryBuilder.Append(");").ToString();
@@ -187,7 +187,7 @@ internal static class JmnedictDBManager
 
         for (int i = 0; i < terms.Length; i++)
         {
-            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
+            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), terms[i]);
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
