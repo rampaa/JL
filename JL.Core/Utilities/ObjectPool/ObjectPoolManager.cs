@@ -13,7 +13,7 @@ public static class ObjectPoolManager
     internal static readonly StringPool s_stringPoolInstance = StringPool.Shared;
 
     internal static readonly ObjectPool<Dictionary<string, IntermediaryResult>> s_intermediaryResultPool = new DefaultObjectPoolProvider().Create(new IntermediaryResultDictionaryPolicy());
-    internal static readonly ObjectPool<List<LookupResult>> s_lookupResultListPool = new DefaultObjectPoolProvider().Create(new LookupResultListPolicy());
+    internal static readonly ObjectPool<List<LookupResult>> s_lookupResultListPool = new DefaultObjectPoolProvider().Create(new ListPolicy<LookupResult>());
 
     public static void ClearStringPoolIfDictsAreReady()
     {
