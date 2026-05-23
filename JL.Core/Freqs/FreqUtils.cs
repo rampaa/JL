@@ -558,8 +558,14 @@ public static class FreqUtils
 
                 DBWordFreqs = dbWordFreqs;
             }
+            else
+            {
+                DBWordFreqs = null;
+            }
         }
-
-        DBWordFreqs = null;
+        else
+        {
+            DBWordFreqs = null;
+        }
     }
 }
