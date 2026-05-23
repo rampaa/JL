@@ -40,7 +40,7 @@ public static class LookupUtils
 
         (string kanji, string[]? kanjiCompositions, List<LookupFrequencyResult>? kanjiFrequencyResults) = GetKanjiInfo(text);
         Freq[]? wordFreqs = FreqUtils.WordFreqs;
-        Freq[]? dbWordFreqs = GetDBWordFreqs();
+        Freq[]? dbWordFreqs = FreqUtils.DBWordFreqs;
 
         using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForJmdict = dbWordFreqs is not null && DictUtils.JmdictIsActive
             ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
@@ -432,41 +432,6 @@ public static class LookupUtils
         }
 
         return new DBParameters(allTextWithoutLongVowelMark, jmdictWordQuery, jmdictVerbQuery, jmnedictQuery, yomichanWordQuery, yomichanVerbQuery, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQuery, yomichanTextWithoutLongVowelMarkQuery, jmdictTextWithoutLongVowelMarkParameter);
-    }
-
-    // TODO: Cache this in FreqUtils so that it doesn't have to be recalculated on every lookup
-    private static Freq[]? GetDBWordFreqs()
-    {
-        Freq[]? wordFreqs = FreqUtils.WordFreqs;
-        if (wordFreqs is not null)
-        {
-            int validFreqCount = 0;
-            foreach (Freq freq in wordFreqs)
-            {
-                if (freq is { Options.UseDB.Value: true, Ready: true, Active: true })
-                {
-                    ++validFreqCount;
-                }
-            }
-
-            if (validFreqCount > 0)
-            {
-                Freq[] dbWordFreqs = new Freq[validFreqCount];
-                int currentIndex = 0;
-                foreach (Freq freq in wordFreqs)
-                {
-                    if (freq is { Options.UseDB.Value: true, Ready: true, Active: true })
-                    {
-                        dbWordFreqs[currentIndex] = freq;
-                        ++currentIndex;
-                    }
-                }
-
-                return dbWordFreqs;
-            }
-        }
-
-        return null;
     }
 
     private static (string kanji, string[]? kanjiCompositions, List<LookupFrequencyResult>? kanjiFrequencyResults) GetKanjiInfo(string text)

@@ -22,6 +22,7 @@ public static class FreqUtils
 
     internal static Freq[]? WordFreqs { get; private set; }
     internal static Freq[]? KanjiFreqs { get; private set; }
+    internal static Freq[]? DBWordFreqs { get; private set; }
 
     internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3, StringComparer.OrdinalIgnoreCase)
     {
@@ -473,6 +474,8 @@ public static class FreqUtils
             WordFreqs = null;
         }
 
+        PopulateDBWordFreqs(WordFreqs);
+
         KanjiFreqs = freqs.Where(static f => f is { Type: FreqType.YomichanKanji, Active: true })
             .OrderBy(static f => f.Priority)
             .ToArray();
@@ -525,5 +528,38 @@ public static class FreqUtils
                 freq.Url = new Uri(indexUrl);
             }
         }
+    }
+
+    private static void PopulateDBWordFreqs(Freq[]? wordFreqs)
+    {
+        if (wordFreqs is not null)
+        {
+            int validFreqCount = 0;
+            foreach (Freq freq in wordFreqs)
+            {
+                if (freq is { Options.UseDB.Value: true, Ready: true, Active: true })
+                {
+                    ++validFreqCount;
+                }
+            }
+
+            if (validFreqCount > 0)
+            {
+                Freq[] dbWordFreqs = new Freq[validFreqCount];
+                int currentIndex = 0;
+                foreach (Freq freq in wordFreqs)
+                {
+                    if (freq is { Options.UseDB.Value: true, Ready: true, Active: true })
+                    {
+                        dbWordFreqs[currentIndex] = freq;
+                        ++currentIndex;
+                    }
+                }
+
+                DBWordFreqs = dbWordFreqs;
+            }
+        }
+
+        DBWordFreqs = null;
     }
 }
