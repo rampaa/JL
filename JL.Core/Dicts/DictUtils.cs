@@ -49,11 +49,11 @@ public static class DictUtils
     internal static bool DBIsUsedForJmdict { get; private set; } = true;
     internal static bool DBIsUsedForJmnedict { get; private set; } = true;
     internal static bool JmdictIsActive { get; private set; } = true;
-    internal static bool DBIsUsedForPitchDict { get; private set; } = true;
     internal static bool AnyCustomWordDictIsActive { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; } = true;
     internal static bool AtLeastOneKanjiDictIsActive { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneYomichanOrNazekaWordDict { get; private set; } = true;
+    internal static bool DBIsUsedForPitchDict { get; private set; } // false;
 
     internal static Dict? PitchDict { get; private set; }
 
