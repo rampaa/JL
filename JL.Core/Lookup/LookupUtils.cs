@@ -35,9 +35,6 @@ public static class LookupUtils
 
     public static LookupResult[]? LookupText(string text)
     {
-        bool dbIsUsedForPitchDict = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict)
-            && pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
-
         (string kanji, string[]? kanjiCompositions, List<LookupFrequencyResult>? kanjiFrequencyResults) = GetKanjiInfo(text);
         Freq[]? wordFreqs = FreqUtils.WordFreqs;
         Freq[]? dbWordFreqs = FreqUtils.DBWordFreqs;
@@ -52,6 +49,8 @@ public static class LookupUtils
 
         (SqliteConnection?[]? freqConnectionsForJmdict, SqliteConnection?[]? freqConnectionsForCustomWordDict) = GetFreqSqliteConnections(sqliteFreqConnectionsForJmdict.Items, sqliteFreqConnectionsForCustomWordDict.Items, dbWordFreqs);
 
+        bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict;
+        Dict? pitchDict = DictUtils.PitchDict;
         TextInfo textInfo = GetTextInfo(text, wordFreqs is not null, dbIsUsedForPitchDict, dbWordFreqs, pitchDict);
 
         DBParameters dbParameters = GetDBParameters(textInfo);

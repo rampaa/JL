@@ -49,11 +49,13 @@ public static class DictUtils
     internal static bool DBIsUsedForJmdict { get; private set; } = true;
     internal static bool DBIsUsedForJmnedict { get; private set; } = true;
     internal static bool JmdictIsActive { get; private set; } = true;
+    internal static bool DBIsUsedForPitchDict { get; private set; } = true;
     internal static bool AnyCustomWordDictIsActive { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; } = true;
     internal static bool AtLeastOneKanjiDictIsActive { get; private set; } = true;
     internal static bool DBIsUsedForAtLeastOneYomichanOrNazekaWordDict { get; private set; } = true;
 
+    internal static Dict? PitchDict { get; private set; }
 
     private static Dict[] s_allDicts = [];
     private static Dict[] s_nameDicts = [];
@@ -1689,6 +1691,10 @@ public static class DictUtils
         JmdictIsActive = SingleDictTypeDicts.TryGetValue(DictType.JMdict, out Dict? jmdict) && jmdict.Active;
         AnyCustomWordDictIsActive = (SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict) && customWordDict.Active)
             || (SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict) && profileCustomWordDict.Active);
+
+        DBIsUsedForPitchDict = SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict)
+            && pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
+        PitchDict = pitchDict;
     }
 
     private static void CheckDBUsageForDicts(Dict[] dicts)
