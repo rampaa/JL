@@ -336,7 +336,7 @@ public static class DictUtils
         { "obj", "object" },
         { "obs", "obsolete term" },
         { "on-mim", "onomatopoeic or mimetic word" },
-        { "organization", "organization name" },
+        { "org", "organization name" },
         { "oth", "other" },
         { "person", "full name of a particular person" },
         { "place", "place name" },
@@ -469,7 +469,7 @@ public static class DictUtils
         { "doc", "document" }, { "ev", "event" }, { "fem", "female given name or forename" }, { "fict", "fiction" },
         { "given", "given name or forename, gender not specified" },
         { "group", "group" }, { "leg", "legend" }, { "masc", "male given name or forename" }, { "myth", "mythology" },
-        { "obj", "object" }, { "organization", "organization name" }, { "oth", "other" }, { "person", "full name of a particular person" },
+        { "obj", "object" }, { "org", "organization name" }, { "oth", "other" }, { "person", "full name of a particular person" },
         { "place", "place name" }, { "product", "product name" }, { "relig", "religion" }, { "serv", "service" }, { "ship", "ship name" },
         { "station", "railway station" }, { "surname", "family or surname" },{ "unclass", "unclassified name" }, { "work", "work of art, literature, music, etc. name" }
         // ReSharper restore BadExpressionBracesLineBreaks
