@@ -15,7 +15,7 @@ internal readonly ref struct DisposableItemArrayRefStruct<T> : IDisposable where
     {
         if (Items is not null)
         {
-            foreach (T? item in Items.Array)
+            foreach (T? item in Items.AsReadOnlySpan())
             {
                 item?.Dispose();
             }
