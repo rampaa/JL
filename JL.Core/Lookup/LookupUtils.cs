@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+using System.Buffers;
 using System.Diagnostics;
 using JL.Core.Config;
 using JL.Core.Deconjugation;
@@ -47,7 +47,7 @@ public static class LookupUtils
             ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
             : default;
 
-        (SqliteConnection?[]? freqConnectionsForJmdict, SqliteConnection?[]? freqConnectionsForCustomWordDict) = GetFreqSqliteConnections(sqliteFreqConnectionsForJmdict.Items, sqliteFreqConnectionsForCustomWordDict.Items, dbWordFreqs);
+        (RentedArrayBuffer<SqliteConnection?>? freqConnectionsForJmdict, RentedArrayBuffer<SqliteConnection?>? freqConnectionsForCustomWordDict) = GetFreqSqliteConnections(sqliteFreqConnectionsForJmdict.Items, sqliteFreqConnectionsForCustomWordDict.Items, dbWordFreqs);
 
         bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict;
         Dict? pitchDict = DictUtils.PitchDict;
@@ -452,13 +452,13 @@ public static class LookupUtils
         return (kanji, kanjiCompositions, kanjiFrequencyResults);
     }
 
-    private static (SqliteConnection?[]? freqConnectionsForJmdict, SqliteConnection?[]? freqConnectionsForCustomWordDict) GetFreqSqliteConnections(SqliteConnection[]? sqliteFreqConnectionsForJmdict, SqliteConnection[]? sqliteFreqConnectionsForCustomWordDict, Freq[]? dbWordFreqs)
+    private static (RentedArrayBuffer<SqliteConnection?>? freqConnectionsForJmdict, RentedArrayBuffer<SqliteConnection?>? freqConnectionsForCustomWordDict) GetFreqSqliteConnections(RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForJmdict, RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForCustomWordDict, Freq[]? dbWordFreqs)
     {
         bool sqliteFreqConnectionsForJmdictExist = sqliteFreqConnectionsForJmdict is not null;
         bool sqliteFreqConnectionsForCustomWordDictExist = sqliteFreqConnectionsForCustomWordDict is not null;
 
-        SqliteConnection?[]? freqConnectionsForJmdict = null;
-        SqliteConnection?[]? freqConnectionsForCustomWordDict = null;
+        RentedArrayBuffer<SqliteConnection?>? freqConnectionsForJmdict = null;
+        RentedArrayBuffer<SqliteConnection?>? freqConnectionsForCustomWordDict = null;
         if (sqliteFreqConnectionsForJmdictExist || sqliteFreqConnectionsForCustomWordDictExist)
         {
             Debug.Assert(dbWordFreqs is not null);
@@ -482,23 +482,24 @@ public static class LookupUtils
                 freqConnectionsForCustomWordDict = null;
             }
 
-            int index = 0;
             foreach (Freq dbWordFreq in dbWordFreqs)
             {
                 string freqPath = DBUtils.GetFreqDBPath(dbWordFreq.Name);
                 if (sqliteFreqConnectionsForJmdictExist)
                 {
                     Debug.Assert(freqConnectionsForJmdict is not null);
-                    freqConnectionsForJmdict[index] = DBUtils.CreateReadOnlyDBConnection(freqPath);
+#pragma warning disable CA2000 // Dispose objects before losing scope
+                    freqConnectionsForJmdict.Add(DBUtils.CreateReadOnlyDBConnection(freqPath));
+#pragma warning restore CA2000 // Dispose objects before losing scope
                 }
 
                 if (sqliteFreqConnectionsForCustomWordDictExist)
                 {
                     Debug.Assert(freqConnectionsForCustomWordDict is not null);
-                    freqConnectionsForCustomWordDict[index] = DBUtils.CreateReadOnlyDBConnection(freqPath);
+#pragma warning disable CA2000 // Dispose objects before losing scope
+                    freqConnectionsForCustomWordDict.Add(DBUtils.CreateReadOnlyDBConnection(freqPath));
+#pragma warning restore CA2000 // Dispose objects before losing scope
                 }
-
-                ++index;
             }
         }
 
@@ -661,7 +662,7 @@ public static class LookupUtils
             }
         }
 
-        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
+        Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
         IDictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
         if (allSearchKeys is not null)
         {
@@ -992,43 +993,60 @@ public static class LookupUtils
             : null;
     }
 
-    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, SqliteConnection?[] connections, HashSet<string> searchKeys)
+    private static Dictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, RentedArrayBuffer<SqliteConnection?> connections, HashSet<string> searchKeys)
     {
-        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Length, StringComparer.Ordinal);
+        Dictionary<string, List<FrequencyRecord>>?[] resultsArray = ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Rent(dbFreqs.Length);
         _ = Parallel.For(0, dbFreqs.Length, i =>
         {
             Freq freq = dbFreqs[i];
-            SqliteConnection? connection = connections[i];
+            SqliteConnection? connection = connections.Array[i];
 
             if (connection is not null)
             {
-                Dictionary<string, List<FrequencyRecord>>? freqRecords = FreqDBManager.GetRecordsFromDB(connection, searchKeys);
-                if (freqRecords is not null)
-                {
-                    _ = frequencyDicts.TryAdd(freq.Name, freqRecords);
-                }
+                resultsArray[i] = FreqDBManager.GetRecordsFromDB(connection, searchKeys);
             }
         });
 
-        return frequencyDicts;
-    }
-
-    private static ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, HashSet<string> searchKeys)
-    {
-        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>> frequencyDicts = new(-1, dbFreqs.Length, StringComparer.Ordinal);
-        _ = Parallel.ForEach(dbFreqs, freq =>
+        Dictionary<string, Dictionary<string, List<FrequencyRecord>>> result = new(dbFreqs.Length, StringComparer.Ordinal);
+        for (int i = 0; i < dbFreqs.Length; i++)
         {
-            Dictionary<string, List<FrequencyRecord>>? freqRecords = FreqDBManager.GetRecordsFromDB(freq.Name, searchKeys);
-            if (freqRecords is not null)
+            Dictionary<string, List<FrequencyRecord>>? resultArrayItem = resultsArray[i];
+            if (resultArrayItem is not null)
             {
-                _ = frequencyDicts.TryAdd(freq.Name, freqRecords);
+                result[dbFreqs[i].Name] = resultArrayItem;
             }
-        });
+        }
 
-        return frequencyDicts;
+        ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Return(resultsArray);
+
+        return result;
     }
 
-    private static void BuildJmdictResult(Dictionary<string, IntermediaryResult> jmdictResults, List<LookupResult> results, Freq[]? wordFreqs, Freq[]? dbWordFreqs, SqliteConnection?[]? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchDictConnection, Dict? pitchDict)
+    private static Dictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, HashSet<string> searchKeys)
+    {
+        Dictionary<string, List<FrequencyRecord>>?[] resultsArray = ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Rent(dbFreqs.Length);
+
+        _ = Parallel.For(0, dbFreqs.Length, i =>
+        {
+            Freq freq = dbFreqs[i];
+            resultsArray[i] = FreqDBManager.GetRecordsFromDB(freq.Name, searchKeys);
+        });
+
+        Dictionary<string, Dictionary<string, List<FrequencyRecord>>> result = new(dbFreqs.Length, StringComparer.Ordinal);
+        for (int i = 0; i < dbFreqs.Length; i++)
+        {
+            Dictionary<string, List<FrequencyRecord>>? resultArrayItem = resultsArray[i];
+            if (resultArrayItem is not null)
+            {
+                result[dbFreqs[i].Name] = resultArrayItem;
+            }
+        }
+
+        ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Return(resultsArray);
+        return result;
+    }
+
+    private static void BuildJmdictResult(Dictionary<string, IntermediaryResult> jmdictResults, List<LookupResult> results, Freq[]? wordFreqs, Freq[]? dbWordFreqs, RentedArrayBuffer<SqliteConnection?>? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchDictConnection, Dict? pitchDict)
     {
         bool wordFreqsExist = wordFreqs is not null;
         bool dbWordFreqsExist = dbWordFreqs is not null;
@@ -1038,7 +1056,7 @@ public static class LookupUtils
             : null;
 
         bool pitchAccentDictExists = false;
-        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
+        Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
         IDictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
 
         if (dbWordFreqsExist && dbIsUsedForPitchDict)
@@ -1218,7 +1236,7 @@ public static class LookupUtils
     }
 
     private static void BuildEpwingYomichanResult(
-        IDictionary<string, IntermediaryResult> epwingResults, List<LookupResult> results, Freq[]? freqs, ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        IDictionary<string, IntermediaryResult> epwingResults, List<LookupResult> results, Freq[]? freqs, Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool freqsExist = freqs is not null;
         bool pitchAccentDictExists = pitchAccentDict is not null;
@@ -1281,7 +1299,7 @@ public static class LookupUtils
     }
 
     private static void BuildEpwingNazekaResult(
-        IDictionary<string, IntermediaryResult> epwingNazekaResults, List<LookupResult> results, Freq[]? freqs, ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        IDictionary<string, IntermediaryResult> epwingNazekaResults, List<LookupResult> results, Freq[]? freqs, Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         bool freqsExist = freqs is not null;
@@ -1365,7 +1383,7 @@ public static class LookupUtils
     }
 
     private static void BuildCustomWordResult(
-        Dictionary<string, IntermediaryResult> customWordResults, List<LookupResult> results, Freq[]? wordFreqs, Freq[]? dbWordFreqs, SqliteConnection?[]? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchDictConnection, Dict? pitchDict)
+        Dictionary<string, IntermediaryResult> customWordResults, List<LookupResult> results, Freq[]? wordFreqs, Freq[]? dbWordFreqs, RentedArrayBuffer<SqliteConnection?>? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchDictConnection, Dict? pitchDict)
     {
         bool wordFreqsExist = wordFreqs is not null;
         bool dbWordFreqsExist = dbWordFreqs is not null;
@@ -1375,7 +1393,7 @@ public static class LookupUtils
             : null;
 
         bool pitchAccentDictExists = false;
-        ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
+        Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
         IDictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
         if (dbWordFreqsExist && dbIsUsedForPitchDict)
         {
@@ -1482,7 +1500,7 @@ public static class LookupUtils
         }
     }
 
-    private static List<LookupFrequencyResult>? GetWordFrequencies<T>(T record, Freq[] wordFreqs, ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB) where T : IGetFrequency
+    private static List<LookupFrequencyResult>? GetWordFrequencies<T>(T record, Freq[] wordFreqs, Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB) where T : IGetFrequency
     {
         bool freqDictsFromDBExist = freqDictsFromDB is not null;
         List<LookupFrequencyResult> freqsList = new(wordFreqs.Length);

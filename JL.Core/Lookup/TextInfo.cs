@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts.Interfaces;
@@ -14,7 +13,7 @@ internal sealed class TextInfo(List<string> textList,
     List<List<string>?>? textWithoutLongVowelMarksList,
     int textWithoutLongVowelMarksCount,
     string[]? deconjugatedTexts,
-    ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts,
+    Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts,
     IDictionary<string, IList<IDictRecord>>? pitchAccentDict) : IEquatable<TextInfo>
 {
     public List<string> TextList { get; } = textList;
@@ -24,7 +23,7 @@ internal sealed class TextInfo(List<string> textList,
     public List<List<string>?>? TextWithoutLongVowelMarksList { get; } = textWithoutLongVowelMarksList;
     public int TextWithoutLongVowelMarksCount { get; } = textWithoutLongVowelMarksCount;
     public string[]? DeconjugatedTexts { get; } = deconjugatedTexts;
-    public ConcurrentDictionary<string, Dictionary<string, List<FrequencyRecord>>>? FrequencyDicts { get; } = frequencyDicts;
+    public Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? FrequencyDicts { get; } = frequencyDicts;
     public IDictionary<string, IList<IDictRecord>>? PitchAccentDict { get; } = pitchAccentDict;
 
     public bool Equals([NotNullWhen(true)] TextInfo? other)
