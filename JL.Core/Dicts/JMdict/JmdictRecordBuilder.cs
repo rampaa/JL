@@ -162,10 +162,7 @@ internal static class JmdictRecordBuilder
             List<string[]?> miscList = new(senseListSpanLength);
             List<string[]?> dialectList = new(senseListSpanLength);
             List<string?> definitionInfoList = new(senseListSpanLength);
-            List<string[]?> relatedTermList = new(senseListSpanLength);
-            List<string[]?> antonymList = new(senseListSpanLength);
-
-            LoanwordSource[]? loanwordSourceArray = senseListSpan[0].LSourceArray;
+            List<string[]?> crossReferencesList = new(senseListSpanLength);
 
             ReadOnlySpan<string> readingListSpan = readingList.AsReadOnlySpan();
             foreach (ref readonly Sense sense in senseListSpan)
@@ -182,8 +179,7 @@ internal static class JmdictRecordBuilder
                     miscList.Add(sense.MiscArray);
                     dialectList.Add(sense.DialArray);
                     definitionInfoList.Add(sense.SInf);
-                    relatedTermList.Add(sense.XRefArray);
-                    antonymList.Add(sense.AntArray);
+                    crossReferencesList.Add(sense.XRefArray);
                 }
             }
 
@@ -211,9 +207,9 @@ internal static class JmdictRecordBuilder
                 definitionInfoList.TrimListOfNullableElementsToArray(),
                 exclusiveDialectValues,
                 dialectValuesSharedByAllSenses,
-                loanwordSourceArray,
-                relatedTermList.TrimListOfNullableElementsToArray(),
-                antonymList.TrimListOfNullableElementsToArray());
+                entry.LSourceArray,
+                crossReferencesList.TrimListOfNullableElementsToArray(),
+                entry.Info);
 
             recordDictionary.Add(key, record);
 
@@ -339,10 +335,7 @@ internal static class JmdictRecordBuilder
             List<string[]?> miscList = new(senseListSpanLength);
             List<string[]?> dialectList = new(senseListSpanLength);
             List<string?> definitionInfoList = new(senseListSpanLength);
-            List<string[]?> relatedTermList = new(senseListSpanLength);
-            List<string[]?> antonymList = new(senseListSpanLength);
-
-            LoanwordSource[]? loanwordSourceArray = senseListSpan[0].LSourceArray;
+            List<string[]?> crossReferencesList = new(senseListSpanLength);
 
             bool alternativeSpellingsExist = alternativeSpellings is not null;
             foreach (ref readonly Sense sense in senseListSpan)
@@ -361,8 +354,7 @@ internal static class JmdictRecordBuilder
                     miscList.Add(sense.MiscArray);
                     dialectList.Add(sense.DialArray);
                     definitionInfoList.Add(sense.SInf);
-                    relatedTermList.Add(sense.XRefArray);
-                    antonymList.Add(sense.AntArray);
+                    crossReferencesList.Add(sense.XRefArray);
                 }
             }
 
@@ -390,9 +382,9 @@ internal static class JmdictRecordBuilder
                 definitionInfoList.TrimListOfNullableElementsToArray(),
                 exclusiveDialectValues,
                 dialectValuesSharedByAllSenses,
-                loanwordSourceArray,
-                relatedTermList.TrimListOfNullableElementsToArray(),
-                antonymList.TrimListOfNullableElementsToArray());
+                entry.LSourceArray,
+                crossReferencesList.TrimListOfNullableElementsToArray(),
+                entry.Info);
 
             // record.Priorities = kanjiElement.KePriList
 

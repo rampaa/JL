@@ -18,8 +18,7 @@ public sealed class DictOptions(
     ExtraDefinitionInfoOption? extraDefinitionInfo = null,
     MiscInfoOption? miscInfo = null,
     LoanwordEtymologyOption? loanwordEtymology = null,
-    RelatedTermOption? relatedTerm = null,
-    AntonymOption? antonym = null,
+    ShowCrossReferencesOption? showCrossReferences = null,
     ShowPitchAccentWithDottedLinesOption? showPitchAccentWithDottedLines = null,
     AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null,
     ShowImagesOption? showImages = null,
@@ -43,8 +42,7 @@ public sealed class DictOptions(
     public SpellingRestrictionInfoOption? SpellingRestrictionInfo { get; internal set; } = spellingRestrictionInfo;
     public ExtraDefinitionInfoOption? ExtraDefinitionInfo { get; internal set; } = extraDefinitionInfo;
     public MiscInfoOption? MiscInfo { get; internal set; } = miscInfo;
-    public RelatedTermOption? RelatedTerm { get; internal set; } = relatedTerm;
-    public AntonymOption? Antonym { get; internal set; } = antonym;
+    public ShowCrossReferencesOption? ShowCrossReferences { get; internal set; } = showCrossReferences;
     public LoanwordEtymologyOption? LoanwordEtymology { get; internal set; } = loanwordEtymology;
     public ShowPitchAccentWithDottedLinesOption? ShowPitchAccentWithDottedLines { get; internal set; } = showPitchAccentWithDottedLines;
 

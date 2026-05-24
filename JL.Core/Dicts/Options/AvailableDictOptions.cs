@@ -106,13 +106,7 @@ public sealed class LoanwordEtymologyOption(bool value)
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 
-public sealed class RelatedTermOption(bool value)
-{
-    public bool Value { get; } = value;
-    [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
-}
-
-public sealed class AntonymOption(bool value)
+public sealed class ShowCrossReferencesOption(bool value)
 {
     public bool Value { get; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];

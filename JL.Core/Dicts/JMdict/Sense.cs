@@ -9,9 +9,7 @@ internal sealed class Sense(
     string[]? fieldArray,
     string[]? miscArray,
     string[]? dialArray,
-    string[]? xRefArray,
-    string[]? antArray,
-    LoanwordSource[]? lSourceArray)
+    string[]? xRefArray)
 {
     public string[] GlossArray { get; } = glossArray; // English meaning
     public string[]? PosArray { get; } = posArray; // e.g. "noun"
@@ -21,7 +19,5 @@ internal sealed class Sense(
     public string[]? FieldArray { get; } = fieldArray; // e.g. "martial arts"
     public string[]? MiscArray { get; } = miscArray; // e.g. "abbr"
     public string[]? DialArray { get; } = dialArray; // e.g. ksb
-    public string[]? XRefArray { get; } = xRefArray; // Related terms
-    public string[]? AntArray { get; } = antArray; // Antonyms
-    public LoanwordSource[]? LSourceArray { get; } = lSourceArray;
+    public string[]? XRefArray { get; } = xRefArray; // Cross-references
 }

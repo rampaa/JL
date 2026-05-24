@@ -183,6 +183,8 @@ internal static class JmdictLoader
         List<KanjiElement> kanjiElements = [];
         List<ReadingElement> readingElements = [];
         List<Sense> senseList = [];
+        List<LoanwordSource>? lSourceList = null;
+        List<string>? infoList = null;
 
         _ = xmlReader.Read();
 
@@ -198,20 +200,95 @@ internal static class JmdictLoader
                 switch (xmlReader.Name)
                 {
                     case "ent_seq":
+                    {
                         id = xmlReader.ReadElementContentAsInt();
                         break;
+                    }
 
                     case "k_ele":
+                    {
                         kanjiElements.Add(ReadKanjiElement(xmlReader));
                         break;
+                    }
 
                     case "r_ele":
+                    {
                         readingElements.Add(ReadReadingElement(xmlReader));
                         break;
+                    }
 
                     case "sense":
+                    {
                         senseList.Add(ReadSense(xmlReader));
                         break;
+                    }
+
+                    case "info":
+                    {
+                        infoList ??= [];
+
+                        string info = "";
+                        if (xmlReader.HasAttributes)
+                        {
+                            string? infoType = xmlReader.GetAttribute("inf_type");
+                            if (infoType is not null)
+                            {
+                                // Currently, the only info type in JMdict is "note".
+                                // We should revisit this in the future to see if the $"{infoType}: " format looks good
+                                if (infoType is not "note")
+                                {
+                                    info = $"{infoType}: ";
+                                }
+                            }
+                        }
+
+                        info += xmlReader.ReadElementContentAsString();
+                        infoList.Add(info);
+                        break;
+                    }
+
+                    case "lsource":
+                    {
+                        string? lang = xmlReader.GetAttribute("xml:lang");
+
+                        if (lang is not null)
+                        {
+                            if (s_iso6392BToEnglishNames.TryGetValue(lang, out string? englishName))
+                            {
+                                lang = englishName;
+                            }
+
+                            else if (s_canHandleCulture)
+                            {
+                                LoggerManager.Logger.Error("JMdict: English name of {Lang} is missing!", lang);
+
+                                try
+                                {
+                                    lang = CultureInfo.GetCultureInfo(lang).EnglishName;
+                                }
+                                catch (CultureNotFoundException ex)
+                                {
+                                    LoggerManager.Logger.Error(ex, "Underlying OS cannot process the culture info for {LanguageCode}", lang);
+                                    s_canHandleCulture = false;
+                                }
+                            }
+                        }
+
+                        else
+                        {
+                            lang = "English";
+                        }
+
+                        bool isPart = xmlReader.GetAttribute("ls_type") is "part";
+                        bool isWasei = xmlReader.GetAttribute("ls_wasei") is not null;
+
+                        string? originalWord = xmlReader.ReadElementContentAsString();
+                        originalWord = originalWord.Length > 0 ? originalWord : null;
+
+                        lSourceList ??= [];
+                        lSourceList.Add(new LoanwordSource(lang.GetPooledString(), isPart, isWasei, originalWord));
+                        break;
+                    }
 
                     default:
                         _ = xmlReader.Read();
@@ -224,7 +301,7 @@ internal static class JmdictLoader
             }
         }
 
-        return new JmdictEntry(id, kanjiElements, readingElements, senseList);
+        return new JmdictEntry(id, kanjiElements, readingElements, senseList, lSourceList?.ToArray(), infoList?.ToArray());
     }
 
     private static KanjiElement ReadKanjiElement(XmlTextReader xmlReader)
@@ -336,8 +413,6 @@ internal static class JmdictLoader
         List<string>? miscList = null;
         List<string>? dialList = null;
         List<string>? xRefList = null;
-        List<string>? antList = null;
-        List<LoanwordSource>? lSourceList = null;
 
         _ = xmlReader.Read();
 
@@ -353,39 +428,54 @@ internal static class JmdictLoader
                 switch (xmlReader.Name)
                 {
                     case "stagk":
+                    {
                         stagKList ??= [];
                         stagKList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
+                    }
 
                     case "stagr":
+                    {
                         stagRList ??= [];
                         stagRList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
+                    }
 
                     case "pos":
+                    {
                         posList.Add(ReadEntity(xmlReader));
                         break;
+                    }
 
                     case "field":
+                    {
                         fieldList ??= [];
                         fieldList.Add(ReadEntity(xmlReader));
                         break;
+                    }
 
                     case "misc":
+                    {
                         miscList ??= [];
                         miscList.Add(ReadEntity(xmlReader));
                         break;
+                    }
 
                     case "s_inf":
+                    {
                         sInf = xmlReader.ReadElementContentAsString();
                         break;
+                    }
 
                     case "dial":
+                    {
                         dialList ??= [];
                         dialList.Add(ReadEntity(xmlReader));
                         break;
+                    }
 
                     case "gloss":
+                    {
                         string gloss = "";
 
                         if (xmlReader.HasAttributes)
@@ -402,61 +492,40 @@ internal static class JmdictLoader
 
                         glossList.Add(gloss);
                         break;
+                    }
+
 
                     case "xref":
+                    {
                         xRefList ??= [];
-                        xRefList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
-                        break;
 
-                    case "ant":
-                        antList ??= [];
-                        antList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
-                        break;
-
-                    case "lsource":
-                        string? lang = xmlReader.GetAttribute("xml:lang");
-
-                        if (lang is not null)
+                        string crossReference = "";
+                        if (xmlReader.HasAttributes)
                         {
-                            if (s_iso6392BToEnglishNames.TryGetValue(lang, out string? englishName))
+                            string? crossReferenceType = xmlReader.GetAttribute("type");
+                            if (crossReferenceType is not null)
                             {
-                                lang = englishName;
-                            }
-
-                            else if (s_canHandleCulture)
-                            {
-                                LoggerManager.Logger.Error("JMdict: English name of {Lang} is missing!", lang);
-
-                                try
+                                crossReference = crossReferenceType switch
                                 {
-                                    lang = CultureInfo.GetCultureInfo(lang).EnglishName;
-                                }
-                                catch (CultureNotFoundException ex)
-                                {
-                                    LoggerManager.Logger.Error(ex, "Underlying OS cannot process the culture info for {LanguageCode}", lang);
-                                    s_canHandleCulture = false;
-                                }
+                                    "see" => "see: ",
+                                    "ant" => "antonym: ",
+                                    "syn" => "synonym: ",
+                                    _ => ""
+                                };
                             }
                         }
 
-                        else
-                        {
-                            lang = "English";
-                        }
+                        crossReference += xmlReader.ReadElementContentAsString().GetPooledString();
 
-                        bool isPart = xmlReader.GetAttribute("ls_type") is "part";
-                        bool isWasei = xmlReader.GetAttribute("ls_wasei") is not null;
-
-                        string? originalWord = xmlReader.ReadElementContentAsString();
-                        originalWord = originalWord.Length > 0 ? originalWord : null;
-
-                        lSourceList ??= [];
-                        lSourceList.Add(new LoanwordSource(lang.GetPooledString(), isPart, isWasei, originalWord));
+                        xRefList.Add(crossReference);
                         break;
+                    }
 
                     default:
+                    {
                         _ = xmlReader.Read();
                         break;
+                    }
                 }
             }
 
@@ -466,7 +535,7 @@ internal static class JmdictLoader
             }
         }
 
-        return new Sense(glossList.ToArray(), posList.TrimToArray(), sInf, stagKList?.ToArray(), stagRList?.ToArray(), fieldList?.ToArray(), miscList?.ToArray(), dialList?.ToArray(), xRefList?.ToArray(), antList?.ToArray(), lSourceList?.ToArray());
+        return new Sense(glossList.ToArray(), posList.TrimToArray(), sInf, stagKList?.ToArray(), stagRList?.ToArray(), fieldList?.ToArray(), miscList?.ToArray(), dialList?.ToArray(), xRefList?.ToArray());
     }
 
     private static string ReadEntity(XmlTextReader xmlReader)

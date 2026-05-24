@@ -123,12 +123,8 @@
                     <TextBlock Text="Show the etymology of loanwords" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
-                <CheckBox Name="RelatedTermCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Show related terms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                </CheckBox>
-
-                <CheckBox Name="AntonymCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Show antonyms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                <CheckBox Name="ShowCrossReferencesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show cross-references" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="ShowImagesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">

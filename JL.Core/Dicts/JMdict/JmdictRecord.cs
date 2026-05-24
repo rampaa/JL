@@ -34,8 +34,9 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
     public string[]?[]? Dialects { get; } // e.g. ksb
     public string[]? DialectsSharedByAllSenses { get; }
     public LoanwordSource[]? LoanwordEtymology { get; }
-    public string[]?[]? RelatedTerms { get; }
-    public string[]?[]? Antonyms { get; }
+    public string[]?[]? CrossReferences { get; }
+    public string[]? Info { get; }
+
     //public string[] Priorities { get; } // e.g. gai1
 
     public JmdictRecord(int id,
@@ -59,7 +60,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         string[]? dialectsSharedByAllSenses,
         LoanwordSource[]? loanwordEtymology,
         string[]?[]? relatedTerms,
-        string[]?[]? antonyms)
+        string[]? info)
     {
         Id = id;
         PrimarySpelling = primarySpelling;
@@ -81,8 +82,8 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         Dialects = dialects;
         DialectsSharedByAllSenses = dialectsSharedByAllSenses;
         LoanwordEtymology = loanwordEtymology;
-        RelatedTerms = relatedTerms;
-        Antonyms = antonyms;
+        CrossReferences = relatedTerms;
+        Info = info;
     }
 
     public string BuildFormattedDefinition(DictOptions options)
@@ -130,16 +131,15 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         LoanwordSource[]? loanwordEtymology = LoanwordEtymology;
         bool showLoanwordEtymology = options.LoanwordEtymology.Value && loanwordEtymology is not null;
 
-        Debug.Assert(options.RelatedTerm is not null);
-        string[]?[]? relatedTerms = RelatedTerms;
-        bool showRelatedTerms = options.RelatedTerm.Value && relatedTerms is not null;
+        string[]? info = Info;
+        bool showInfo = info is not null;
 
-        Debug.Assert(options.Antonym is not null);
-        string[]?[]? antonyms = Antonyms;
-        bool showAntonyms = options.Antonym.Value && antonyms is not null;
+        Debug.Assert(options.ShowCrossReferences is not null);
+        string[]?[]? crossReferences = CrossReferences;
+        bool showCrossReferences = options.ShowCrossReferences.Value && crossReferences is not null;
 
         StringBuilder defBuilder = ObjectPoolManager.StringBuilderPool.Get();
-        if (showWordClassesSharedByAllSenses || showMiscSharedByAllSenses || showDialectsSharedByAllSenses || showFieldsSharedByAllSenses || showLoanwordEtymology)
+        if (showWordClassesSharedByAllSenses || showMiscSharedByAllSenses || showDialectsSharedByAllSenses || showFieldsSharedByAllSenses || showLoanwordEtymology || showInfo)
         {
             if (showWordClassesSharedByAllSenses)
             {
@@ -169,6 +169,12 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
             {
                 Debug.Assert(loanwordEtymology is not null);
                 AppendLoanwordEtymology(defBuilder, loanwordEtymology);
+            }
+
+            if (showInfo)
+            {
+                Debug.Assert(info is not null);
+                _ = defBuilder.AppendJoin(", ", info).Append(' ');
             }
 
             if (multipleDefinitions && newlines)
@@ -243,16 +249,10 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 AppendSpellingRestrictionInfo(defBuilder, showSpellingRestrictions, SpellingRestrictions, showReadingRestrictionss, ReadingRestrictions, i);
             }
 
-            if (showRelatedTerms)
+            if (showCrossReferences)
             {
-                Debug.Assert(relatedTerms is not null);
-                AppendRelatedTerms(defBuilder, relatedTerms[i]);
-            }
-
-            if (showAntonyms)
-            {
-                Debug.Assert(antonyms is not null);
-                AppendAntonyms(defBuilder, antonyms[i]);
+                Debug.Assert(crossReferences is not null);
+                AppendCrossReferences(defBuilder, crossReferences[i]);
             }
 
             if (i + 1 != definitions.Length)
@@ -341,32 +341,17 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         _ = defBuilder.Append("] ");
     }
 
-    private static void AppendRelatedTerms(StringBuilder defBuilder, string[]? relatedTermsElement)
+    private static void AppendCrossReferences(StringBuilder defBuilder, string[]? crossReferencesElement)
     {
-        if (relatedTermsElement is not null)
+        if (crossReferencesElement is not null)
         {
-            if (relatedTermsElement.Length is 1)
+            if (crossReferencesElement.Length is 1)
             {
-                _ = defBuilder.Append(CultureInfo.InvariantCulture, $"(related term: {relatedTermsElement[0]}) ");
+                _ = defBuilder.Append('(').Append(crossReferencesElement[0]).Append(") ");
             }
             else
             {
-                _ = defBuilder.Append("(related terms: ").AppendJoin(", ", relatedTermsElement).Append(") ");
-            }
-        }
-    }
-
-    private static void AppendAntonyms(StringBuilder defBuilder, string[]? antonymsElement)
-    {
-        if (antonymsElement is not null)
-        {
-            if (antonymsElement.Length is 1)
-            {
-                _ = defBuilder.Append(CultureInfo.InvariantCulture, $"(antonym: {antonymsElement[0]}) ");
-            }
-            else
-            {
-                _ = defBuilder.Append("(antonyms: ").AppendJoin(", ", antonymsElement).Append(") ");
+                _ = defBuilder.Append('(').AppendJoin(", ", crossReferencesElement).Append(") ");
             }
         }
     }

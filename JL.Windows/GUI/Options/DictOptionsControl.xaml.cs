@@ -140,18 +140,11 @@ internal sealed partial class DictOptionsControl
             loanwordEtymology = new LoanwordEtymologyOption(LoanwordEtymologyCheckBox.IsChecked.Value);
         }
 
-        RelatedTermOption? relatedTermOption = null;
-        if (RelatedTermOption.ValidDictTypes.Contains(type))
+        ShowCrossReferencesOption? showCrossReferencesOption = null;
+        if (ShowCrossReferencesOption.ValidDictTypes.Contains(type))
         {
-            Debug.Assert(RelatedTermCheckBox.IsChecked is not null);
-            relatedTermOption = new RelatedTermOption(RelatedTermCheckBox.IsChecked.Value);
-        }
-
-        AntonymOption? antonymOption = null;
-        if (AntonymOption.ValidDictTypes.Contains(type))
-        {
-            Debug.Assert(AntonymCheckBox.IsChecked is not null);
-            antonymOption = new AntonymOption(AntonymCheckBox.IsChecked.Value);
+            Debug.Assert(ShowCrossReferencesCheckBox.IsChecked is not null);
+            showCrossReferencesOption = new ShowCrossReferencesOption(ShowCrossReferencesCheckBox.IsChecked.Value);
         }
 
         UseDBOption useDBOption;
@@ -222,8 +215,7 @@ internal sealed partial class DictOptionsControl
             extraDefinitionInfo,
             miscInfoOption,
             loanwordEtymology,
-            relatedTermOption,
-            antonymOption,
+            showCrossReferencesOption,
             showPitchAccentWithDottedLines,
             autoUpdateAfterNDaysOption,
             showImagesOption,
@@ -250,8 +242,7 @@ internal sealed partial class DictOptionsControl
         OptionUtils.ChangeVisibilityOfCheckBox(ExtraDefinitionInfoOption.ValidDictTypes.Contains(dictType), ExtraDefinitionInfoCheckBox, dictOptions?.ExtraDefinitionInfo?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(MiscInfoOption.ValidDictTypes.Contains(dictType), MiscInfoCheckBox, dictOptions?.MiscInfo?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(LoanwordEtymologyOption.ValidDictTypes.Contains(dictType), LoanwordEtymologyCheckBox, dictOptions?.LoanwordEtymology?.Value ?? true, ref showDictOptions);
-        OptionUtils.ChangeVisibilityOfCheckBox(RelatedTermOption.ValidDictTypes.Contains(dictType), RelatedTermCheckBox, dictOptions?.RelatedTerm?.Value ?? false, ref showDictOptions);
-        OptionUtils.ChangeVisibilityOfCheckBox(AntonymOption.ValidDictTypes.Contains(dictType), AntonymCheckBox, dictOptions?.Antonym?.Value ?? false, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(ShowCrossReferencesOption.ValidDictTypes.Contains(dictType), ShowCrossReferencesCheckBox, dictOptions?.ShowCrossReferences?.Value ?? false, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(UseDBOption.ValidDictTypes.Contains(dictType), UseDBCheckBox, dictOptions?.UseDB.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dictType), ShowPitchAccentWithDottedLinesCheckBox, dictOptions?.ShowPitchAccentWithDottedLines?.Value ?? true, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(ShowImagesOption.ValidDictTypes.Contains(dictType), ShowImagesCheckBox, dictOptions?.ShowImages?.Value ?? true, ref showDictOptions);

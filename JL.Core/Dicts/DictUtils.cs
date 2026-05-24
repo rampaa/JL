@@ -34,7 +34,7 @@ public static class DictUtils
     public static bool DictsReady { get; private set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
-    private static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
+    private static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e_NG.gz");
     private static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
@@ -147,8 +147,7 @@ public static class DictUtils
                     extraDefinitionInfo: new ExtraDefinitionInfoOption(true),
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
-                    relatedTerm: new RelatedTermOption(true),
-                    antonym: new AntonymOption(true),
+                    showCrossReferences: new ShowCrossReferencesOption(true),
                     autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)
                 ),
                 autoUpdatable: true,
@@ -1621,8 +1620,7 @@ public static class DictUtils
             dict.Options.SpellingRestrictionInfo ??= builtInJmdictOptions.SpellingRestrictionInfo;
             dict.Options.MiscInfo ??= builtInJmdictOptions.MiscInfo;
             dict.Options.LoanwordEtymology ??= builtInJmdictOptions.LoanwordEtymology;
-            dict.Options.RelatedTerm ??= builtInJmdictOptions.RelatedTerm;
-            dict.Options.Antonym ??= builtInJmdictOptions.Antonym;
+            dict.Options.ShowCrossReferences ??= builtInJmdictOptions.ShowCrossReferences;
             dict.Options.AutoUpdateAfterNDays ??= builtInJmdictOptions.AutoUpdateAfterNDays;
         }
         else if (dict.Type is DictType.Kanjidic)
