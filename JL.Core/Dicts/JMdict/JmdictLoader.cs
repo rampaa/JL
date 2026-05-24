@@ -494,7 +494,6 @@ internal static class JmdictLoader
                         break;
                     }
 
-
                     case "xref":
                     {
                         xRefList ??= [];
