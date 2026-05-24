@@ -122,14 +122,6 @@ public static class TextUtils
             : Rune.IsWhiteSpace(new Rune(firstChar, text[1]));
     }
 
-    internal static string GetFirstCharacter(ReadOnlySpan<char> text)
-    {
-        char firstChar = text[0];
-        return !char.IsHighSurrogate(firstChar)
-            ? firstChar.ToString()
-            : char.ConvertFromUtf32(char.ConvertToUtf32(firstChar, text[1]));
-    }
-
     internal static int ExtractFirstInt(ReadOnlySpan<char> text)
     {
         int startIndex = text.IndexOfAny(s_digits);

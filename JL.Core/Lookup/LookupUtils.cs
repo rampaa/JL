@@ -35,7 +35,25 @@ public static class LookupUtils
 
     public static LookupResult[]? LookupText(string text)
     {
-        (string kanji, string[]? kanjiCompositions, List<LookupFrequencyResult>? kanjiFrequencyResults) = GetKanjiInfo(text);
+        string? kanji = null;
+        string[]? kanjiCompositions = null;
+        List<LookupFrequencyResult>? kanjiFrequencyResults = null;
+        bool kanjiExists = false;
+        if (DictUtils.AtLeastOneKanjiDictIsActive)
+        {
+            kanji = JapaneseUtils.GetFirstCharacterIfKanji(text);
+            if (kanji is not null)
+            {
+                kanjiExists = true;
+                kanjiCompositions = KanjiCompositionDBManager.GetRecordsFromDB(kanji);
+
+                Freq[]? kanjiFreqs = FreqUtils.KanjiFreqs;
+                kanjiFrequencyResults = kanjiFreqs is not null
+                    ? GetKanjiFrequencies(kanji, kanjiFreqs)
+                    : null;
+            }
+        }
+
         Freq[]? wordFreqs = FreqUtils.WordFreqs;
         Freq[]? dbWordFreqs = FreqUtils.DBWordFreqs;
 
@@ -129,13 +147,17 @@ public static class LookupUtils
 
                 case DictType.Kanjidic:
                 {
-                    IntermediaryResult? kanjidicResult = useDB
-                        ? GetKanjiResultsFromDB(kanji, dict, KanjidicDBManager.GetRecordsFromDB)
-                        : GetKanjiResults(kanji, dict);
-
-                    if (kanjidicResult is not null)
+                    if (kanjiExists)
                     {
-                        resultSlots[i] = [BuildKanjidicResult(kanji, kanjiCompositions, kanjidicResult, kanjiFrequencyResults, textInfo.PitchAccentDict)];
+                        Debug.Assert(kanji is not null);
+                        IntermediaryResult? kanjidicResult = useDB
+                            ? GetKanjiResultsFromDB(kanji, dict, KanjidicDBManager.GetRecordsFromDB)
+                            : GetKanjiResults(kanji, dict);
+
+                        if (kanjidicResult is not null)
+                        {
+                            resultSlots[i] = [BuildKanjidicResult(kanji, kanjiCompositions, kanjidicResult, kanjiFrequencyResults, textInfo.PitchAccentDict)];
+                        }
                     }
 
                     break;
@@ -143,18 +165,23 @@ public static class LookupUtils
 
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
                 {
-                    // Template-wise, it is a word dictionary that's why its results are put into Yomichan Word Results
-                    // Content-wise though it's a kanji dictionary, that's why GetKanjiResults is being used for the lookup
-                    IntermediaryResult? epwingYomichanKanjiWithWordSchemaResults = useDB
-                        ? GetKanjiResultsFromDB(kanji, dict, EpwingYomichanDBManager.GetRecordsFromDB)
-                        : GetKanjiResults(kanji, dict);
-
-                    if (epwingYomichanKanjiWithWordSchemaResults is not null)
+                    if (kanjiExists)
                     {
-                        List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
-                        // ReSharper disable once AccessToDisposedClosure
-                        resultSlots[i] = rentedLookupResults;
-                        BuildEpwingYomichanResultForKanjiWithWordSchema(epwingYomichanKanjiWithWordSchemaResults, rentedLookupResults, kanjiCompositions, kanjiFrequencyResults, textInfo.PitchAccentDict);
+                        Debug.Assert(kanji is not null);
+
+                        // Template-wise, it is a word dictionary that's why its results are put into Yomichan Word Results
+                        // Content-wise though it's a kanji dictionary, that's why GetKanjiResults is being used for the lookup
+                        IntermediaryResult? epwingYomichanKanjiWithWordSchemaResults = useDB
+                            ? GetKanjiResultsFromDB(kanji, dict, EpwingYomichanDBManager.GetRecordsFromDB)
+                            : GetKanjiResults(kanji, dict);
+
+                        if (epwingYomichanKanjiWithWordSchemaResults is not null)
+                        {
+                            List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
+                            // ReSharper disable once AccessToDisposedClosure
+                            resultSlots[i] = rentedLookupResults;
+                            BuildEpwingYomichanResultForKanjiWithWordSchema(epwingYomichanKanjiWithWordSchemaResults, rentedLookupResults, kanjiCompositions, kanjiFrequencyResults, textInfo.PitchAccentDict);
+                        }
                     }
                     break;
                 }
@@ -196,16 +223,21 @@ public static class LookupUtils
 
                 case DictType.NonspecificKanjiYomichan:
                 {
-                    IntermediaryResult? epwingYomichanKanjiResults = useDB
-                        ? GetKanjiResultsFromDB(kanji, dict, YomichanKanjiDBManager.GetRecordsFromDB)
-                        : GetKanjiResults(kanji, dict);
-
-                    if (epwingYomichanKanjiResults is not null)
+                    if (kanjiExists)
                     {
-                        List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
-                        // ReSharper disable once AccessToDisposedClosure
-                        resultSlots[i] = rentedLookupResults;
-                        BuildYomichanKanjiResult(kanji, rentedLookupResults, kanjiCompositions, epwingYomichanKanjiResults, kanjiFrequencyResults, textInfo.PitchAccentDict);
+                        Debug.Assert(kanji is not null);
+
+                        IntermediaryResult? epwingYomichanKanjiResults = useDB
+                            ? GetKanjiResultsFromDB(kanji, dict, YomichanKanjiDBManager.GetRecordsFromDB)
+                            : GetKanjiResults(kanji, dict);
+
+                        if (epwingYomichanKanjiResults is not null)
+                        {
+                            List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
+                            // ReSharper disable once AccessToDisposedClosure
+                            resultSlots[i] = rentedLookupResults;
+                            BuildYomichanKanjiResult(kanji, rentedLookupResults, kanjiCompositions, epwingYomichanKanjiResults, kanjiFrequencyResults, textInfo.PitchAccentDict);
+                        }
                     }
                     break;
                 }
@@ -245,16 +277,21 @@ public static class LookupUtils
 
                 case DictType.NonspecificKanjiNazeka:
                 {
-                    IntermediaryResult? epwingNazekaKanjiResults = useDB
-                        ? GetKanjiResultsFromDB(kanji, dict, EpwingNazekaDBManager.GetRecordsFromDB)
-                        : GetKanjiResults(kanji, dict);
-
-                    if (epwingNazekaKanjiResults is not null)
+                    if (kanjiExists)
                     {
-                        List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
-                        // ReSharper disable once AccessToDisposedClosure
-                        resultSlots[i] = rentedLookupResults;
-                        BuildEpwingNazekaResultForKanji(epwingNazekaKanjiResults, rentedLookupResults, kanjiCompositions, kanjiFrequencyResults, textInfo.PitchAccentDict);
+                        Debug.Assert(kanji is not null);
+
+                        IntermediaryResult? epwingNazekaKanjiResults = useDB
+                            ? GetKanjiResultsFromDB(kanji, dict, EpwingNazekaDBManager.GetRecordsFromDB)
+                            : GetKanjiResults(kanji, dict);
+
+                        if (epwingNazekaKanjiResults is not null)
+                        {
+                            List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
+                            // ReSharper disable once AccessToDisposedClosure
+                            resultSlots[i] = rentedLookupResults;
+                            BuildEpwingNazekaResultForKanji(epwingNazekaKanjiResults, rentedLookupResults, kanjiCompositions, kanjiFrequencyResults, textInfo.PitchAccentDict);
+                        }
                     }
 
                     break;
@@ -431,25 +468,6 @@ public static class LookupUtils
         }
 
         return new DBParameters(allTextWithoutLongVowelMark, jmdictWordQuery, jmdictVerbQuery, jmnedictQuery, yomichanWordQuery, yomichanVerbQuery, nazekaWordQuery, nazekaVerbQuery, nazekaTextWithoutLongVowelMarkQuery, yomichanTextWithoutLongVowelMarkQuery, jmdictTextWithoutLongVowelMarkParameter);
-    }
-
-    private static (string kanji, string[]? kanjiCompositions, List<LookupFrequencyResult>? kanjiFrequencyResults) GetKanjiInfo(string text)
-    {
-        string kanji = "";
-        string[]? kanjiCompositions = null;
-        List<LookupFrequencyResult>? kanjiFrequencyResults = null;
-        if (DictUtils.AtLeastOneKanjiDictIsActive)
-        {
-            kanji = TextUtils.GetFirstCharacter(text);
-            kanjiCompositions = KanjiCompositionDBManager.GetRecordsFromDB(kanji);
-
-            Freq[]? kanjiFreqs = FreqUtils.KanjiFreqs;
-            kanjiFrequencyResults = kanjiFreqs is not null
-                ? GetKanjiFrequencies(kanji, kanjiFreqs)
-                : null;
-        }
-
-        return (kanji, kanjiCompositions, kanjiFrequencyResults);
     }
 
     private static (RentedArrayBuffer<SqliteConnection?>? freqConnectionsForJmdict, RentedArrayBuffer<SqliteConnection?>? freqConnectionsForCustomWordDict) GetFreqSqliteConnections(RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForJmdict, RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForCustomWordDict, Freq[]? dbWordFreqs)

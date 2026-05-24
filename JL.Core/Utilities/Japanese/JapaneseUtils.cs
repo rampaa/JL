@@ -889,4 +889,42 @@ public static partial class JapaneseUtils
 
         return false;
     }
+
+    private static bool IsKanji(char c)
+    {
+        return (int)c is (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
+            or (>= 0x2E80 and <= 0x2FDF) // CJK Radicals Supplement (2E80–2EFF), Kangxi Radicals (2F00–2FDF)
+            or (>= 0x3190 and <= 0x319F) // Kanbun (3190–319F)
+            or (>= 0x3220 and <= 0x325F) // Enclosed CJK Letters and Months 3220-325F
+            or (>= 0x3280 and <= 0x4DBF) // Enclosed CJK Letters and Months 3280-32FF, CJK Compatibility (3300–33FF), CJK Unified Ideographs Extension A (3400–4DBF)
+            or (>= 0xF900 and <= 0xFAFF) // CJK Compatibility Ideographs (F900–FAFF)
+            or (>= 0xFE30 and <= 0xFE4F); // CJK Compatibility Forms (FE30–FE4F)
+    }
+
+    private static bool IsKanji(char firstChar, char secondChar)
+    {
+        int codePoint = char.ConvertToUtf32(firstChar, secondChar);
+        return codePoint is (>= 0x1F200 and <= 0x1F2FF) // Enclosed Ideographic Supplement (1F200-1F2FF)
+                or (>= 0x20000 and <= 0x2A6DF) // CJK Unified Ideographs Extension B (20000–2A6DF)
+                or (>= 0x2A700 and <= 0x2EBEF) // CJK Unified Ideographs Extension C (2A700–2B73F), CJK Unified Ideographs Extension D (2B740–2B81F), CJK Unified Ideographs Extension E (2B820–2CEAF), CJK Unified Ideographs Extension F (2CEB0–2EBEF)
+                or (>= 0x2F800 and <= 0x2FA1F) // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
+                or (>= 0x30000 and <= 0x323AF); // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF)
+    }
+
+    internal static string? GetFirstCharacterIfKanji(ReadOnlySpan<char> text)
+    {
+        char firstChar = text[0];
+        if (!char.IsHighSurrogate(firstChar))
+        {
+            return IsKanji(firstChar)
+                ? firstChar.ToString()
+                : null;
+        }
+
+        Debug.Assert(text.Length > 1);
+        char secondChar = text[1];
+        return IsKanji(firstChar, secondChar)
+            ? char.ConvertFromUtf32(char.ConvertToUtf32(firstChar, secondChar))
+            : null;
+    }
 }
