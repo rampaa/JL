@@ -161,7 +161,6 @@ internal static class FreqDBManager
 
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(SqliteConnection connection, HashSet<string> terms)
     {
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
@@ -222,7 +221,6 @@ internal static class FreqDBManager
             return null;
         }
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText = SingleTermQuery;
@@ -247,7 +245,6 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
         Debug.Assert(connection is not null);
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -270,7 +267,6 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
         Debug.Assert(connection is not null);
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =

@@ -140,7 +140,6 @@ internal static class KanjidicDBManager
             return null;
         }
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText = SingleTermQuery;
@@ -161,7 +160,6 @@ internal static class KanjidicDBManager
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
         Debug.Assert(connection is not null);
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =

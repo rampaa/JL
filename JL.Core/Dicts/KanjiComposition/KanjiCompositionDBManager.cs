@@ -26,7 +26,6 @@ internal static class KanjiCompositionDBManager
             return null;
         }
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText = SingleTermQuery;

@@ -303,7 +303,6 @@ internal static class JmdictDBManager
             return null;
         }
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
@@ -344,7 +343,6 @@ internal static class JmdictDBManager
         using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
         Debug.Assert(connection is not null);
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =

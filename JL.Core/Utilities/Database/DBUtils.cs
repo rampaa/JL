@@ -112,7 +112,6 @@ public static class DBUtils
         using SqliteConnection? connection = CreateReadOnlyDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
-        EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
 
@@ -195,6 +194,12 @@ public static class DBUtils
         try
         {
             connection.Open();
+
+#if X64 || ARM64
+            using SqliteCommand command = connection.CreateCommand();
+            command.CommandText = "PRAGMA mmap_size = 2097152000;"; // 1024L * 1024L * 2000L = 2097152000 bytes ≈ 1.953 GiB. Max allowed value is 2147418112 bytes (≈1.999 GiB)
+            _ = command.ExecuteNonQuery();
+#endif
             return connection;
         }
         catch (SqliteException ex)
@@ -226,8 +231,6 @@ public static class DBUtils
         using SqliteConnection? connection = CreateReadOnlyDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
-        EnableMemoryMapping(connection);
-
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             """
@@ -248,18 +251,6 @@ public static class DBUtils
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA synchronous = 1;";
         _ = command.ExecuteNonQuery();
-    }
-
-    internal static void EnableMemoryMapping(SqliteConnection connection)
-    {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA cache_size = 0;";
-        _ = command.ExecuteNonQuery();
-
-#if X64 || ARM64
-        command.CommandText = "PRAGMA mmap_size = 2097152000;"; // 1024L * 1024L * 2000L = 2097152000 bytes ≈ 1.953 GiB. Max allowed value is 2147418112 bytes (≈1.999 GiB)
-        _ = command.ExecuteNonQuery();
-#endif
     }
 
     //internal static bool IsDBCorrupt(SqliteConnection connection)

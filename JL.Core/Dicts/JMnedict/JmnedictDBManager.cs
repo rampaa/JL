@@ -178,7 +178,6 @@ internal static class JmnedictDBManager
             return null;
         }
 
-        DBUtils.EnableMemoryMapping(connection);
         using SqliteCommand command = connection.CreateCommand();
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
