@@ -227,23 +227,23 @@ internal static class JmdictLoader
                     {
                         infoList ??= [];
 
-                        string info = "";
-                        if (xmlReader.HasAttributes)
-                        {
-                            string? infoType = xmlReader.GetAttribute("inf_type");
-                            if (infoType is not null)
-                            {
-                                // Currently, the only info type in JMdict is "note".
-                                // We should revisit this in the future to see if the $"{infoType}: " format looks good
-                                if (infoType is not "note")
-                                {
-                                    info = $"{infoType}: ";
-                                }
-                            }
-                        }
+                        //string info = "";
+                        //if (xmlReader.HasAttributes)
+                        //{
+                        //    string? infoType = xmlReader.GetAttribute("inf_type");
+                        //    if (infoType is not null)
+                        //    {
+                        //        // Currently, the only info type in JMdict is "note".
+                        //        // We should revisit this in the future to see if the $"{infoType}: " format looks good
+                        //        if (infoType is not "note")
+                        //        {
+                        //            info = $"{infoType}: ";
+                        //        }
+                        //    }
+                        //}
 
-                        info += xmlReader.ReadElementContentAsString();
-                        infoList.Add(info);
+                        //info += xmlReader.ReadElementContentAsString();
+                        infoList.Add(xmlReader.ReadElementContentAsString());
                         break;
                     }
 
@@ -477,11 +477,9 @@ internal static class JmdictLoader
                     case "gloss":
                     {
                         string gloss = "";
-
                         if (xmlReader.HasAttributes)
                         {
                             string? glossType = xmlReader.GetAttribute("g_type");
-
                             if (glossType is not null)
                             {
                                 gloss = $"({glossType}.) ";
@@ -509,12 +507,12 @@ internal static class JmdictLoader
                                     "see" => "see: ",
                                     "ant" => "antonym: ",
                                     "syn" => "synonym: ",
-                                    _ => ""
+                                    _ => $"{crossReferenceType}: "
                                 };
                             }
                         }
 
-                        crossReference += xmlReader.ReadElementContentAsString().GetPooledString();
+                        crossReference += xmlReader.ReadElementContentAsString();
 
                         xRefList.Add(crossReference);
                         break;
