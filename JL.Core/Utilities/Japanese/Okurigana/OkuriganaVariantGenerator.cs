@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace JL.Core.Utilities.Japanese.Okurigana;
@@ -160,12 +161,12 @@ internal static class OkuriganaVariantGenerator
         while (i < expressionLength)
         {
             int start = i;
-            bool isKanji = IsKanji(expression, i, out int consumed);
+            bool isKanji = IsKanjiLike(expression, i, out int consumed);
             i += consumed;
 
             while (i < expressionLength)
             {
-                if (IsKanji(expression, i, out int nextConsumed) != isKanji)
+                if (IsKanjiLike(expression, i, out int nextConsumed) != isKanji)
                 {
                     break;
                 }
@@ -232,15 +233,13 @@ internal static class OkuriganaVariantGenerator
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool IsKanji(ReadOnlySpan<char> span, int index, out int consumedCharCount)
+    private static bool IsKanjiLike(ReadOnlySpan<char> span, int index, out int consumedCharCount)
     {
         char character = span[index];
-
         if (!char.IsHighSurrogate(character))
         {
             consumedCharCount = 1;
-            int codePoint = character;
-            return codePoint is (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
+            return (ushort)character is (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
                     or (>= 0x3400 and <= 0x4DBF) // CJK Unified Ideographs Extension A (3400–4DBF)
                     or (>= 0x2E80 and <= 0x2FDF) // CJK Radicals Supplement (2E80–2EFF), Kangxi Radicals (2F00–2FDF)
                     or (>= 0x3005 and <= 0x3007) // Iteration marks, etc. (々 〆 〇)
@@ -254,22 +253,16 @@ internal static class OkuriganaVariantGenerator
                     or (>= 0xFE30 and <= 0xFE4F); // CJK Compatibility Forms (FE30–FE4F)
         }
 
-        if (index + 1 < span.Length)
-        {
-            char nextChar = span[index + 1];
-            if (char.IsLowSurrogate(nextChar))
-            {
-                consumedCharCount = 2;
-                int codePoint = char.ConvertToUtf32(character, nextChar);
+        Debug.Assert(span.Length > index + 1);
+        char nextChar = span[index + 1];
+        Debug.Assert(char.IsLowSurrogate(nextChar));
 
-                return codePoint is (>= 0x20000 and <= 0x2A6DF) // CJK Unified Ideographs Extension B (20000–2A6DF)
-                    or (>= 0x2A700 and <= 0x2EBEF) // CJK Unified Ideographs Extension C (2A700–2B73F), CJK Unified Ideographs Extension D (2B740–2B81F), CJK Unified Ideographs Extension E (2B820–2CEAF), CJK Unified Ideographs Extension F (2CEB0–2EBEF)
-                    or (>= 0x2F800 and <= 0x2FA1F) // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
-                    or (>= 0x30000 and <= 0x3347F); // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF), CJK Unified Ideographs Extension J (323B0-3347F)
-            }
-        }
+        consumedCharCount = 2;
 
-        consumedCharCount = 1;
-        return false;
+        int codePoint = char.ConvertToUtf32(character, nextChar);
+        return codePoint is (>= 0x20000 and <= 0x2A6DF) // CJK Unified Ideographs Extension B (20000–2A6DF)
+            or (>= 0x2A700 and <= 0x2EBEF) // CJK Unified Ideographs Extension C (2A700–2B73F), CJK Unified Ideographs Extension D (2B740–2B81F), CJK Unified Ideographs Extension E (2B820–2CEAF), CJK Unified Ideographs Extension F (2CEB0–2EBEF)
+            or (>= 0x2F800 and <= 0x2FA1F) // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
+            or (>= 0x30000 and <= 0x3347F); // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF), CJK Unified Ideographs Extension J (323B0-3347F)
     }
 }

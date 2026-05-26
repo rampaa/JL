@@ -837,7 +837,11 @@ public static partial class JapaneseUtils
             {
                 Debug.Assert(text.Length > 1);
                 char secondChar = text[1];
-                isFirstCharacterJapanese = IsKanji(firstChar, secondChar);
+
+                Debug.Assert(char.IsHighSurrogate(firstChar));
+                Debug.Assert(char.IsLowSurrogate(secondChar));
+                int codePoint = char.ConvertToUtf32(firstChar, secondChar);
+                isFirstCharacterJapanese = IsKanji(codePoint);
             }
 
             return isFirstCharacterJapanese || JapaneseRegex.IsMatch(text);
@@ -881,7 +885,7 @@ public static partial class JapaneseUtils
         Debug.Assert(!char.IsHighSurrogate(codePoint) && !char.IsLowSurrogate(codePoint));
 
         // Katakana Phonetic Extensions (31F0–31FF): The range is mainly for Ainu, but some characters like ㇲ and ト are occasionally used in Japanese, so it's included
-        return (int)codePoint is (>= 0x2FF0 and <= 0x30FF) // Ideographic Description Characters (2FF0–2FFF), CJK Symbols and Punctuation (3000–303F), Hiragana (3040–309F), Katakana (30A0–30FF)
+        return (ushort)codePoint is (>= 0x2FF0 and <= 0x30FF) // Ideographic Description Characters (2FF0–2FFF), CJK Symbols and Punctuation (3000–303F), Hiragana (3040–309F), Katakana (30A0–30FF)
             or (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
             or 0x00D7 // × (\u00D7)
             or (>= 0x2000 and <= 0x206F) // General Punctuation (2000-206F): ‥, …, •, ※
@@ -916,7 +920,7 @@ public static partial class JapaneseUtils
     private static bool IsKanji(char codePoint)
     {
         Debug.Assert(!char.IsHighSurrogate(codePoint) && !char.IsLowSurrogate(codePoint));
-        return (int)codePoint is (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
+        return (ushort)codePoint is (>= 0x4E00 and <= 0x9FFF) // CJK Unified Ideographs (4E00–9FFF)
             or (>= 0x2E80 and <= 0x2FDF) // CJK Radicals Supplement (2E80–2EFF), Kangxi Radicals (2F00–2FDF)
             or (>= 0x3190 and <= 0x319F) // Kanbun (3190–319F)
             or (>= 0x3220 and <= 0x325F) // Enclosed CJK Letters and Months 3220-325F
@@ -925,12 +929,8 @@ public static partial class JapaneseUtils
             or (>= 0xFE30 and <= 0xFE4F); // CJK Compatibility Forms (FE30–FE4F)
     }
 
-    private static bool IsKanji(char firstChar, char secondChar)
+    private static bool IsKanji(int codePoint)
     {
-        Debug.Assert(char.IsHighSurrogate(firstChar));
-        Debug.Assert(char.IsLowSurrogate(secondChar));
-        int codePoint = char.ConvertToUtf32(firstChar, secondChar);
-
         return codePoint is (>= 0x1F200 and <= 0x1F2FF) // Enclosed Ideographic Supplement (1F200-1F2FF)
                 or (>= 0x20000 and <= 0x2A6DF) // CJK Unified Ideographs Extension B (20000–2A6DF)
                 or (>= 0x2A700 and <= 0x2EBEF) // CJK Unified Ideographs Extension C (2A700–2B73F), CJK Unified Ideographs Extension D (2B740–2B81F), CJK Unified Ideographs Extension E (2B820–2CEAF), CJK Unified Ideographs Extension F (2CEB0–2EBEF)
@@ -951,8 +951,12 @@ public static partial class JapaneseUtils
         Debug.Assert(text.Length > 1);
         char secondChar = text[1];
 
-        return IsKanji(firstChar, secondChar)
-            ? char.ConvertFromUtf32(char.ConvertToUtf32(firstChar, secondChar))
+        Debug.Assert(char.IsHighSurrogate(firstChar));
+        Debug.Assert(char.IsLowSurrogate(secondChar));
+        int codePoint = char.ConvertToUtf32(firstChar, secondChar);
+
+        return IsKanji(codePoint)
+            ? char.ConvertFromUtf32(codePoint)
             : null;
     }
 }

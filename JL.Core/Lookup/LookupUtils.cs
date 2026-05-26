@@ -571,8 +571,8 @@ public static class LookupUtils
                             longVowelMarkCount = 2;
                             for (int j = firstLongVowelMarkIndex + 1; j < lastLongVowelMarkIndex; j++)
                             {
-                                char c = textInHiragana[j];
-                                if (c is 'ー' or '〜')
+                                char character = textInHiragana[j];
+                                if (character is 'ー' or '〜')
                                 {
                                     ++longVowelMarkCount;
                                 }
