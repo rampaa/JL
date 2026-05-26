@@ -1,6 +1,6 @@
 # Supported Dictionaries
 
-* JMdict (displayed info can be customized through Manage Dictionaries→JMdict→Edit→Options)
+* [JMdict NG](https://www.edrdg.org/jmwsgi/web/doc/2026-03-update.html) (displayed info can be customized through Manage Dictionaries→JMdict→Edit→Options)
 * JMnedict
 * KANJIDIC2 (with de/composition data provided by [ids.txt](https://github.com/cjkvi/cjkvi-ids/blob/master/ids.txt))
 
