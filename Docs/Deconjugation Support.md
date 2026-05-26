@@ -1,5 +1,7 @@
 * adj-i: adjective (keiyoushi)
-* adj-na: adjectival nouns or quasi-adjectives (keiyodoshi)
+* adj-ix: adjective (keiyoushi) - yoi/ii class
+
+* cop: copula
 
 * v1: Ichidan verb
 * v1-s: Ichidan verb - kureru special class
