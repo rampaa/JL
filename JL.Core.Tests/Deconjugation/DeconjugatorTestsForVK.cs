@@ -2151,6 +2151,15 @@ internal sealed class DeconjugatorTestsForVK
     }
 
     [Test]
+    public void Deconjugate_Mashi_VK()
+    {
+        const string termToDeconjugate = "来まし";
+        const string expected = "～polite imperative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "来る", LastTag: "vk" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_Masendeshitara_VK()
     {
         const string termToDeconjugate = "来ませんでしたら";

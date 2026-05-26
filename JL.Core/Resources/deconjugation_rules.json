@@ -1466,6 +1466,14 @@
   {
     "type": "onlyfinalrule",
     "dec_end": [ "" ],
+    "con_end": [ "まし" ],
+    "dec_tag": [ "stem-ren" ],
+    "con_tag": [ "uninflectable" ],
+    "detail": "polite imperative"
+  },
+  {
+    "type": "onlyfinalrule",
+    "dec_end": [ "" ],
     "con_end": [ "たら" ],
     "dec_tag": [ "stem-ren-less" ],
     "con_tag": [ "uninflectable" ],

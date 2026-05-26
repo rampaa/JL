@@ -1998,6 +1998,15 @@ internal sealed class DeconjugatorTestsForVSC
     }
 
     [Test]
+    public void Deconjugate_Mashi_VSC()
+    {
+        const string termToDeconjugate = "御座しまし";
+        const string expected = "～polite imperative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "御座す", LastTag: "vs-c" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_Masendeshitara_VSC()
     {
         const string termToDeconjugate = "御座しませんでしたら";

@@ -2160,6 +2160,15 @@ internal sealed class DeconjugatorTestsForVSS
     }
 
     [Test]
+    public void Deconjugate_Mashi_VSS()
+    {
+        const string termToDeconjugate = "愛しまし";
+        const string expected = "～polite imperative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "愛する", LastTag: "vs-s" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_Masendeshitara_VSS()
     {
         const string termToDeconjugate = "愛しませんでしたら";

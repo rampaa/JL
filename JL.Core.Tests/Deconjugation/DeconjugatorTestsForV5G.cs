@@ -2151,6 +2151,15 @@ internal sealed class DeconjugatorTestsForV5G
     }
 
     [Test]
+    public void Deconjugate_Mashi_V5G()
+    {
+        const string termToDeconjugate = "繋ぎまし";
+        const string expected = "～polite imperative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "繋ぐ", LastTag: "v5g" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_Masendeshitara_V5G()
     {
         const string termToDeconjugate = "繋ぎませんでしたら";

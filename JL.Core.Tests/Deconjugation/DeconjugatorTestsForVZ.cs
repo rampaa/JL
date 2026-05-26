@@ -2241,6 +2241,15 @@ internal sealed class DeconjugatorTestsForVZ
     }
 
     [Test]
+    public void Deconjugate_Mashi_VZ()
+    {
+        const string termToDeconjugate = "命じまし";
+        const string expected = "～polite imperative";
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "命ずる", LastTag: "vz" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void Deconjugate_Masendeshitara_VZ()
     {
         const string termToDeconjugate = "命じませんでしたら";
