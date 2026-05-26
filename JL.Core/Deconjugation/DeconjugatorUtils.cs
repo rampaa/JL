@@ -20,7 +20,7 @@ internal static class DeconjugatorUtils
 
     public static readonly FrozenSet<string> ValidWordClasses =
     [
-        "adj-i", "cop", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
+        "adj-i", "adj-ix", "cop", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
     ];
 
