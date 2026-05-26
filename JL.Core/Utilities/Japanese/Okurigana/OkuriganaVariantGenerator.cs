@@ -250,6 +250,7 @@ internal static class OkuriganaVariantGenerator
                     or (>= 0x3190 and <= 0x319F) // Kanbun (3190–319F)
                     or (>= 0x31C0 and <= 0x31EF) // CJK Strokes (31C0–31EF)
                     or (>= 0xF900 and <= 0xFAFF) // CJK Compatibility Ideographs(F900–FAFF)
+                    or (>= 0xFE10 and <= 0xFE1F) // Vertical Forms (FE10–FE1F)
                     or (>= 0xFE30 and <= 0xFE4F); // CJK Compatibility Forms (FE30–FE4F)
         }
 
@@ -263,6 +264,7 @@ internal static class OkuriganaVariantGenerator
         return codePoint is (>= 0x20000 and <= 0x2A6DF) // CJK Unified Ideographs Extension B (20000–2A6DF)
             or (>= 0x2A700 and <= 0x2EBEF) // CJK Unified Ideographs Extension C (2A700–2B73F), CJK Unified Ideographs Extension D (2B740–2B81F), CJK Unified Ideographs Extension E (2B820–2CEAF), CJK Unified Ideographs Extension F (2CEB0–2EBEF)
             or (>= 0x2F800 and <= 0x2FA1F) // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
-            or (>= 0x30000 and <= 0x3347F); // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF), CJK Unified Ideographs Extension J (323B0-3347F)
+            or (>= 0x30000 and <= 0x3347F) // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF), CJK Unified Ideographs Extension J (323B0-3347F)
+            or (>= 0x1D360 and <= 0x1D37F); // Counting Rod Numerals (1D360-1D37F)
     }
 }
