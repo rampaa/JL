@@ -44,7 +44,8 @@ public static partial class JapaneseUtils
     // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
-    [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u2FDF\u2FF0-\u30FF\u3190-\u319F\u31C0-\u31FF\u3220-\u325F\u3280-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFF9F\uFFE0-\uFFEF]|\uD82C[\uDC00-\uDD6F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD868][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]|\uD869[\uDF00-\uDFFF]|[\uD86A-\uD87A][\uDC00-\uDFFF]|\uD87B[\uDC00-\uDE5F]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]", RegexOptions.CultureInvariant)]
+    // CJK Unified Ideographs Extension J (323B0-3347F)
+    [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u2FDF\u2FF0-\u30FF\u3190-\u319F\u31C0-\u31FF\u3220-\u325F\u3280-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFF9F\uFFE0-\uFFEF]|\uD82C[\uDC00-\uDD6F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD868][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]|\uD869[\uDF00-\uDFFF]|[\uD86A-\uD87A][\uDC00-\uDFFF]|\uD87B[\uDC00-\uDE5F]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD88C][\uDC00-\uDFFF]|\uD88D[\uDC00-\uDC7F]", RegexOptions.CultureInvariant)]
     private static partial Regex JapaneseRegex { get; }
 
     private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new KeyValuePair<char, string>[]
@@ -857,7 +858,7 @@ public static partial class JapaneseUtils
                     or (>= 0x20000 and <= 0x2A6DF) // CJK Unified Ideographs Extension B (20000–2A6DF)
                     or (>= 0x2A700 and <= 0x2EBEF) // CJK Unified Ideographs Extension C (2A700–2B73F), CJK Unified Ideographs Extension D (2B740–2B81F), CJK Unified Ideographs Extension E (2B820–2CEAF), CJK Unified Ideographs Extension F (2CEB0–2EBEF)
                     or (>= 0x2F800 and <= 0x2FA1F) // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
-                    or (>= 0x30000 and <= 0x323AF)) // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF)
+                    or (>= 0x30000 and <= 0x3347F)) // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF), CJK Unified Ideographs Extension J (323B0-3347F)
                 {
                     return true;
                 }
@@ -908,7 +909,7 @@ public static partial class JapaneseUtils
                 or (>= 0x20000 and <= 0x2A6DF) // CJK Unified Ideographs Extension B (20000–2A6DF)
                 or (>= 0x2A700 and <= 0x2EBEF) // CJK Unified Ideographs Extension C (2A700–2B73F), CJK Unified Ideographs Extension D (2B740–2B81F), CJK Unified Ideographs Extension E (2B820–2CEAF), CJK Unified Ideographs Extension F (2CEB0–2EBEF)
                 or (>= 0x2F800 and <= 0x2FA1F) // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
-                or (>= 0x30000 and <= 0x323AF); // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF)
+                or (>= 0x30000 and <= 0x3347F); // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF), CJK Unified Ideographs Extension J (323B0-3347F)
     }
 
     internal static string? GetFirstCharacterIfKanji(ReadOnlySpan<char> text)
