@@ -93,7 +93,7 @@ No.
 
 ## Credits
 * [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
-* [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project): JMdict_e.gz
+* [JMdict NG](https://www.edrdg.org/jmwsgi/web/doc/2026-03-update.html): [JMdict_e_NG.gz](http://ftp.edrdg.org/pub/Nihongo/00INDEX.html#dic_fil)
 * [JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html): JMnedict.xml.gz
 * [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project): kanjidic2.xml.gz
 * [cjkvi-ids](https://github.com/cjkvi/cjkvi-ids): ids.txt
