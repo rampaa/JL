@@ -672,9 +672,9 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "い", "い", "い", "い" ],
-    "con_end": [ "げ", "気", "げ", "気" ],
-    "dec_tag": [ "adj-i", "adj-i", "adj-ix", "adj-ix" ],
+    "dec_end": [ "", "" ],
+    "con_end": [ "げ", "気" ],
+    "dec_tag": [ "stem-adj-base" ],
     "con_tag": [ "stem-adj-base" ],
     "detail": "seeming"
   },
@@ -776,9 +776,9 @@
   },
   {
     "type": "stdrule",
-    "dec_end": [ "", "" ],
-    "con_end": [ "で", "で" ],
-    "dec_tag": [ "adj-i", "adj-ix" ],
+    "dec_end": [ "" ],
+    "con_end": [ "で" ],
+    "dec_tag": [ "adj-i" ],
     "con_tag": [ "stem-te" ],
     "detail": "(te)"
   },
