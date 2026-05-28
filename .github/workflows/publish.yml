@@ -92,7 +92,7 @@ jobs:
 
           # Build SQLite
           mkdir sqlite-build && cd sqlite-build
-          cl /O2 /Oi /GL /Gy /Gw /Ob2 /GF /fp:fast /utf-8 \
+          cl /LD /O2 /Oi /GL /Gy /Gw /Ob2 /GF /fp:fast /utf-8 \
             /wd4003 /wd4047 \
             "/DSQLITE_API=__declspec(dllexport)" \
             /Dalloca=_alloca \
