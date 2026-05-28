@@ -60,7 +60,7 @@ jobs:
           cache-dependency-path: "**/packages.lock.json"
 
       - name: Download SQLite artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: sqlite-amalgamation
           path: sqlite-src
