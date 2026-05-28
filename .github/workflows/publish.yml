@@ -41,34 +41,29 @@ jobs:
             os: windows-latest
             target: win-x64
             msvc_arch: x64
-
           - kind: windowsx86
             os: windows-latest
             target: win-x86
             msvc_arch: x86
-
           - kind: windowsarm64
             os: windows-latest
             target: win-arm64
             msvc_arch: amd64_arm64
-
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v6
-
-      - name: Download SQLite artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: sqlite-amalgamation
-          path: sqlite-src
-
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.x
           cache: true
           cache-dependency-path: "**/packages.lock.json"
+
+      - name: Download SQLite artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sqlite-amalgamation
+          path: sqlite-src
 
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
@@ -86,21 +81,10 @@ jobs:
           tag=$(git describe --tags --abbrev=0)
           release_name="JL-$tag-${{ matrix.target }}"
 
-          # SQLite mmap size differs by architecture
-          if [ "${{ matrix.target }}" = "win-x86" ]
-          then
+          if [ "${{ matrix.target }}" = "win-x86" ]; then
             SQLITE_DEFAULT_MMAP_SIZE=0
             SQLITE_MAX_MMAP_SIZE=2147483648
-          fi
-
-          if [ "${{ matrix.target }}" = "win-x64" ]
-          then
-            SQLITE_DEFAULT_MMAP_SIZE=2097152000
-            SQLITE_MAX_MMAP_SIZE=6597069766656
-          fi
-
-          if [ "${{ matrix.target }}" = "win-arm64" ]
-          then
+          else
             SQLITE_DEFAULT_MMAP_SIZE=2097152000
             SQLITE_MAX_MMAP_SIZE=6597069766656
           fi
@@ -108,7 +92,7 @@ jobs:
           # Build SQLite
           mkdir sqlite-build && cd sqlite-build
           cl /O2 /GL /LD /utf-8 \
-            /DSQLITE_API=__declspec(dllexport) \
+            "/DSQLITE_API=__declspec(dllexport)" \
             /DSQLITE_DQS=0 \
             /DSQLITE_DEFAULT_MEMSTATUS=0 \
             /DSQLITE_LIKE_DOESNT_MATCH_BLOB \
@@ -142,32 +126,33 @@ jobs:
             ../sqlite-src/sqlite3.c \
             /link /LTCG /OUT:e_sqlite3.dll
           cd ..
-
+          
           # Build everything
           dotnet publish JL.Windows/JL.Windows.csproj --runtime "${{ matrix.target }}" -c Release -o "$release_name"
-
+          
           # Replace bundled SQLite with custom build
           cp sqlite-build/e_sqlite3.dll "${release_name}/e_sqlite3.dll"
 
           # Mark JL as LARGEADDRESSAWARE
           if [ "${{ matrix.target }}" = "win-x86" ]
           then
-            vswhere_path="C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
-            read -r vc_tools_version<"$("$vswhere_path" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt")"
-            vc_tools_version="${vc_tools_version//$'\r'/}"
-            editbin_path=$("${vswhere_path}" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC/Tools/MSVC/${vc_tools_version}/bin/Hostx64/x64/editbin.exe")
-            "${editbin_path}" //NOLOGO //LARGEADDRESSAWARE ${release_name}/JL.exe
+          vswhere_path="C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+          vc_tools_path=$("$vswhere_path" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt")
+          read -r vc_tools_version < "$vc_tools_path"
+          vc_tools_version="${vc_tools_version//$'\r'/}"
+          editbin_path=$("$vswhere_path" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC/Tools/MSVC/${vc_tools_version}/bin/Hostx64/x64/editbin.exe")
+          "${editbin_path}" //NOLOGO //LARGEADDRESSAWARE ${release_name}/JL.exe
           fi
-
+          
           #Sign with self-signed certificate
-          pfxCertFilePath="${release_name}/JLCertificate.pfx"
+          pfxCertFilePath=${release_name}/JLCertificate.pfx
           echo "${BASE64_PFX}" | base64 --decode > "${pfxCertFilePath}"
-          pwsh -c '$password = ConvertTo-SecureString -String "'"${PFX_PASSWORD}"'" -Force -AsPlainText;''$pfx = Get-PfxCertificate -FilePath '"$pfxCertFilePath"' -Password $password -NoPromptForPassword;''Set-AuthenticodeSignature -FilePath '"$release_name"'/JL.exe -Certificate $pfx -HashAlgorithm SHA256;'
+          pwsh -c '$password = ConvertTo-SecureString -String '"${PFX_PASSWORD}"' -Force -AsPlainText;''$pfx = Get-PfxCertificate -FilePath '"$pfxCertFilePath"' -Password $password -NoPromptForPassword;''Set-AuthenticodeSignature -FilePath '"$release_name"'/JL.exe -Certificate $pfx -HashAlgorithm SHA256;'
           rm "${pfxCertFilePath}"
-
+          
           # Pack files
           7z a -tzip -mx=9 "${release_name}.zip" "./${release_name}/*"
-
+          
           # Delete output directory
           rm -rf sqlite-build
           rm -rf "$release_name"
