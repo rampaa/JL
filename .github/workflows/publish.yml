@@ -5,8 +5,34 @@ on:
     types: [published]
 
 jobs:
+  sqlite:
+    name: Download SQLite
+    runs-on: windows-latest
+    steps:
+      - name: Download latest SQLite amalgamation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir sqlite
+          REL_PATH=$(curl --fail -s https://www.sqlite.org/download.html | grep -oE '[0-9]{4}/sqlite-amalgamation-[0-9]+\.zip' | head -n1 || true)
+          if [ -z "$REL_PATH" ]; then
+            echo "Failed to locate SQLite amalgamation URL"
+            exit 1
+          fi
+          curl --fail -L "https://www.sqlite.org/$REL_PATH" -o sqlite.zip
+          unzip -q sqlite.zip
+          sqlite_dir=$(find . -maxdepth 1 -type d -name "sqlite-amalgamation-*")
+          mv "$sqlite_dir"/* sqlite/
+
+      - name: Upload SQLite artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sqlite-amalgamation
+          path: sqlite/
+
   release:
     name: Release
+    needs: sqlite
     strategy:
       matrix:
         kind: ['windowsx64', 'windowsx86', 'windowsarm64']
@@ -14,21 +40,40 @@ jobs:
           - kind: windowsx64
             os: windows-latest
             target: win-x64
+            msvc_arch: x64
+
           - kind: windowsx86
             os: windows-latest
             target: win-x86
+            msvc_arch: x86
+
           - kind: windowsarm64
             os: windows-latest
             target: win-arm64
+            msvc_arch: amd64_arm64
+
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v6
+
+      - name: Download SQLite artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sqlite-amalgamation
+          path: sqlite-src
+
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.x
           cache: true
           cache-dependency-path: "**/packages.lock.json"
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc_arch }}
 
       - name: Build
         env:
@@ -37,33 +82,96 @@ jobs:
           PFX_PASSWORD: ${{ secrets.PFX_PASSWORD }}
         shell: bash
         run: |
+          set -euo pipefail
           tag=$(git describe --tags --abbrev=0)
           release_name="JL-$tag-${{ matrix.target }}"
-          
+
+          # SQLite mmap size differs by architecture
+          if [ "${{ matrix.target }}" = "win-x86" ]
+          then
+            SQLITE_DEFAULT_MMAP_SIZE=0
+            SQLITE_MAX_MMAP_SIZE=2147483648
+          fi
+
+          if [ "${{ matrix.target }}" = "win-x64" ]
+          then
+            SQLITE_DEFAULT_MMAP_SIZE=2097152000
+            SQLITE_MAX_MMAP_SIZE=6597069766656
+          fi
+
+          if [ "${{ matrix.target }}" = "win-arm64" ]
+          then
+            SQLITE_DEFAULT_MMAP_SIZE=2097152000
+            SQLITE_MAX_MMAP_SIZE=6597069766656
+          fi
+
+          # Build SQLite
+          mkdir sqlite-build && cd sqlite-build
+          cl /O2 /GL /LD /utf-8 \
+            /DSQLITE_API=__declspec(dllexport) \
+            /DSQLITE_DQS=0 \
+            /DSQLITE_DEFAULT_MEMSTATUS=0 \
+            /DSQLITE_LIKE_DOESNT_MATCH_BLOB \
+            /DSQLITE_MAX_EXPR_DEPTH=0 \
+            /DSQLITE_OMIT_DEPRECATED \
+            /DSQLITE_OMIT_PROGRESS_CALLBACK \
+            /DSQLITE_OMIT_SHARED_CACHE \
+            /DHAVE_ISNAN \
+            /DHAVE_LOCALTIME_S \
+            /DSQLITE_DEFAULT_FOREIGN_KEYS=1 \
+            /DSQLITE_DEFAULT_SYNCHRONOUS=1 \
+            /DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 \
+            /DSQLITE_POWERSAFE_OVERWRITE=1 \
+            /DSQLITE_MAX_MMAP_SIZE=${SQLITE_MAX_MMAP_SIZE} \
+            /DSQLITE_TEMP_STORE=2 \
+            /DSQLITE_ENABLE_MATH_FUNCTIONS \
+            /DSQLITE_ENABLE_STAT4 \
+            /DSQLITE_ENABLE_FTS5 \
+            /DSQLITE_USE_ALLOCA \
+            /DSQLITE_DISABLE_FTS3_UNICODE \
+            /DSQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS \
+            /DSQLITE_ENABLE_DBSTAT_VTAB \
+            /DSQLITE_ENABLE_NULL_TRIM \
+            /DSQLITE_WIN32_MALLOC \
+            /DSQLITE_WIN32_HEAP_CREATE \
+            /DSQLITE_THREADSAFE=2 \
+            /DSQLITE_STRICT_SUBTYPE=1 \
+            /DSQLITE_DEFAULT_MMAP_SIZE=${SQLITE_DEFAULT_MMAP_SIZE} \
+            /DSQLITE_DEFAULT_LOOKASIDE=1200,256 \
+            /DSQLITE_ENABLE_COLUMN_METADATA \
+            ../sqlite-src/sqlite3.c \
+            /link /LTCG /OUT:e_sqlite3.dll
+          cd ..
+
           # Build everything
           dotnet publish JL.Windows/JL.Windows.csproj --runtime "${{ matrix.target }}" -c Release -o "$release_name"
-          
+
+          # Replace bundled SQLite with custom build
+          cp sqlite-build/e_sqlite3.dll "${release_name}/e_sqlite3.dll"
+
           # Mark JL as LARGEADDRESSAWARE
           if [ "${{ matrix.target }}" = "win-x86" ]
           then
-          vswhere_path="C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
-          read -r vc_tools_version<"$("$vswhere_path" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt")"
-          vc_tools_version="${vc_tools_version//$'\r'/}"
-          editbin_path=$("${vswhere_path}" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC/Tools/MSVC/${vc_tools_version}/bin/Hostx64/x64/editbin.exe")
-          "${editbin_path}" //NOLOGO //LARGEADDRESSAWARE ${release_name}/JL.exe
+            vswhere_path="C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+            read -r vc_tools_version < "$("$vswhere_path" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt")"
+            vc_tools_version="${vc_tools_version//$'\r'/}"
+            editbin_path=$("$vswhere_path" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC/Tools/MSVC/${vc_tools_version}/bin/Hostx64/x64/editbin.exe")
+            "${editbin_path}" //NOLOGO //LARGEADDRESSAWARE "${release_name}/JL.exe"
           fi
-          
+
           #Sign with self-signed certificate
-          pfxCertFilePath=${release_name}/JLCertificate.pfx
+          pfxCertFilePath="${release_name}/JLCertificate.pfx"
           echo "${BASE64_PFX}" | base64 --decode > "${pfxCertFilePath}"
-          pwsh -c '$password = ConvertTo-SecureString -String '"${PFX_PASSWORD}"' -Force -AsPlainText;''$pfx = Get-PfxCertificate -FilePath '"$pfxCertFilePath"' -Password $password -NoPromptForPassword;''Set-AuthenticodeSignature -FilePath '"$release_name"'/JL.exe -Certificate $pfx -HashAlgorithm SHA256;'
+          pwsh -c '$password = ConvertTo-SecureString -String "'"${PFX_PASSWORD}"'" -Force -AsPlainText;''$pfx = Get-PfxCertificate -FilePath '"$pfxCertFilePath"' -Password $password -NoPromptForPassword;''Set-AuthenticodeSignature -FilePath '"$release_name"'/JL.exe -Certificate $pfx -HashAlgorithm SHA256;'
           rm "${pfxCertFilePath}"
-          
+
           # Pack files
           7z a -tzip -mx=9 "${release_name}.zip" "./${release_name}/*"
-          
+
           # Delete output directory
-          rm -r "$release_name"
+          rm -rf sqlite-build
+          rm -rf "$release_name"
+
       - name: Publish
         uses: softprops/action-gh-release@v3
         with:
