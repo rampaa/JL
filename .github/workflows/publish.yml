@@ -96,36 +96,36 @@ jobs:
             /wd4003 /wd4047 \
             "/DSQLITE_API=__declspec(dllexport)" \
             /Dalloca=_alloca \
-            /DSQLITE_DQS=0 \
-            /DSQLITE_DEFAULT_MEMSTATUS=0 \
-            /DSQLITE_LIKE_DOESNT_MATCH_BLOB \
-            /DSQLITE_MAX_EXPR_DEPTH=0 \
             /DSQLITE_OMIT_DEPRECATED \
             /DSQLITE_OMIT_PROGRESS_CALLBACK \
             /DSQLITE_OMIT_SHARED_CACHE \
-            /DHAVE_ISNAN \
-            /DHAVE_LOCALTIME_S \
-            /DSQLITE_DEFAULT_FOREIGN_KEYS=1 \
-            /DSQLITE_DEFAULT_SYNCHRONOUS=1 \
-            /DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 \
-            /DSQLITE_POWERSAFE_OVERWRITE=1 \
-            /DSQLITE_MAX_MMAP_SIZE=${SQLITE_MAX_MMAP_SIZE} \
-            /DSQLITE_TEMP_STORE=2 \
-            /DSQLITE_ENABLE_STAT4 \
-            /DSQLITE_USE_ALLOCA \
-            /DSQLITE_DISABLE_FTS3_UNICODE \
-            /DSQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS \
             /DSQLITE_OMIT_LOAD_EXTENSION \
             /DSQLITE_OMIT_COMPLETE \
             /DSQLITE_OMIT_DATETIME_FUNCS \
+            /DSQLITE_DISABLE_FTS3_UNICODE \
+            /DSQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS \
+            /DSQLITE_ENABLE_COLUMN_METADATA \
+            /DSQLITE_ENABLE_STAT4 \
             /DSQLITE_ENABLE_DBSTAT_VTAB \
             /DSQLITE_ENABLE_NULL_TRIM \
+            /DSQLITE_MAX_EXPR_DEPTH=0 \
+            /DSQLITE_MAX_MMAP_SIZE=${SQLITE_MAX_MMAP_SIZE} \
+            /DSQLITE_DEFAULT_FOREIGN_KEYS=1 \
+            /DSQLITE_DEFAULT_MEMSTATUS=0 \
+            /DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 \
+            /DSQLITE_DEFAULT_SYNCHRONOUS=2 \
+            /DSQLITE_DEFAULT_MMAP_SIZE=${SQLITE_DEFAULT_MMAP_SIZE} \
+            /DSQLITE_DEFAULT_LOOKASIDE=1200,256 \
+            /DSQLITE_DQS=0 \
+            /DSQLITE_LIKE_DOESNT_MATCH_BLOB \
+            /DHAVE_ISNAN \
+            /DHAVE_LOCALTIME_S \
+            /DSQLITE_POWERSAFE_OVERWRITE=1 \
+            /DSQLITE_USE_ALLOCA \
+            /DSQLITE_TEMP_STORE=2 \
             /DSQLITE_WIN32_MALLOC \
             /DSQLITE_WIN32_HEAP_CREATE \
             /DSQLITE_THREADSAFE=2 \
-            /DSQLITE_DEFAULT_MMAP_SIZE=${SQLITE_DEFAULT_MMAP_SIZE} \
-            /DSQLITE_DEFAULT_LOOKASIDE=1200,256 \
-            /DSQLITE_ENABLE_COLUMN_METADATA \
             ../sqlite-src/sqlite3.c \
             /link /LTCG /OPT:REF /OPT:ICF /OUT:e_sqlite3.dll
           cd ..
