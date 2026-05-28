@@ -92,7 +92,7 @@ jobs:
 
           # Build SQLite
           mkdir sqlite-build && cd sqlite-build
-          cl /O2 /GL /LD /utf-8 \
+          cl /O2 /Oi /GL /Gy /Gw /Ob2 /GF /fp:fast /utf-8 \
             /wd4003 /wd4047 \
             "/DSQLITE_API=__declspec(dllexport)" \
             /Dalloca=_alloca \
@@ -111,12 +111,13 @@ jobs:
             /DSQLITE_POWERSAFE_OVERWRITE=1 \
             /DSQLITE_MAX_MMAP_SIZE=${SQLITE_MAX_MMAP_SIZE} \
             /DSQLITE_TEMP_STORE=2 \
-            /DSQLITE_ENABLE_MATH_FUNCTIONS \
             /DSQLITE_ENABLE_STAT4 \
-            /DSQLITE_ENABLE_FTS5 \
             /DSQLITE_USE_ALLOCA \
             /DSQLITE_DISABLE_FTS3_UNICODE \
             /DSQLITE_DISABLE_PAGECACHE_OVERFLOW_STATS \
+            /DSQLITE_OMIT_LOAD_EXTENSION \
+            /DSQLITE_OMIT_COMPLETE \
+            /DSQLITE_OMIT_DATETIME_FUNCS \
             /DSQLITE_ENABLE_DBSTAT_VTAB \
             /DSQLITE_ENABLE_NULL_TRIM \
             /DSQLITE_WIN32_MALLOC \
@@ -127,7 +128,7 @@ jobs:
             /DSQLITE_DEFAULT_LOOKASIDE=1200,256 \
             /DSQLITE_ENABLE_COLUMN_METADATA \
             ../sqlite-src/sqlite3.c \
-            /link /LTCG /OUT:e_sqlite3.dll
+            /link /LTCG /OPT:REF /OPT:ICF /OUT:e_sqlite3.dll
           cd ..
           
           # Build everything
