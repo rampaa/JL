@@ -93,7 +93,9 @@ jobs:
           # Build SQLite
           mkdir sqlite-build && cd sqlite-build
           cl /O2 /GL /LD /utf-8 \
+            /wd4003 /wd4047 \
             "/DSQLITE_API=__declspec(dllexport)" \
+            /Dalloca=_alloca \
             /DSQLITE_DQS=0 \
             /DSQLITE_DEFAULT_MEMSTATUS=0 \
             /DSQLITE_LIKE_DOESNT_MATCH_BLOB \
