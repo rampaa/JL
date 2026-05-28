@@ -84,9 +84,9 @@ jobs:
 
           if [ "${{ matrix.target }}" = "win-x86" ]; then
             SQLITE_DEFAULT_MMAP_SIZE=0
-            SQLITE_MAX_MMAP_SIZE=2147483648
+            SQLITE_MAX_MMAP_SIZE=2147418112
           else
-            SQLITE_DEFAULT_MMAP_SIZE=2097152000
+            SQLITE_DEFAULT_MMAP_SIZE=2147418112
             SQLITE_MAX_MMAP_SIZE=6597069766656
           fi
 
