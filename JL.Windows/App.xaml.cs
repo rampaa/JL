@@ -34,6 +34,8 @@ internal sealed partial class App
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        base.OnStartup(e);
+
         if (!HasModifyPermission(AppContext.BaseDirectory))
         {
             LoggerManager.Logger.Information(
