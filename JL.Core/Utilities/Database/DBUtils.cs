@@ -195,7 +195,7 @@ public static class DBUtils
         }
         catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Failed to open DB connection in read-only mode for path: {DBPath}", readOnlyConnectionString);
+            LoggerManager.Logger.Error(ex, "Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
             connection.Dispose();
             return null;
         }
