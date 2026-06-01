@@ -74,14 +74,20 @@ internal sealed class PopupContentGenerator : Decorator
             CreateImages(lookupDisplayResult, bottom);
         }
 
-        CreateFormattedDefinition(lookupDisplayResult, bottom);
-
-        if (result.KanjiLookupResult is not null)
+        string? formattedDefinitions = result.FormattedDefinitions;
+        if (result.KanjiLookupResult is null)
         {
-            string? kanjiText = GetKanjiText(result.KanjiLookupResult);
+            if (formattedDefinitions is not null)
+            {
+                CreateFormattedDefinition(ownerWindow, formattedDefinitions, bottom);
+            }
+        }
+        else
+        {
+            string? kanjiText = GetKanjiText(result.KanjiLookupResult, formattedDefinitions);
             if (kanjiText is not null)
             {
-                CreateKanjiText(ownerWindow, kanjiText, bottom);
+                CreateFormattedDefinition(ownerWindow, kanjiText, bottom);
             }
         }
 
@@ -537,20 +543,13 @@ internal sealed class PopupContentGenerator : Decorator
         _ = top.Children.Add(miningButton);
     }
 
-    private static void CreateFormattedDefinition(LookupDisplayResult lookupDisplayResult, StackPanel bottom)
+    private static void CreateFormattedDefinition(PopupWindow ownerWindow, string formattedDefinitions, StackPanel bottom)
     {
-        LookupResult result = lookupDisplayResult.LookupResult;
-        if (result.FormattedDefinitions is null)
-        {
-            return;
-        }
-
         ConfigManager configManager = ConfigManager.Instance;
-        PopupWindow ownerWindow = lookupDisplayResult.OwnerWindow;
         if (ownerWindow.MiningMode)
         {
-            TextBox definitionsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.FormattedDefinitions),
-                result.FormattedDefinitions,
+            TextBox definitionsTextBox = PopupWindowUtils.CreateTextBox(nameof(LookupResult.FormattedDefinitions),
+                formattedDefinitions,
                 configManager.DefinitionsColor,
                 configManager.DefinitionsFontSize,
                 VerticalAlignment.Center,
@@ -560,11 +559,10 @@ internal sealed class PopupContentGenerator : Decorator
             ownerWindow.AddEventHandlersToDefinitionsTextBox(definitionsTextBox);
             _ = bottom.Children.Add(definitionsTextBox);
         }
-
         else
         {
-            TextBlock definitionsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.FormattedDefinitions),
-                result.FormattedDefinitions,
+            TextBlock definitionsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(LookupResult.FormattedDefinitions),
+                formattedDefinitions,
                 configManager.DefinitionsColor,
                 configManager.DefinitionsFontSize,
                 VerticalAlignment.Center,
@@ -574,42 +572,19 @@ internal sealed class PopupContentGenerator : Decorator
         }
     }
 
-    private static void CreateKanjiText(PopupWindow ownerWindow, string kanjiText, StackPanel bottom)
-    {
-        ConfigManager configManager = ConfigManager.Instance;
-        if (ownerWindow.MiningMode)
-        {
-            TextBox kanjiTextTextBox = PopupWindowUtils.CreateTextBox(nameof(kanjiText),
-                kanjiText,
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(0, 2, 2, 2),
-                ownerWindow.PopupContextMenu);
-
-            ownerWindow.AddEventHandlersToTextBox(kanjiTextTextBox);
-
-            _ = bottom.Children.Add(kanjiTextTextBox);
-        }
-        else
-        {
-            TextBlock kanjiTextTextBlock = PopupWindowUtils.CreateTextBlock(nameof(kanjiText),
-                kanjiText,
-                configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
-
-            _ = bottom.Children.Add(kanjiTextTextBlock);
-        }
-    }
-
-    private static string? GetKanjiText(KanjiLookupResult kanjiLookupResult)
+    private static string? GetKanjiText(KanjiLookupResult kanjiLookupResult, string? formattedDefinition)
     {
         StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
+
+        bool hasFormattedDefinition = formattedDefinition is not null;
+        if (hasFormattedDefinition)
+        {
+            _ = sb.Append(formattedDefinition);
+        }
+
         if (kanjiLookupResult.OnReadings is not null)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"On: {string.Join('、', kanjiLookupResult.OnReadings)}");
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{(hasFormattedDefinition ? "\n" : "")}On: {string.Join('、', kanjiLookupResult.OnReadings)}");
         }
 
         if (kanjiLookupResult.KunReadings is not null)
