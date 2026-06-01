@@ -19,6 +19,8 @@ internal readonly ref struct DisposableItemArrayRefStruct<T> : IDisposable where
             {
                 item?.Dispose();
             }
+
+            Items.Dispose();
         }
     }
 }
