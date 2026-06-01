@@ -329,7 +329,7 @@ public static class ResourceUpdater
                 await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
                 await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
-                string dbPath = DBUtils.GetDictDBPath(dict.Name);
+                string dbPath = dict.DBPath;
                 bool useDB = dict.Options.UseDB.Value;
                 bool dbExists = File.Exists(dbPath);
 
@@ -342,7 +342,7 @@ public static class ResourceUpdater
                 {
                     await Task.Run(() =>
                     {
-                        JmdictDBManager.CreateDB(dict.Name);
+                        JmdictDBManager.CreateDB(dbPath);
                         JmdictDBManager.InsertRecordsToDB(dict);
                     }).ConfigureAwait(false);
                 }
@@ -430,7 +430,7 @@ public static class ResourceUpdater
                     File.Delete(dictBackupPath);
                 }
 
-                string dbPath = DBUtils.GetDictDBPath(dict.Name);
+                string dbPath = dict.DBPath;
                 bool useDB = dict.Options.UseDB.Value;
                 bool dbExists = File.Exists(dbPath);
 
@@ -443,7 +443,7 @@ public static class ResourceUpdater
                 {
                     await Task.Run(() =>
                     {
-                        JmnedictDBManager.CreateDB(dict.Name);
+                        JmnedictDBManager.CreateDB(dbPath);
                         JmnedictDBManager.InsertRecordsToDB(dict);
                     }).ConfigureAwait(false);
                 }
@@ -531,7 +531,7 @@ public static class ResourceUpdater
                     File.Delete(dictBackupPath);
                 }
 
-                string dbPath = DBUtils.GetDictDBPath(dict.Name);
+                string dbPath = dict.DBPath;
                 bool useDB = dict.Options.UseDB.Value;
                 bool dbExists = File.Exists(dbPath);
 
@@ -544,7 +544,7 @@ public static class ResourceUpdater
                 {
                     await Task.Run(() =>
                     {
-                        KanjidicDBManager.CreateDB(dict.Name);
+                        KanjidicDBManager.CreateDB(dbPath);
                         KanjidicDBManager.InsertRecordsToDB(dict);
                     }).ConfigureAwait(false);
                 }
@@ -645,7 +645,7 @@ public static class ResourceUpdater
                     Directory.Delete(dictBackupPath, true);
                 }
 
-                string dbPath = DBUtils.GetDictDBPath(dict.Name);
+                string dbPath = dict.DBPath;
                 bool useDB = dict.Options.UseDB.Value;
                 bool dbExists = File.Exists(dbPath);
 
@@ -660,17 +660,17 @@ public static class ResourceUpdater
                     {
                         if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificNameYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificYomichan)
                         {
-                            EpwingYomichanDBManager.CreateDB(dict.Name);
+                            EpwingYomichanDBManager.CreateDB(dbPath);
                             EpwingYomichanDBManager.InsertRecordsToDB(dict);
                         }
                         else if (dict.Type is DictType.NonspecificKanjiYomichan)
                         {
-                            YomichanKanjiDBManager.CreateDB(dict.Name);
+                            YomichanKanjiDBManager.CreateDB(dbPath);
                             YomichanKanjiDBManager.InsertRecordsToDB(dict);
                         }
                         else if (dict.Type is DictType.PitchAccentYomichan)
                         {
-                            YomichanPitchAccentDBManager.CreateDB(dict.Name);
+                            YomichanPitchAccentDBManager.CreateDB(dbPath);
                             YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
                         }
                     }).ConfigureAwait(false);
@@ -774,7 +774,7 @@ public static class ResourceUpdater
                     Directory.Delete(dictBackupPath, true);
                 }
 
-                string dbPath = DBUtils.GetFreqDBPath(freq.Name);
+                string dbPath = freq.DBPath;
                 bool useDB = freq.Options.UseDB.Value;
                 bool dbExists = File.Exists(dbPath);
 
@@ -787,7 +787,7 @@ public static class ResourceUpdater
                 {
                     await Task.Run(() =>
                     {
-                        FreqDBManager.CreateDB(freq.Name);
+                        FreqDBManager.CreateDB(dbPath);
                         FreqDBManager.InsertRecordsToDB(freq);
                     }).ConfigureAwait(false);
                 }

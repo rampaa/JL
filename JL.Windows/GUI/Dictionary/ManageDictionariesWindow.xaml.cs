@@ -345,7 +345,7 @@ internal sealed partial class ManageDictionariesWindow
         dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
         _ = DictUtils.Dicts.Remove(dict.Name);
 
-        string dbPath = DBUtils.GetDictDBPath(dict.Name);
+        string dbPath = dict.DBPath;
         if (File.Exists(dbPath))
         {
             DBUtils.DeleteDB(dbPath);

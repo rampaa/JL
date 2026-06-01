@@ -312,7 +312,7 @@ internal sealed partial class ManageFrequenciesWindow
         freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
         _ = FreqUtils.FreqDicts.Remove(freq.Name);
 
-        string dbPath = DBUtils.GetFreqDBPath(freq.Name);
+        string dbPath = freq.DBPath;
         if (File.Exists(dbPath))
         {
             DBUtils.DeleteDB(dbPath);

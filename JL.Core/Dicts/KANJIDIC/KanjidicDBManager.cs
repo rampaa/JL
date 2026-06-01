@@ -33,9 +33,9 @@ internal static class KanjidicDBManager
         Kanji
     }
 
-    public static void CreateDB(string dbName)
+    public static void CreateDB(string dbPath)
     {
-        using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -64,7 +64,7 @@ internal static class KanjidicDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
         DBUtils.SetSynchronousModeToNormal(connection);
@@ -130,13 +130,12 @@ internal static class KanjidicDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
+    public static List<IDictRecord>? GetRecordsFromDB(string readOnlyConnectionString, string term)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", dbName);
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
             return null;
         }
 
@@ -157,7 +156,7 @@ internal static class KanjidicDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
         using SqliteCommand command = connection.CreateCommand();

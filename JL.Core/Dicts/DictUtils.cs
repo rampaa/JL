@@ -469,7 +469,7 @@ public static class DictUtils
         { "doc", "document" }, { "ev", "event" }, { "fem", "female given name or forename" }, { "fict", "fiction" },
         { "given", "given name or forename, gender not specified" },
         { "group", "group" }, { "leg", "legend" }, { "masc", "male given name or forename" }, { "myth", "mythology" },
-        { "obj", "object" }, { "org", "organization name" }, { "oth", "other" }, { "person", "full name of a particular person" },
+        { "obj", "object" }, { "org", "organization name" }, { "organization", "organization name" }, { "oth", "other" }, { "person", "full name of a particular person" },
         { "place", "place name" }, { "product", "product name" }, { "relig", "religion" }, { "serv", "service" }, { "ship", "ship name" },
         { "station", "railway station" }, { "surname", "family or surname" },{ "unclass", "unclassified name" }, { "work", "work of art, literature, music, etc. name" }
         // ReSharper restore BadExpressionBracesLineBreaks
@@ -566,8 +566,6 @@ public static class DictUtils
             bool rebuildingAnyDB = false;
             ConcurrentBag<Dict> dictsToBeRemoved = [];
 
-            Dictionary<string, string> dictDBPaths = new(StringComparer.Ordinal);
-
             List<Task> tasks = [];
 
             Dict[] dicts = Dicts.Values.ToArray();
@@ -582,26 +580,26 @@ public static class DictUtils
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        LoadJmdict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadJmdict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.JMnedict:
-                        LoadJmnedict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadJmnedict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.Kanjidic:
-                        LoadKanjidic(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadKanjidic(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.NonspecificWordYomichan:
                     case DictType.NonspecificKanjiWithWordSchemaYomichan:
                     case DictType.NonspecificNameYomichan:
                     case DictType.NonspecificYomichan:
-                        LoadYomichanDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadYomichanDict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
-                        LoadYomichanKanjiDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadYomichanKanjiDict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.CustomWordDictionary:
@@ -618,11 +616,11 @@ public static class DictUtils
                     case DictType.NonspecificKanjiNazeka:
                     case DictType.NonspecificNameNazeka:
                     case DictType.NonspecificNazeka:
-                        LoadNazekaDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadNazekaDict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.PitchAccentYomichan:
-                        LoadYomichanPitchAccentDict(dict, tasks, dictDBPaths, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadYomichanPitchAccentDict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     default:
@@ -632,25 +630,6 @@ public static class DictUtils
                         break;
                     }
                 }
-            }
-
-            if (dictDBPaths.Count > 0)
-            {
-                KeyValuePair<string, string>[] tempDictDBPathKeyValuePairs = new KeyValuePair<string, string>[DBUtils.DictDBPaths.Count + dictDBPaths.Count];
-                int index = 0;
-                foreach ((string key, string value) in DBUtils.DictDBPaths)
-                {
-                    tempDictDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
-                    ++index;
-                }
-
-                foreach ((string key, string value) in dictDBPaths)
-                {
-                    tempDictDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
-                    ++index;
-                }
-
-                DBUtils.DictDBPaths = tempDictDBPathKeyValuePairs.ToFrozenDictionary(StringComparer.Ordinal);
             }
 
             if (tasks.Count > 0 || dictCleared)
@@ -672,7 +651,7 @@ public static class DictUtils
                             //_ = Dicts.Remove(dict.Name);
                             //_ = SingleDictTypeDicts.Remove(dict.Type);
 
-                            string dbPath = DBUtils.GetDictDBPath(dict.Name);
+                            string dbPath = dict.DBPath;
                             if (File.Exists(dbPath))
                             {
                                 DBUtils.DeleteDB(dbPath);
@@ -716,12 +695,12 @@ public static class DictUtils
         }
     }
 
-    private static DBState PrepareDictDB(Dict dict, Dictionary<string, string> dictDBPaths, int dbVersion, ref bool rebuildingAnyDB)
+    private static DBState PrepareDictDB(Dict dict, int dbVersion, ref bool rebuildingAnyDB)
     {
         dict.Ready = false;
 
         bool useDB = dict.Options.UseDB.Value;
-        string dbPath = DBUtils.GetDictDBPath(dict.Name);
+        string dbPath = dict.DBPath;
         string dbJournalPath = $"{dbPath}-journal";
         bool dbExists = File.Exists(dbPath);
         bool dbExisted = dbExists;
@@ -739,19 +718,14 @@ public static class DictUtils
 
                 File.Delete(dbJournalPath);
             }
-            else if (dbExists && !DBUtils.RecordExists(dbPath))
+            else if (dbExists && !DBUtils.RecordExists(dict.ReadOnlyConnectionString))
             {
                 DBUtils.DeleteDB(dbPath);
                 dbExists = false;
             }
         }
 
-        if (useDB && !DBUtils.DictDBPaths.ContainsKey(dict.Name))
-        {
-            dictDBPaths.Add(dict.Name, dbPath);
-        }
-
-        if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(dbVersion, dbPath))
+        if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(dbVersion, dict.ReadOnlyConnectionString))
         {
             DBUtils.DeleteDB(dbPath);
             dbExists = false;
@@ -761,7 +735,7 @@ public static class DictUtils
         return new DBState(useDB, dbExists, dbExisted);
     }
 
-    private static void LoadJmdict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadJmdict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -770,7 +744,7 @@ public static class DictUtils
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         ResourceUpdater.HandleLeftOverFiles(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmdictDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, JmdictDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -800,7 +774,7 @@ public static class DictUtils
 
                             if (!dbExists && (useDB || dbExisted))
                             {
-                                JmdictDBManager.CreateDB(dict.Name);
+                                JmdictDBManager.CreateDB(dict.DBPath);
                                 JmdictDBManager.InsertRecordsToDB(dict);
 
                                 if (useDB)
@@ -833,7 +807,7 @@ public static class DictUtils
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    JmdictDBManager.CreateDB(dict.Name);
+                    JmdictDBManager.CreateDB(dict.DBPath);
                     JmdictDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
@@ -854,7 +828,7 @@ public static class DictUtils
         }
     }
 
-    private static void LoadJmnedict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadJmnedict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -863,7 +837,7 @@ public static class DictUtils
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         ResourceUpdater.HandleLeftOverFiles(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, JmnedictDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, JmnedictDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -887,7 +861,7 @@ public static class DictUtils
 
                         if (!dbExists && (useDB || dbExisted))
                         {
-                            JmnedictDBManager.CreateDB(dict.Name);
+                            JmnedictDBManager.CreateDB(dict.DBPath);
                             JmnedictDBManager.InsertRecordsToDB(dict);
 
                             if (useDB)
@@ -919,7 +893,7 @@ public static class DictUtils
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    JmnedictDBManager.CreateDB(dict.Name);
+                    JmnedictDBManager.CreateDB(dict.DBPath);
                     JmnedictDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
@@ -940,7 +914,7 @@ public static class DictUtils
         }
     }
 
-    private static void LoadKanjidic(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadKanjidic(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -949,7 +923,7 @@ public static class DictUtils
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         ResourceUpdater.HandleLeftOverFiles(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, KanjidicDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, KanjidicDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -979,7 +953,7 @@ public static class DictUtils
 
                             if (!dbExists && (useDB || dbExisted))
                             {
-                                KanjidicDBManager.CreateDB(dict.Name);
+                                KanjidicDBManager.CreateDB(dict.DBPath);
                                 KanjidicDBManager.InsertRecordsToDB(dict);
 
                                 if (useDB)
@@ -1012,7 +986,7 @@ public static class DictUtils
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    KanjidicDBManager.CreateDB(dict.Name);
+                    KanjidicDBManager.CreateDB(dict.DBPath);
                     KanjidicDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
@@ -1033,7 +1007,7 @@ public static class DictUtils
         }
     }
 
-    private static void LoadYomichanDict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadYomichanDict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -1042,7 +1016,7 @@ public static class DictUtils
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         ResourceUpdater.HandleLeftOverFolders(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, EpwingYomichanDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, EpwingYomichanDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -1081,7 +1055,7 @@ public static class DictUtils
                         }
                         else if (!dbExists && (useDB || dbExisted))
                         {
-                            EpwingYomichanDBManager.CreateDB(dict.Name);
+                            EpwingYomichanDBManager.CreateDB(dict.DBPath);
                             EpwingYomichanDBManager.InsertRecordsToDB(dict);
 
                             if (useDB)
@@ -1113,7 +1087,7 @@ public static class DictUtils
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    EpwingYomichanDBManager.CreateDB(dict.Name);
+                    EpwingYomichanDBManager.CreateDB(dict.DBPath);
                     EpwingYomichanDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
@@ -1134,7 +1108,7 @@ public static class DictUtils
         }
     }
 
-    private static void LoadYomichanKanjiDict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadYomichanKanjiDict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -1143,7 +1117,7 @@ public static class DictUtils
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         ResourceUpdater.HandleLeftOverFolders(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, YomichanKanjiDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, YomichanKanjiDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -1170,7 +1144,7 @@ public static class DictUtils
 
                         if (!dbExists && (useDB || dbExisted))
                         {
-                            YomichanKanjiDBManager.CreateDB(dict.Name);
+                            YomichanKanjiDBManager.CreateDB(dict.DBPath);
                             YomichanKanjiDBManager.InsertRecordsToDB(dict);
 
                             if (useDB)
@@ -1202,7 +1176,7 @@ public static class DictUtils
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    YomichanKanjiDBManager.CreateDB(dict.Name);
+                    YomichanKanjiDBManager.CreateDB(dict.DBPath);
                     YomichanKanjiDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
@@ -1314,9 +1288,9 @@ public static class DictUtils
         }
     }
 
-    private static void LoadNazekaDict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadNazekaDict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, EpwingNazekaDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, EpwingNazekaDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -1347,7 +1321,7 @@ public static class DictUtils
 
                         if (!dbExists && (useDB || dbExisted))
                         {
-                            EpwingNazekaDBManager.CreateDB(dict.Name);
+                            EpwingNazekaDBManager.CreateDB(dict.DBPath);
                             EpwingNazekaDBManager.InsertRecordsToDB(dict);
 
                             if (useDB)
@@ -1379,7 +1353,7 @@ public static class DictUtils
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    EpwingNazekaDBManager.CreateDB(dict.Name);
+                    EpwingNazekaDBManager.CreateDB(dict.DBPath);
                     EpwingNazekaDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;
@@ -1400,7 +1374,7 @@ public static class DictUtils
         }
     }
 
-    private static void LoadYomichanPitchAccentDict(Dict dict, List<Task> tasks, Dictionary<string, string> dictDBPaths, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadYomichanPitchAccentDict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -1409,7 +1383,7 @@ public static class DictUtils
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         ResourceUpdater.HandleLeftOverFolders(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, dictDBPaths, YomichanPitchAccentDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, YomichanPitchAccentDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -1436,7 +1410,7 @@ public static class DictUtils
 
                         if (!dbExists && (useDB || dbExisted))
                         {
-                            YomichanPitchAccentDBManager.CreateDB(dict.Name);
+                            YomichanPitchAccentDBManager.CreateDB(dict.DBPath);
                             YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
 
                             if (useDB)
@@ -1467,7 +1441,7 @@ public static class DictUtils
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    YomichanPitchAccentDBManager.CreateDB(dict.Name);
+                    YomichanPitchAccentDBManager.CreateDB(dict.DBPath);
                     YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
                     dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     dict.Ready = true;

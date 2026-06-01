@@ -83,7 +83,7 @@ internal sealed partial class EditFrequencyWindow
             return;
         }
 
-        string dbPath = DBUtils.GetFreqDBPath(_freq.Name);
+        string dbPath = _freq.DBPath;
         bool dbExists = File.Exists(dbPath);
 
         string? revision = (string?)NameTextBox.Tag;
@@ -147,7 +147,7 @@ internal sealed partial class EditFrequencyWindow
             {
                 DBUtils.SendOptimizePragmaToAllDBs();
                 SqliteConnection.ClearAllPools();
-                PathUtils.ReplaceFileAtomicallyOnSameVolume(DBUtils.GetFreqDBPath(name), dbPath);
+                PathUtils.ReplaceFileAtomicallyOnSameVolume(DBUtils.GetDBPathForFreqDict(name), dbPath);
             }
 
             _ = FreqUtils.FreqDicts.Remove(_freq.Name);

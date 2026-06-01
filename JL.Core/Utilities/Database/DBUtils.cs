@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
@@ -12,9 +11,6 @@ namespace JL.Core.Utilities.Database;
 
 public static class DBUtils
 {
-    internal static FrozenDictionary<string, string> DictDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
-    internal static FrozenDictionary<string, string> FreqDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
-
     internal static readonly string s_freqDBFolderPath = Path.Join(AppInfo.ResourcesPath, "Frequency Databases");
     internal static readonly string s_dictDBFolderPath = Path.Join(AppInfo.ResourcesPath, "Dictionary Databases");
 
@@ -48,18 +44,14 @@ public static class DBUtils
         return parameterNames;
     }
 
-    public static string GetDictDBPath(string dbName)
+    public static string GetDBPathForDict(string dictName)
     {
-        return DictDBPaths.TryGetValue(dbName, out string? dbPath)
-            ? dbPath
-            : $"{Path.Join(s_dictDBFolderPath, dbName)}.sqlite";
+        return $"{Path.Join(s_dictDBFolderPath, dictName)}.sqlite";
     }
 
-    public static string GetFreqDBPath(string dbName)
+    public static string GetDBPathForFreqDict(string dictName)
     {
-        return FreqDBPaths.TryGetValue(dbName, out string? dbPath)
-            ? dbPath
-            : $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite";
+        return $"{Path.Join(s_freqDBFolderPath, dictName)}.sqlite";
     }
 
     public static void SendOptimizePragmaToAllDBs()
@@ -69,9 +61,9 @@ public static class DBUtils
         ConfigDBManager.SendOptimizePragma();
     }
 
-    internal static void SendOptimizePragma(string path)
+    internal static void SendOptimizePragma(string dbPath)
     {
-        using SqliteConnection? connection = CreateReadWriteDBConnection(path);
+        using SqliteConnection? connection = CreateReadWriteDBConnection(dbPath);
         if (connection is not null)
         {
             SendOptimizePragma(connection);
@@ -91,7 +83,7 @@ public static class DBUtils
         {
             if (dict is { Active: true, Ready: true, Options.UseDB.Value: true })
             {
-                SendOptimizePragma(GetDictDBPath(dict.Name));
+                SendOptimizePragma(dict.DBPath);
             }
         }
     }
@@ -102,14 +94,14 @@ public static class DBUtils
         {
             if (freq is { Active: true, Ready: true, Options.UseDB.Value: true })
             {
-                SendOptimizePragma(GetFreqDBPath(freq.Name));
+                SendOptimizePragma(freq.DBPath);
             }
         }
     }
 
-    private static int GetVersionFromDB(string dbPath)
+    private static int GetVersionFromDB(string readOnlyConnectionString)
     {
-        using SqliteConnection? connection = CreateReadOnlyDBConnection(dbPath);
+        using SqliteConnection? connection = CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         Debug.Assert(connection is not null);
 
         using SqliteCommand command = connection.CreateCommand();
@@ -120,9 +112,9 @@ public static class DBUtils
         return reader.GetInt32(0);
     }
 
-    internal static bool CheckIfDBSchemaIsOutOfDate(int version, string dbPath)
+    internal static bool CheckIfDBSchemaIsOutOfDate(int version, string readonlyConnectionString)
     {
-        return version != GetVersionFromDB(dbPath);
+        return version != GetVersionFromDB(readonlyConnectionString);
     }
 
     public static void DeleteDB(string dbPath)
@@ -181,16 +173,21 @@ public static class DBUtils
             : string.Create(CultureInfo.InvariantCulture, $"@{index}");
     }
 
-    internal static SqliteConnection CreateDBConnection(string path)
+    internal static SqliteConnection CreateDBConnection(string dbPath)
     {
-        SqliteConnection connection = new($"Data Source={path};");
+        SqliteConnection connection = new($"Data Source={dbPath};");
         connection.Open();
         return connection;
     }
 
-    internal static SqliteConnection? CreateReadOnlyDBConnection(string path)
+    internal static string GetReadOnlyConnectionString(string dbPath)
     {
-        SqliteConnection connection = new($"Data Source={path};Mode=ReadOnly;");
+        return $"Data Source={dbPath};Mode=ReadOnly;";
+    }
+
+    internal static SqliteConnection? CreateDBConnectionForReadOnlyConnectionString(string readOnlyConnectionString)
+    {
+        SqliteConnection connection = new(readOnlyConnectionString);
         try
         {
             connection.Open();
@@ -198,15 +195,15 @@ public static class DBUtils
         }
         catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Failed to open DB connection in read-only mode for path: {DBPath}", path);
+            LoggerManager.Logger.Error(ex, "Failed to open DB connection in read-only mode for path: {DBPath}", readOnlyConnectionString);
             connection.Dispose();
             return null;
         }
     }
 
-    internal static SqliteConnection? CreateReadWriteDBConnection(string path)
+    internal static SqliteConnection? CreateReadWriteDBConnection(string dbPath)
     {
-        SqliteConnection connection = new($"Data Source={path};Mode=ReadWrite;");
+        SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadWrite;");
         try
         {
             connection.Open();
@@ -214,15 +211,15 @@ public static class DBUtils
         }
         catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Failed to open DB connection in ReadWrite mode for path: {DBPath}", path);
+            LoggerManager.Logger.Error(ex, "Failed to open DB connection in ReadWrite mode for path: {DBPath}", dbPath);
             connection.Dispose();
             return null;
         }
     }
 
-    internal static bool RecordExists(string dbPath)
+    internal static bool RecordExists(string readOnlyConnectionString)
     {
-        using SqliteConnection? connection = CreateReadOnlyDBConnection(dbPath);
+        using SqliteConnection? connection = CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         Debug.Assert(connection is not null);
 
         using SqliteCommand command = connection.CreateCommand();

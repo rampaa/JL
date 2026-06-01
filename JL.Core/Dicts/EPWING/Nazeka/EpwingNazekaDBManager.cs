@@ -65,9 +65,9 @@ internal static class EpwingNazekaDBManager
         SearchKey
     }
 
-    public static void CreateDB(string dbName)
+    public static void CreateDB(string dbPath)
     {
-        using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -121,7 +121,7 @@ internal static class EpwingNazekaDBManager
 
         ulong rowId = 1;
 
-        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
         DBUtils.SetSynchronousModeToNormal(connection);
@@ -194,13 +194,12 @@ internal static class EpwingNazekaDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, string query)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", dbName);
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
             return null;
         }
 
@@ -239,13 +238,12 @@ internal static class EpwingNazekaDBManager
         return results;
     }
 
-    public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
+    public static List<IDictRecord>? GetRecordsFromDB(string readOnlyConnectionString, string term)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", dbName);
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
             return null;
         }
 
@@ -272,7 +270,7 @@ internal static class EpwingNazekaDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
         using SqliteCommand command = connection.CreateCommand();

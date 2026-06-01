@@ -60,9 +60,6 @@ public static class FreqUtils
         bool freqCleared = false;
         bool rebuildingAnyDB = false;
         ConcurrentBag<Freq> freqNamesToBeRemoved = [];
-
-        Dictionary<string, string> freqDBPaths = new(StringComparer.Ordinal);
-
         List<Task> tasks = [];
         Freq[] freqs = FreqDicts.Values.ToArray();
 
@@ -73,12 +70,12 @@ public static class FreqUtils
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
-                    LoadNazekaFreq(freq, tasks, freqDBPaths, freqNamesToBeRemoved, ref rebuildingAnyDB, ref freqCleared);
+                    LoadNazekaFreq(freq, tasks, freqNamesToBeRemoved, ref rebuildingAnyDB, ref freqCleared);
                     break;
 
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
-                    LoadYomichanFreq(freq, tasks, freqDBPaths, freqNamesToBeRemoved, ref rebuildingAnyDB, ref freqCleared);
+                    LoadYomichanFreq(freq, tasks, freqNamesToBeRemoved, ref rebuildingAnyDB, ref freqCleared);
                     break;
 
                 default:
@@ -88,25 +85,6 @@ public static class FreqUtils
                     break;
                 }
             }
-        }
-
-        if (freqDBPaths.Count > 0)
-        {
-            KeyValuePair<string, string>[] tempFreqDBPathKeyValuePairs = new KeyValuePair<string, string>[DBUtils.FreqDBPaths.Count + freqDBPaths.Count];
-            int index = 0;
-            foreach ((string key, string value) in DBUtils.FreqDBPaths)
-            {
-                tempFreqDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
-                ++index;
-            }
-
-            foreach ((string key, string value) in freqDBPaths)
-            {
-                tempFreqDBPathKeyValuePairs[index] = KeyValuePair.Create(key, value);
-                ++index;
-            }
-
-            DBUtils.FreqDBPaths = tempFreqDBPathKeyValuePairs.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
         if (tasks.Count > 0 || freqCleared)
@@ -128,7 +106,7 @@ public static class FreqUtils
                     {
                         //_ = FreqDicts.Remove(freq.Name);
 
-                        string dbPath = DBUtils.GetFreqDBPath(freq.Name);
+                        string dbPath = freq.DBPath;
                         if (File.Exists(dbPath))
                         {
                             DBUtils.DeleteDB(dbPath);
@@ -158,10 +136,10 @@ public static class FreqUtils
         FreqsReady = true;
     }
 
-    private static DBState PrepareFreqDB(Freq freq, Dictionary<string, string> freqDBPaths, int dbVersion, ref bool rebuildingAnyDB)
+    private static DBState PrepareFreqDB(Freq freq, int dbVersion, ref bool rebuildingAnyDB)
     {
         bool useDB = freq.Options.UseDB.Value;
-        string dbPath = DBUtils.GetFreqDBPath(freq.Name);
+        string dbPath = freq.DBPath;
         string dbJournalPath = $"{dbPath}-journal";
         bool dbExists = File.Exists(dbPath);
         bool dbExisted = dbExists;
@@ -179,7 +157,7 @@ public static class FreqUtils
 
                 File.Delete(dbJournalPath);
             }
-            else if (dbExists && !DBUtils.RecordExists(dbPath))
+            else if (dbExists && !DBUtils.RecordExists(freq.ReadOnlyConnectionString))
             {
                 DBUtils.DeleteDB(dbPath);
                 dbExists = false;
@@ -187,13 +165,7 @@ public static class FreqUtils
         }
 
         freq.Ready = false;
-
-        if (useDB && !DBUtils.FreqDBPaths.ContainsKey(freq.Name))
-        {
-            freqDBPaths.Add(freq.Name, dbPath);
-        }
-
-        if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(dbVersion, dbPath))
+        if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(dbVersion, freq.ReadOnlyConnectionString))
         {
             DBUtils.DeleteDB(dbPath);
             dbExists = false;
@@ -203,9 +175,9 @@ public static class FreqUtils
         return new DBState(useDB, dbExists, dbExisted);
     }
 
-    private static void LoadNazekaFreq(Freq freq, List<Task> tasks, Dictionary<string, string> freqDBPaths, ConcurrentBag<Freq> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
+    private static void LoadNazekaFreq(Freq freq, List<Task> tasks, ConcurrentBag<Freq> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
     {
-        DBState dBContext = PrepareFreqDB(freq, freqDBPaths, FreqDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareFreqDB(freq, FreqDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -236,7 +208,7 @@ public static class FreqUtils
 
                         if (!dbExists && (useDB || dbExisted))
                         {
-                            FreqDBManager.CreateDB(freq.Name);
+                            FreqDBManager.CreateDB(freq.DBPath);
                             FreqDBManager.InsertRecordsToDB(freq);
 
                             if (useDB)
@@ -266,7 +238,7 @@ public static class FreqUtils
         {
             if (useDB && !dbExists)
             {
-                FreqDBManager.CreateDB(freq.Name);
+                FreqDBManager.CreateDB(freq.DBPath);
                 FreqDBManager.InsertRecordsToDB(freq);
             }
 
@@ -291,7 +263,7 @@ public static class FreqUtils
         }
     }
 
-    private static void LoadYomichanFreq(Freq freq, List<Task> tasks, Dictionary<string, string> freqDBPaths, ConcurrentBag<Freq> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
+    private static void LoadYomichanFreq(Freq freq, List<Task> tasks, ConcurrentBag<Freq> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
     {
         if (freq.Updating)
         {
@@ -300,7 +272,7 @@ public static class FreqUtils
 
         string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
         ResourceUpdater.HandleLeftOverFolders(fullFreqPath);
-        DBState dBContext = PrepareFreqDB(freq, freqDBPaths, FreqDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareFreqDB(freq, FreqDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -332,7 +304,7 @@ public static class FreqUtils
 
                         if (!dbExists && (useDB || dbExisted))
                         {
-                            FreqDBManager.CreateDB(freq.Name);
+                            FreqDBManager.CreateDB(freq.DBPath);
                             FreqDBManager.InsertRecordsToDB(freq);
 
                             if (useDB)
@@ -361,7 +333,7 @@ public static class FreqUtils
         {
             if (useDB && !dbExists)
             {
-                FreqDBManager.CreateDB(freq.Name);
+                FreqDBManager.CreateDB(freq.DBPath);
                 FreqDBManager.InsertRecordsToDB(freq);
             }
 

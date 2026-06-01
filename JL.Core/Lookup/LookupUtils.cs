@@ -28,7 +28,7 @@ namespace JL.Core.Lookup;
 
 public static class LookupUtils
 {
-    private delegate Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query);
+    private delegate Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, string query);
     private delegate List<IDictRecord>? GetKanjiRecordsFromDB(string dbName, string term);
 
     private static List<LookupResult>?[] s_resultSlots = [];
@@ -73,23 +73,23 @@ public static class LookupUtils
 
         DBParameters dbParameters = GetDBParameters(textInfo);
 
-        string? pitchDictPath;
+        string? readOnlyConnectionStringForPitchDict;
         if (dbIsUsedForPitchDict)
         {
             Debug.Assert(pitchDict is not null);
-            pitchDictPath = DBUtils.GetDictDBPath(pitchDict.Name);
+            readOnlyConnectionStringForPitchDict = pitchDict.ReadOnlyConnectionString;
         }
         else
         {
-            pitchDictPath = null;
+            readOnlyConnectionStringForPitchDict = null;
         }
 
-        using SqliteConnection? sqliteConnectionForJmdictPitch = pitchDictPath is not null && DictUtils.JmdictIsActive
-            ? DBUtils.CreateReadOnlyDBConnection(pitchDictPath)
+        using SqliteConnection? sqliteConnectionForJmdictPitch = readOnlyConnectionStringForPitchDict is not null && DictUtils.JmdictIsActive
+            ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForPitchDict)
             : null;
 
-        using SqliteConnection? sqliteConnectionForCustomWordPitch = pitchDictPath is not null && DictUtils.AnyCustomWordDictIsActive
-            ? DBUtils.CreateReadOnlyDBConnection(pitchDictPath)
+        using SqliteConnection? sqliteConnectionForCustomWordPitch = readOnlyConnectionStringForPitchDict is not null && DictUtils.AnyCustomWordDictIsActive
+            ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForPitchDict)
             : null;
 
         Dict[] dicts = DictUtils.GetDictForLookupCategoryType(CoreConfigManager.Instance.LookupCategory);
@@ -502,12 +502,12 @@ public static class LookupUtils
 
             foreach (Freq dbWordFreq in dbWordFreqs)
             {
-                string freqPath = DBUtils.GetFreqDBPath(dbWordFreq.Name);
+                string readOnlyConnectionStringForFreq = dbWordFreq.ReadOnlyConnectionString;
                 if (sqliteFreqConnectionsForJmdictExist)
                 {
                     Debug.Assert(freqConnectionsForJmdict is not null);
 #pragma warning disable CA2000 // Dispose objects before losing scope
-                    freqConnectionsForJmdict.Add(DBUtils.CreateReadOnlyDBConnection(freqPath));
+                    freqConnectionsForJmdict.Add(DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq));
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 }
 
@@ -515,7 +515,7 @@ public static class LookupUtils
                 {
                     Debug.Assert(freqConnectionsForCustomWordDict is not null);
 #pragma warning disable CA2000 // Dispose objects before losing scope
-                    freqConnectionsForCustomWordDict.Add(DBUtils.CreateReadOnlyDBConnection(freqPath));
+                    freqConnectionsForCustomWordDict.Add(DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq));
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 }
             }
@@ -696,7 +696,7 @@ public static class LookupUtils
                 if (dbIsUsedForPitchDict)
                 {
                     Debug.Assert(pitchDict is not null);
-                    pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.Name, allSearchKeys);
+                    pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.ReadOnlyConnectionString, allSearchKeys);
                 }
                 else
                 {
@@ -809,15 +809,15 @@ public static class LookupUtils
         {
             Debug.Assert(getRecordsFromDB is not null);
             Debug.Assert(query is not null);
-            dbWordDict = getRecordsFromDB(dict.Name, textInHiraganaList, query);
+            dbWordDict = getRecordsFromDB(dict.ReadOnlyConnectionString, textInHiraganaList, query);
 
             Debug.Assert(deconjugatedTexts is not null);
             Debug.Assert(verbQuery is not null);
-            dbVerbDict = getRecordsFromDB(dict.Name, deconjugatedTexts, verbQuery);
+            dbVerbDict = getRecordsFromDB(dict.ReadOnlyConnectionString, deconjugatedTexts, verbQuery);
             if (!allTextWithoutLongVowelMark.IsEmpty)
             {
                 Debug.Assert(textWithoutLongVowelMarkQuery is not null);
-                dbWordDictForLongVowelConversion = getRecordsFromDB(dict.Name, allTextWithoutLongVowelMark, textWithoutLongVowelMarkQuery);
+                dbWordDictForLongVowelConversion = getRecordsFromDB(dict.ReadOnlyConnectionString, allTextWithoutLongVowelMark, textWithoutLongVowelMarkQuery);
             }
         }
 
@@ -972,7 +972,7 @@ public static class LookupUtils
         {
             Debug.Assert(getRecordsFromDB is not null);
             Debug.Assert(query is not null);
-            nameDict = getRecordsFromDB(dict.Name, textInHiraganaList, query);
+            nameDict = getRecordsFromDB(dict.ReadOnlyConnectionString, textInHiraganaList, query);
         }
         else
         {
@@ -1004,7 +1004,7 @@ public static class LookupUtils
 
     private static IntermediaryResult? GetKanjiResultsFromDB(string kanji, Dict dict, GetKanjiRecordsFromDB getKanjiRecordsFromDB)
     {
-        List<IDictRecord>? results = getKanjiRecordsFromDB(dict.Name, kanji);
+        List<IDictRecord>? results = getKanjiRecordsFromDB(dict.ReadOnlyConnectionString, kanji);
 
         return results is not null && results.Count > 0
             ? new IntermediaryResult(kanji, dict, results)
@@ -1047,7 +1047,7 @@ public static class LookupUtils
         _ = Parallel.For(0, dbFreqs.Length, i =>
         {
             Freq freq = dbFreqs[i];
-            resultsArray[i] = FreqDBManager.GetRecordsFromDB(freq.Name, searchKeys);
+            resultsArray[i] = FreqDBManager.GetRecordsFromDB(freq.ReadOnlyConnectionString, searchKeys);
         });
 
         Dictionary<string, Dictionary<string, List<FrequencyRecord>>> result = new(dbFreqs.Length, StringComparer.Ordinal);
@@ -1561,7 +1561,7 @@ public static class LookupUtils
 
             if (useDB)
             {
-                freqResultList = FreqDBManager.GetRecordsFromDB(kanjiFreq.Name, kanji);
+                freqResultList = FreqDBManager.GetRecordsFromDB(kanjiFreq.ReadOnlyConnectionString, kanji);
             }
             else
             {

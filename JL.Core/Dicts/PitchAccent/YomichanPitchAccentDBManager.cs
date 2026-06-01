@@ -52,9 +52,9 @@ internal static class YomichanPitchAccentDBManager
         SearchKey
     }
 
-    public static void CreateDB(string dbName)
+    public static void CreateDB(string dbPath)
     {
-        using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -106,7 +106,7 @@ internal static class YomichanPitchAccentDBManager
 
         ulong rowId = 1;
 
-        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
         DBUtils.SetSynchronousModeToNormal(connection);
@@ -212,12 +212,12 @@ internal static class YomichanPitchAccentDBManager
         return results;
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectingString, HashSet<string> terms)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectingString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", dbName);
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", readOnlyConnectingString);
             // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
             return null;
         }
@@ -227,7 +227,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
         using SqliteCommand command = connection.CreateCommand();

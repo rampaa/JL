@@ -35,6 +35,7 @@ public static class ConfigDBManager
     private const string ChangedDefaultValueOfTsukikageOnceV4SettingName = "ChangedDefaultValueOfTsukikageOnceV4";
 
     private static readonly string s_configsPath = Path.Join(AppInfo.ConfigPath, "Configs.sqlite");
+    private static readonly string s_configsReadOnlyConnectionString = DBUtils.GetReadOnlyConnectionString(s_configsPath);
 
     public static void CreateDB()
     {
@@ -226,7 +227,7 @@ public static class ConfigDBManager
 
     public static SqliteConnection? CreateReadOnlyDBConnection()
     {
-        return DBUtils.CreateReadOnlyDBConnection(s_configsPath);
+        return DBUtils.CreateDBConnectionForReadOnlyConnectionString(s_configsReadOnlyConnectionString);
     }
 
     public static SqliteConnection CreateReadWriteDBConnection()

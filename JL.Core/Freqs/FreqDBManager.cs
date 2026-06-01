@@ -58,9 +58,9 @@ internal static class FreqDBManager
         SearchKey
     }
 
-    public static void CreateDB(string dbName)
+    public static void CreateDB(string dbPath)
     {
-        using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetFreqDBPath(dbName));
+        using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -93,7 +93,7 @@ internal static class FreqDBManager
     {
         ulong rowId = 1;
 
-        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
         Debug.Assert(connection is not null);
 
         DBUtils.SetSynchronousModeToNormal(connection);
@@ -198,26 +198,24 @@ internal static class FreqDBManager
         return results;
     }
 
-    public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, HashSet<string> terms)
+    public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string readOnlyConnectionString, HashSet<string> terms)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DBName}.", dbName);
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for freq dict {dbName}.");
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DBName}.", readOnlyConnectionString);
             return null;
         }
 
         return GetRecordsFromDB(connection, terms);
     }
 
-    public static List<FrequencyRecord>? GetRecordsFromDB(string dbName, string term)
+    public static List<FrequencyRecord>? GetRecordsFromDB(string readOnlyConnectionString, string term)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DBName}.", dbName);
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for freq dict {dbName}.");
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
             return null;
         }
 
@@ -242,7 +240,7 @@ internal static class FreqDBManager
 
     public static void SetMaxFrequencyValue(Freq freq)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(freq.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
         using SqliteCommand command = connection.CreateCommand();
@@ -264,7 +262,7 @@ internal static class FreqDBManager
     {
         SetMaxFrequencyValue(freq);
 
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(freq.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
         using SqliteCommand command = connection.CreateCommand();

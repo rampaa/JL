@@ -86,7 +86,7 @@ internal sealed partial class EditDictionaryWindow
             return;
         }
 
-        string dbPath = DBUtils.GetDictDBPath(_dict.Name);
+        string dbPath = _dict.DBPath;
         bool dbExists = File.Exists(dbPath);
 
         string? revision = (string?)NameTextBox.Tag;
@@ -198,7 +198,7 @@ internal sealed partial class EditDictionaryWindow
             {
                 DBUtils.SendOptimizePragmaToAllDBs();
                 SqliteConnection.ClearAllPools();
-                PathUtils.ReplaceFileAtomicallyOnSameVolume(DBUtils.GetDictDBPath(name), dbPath);
+                PathUtils.ReplaceFileAtomicallyOnSameVolume(DBUtils.GetDBPathForDict(name), dbPath);
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);

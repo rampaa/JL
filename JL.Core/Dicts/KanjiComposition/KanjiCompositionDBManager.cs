@@ -7,7 +7,7 @@ namespace JL.Core.Dicts.KanjiComposition;
 
 internal static class KanjiCompositionDBManager
 {
-    private static readonly string s_dbPath = Path.Join(AppInfo.ResourcesPath, "Kanji Compositions.sqlite");
+    private static readonly string s_readOnlyDBConnectionString = DBUtils.GetReadOnlyConnectionString(Path.Join(AppInfo.ResourcesPath, "Kanji Compositions.sqlite"));
 
     private const string SingleTermQuery =
         """
@@ -18,11 +18,10 @@ internal static class KanjiCompositionDBManager
 
     public static string[]? GetRecordsFromDB(string kanji)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(s_dbPath);
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(s_readOnlyDBConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict: {DBPath}.", s_dbPath);
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict: {s_dbPath}.");
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", s_readOnlyDBConnectionString);
             return null;
         }
 

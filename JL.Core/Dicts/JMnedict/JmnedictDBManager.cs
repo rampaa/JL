@@ -55,9 +55,9 @@ internal static class JmnedictDBManager
         PrimarySpellingInHiragana
     }
 
-    public static void CreateDB(string dbName)
+    public static void CreateDB(string dbPath)
     {
-        using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -104,7 +104,7 @@ internal static class JmnedictDBManager
 
         ulong rowId = 1;
 
-        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetDictDBPath(dict.Name));
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
         DBUtils.SetSynchronousModeToNormal(connection);
@@ -168,13 +168,12 @@ internal static class JmnedictDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, ReadOnlySpan<string> terms, string query)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, string query)
     {
-        using SqliteConnection? connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dbName));
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", dbName);
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
             return null;
         }
 
@@ -213,34 +212,36 @@ internal static class JmnedictDBManager
         return results;
     }
 
-    // public static void LoadFromDB(Dict dict)
-    // {
-    //     using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetDictDBPath(dict.Name));
-    //     using SqliteCommand command = connection.CreateCommand();
+    //public static void LoadFromDB(Dict dict)
+    //{
+    //    using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
+    //    Debug.Assert(connection is not null);
     //
-    //     command.CommandText =
-    //         """
-    //         SELECT r.rowid, r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
-    //         FROM record r;
-    //         """;
+    //    using SqliteCommand command = connection.CreateCommand();
     //
-    //     using SqliteDataReader dataReader = command.ExecuteReader();
-    //     while (dataReader.Read())
-    //     {
-    //         JmnedictRecord record = GetRecord(dataReader);
-    //         string searchKey = dataReader.GetString((int)ColumnIndex.PrimarySpellingInHiragana);
-    //         if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
-    //         {
-    //             result.Add(record);
-    //         }
-    //         else
-    //         {
-    //             dict.Contents[searchKey] = [record];
-    //         }
-    //     }
+    //    command.CommandText =
+    //        """
+    //        SELECT r.rowid, r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
+    //        FROM record r;
+    //        """;
     //
-    // dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord>(entry) => entry.Value.ToArray(), StringComparer.Ordinal);
-    // }
+    //    using SqliteDataReader dataReader = command.ExecuteReader();
+    //    while (dataReader.Read())
+    //    {
+    //        JmnedictRecord record = GetRecord(dataReader);
+    //        string searchKey = dataReader.GetString((int)ColumnIndex.PrimarySpellingInHiragana);
+    //        if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+    //        {
+    //            result.Add(record);
+    //        }
+    //        else
+    //        {
+    //            dict.Contents[searchKey] = [record];
+    //        }
+    //    }
+    //
+    //    dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+    //}
 
     private static JmnedictRecord GetRecord(SqliteDataReader dataReader)
     {
