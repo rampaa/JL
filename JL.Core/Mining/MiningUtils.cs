@@ -487,14 +487,16 @@ public static class MiningUtils
         return lookupResult.DeconjugatedMatchedText ?? lookupResult.MatchedText;
     }
 
-    private static string? GetMiningParameter(JLField field, ReadOnlySpan<LookupResult> lookupResults, int currentLookupResultIndex, ReadOnlySpan<char> currentText, int currentCharPosition)
+    private static string? GetMiningParameter(JLField field, ReadOnlySpan<LookupResult> lookupResults, int currentLookupResultIndex, string currentText, int currentCharPosition)
     {
         return field switch
         {
             JLField.LeadingSentencePart => GetLeadingSentencePart(lookupResults[currentLookupResultIndex], currentText, currentCharPosition),
             JLField.TrailingSentencePart => GetTrailingSentencePart(lookupResults[currentLookupResultIndex], currentText, currentCharPosition),
             JLField.Sentence => GetSentence(lookupResults[currentLookupResultIndex], currentText, currentCharPosition),
+            JLField.SentenceNoBolding => JapaneseUtils.FindSentence(currentText, currentCharPosition),
             JLField.SourceText => GetSourceText(lookupResults[currentLookupResultIndex], currentText, currentCharPosition),
+            JLField.SourceTextNoBolding => currentText.ReplaceLineEndings("<br/>"),
             JLField.Readings => GetReadings(lookupResults[currentLookupResultIndex]),
             JLField.ReadingsWithOrthographyInfo => GetReadingsWithOrthographyInfo(lookupResults[currentLookupResultIndex]),
             JLField.FirstReading => lookupResults[currentLookupResultIndex].Readings?[0],
@@ -609,8 +611,22 @@ public static class MiningUtils
             miningParams[JLField.DeconjugationProcess] = lookupResult.DeconjugationProcess;
         }
 
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.SourceTextNoBolding))
+        {
+            miningParams[JLField.SourceTextNoBolding] = currentText.ReplaceLineEndings("<br/>");
+        }
         AddSourceTextFields(miningParams, jlFields, lookupResult, currentText, currentCharPosition, useHtmlTags);
+
+        if (mineAllFields
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            || jlFields!.Contains(JLField.SourceTextNoBolding))
+        {
+            miningParams[JLField.SourceTextNoBolding] = sentence;
+        }
         AddSentenceFields(miningParams, jlFields, lookupResult, sentence, currentText, currentCharPosition, useHtmlTags);
+
         AddWordClassesField(miningParams, jlFields, lookupResult);
         AddAlternativeSpellingFields(miningParams, jlFields, lookupResult);
         AddFrequencyFields(miningParams, jlFields, lookupResult);
