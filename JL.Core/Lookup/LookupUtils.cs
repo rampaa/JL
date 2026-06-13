@@ -1498,8 +1498,8 @@ public static class LookupUtils
 
     private static List<LookupFrequencyResult>? GetWordFrequencies<T>(T record, Freq[] wordFreqs, Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? freqDictsFromDB) where T : IGetFrequency
     {
-        bool freqDictsFromDBExist = freqDictsFromDB is not null;
         List<LookupFrequencyResult> freqsList = new(wordFreqs.Length);
+        bool frequencyExists = false;
 
         // TODO: Precompute this? Can we make the return type an array if we do this without allocating more?
         foreach (Freq freq in wordFreqs)
@@ -1508,23 +1508,24 @@ public static class LookupUtils
 
             if (useDB)
             {
-                if (freqDictsFromDBExist)
+                Debug.Assert(freqDictsFromDB is not null);
+                if (freqDictsFromDB.TryGetValue(freq.Name, out Dictionary<string, List<FrequencyRecord>>? freqDict))
                 {
-                    Debug.Assert(freqDictsFromDB is not null);
-                    if (freqDictsFromDB.TryGetValue(freq.Name, out Dictionary<string, List<FrequencyRecord>>? freqDict))
-                    {
-                        freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freqDict), freq.Options.HigherValueMeansHigherFrequency.Value));
-                    }
+                    int frequency = record.GetFrequency(freqDict);
+                    frequencyExists = frequencyExists || frequency is not int.MaxValue;
+                    freqsList.Add(new LookupFrequencyResult(freq.Name, frequency, freq.Options.HigherValueMeansHigherFrequency.Value));
                 }
             }
 
             else
             {
-                freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq.Contents), freq.Options.HigherValueMeansHigherFrequency.Value));
+                int frequency = record.GetFrequency(freq.Contents);
+                frequencyExists = frequencyExists || frequency is not int.MaxValue;
+                freqsList.Add(new LookupFrequencyResult(freq.Name, frequency, freq.Options.HigherValueMeansHigherFrequency.Value));
             }
         }
 
-        return freqsList.Count > 0
+        return frequencyExists
             ? freqsList
             : null;
     }
@@ -1549,10 +1550,7 @@ public static class LookupUtils
             if (freqResultList is not null)
             {
                 int frequency = freqResultList[0].Frequency;
-                if (frequency is not 0)
-                {
-                    freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency, false));
-                }
+                freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency, false));
             }
         }
 

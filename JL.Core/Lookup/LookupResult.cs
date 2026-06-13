@@ -202,12 +202,53 @@ public sealed class LookupResult
         }
 
         // 8. ThenBy: Frequency score
-        int frequencyScore = GetFrequencyScore(Frequencies);
-        int otherFrequencyScore = GetFrequencyScore(other.Frequencies);
-        cmpResult = frequencyScore.CompareTo(otherFrequencyScore);
-        if (cmpResult is not 0)
+        bool frequenciesExists = Frequencies is not null;
+        bool otherFrequenciesExists = other.Frequencies is not null;
+        if (frequenciesExists || otherFrequenciesExists)
         {
-            return cmpResult;
+            int frequencyScore;
+            if (frequenciesExists)
+            {
+                Debug.Assert(Frequencies is not null);
+                frequencyScore = GetFrequencyScore(Frequencies);
+            }
+            else
+            {
+                frequencyScore = int.MaxValue;
+            }
+
+            int otherFrequencyScore;
+            if (otherFrequenciesExists)
+            {
+                Debug.Assert(other.Frequencies is not null);
+                otherFrequencyScore = GetFrequencyScore(other.Frequencies);
+            }
+            else
+            {
+                otherFrequencyScore = int.MaxValue;
+            }
+
+            cmpResult = frequencyScore.CompareTo(otherFrequencyScore);
+            if (cmpResult is not 0)
+            {
+                return cmpResult;
+            }
+
+            Debug.Assert(frequenciesExists && otherFrequenciesExists);
+            Debug.Assert(Frequencies is not null);
+            Debug.Assert(other.Frequencies is not null);
+            if ((Frequencies.Count > 1 || other.Frequencies.Count > 1)
+                && (frequencyScore is int.MaxValue
+                    || (!readingsContainMatchedText
+                        && !otherReadingsContainMatchedText
+                        && !Readings.SequenceEqual(other.Readings))))
+            {
+                cmpResult = GetFrequencyScore(Frequencies, other.Frequencies);
+                if (cmpResult is not 0)
+                {
+                    return cmpResult;
+                }
+            }
         }
 
         // 9. ThenBy: Index in Readings
@@ -318,20 +359,42 @@ public sealed class LookupResult
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int GetFrequencyScore(List<LookupFrequencyResult>? frequencies)
+    private static int GetFrequencyScore(List<LookupFrequencyResult> frequencies)
     {
-        if (frequencies is null)
-        {
-            return int.MaxValue;
-        }
-
         Debug.Assert(frequencies.Count > 0);
         LookupFrequencyResult freqResult = frequencies[0];
-        return !freqResult.HigherValueMeansHigherFrequency
-            ? freqResult.Freq
-            : freqResult.Freq is int.MaxValue
+        return GetNormalizedFrequencyScore(freqResult);
+    }
+
+    private static int GetFrequencyScore(List<LookupFrequencyResult> frequencies, List<LookupFrequencyResult> otherFrequencies)
+    {
+        Debug.Assert(frequencies.Count > 1 || otherFrequencies.Count > 1);
+        Debug.Assert(frequencies.Count == otherFrequencies.Count);
+        for (int i = 1; i < frequencies.Count; i++)
+        {
+            LookupFrequencyResult frequencyResult = frequencies[i];
+            LookupFrequencyResult otherFrequencyResult = otherFrequencies[i];
+            Debug.Assert(frequencyResult.HigherValueMeansHigherFrequency == otherFrequencyResult.HigherValueMeansHigherFrequency);
+
+            if (frequencyResult.Freq != otherFrequencyResult.Freq)
+            {
+                int normalizedFrequencyScore = GetNormalizedFrequencyScore(frequencyResult);
+                int otherNormalizedFrequencyScore = GetNormalizedFrequencyScore(otherFrequencyResult);
+                return normalizedFrequencyScore.CompareTo(otherNormalizedFrequencyScore);
+            }
+        }
+
+        return 0;
+    }
+
+    private static int GetNormalizedFrequencyScore(LookupFrequencyResult frequencyResult)
+    {
+        int frequency = frequencyResult.Freq;
+        return !frequencyResult.HigherValueMeansHigherFrequency
+            ? frequency
+            : frequency is int.MaxValue
                 ? int.MaxValue
-                : int.MaxValue - freqResult.Freq;
+                : int.MaxValue - frequency;
     }
 
     public static bool operator <(LookupResult left, LookupResult right) => left.CompareTo(right) < 0;
