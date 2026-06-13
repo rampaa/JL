@@ -237,7 +237,7 @@ public sealed class LookupResult
             Debug.Assert(frequenciesExists && otherFrequenciesExists);
             Debug.Assert(Frequencies is not null);
             Debug.Assert(other.Frequencies is not null);
-            if ((Frequencies.Count > 1 || other.Frequencies.Count > 1)
+            if (Frequencies.Count > 1
                 && (frequencyScore is int.MaxValue
                     || (!readingsContainMatchedText
                         && !otherReadingsContainMatchedText
@@ -368,7 +368,7 @@ public sealed class LookupResult
 
     private static int GetFrequencyScore(List<LookupFrequencyResult> frequencies, List<LookupFrequencyResult> otherFrequencies)
     {
-        Debug.Assert(frequencies.Count > 1 || otherFrequencies.Count > 1);
+        Debug.Assert(frequencies.Count > 1);
         Debug.Assert(frequencies.Count == otherFrequencies.Count);
         for (int i = 1; i < frequencies.Count; i++)
         {
