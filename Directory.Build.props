@@ -15,7 +15,7 @@
     <PublishReadyToRun>false</PublishReadyToRun>
     <SelfContained>false</SelfContained>
     <RollForward>LatestMinor</RollForward>
-    <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
+    <Platforms>x86;x64;ARM64</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <Deterministic>true</Deterministic>
     <CETCompat>false</CETCompat>

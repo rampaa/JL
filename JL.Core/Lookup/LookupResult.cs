@@ -206,34 +206,6 @@ public sealed class LookupResult
         bool otherFrequenciesExists = other.Frequencies is not null;
         if (frequenciesExists || otherFrequenciesExists)
         {
-            int frequencyScore;
-            if (frequenciesExists)
-            {
-                Debug.Assert(Frequencies is not null);
-                frequencyScore = GetFrequencyScore(Frequencies);
-            }
-            else
-            {
-                frequencyScore = int.MaxValue;
-            }
-
-            int otherFrequencyScore;
-            if (otherFrequenciesExists)
-            {
-                Debug.Assert(other.Frequencies is not null);
-                otherFrequencyScore = GetFrequencyScore(other.Frequencies);
-            }
-            else
-            {
-                otherFrequencyScore = int.MaxValue;
-            }
-
-            cmpResult = frequencyScore.CompareTo(otherFrequencyScore);
-            if (cmpResult is not 0)
-            {
-                return cmpResult;
-            }
-
             if (frequenciesExists && !otherFrequenciesExists)
             {
                 return -1;
@@ -247,6 +219,15 @@ public sealed class LookupResult
             Debug.Assert(frequenciesExists && otherFrequenciesExists);
             Debug.Assert(Frequencies is not null);
             Debug.Assert(other.Frequencies is not null);
+
+            int frequencyScore = GetFrequencyScore(Frequencies);
+            int otherFrequencyScore = GetFrequencyScore(other.Frequencies);
+            cmpResult = frequencyScore.CompareTo(otherFrequencyScore);
+            if (cmpResult is not 0)
+            {
+                return cmpResult;
+            }
+
             if (Frequencies.Count > 1
                 && (frequencyScore is int.MaxValue
                     || (!readingsContainMatchedText
