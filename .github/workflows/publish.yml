@@ -41,14 +41,20 @@ jobs:
             os: windows-latest
             target: win-x64
             msvc_arch: x64
+            platform: x64
+            
           - kind: windowsx86
             os: windows-latest
             target: win-x86
             msvc_arch: x86
+            platform: x86
+            
           - kind: windowsarm64
             os: windows-latest
             target: win-arm64
             msvc_arch: amd64_arm64
+            platform: ARM64
+            
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -131,7 +137,7 @@ jobs:
           cd ..
           
           # Build everything
-          dotnet publish JL.Windows/JL.Windows.csproj --runtime "${{ matrix.target }}" -c Release -o "$release_name"
+          dotnet publish JL.Windows/JL.Windows.csproj --runtime "${{ matrix.target }}" -c Release -o "$release_name" -p:Platform=${{ matrix.platform }}
           
           # Replace bundled SQLite with custom build
           cp sqlite-build/e_sqlite3.dll "${release_name}/e_sqlite3.dll"
