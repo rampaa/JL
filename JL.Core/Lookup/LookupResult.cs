@@ -234,6 +234,16 @@ public sealed class LookupResult
                 return cmpResult;
             }
 
+            if (frequenciesExists && !otherFrequenciesExists)
+            {
+                return -1;
+            }
+
+            if (!frequenciesExists && otherFrequenciesExists)
+            {
+                return 1;
+            }
+
             Debug.Assert(frequenciesExists && otherFrequenciesExists);
             Debug.Assert(Frequencies is not null);
             Debug.Assert(other.Frequencies is not null);
@@ -366,6 +376,7 @@ public sealed class LookupResult
         return GetNormalizedFrequencyScore(freqResult);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int GetFrequencyScore(List<LookupFrequencyResult> frequencies, List<LookupFrequencyResult> otherFrequencies)
     {
         Debug.Assert(frequencies.Count > 1);
@@ -387,6 +398,7 @@ public sealed class LookupResult
         return 0;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int GetNormalizedFrequencyScore(LookupFrequencyResult frequencyResult)
     {
         int frequency = frequencyResult.Freq;

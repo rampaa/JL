@@ -1665,7 +1665,7 @@ public static class DictUtils
             || (SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict) && profileCustomWordDict.Active);
 
         DBIsUsedForPitchDict = SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict)
-            && pitchDict is { Active: true, Options.UseDB.Value: true, Ready: true };
+            && pitchDict is { Active: true, Options.UseDB.Value: true };
         PitchDict = pitchDict;
     }
 

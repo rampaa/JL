@@ -509,7 +509,7 @@ public static class FreqUtils
             int validFreqCount = 0;
             foreach (Freq freq in wordFreqs)
             {
-                if (freq is { Options.UseDB.Value: true, Ready: true, Active: true })
+                if (freq is { Options.UseDB.Value: true, Active: true })
                 {
                     ++validFreqCount;
                 }
@@ -521,7 +521,7 @@ public static class FreqUtils
                 int currentIndex = 0;
                 foreach (Freq freq in wordFreqs)
                 {
-                    if (freq is { Options.UseDB.Value: true, Ready: true, Active: true })
+                    if (freq is { Options.UseDB.Value: true, Active: true })
                     {
                         dbWordFreqs[currentIndex] = freq;
                         ++currentIndex;

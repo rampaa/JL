@@ -69,8 +69,8 @@ public static class LookupUtils
         RentedArrayBuffer<SqliteConnection?>? freqConnectionsForJmdict = sqliteFreqConnectionsForJmdict.Items;
         RentedArrayBuffer<SqliteConnection?>? freqConnectionsForCustomWordDict = sqliteFreqConnectionsForCustomWordDict.Items;
 
-        bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict;
         Dict? pitchDict = DictUtils.PitchDict;
+        bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict && pitchDict!.Ready;
         TextInfo textInfo = GetTextInfo(text, wordFreqs is not null, dbIsUsedForPitchDict, dbWordFreqs, pitchDict);
 
         DBParameters dbParameters = GetDBParameters(textInfo);
@@ -1505,7 +1505,6 @@ public static class LookupUtils
         foreach (Freq freq in wordFreqs)
         {
             bool useDB = freq.Options.UseDB.Value && freq.Ready;
-
             if (useDB)
             {
                 Debug.Assert(freqDictsFromDB is not null);
