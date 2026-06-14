@@ -148,6 +148,11 @@ internal sealed partial class PopupWindow : IDisposable
         AddNameMenuItem.SetInputGestureText(configManager.ShowAddNameWindowKeyGesture);
         AddWordMenuItem.SetInputGestureText(configManager.ShowAddWordWindowKeyGesture);
         SearchMenuItem.SetInputGestureText(configManager.SearchWithBrowserKeyGesture);
+        AnkiSearchMenuItem.SetInputGestureText(configManager.SearchWithAnkiConnectKeyGesture);
+
+        AnkiSearchMenuItem.Visibility = CoreConfigManager.Instance.AnkiIntegration
+            ? Visibility.Visible
+            : Visibility.Collapsed;
 
         AllDictionaryTabButton.Click += DictTypeButtonOnClick;
 
@@ -221,6 +226,19 @@ internal sealed partial class PopupWindow : IDisposable
         searchMenuItem.SetInputGestureText(configManger.SearchWithBrowserKeyGesture);
         _ = DefinitionsTextBoxContextMenu.Items.Add(searchMenuItem);
 
+        if (CoreConfigManager.Instance.AnkiIntegration)
+        {
+            MenuItem ankiSearchMenuItem = new()
+            {
+                Name = "AnkiSearchMenuItem",
+                Header = "Search (Anki)"
+            };
+
+            ankiSearchMenuItem.Click += SearchWithAnkiConnect;
+            ankiSearchMenuItem.SetInputGestureText(configManger.SearchWithAnkiConnectKeyGesture);
+            _ = DefinitionsTextBoxContextMenu.Items.Add(ankiSearchMenuItem);
+        }
+
         DefinitionsTextBoxContextMenu.Opened += (_, _) =>
         {
             HandleContextMenuOpening();
@@ -277,7 +295,22 @@ internal sealed partial class PopupWindow : IDisposable
         SearchWithBrowser(false);
     }
 
+    private async void SearchWithAnkiConnect(object sender, RoutedEventArgs e)
+    {
+        await SearchWithAnkiConnect(false).ConfigureAwait(false);
+    }
+
     private void SearchWithBrowser(bool useSelectedListViewItemIfItExists)
+    {
+        WindowsUtils.SearchWithBrowser(GetSearchText(useSelectedListViewItemIfItExists));
+    }
+
+    private Task SearchWithAnkiConnect(bool useSelectedListViewItemIfItExists)
+    {
+        return WindowsUtils.SearchWithAnkiConnect(GetSearchText(useSelectedListViewItemIfItExists));
+    }
+
+    private string GetSearchText(bool useSelectedListViewItemIfItExists)
     {
         string text;
         if (useSelectedListViewItemIfItExists)
@@ -293,7 +326,7 @@ internal sealed partial class PopupWindow : IDisposable
                 : LastLookupResults[_listViewItemIndex].PrimarySpelling;
         }
 
-        WindowsUtils.SearchWithBrowser(text);
+        return text;
     }
 
     public Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode, bool mayNeedCoordinateConversion, bool verticalText)
@@ -1424,6 +1457,11 @@ internal sealed partial class PopupWindow : IDisposable
             HandleSearchWithBrowserKeyGesture();
         }
 
+        else if (keyGesture.IsEqual(configManager.SearchWithAnkiConnectKeyGesture))
+        {
+            return HandleSearchWithAnkiConnectKeyGesture();
+        }
+
         else if (keyGesture.IsEqual(configManager.InactiveLookupModeKeyGesture))
         {
             configManager.InactiveLookupMode = !configManager.InactiveLookupMode;
@@ -1533,7 +1571,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeygesture))
         {
-            return AnkiConnectUtils.OpenLastestNoteInAnki();
+            return WindowsUtils.OpenLastestNoteInAnki();
         }
 
         else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))
@@ -1726,6 +1764,43 @@ internal sealed partial class PopupWindow : IDisposable
         else
         {
             SearchWithBrowser(false);
+        }
+    }
+
+    private async Task HandleSearchWithAnkiConnectKeyGesture()
+    {
+        if (!MiningMode)
+        {
+            if (PopupIndex > 0)
+            {
+                PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[PopupIndex - 1];
+                Debug.Assert(popupWindow is not null);
+                await popupWindow.SearchWithAnkiConnect(true).ConfigureAwait(true);
+            }
+            else
+            {
+                await MainWindow.Instance.SearchWithAnkiConnect().ConfigureAwait(true);
+            }
+
+            if (PopupIndex is 0)
+            {
+                if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
+                MainWindow.Instance.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
+            }
+        }
+
+        else
+        {
+            await SearchWithAnkiConnect(false).ConfigureAwait(false);
         }
     }
 
