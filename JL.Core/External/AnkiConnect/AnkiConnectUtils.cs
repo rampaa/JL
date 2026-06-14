@@ -134,6 +134,11 @@ public static class AnkiConnectUtils
             : Task.CompletedTask;
     }
 
+    public static Task SearchInAnki(string text)
+    {
+        return AnkiConnectClient.GuiBrowse(text);
+    }
+
     public static async Task Mine(LookupResult[] lookupResults, int currentLookupResultIndex, string currentText, string? formattedDefinitions, string? selectedDefinitions, int currentCharPosition, string selectedSpelling)
     {
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;

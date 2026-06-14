@@ -72,6 +72,10 @@
                             Header="Search"
                             Click="SearchWithBrowser" />
                         <MenuItem
+                            Name="AnkiSearchMenuItem"
+                            Header="Search (Anki)"
+                            Click="SearchWithAnkiConnect" />
+                        <MenuItem
                             Name="StatsMenuItem"
                             Header="Stats"
                             Click="ShowStats" />

@@ -62,6 +62,7 @@ internal static class KeyGestureUtils
         nameof(ConfigManager.ClickMiningButtonKeyGesture),
         nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
         nameof(ConfigManager.SearchWithBrowserKeyGesture),
+        nameof(ConfigManager.SearchWithAnkiConnectKeyGesture),
         nameof(ConfigManager.LookupFirstTermKeyGesture),
         nameof(ConfigManager.ConfirmItemSelectionKeyGesture),
         nameof(ConfigManager.MotivationKeyGesture),

@@ -179,6 +179,7 @@ internal sealed class ConfigManager
     public KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture SearchWithBrowserKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture SearchWithAnkiConnectKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     public KeyGesture MousePassThroughModeKeyGesture { get; private set; } = new(Key.T, ModifierKeys.Alt);
     public KeyGesture SteppedBacklogBackwardsKeyGesture { get; private set; } = new(Key.Left, ModifierKeys.Alt);
     public KeyGesture SteppedBacklogForwardsKeyGesture { get; private set; } = new(Key.Right, ModifierKeys.Alt);
@@ -650,6 +651,8 @@ internal sealed class ConfigManager
             KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ShowAddWordWindowKeyGesture), ShowAddWordWindowKeyGesture);
         SearchWithBrowserKeyGesture =
             KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(SearchWithBrowserKeyGesture), SearchWithBrowserKeyGesture);
+        SearchWithAnkiConnectKeyGesture =
+            KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(SearchWithAnkiConnectKeyGesture), SearchWithAnkiConnectKeyGesture);
         MousePassThroughModeKeyGesture =
             KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(MousePassThroughModeKeyGesture), MousePassThroughModeKeyGesture);
         SteppedBacklogBackwardsKeyGesture =
@@ -687,6 +690,12 @@ internal sealed class ConfigManager
         MainWindow.Instance.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
         MainWindow.Instance.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);
         MainWindow.Instance.SearchMenuItem.SetInputGestureText(SearchWithBrowserKeyGesture);
+        MainWindow.Instance.AnkiSearchMenuItem.SetInputGestureText(SearchWithAnkiConnectKeyGesture);
+
+        MainWindow.Instance.AnkiSearchMenuItem.Visibility = coreConfigManager.AnkiIntegration
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
         MainWindow.Instance.PreferencesMenuItem.SetInputGestureText(ShowPreferencesWindowKeyGesture);
         MainWindow.Instance.ManageDictionariesMenuItem.SetInputGestureText(ShowManageDictionariesWindowKeyGesture);
         MainWindow.Instance.ManageFrequenciesMenuItem.SetInputGestureText(ShowManageFrequenciesWindowKeyGesture);
@@ -910,6 +919,11 @@ internal sealed class ConfigManager
             currentPopupWindow.AddNameMenuItem.SetInputGestureText(ShowAddNameWindowKeyGesture);
             currentPopupWindow.AddWordMenuItem.SetInputGestureText(ShowAddWordWindowKeyGesture);
             currentPopupWindow.SearchMenuItem.SetInputGestureText(SearchWithBrowserKeyGesture);
+            currentPopupWindow.AnkiSearchMenuItem.SetInputGestureText(SearchWithAnkiConnectKeyGesture);
+
+            currentPopupWindow.AnkiSearchMenuItem.Visibility = coreConfigManager.AnkiIntegration
+                ? Visibility.Visible
+                : Visibility.Collapsed;
 
             currentPopupWindow.TitleBarToggleVisibilityOfDictTabsMenuItem.SetInputGestureText(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
             currentPopupWindow.TitleBarHidePopupMenuItem.SetInputGestureText(ClosePopupKeyGesture);
@@ -951,6 +965,8 @@ internal sealed class ConfigManager
             ShowAddWordWindowKeyGesture.ToFormattedString();
         preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text =
             SearchWithBrowserKeyGesture.ToFormattedString();
+        preferenceWindow.SearchWithAnkiConnectKeyGestureTextBox.Text =
+            SearchWithAnkiConnectKeyGesture.ToFormattedString();
         preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text =
             MousePassThroughModeKeyGesture.ToFormattedString();
         preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text =
@@ -1289,6 +1305,8 @@ internal sealed class ConfigManager
                 preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(SearchWithBrowserKeyGesture),
                 preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text);
+            KeyGestureUtils.UpdateKeyGesture(connection, nameof(SearchWithAnkiConnectKeyGesture),
+                preferenceWindow.SearchWithAnkiConnectKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(MousePassThroughModeKeyGesture),
                 preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text);
             KeyGestureUtils.UpdateKeyGesture(connection, nameof(SteppedBacklogBackwardsKeyGesture),

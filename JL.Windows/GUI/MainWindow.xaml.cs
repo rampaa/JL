@@ -14,7 +14,6 @@ using HandyControl.Tools;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
-using JL.Core.External.AnkiConnect;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Network.WebSocket;
@@ -964,6 +963,11 @@ internal sealed partial class MainWindow : IDisposable
             WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
         }
 
+        else if (keyGesture.IsEqual(configManager.SearchWithAnkiConnectKeyGesture))
+        {
+            return WindowsUtils.SearchWithAnkiConnect(MainTextBox.SelectedText);
+        }
+
         else if (keyGesture.IsEqual(configManager.InactiveLookupModeKeyGesture))
         {
             configManager.InactiveLookupMode = !configManager.InactiveLookupMode;
@@ -1106,7 +1110,7 @@ internal sealed partial class MainWindow : IDisposable
 
         else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeygesture))
         {
-            return AnkiConnectUtils.OpenLastestNoteInAnki();
+            return WindowsUtils.OpenLastestNoteInAnki();
         }
 
         else if (keyGesture.IsEqual(KeyGestureUtils.CtrlCKeyGesture))
@@ -1499,17 +1503,30 @@ internal sealed partial class MainWindow : IDisposable
         SearchWithBrowser();
     }
 
-    public void SearchWithBrowser()
+    private async void SearchWithAnkiConnect(object sender, RoutedEventArgs e)
     {
-        string? text = MainTextBox.SelectionLength > 0
+        await SearchWithAnkiConnect().ConfigureAwait(false);
+    }
+
+    private string? GetTextForSearch()
+    {
+        return MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) >= 0
               || (FirstPopupWindow.LastSelectedText is not null
                   && MainTextBox.Text.AsSpan().StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                 ? FirstPopupWindow.LastSelectedText
                 : null;
+    }
 
-        WindowsUtils.SearchWithBrowser(text);
+    public void SearchWithBrowser()
+    {
+        WindowsUtils.SearchWithBrowser(GetTextForSearch());
+    }
+
+    public Task SearchWithAnkiConnect()
+    {
+        return WindowsUtils.SearchWithAnkiConnect(GetTextForSearch());
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -2000,7 +2017,10 @@ internal sealed partial class MainWindow : IDisposable
 
         ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating);
-        SearchMenuItem.IsEnabled = !string.IsNullOrWhiteSpace(MainTextBox.SelectedText);
+
+        bool textSelected = !string.IsNullOrWhiteSpace(MainTextBox.SelectedText);
+        SearchMenuItem.IsEnabled = textSelected;
+        AnkiSearchMenuItem.IsEnabled = textSelected;
 
         bool customNameDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict) && customNameDict.Ready;
         bool profileCustomNameDictReady = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict) && profileCustomNameDict.Ready;

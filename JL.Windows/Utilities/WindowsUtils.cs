@@ -19,6 +19,7 @@ using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
+using JL.Core.External.AnkiConnect;
 using JL.Core.Freqs;
 using JL.Core.Frontend;
 using JL.Core.Network;
@@ -328,6 +329,29 @@ internal static class WindowsUtils
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
         {
             MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
+        }
+    }
+
+    public static async Task SearchWithAnkiConnect(string? selectedText)
+    {
+        if (string.IsNullOrWhiteSpace(selectedText))
+        {
+            return;
+        }
+
+        await AnkiConnectUtils.SearchInAnki(selectedText).ConfigureAwait(false);
+        if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+        {
+            await MpvUtils.PausePlayback().ConfigureAwait(false);
+        }
+    }
+
+    public static async Task OpenLastestNoteInAnki()
+    {
+        await AnkiConnectUtils.OpenLastestNoteInAnki().ConfigureAwait(false);
+        if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+        {
+            await MpvUtils.PausePlayback().ConfigureAwait(false);
         }
     }
 
