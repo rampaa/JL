@@ -173,10 +173,12 @@ public sealed class LookupResult
         bool otherJmdictLookupResultExists = otherJmdictLookupResult is not null;
 
         int primarySpellingOrthographyScore = jmdictLookupResultExists && matchedPrimarySpelling
+            // ReSharper disable once NullableWarningSuppressionIsUsed
             ? GetPrimarySpellingOrthographyScore(jmdictLookupResult!)
             : int.MaxValue;
 
         int otherPrimarySpellingOrthographyScore = otherJmdictLookupResultExists && otherMatchedPrimarySpelling
+            // ReSharper disable once NullableWarningSuppressionIsUsed
             ? GetPrimarySpellingOrthographyScore(otherJmdictLookupResult!)
             : int.MaxValue;
 

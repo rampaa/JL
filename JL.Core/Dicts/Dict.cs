@@ -26,8 +26,8 @@ public sealed class Dict : IEquatable<Dict>
     [JsonIgnore] public bool Ready { get; set; } // = false;
     [JsonIgnore] public bool Updating { get; internal set; } // = false;
 
-    [JsonIgnore] public string DBPath { get; private set; }
-    [JsonIgnore] public string ReadOnlyConnectionString { get; private set; }
+    [JsonIgnore] public string DBPath { get; }
+    [JsonIgnore] internal string ReadOnlyConnectionString { get; private set; }
 
 #pragma warning disable CA2227 // Collection properties should be read only
     [JsonIgnore] public IDictionary<string, IList<IDictRecord>> Contents { get; set; }

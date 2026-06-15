@@ -1775,28 +1775,24 @@ public static class DictUtils
 
         foreach (Dict dict in dicts)
         {
-            if (dict is { Active: true })
+            if (dict is { Active: true, Type: not DictType.PitchAccentYomichan })
             {
-                if (dict.Type is not DictType.PitchAccentYomichan)
+                allDicts.Add(dict);
+                if (s_wordDictTypes.Contains(dict.Type))
                 {
-                    allDicts.Add(dict);
-
-                    if (s_wordDictTypes.Contains(dict.Type))
-                    {
-                        wordDicts.Add(dict);
-                    }
-                    else if (KanjiDictTypes.Contains(dict.Type))
-                    {
-                        kanjiDicts.Add(dict);
-                    }
-                    else if (s_nameDictTypes.Contains(dict.Type))
-                    {
-                        nameDicts.Add(dict);
-                    }
-                    else if (s_otherDictTypes.Contains(dict.Type))
-                    {
-                        otherDicts.Add(dict);
-                    }
+                    wordDicts.Add(dict);
+                }
+                else if (KanjiDictTypes.Contains(dict.Type))
+                {
+                    kanjiDicts.Add(dict);
+                }
+                else if (s_nameDictTypes.Contains(dict.Type))
+                {
+                    nameDicts.Add(dict);
+                }
+                else if (s_otherDictTypes.Contains(dict.Type))
+                {
+                    otherDicts.Add(dict);
                 }
             }
         }

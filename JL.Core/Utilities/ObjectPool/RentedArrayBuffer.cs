@@ -6,7 +6,7 @@ namespace JL.Core.Utilities.ObjectPool;
 internal sealed class RentedArrayBuffer<T>(int capacity) : IEquatable<RentedArrayBuffer<T>>, IDisposable
 {
     public T[] Array { get; } = ArrayPool<T>.Shared.Rent(capacity);
-    public int Count { get; private set; }
+    private int Count { get; set; }
 
     public void Add(T item)
     {

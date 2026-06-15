@@ -28,11 +28,11 @@ public sealed class Freq : IEquatable<Freq>
     [JsonIgnore] public bool Ready { get; set; } // = false;
     [JsonIgnore] public bool Updating { get; internal set; } // = false;
 
-    [JsonIgnore] public string DBPath { get; private set; }
-    [JsonIgnore] public string ReadOnlyConnectionString { get; private set; }
+    [JsonIgnore] public string DBPath { get; }
+    [JsonIgnore] internal string ReadOnlyConnectionString { get; private set; }
 
 #pragma warning disable CA2227 // Collection properties should be read only
-    [JsonIgnore] public IDictionary<string, IList<FrequencyRecord>> Contents { get; set; } = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+    [JsonIgnore] public IDictionary<string, IList<FrequencyRecord>> Contents { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
 
     public Freq(FreqType type, string name, string path, bool active, int priority, int size, int maxValue, FreqOptions options, bool autoUpdatable = false, Uri? url = null, string? revision = null)

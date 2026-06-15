@@ -70,7 +70,10 @@ public static class LookupUtils
         RentedArrayBuffer<SqliteConnection?>? freqConnectionsForCustomWordDict = sqliteFreqConnectionsForCustomWordDict.Items;
 
         Dict? pitchDict = DictUtils.PitchDict;
-        bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict && pitchDict!.Ready;
+        bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && pitchDict!.Ready;
+
         TextInfo textInfo = GetTextInfo(text, wordFreqs is not null, dbIsUsedForPitchDict, dbWordFreqs, pitchDict);
 
         DBParameters dbParameters = GetDBParameters(textInfo);
@@ -122,8 +125,8 @@ public static class LookupUtils
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
-                        // ReSharper disable once AccessToDisposedClosure
                         resultSlots[i] = rentedLookupResults;
+                        // ReSharper disable once AccessToDisposedClosure
                         BuildJmdictResult(results, rentedLookupResults, wordFreqs, dbWordFreqs, freqConnectionsForJmdict, dbIsUsedForPitchDict, sqliteConnectionForJmdictPitch, pitchDict);
                     }
 
@@ -994,9 +997,7 @@ public static class LookupUtils
         Dictionary<string, List<FrequencyRecord>>?[] resultsArray = ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Rent(dbFreqs.Length);
         _ = Parallel.For(0, dbFreqs.Length, i =>
         {
-            Freq freq = dbFreqs[i];
             SqliteConnection? connection = connections.Array[i];
-
             if (connection is not null)
             {
                 resultsArray[i] = FreqDBManager.GetRecordsFromDB(connection, searchKeys);

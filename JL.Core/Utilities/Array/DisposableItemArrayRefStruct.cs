@@ -2,7 +2,7 @@ using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Utilities.Array;
 
-internal readonly ref struct DisposableItemArrayRefStruct<T> : IDisposable where T : notnull, IDisposable
+internal readonly ref struct DisposableItemArrayRefStruct<T> : IDisposable where T : IDisposable
 {
     public RentedArrayBuffer<T?>? Items { get; }
 

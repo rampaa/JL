@@ -19,6 +19,7 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <Deterministic>true</Deterministic>
     <CETCompat>false</CETCompat>
+    <WarningsNotAsErrors>NU1900</WarningsNotAsErrors>
 
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
