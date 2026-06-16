@@ -12,13 +12,11 @@ public sealed class AtomicBool
         _value = initialValue ? True : False;
     }
 
-    // ReSharper disable once MemberCanBeInternal
     public bool Read()
     {
         return Volatile.Read(ref _value) is not False;
     }
 
-    // ReSharper disable once MemberCanBeInternal
     public void SetTrue()
     {
         Volatile.Write(ref _value, True);
@@ -29,8 +27,19 @@ public sealed class AtomicBool
         Volatile.Write(ref _value, False);
     }
 
+    public void SetValue(bool value)
+    {
+        if (value)
+        {
+            SetTrue();
+        }
+        else
+        {
+            SetFalse();
+        }
+    }
+
     public bool TrySetTrue() => Interlocked.CompareExchange(ref _value, True, False) is False;
 
-    // ReSharper disable once UnusedMember.Global
     public bool TrySetFalse() => Interlocked.CompareExchange(ref _value, False, True) is True;
 }

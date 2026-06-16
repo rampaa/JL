@@ -1139,9 +1139,7 @@ internal static class WindowsUtils
     {
         return !mayNeedCoordinateConversion
             ? mousePosition
-            : MagpieUtils.IsMagpieScaling()
-                ? MagpieUtils.GetMousePosition(mousePosition)
-                : mousePosition;
+            : MagpieUtils.GetEffectiveMousePosition(mousePosition);
     }
 
     public static async Task CopyTextToClipboard(string text)
