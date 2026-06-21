@@ -54,7 +54,7 @@ internal sealed partial class MainWindow : IDisposable
     private bool _contextMenuIsClosed = true;
     private bool _passThroughMode; // = false;
     private Point _swipeStartPoint;
-    private InputMethod? _input;
+    private readonly InputMethod? _input = InputMethod.Current;
     private Point _lastMouseMovePosition;
     private readonly Timer _lookupDelayTimer;
     private readonly Timer _tsukikageLookupDelayTimer;
@@ -107,7 +107,6 @@ internal sealed partial class MainWindow : IDisposable
         WinApi.SetCompositedAndNoRedirectionBitmapStyle(WindowHandle);
         WinApi.SubscribeToWndProc(this);
 
-        _input = InputMethod.Current;
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
         MagpieUtils.RegisterToMagpieScalingChangedMessage(WindowHandle);
