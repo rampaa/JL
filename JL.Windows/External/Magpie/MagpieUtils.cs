@@ -58,6 +58,10 @@ internal static class MagpieUtils
 
         s_deadZoneCheckingTimer.Elapsed += DeadZoneCheckEvent;
         s_deadZoneCheckingTimer.Enabled = isMagpieScaling && MainWindowIntersectsWithSourceWindow();
+        if (!s_deadZoneCheckingTimer.Enabled && s_mainWindowTransparentToAvoidDeadZone.TrySetFalse())
+        {
+            WinApi.UnsetTransparentStyle(MainWindow.Instance.WindowHandle);
+        }
     }
 
     private static bool ContainsPoint(double rectX, double rectY, double rectWidth, double rectHeight, Point point)
@@ -87,6 +91,10 @@ internal static class MagpieUtils
     public static void UpdateDeadZoneCheckingState()
     {
         s_deadZoneCheckingTimer.Enabled = IsMagpieScaling() && MainWindowIntersectsWithSourceWindow();
+        if (!s_deadZoneCheckingTimer.Enabled && s_mainWindowTransparentToAvoidDeadZone.TrySetFalse())
+        {
+            WinApi.UnsetTransparentStyle(MainWindow.Instance.WindowHandle);
+        }
     }
 
     private static void DeadZoneCheckEvent(object? sender, EventArgs e)
@@ -234,6 +242,10 @@ internal static class MagpieUtils
             else
             {
                 s_deadZoneCheckingTimer.Enabled = MainWindowIntersectsWithSourceWindow();
+                if (!s_deadZoneCheckingTimer.Enabled && s_mainWindowTransparentToAvoidDeadZone.TrySetFalse())
+                {
+                    WinApi.UnsetTransparentStyle(MainWindow.Instance.WindowHandle);
+                }
             }
         }
         else if (wParam is 1 or 2)
@@ -241,6 +253,10 @@ internal static class MagpieUtils
             s_isMagpieScaling.SetTrue();
             SetMagpieInfo(wParam is 1 ? lParam : s_magpieWindowHandle);
             s_deadZoneCheckingTimer.Enabled = MainWindowIntersectsWithSourceWindow();
+            if (!s_deadZoneCheckingTimer.Enabled && s_mainWindowTransparentToAvoidDeadZone.TrySetFalse())
+            {
+                WinApi.UnsetTransparentStyle(MainWindow.Instance.WindowHandle);
+            }
         }
     }
 
