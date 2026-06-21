@@ -329,6 +329,7 @@ internal sealed partial class MainWindow : IDisposable
                 _lookupDelayTimer.Enabled = false;
                 _tsukikageLookupDelayTimer.Enabled = false;
                 MainTextBox.Text = BacklogUtils.LastItem;
+                UpdatePosition();
             }
 
             return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard || tsukikage;
@@ -439,9 +440,9 @@ internal sealed partial class MainWindow : IDisposable
             PopupWindowUtils.HidePopups(0);
         }
 
+        UpdatePosition();
         if (notMinimized)
         {
-            UpdatePosition();
             if (configManager.AlwaysOnTop && FirstPopupWindow.Opacity is 0)
             {
                 WinApi.BringToFront(WindowHandle);
@@ -1941,6 +1942,8 @@ internal sealed partial class MainWindow : IDisposable
             TopPositionBeforeResolutionChange = Top;
             WidthBeforeResolutionChange = ActualWidth;
             HeightBeforeResolutionChange = ActualHeight;
+
+            MagpieUtils.UpdateDeadZoneCheckingState();
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
@@ -2008,6 +2011,7 @@ internal sealed partial class MainWindow : IDisposable
 
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;
+        MagpieUtils.UpdateDeadZoneCheckingState();
     }
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -2236,7 +2240,6 @@ internal sealed partial class MainWindow : IDisposable
             }
 
             UpdatePosition();
-
             if (configManager.AlwaysOnTop)
             {
                 WinApi.BringToFront(WindowHandle);
@@ -2359,10 +2362,12 @@ internal sealed partial class MainWindow : IDisposable
 
                 LeftPositionBeforeResolutionChange = Left;
                 TopPositionBeforeResolutionChange = Top;
-                HeightBeforeResolutionChange = Height;
-                WidthBeforeResolutionChange = Width;
             }
         }
+
+        HeightBeforeResolutionChange = Height;
+        WidthBeforeResolutionChange = Width;
+        MagpieUtils.UpdateDeadZoneCheckingState();
     }
 
     private double GetDynamicXPosition(double rightPosition)

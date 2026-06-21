@@ -57,7 +57,7 @@ internal static class MagpieUtils
         }
 
         s_deadZoneCheckingTimer.Elapsed += DeadZoneCheckEvent;
-        s_deadZoneCheckingTimer.Enabled = isMagpieScaling;
+        s_deadZoneCheckingTimer.Enabled = isMagpieScaling && MainWindowIntersectsWithSourceWindow();
     }
 
     private static bool ContainsPoint(double rectX, double rectY, double rectWidth, double rectHeight, Point point)
@@ -66,6 +66,27 @@ internal static class MagpieUtils
             && point.X - rectWidth <= rectX
             && point.Y >= rectY
             && point.Y - rectHeight <= rectY;
+    }
+
+    private static bool IntersectsWith(double rectX, double rectY, double rectWidth, double rectHeight, Rect rect)
+    {
+        return !rect.IsEmpty
+            && rect.Left <= rectX + rectWidth
+            && rect.Right >= rectX
+            && rect.Top <= rectY + rectHeight
+            && rect.Bottom >= rectY;
+    }
+
+    private static bool MainWindowIntersectsWithSourceWindow()
+    {
+        MainWindow mainWindow = MainWindow.Instance;
+        DpiScale dpi = WindowsUtils.Dpi;
+        return IntersectsWith(mainWindow.LeftPositionBeforeResolutionChange * dpi.DpiScaleX, mainWindow.TopPositionBeforeResolutionChange * dpi.DpiScaleY, mainWindow.WidthBeforeResolutionChange * dpi.DpiScaleX, mainWindow.HeightBeforeResolutionChange * dpi.DpiScaleY, s_sourceWindowRect);
+    }
+
+    public static void UpdateDeadZoneCheckingState()
+    {
+        s_deadZoneCheckingTimer.Enabled = IsMagpieScaling() && MainWindowIntersectsWithSourceWindow();
     }
 
     private static void DeadZoneCheckEvent(object? sender, EventArgs e)
@@ -212,14 +233,14 @@ internal static class MagpieUtils
             }
             else
             {
-                s_deadZoneCheckingTimer.Enabled = true;
+                s_deadZoneCheckingTimer.Enabled = MainWindowIntersectsWithSourceWindow();
             }
         }
         else if (wParam is 1 or 2)
         {
             s_isMagpieScaling.SetTrue();
             SetMagpieInfo(wParam is 1 ? lParam : s_magpieWindowHandle);
-            s_deadZoneCheckingTimer.Enabled = true;
+            s_deadZoneCheckingTimer.Enabled = MainWindowIntersectsWithSourceWindow();
         }
     }
 
