@@ -141,11 +141,11 @@ internal sealed partial class MainWindow : IDisposable
             _ = await CopyFromClipboard().ConfigureAwait(true);
         }
 
+        FirstPopupWindow.Owner = this;
+
         // Can't use ActivateWindow for FirstPopupWindow if it's not shown at least once
         FirstPopupWindow.Show();
         FirstPopupWindow.HidePopup();
-
-        FirstPopupWindow.Owner = this;
 
         FocusManager.SetFocusedElement(this, MainTextBox);
         // Makes caret/highlight visible without any mouse click
