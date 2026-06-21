@@ -57,12 +57,12 @@
       },
       "OpusSharp": {
         "type": "Direct",
-        "requested": "[1.6.7, )",
-        "resolved": "1.6.7",
-        "contentHash": "nTYvrNARdRCqItV44MI5AcJBQ6/XqZJXl3LfJprbnluFyRzH5qHSS3rlEZEQKPOCByK+jpN22/zNi3j7V03F3w==",
+        "requested": "[1.6.8, )",
+        "resolved": "1.6.8",
+        "contentHash": "YdV2utTYl7eeeZHKDfgCmy6Vg0eXjctGTlw3Onm6b4MsHaCIpECTMCCib5Ni8QcsjV5F2dUPH3j4G8Hp4LJGyA==",
         "dependencies": {
-          "OpusSharp.Core": "1.6.1.3",
-          "OpusSharp.Natives": "1.6.1.3"
+          "OpusSharp.Core": "1.6.1.4",
+          "OpusSharp.Natives": "1.6.1.4"
         }
       },
       "Serilog": {
@@ -121,13 +121,13 @@
       },
       "OpusSharp.Core": {
         "type": "Transitive",
-        "resolved": "1.6.1.3",
-        "contentHash": "4cbbF6oK5yi2N4BBlOdNitl3V3GKY0F/LY5qxsUgVUKXuPg0pNo6eywIK+gTUYx/r8uzoiZbS3o6qolizxk4AQ=="
+        "resolved": "1.6.1.4",
+        "contentHash": "yoUV2RRHMF6S+z4VyexSWLY9se/NNf1Ej20+jlzmdgoxn6wiwkN021HrmJrSXYMBJKHRIfFYDNlT27k8cPMsOw=="
       },
       "OpusSharp.Natives": {
         "type": "Transitive",
-        "resolved": "1.6.1.3",
-        "contentHash": "ohS8ppBayHKeqfrFH3sxfwE+N9OvijVWfguY0oooRknTxXGcwGrai+8XmW3dydg+EsVjqvCi2/p1kuLcMsq/tg=="
+        "resolved": "1.6.1.4",
+        "contentHash": "tZBCuOp42RH51ri6Up2sOj64EpOrCAAq36ZmuwSAT/nKjfg0x4HR4D0AgChztgvJQTK9C/MZ9J2WIjUzkvgesg=="
       },
       "SQLitePCLRaw.config.e_sqlite3": {
         "type": "Transitive",
