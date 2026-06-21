@@ -844,7 +844,7 @@ internal sealed partial class PopupWindow : IDisposable
 
             if (!_dictsWithResults.Contains(lookupResult.Dict))
             {
-                _dictsWithResults.Add(lookupResult.Dict);
+                _ = _dictsWithResults.Add(lookupResult.Dict);
             }
 
             popupItemSource[i] = new LookupDisplayResult(this, lookupResult, i, resultCount - 1 > i);
