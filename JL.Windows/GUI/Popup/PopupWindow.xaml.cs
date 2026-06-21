@@ -15,6 +15,7 @@ using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Bool;
 using JL.Core.Utilities.Japanese;
 using JL.Windows.Config;
 using JL.Windows.Interop;
@@ -72,7 +73,7 @@ internal sealed partial class PopupWindow : IDisposable
 
     public LookupResult[] LastLookupResults { get; private set; } = [];
 
-    private readonly List<Dict> _dictsWithResults = [];
+    private readonly HashSet<Dict> _dictsWithResults;
 
     private Dict? _filteredDict;
 
@@ -89,6 +90,9 @@ internal sealed partial class PopupWindow : IDisposable
     public int PopupIndex { get; }
 
     private CancellationTokenSource? _duplicateCheckCancellationTokenSource;
+    private readonly ObservableCollection<Button> _dictTypeButtons = [];
+
+    public AtomicBool NeedToUpdateDictTypeButtons { get; } = new(false);
 
     public PopupWindow(int popupIndex)
     {
@@ -109,6 +113,8 @@ internal sealed partial class PopupWindow : IDisposable
             Enabled = false
         };
         _enableMiningModeTimer.Elapsed += EnableMiningModeTimer_Elapsed;
+
+        _dictsWithResults = new HashSet<Dict>(DictUtils.Dicts.Count);
 
         Init();
     }
@@ -154,9 +160,13 @@ internal sealed partial class PopupWindow : IDisposable
             ? Visibility.Visible
             : Visibility.Collapsed;
 
+        NeedToUpdateDictTypeButtons.SetTrue();
         AllDictionaryTabButton.Click += DictTypeButtonOnClick;
+        _dictTypeButtons.Add(AllDictionaryTabButton);
 
         AddMenuItemsToEditableTextBoxContextMenu();
+
+        DictTabButtonsItemsControl.ItemsSource = _dictTypeButtons;
     }
 
     private void AddMenuItemsToEditableTextBoxContextMenu()
@@ -806,7 +816,10 @@ internal sealed partial class PopupWindow : IDisposable
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         _dictsWithResults.Clear();
 
-        PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
+        if (PopupListView.Items.Filter != PopupWindowUtils.NoAllDictFilter)
+        {
+            PopupListView.Items.Filter = PopupWindowUtils.NoAllDictFilter;
+        }
 
         int resultCount;
         bool checkForDuplicateCards;
@@ -853,7 +866,7 @@ internal sealed partial class PopupWindow : IDisposable
             CheckResultForDuplicates(popupItemSource, _duplicateCheckCancellationTokenSource.Token).SafeFireAndForget("Unexpected error while checking results for duplicates");
         }
 
-        GenerateDictTypeButtons();
+        UpdateDictTypeButtons();
 
         UpdateLayout();
     }
@@ -2262,48 +2275,119 @@ internal sealed partial class PopupWindow : IDisposable
         }
     }
 
-    private void GenerateDictTypeButtons()
+    private void UpdateDictTypeButtons()
     {
-        List<Button> buttons = new(DictUtils.Dicts.Values.Count + 1);
-        AllDictionaryTabButton.Background = Brushes.DodgerBlue;
-        buttons.Add(AllDictionaryTabButton);
-
-        double buttonFontSize = ConfigManager.Instance.PopupDictionaryTabFontSize;
-        IOrderedEnumerable<Dict> dicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority);
-        foreach (Dict dict in dicts)
+        if (!DictUtils.DictsReady || NeedToUpdateDictTypeButtons.TrySetFalse())
         {
-            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.Instance.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
-            {
-                continue;
-            }
-
-            Button button = new()
-            {
-                Content = dict.Name,
-                Margin = new Thickness(2, 0, 0, 0),
-                Tag = dict,
-                Cursor = Cursors.Arrow,
-                VerticalAlignment = VerticalAlignment.Top,
-                VerticalContentAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                HorizontalContentAlignment = HorizontalAlignment.Center,
-                FontSize = buttonFontSize,
-                Padding = new Thickness(5, 3, 5, 3),
-                Height = double.NaN,
-                Width = double.NaN
-            };
-
-            button.Click += DictTypeButtonOnClick;
-
-            if (!_dictsWithResults.Contains(dict))
-            {
-                button.IsEnabled = false;
-            }
-
-            buttons.Add(button);
+            RebuildDictButtons();
         }
 
-        DictTabButtonsItemsControl.ItemsSource = buttons;
+        bool needToResetBackgroundColor = AllDictionaryTabButton.Background != Brushes.DodgerBlue;
+        if (needToResetBackgroundColor)
+        {
+            AllDictionaryTabButton.Background = Brushes.DodgerBlue;
+        }
+
+        ConfigManager configManager = ConfigManager.Instance;
+        bool hideWithNoResults = configManager.HideDictTabsWithNoResults;
+        ObservableCollection<Button> dictButtonsList = _dictTypeButtons;
+        HashSet<Dict> dictsWithResults = _dictsWithResults;
+        for (int i = 1; i < dictButtonsList.Count; i++)
+        {
+            Button button = dictButtonsList[i];
+            if (needToResetBackgroundColor && button.Background == Brushes.DodgerBlue)
+            {
+                button.ClearValue(BackgroundProperty);
+                needToResetBackgroundColor = false;
+            }
+
+            bool hasResults = dictsWithResults.Contains((Dict)button.Tag);
+            button.IsEnabled = hasResults;
+            if (hideWithNoResults)
+            {
+                button.Visibility = hasResults
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+    }
+
+    private void RebuildDictButtons()
+    {
+        ObservableCollection<Button> dictTypeButtons = _dictTypeButtons;
+        for (int i = 1; i < dictTypeButtons.Count; i++)
+        {
+            Button oldButton = dictTypeButtons[i];
+            oldButton.Click -= DictTypeButtonOnClick;
+        }
+
+        List<Button> buttons = new(DictUtils.Dicts.Values.Count);
+
+        double dictionaryTabFontSize = ConfigManager.Instance.PopupDictionaryTabFontSize;
+        IOrderedEnumerable<Dict> orderedDicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority);
+        foreach (Dict dict in orderedDicts)
+        {
+            if (dict.Type is not DictType.PitchAccentYomichan)
+            {
+                Button button = new()
+                {
+                    Content = dict.Name,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    Tag = dict,
+                    Cursor = Cursors.Arrow,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    VerticalContentAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    HorizontalContentAlignment = HorizontalAlignment.Center,
+                    FontSize = dictionaryTabFontSize,
+                    Padding = new Thickness(5, 3, 5, 3),
+                    Height = double.NaN,
+                    Width = double.NaN
+                };
+
+                button.Click += DictTypeButtonOnClick;
+                buttons.Add(button);
+            }
+        }
+
+        UpdateDictTypeButtonsItemsSource(buttons.AsReadOnlySpan());
+    }
+
+    private void UpdateDictTypeButtonsItemsSource(ReadOnlySpan<Button> buttons)
+    {
+        int currentDictButtonCount = _dictTypeButtons.Count - 1;
+        int newDictButtonCount = buttons.Length;
+        int sharedDictButtonCount = Math.Min(currentDictButtonCount, newDictButtonCount);
+
+        for (int i = 0; i < sharedDictButtonCount; i++)
+        {
+            _dictTypeButtons[i + 1] = buttons[i];
+        }
+
+        if (newDictButtonCount > currentDictButtonCount)
+        {
+            for (int i = currentDictButtonCount; i < newDictButtonCount; i++)
+            {
+                _dictTypeButtons.Add(buttons[i]);
+            }
+        }
+        else if (newDictButtonCount < currentDictButtonCount)
+        {
+            for (int i = _dictTypeButtons.Count - 1; i > newDictButtonCount; i--)
+            {
+                _dictTypeButtons.RemoveAt(i);
+            }
+        }
+    }
+
+    public void MakeDictTypeButtonsVisible()
+    {
+        ObservableCollection<Button> dictButtonsList = _dictTypeButtons;
+        for (int i = 1; i < dictButtonsList.Count; i++)
+        {
+            Button button = dictButtonsList[i];
+            button.Visibility = Visibility.Visible;
+        }
     }
 
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
@@ -2464,7 +2548,6 @@ internal sealed partial class PopupWindow : IDisposable
         MiningMode = false;
         TitleBarGrid.Visibility = Visibility.Collapsed;
         DictTabButtonsItemsControl.Visibility = Visibility.Collapsed;
-        DictTabButtonsItemsControl.ItemsSource = null;
 
         Debug.Assert(_popupListViewScrollViewer is not null);
         _popupListViewScrollViewer.ScrollToTop();
@@ -2689,6 +2772,7 @@ internal sealed partial class PopupWindow : IDisposable
         DictTabButtonsItemsControl.ItemsSource = null;
         PopupListView.ItemsSource = null;
         _lastInteractedTextBox = null;
+        _dictTypeButtons.Clear();
         LastLookupResults = [];
         _dictsWithResults.Clear();
         AllDictionaryTabButton.Click -= DictTypeButtonOnClick;

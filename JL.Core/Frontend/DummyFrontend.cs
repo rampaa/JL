@@ -46,5 +46,9 @@ internal sealed class DummyFrontend : IFrontend
     {
     }
 
+    public void PopupDictTypeButtonsNeedUpdating()
+    {
+    }
+
     public Version JLVersion { get; } = new(0, 0, 0);
 }

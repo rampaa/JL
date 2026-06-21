@@ -688,6 +688,7 @@ public static class DictUtils
             }
 
             DictsReady = true;
+            FrontendManager.Frontend.PopupDictTypeButtonsNeedUpdating();
         }
         finally
         {

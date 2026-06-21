@@ -46,5 +46,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId) => ConfigManager.Instance.InsertSettingsForTsukikageProfile(connection, tsukikageProfileId);
 
+    public void PopupDictTypeButtonsNeedUpdating() => PopupWindowUtils.PopupDictTypeButtonsNeedUpdating();
+
     public Version JLVersion => WindowsUtils.JLVersion;
 }

@@ -34,5 +34,7 @@ public interface IFrontend
 
     public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId);
 
+    public void PopupDictTypeButtonsNeedUpdating();
+
     public Version JLVersion { get; }
 }

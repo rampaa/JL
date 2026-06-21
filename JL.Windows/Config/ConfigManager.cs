@@ -931,6 +931,11 @@ internal sealed class ConfigManager
             currentPopupWindow.DictTabButtonsItemsControlToggleVisibilityOfDictTabsMenuItem.SetInputGestureText(ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture);
             currentPopupWindow.DictTabButtonsItemsControlHidePopupMenuItem.SetInputGestureText(ClosePopupKeyGesture);
 
+            if (!HideDictTabsWithNoResults)
+            {
+                currentPopupWindow.MakeDictTypeButtonsVisible();
+            }
+
             currentPopupWindow = PopupWindowUtils.PopupWindows[currentPopupWindow.PopupIndex + 1];
         }
 

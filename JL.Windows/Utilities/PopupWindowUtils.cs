@@ -229,4 +229,17 @@ internal static class PopupWindowUtils
             ? definitionsTextBox.SelectedText
             : null;
     }
+
+    public static void PopupDictTypeButtonsNeedUpdating()
+    {
+        foreach (PopupWindow? popupWindow in PopupWindows)
+        {
+            if (popupWindow is null)
+            {
+                break;
+            }
+
+            popupWindow.NeedToUpdateDictTypeButtons.SetTrue();
+        }
+    }
 }
