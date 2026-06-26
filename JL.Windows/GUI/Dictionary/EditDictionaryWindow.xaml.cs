@@ -292,6 +292,19 @@ internal sealed partial class EditDictionaryWindow
         FolderBrowseButton.IsEnabled = isNotCustomDict;
 
         NameTextBox.Text = _dict.Name;
+
+        string indexJsonPath = Path.GetFullPath(Path.Join(PathTextBlock.Text, "index.json"), AppInfo.ApplicationPath);
+        if (File.Exists(indexJsonPath))
+        {
+            JsonElement jsonElement;
+            using (FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.SyncReadFso))
+            {
+                jsonElement = JsonSerializer.Deserialize<JsonElement>(fileStream, JsonOptions.DefaultJso);
+            }
+
+            NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
+        }
+
         _dictOptionsControl.GenerateDictOptionsElements(_dict.Type, _dict.Options);
         _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = _dict.AutoUpdatable
             ? Visibility.Visible

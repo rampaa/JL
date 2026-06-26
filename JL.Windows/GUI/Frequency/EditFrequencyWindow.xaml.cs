@@ -238,6 +238,18 @@ internal sealed partial class EditFrequencyWindow
         PathTextBlock.Text = _freq.Path;
         NameTextBox.Text = _freq.Name;
 
+        string indexJsonPath = Path.GetFullPath(Path.Join(PathTextBlock.Text, "index.json"), AppInfo.ApplicationPath);
+        if (File.Exists(indexJsonPath))
+        {
+            JsonElement jsonElement;
+            using (FileStream fileStream = new(indexJsonPath, FileStreamOptionsPresets.SyncReadFso))
+            {
+                jsonElement = JsonSerializer.Deserialize<JsonElement>(fileStream, JsonOptions.DefaultJso);
+            }
+
+            NameTextBox.Tag = jsonElement.GetProperty("revision").GetString();
+        }
+
         _freqOptionsControl.GenerateFreqOptionsElements(_freq.Type, _freq.Options);
         _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Visibility = _freq.AutoUpdatable
             ? Visibility.Visible
