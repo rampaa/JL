@@ -17,7 +17,7 @@ public interface IFrontend
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease);
 
-    public void ApplyDictOptions();
+    public Task ApplyDictOptions();
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray();
 

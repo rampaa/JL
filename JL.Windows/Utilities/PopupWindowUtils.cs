@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,7 +11,6 @@ using JL.Windows.Config;
 using JL.Windows.GUI;
 using JL.Windows.GUI.Popup;
 using NAudio.Wave;
-using Timer = System.Timers.Timer;
 
 namespace JL.Windows.Utilities;
 
@@ -21,11 +19,6 @@ internal static class PopupWindowUtils
     public const int MaxPopupWindowsIndex = 40;
 
     public static readonly PopupWindow?[] PopupWindows = new PopupWindow?[MaxPopupWindowsIndex + 2];
-    public static readonly Timer PopupAutoHideTimer = new()
-    {
-        AutoReset = false,
-        Enabled = false
-    };
 
     private static string? s_primarySpellingOfLastPlayedAudio;
     private static string? s_readingOfLastPlayedAudio;
@@ -34,10 +27,6 @@ internal static class PopupWindowUtils
 
     public static Pen PitchAccentMarkerPen { get; private set; } = new();
 
-    static PopupWindowUtils()
-    {
-        PopupAutoHideTimer.Elapsed += PopupAutoHideTimerEvent;
-    }
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin)
     {
@@ -89,73 +78,6 @@ internal static class PopupWindowUtils
         textBox.SetValue(ScrollViewer.PanningModeProperty, PanningMode.None);
 
         return textBox;
-    }
-
-    public static void SetPopupAutoHideTimer()
-    {
-        PopupAutoHideTimer.Interval = ConfigManager.Instance.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
-        PopupAutoHideTimer.Enabled = true;
-    }
-
-    private static void PopupAutoHideTimerEvent(object? sender, ElapsedEventArgs e)
-    {
-        _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.InvokeAsync(static () =>
-        {
-            PopupWindow? hoveredPopup = null;
-            PopupWindow? currentPopupWindow = PopupWindows[0];
-            while (currentPopupWindow is not null)
-            {
-                if (currentPopupWindow.IsMouseOver)
-                {
-                    hoveredPopup = currentPopupWindow;
-                    break;
-                }
-
-                currentPopupWindow = PopupWindows[currentPopupWindow.PopupIndex + 1];
-            }
-
-            bool hidPopup = false;
-            if (hoveredPopup is null)
-            {
-                MainWindow mainWindow = MainWindow.Instance;
-                PopupWindow firstPopupWindow = mainWindow.FirstPopupWindow;
-                if (firstPopupWindow.Opacity is not 0)
-                {
-                    TextBox textBox = mainWindow.MainTextBox;
-                    PopupWindow? childPopup = PopupWindows[firstPopupWindow.PopupIndex + 1];
-                    if ((childPopup is not null && childPopup.Opacity is not 0)
-                        || firstPopupWindow.CurrentSourceTextCharPosition != textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false))
-                    {
-                        HidePopups(firstPopupWindow.PopupIndex);
-                        hidPopup = true;
-                    }
-                }
-            }
-
-            else
-            {
-                PopupWindow? popupWindow = PopupWindows[hoveredPopup.PopupIndex + 1];
-                if (popupWindow is not null)
-                {
-                    if (popupWindow.Opacity is not 0)
-                    {
-                        PopupWindow? childPopup = PopupWindows[popupWindow.PopupIndex + 1];
-                        TextBox? textBox = popupWindow.PreviousTextBox;
-                        if ((childPopup is not null && childPopup.Opacity is not 0)
-                            || popupWindow.CurrentSourceTextCharPosition != (textBox?.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false) ?? -1))
-                        {
-                            HidePopups(popupWindow.PopupIndex);
-                            hidPopup = true;
-                        }
-                    }
-                }
-            }
-
-            if (!hidPopup && !PopupAutoHideTimer.Enabled)
-            {
-                PopupAutoHideTimer.Enabled = true;
-            }
-        });
     }
 
     public static void HidePopups(int rootPopupIndex)

@@ -38,7 +38,7 @@ public static class CoreInitializer
             Task.Run(static async () =>
             {
                 await DictUtils.DeserializeDicts().ConfigureAwait(false);
-                FrontendManager.Frontend.ApplyDictOptions();
+                await FrontendManager.Frontend.ApplyDictOptions().ConfigureAwait(false);
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
                 await DictUtils.SerializeDicts().ConfigureAwait(false);
                 await JmdictWordClassUtils.Initialize().ConfigureAwait(false);

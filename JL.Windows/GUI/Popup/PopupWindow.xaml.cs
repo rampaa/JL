@@ -1,12 +1,12 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
@@ -24,7 +24,6 @@ using JL.Windows.Utilities;
 using Point = System.Windows.Point;
 using Rectangle = System.Drawing.Rectangle;
 using Screen = System.Windows.Forms.Screen;
-using Timer = System.Timers.Timer;
 
 namespace JL.Windows.GUI.Popup;
 
@@ -47,8 +46,8 @@ internal sealed partial class PopupWindow : IDisposable
 
     private string _currentSourceText = "";
 
-    private readonly Timer _lookupDelayTimer;
-    private readonly Timer _enableMiningModeTimer;
+    private readonly DispatcherTimer _lookupDelayTimer;
+    private readonly DispatcherTimer _enableMiningModeTimer;
 
     public Button AllDictionaryTabButton { get; } = new()
     {
@@ -99,20 +98,17 @@ internal sealed partial class PopupWindow : IDisposable
         InitializeComponent();
         PopupIndex = popupIndex;
         PopupWindowUtils.PopupWindows[popupIndex] = this;
-
-        _lookupDelayTimer = new Timer
+        _lookupDelayTimer = new DispatcherTimer
         {
-            AutoReset = false,
-            Enabled = false
+            IsEnabled = false
         };
-        _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
+        _lookupDelayTimer.Tick += LookupDelayTimer_Elapsed;
 
-        _enableMiningModeTimer = new Timer
+        _enableMiningModeTimer = new DispatcherTimer()
         {
-            AutoReset = false,
-            Enabled = false
+            IsEnabled = false
         };
-        _enableMiningModeTimer.Elapsed += EnableMiningModeTimer_Elapsed;
+        _enableMiningModeTimer.Tick += EnableMiningModeTimer_Elapsed;
 
         _dictsWithResults = new HashSet<Dict>(DictUtils.Dicts.Count);
 
@@ -359,6 +355,7 @@ internal sealed partial class PopupWindow : IDisposable
             CurrentSourceTextCharPosition = charPosition;
         }
 
+        MainWindow mainWindow = MainWindow.Instance;
         bool isFirstPopupWindow = PopupIndex is 0;
         if (isFirstPopupWindow ? configManager.DisableLookupsForNonJapaneseCharsInMainWindow : configManager.DisableLookupsForNonJapaneseCharsInPopups)
         {
@@ -372,11 +369,11 @@ internal sealed partial class PopupWindow : IDisposable
                 {
                     if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                     {
-                        MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                        mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
                     }
 
                     HidePopup();
-                    MainWindow.Instance.ChangeVisibility();
+                    mainWindow.ChangeVisibility();
                 }
                 else
                 {
@@ -408,11 +405,11 @@ internal sealed partial class PopupWindow : IDisposable
             {
                 if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                 {
-                    MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
                 }
 
                 HidePopup();
-                MainWindow.Instance.ChangeVisibility();
+                mainWindow.ChangeVisibility();
             }
             else
             {
@@ -449,7 +446,7 @@ internal sealed partial class PopupWindow : IDisposable
             {
                 Debug.Assert(isFirstPopupWindow || PopupWindowUtils.PopupWindows[PopupIndex - 1] is not null);
                 WinApi.ActivateWindow(isFirstPopupWindow
-                    ? MainWindow.Instance.WindowHandle
+                    ? mainWindow.WindowHandle
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     : PopupWindowUtils.PopupWindows[PopupIndex - 1]!.WindowHandle);
 
@@ -466,7 +463,7 @@ internal sealed partial class PopupWindow : IDisposable
 
                 if (configManager.AutoHidePopupIfMouseIsNotOverIt)
                 {
-                    PopupWindowUtils.SetPopupAutoHideTimer();
+                    mainWindow.SetPopupAutoHideTimer();
                 }
             }
 
@@ -476,8 +473,8 @@ internal sealed partial class PopupWindow : IDisposable
                 if (configManager.AutoEnableMiningModeForMouseMove)
                 {
                     Debug.Assert(configManager.AutoEnableMiningModeForMouseMoveDelayInMilliseconds > 0);
-                    _enableMiningModeTimer.Interval = configManager.AutoEnableMiningModeForMouseMoveDelayInMilliseconds;
-                    _enableMiningModeTimer.Enabled = true;
+                    _enableMiningModeTimer.Interval = TimeSpan.FromMilliseconds(configManager.AutoEnableMiningModeForMouseMoveDelayInMilliseconds);
+                    _enableMiningModeTimer.IsEnabled = true;
                 }
             }
 
@@ -494,7 +491,7 @@ internal sealed partial class PopupWindow : IDisposable
                 if (configManager.RestoreFocusToPreviouslyActiveWindow && isFirstPopupWindow)
                 {
                     nint previousWindowHandle = WinApi.GetActiveWindowHandle();
-                    if (previousWindowHandle != MainWindow.Instance.WindowHandle && previousWindowHandle != WindowHandle)
+                    if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
                     {
                         WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
                     }
@@ -521,11 +518,11 @@ internal sealed partial class PopupWindow : IDisposable
             {
                 if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                 {
-                    MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
                 }
 
                 HidePopup();
-                MainWindow.Instance.ChangeVisibility();
+                mainWindow.ChangeVisibility();
             }
             else
             {
@@ -576,6 +573,7 @@ internal sealed partial class PopupWindow : IDisposable
             CurrentSourceTextCharPosition = textBox.SelectionStart;
         }
 
+        MainWindow mainWindow = MainWindow.Instance;
         string selectedText = textBox.SelectedText;
         if (string.IsNullOrEmpty(selectedText) || TextUtils.StartsWithWhiteSpace(selectedText))
         {
@@ -583,11 +581,11 @@ internal sealed partial class PopupWindow : IDisposable
             {
                 if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                 {
-                    MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
                 }
 
                 HidePopup();
-                MainWindow.Instance.ChangeVisibility();
+                mainWindow.ChangeVisibility();
             }
             else
             {
@@ -626,7 +624,7 @@ internal sealed partial class PopupWindow : IDisposable
 
             if (configManager.AutoHidePopupIfMouseIsNotOverIt)
             {
-                PopupWindowUtils.SetPopupAutoHideTimer();
+                mainWindow.SetPopupAutoHideTimer();
             }
 
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
@@ -643,7 +641,7 @@ internal sealed partial class PopupWindow : IDisposable
                 if (configManager.RestoreFocusToPreviouslyActiveWindow && PopupIndex is 0)
                 {
                     nint previousWindowHandle = WinApi.GetActiveWindowHandle();
-                    if (previousWindowHandle != MainWindow.Instance.WindowHandle && previousWindowHandle != WindowHandle)
+                    if (previousWindowHandle != mainWindow.WindowHandle && previousWindowHandle != WindowHandle)
                     {
                         WindowsUtils.LastActiveWindowHandle = previousWindowHandle;
                     }
@@ -670,11 +668,11 @@ internal sealed partial class PopupWindow : IDisposable
             {
                 if (configManager.AutoPauseOrResumeMpvOnHoverChange)
                 {
-                    MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                    mainWindow.MouseEnterDueToFirstPopupHide = mainWindow.IsMouseWithinWindowBounds();
                 }
 
                 HidePopup();
-                MainWindow.Instance.ChangeVisibility();
+                mainWindow.ChangeVisibility();
             }
             else
             {
@@ -1062,7 +1060,7 @@ internal sealed partial class PopupWindow : IDisposable
         int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
         if (charPosition < 0)
         {
-            _lookupDelayTimer.Enabled = false;
+            _lookupDelayTimer.IsEnabled = false;
             _lastCharPosition = charPosition;
             childPopupWindow?.HidePopup();
             return;
@@ -1075,30 +1073,32 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (charPosition != _lastCharPosition)
         {
-            _lookupDelayTimer.Enabled = false;
+            _lookupDelayTimer.IsEnabled = false;
             _lastCharPosition = charPosition;
-            _lookupDelayTimer.Interval = ConfigManager.Instance.PopupLookupDelay;
-            _lookupDelayTimer.Enabled = true;
+            _lookupDelayTimer.Interval = TimeSpan.FromMilliseconds(ConfigManager.Instance.PopupLookupDelay);
+            _lookupDelayTimer.IsEnabled = true;
         }
-        else if (!_lookupDelayTimer.Enabled
+        else if (!_lookupDelayTimer.IsEnabled
             && (childPopupWindow is null || childPopupWindow.Opacity is 0))
         {
-            _lookupDelayTimer.Interval = ConfigManager.Instance.PopupLookupDelay;
-            _lookupDelayTimer.Enabled = true;
+            _lookupDelayTimer.Interval = TimeSpan.FromMilliseconds(ConfigManager.Instance.PopupLookupDelay);
+            _lookupDelayTimer.IsEnabled = true;
         }
     }
 
-    private void LookupDelayTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    private void LookupDelayTimer_Elapsed(object? sender, EventArgs e)
     {
+        _lookupDelayTimer.Stop();
         if (_lastInteractedTextBox is not null)
         {
-            Dispatcher.Invoke(HandleDelayedLookup);
+            HandleDelayedLookup();
         }
     }
 
-    private void EnableMiningModeTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    private void EnableMiningModeTimer_Elapsed(object? sender, EventArgs e)
     {
-        Dispatcher.Invoke(HandleMiningModeKeyGesture);
+        _enableMiningModeTimer.Stop();
+        HandleMiningModeKeyGesture();
     }
 
     private void HandleDelayedLookup()
@@ -1635,7 +1635,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (configManager.AutoHidePopupIfMouseIsNotOverIt)
         {
-            PopupWindowUtils.SetPopupAutoHideTimer();
+            MainWindow.Instance.SetPopupAutoHideTimer();
         }
     }
 
@@ -1661,6 +1661,7 @@ internal sealed partial class PopupWindow : IDisposable
     {
         if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
         {
+            MainWindow mainWindow = MainWindow.Instance;
             if (!MiningMode)
             {
                 if (PopupIndex > 0)
@@ -1672,18 +1673,18 @@ internal sealed partial class PopupWindow : IDisposable
 
                 else
                 {
-                    MainWindow.Instance.ShowAddNameWindow();
+                    mainWindow.ShowAddNameWindow();
                 }
 
                 if (PopupIndex is 0)
                 {
                     if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
                     {
-                        MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                        mainWindow.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
                     }
 
                     HidePopup();
-                    MainWindow.Instance.ChangeVisibility();
+                    mainWindow.ChangeVisibility();
                 }
                 else
                 {
@@ -1696,7 +1697,7 @@ internal sealed partial class PopupWindow : IDisposable
                 ShowAddNameWindow(false);
             }
 
-            PopupWindowUtils.PopupAutoHideTimer.Start();
+            mainWindow.PopupAutoHideTimer.Start();
         }
     }
 
@@ -1704,6 +1705,7 @@ internal sealed partial class PopupWindow : IDisposable
     {
         if (DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready)
         {
+            MainWindow mainWindow = MainWindow.Instance;
             if (!MiningMode)
             {
                 if (PopupIndex > 0)
@@ -1715,18 +1717,18 @@ internal sealed partial class PopupWindow : IDisposable
 
                 else
                 {
-                    MainWindow.Instance.ShowAddWordWindow();
+                    mainWindow.ShowAddWordWindow();
                 }
 
                 if (PopupIndex is 0)
                 {
                     if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
                     {
-                        MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                        mainWindow.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
                     }
 
                     HidePopup();
-                    MainWindow.Instance.ChangeVisibility();
+                    mainWindow.ChangeVisibility();
                 }
                 else
                 {
@@ -1739,7 +1741,7 @@ internal sealed partial class PopupWindow : IDisposable
                 ShowAddWordWindow(false);
             }
 
-            PopupWindowUtils.PopupAutoHideTimer.Start();
+            mainWindow.PopupAutoHideTimer.Start();
         }
     }
 
@@ -2105,11 +2107,12 @@ internal sealed partial class PopupWindow : IDisposable
             childPopupWindow.HidePopup();
         }
 
+        MainWindow mainWindow = MainWindow.Instance;
         if (MiningMode)
         {
             if (childPopupWindow is null || childPopupWindow.Opacity is 0)
             {
-                PopupWindowUtils.PopupAutoHideTimer.Stop();
+                mainWindow.PopupAutoHideTimer.Stop();
             }
 
             return;
@@ -2125,11 +2128,11 @@ internal sealed partial class PopupWindow : IDisposable
         {
             if (configManager.AutoPauseOrResumeMpvOnHoverChange)
             {
-                MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                mainWindow.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
             }
 
             HidePopup();
-            MainWindow.Instance.ChangeVisibility();
+            mainWindow.ChangeVisibility();
         }
         else
         {
@@ -2234,13 +2237,14 @@ internal sealed partial class PopupWindow : IDisposable
                     || AddWordWindow.IsItVisible()
                     || AddNameWindow.IsItVisible())
                 {
-                    PopupWindowUtils.PopupAutoHideTimer.Stop();
+                    MainWindow.Instance.PopupAutoHideTimer.Stop();
                 }
 
                 else if (childPopupWindow is null || childPopupWindow.Opacity is 0)
                 {
-                    PopupWindowUtils.PopupAutoHideTimer.Stop();
-                    PopupWindowUtils.PopupAutoHideTimer.Start();
+                    MainWindow mainWindow = MainWindow.Instance;
+                    mainWindow.PopupAutoHideTimer.Stop();
+                    mainWindow.PopupAutoHideTimer.Start();
                 }
             }
         }
@@ -2459,7 +2463,7 @@ internal sealed partial class PopupWindow : IDisposable
                     && !AddWordWindow.IsItVisible()
                     && !AddNameWindow.IsItVisible())
                 {
-                    PopupWindowUtils.PopupAutoHideTimer.Start();
+                    MainWindow.Instance.PopupAutoHideTimer.Start();
                 }
             }
         }
@@ -2467,8 +2471,8 @@ internal sealed partial class PopupWindow : IDisposable
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        _lookupDelayTimer.Enabled = false;
-        _enableMiningModeTimer.Enabled = false;
+        _lookupDelayTimer.IsEnabled = false;
+        _enableMiningModeTimer.IsEnabled = false;
         ReadingSelectionWindow.HideWindow();
         MiningSelectionWindow.CloseWindow();
 
@@ -2534,8 +2538,8 @@ internal sealed partial class PopupWindow : IDisposable
         ReadingSelectionWindow.HideWindow();
         MiningSelectionWindow.CloseWindow();
 
-        _lookupDelayTimer.Enabled = false;
-        _enableMiningModeTimer.Enabled = false;
+        _lookupDelayTimer.IsEnabled = false;
+        _enableMiningModeTimer.IsEnabled = false;
 
         PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];
         bool isFirstPopup = PopupIndex is 0;
@@ -2569,7 +2573,7 @@ internal sealed partial class PopupWindow : IDisposable
             duplicateCheckCancellationTokenSource.Dispose();
         }
 
-        PopupWindowUtils.PopupAutoHideTimer.Stop();
+        MainWindow.Instance.PopupAutoHideTimer.Stop();
 
         Opacity = 0d;
         UpdateLayout();
@@ -2614,8 +2618,8 @@ internal sealed partial class PopupWindow : IDisposable
 
     private void HandleContextMenuOpening()
     {
-        _lookupDelayTimer.Enabled = false;
-        _enableMiningModeTimer.Enabled = false;
+        _lookupDelayTimer.IsEnabled = false;
+        _enableMiningModeTimer.IsEnabled = false;
         _contextMenuIsOpening = true;
         PopupWindowUtils.HidePopups(PopupIndex + 1);
         _contextMenuIsOpening = false;
@@ -2739,7 +2743,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (configManager.AutoHidePopupIfMouseIsNotOverIt)
         {
-            PopupWindowUtils.SetPopupAutoHideTimer();
+            MainWindow.Instance.SetPopupAutoHideTimer();
         }
     }
 
@@ -2776,12 +2780,8 @@ internal sealed partial class PopupWindow : IDisposable
         LastLookupResults = [];
         _dictsWithResults.Clear();
         AllDictionaryTabButton.Click -= DictTypeButtonOnClick;
-
-        _lookupDelayTimer.Elapsed -= LookupDelayTimer_Elapsed;
-        _lookupDelayTimer.Dispose();
-
-        _enableMiningModeTimer.Elapsed -= EnableMiningModeTimer_Elapsed;
-        _enableMiningModeTimer.Dispose();
+        _lookupDelayTimer.Tick -= LookupDelayTimer_Elapsed;
+        _enableMiningModeTimer.Tick -= EnableMiningModeTimer_Elapsed;
 
         if (_duplicateCheckCancellationTokenSource is not null)
         {

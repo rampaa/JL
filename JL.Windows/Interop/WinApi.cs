@@ -405,10 +405,10 @@ internal static partial class WinApi
             {
                 s_clipboardSequenceNo = clipboardSequenceNo;
 
-                _ = Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.Background, static () =>
+                _ = Application.Current?.Dispatcher.BeginInvoke(static () =>
                 {
                     MainWindow.Instance.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedly");
-                });
+                }, DispatcherPriority.Normal);
 
                 handled = true;
             }
@@ -421,10 +421,10 @@ internal static partial class WinApi
             {
                 KeyGesture keyGesture = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.GetAt(keyGestureId).Value;
 
-                _ = Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
+                _ = Application.Current?.Dispatcher.BeginInvoke(() =>
                 {
                     KeyGestureUtils.HandleHotKey(keyGesture).SafeFireAndForget("HandleHotKey failed unexpectedly");
-                });
+                }, DispatcherPriority.Input);
 
                 handled = true;
             }

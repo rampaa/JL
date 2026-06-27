@@ -379,7 +379,7 @@ internal static class WindowsUtils
             Application? application = Application.Current;
             if (application is not null)
             {
-                await application.Dispatcher.Invoke(static () => MainWindow.Instance.HandleAppClosing()).ConfigureAwait(false);
+                await application.Dispatcher.BeginInvoke(MainWindow.Instance.HandleAppClosing, DispatcherPriority.Send).Task.ConfigureAwait(true);
 
                 using Process? process = Process.Start(new ProcessStartInfo
                 {
@@ -389,7 +389,7 @@ internal static class WindowsUtils
                     UseShellExecute = true
                 });
 
-                await application.Dispatcher.InvokeAsync(application.Shutdown, DispatcherPriority.Send);
+                await application.Dispatcher.BeginInvoke(application.Shutdown, DispatcherPriority.Send).Task.ConfigureAwait(false);
             }
         }
 
@@ -409,21 +409,21 @@ internal static class WindowsUtils
             Application? application = Application.Current;
             if (application is not null)
             {
-                application.Dispatcher.Invoke(static () =>
+                await application.Dispatcher.BeginInvoke(static () =>
                 {
                     PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
-                });
+                }, DispatcherPriority.Render).Task.ConfigureAwait(false);
 
                 await Task.Run(static () => NetworkUtils.CheckForJLUpdates(true)).ConfigureAwait(false);
 
-                application.Dispatcher.Invoke(static () =>
+                await application.Dispatcher.BeginInvoke(static () =>
                 {
                     PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
                     if (!PreferencesWindow.Instance.IsVisible)
                     {
                         PreferencesWindow.Instance.Close();
                     }
-                });
+                }, DispatcherPriority.Render).Task.ConfigureAwait(false);
             }
         }
     }
@@ -603,7 +603,7 @@ internal static class WindowsUtils
             return;
         }
 
-        _ = application.Dispatcher.InvokeAsync(async () =>
+        _ = application.Dispatcher.BeginInvoke(async () =>
         {
             List<AlertWindow> alertWindowList = application.Windows.OfType<AlertWindow>().ToList();
 
@@ -620,7 +620,7 @@ internal static class WindowsUtils
 
             await Task.Delay(4004).ConfigureAwait(true);
             alertWindow.Close();
-        });
+        }, DispatcherPriority.Render);
     }
 
     private static double MeasureTextWidth(double fontSize, string text)
@@ -862,39 +862,39 @@ internal static class WindowsUtils
         });
     }
 
-    public static Task<byte[]?> GetImageFromClipboardAsByteArray()
+    public static async Task<byte[]?> GetImageFromClipboardAsByteArray()
     {
         Application? application = Application.Current;
         return application is null
-            ? Task.FromResult<byte[]?>(null)
-            : application.Dispatcher.Invoke(static async () =>
-        {
-            while (Clipboard.ContainsImage())
+            ? null
+            : await application.Dispatcher.InvokeAsync(static async () =>
             {
-                try
+                while (Clipboard.ContainsImage())
                 {
-                    BitmapSource? image = Clipboard.GetImage();
-                    if (image is null)
+                    try
                     {
-                        return null;
+                        BitmapSource? image = Clipboard.GetImage();
+                        if (image is null)
+                        {
+                            return null;
+                        }
+
+                        PngBitmapEncoder pngBitmapEncoder = new();
+                        pngBitmapEncoder.Frames.Add(BitmapFrame.Create(image));
+
+                        using MemoryStream stream = new();
+                        pngBitmapEncoder.Save(stream);
+                        return stream.ToArray();
                     }
-
-                    PngBitmapEncoder pngBitmapEncoder = new();
-                    pngBitmapEncoder.Frames.Add(BitmapFrame.Create(image));
-
-                    using MemoryStream stream = new();
-                    pngBitmapEncoder.Save(stream);
-                    return stream.ToArray();
+                    catch (Exception ex)
+                    {
+                        LoggerManager.Logger.Warning(ex, "GetImageFromClipboard failed");
+                        await Task.Delay(5).ConfigureAwait(true);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    LoggerManager.Logger.Warning(ex, "GetImageFromClipboard failed");
-                    await Task.Delay(5).ConfigureAwait(true);
-                }
-            }
 
-            return null;
-        });
+                return null;
+            }, DispatcherPriority.Normal).Task.Unwrap().ConfigureAwait(false);
     }
 
     public static bool ShowYesNoDialog(string text, string caption, Window owner)
@@ -926,12 +926,13 @@ internal static class WindowsUtils
                     }
 
                     return HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
-                });
+                }, DispatcherPriority.Render).Task.ConfigureAwait(false);
             }
             else
             {
                 Application? application = Application.Current;
-                return application is not null && await application.Dispatcher.InvokeAsync(() => HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes);
+                return application is not null
+                    && await application.Dispatcher.InvokeAsync(() => HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes, DispatcherPriority.Render).Task.ConfigureAwait(false);
             }
         }
         finally
@@ -948,7 +949,7 @@ internal static class WindowsUtils
         {
             if (owner is not null)
             {
-                await owner.Dispatcher.InvokeAsync(() =>
+                await owner.Dispatcher.BeginInvoke(() =>
                 {
                     if (owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false } && PresentationSource.FromVisual(owner) is not null)
                     {
@@ -966,17 +967,17 @@ internal static class WindowsUtils
                     {
                         _ = HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
                     }
-                });
+                }, DispatcherPriority.Render).Task.ConfigureAwait(false);
             }
             else
             {
                 Application? application = Application.Current;
                 if (application is not null)
                 {
-                    await application.Dispatcher.InvokeAsync(() =>
+                    await application.Dispatcher.BeginInvoke(() =>
                     {
                         _ = HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-                    });
+                    }, DispatcherPriority.Render).Task.ConfigureAwait(false);
                 }
             }
         }
@@ -986,19 +987,22 @@ internal static class WindowsUtils
         }
     }
 
-    public static Window? GetVisibleOwnedWindowOrOwner(Window owner)
+    public static async Task<Window?> GetVisibleOwnedWindowOrOwner(Window owner)
     {
-        return Application.Current?.Dispatcher.Invoke(() =>
-        {
-            Window? candidate = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Owner == owner
-                && w is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
-                && PresentationSource.FromVisual(w) is not null);
+        Application? application = Application.Current;
+        return application is null
+            ? null
+            : await application.Dispatcher.InvokeAsync(() =>
+            {
+                Window? candidate = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.Owner == owner
+                    && w is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
+                    && PresentationSource.FromVisual(w) is not null);
 
-            return candidate ?? (owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
-                                 && PresentationSource.FromVisual(owner) is not null
-                ? owner
-                : null);
-        });
+                return candidate ?? (owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false }
+                                     && PresentationSource.FromVisual(owner) is not null
+                    ? owner
+                    : null);
+            }, DispatcherPriority.Normal).Task.ConfigureAwait(false);
     }
 
     public static void UpdatePositionForSelectionWindows(Window window, nint windowHandle, Point cursorPosition)
@@ -1167,11 +1171,6 @@ internal static class WindowsUtils
     public static ImageInfo? GetImageInfo(string imagePath)
     {
         string fullImagePath = Path.GetFullPath(imagePath, AppInfo.ApplicationPath);
-        if (!File.Exists(fullImagePath))
-        {
-            return null;
-        }
-
         try
         {
             using FileStream imageStream = File.OpenRead(fullImagePath);
@@ -1183,12 +1182,5 @@ internal static class WindowsUtils
             LoggerManager.Logger.Warning(ex, "Failed to read image dimensions for '{ImagePath}'", fullImagePath);
             return null;
         }
-    }
-
-    public static bool UseMagpiePositioning(Window window)
-    {
-        DpiScale dpi = Dpi;
-        return MagpieUtils.IsMagpieScaling()
-            && window.Dispatcher.Invoke(() => MagpieUtils.MagpieWindowRect.IntersectsWith(new Rect(window.Left * dpi.DpiScaleX, window.Top * dpi.DpiScaleY, window.Width * dpi.DpiScaleX, window.Height * dpi.DpiScaleY)));
     }
 }

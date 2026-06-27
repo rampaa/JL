@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -37,7 +36,6 @@ using Microsoft.Win32;
 using Point = System.Windows.Point;
 using Rectangle = System.Drawing.Rectangle;
 using Screen = System.Windows.Forms.Screen;
-using Timer = System.Timers.Timer;
 
 namespace JL.Windows.GUI;
 
@@ -56,8 +54,10 @@ internal sealed partial class MainWindow : IDisposable
     private Point _swipeStartPoint;
     private readonly InputMethod? _input = InputMethod.Current;
     private Point _lastMouseMovePosition;
-    private readonly Timer _lookupDelayTimer;
-    private readonly Timer _tsukikageLookupDelayTimer;
+    private readonly DispatcherTimer _lookupDelayTimer;
+    private readonly DispatcherTimer _tsukikageLookupDelayTimer;
+    public DispatcherTimer PopupAutoHideTimer { get; }
+
     private int _lastCharPosition = -1;
 
     private string? _webSocketTextToProcess;
@@ -83,19 +83,14 @@ internal sealed partial class MainWindow : IDisposable
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow(0);
 
-        _lookupDelayTimer = new Timer
-        {
-            AutoReset = false,
-            Enabled = false
-        };
-        _lookupDelayTimer.Elapsed += LookupDelayTimer_Elapsed;
+        _lookupDelayTimer = new DispatcherTimer();
+        _lookupDelayTimer.Tick += LookupDelayTimer_Elapsed;
 
-        _tsukikageLookupDelayTimer = new Timer
-        {
-            AutoReset = false,
-            Enabled = false
-        };
-        _tsukikageLookupDelayTimer.Elapsed += TsukikageLookupDelayTimer_Elapsed;
+        _tsukikageLookupDelayTimer = new DispatcherTimer();
+        _tsukikageLookupDelayTimer.Tick += TsukikageLookupDelayTimer_Elapsed;
+
+        PopupAutoHideTimer = new DispatcherTimer();
+        PopupAutoHideTimer.Tick += PopupAutoHideTimerEvent;
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -157,22 +152,31 @@ internal sealed partial class MainWindow : IDisposable
 
     private async Task<bool> CopyFromClipboard()
     {
-        while (Clipboard.ContainsText())
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        try
         {
-            try
+            while (Clipboard.ContainsText())
             {
-                string text = Clipboard.GetText();
-                WindowsUtils.LastWebSocketTextWasVertical = false;
-                return CopyText(text);
+                try
+                {
+                    string text = Clipboard.GetText();
+                    WindowsUtils.LastWebSocketTextWasVertical = false;
+                    return CopyText(text);
+                }
+                catch (ExternalException ex)
+                {
+                    LoggerManager.Logger.Warning(ex, "CopyFromClipboard failed");
+                    await Task.Delay(5).ConfigureAwait(true);
+                }
             }
-            catch (ExternalException ex)
-            {
-                LoggerManager.Logger.Warning(ex, "CopyFromClipboard failed");
-                await Task.Delay(5).ConfigureAwait(true);
-            }
-        }
 
-        return false;
+            return false;
+        }
+        finally
+        {
+            stopwatch.Stop();
+            Debug.WriteLine(stopwatch.ElapsedMilliseconds);
+        }
     }
 
     public async Task CopyFromWebSocket(string text, bool tsukikage)
@@ -258,7 +262,7 @@ internal sealed partial class MainWindow : IDisposable
                     {
                         InitDelayedLookup(charIndex);
                     }
-                }, DispatcherPriority.Send).Task.ConfigureAwait(true);
+                }, DispatcherPriority.Normal).Task.ConfigureAwait(true);
             }
         }
         finally
@@ -288,8 +292,8 @@ internal sealed partial class MainWindow : IDisposable
                 }
             }
 
-            _lookupDelayTimer.Enabled = false;
-            _tsukikageLookupDelayTimer.Enabled = false;
+            _lookupDelayTimer.IsEnabled = false;
+            _tsukikageLookupDelayTimer.IsEnabled = false;
 
             return false;
         }
@@ -325,8 +329,8 @@ internal sealed partial class MainWindow : IDisposable
 
             if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
             {
-                _lookupDelayTimer.Enabled = false;
-                _tsukikageLookupDelayTimer.Enabled = false;
+                _lookupDelayTimer.IsEnabled = false;
+                _tsukikageLookupDelayTimer.IsEnabled = false;
                 MainTextBox.Text = BacklogUtils.LastItem;
                 UpdatePosition();
             }
@@ -348,8 +352,8 @@ internal sealed partial class MainWindow : IDisposable
                 {
                     if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
                     {
-                        _lookupDelayTimer.Enabled = false;
-                        _tsukikageLookupDelayTimer.Enabled = false;
+                        _lookupDelayTimer.IsEnabled = false;
+                        _tsukikageLookupDelayTimer.IsEnabled = false;
                         MainTextBox.Text = BacklogUtils.LastItem;
                     }
 
@@ -384,8 +388,8 @@ internal sealed partial class MainWindow : IDisposable
             }
         }
 
-        _lookupDelayTimer.Enabled = false;
-        _tsukikageLookupDelayTimer.Enabled = false;
+        _lookupDelayTimer.IsEnabled = false;
+        _tsukikageLookupDelayTimer.IsEnabled = false;
         bool backlogActive = configManager.MaxBacklogCapacity is not 0;
         mergeTexts = mergeTexts && subsequentText is not null;
         bool doNotShowAllBacklog = !backlogActive || !configManager.AlwaysShowBacklog;
@@ -565,15 +569,15 @@ internal sealed partial class MainWindow : IDisposable
 
         if (charPosition != _lastCharPosition)
         {
-            _tsukikageLookupDelayTimer.Enabled = false;
+            _tsukikageLookupDelayTimer.IsEnabled = false;
             _lastCharPosition = charPosition;
-            _tsukikageLookupDelayTimer.Interval = ConfigManager.Instance.MainWindowLookupDelay;
-            _tsukikageLookupDelayTimer.Enabled = true;
+            _tsukikageLookupDelayTimer.Interval = TimeSpan.FromMilliseconds(ConfigManager.Instance.MainWindowLookupDelay);
+            _tsukikageLookupDelayTimer.IsEnabled = true;
         }
-        else if (FirstPopupWindow.Opacity is 0 && !_tsukikageLookupDelayTimer.Enabled)
+        else if (FirstPopupWindow.Opacity is 0 && !_tsukikageLookupDelayTimer.IsEnabled)
         {
-            _tsukikageLookupDelayTimer.Interval = ConfigManager.Instance.MainWindowLookupDelay;
-            _tsukikageLookupDelayTimer.Enabled = true;
+            _tsukikageLookupDelayTimer.Interval = TimeSpan.FromMilliseconds(ConfigManager.Instance.MainWindowLookupDelay);
+            _tsukikageLookupDelayTimer.IsEnabled = true;
         }
     }
 
@@ -582,7 +586,7 @@ internal sealed partial class MainWindow : IDisposable
         int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
         if (charPosition < 0)
         {
-            _lookupDelayTimer.Enabled = false;
+            _lookupDelayTimer.IsEnabled = false;
             _lastCharPosition = charPosition;
             FirstPopupWindow.HidePopup();
             return;
@@ -595,26 +599,28 @@ internal sealed partial class MainWindow : IDisposable
 
         if (charPosition != _lastCharPosition)
         {
-            _lookupDelayTimer.Enabled = false;
+            _lookupDelayTimer.IsEnabled = false;
             _lastCharPosition = charPosition;
-            _lookupDelayTimer.Interval = ConfigManager.Instance.MainWindowLookupDelay;
-            _lookupDelayTimer.Enabled = true;
+            _lookupDelayTimer.Interval = TimeSpan.FromMilliseconds(ConfigManager.Instance.MainWindowLookupDelay);
+            _lookupDelayTimer.IsEnabled = true;
         }
-        else if (FirstPopupWindow.Opacity is 0 && !_lookupDelayTimer.Enabled)
+        else if (FirstPopupWindow.Opacity is 0 && !_lookupDelayTimer.IsEnabled)
         {
-            _lookupDelayTimer.Interval = ConfigManager.Instance.MainWindowLookupDelay;
-            _lookupDelayTimer.Enabled = true;
+            _lookupDelayTimer.Interval = TimeSpan.FromMilliseconds(ConfigManager.Instance.MainWindowLookupDelay);
+            _lookupDelayTimer.IsEnabled = true;
         }
     }
 
-    private void LookupDelayTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    private void LookupDelayTimer_Elapsed(object? sender, EventArgs e)
     {
-        Dispatcher.Invoke(HandleDelayedLookup);
+        _lookupDelayTimer.Stop();
+        HandleDelayedLookup();
     }
 
-    private async void TsukikageLookupDelayTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    private async void TsukikageLookupDelayTimer_Elapsed(object? sender, EventArgs e)
     {
-        await Dispatcher.Invoke(HandleDelayedLookupForTsukikage).ConfigureAwait(false);
+        _tsukikageLookupDelayTimer.Stop();
+        await HandleDelayedLookupForTsukikage().ConfigureAwait(false);
     }
 
     // ReSharper disable once AsyncVoidMethod
@@ -1636,8 +1642,8 @@ internal sealed partial class MainWindow : IDisposable
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        _lookupDelayTimer.Enabled = false;
-        _tsukikageLookupDelayTimer.Enabled = false;
+        _lookupDelayTimer.IsEnabled = false;
+        _tsukikageLookupDelayTimer.IsEnabled = false;
 
         if (e.ChangedButton == ConfigManager.Instance.MiningModeMouseButton && FirstPopupWindow is { Opacity: not 0, MiningMode: false })
         {
@@ -1774,39 +1780,35 @@ internal sealed partial class MainWindow : IDisposable
         }
     }
 
-    private void DisplaySettingsChanged(object? sender, EventArgs e)
+    private async void DisplaySettingsChanged(object? sender, EventArgs e)
     {
-        HandleDisplaySettingsChange();
+        await Dispatcher.BeginInvoke(HandleDisplaySettingsChange, DispatcherPriority.Background).Task.ConfigureAwait(false);
     }
 
     private void HandleDisplaySettingsChange()
     {
         ConfigManager configManager = ConfigManager.Instance;
+        Screen previousActiveScreen = WindowsUtils.ActiveScreen;
 
-        _ = Dispatcher.Invoke(DispatcherPriority.Background, () =>
+        WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
+        DpiScale dpi = VisualTreeHelper.GetDpi(this);
+        WindowsUtils.Dpi = dpi;
+        WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * dpi.DpiScaleY;
+        WindowsUtils.DpiAwareXOffsetForVerticalText = configManager.PopupXOffsetForVerticalText * dpi.DpiScaleX;
+        WindowsUtils.DpiAwareYOffsetForVerticalText = configManager.PopupYOffsetForVerticalText * dpi.DpiScaleY;
+
+        Rectangle previousScreenBonds = previousActiveScreen.Bounds;
+        Rectangle currentScreenBounds = WindowsUtils.ActiveScreen.Bounds;
+        if (Math.Abs(previousScreenBonds.Width - currentScreenBounds.Width) <= 1 && Math.Abs(previousScreenBonds.Height - currentScreenBounds.Height) <= 1)
         {
-            Screen previousActiveScreen = WindowsUtils.ActiveScreen;
+            return;
+        }
 
-            WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
-            DpiScale dpi = VisualTreeHelper.GetDpi(this);
-            WindowsUtils.Dpi = dpi;
-            WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * dpi.DpiScaleX;
-            WindowsUtils.DpiAwareYOffset = configManager.PopupYOffset * dpi.DpiScaleY;
-            WindowsUtils.DpiAwareXOffsetForVerticalText = configManager.PopupXOffsetForVerticalText * dpi.DpiScaleX;
-            WindowsUtils.DpiAwareYOffsetForVerticalText = configManager.PopupYOffsetForVerticalText * dpi.DpiScaleY;
+        DpiScale previousDpi = s_previousDpi ?? dpi;
+        s_previousDpi = null;
 
-            Rectangle previousScreenBonds = previousActiveScreen.Bounds;
-            Rectangle currentScreenBounds = WindowsUtils.ActiveScreen.Bounds;
-            if (Math.Abs(previousScreenBonds.Width - currentScreenBounds.Width) <= 1 && Math.Abs(previousScreenBonds.Height - currentScreenBounds.Height) <= 1)
-            {
-                return;
-            }
-
-            DpiScale previousDpi = s_previousDpi ?? dpi;
-            s_previousDpi = null;
-
-            AdjustWindowsSize(previousActiveScreen, previousDpi);
-        });
+        AdjustWindowsSize(previousActiveScreen, previousDpi);
     }
 
     private void Window_DpiChanged(object sender, DpiChangedEventArgs e)
@@ -1964,7 +1966,7 @@ internal sealed partial class MainWindow : IDisposable
         if (e.ClickCount is 2)
         {
             DpiScale dpi = WindowsUtils.Dpi;
-            bool useMagpiePositioning = WindowsUtils.UseMagpiePositioning(this);
+            bool useMagpiePositioning = MagpieUtils.UseMagpiePositioning();
             Rect referenceWindowRect = !useMagpiePositioning
                 ? WindowsUtils.ActiveScreen.WorkingArea.ToRect()
                 : MagpieUtils.MagpieWindowRect;
@@ -2015,8 +2017,8 @@ internal sealed partial class MainWindow : IDisposable
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        _lookupDelayTimer.Enabled = false;
-        _tsukikageLookupDelayTimer.Enabled = false;
+        _lookupDelayTimer.IsEnabled = false;
+        _tsukikageLookupDelayTimer.IsEnabled = false;
 
         ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating);
@@ -2320,8 +2322,8 @@ internal sealed partial class MainWindow : IDisposable
 
     private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        _lookupDelayTimer.Enabled = false;
-        _tsukikageLookupDelayTimer.Enabled = false;
+        _lookupDelayTimer.IsEnabled = false;
+        _tsukikageLookupDelayTimer.IsEnabled = false;
 
         if (FirstPopupWindow.Opacity is not 0)
         {
@@ -2345,7 +2347,7 @@ internal sealed partial class MainWindow : IDisposable
             double newTop = currentTop;
             if (configManager is { RepositionMainWindowOnTextChangeByBottomPosition: true, MainWindowDynamicHeight: true })
             {
-                newTop = GetDynamicYPosition(configManager.MainWindowFixedBottomPosition, WindowsUtils.UseMagpiePositioning(this));
+                newTop = GetDynamicYPosition(configManager.MainWindowFixedBottomPosition, MagpieUtils.UseMagpiePositioning());
             }
 
             double currentLeft = Left * dpi.DpiScaleX;
@@ -2642,12 +2644,76 @@ internal sealed partial class MainWindow : IDisposable
         HandleTextBoxReadOnlyToggle();
     }
 
+    public void PopupAutoHideTimerEvent(object? sender, EventArgs e)
+    {
+        PopupAutoHideTimer.Stop();
+
+        PopupWindow? hoveredPopup = null;
+        PopupWindow? currentPopupWindow = PopupWindowUtils.PopupWindows[0];
+        while (currentPopupWindow is not null)
+        {
+            if (currentPopupWindow.IsMouseOver)
+            {
+                hoveredPopup = currentPopupWindow;
+                break;
+            }
+
+            currentPopupWindow = PopupWindowUtils.PopupWindows[currentPopupWindow.PopupIndex + 1];
+        }
+
+        bool hidPopup = false;
+        if (hoveredPopup is null)
+        {
+            PopupWindow firstPopupWindow = FirstPopupWindow;
+            if (firstPopupWindow.Opacity is not 0)
+            {
+                TextBox textBox = MainTextBox;
+                PopupWindow? childPopup = PopupWindowUtils.PopupWindows[firstPopupWindow.PopupIndex + 1];
+                if ((childPopup is not null && childPopup.Opacity is not 0)
+                    || firstPopupWindow.CurrentSourceTextCharPosition != textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false))
+                {
+                    PopupWindowUtils.HidePopups(firstPopupWindow.PopupIndex);
+                    hidPopup = true;
+                }
+            }
+        }
+
+        else
+        {
+            PopupWindow? popupWindow = PopupWindowUtils.PopupWindows[hoveredPopup.PopupIndex + 1];
+            if (popupWindow is not null)
+            {
+                if (popupWindow.Opacity is not 0)
+                {
+                    PopupWindow? childPopup = PopupWindowUtils.PopupWindows[popupWindow.PopupIndex + 1];
+                    TextBox? textBox = popupWindow.PreviousTextBox;
+                    if ((childPopup is not null && childPopup.Opacity is not 0)
+                        || popupWindow.CurrentSourceTextCharPosition != (textBox?.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false) ?? -1))
+                    {
+                        PopupWindowUtils.HidePopups(popupWindow.PopupIndex);
+                        hidPopup = true;
+                    }
+                }
+            }
+        }
+
+        if (!hidPopup && !PopupAutoHideTimer.IsEnabled)
+        {
+            PopupAutoHideTimer.IsEnabled = true;
+        }
+    }
+
+    public void SetPopupAutoHideTimer()
+    {
+        PopupAutoHideTimer.Interval = TimeSpan.FromMilliseconds(ConfigManager.Instance.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds);
+        PopupAutoHideTimer.IsEnabled = true;
+    }
+
     public void Dispose()
     {
-        _lookupDelayTimer.Elapsed -= LookupDelayTimer_Elapsed;
-        _lookupDelayTimer.Dispose();
-
-        _tsukikageLookupDelayTimer.Elapsed -= TsukikageLookupDelayTimer_Elapsed;
-        _tsukikageLookupDelayTimer.Dispose();
+        _lookupDelayTimer.Tick -= LookupDelayTimer_Elapsed;
+        _tsukikageLookupDelayTimer.Tick -= TsukikageLookupDelayTimer_Elapsed;
+        PopupAutoHideTimer.Tick -= PopupAutoHideTimerEvent;
+        SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
     }
 }

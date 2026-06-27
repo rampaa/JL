@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Windows.Media;
+using System.Windows.Threading;
 using JL.Core.Dicts;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
@@ -11,7 +12,7 @@ internal static class DictOptionManager
     public static Brush POrthographyInfoColor { get; set; } = ConfigManager.Instance.PrimarySpellingColor;
     public static Brush PitchAccentMarkerColor { get; set; } = Brushes.DeepSkyBlue;
 
-    public static void ApplyDictOptions()
+    public static async Task ApplyDictOptions()
     {
         Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
 
@@ -26,7 +27,7 @@ internal static class DictOptionManager
             PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorString);
 
             Debug.Assert(pitchAccentDict.Options.ShowPitchAccentWithDottedLines is not null);
-            MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetPitchAccentMarkerPen(pitchAccentDict.Options.ShowPitchAccentWithDottedLines.Value, PitchAccentMarkerColor));
+            await MainWindow.Instance.Dispatcher.BeginInvoke(() => PopupWindowUtils.SetPitchAccentMarkerPen(pitchAccentDict.Options.ShowPitchAccentWithDottedLines.Value, PitchAccentMarkerColor), DispatcherPriority.Send).Task.ConfigureAwait(false);
         }
         else
         {

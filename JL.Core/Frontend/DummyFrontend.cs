@@ -17,9 +17,7 @@ internal sealed class DummyFrontend : IFrontend
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => Task.CompletedTask;
 
-    public void ApplyDictOptions()
-    {
-    }
+    public Task ApplyDictOptions() => Task.CompletedTask;
 
     public Task CopyFromWebSocket(string text, bool tsukikage) => Task.CompletedTask;
 

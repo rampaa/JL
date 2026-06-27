@@ -2,7 +2,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using JL.Windows.External.Magpie;
-using JL.Windows.GUI;
 using Encoder = System.Drawing.Imaging.Encoder;
 using Rectangle = System.Drawing.Rectangle;
 
@@ -41,7 +40,7 @@ internal static class ScreenshotUtils
             return null;
         }
 
-        bool useMagpiePositioning = WindowsUtils.UseMagpiePositioning(MainWindow.Instance);
+        bool useMagpiePositioning = MagpieUtils.UseMagpiePositioning();
         Rectangle referenceWindowRect = !useMagpiePositioning
             ? WindowsUtils.ActiveScreen.Bounds
             : MagpieUtils.MagpieWindowRect.ToRectangle();

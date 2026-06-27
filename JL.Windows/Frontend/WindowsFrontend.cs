@@ -21,13 +21,13 @@ internal sealed class WindowsFrontend : IFrontend
 
     public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
 
-    public Task<bool> ShowYesNoDialogAsync(string text, string caption) => WindowsUtils.ShowYesNoDialogAsync(text, caption, WindowsUtils.GetVisibleOwnedWindowOrOwner(_mainWindow));
+    public async Task<bool> ShowYesNoDialogAsync(string text, string caption) => await WindowsUtils.ShowYesNoDialogAsync(text, caption, await WindowsUtils.GetVisibleOwnedWindowOrOwner(_mainWindow).ConfigureAwait(true)).ConfigureAwait(false);
 
-    public Task ShowOkDialogAsync(string text, string caption) => WindowsUtils.ShowOkDialogAsync(text, caption, WindowsUtils.GetVisibleOwnedWindowOrOwner(_mainWindow));
+    public async Task ShowOkDialogAsync(string text, string caption) => await WindowsUtils.ShowOkDialogAsync(text, caption, await WindowsUtils.GetVisibleOwnedWindowOrOwner(_mainWindow).ConfigureAwait(true)).ConfigureAwait(false);
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => WindowsUtils.UpdateJL(downloadUrlOfLatestJLRelease);
 
-    public void ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
+    public Task ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
 
     public Task CopyFromWebSocket(string text, bool tsukikage) => _mainWindow.CopyFromWebSocket(text, tsukikage);
 

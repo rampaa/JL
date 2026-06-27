@@ -282,4 +282,11 @@ internal static class MagpieUtils
         s_scaleFactorY = magpieWindowHeight / sourceWindowHeight;
         // SourceWindowHandle = GetSourceWindowHande(lParam);
     }
+
+    public static bool UseMagpiePositioning()
+    {
+        DpiScale dpi = WindowsUtils.Dpi;
+        MainWindow mainWindow = MainWindow.Instance;
+        return IsMagpieScaling() && IntersectsWith(mainWindow.LeftPositionBeforeResolutionChange * dpi.DpiScaleX, mainWindow.TopPositionBeforeResolutionChange * dpi.DpiScaleY, mainWindow.WidthBeforeResolutionChange * dpi.DpiScaleX, mainWindow.HeightBeforeResolutionChange * dpi.DpiScaleY, MagpieWindowRect);
+    }
 }

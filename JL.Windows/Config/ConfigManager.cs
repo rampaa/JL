@@ -496,8 +496,8 @@ internal sealed class ConfigManager
         PopupDictionaryTabFontSize = ConfigDBManager.GetValueFromConfig(connection, configs, PopupDictionaryTabFontSize, nameof(PopupDictionaryTabFontSize));
 
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = ConfigDBManager.GetValueFromConfig(connection, configs, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds));
-        PopupWindowUtils.PopupAutoHideTimer.Enabled = false;
-        PopupWindowUtils.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
+        MainWindow.Instance.PopupAutoHideTimer.IsEnabled = false;
+        MainWindow.Instance.PopupAutoHideTimer.Interval = TimeSpan.FromMilliseconds(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds);
 
         AutoEnableMiningModeForMouseMoveDelayInMilliseconds = ConfigDBManager.GetValueFromConfig(connection, configs, AutoEnableMiningModeForMouseMoveDelayInMilliseconds, nameof(AutoEnableMiningModeForMouseMoveDelayInMilliseconds));
 
