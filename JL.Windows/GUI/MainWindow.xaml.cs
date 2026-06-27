@@ -1308,26 +1308,17 @@ internal sealed partial class MainWindow : IDisposable
             PopupWindowUtils.HidePopups(0);
         }
 
-        if (configManager.Focusable)
+        if (WindowState is WindowState.Minimized)
         {
-            WindowState = WindowState is WindowState.Minimized
-                ? WindowState.Normal
-                : WindowState.Minimized;
+            WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
+            WinApi.RestoreWindow(WindowHandle);
         }
         else
         {
-            if (WindowState is WindowState.Minimized)
+            WinApi.MinimizeWindow(WindowHandle);
+            if (configManager.AutoPauseOrResumeMpvOnHoverChange)
             {
-                WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
-                WinApi.RestoreWindow(WindowHandle);
-            }
-            else
-            {
-                WinApi.MinimizeWindow(WindowHandle);
-                if (configManager.AutoPauseOrResumeMpvOnHoverChange)
-                {
-                    MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
-                }
+                MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
             }
         }
     }
@@ -1442,15 +1433,7 @@ internal sealed partial class MainWindow : IDisposable
         FontSizeSlider.Visibility = Visibility.Collapsed;
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.Focusable)
-        {
-            WindowState = WindowState.Minimized;
-        }
-        else
-        {
-            WinApi.MinimizeWindow(WindowHandle);
-        }
-
+        WinApi.MinimizeWindow(WindowHandle);
         if (configManager.AutoPauseOrResumeMpvOnHoverChange)
         {
             MpvUtils.ResumePlayback().SafeFireAndForget("Unexpected error while resuming playback");
@@ -2568,18 +2551,10 @@ internal sealed partial class MainWindow : IDisposable
             bool isMinimized = WindowState is WindowState.Minimized;
             if (isMinimized)
             {
-
-                if (ConfigManager.Instance.Focusable)
-                {
-                    WindowState = WindowState.Normal;
-                }
-                else
-                {
-                    // If another window is not set as active window
-                    // Main Window gets activated on restore
-                    WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
-                    WinApi.RestoreWindow(WindowHandle);
-                }
+                // If another window is not set as active window
+                // Main Window gets activated on restore
+                WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
+                WinApi.RestoreWindow(WindowHandle);
             }
 
             WinApi.MoveWindowToPosition(WindowHandle, workingArea.X, workingArea.Y);
@@ -2588,14 +2563,7 @@ internal sealed partial class MainWindow : IDisposable
 
             if (isMinimized)
             {
-                if (ConfigManager.Instance.Focusable)
-                {
-                    WindowState = WindowState.Minimized;
-                }
-                else
-                {
-                    WinApi.MinimizeWindow(WindowHandle);
-                }
+                WinApi.MinimizeWindow(WindowHandle);
             }
 
             Opacity = 1d;
