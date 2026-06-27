@@ -1,6 +1,5 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
-using JL.Core.Utilities.Japanese.Mazegaki;
 
 namespace JL.Core.Utilities.Japanese.Mazegaki;
 
