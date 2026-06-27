@@ -4,7 +4,7 @@ using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Japanese;
-using JL.Core.Utilities.Japanese.Okurigana;
+using JL.Core.Utilities.Japanese.Mazegaki;
 
 namespace JL.Core.Dicts.PitchAccent;
 
@@ -47,7 +47,7 @@ internal static class YomichanPitchAccentLoader
                                 _ = DictUtils.AddRecordToDictionary(readingInHiragana, record, pitchDict);
                             }
 
-                            foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(spellingInHiragana, readingInHiragana))
+                            foreach (string variant in MazegakiVariantGenerator.GenerateMixedVariants(spellingInHiragana, readingInHiragana))
                             {
                                 _ = DictUtils.AddRecordToDictionary(variant, record, pitchDict);
                             }

@@ -4,7 +4,7 @@ using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Japanese;
-using JL.Core.Utilities.Japanese.Okurigana;
+using JL.Core.Utilities.Japanese.Mazegaki;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 
@@ -105,7 +105,7 @@ internal static class EpwingNazekaLoader
                                     _ = DictUtils.AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict);
                                 }
 
-                                foreach (string variant in OkuriganaVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
+                                foreach (string variant in MazegakiVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
                                 {
                                     _ = DictUtils.AddRecordToDictionary(variant, record, nazekaEpwingDict);
                                 }

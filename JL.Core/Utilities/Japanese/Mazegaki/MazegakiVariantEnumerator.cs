@@ -1,18 +1,19 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
+using JL.Core.Utilities.Japanese.Mazegaki;
 
-namespace JL.Core.Utilities.Japanese.Okurigana;
+namespace JL.Core.Utilities.Japanese.Mazegaki;
 
-internal ref struct OkuriganaVariantEnumerator
+internal ref struct MazegakiVariantEnumerator
 {
     private readonly string _expression;
     private readonly string _reading;
-    private OkuriganaSegment[]? _segments;
+    private MazegakiSegment[]? _segments;
     private readonly int _segmentCount;
     private ulong _mask;
     private readonly ulong _maxMask;
 
-    public OkuriganaVariantEnumerator(string expression, string reading)
+    public MazegakiVariantEnumerator(string expression, string reading)
     {
         _expression = expression;
         _reading = reading;
@@ -20,9 +21,9 @@ internal ref struct OkuriganaVariantEnumerator
         _segmentCount = 0;
         _mask = 0;
         Current = "";
-        _segments = ArrayPool<OkuriganaSegment>.Shared.Rent(expression.Length * 2);
+        _segments = ArrayPool<MazegakiSegment>.Shared.Rent(expression.Length * 2);
 
-        if (!OkuriganaVariantGenerator.TryGetUniqueSegmentation(_expression, _reading, _segments, out _segmentCount, out int kanjiCount)
+        if (!MazegakiVariantGenerator.TryGetUniqueSegmentation(_expression, _reading, _segments, out _segmentCount, out int kanjiCount)
             || kanjiCount is < 2 or > 63)
         {
             Dispose();
@@ -48,7 +49,7 @@ internal ref struct OkuriganaVariantEnumerator
         }
 
         ++_mask;
-        Current = OkuriganaVariantGenerator.Assemble(_expression, _reading, _segments, _segmentCount, _mask);
+        Current = MazegakiVariantGenerator.Assemble(_expression, _reading, _segments, _segmentCount, _mask);
         return true;
     }
 
@@ -56,7 +57,7 @@ internal ref struct OkuriganaVariantEnumerator
     {
         if (_segments is not null)
         {
-            ArrayPool<OkuriganaSegment>.Shared.Return(_segments);
+            ArrayPool<MazegakiSegment>.Shared.Return(_segments);
             _segments = null;
         }
     }

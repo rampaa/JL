@@ -1,4 +1,4 @@
-namespace JL.Core.Utilities.Japanese.Okurigana;
+namespace JL.Core.Utilities.Japanese.Mazegaki;
 
 internal readonly struct ExpressionRun(int start, int length, bool isKanji) : IEquatable<ExpressionRun>
 {

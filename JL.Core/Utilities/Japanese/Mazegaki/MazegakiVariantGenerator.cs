@@ -2,9 +2,9 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace JL.Core.Utilities.Japanese.Okurigana;
+namespace JL.Core.Utilities.Japanese.Mazegaki;
 
-internal static class OkuriganaVariantGenerator
+internal static class MazegakiVariantGenerator
 {
     private const int StackAllocBytesThreshold = 2048;
     private const int MaxStackRuns = 128;
@@ -15,12 +15,12 @@ internal static class OkuriganaVariantGenerator
         return (mask & (1UL << index)) is not 0;
     }
 
-    public static OkuriganaVariantEnumerable GenerateMixedVariants(string expression, string reading)
+    public static MazegakiVariantEnumerable GenerateMixedVariants(string expression, string reading)
     {
-        return new OkuriganaVariantEnumerable(expression, reading);
+        return new MazegakiVariantEnumerable(expression, reading);
     }
 
-    public static bool TryGetUniqueSegmentation(ReadOnlySpan<char> expression, ReadOnlySpan<char> reading, Span<OkuriganaSegment> segments, out int count, out int kanjiCount)
+    public static bool TryGetUniqueSegmentation(ReadOnlySpan<char> expression, ReadOnlySpan<char> reading, Span<MazegakiSegment> segments, out int count, out int kanjiCount)
     {
         count = 0;
         kanjiCount = 0;
@@ -66,7 +66,7 @@ internal static class OkuriganaVariantGenerator
         ReadOnlySpan<char> reading,
         ReadOnlySpan<ExpressionRun> runs,
         Span<byte> ways,
-        Span<OkuriganaSegment> segments,
+        Span<MazegakiSegment> segments,
         out int segmentCount,
         out int kanjiCount)
     {
@@ -132,7 +132,7 @@ internal static class OkuriganaVariantGenerator
                 {
                     if (nextRow[readingEnd] is 1)
                     {
-                        segments[segmentCount] = new OkuriganaSegment(run.Start, run.Length, currentReadingIndex, readingEnd - currentReadingIndex, true);
+                        segments[segmentCount] = new MazegakiSegment(run.Start, run.Length, currentReadingIndex, readingEnd - currentReadingIndex, true);
 
                         ++segmentCount;
                         currentReadingIndex = readingEnd;
@@ -143,7 +143,7 @@ internal static class OkuriganaVariantGenerator
             }
             else
             {
-                segments[segmentCount] = new OkuriganaSegment(run.Start, run.Length, currentReadingIndex, run.Length, false);
+                segments[segmentCount] = new MazegakiSegment(run.Start, run.Length, currentReadingIndex, run.Length, false);
                 ++segmentCount;
                 currentReadingIndex += run.Length;
             }
@@ -181,14 +181,14 @@ internal static class OkuriganaVariantGenerator
         return runCount;
     }
 
-    public static string Assemble(string expression, string reading, OkuriganaSegment[] segments, int segmentCount, ulong mask)
+    public static string Assemble(string expression, string reading, MazegakiSegment[] segments, int segmentCount, ulong mask)
     {
         int finalLength = 0;
         int bitIndex = 0;
 
         for (int i = 0; i < segmentCount; i++)
         {
-            ref readonly OkuriganaSegment segment = ref segments[i];
+            ref readonly MazegakiSegment segment = ref segments[i];
             if (segment.IsKanji)
             {
                 finalLength += IsBitSet(mask, bitIndex)
@@ -210,7 +210,7 @@ internal static class OkuriganaVariantGenerator
 
             for (int i = 0; i < state.segmentCount; i++)
             {
-                ref readonly OkuriganaSegment segment = ref state.segments[i];
+                ref readonly MazegakiSegment segment = ref state.segments[i];
                 ReadOnlySpan<char> source;
 
                 if (segment.IsKanji)
