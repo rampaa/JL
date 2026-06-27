@@ -408,7 +408,7 @@ internal static partial class WinApi
                 _ = Application.Current?.Dispatcher.BeginInvoke(static () =>
                 {
                     MainWindow.Instance.ClipboardChanged().SafeFireAndForget("ClipboardChanged failed unexpectedly");
-                }, DispatcherPriority.Normal);
+                }, DispatcherPriority.Send);
 
                 handled = true;
             }

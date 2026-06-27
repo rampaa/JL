@@ -83,13 +83,22 @@ internal sealed partial class MainWindow : IDisposable
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow(0);
 
-        _lookupDelayTimer = new DispatcherTimer();
+        _lookupDelayTimer = new DispatcherTimer
+        {
+            IsEnabled = false
+        };
         _lookupDelayTimer.Tick += LookupDelayTimer_Elapsed;
 
-        _tsukikageLookupDelayTimer = new DispatcherTimer();
+        _tsukikageLookupDelayTimer = new DispatcherTimer
+        {
+            IsEnabled = false
+        };
         _tsukikageLookupDelayTimer.Tick += TsukikageLookupDelayTimer_Elapsed;
 
-        PopupAutoHideTimer = new DispatcherTimer();
+        PopupAutoHideTimer = new DispatcherTimer
+        {
+            IsEnabled = false
+        };
         PopupAutoHideTimer.Tick += PopupAutoHideTimerEvent;
     }
 
@@ -262,7 +271,7 @@ internal sealed partial class MainWindow : IDisposable
                     {
                         InitDelayedLookup(charIndex);
                     }
-                }, DispatcherPriority.Normal).Task.ConfigureAwait(true);
+                }, DispatcherPriority.Send).Task.ConfigureAwait(true);
             }
         }
         finally

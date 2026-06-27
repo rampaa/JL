@@ -104,7 +104,7 @@ internal sealed partial class PopupWindow : IDisposable
         };
         _lookupDelayTimer.Tick += LookupDelayTimer_Elapsed;
 
-        _enableMiningModeTimer = new DispatcherTimer()
+        _enableMiningModeTimer = new DispatcherTimer
         {
             IsEnabled = false
         };
