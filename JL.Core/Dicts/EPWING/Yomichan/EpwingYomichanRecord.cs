@@ -18,19 +18,19 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
     public string[]? Definitions { get; }
     public string[]? WordClasses { get; }
     public string[]? DefinitionTags { get; }
-    public string[]? ImagePaths { get; }
+    public ImageInfo[]? ImageInfos { get; }
     //public int Score { get; }
     //public int Sequence { get; }
     //public string[]? TermTags { get; }
 
-    public EpwingYomichanRecord(string primarySpelling, string? reading, string[]? definitions, string[]? wordClasses, string[]? definitionTags, string[]? imagePaths)
+    public EpwingYomichanRecord(string primarySpelling, string? reading, string[]? definitions, string[]? wordClasses, string[]? definitionTags, ImageInfo[]? imageInfo)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
         Definitions = definitions;
         WordClasses = wordClasses;
         DefinitionTags = definitionTags;
-        ImagePaths = imagePaths;
+        ImageInfos = imageInfo;
     }
 
     public string? BuildFormattedDefinition(DictOptions options)
@@ -149,7 +149,7 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
                && other.Definitions.SequenceEqual(Definitions)
-               && other.ImagePaths.SequenceEqual(ImagePaths)));
+               && other.ImageInfos.SequenceEqual(ImageInfos)));
     }
 
     public bool Equals([NotNullWhen(true)] EpwingYomichanRecord? other)
@@ -158,7 +158,7 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
                && other.Definitions.SequenceEqual(Definitions)
-               && other.ImagePaths.SequenceEqual(ImagePaths)));
+               && other.ImageInfos.SequenceEqual(ImageInfos)));
     }
 
     public override int GetHashCode()
@@ -180,11 +180,11 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
                 hash *= 37;
             }
 
-            if (ImagePaths is not null)
+            if (ImageInfos is not null)
             {
-                foreach (string imagePath in ImagePaths)
+                foreach (ImageInfo imagePath in ImageInfos)
                 {
-                    hash = (hash * 37) + imagePath.GetHashCode(StringComparison.Ordinal);
+                    hash = (hash * 37) + imagePath.GetHashCode();
                 }
             }
             else

@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using JL.Core;
 using JL.Core.Config;
+using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
@@ -63,7 +64,7 @@ internal sealed class PopupContentGenerator : Decorator
 
         StackPanel bottom = new();
 
-        bool imagesExist = result.ImagePaths is not null;
+        bool imagesExist = result.ImageInfos is not null;
         Debug.Assert(!imagesExist || (result.Dict.Options.ShowImages is not null && result.Dict.Options.ShowImageAtBottom is not null));
         bool showImagesAtBottom = imagesExist
                                   // ReSharper disable once NullableWarningSuppressionIsUsed
@@ -658,25 +659,24 @@ internal sealed class PopupContentGenerator : Decorator
             maxHeight = Math.Min(maxHeight, maxImageHeightOptionValue);
         }
 
-        Debug.Assert(result.ImagePaths is not null);
-        for (int i = 0; i < result.ImagePaths.Length; i++)
+        Debug.Assert(result.ImageInfos is not null);
+        for (int i = 0; i < result.ImageInfos.Length; i++)
         {
-            string imagePath = Path.GetFullPath(result.ImagePaths[i], AppInfo.ApplicationPath);
+            ImageInfo imageInfo = result.ImageInfos[i];
+            string imagePath = Path.GetFullPath(imageInfo.Path, AppInfo.ApplicationPath);
             Uri imageUri = new(imagePath);
 
             try
             {
-                BitmapFrame frame = BitmapFrame.Create(imageUri, BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
-
                 BitmapImage bitmap = new();
                 bitmap.BeginInit();
                 bitmap.UriSource = imageUri;
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
 
-                if (frame.PixelWidth > maxWidth || frame.PixelHeight > maxHeight)
+                if (imageInfo.Width > maxWidth || imageInfo.Height > maxHeight)
                 {
-                    if ((long)maxWidth * frame.PixelHeight < (long)maxHeight * frame.PixelWidth)
+                    if ((long)maxWidth * imageInfo.Height < (long)maxHeight * imageInfo.Width)
                     {
                         bitmap.DecodePixelWidth = maxWidth;
                     }

@@ -1,3 +1,4 @@
+using JL.Core.Dicts;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Frontend;
@@ -35,6 +36,8 @@ public interface IFrontend
     public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId);
 
     public void PopupDictTypeButtonsNeedUpdating();
+
+    public ImageInfo? GetImageInfo(string imagePath);
 
     public Version JLVersion { get; }
 }

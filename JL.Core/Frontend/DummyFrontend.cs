@@ -1,3 +1,4 @@
+using JL.Core.Dicts;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Frontend;
@@ -49,6 +50,8 @@ internal sealed class DummyFrontend : IFrontend
     public void PopupDictTypeButtonsNeedUpdating()
     {
     }
+
+    public ImageInfo? GetImageInfo(string imagePath) => null;
 
     public Version JLVersion { get; } = new(0, 0, 0);
 }

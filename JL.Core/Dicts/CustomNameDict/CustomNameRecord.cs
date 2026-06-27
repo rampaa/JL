@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Frontend;
 
 namespace JL.Core.Dicts.CustomNameDict;
 
@@ -9,15 +10,15 @@ internal sealed class CustomNameRecord : IDictRecord, IEquatable<CustomNameRecor
     public string? Reading { get; }
     private string NameType { get; }
     private string? ExtraInfo { get; }
-    public string? ImagePath { get; }
+    public ImageInfo? ImageInfo { get; }
 
-    public CustomNameRecord(string primarySpelling, string? reading, string nameType, string? extraInfo, string? imagePath)
+    public CustomNameRecord(string primarySpelling, string? reading, string nameType, string? extraInfo, ImageInfo? imageInfo)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
         NameType = nameType;
         ExtraInfo = extraInfo;
-        ImagePath = imagePath;
+        ImageInfo = imageInfo;
     }
 
     public string BuildFormattedDefinition()
@@ -27,12 +28,12 @@ internal sealed class CustomNameRecord : IDictRecord, IEquatable<CustomNameRecor
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        return obj is CustomNameRecord customNameRecord
-               && PrimarySpelling == customNameRecord.PrimarySpelling
-               && Reading == customNameRecord.Reading
-               && NameType == customNameRecord.NameType
-               && ExtraInfo == customNameRecord.ExtraInfo
-               && ImagePath == customNameRecord.ImagePath;
+        return obj is CustomNameRecord other
+               && PrimarySpelling == other.PrimarySpelling
+               && Reading == other.Reading
+               && NameType == other.NameType
+               && ExtraInfo == other.ExtraInfo
+               && ImageInfo == other.ImageInfo;
     }
 
     public bool Equals([NotNullWhen(true)] CustomNameRecord? other)
@@ -42,7 +43,7 @@ internal sealed class CustomNameRecord : IDictRecord, IEquatable<CustomNameRecor
                && Reading == other.Reading
                && NameType == other.NameType
                && ExtraInfo == other.ExtraInfo
-               && ImagePath == other.ImagePath;
+               && ImageInfo == other.ImageInfo;
     }
 
     public override int GetHashCode()
@@ -51,7 +52,7 @@ internal sealed class CustomNameRecord : IDictRecord, IEquatable<CustomNameRecor
             Reading?.GetHashCode(StringComparison.Ordinal) ?? 37,
             NameType.GetHashCode(StringComparison.Ordinal),
             ExtraInfo?.GetHashCode(StringComparison.Ordinal) ?? 37,
-            ImagePath?.GetHashCode(StringComparison.Ordinal) ?? 37);
+            ImageInfo?.GetHashCode() ?? 37);
     }
 
     public static bool operator ==(CustomNameRecord? left, CustomNameRecord? right) => left?.Equals(right) ?? (right is null);

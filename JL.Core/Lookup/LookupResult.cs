@@ -20,7 +20,7 @@ public sealed class LookupResult
         int entryId = 0,
         byte[]? pitchPositions = null,
         string[]? wordClasses = null,
-        string[]? imagePaths = null,
+        ImageInfo[]? imageInfos = null,
         JmdictLookupResult? jmdictLookupResult = null,
         KanjiLookupResult? kanjiLookupResult = null
     ) : IEquatable<LookupResult>, IComparable<LookupResult>, IComparable
@@ -43,7 +43,7 @@ public sealed class LookupResult
     internal string[]? WordClasses { get; } = wordClasses;
 
     // Yomichan dictionaries
-    public string[]? ImagePaths { get; } = imagePaths;
+    public ImageInfo[]? ImageInfos { get; } = imageInfos;
 
     // JMdict, Nazeka EPWING
     public string[]? AlternativeSpellings { get; } = alternativeSpellings;

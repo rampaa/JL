@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.ObjectPool;
 
@@ -9,7 +10,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanUtils
 {
-    public static string[]? GetDefinitions(JsonElement jsonElement, Dict dict, ref List<string>? imagePaths)
+    public static string[]? GetDefinitions(JsonElement jsonElement, Dict dict, ref List<ImageInfo>? imageInfos)
     {
         List<string> definitions = new(jsonElement.GetArrayLength());
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
@@ -21,13 +22,17 @@ internal static class EpwingYomichanUtils
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
             {
-                YomichanContent objContent = GetDefinitionsFromJsonObject(definitionElement, dict, ref imagePaths, null);
+                YomichanContent objContent = GetDefinitionsFromJsonObject(definitionElement, dict, ref imageInfos, null);
                 if (objContent.Tag is "img")
                 {
                     if (objContent.Content is not null)
                     {
-                        imagePaths ??= [];
-                        imagePaths.Add(objContent.Content);
+                        ImageInfo? imageInfo = FrontendManager.Frontend.GetImageInfo(objContent.Content);
+                        if (imageInfo is not null)
+                        {
+                            imageInfos ??= [];
+                            imageInfos.Add(imageInfo);
+                        }
                     }
                 }
                 else
@@ -50,7 +55,7 @@ internal static class EpwingYomichanUtils
         return definitions.TrimToArray();
     }
 
-    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict, ref List<string>? imagePaths, string? parentTag, bool isOrderedList, int orderedListIndex)
+    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict, ref List<ImageInfo>? imageInfos, string? parentTag, bool isOrderedList, int orderedListIndex)
     {
         bool first = true;
         string? lastTag = null;
@@ -64,7 +69,7 @@ internal static class EpwingYomichanUtils
             }
             else if (definitionElement.ValueKind is JsonValueKind.Array)
             {
-                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, ref imagePaths, null, isOrderedList, orderedListIndex);
+                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, ref imageInfos, null, isOrderedList, orderedListIndex);
                 lastTag = null;
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
@@ -75,7 +80,7 @@ internal static class EpwingYomichanUtils
                     parentTag = null;
                 }
 
-                YomichanContent contentResult = GetDefinitionsFromJsonObject(definitionElement, dict, ref imagePaths, parentTag);
+                YomichanContent contentResult = GetDefinitionsFromJsonObject(definitionElement, dict, ref imageInfos, parentTag);
                 string? content = contentResult.Content;
                 if (content is not null)
                 {
@@ -155,8 +160,13 @@ internal static class EpwingYomichanUtils
 
                         case "img":
                         {
-                            imagePaths ??= [];
-                            imagePaths.Add(content);
+                            ImageInfo? imageInfo = FrontendManager.Frontend.GetImageInfo(content);
+                            if (imageInfo is not null)
+                            {
+                                imageInfos ??= [];
+                                imageInfos.Add(imageInfo);
+                            }
+
                             break;
                         }
 
@@ -193,7 +203,7 @@ internal static class EpwingYomichanUtils
         }
     }
 
-    private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict, ref List<string>? imagePaths, string? parentTag)
+    private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict, ref List<ImageInfo>? imagePaths, string? parentTag)
     {
         while (true)
         {

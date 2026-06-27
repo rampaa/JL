@@ -143,11 +143,11 @@ internal static class EpwingYomichanLoader
             return null;
         }
 
-        List<string>? imagePaths = null;
+        List<ImageInfo>? imageInfos = null;
         string[]? definitions;
         try
         {
-            definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5], dict, ref imagePaths);
+            definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5], dict, ref imageInfos);
         }
         catch (InvalidOperationException ex)
         {
@@ -156,7 +156,7 @@ internal static class EpwingYomichanLoader
         }
 
         definitions?.DeduplicateStringsInArray();
-        if (definitions is null && imagePaths is null)
+        if (definitions is null && imageInfos is null)
         {
             return null;
         }
@@ -200,6 +200,6 @@ internal static class EpwingYomichanLoader
         //jsonElements[6].TryGetInt32(out int sequence);
         //string[] termTags = jsonElements[7].ToString();
 
-        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imagePaths?.ToArray());
+        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imageInfos?.ToArray());
     }
 }

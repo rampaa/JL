@@ -1164,6 +1164,27 @@ internal static class WindowsUtils
         while (!copied);
     }
 
+    public static ImageInfo? GetImageInfo(string imagePath)
+    {
+        string fullImagePath = Path.GetFullPath(imagePath, AppInfo.ApplicationPath);
+        if (!File.Exists(fullImagePath))
+        {
+            return null;
+        }
+
+        try
+        {
+            using FileStream imageStream = File.OpenRead(fullImagePath);
+            BitmapFrame frame = BitmapFrame.Create(imageStream, BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
+            return new ImageInfo(imagePath, frame.PixelHeight, frame.PixelWidth);
+        }
+        catch (Exception ex)
+        {
+            LoggerManager.Logger.Warning(ex, "Failed to read image dimensions for '{ImagePath}'", fullImagePath);
+            return null;
+        }
+    }
+
     public static bool UseMagpiePositioning(Window window)
     {
         DpiScale dpi = Dpi;

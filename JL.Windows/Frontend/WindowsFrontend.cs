@@ -1,3 +1,4 @@
+using JL.Core.Dicts;
 using JL.Core.Frontend;
 using JL.Windows.Config;
 using JL.Windows.GUI;
@@ -47,6 +48,8 @@ internal sealed class WindowsFrontend : IFrontend
     public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId) => ConfigManager.Instance.InsertSettingsForTsukikageProfile(connection, tsukikageProfileId);
 
     public void PopupDictTypeButtonsNeedUpdating() => PopupWindowUtils.PopupDictTypeButtonsNeedUpdating();
+
+    public ImageInfo? GetImageInfo(string imagePath) => WindowsUtils.GetImageInfo(imagePath);
 
     public Version JLVersion => WindowsUtils.JLVersion;
 }

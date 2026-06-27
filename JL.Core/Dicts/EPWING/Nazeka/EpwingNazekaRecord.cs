@@ -4,6 +4,7 @@ using System.Text;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Japanese;
 using JL.Core.Utilities.ObjectPool;
@@ -16,15 +17,15 @@ internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatabl
     public string? Reading { get; }
     public string[]? AlternativeSpellings { get; }
     public string[] Definitions { get; }
-    public string? ImagePath { get; }
+    public ImageInfo? ImageInfo { get; }
 
-    public EpwingNazekaRecord(string primarySpelling, string? reading, string[]? alternativeSpellings, string[] definitions, string? imagePath)
+    public EpwingNazekaRecord(string primarySpelling, string? reading, string[]? alternativeSpellings, string[] definitions, ImageInfo? imageInfo)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
         AlternativeSpellings = alternativeSpellings;
         Definitions = definitions;
-        ImagePath = imagePath;
+        ImageInfo = imageInfo;
     }
 
     public string BuildFormattedDefinition(DictOptions options)
@@ -126,7 +127,7 @@ internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatabl
         return obj is EpwingNazekaRecord other
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
-               && ImagePath == other.ImagePath
+               && ImageInfo == other.ImageInfo
                && other.Definitions.SequenceEqual(Definitions)));
     }
 
@@ -135,7 +136,7 @@ internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatabl
         return other is not null
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
-               && ImagePath == other.ImagePath
+               && ImageInfo == other.ImageInfo
                && other.Definitions.SequenceEqual(Definitions)));
     }
 
@@ -145,7 +146,7 @@ internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatabl
         {
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = ((hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal)) ?? 37;
-            hash = ((hash * 37) + ImagePath?.GetHashCode(StringComparison.Ordinal)) ?? 37;
+            hash = ((hash * 37) + ImageInfo?.GetHashCode()) ?? 37;
 
             foreach (string definition in Definitions)
             {

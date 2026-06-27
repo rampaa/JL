@@ -1262,7 +1262,7 @@ public static class LookupUtils
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                     wordClasses: epwingResult.WordClasses,
-                    imagePaths: epwingResult.ImagePaths
+                    imageInfos: epwingResult.ImageInfos
                 );
 
                 results.Add(result);
@@ -1287,7 +1287,7 @@ public static class LookupUtils
                 frequencies: kanjiFrequencyResults,
                 // ReSharper disable once NullableWarningSuppressionIsUsed
                 pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                imagePaths: epwingResult.ImagePaths,
+                imageInfos: epwingResult.ImageInfos,
                 kanjiLookupResult: new KanjiLookupResult(kanjiCompositions)
             );
 
@@ -1325,7 +1325,7 @@ public static class LookupUtils
                     minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                    imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null
+                    imageInfos: epwingResult.ImageInfo is not null ? [epwingResult.ImageInfo] : null
                 );
 
                 results.Add(result);
@@ -1372,7 +1372,7 @@ public static class LookupUtils
                 alternativeSpellings: epwingResult.AlternativeSpellings,
                 // ReSharper disable once NullableWarningSuppressionIsUsed
                 pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                imagePaths: epwingResult.ImagePath is not null ? [epwingResult.ImagePath] : null,
+                imageInfos: epwingResult.ImageInfo is not null ? [epwingResult.ImageInfo] : null,
                 kanjiLookupResult: new KanjiLookupResult(kanjiCompositions)
             );
             results.Add(result);
@@ -1488,7 +1488,7 @@ public static class LookupUtils
                     frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(customNameDictResult.PrimarySpelling, readings, pitchAccentDict!) : null,
-                    imagePaths: customNameDictResult.ImagePath is not null ? [customNameDictResult.ImagePath] : null
+                    imageInfos: customNameDictResult.ImageInfo is not null ? [customNameDictResult.ImageInfo] : null
                 );
 
                 ++freq;

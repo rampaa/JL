@@ -1,6 +1,8 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Japanese;
 using JL.Core.Utilities.Japanese.Okurigana;
@@ -83,13 +85,17 @@ internal static class EpwingNazekaLoader
                             ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
                             : primarySpelling.GetPooledString();
 
-                        string? imagePath = null;
+                        ImageInfo? imageInfo = null;
                         if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
                         {
-                            imagePath = imagePathProperty.GetString();
+                            string? imagePath = imagePathProperty.GetString();
+                            if (imagePath is not null)
+                            {
+                                imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
+                            }
                         }
 
-                        EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions, imagePath);
+                        EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions, imageInfo);
                         if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict))
                         {
                             if (nonKanjiDict && nonNameDict)
@@ -122,20 +128,24 @@ internal static class EpwingNazekaLoader
 
                             if (primarySpellingInHiragana != alternativeSpellingInHiragana)
                             {
-                                _ = DictUtils.AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imagePath), nazekaEpwingDict);
+                                _ = DictUtils.AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imageInfo), nazekaEpwingDict);
                             }
                         }
                     }
 
                     else if (!reading.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
                     {
-                        string? imagePath = null;
+                        ImageInfo? imageInfo = null;
                         if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
                         {
-                            imagePath = imagePathProperty.GetString();
+                            string? imagePath = imagePathProperty.GetString();
+                            if (imagePath is not null)
+                            {
+                                imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
+                            }
                         }
 
-                        EpwingNazekaRecord record = new(reading, null, null, definitions, imagePath);
+                        EpwingNazekaRecord record = new(reading, null, null, definitions, imageInfo);
                         _ = DictUtils.AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.NormalizeText(reading).GetPooledString() : reading, record, nazekaEpwingDict);
                     }
                 }

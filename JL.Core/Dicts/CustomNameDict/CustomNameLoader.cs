@@ -1,4 +1,5 @@
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Frontend;
 using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Dicts.CustomNameDict;
@@ -30,7 +31,7 @@ public static class CustomNameLoader
             if (tabCount >= 3)
             {
                 string? extraInfo = null;
-                string? imagePath = null;
+                ImageInfo? imageInfo = null;
                 if (tabCount >= 4)
                 {
                     ReadOnlySpan<char> extraInfoSpan = lineSpan[tabRanges[3]];
@@ -41,9 +42,10 @@ public static class CustomNameLoader
                     if (tabCount is 5)
                     {
                         ReadOnlySpan<char> imagePathSpan = lineSpan[tabRanges[4]];
-                        imagePath = imagePathSpan.Length is 0
-                            ? null
-                            : imagePathSpan.ToString();
+                        if (imagePathSpan.Length > 0)
+                        {
+                            imageInfo = FrontendManager.Frontend.GetImageInfo(imagePathSpan.ToString());
+                        }
                     }
                 }
 
@@ -56,14 +58,14 @@ public static class CustomNameLoader
                     reading = null;
                 }
 
-                AddToDictionary(spelling, reading, nameType, extraInfo, imagePath, customNameDictionary);
+                AddToDictionary(spelling, reading, nameType, extraInfo, imageInfo, customNameDictionary);
             }
         }
     }
 
-    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, string? imagePath, IDictionary<string, IList<IDictRecord>> customNameDictionary)
+    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, ImageInfo? imageInfo, IDictionary<string, IList<IDictRecord>> customNameDictionary)
     {
-        CustomNameRecord record = new(spelling, reading, nameType, extraInfo, imagePath);
+        CustomNameRecord record = new(spelling, reading, nameType, extraInfo, imageInfo);
         _ = DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(spelling), record, customNameDictionary);
     }
 }

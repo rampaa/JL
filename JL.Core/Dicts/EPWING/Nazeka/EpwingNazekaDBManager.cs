@@ -15,11 +15,11 @@ namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaDBManager
 {
-    public const int Version = 15;
+    public const int Version = 16;
 
     private const string SingleTermQuery =
         """
-        SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_path
+        SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_info
         FROM record r
         JOIN record_search_key rsk ON r.rowid = rsk.record_id
         WHERE rsk.search_key = @term;
@@ -36,7 +36,7 @@ internal static class EpwingNazekaDBManager
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             """
-            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_path, rsk.search_key
+            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_info, rsk.search_key
             FROM record r
             JOIN record_search_key rsk ON r.rowid = rsk.record_id
             WHERE rsk.search_key IN (@1
@@ -61,7 +61,7 @@ internal static class EpwingNazekaDBManager
         Reading,
         AlternativeSpellings,
         Glossary,
-        ImagePath,
+        ImageInfo,
         SearchKey
     }
 
@@ -79,7 +79,7 @@ internal static class EpwingNazekaDBManager
                 reading TEXT,
                 alternative_spellings BLOB,
                 glossary BLOB NOT NULL,
-                image_path TEXT
+                image_info BLOB
             ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key
@@ -130,8 +130,8 @@ internal static class EpwingNazekaDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             """
-            INSERT INTO record (rowid, primary_spelling, reading, alternative_spellings, glossary, image_path)
-            VALUES (@rowid, @primary_spelling, @reading, @alternative_spellings, @glossary, @image_path);
+            INSERT INTO record (rowid, primary_spelling, reading, alternative_spellings, glossary, image_info)
+            VALUES (@rowid, @primary_spelling, @reading, @alternative_spellings, @glossary, @image_info);
             """;
 
         SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
@@ -139,14 +139,14 @@ internal static class EpwingNazekaDBManager
         SqliteParameter readingParam = new("@reading", SqliteType.Text);
         SqliteParameter alternativeSpellingsParam = new("@alternative_spellings", SqliteType.Blob);
         SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
-        SqliteParameter imagePathParam = new("@image_path", SqliteType.Text);
+        SqliteParameter imageInfoParam = new("@image_info", SqliteType.Blob);
         insertRecordCommand.Parameters.AddRange([
             rowidParam,
             primarySpellingParam,
             readingParam,
             alternativeSpellingsParam,
             glossaryParam,
-            imagePathParam
+            imageInfoParam
         ]);
 
         insertRecordCommand.Prepare();
@@ -170,7 +170,7 @@ internal static class EpwingNazekaDBManager
             readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
             alternativeSpellingsParam.Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
             glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
-            imagePathParam.Value = record.ImagePath is not null ? record.ImagePath : DBNull.Value;
+            imageInfoParam.Value = record.ImageInfo is not null ? MessagePackSerializer.Serialize(record.ImageInfo) : DBNull.Value;
             _ = insertRecordCommand.ExecuteNonQuery();
 
             recordIdParam.Value = rowId;
@@ -277,7 +277,7 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_path, json_group_array(rsk.search_key)
+            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_info, json_group_array(rsk.search_key)
             FROM record r
             JOIN record_search_key rsk ON r.rowid = rsk.record_id
             GROUP BY r.rowid;
@@ -318,11 +318,11 @@ internal static class EpwingNazekaDBManager
         string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.AlternativeSpellings);
         string[] definitions = dataReader.GetValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
 
-        const int imagePathIndex = (int)ColumnIndex.ImagePath;
-        string? imagePath = !dataReader.IsDBNull(imagePathIndex)
-            ? dataReader.GetString(imagePathIndex)
+        const int imageInfoIndex = (int)ColumnIndex.ImageInfo;
+        ImageInfo? imageInfo = !dataReader.IsDBNull(imageInfoIndex)
+            ? dataReader.GetValueFromBlobStream<ImageInfo>((int)ColumnIndex.ImageInfo)
             : null;
 
-        return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions, imagePath);
+        return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions, imageInfo);
     }
 }

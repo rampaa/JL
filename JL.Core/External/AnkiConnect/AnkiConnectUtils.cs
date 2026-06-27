@@ -254,23 +254,23 @@ public static class AnkiConnectUtils
             imageDictionaries = [screenshotDictionary];
         }
 
-        if (lookupResult.ImagePaths is not null)
+        if (lookupResult.ImageInfos is not null)
         {
             List<string> definitionsImagesFields = FindFields(JLField.DefinitionsImages, userFields);
             if (definitionsImagesFields.Count > 0)
             {
                 if (imageDictionaries is null)
                 {
-                    imageDictionaries = new List<Dictionary<string, object>>(lookupResult.ImagePaths.Length + 1);
+                    imageDictionaries = new List<Dictionary<string, object>>(lookupResult.ImageInfos.Length + 1);
                 }
                 else
                 {
-                    _ = imageDictionaries.EnsureCapacity(imageDictionaries.Count + lookupResult.ImagePaths.Length + 1);
+                    _ = imageDictionaries.EnsureCapacity(imageDictionaries.Count + lookupResult.ImageInfos.Length + 1);
                 }
 
-                for (int i = 0; i < lookupResult.ImagePaths.Length; i++)
+                for (int i = 0; i < lookupResult.ImageInfos.Length; i++)
                 {
-                    string definitionsImagePath = lookupResult.ImagePaths[i];
+                    string definitionsImagePath = lookupResult.ImageInfos[i].Path;
                     string ext = Path.GetExtension(definitionsImagePath);
                     string definitionsImageFullPath = Path.GetFullPath(definitionsImagePath, AppInfo.ApplicationPath);
                     imageDictionaries.Add(new Dictionary<string, object>(3, StringComparer.Ordinal)
