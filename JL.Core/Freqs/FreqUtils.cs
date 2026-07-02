@@ -509,7 +509,7 @@ public static class FreqUtils
             int validFreqCount = 0;
             foreach (Freq freq in wordFreqs)
             {
-                if (freq is { Options.UseDB.Value: true, Active: true })
+                if (freq is { Options.UseDB.Value: true, Active: true, Ready: true })
                 {
                     ++validFreqCount;
                 }

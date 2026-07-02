@@ -1505,7 +1505,7 @@ public static class LookupUtils
         // TODO: Precompute this? Can we make the return type an array if we do this without allocating more?
         foreach (Freq freq in wordFreqs)
         {
-            bool useDB = freq.Options.UseDB.Value && freq.Ready;
+            bool useDB = freq.Options.UseDB.Value && freq.Ready && freqDictsFromDB is not null;
             if (useDB)
             {
                 Debug.Assert(freqDictsFromDB is not null);
