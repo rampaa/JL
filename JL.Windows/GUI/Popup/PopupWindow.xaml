@@ -15,7 +15,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -46,7 +45,7 @@
             </Button>
         </Grid>
 
-        <ItemsControl Grid.Row="2" Name="DictTabButtonsItemsControl" Margin="2,2,2,0" Visibility="Collapsed"
+        <ItemsControl Grid.Row="1" Name="DictTabButtonsItemsControl" Margin="2,2,2,0" Visibility="Collapsed"
                           Background="Transparent">
             <ItemsControl.ContextMenu>
                 <ContextMenu Name="DictTabButtonsItemsControlContextMenu" IsVisibleChanged="ContextMenu_IsVisibleChanged">
@@ -68,9 +67,9 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-        <ListView Grid.Row="3" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
+        <ListView Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
+                  VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Item"
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
                   HorizontalContentAlignment="Stretch" MouseLeave="PopupListView_MouseLeave" ScrollViewer.PanningMode="VerticalFirst"
