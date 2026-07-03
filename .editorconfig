@@ -95,6 +95,8 @@ dotnet_diagnostic.IDE0005.severity = suggestion
 # IDE0305: Use collection expression for fluent
 dotnet_diagnostic.IDE0305.severity = silent
 
+dotnet_code_quality.ca1051.exclude_structs = true
+
 dotnet_code_quality.api_surface = all
 dotnet_code_quality.required_modifiers = none
 dotnet_code_quality.enum_values_prefix_trigger = AnyEnumValue
