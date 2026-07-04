@@ -69,7 +69,7 @@
 
         <ListView Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Item"
+                  VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
                   HorizontalContentAlignment="Stretch" MouseLeave="PopupListView_MouseLeave" ScrollViewer.PanningMode="VerticalFirst"
