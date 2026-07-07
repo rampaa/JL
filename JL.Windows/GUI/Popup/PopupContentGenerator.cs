@@ -711,7 +711,7 @@ internal sealed class PopupContentGenerator : Decorator
 
     private static async Task LoadImageSource(Image image, string imagePath, int decodePixelWidth, int decodePixelHeight, string dictName)
     {
-        image.Source = await Task.Run(() => CreateBitmapImage(imagePath, decodePixelWidth, decodePixelHeight, dictName)).ConfigureAwait(true);
+        image.Source = await Task.Run(() => CreateBitmapImage(imagePath, decodePixelWidth, decodePixelHeight, dictName)).ConfigureAwait(false);
     }
 
     private static BitmapImage? CreateBitmapImage(string imagePath, int decodePixelWidth, int decodePixelHeight, string dictName)
