@@ -31,8 +31,6 @@ public static class LookupUtils
     private delegate Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, string query);
     private delegate List<IDictRecord>? GetKanjiRecordsFromDB(string dbName, string term);
 
-    private static List<LookupResult>?[] s_resultSlots = [];
-
     public static LookupResult[]? LookupText(string text)
     {
         string? kanji = null;
@@ -100,18 +98,7 @@ public static class LookupUtils
         Dict[] dicts = DictUtils.GetDictForLookupCategoryType(CoreConfigManager.Instance.LookupCategory);
         bool dbIsUsedAtLeastForOneDict = DictUtils.DBIsUsedForAtLeastOneDict;
 
-        List<LookupResult>?[] resultSlots;
-        if (dicts.Length == s_resultSlots.Length)
-        {
-            resultSlots = s_resultSlots;
-            resultSlots.AsSpan().Clear();
-        }
-        else
-        {
-            resultSlots = new List<LookupResult>?[dicts.Length];
-            s_resultSlots = resultSlots;
-        }
-
+        List<LookupResult>?[] resultSlots = ArrayPool<List<LookupResult>?>.Shared.Rent(dicts.Length);
         _ = Parallel.For(0, dicts.Length, i =>
         {
             Dict dict = dicts[i];
@@ -350,8 +337,11 @@ public static class LookupUtils
         });
 
         int lookupResultCount = 0;
-        foreach (List<LookupResult>? resultSlot in resultSlots)
+
+        ReadOnlySpan<List<LookupResult>?> resultSlotsSpan = resultSlots.AsSpan(0, dicts.Length);
+        for (int i = 0; i < resultSlotsSpan.Length; i++)
         {
+            List<LookupResult>? resultSlot = resultSlotsSpan[i];
             if (resultSlot is not null)
             {
                 lookupResultCount += resultSlot.Count;
@@ -360,23 +350,25 @@ public static class LookupUtils
 
         if (lookupResultCount is 0)
         {
+            ArrayPool<List<LookupResult>?>.Shared.Return(resultSlots);
             return null;
         }
 
         LookupResult[] lookupResults = new LookupResult[lookupResultCount];
         Span<LookupResult> lookupResultsSpan = lookupResults;
-
-        foreach (List<LookupResult>? resultSlot in resultSlots)
+        for (int i = 0; i < resultSlotsSpan.Length; i++)
         {
+            List<LookupResult>? resultSlot = resultSlotsSpan[i];
             if (resultSlot is not null)
             {
                 ReadOnlySpan<LookupResult> resultSlotSpan = resultSlot.AsReadOnlySpan();
                 resultSlotSpan.CopyTo(lookupResultsSpan);
                 lookupResultsSpan = lookupResultsSpan[resultSlotSpan.Length..];
-
                 ObjectPoolManager.s_lookupResultListPool.Return(resultSlot);
             }
         }
+
+        ArrayPool<List<LookupResult>?>.Shared.Return(resultSlots, true);
 
         Array.Sort(lookupResults);
         return lookupResults;
@@ -997,7 +989,7 @@ public static class LookupUtils
         Dictionary<string, List<FrequencyRecord>>?[] resultsArray = ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Rent(dbFreqs.Length);
         _ = Parallel.For(0, dbFreqs.Length, i =>
         {
-            SqliteConnection? connection = connections.Array[i];
+            SqliteConnection? connection = connections[i];
             if (connection is not null)
             {
                 resultsArray[i] = FreqDBManager.GetRecordsFromDB(connection, searchKeys);

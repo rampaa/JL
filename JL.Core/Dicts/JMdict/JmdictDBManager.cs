@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
@@ -16,7 +17,7 @@ internal static class JmdictDBManager
 {
     public const int Version = 20;
 
-    private static readonly Dictionary<int, string> s_queryCache = [];
+    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
     public static string GetQuery(int termCount)
     {

@@ -5,7 +5,7 @@ namespace JL.Core.Utilities.ObjectPool;
 
 internal sealed class RentedArrayBuffer<T>(int capacity) : IEquatable<RentedArrayBuffer<T>>, IDisposable
 {
-    public T[] Array { get; } = ArrayPool<T>.Shared.Rent(capacity);
+    private T[] Array { get; } = ArrayPool<T>.Shared.Rent(capacity);
     private int Count { get; set; }
 
     public void Add(T item)
@@ -46,6 +46,12 @@ internal sealed class RentedArrayBuffer<T>(int capacity) : IEquatable<RentedArra
         return other is not null &&
             Count == other.Count
             && Array.AsSpan(0, Count).SequenceEqual(other.Array.AsSpan(0, other.Count));
+    }
+
+    public T this[int index]
+    {
+        get => Array[index];
+        set => Array[index] = value;
     }
 
     public void Dispose()

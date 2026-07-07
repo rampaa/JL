@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
+using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Deconjugation;
 
@@ -11,10 +12,7 @@ internal static class Deconjugator
     internal static FrozenDictionary<char, RuleBucket> RuleBucketsByLastDecEndChar { get; set; } = FrozenDictionary<char, RuleBucket>.Empty;
     internal static RuleBucket RulesWithEmptyConEnd { get; set; }
 
-    private static readonly List<Form> s_formsToProcess = new(4);
-    private static readonly List<Form> s_newFormsToProcess = new(4);
-
-    private static void ApplyRuleInternal(in Form form, in VirtualRule rule, List<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
+    private static void ApplyRuleInternal(in Form form, in VirtualRule rule, PooledList<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
     {
         if (rule.Type is RuleType.OnlyFinal)
         {
@@ -67,7 +65,7 @@ internal static class Deconjugator
         newFormsToProcess.Add(new Form(newText, form.OriginalText, rule.DecTag, new ProcessNode(rule.Detail, form.Process)));
     }
 
-    private static void ApplyBucket(in Form form, in RuleBucket bucket, List<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
+    private static void ApplyBucket(in Form form, in RuleBucket bucket, PooledList<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
     {
         if (form.Process is null)
         {
@@ -112,10 +110,8 @@ internal static class Deconjugator
     public static List<Form> Deconjugate(string text)
     {
         List<Form> processedForms = new(4);
-        List<Form> newFormsToProcess = s_newFormsToProcess;
-
-        List<Form> formsToProcess = s_formsToProcess;
-        formsToProcess.Clear();
+        PooledList<Form> newFormsToProcess = new(64);
+        PooledList<Form> formsToProcess = new(64);
         formsToProcess.Add(new Form(text, text, "", null));
 
         FrozenDictionary<char, RuleBucket> ruleBucketsByLastDecEndChar = RuleBucketsByLastDecEndChar;
@@ -182,6 +178,9 @@ internal static class Deconjugator
             formsToProcess.Clear();
             (newFormsToProcess, formsToProcess) = (formsToProcess, newFormsToProcess);
         }
+
+        newFormsToProcess.Dispose();
+        formsToProcess.Dispose();
 
         return processedForms;
     }
