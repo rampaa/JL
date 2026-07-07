@@ -130,7 +130,7 @@ public static partial class JapaneseUtils
         #pragma warning restore format
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    public static readonly FrozenSet<char> SmallCombiningKanaSet = FrozenSet.ToFrozenSet(
+    public static readonly SearchValues<char> SmallCombiningKanaSet = SearchValues.Create(
     [
         #pragma warning disable format
         'ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ',
