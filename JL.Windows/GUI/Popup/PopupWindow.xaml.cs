@@ -682,6 +682,31 @@ internal sealed partial class PopupWindow : IDisposable
         return Task.CompletedTask;
     }
 
+    public Task HandleDelayedLookup(TextBox textBox, bool enableMiningMode, int charPosition)
+    {
+        if (charPosition < 0)
+        {
+            if (PopupIndex is 0)
+            {
+                if (ConfigManager.Instance.AutoPauseOrResumeMpvOnHoverChange)
+                {
+                    MainWindow.Instance.MouseEnterDueToFirstPopupHide = MainWindow.Instance.IsMouseWithinWindowBounds();
+                }
+
+                HidePopup();
+                MainWindow.Instance.ChangeVisibility();
+            }
+            else
+            {
+                HidePopup();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        return LookupOnCharPosition(textBox, charPosition, enableMiningMode, false, false);
+    }
+
     private void UpdatePosition(Point cursorPosition, bool verticalText)
     {
         double mouseX = cursorPosition.X;
@@ -1139,7 +1164,7 @@ internal sealed partial class PopupWindow : IDisposable
                 PopupWindowUtils.PopupWindows[PopupIndex + 1] = childPopupWindow;
             }
 
-            childPopupWindow.LookupOnMouseMoveOrClick(_lastInteractedTextBox, false).SafeFireAndForget("LookupOnMouseMoveOrClick failed unexpectedly");
+            childPopupWindow.HandleDelayedLookup(_lastInteractedTextBox, false, _lastCharPosition).SafeFireAndForget("LookupOnMouseMoveOrClick failed unexpectedly");
         }
         else
         {

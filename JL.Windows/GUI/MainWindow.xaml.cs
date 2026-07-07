@@ -658,7 +658,7 @@ internal sealed partial class MainWindow : IDisposable
         {
             MoveWindowToScreen();
             ConfigManager configManager = ConfigManager.Instance;
-            await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox, configManager.EnableMiningModeForDelayedLookups).ConfigureAwait(false);
+            await FirstPopupWindow.HandleDelayedLookup(MainTextBox, configManager.EnableMiningModeForDelayedLookups, charPosition).ConfigureAwait(false);
             if (configManager.AutoPauseOrResumeMpvOnHoverChange && FirstPopupWindow.Opacity is not 0)
             {
                 await MpvUtils.PausePlayback().ConfigureAwait(false);
