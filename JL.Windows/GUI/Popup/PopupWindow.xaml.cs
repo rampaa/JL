@@ -335,7 +335,7 @@ internal sealed partial class PopupWindow : IDisposable
         return text;
     }
 
-    public Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode, bool mayNeedCoordinateConversion, bool verticalText)
+    public async Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode, bool mayNeedCoordinateConversion, bool verticalText)
     {
         string textBoxText = textBox.Text;
         if (char.IsLowSurrogate(textBoxText[charPosition]))
@@ -380,11 +380,11 @@ internal sealed partial class PopupWindow : IDisposable
                     HidePopup();
                 }
 
-                return Task.CompletedTask;
+                return;
             }
         }
 
-        string textToLookUp = textBoxText;
+        ReadOnlySpan<char> searchSpan = textBoxText;
         if (textBoxText.Length - charPosition > configManager.MaxSearchLength)
         {
             int newLength = charPosition + configManager.MaxSearchLength;
@@ -393,13 +393,13 @@ internal sealed partial class PopupWindow : IDisposable
                 --newLength;
             }
 
-            textToLookUp = textBoxText[..newLength];
+            searchSpan = searchSpan[..newLength];
         }
 
-        int endPosition = JapaneseUtils.FindExpressionBoundary(textToLookUp, charPosition);
-        textToLookUp = textToLookUp[charPosition..endPosition];
+        int endPosition = JapaneseUtils.FindExpressionBoundary(searchSpan, charPosition);
+        ReadOnlySpan<char> spanToLookup = searchSpan[charPosition..endPosition];
 
-        if (string.IsNullOrEmpty(textToLookUp) || TextUtils.StartsWithWhiteSpace(textToLookUp))
+        if (spanToLookup.IsEmpty || TextUtils.StartsWithWhiteSpace(spanToLookup))
         {
             if (isFirstPopupWindow)
             {
@@ -416,16 +416,17 @@ internal sealed partial class PopupWindow : IDisposable
                 HidePopup();
             }
 
-            return Task.CompletedTask;
+            return;
         }
 
-        if (textToLookUp == _lastLookedUpText && Opacity is not 0 && MiningMode == enableMiningMode)
+        if (spanToLookup.SequenceEqual(_lastLookedUpText) && Opacity is not 0 && MiningMode == enableMiningMode)
         {
             UpdatePosition(mayNeedCoordinateConversion, verticalText);
             WinApi.BringToFront(WindowHandle);
-            return Task.CompletedTask;
+            return;
         }
 
+        string textToLookUp = new(spanToLookup);
         _lastLookedUpText = textToLookUp;
 
         LookupResult[]? lookupResults = LookupUtils.LookupText(textToLookUp);
@@ -509,7 +510,7 @@ internal sealed partial class PopupWindow : IDisposable
 
             if (configManager.AutoPlayAudio)
             {
-                return PlayAudio(false);
+                await PlayAudio(false).ConfigureAwait(false);
             }
         }
         else
@@ -529,8 +530,6 @@ internal sealed partial class PopupWindow : IDisposable
                 HidePopup();
             }
         }
-
-        return Task.CompletedTask;
     }
 
     public Task LookupOnMouseMoveOrClick(TextBox textBox, bool enableMiningMode)
