@@ -1175,7 +1175,7 @@ internal static class WindowsUtils
         {
             using FileStream imageStream = File.OpenRead(fullImagePath);
             BitmapFrame frame = BitmapFrame.Create(imageStream, BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
-            return new ImageInfo(imagePath, frame.PixelHeight, frame.PixelWidth);
+            return new ImageInfo(imagePath, frame.PixelWidth, frame.PixelHeight, frame.Width, frame.Height);
         }
         catch (Exception ex)
         {

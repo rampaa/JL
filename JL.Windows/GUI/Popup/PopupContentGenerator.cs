@@ -662,63 +662,88 @@ internal sealed class PopupContentGenerator : Decorator
         Debug.Assert(result.ImageInfos is not null);
         for (int i = 0; i < result.ImageInfos.Length; i++)
         {
+            double imageWidth;
+            double imageHeight;
+
+            int decodePixelWidth = 0;
+            int decodePixelHeight = 0;
+
             ImageInfo imageInfo = result.ImageInfos[i];
-            string imagePath = Path.GetFullPath(imageInfo.Path, AppInfo.ApplicationPath);
-            Uri imageUri = new(imagePath);
-
-            try
+            if (imageInfo.Width > maxWidth || imageInfo.Height > maxHeight)
             {
-                BitmapImage bitmap = new();
-                bitmap.BeginInit();
-                bitmap.UriSource = imageUri;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-
-                if (imageInfo.Width > maxWidth || imageInfo.Height > maxHeight)
+                if (maxWidth * imageInfo.Height < maxHeight * imageInfo.Width)
                 {
-                    if ((long)maxWidth * imageInfo.Height < (long)maxHeight * imageInfo.Width)
-                    {
-                        bitmap.DecodePixelWidth = maxWidth;
-                    }
-                    else
-                    {
-                        bitmap.DecodePixelHeight = maxHeight;
-                    }
+                    decodePixelWidth = double.ConvertToIntegerNative<int>(maxWidth * (imageInfo.PixelWidth / imageInfo.Width));
+                    decodePixelHeight = double.ConvertToIntegerNative<int>((double)imageInfo.PixelHeight * decodePixelWidth / imageInfo.PixelWidth);
+
+                    imageWidth = decodePixelWidth * (imageInfo.Width / imageInfo.PixelWidth);
+                    imageHeight = decodePixelHeight * (imageInfo.Height / imageInfo.PixelHeight);
                 }
-
-                bitmap.EndInit();
-                bitmap.Freeze();
-
-                Image image = new()
+                else
                 {
-                    Name = $"Image{i}",
-                    Source = bitmap,
-                    Stretch = Stretch.None,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    Margin = new Thickness(2, 2, 2, 4)
-                };
+                    decodePixelHeight = double.ConvertToIntegerNative<int>(maxHeight * (imageInfo.PixelHeight / imageInfo.Height));
+                    decodePixelWidth = double.ConvertToIntegerNative<int>((double)imageInfo.PixelWidth * decodePixelHeight / imageInfo.PixelHeight);
 
-                _ = bottom.Children.Add(image);
+                    imageWidth = decodePixelWidth * (imageInfo.Width / imageInfo.PixelWidth);
+                    imageHeight = decodePixelHeight * (imageInfo.Height / imageInfo.PixelHeight);
+                }
             }
-            catch (NotSupportedException ex)
+            else
             {
-                LoggerManager.Logger.Error(ex, "Image type is not supported: {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, result.Dict.Name);
-                showImagesOption.Value = false;
-                return;
+                imageWidth = imageInfo.Width;
+                imageHeight = imageInfo.Height;
             }
-            catch (DirectoryNotFoundException ex)
+
+            Image image = new()
             {
-                LoggerManager.Logger.Error(ex, "Image path is not found {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, result.Dict.Name);
-                showImagesOption.Value = false;
-                return;
-            }
-            catch (Exception ex)
-            {
-                LoggerManager.Logger.Error(ex, "Unexpected error while showing image: {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, result.Dict.Name);
-                showImagesOption.Value = false;
-                return;
-            }
+                Width = imageWidth,
+                Height = imageHeight,
+                Stretch = Stretch.None,
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(2, 2, 2, 4)
+            };
+
+            _ = bottom.Children.Add(image);
+            LoadImageSource(image, Path.GetFullPath(imageInfo.Path, AppInfo.ApplicationPath), decodePixelWidth, decodePixelHeight, result.Dict.Name).SafeFireAndForget("Unexpected error while loading image source");
+        }
+    }
+
+    private static async Task LoadImageSource(Image image, string imagePath, int decodePixelWidth, int decodePixelHeight, string dictName)
+    {
+        image.Source = await Task.Run(() => CreateBitmapImage(imagePath, decodePixelWidth, decodePixelHeight, dictName)).ConfigureAwait(true);
+    }
+
+    private static BitmapImage? CreateBitmapImage(string imagePath, int decodePixelWidth, int decodePixelHeight, string dictName)
+    {
+        Uri imageIri = new(imagePath);
+        try
+        {
+            BitmapImage bitmap = new();
+            bitmap.BeginInit();
+            bitmap.UriSource = imageIri;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+            bitmap.DecodePixelWidth = decodePixelWidth;
+            bitmap.DecodePixelHeight = decodePixelHeight;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
+        }
+        catch (NotSupportedException ex)
+        {
+            LoggerManager.Logger.Error(ex, "Image type is not supported: {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, dictName);
+            return null;
+        }
+        catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
+        {
+            LoggerManager.Logger.Error(ex, "Image path is not found {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, dictName);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            LoggerManager.Logger.Error(ex, "Unexpected error while decoding image: {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, dictName);
+            return null;
         }
     }
 
