@@ -128,27 +128,127 @@ internal sealed class ConfigManager
     public bool PopupFlipXForVerticalText { get; private set; } = true;
     public bool PopupFlipYForVerticalText { get; private set; } = true;
     public Brush PrimarySpellingColor { get; private set; } = Brushes.Chocolate;
-    public double PrimarySpellingFontSize { get; set; } = 21;
+
+    public double PrimarySpellingFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedPrimarySpellingFontSize = value;
+        }
+    } = 21;
+
     public Brush ReadingsColor { get; private set; } = Brushes.Goldenrod;
-    public double ReadingsFontSize { get; set; } = 19;
+
+    public double ReadingsFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedReadingsFontSize = value;
+        }
+    } = 19;
+
     public Brush AlternativeSpellingsColor { get; private set; } = Brushes.LightYellow;
-    public double AlternativeSpellingsFontSize { get; set; } = 17;
+
+    public double AlternativeSpellingsFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedAlternativeSpellingsFontSize = value;
+        }
+    } = 17;
+
     public Brush DefinitionsColor { get; private set; } = Brushes.White;
-    public double DefinitionsFontSize { get; set; } = 17;
+
+    public double DefinitionsFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedDefinitionsFontSize = value;
+        }
+    } = 17;
+
     public Brush FrequencyColor { get; private set; } = Brushes.Yellow;
-    public double FrequencyFontSize { get; set; } = 17;
+
+    public double FrequencyFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedFrequencyFontSize = value;
+        }
+    } = 17;
+
     public Brush DeconjugationInfoColor { get; private set; } = Brushes.LightSteelBlue;
-    public double DeconjugationInfoFontSize { get; set; } = 17;
+
+    public double DeconjugationInfoFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedDeconjugationInfoFontSize = value;
+        }
+    } = 17;
+
     public Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
-    public double DictTypeFontSize { get; set; } = 15;
+
+    public double DictTypeFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedDictTypeFontSize = value;
+        }
+    } = 15;
+
     public Brush AudioButtonColor { get; private set; } = Brushes.White;
-    public double AudioButtonFontSize { get; set; } = 12;
+
+    public double AudioButtonFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedAudioButtonFontSize = value;
+        }
+    } = 12;
+
     public Brush MiningButtonColor { get; private set; } = Brushes.White;
-    public double MiningButtonFontSize { get; set; } = 12;
+
+    public double MiningButtonFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedMiningButtonFontSize = value;
+        }
+    } = 12;
+
     public Brush SeparatorColor { get; private set; } = Brushes.White;
     public bool HideDictTabsWithNoResults { get; private set; } = true;
     public bool ShowDictionaryTabsInMiningMode { get; private set; } = true;
-    public double PopupDictionaryTabFontSize { get; private set; } = 12;
+
+    public double PopupDictionaryTabFontSize
+    {
+        get;
+        set
+        {
+            field = value;
+            PopupContentGenerator.BoxedPopupDictionaryTabFontSize = value;
+        }
+    } = 12;
+
     public bool AutoEnableMiningModeForMouseMove { get; private set; } // = false;
     public double AutoEnableMiningModeForMouseMoveDelayInMilliseconds { get; private set; } = 2000;
     public bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } // = false;

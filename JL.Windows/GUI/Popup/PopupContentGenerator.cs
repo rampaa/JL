@@ -24,6 +24,17 @@ namespace JL.Windows.GUI.Popup;
 internal sealed class PopupContentGenerator : Decorator
 #pragma warning restore CA1812 // Internal class that is apparently never instantiated
 {
+    public static object BoxedPrimarySpellingFontSize { get; set; } = 1d;
+    public static object BoxedReadingsFontSize { get; set; } = 1d;
+    public static object BoxedAlternativeSpellingsFontSize { get; set; } = 1d;
+    public static object BoxedDeconjugationInfoFontSize { get; set; } = 1d;
+    public static object BoxedFrequencyFontSize { get; set; } = 1d;
+    public static object BoxedDefinitionsFontSize { get; set; } = 1d;
+    public static object BoxedAudioButtonFontSize { get; set; } = 1d;
+    public static object BoxedDictTypeFontSize { get; set; } = 1d;
+    public static object BoxedMiningButtonFontSize { get; set; } = 1d;
+    public static object BoxedPopupDictionaryTabFontSize { get; set; } = 1d;
+
     static PopupContentGenerator()
     {
         DataContextProperty.OverrideMetadata(typeof(PopupContentGenerator), new FrameworkPropertyMetadata(null, OnDataContextChanged));
@@ -131,9 +142,9 @@ internal sealed class PopupContentGenerator : Decorator
             primarySpellingFrameworkElement = PopupWindowUtils.CreateTextBox(nameof(result.PrimarySpelling),
             result.PrimarySpelling,
             configManager.PrimarySpellingColor,
-            configManager.PrimarySpellingFontSize,
-            VerticalAlignment.Center,
-            new Thickness(),
+            BoxedPrimarySpellingFontSize,
+            PopupWindowUtils.BoxedVerticalAlignmentCenter,
+            PopupWindowUtils.BoxedDefaultThickness,
             ownerWindow.PopupContextMenu);
 
             ownerWindow.AddEventHandlersToPrimarySpellingTextBox(primarySpellingFrameworkElement);
@@ -143,9 +154,9 @@ internal sealed class PopupContentGenerator : Decorator
             primarySpellingFrameworkElement = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpelling),
             result.PrimarySpelling,
             configManager.PrimarySpellingColor,
-            configManager.PrimarySpellingFontSize,
-            VerticalAlignment.Center,
-            new Thickness(2, 0, 0, 0));
+            BoxedPrimarySpellingFontSize,
+            PopupWindowUtils.BoxedVerticalAlignmentCenter,
+            PopupWindowUtils.BoxedThickness2000);
         }
 
         if (result.Readings is null && result.PitchPositions is not null)
@@ -173,21 +184,18 @@ internal sealed class PopupContentGenerator : Decorator
         DictOptions jmdictOptions = result.Dict.Options;
         Debug.Assert(jmdictOptions.POrthographyInfo is not null);
         bool showPOrthographyInfo = jmdictOptions.POrthographyInfo.Value;
-
-        Debug.Assert(jmdictOptions.POrthographyInfoFontSize is not null);
-        double pOrthographyInfoFontSize = jmdictOptions.POrthographyInfoFontSize.Value;
-
         if (!showPOrthographyInfo)
         {
             return;
         }
 
+        Debug.Assert(jmdictOptions.POrthographyInfoFontSize is not null);
         TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(jmdictLookupResult.PrimarySpellingOrthographyInfoList),
             $"[{string.Join(", ", jmdictLookupResult.PrimarySpellingOrthographyInfoList)}]",
             DictOptionManager.POrthographyInfoColor,
-            pOrthographyInfoFontSize,
-            VerticalAlignment.Center,
-            new Thickness(3, 0, 0, 0));
+            jmdictOptions.POrthographyInfoFontSize.BoxedValue,
+            PopupWindowUtils.BoxedVerticalAlignmentCenter,
+            PopupWindowUtils.BoxedThickness3000);
 
         _ = top.Children.Add(textBlockPOrthographyInfo);
     }
@@ -235,9 +243,9 @@ internal sealed class PopupContentGenerator : Decorator
         {
             TextBox readingTextBox = PopupWindowUtils.CreateTextBox(nameof(result.Readings),
                 readingsText, configManager.ReadingsColor,
-                configManager.ReadingsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(5, 0, 0, 0),
+                BoxedReadingsFontSize,
+                PopupWindowUtils.BoxedVerticalAlignmentCenter,
+                PopupWindowUtils.BoxedThickness5000,
                 ownerWindow.PopupContextMenu);
 
             if (pitchPositionsExist)
@@ -264,9 +272,9 @@ internal sealed class PopupContentGenerator : Decorator
             TextBlock readingTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Readings),
                 readingsText,
                 configManager.ReadingsColor,
-                configManager.ReadingsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(7, 0, 0, 0));
+                BoxedReadingsFontSize,
+                PopupWindowUtils.BoxedVerticalAlignmentCenter,
+                PopupWindowUtils.BoxedThickness7000);
 
             if (pitchPositionsExist)
             {
@@ -298,21 +306,22 @@ internal sealed class PopupContentGenerator : Decorator
         {
             Name = "AudioButton",
             Content = "🔊",
-            Foreground = configManager.AudioButtonColor,
-            VerticalAlignment = VerticalAlignment.Top,
-            VerticalContentAlignment = VerticalAlignment.Top,
-            Margin = new Thickness(3, 0, 0, 0),
-            HorizontalAlignment = HorizontalAlignment.Left,
-            HorizontalContentAlignment = HorizontalAlignment.Left,
             Background = Brushes.Transparent,
             Cursor = Cursors.Arrow,
-            BorderThickness = new Thickness(),
-            Padding = new Thickness(),
-            FontSize = configManager.AudioButtonFontSize,
-            Focusable = false,
-            Height = double.NaN,
-            Width = double.NaN
+            Foreground = configManager.AudioButtonColor,
+            Focusable = false
         };
+
+        audioButton.SetValue(Control.VerticalContentAlignmentProperty, PopupWindowUtils.BoxedVerticalAlignmentTop);
+        audioButton.SetValue(Control.HorizontalContentAlignmentProperty, PopupWindowUtils.BoxedHorizontalAlignmentLeft);
+        audioButton.SetValue(Control.BorderThicknessProperty, PopupWindowUtils.BoxedDefaultThickness);
+        audioButton.SetValue(Control.PaddingProperty, PopupWindowUtils.BoxedDefaultThickness);
+        audioButton.SetValue(Control.FontSizeProperty, BoxedAudioButtonFontSize);
+        audioButton.SetValue(MarginProperty, PopupWindowUtils.BoxedThickness3000);
+        audioButton.SetValue(VerticalAlignmentProperty, PopupWindowUtils.BoxedVerticalAlignmentTop);
+        audioButton.SetValue(HorizontalAlignmentProperty, PopupWindowUtils.BoxedHorizontalAlignmentLeft);
+        audioButton.SetValue(HeightProperty, PopupWindowUtils.BoxedDoubleNotANumber);
+        audioButton.SetValue(WidthProperty, PopupWindowUtils.BoxedDoubleNotANumber);
 
         audioButton.PreviewMouseUp += ownerWindow.AudioButton_Click;
 
@@ -354,9 +363,9 @@ internal sealed class PopupContentGenerator : Decorator
             TextBox alternativeSpellingsTexBox = PopupWindowUtils.CreateTextBox(nameof(result.AlternativeSpellings),
                 alternativeSpellingsText,
                 configManager.AlternativeSpellingsColor,
-                configManager.AlternativeSpellingsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(5, 0, 0, 0),
+                BoxedAlternativeSpellingsFontSize,
+                PopupWindowUtils.BoxedVerticalAlignmentCenter,
+                PopupWindowUtils.BoxedThickness5000,
                 ownerWindow.PopupContextMenu);
 
             ownerWindow.AddEventHandlersToTextBox(alternativeSpellingsTexBox);
@@ -368,9 +377,9 @@ internal sealed class PopupContentGenerator : Decorator
             TextBlock alternativeSpellingsTexBlock = PopupWindowUtils.CreateTextBlock(nameof(result.AlternativeSpellings),
                 alternativeSpellingsText,
                 configManager.AlternativeSpellingsColor,
-                configManager.AlternativeSpellingsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(7, 0, 0, 0));
+                BoxedAlternativeSpellingsFontSize,
+                PopupWindowUtils.BoxedVerticalAlignmentCenter,
+                PopupWindowUtils.BoxedThickness7000);
 
             _ = top.Children.Add(alternativeSpellingsTexBlock);
         }
@@ -393,9 +402,9 @@ internal sealed class PopupContentGenerator : Decorator
                 TextBox deconjugationProcessTextBox = PopupWindowUtils.CreateTextBox(nameof(result.DeconjugationProcess),
                     $"{result.MatchedText} {result.DeconjugationProcess}",
                     configManager.DeconjugationInfoColor,
-                    configManager.DeconjugationInfoFontSize,
-                    VerticalAlignment.Top,
-                    new Thickness(5, 0, 0, 0),
+                    BoxedDeconjugationInfoFontSize,
+                    PopupWindowUtils.BoxedVerticalAlignmentTop,
+                    PopupWindowUtils.BoxedThickness5000,
                     ownerWindow.PopupContextMenu);
 
                 ownerWindow.AddEventHandlersToTextBox(deconjugationProcessTextBox);
@@ -407,9 +416,9 @@ internal sealed class PopupContentGenerator : Decorator
                 TextBlock deconjugationProcessTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.DeconjugationProcess),
                     $"{result.MatchedText} {result.DeconjugationProcess}",
                     configManager.DeconjugationInfoColor,
-                    configManager.DeconjugationInfoFontSize,
-                    VerticalAlignment.Top,
-                    new Thickness(7, 0, 0, 0));
+                    BoxedDeconjugationInfoFontSize,
+                    PopupWindowUtils.BoxedVerticalAlignmentTop,
+                    PopupWindowUtils.BoxedThickness7000);
 
                 _ = top.Children.Add(deconjugationProcessTextBlock);
             }
@@ -421,9 +430,9 @@ internal sealed class PopupContentGenerator : Decorator
                 TextBox matchedTextTextBox = PopupWindowUtils.CreateTextBox(nameof(result.MatchedText),
                     result.MatchedText,
                     configManager.DeconjugationInfoColor,
-                    configManager.DeconjugationInfoFontSize,
-                    VerticalAlignment.Top,
-                    new Thickness(5, 0, 0, 0),
+                    BoxedDeconjugationInfoFontSize,
+                    PopupWindowUtils.BoxedVerticalAlignmentTop,
+                    PopupWindowUtils.BoxedThickness5000,
                     ownerWindow.PopupContextMenu);
 
                 ownerWindow.AddEventHandlersToTextBox(matchedTextTextBox);
@@ -435,9 +444,9 @@ internal sealed class PopupContentGenerator : Decorator
                 TextBlock matchedTextTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.MatchedText),
                     result.MatchedText,
                     configManager.DeconjugationInfoColor,
-                    configManager.DeconjugationInfoFontSize,
-                    VerticalAlignment.Top,
-                    new Thickness(7, 0, 0, 0));
+                    BoxedDeconjugationInfoFontSize,
+                    PopupWindowUtils.BoxedVerticalAlignmentTop,
+                    PopupWindowUtils.BoxedThickness7000);
 
                 _ = top.Children.Add(matchedTextTextBlock);
             }
@@ -472,9 +481,9 @@ internal sealed class PopupContentGenerator : Decorator
                 nameof(result.Frequencies),
                 LookupResultUtils.FrequenciesToText(validFrequencies, false, result.Frequencies.Count is 1),
                 configManager.FrequencyColor,
-                configManager.FrequencyFontSize,
-                VerticalAlignment.Top,
-                new Thickness(7, 0, 0, 0));
+                BoxedFrequencyFontSize,
+                PopupWindowUtils.BoxedVerticalAlignmentTop,
+                PopupWindowUtils.BoxedThickness7000);
 
             _ = top.Children.Add(frequencyTextBlock);
         }
@@ -493,9 +502,9 @@ internal sealed class PopupContentGenerator : Decorator
         TextBlock dictTypeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Dict.Name),
             result.Dict.Name,
             configManager.DictTypeColor,
-            configManager.DictTypeFontSize,
-            VerticalAlignment.Top,
-            new Thickness(7, 0, 0, 0));
+            BoxedDictTypeFontSize,
+            PopupWindowUtils.BoxedVerticalAlignmentTop,
+            PopupWindowUtils.BoxedThickness7000);
 
         _ = top.Children.Add(dictTypeTextBlock);
     }
@@ -518,26 +527,40 @@ internal sealed class PopupContentGenerator : Decorator
             return;
         }
 
+        string toolTip;
+        Brush foregroundColor;
+        if (lookupDisplayResult.IsDuplicate)
+        {
+            toolTip = "Duplicate note";
+            foregroundColor = Brushes.OrangeRed;
+        }
+        else
+        {
+            toolTip = "Mine";
+            foregroundColor = configManager.MiningButtonColor;
+        }
+
         Button miningButton = new()
         {
             Name = "MiningButton",
             Content = '➕',
-            ToolTip = lookupDisplayResult.IsDuplicate ? "Duplicate note" : "Mine",
-            Foreground = lookupDisplayResult.IsDuplicate ? Brushes.OrangeRed : configManager.MiningButtonColor,
-            VerticalAlignment = VerticalAlignment.Top,
-            VerticalContentAlignment = VerticalAlignment.Top,
-            Margin = new Thickness(3, 0, 0, 0),
-            HorizontalAlignment = HorizontalAlignment.Left,
-            HorizontalContentAlignment = HorizontalAlignment.Left,
             Background = Brushes.Transparent,
             Cursor = Cursors.Arrow,
-            BorderThickness = new Thickness(),
-            Padding = new Thickness(),
-            FontSize = configManager.MiningButtonFontSize,
             Focusable = false,
-            Height = double.NaN,
-            Width = double.NaN
+            ToolTip = toolTip,
+            Foreground = foregroundColor
         };
+
+        miningButton.SetValue(Control.VerticalContentAlignmentProperty, PopupWindowUtils.BoxedVerticalAlignmentTop);
+        miningButton.SetValue(Control.HorizontalContentAlignmentProperty, PopupWindowUtils.BoxedHorizontalAlignmentLeft);
+        miningButton.SetValue(Control.BorderThicknessProperty, PopupWindowUtils.BoxedDefaultThickness);
+        miningButton.SetValue(Control.PaddingProperty, PopupWindowUtils.BoxedDefaultThickness);
+        miningButton.SetValue(Control.FontSizeProperty, BoxedMiningButtonFontSize);
+        miningButton.SetValue(MarginProperty, PopupWindowUtils.BoxedThickness3000);
+        miningButton.SetValue(VerticalAlignmentProperty, PopupWindowUtils.BoxedVerticalAlignmentTop);
+        miningButton.SetValue(HorizontalAlignmentProperty, PopupWindowUtils.BoxedHorizontalAlignmentLeft);
+        miningButton.SetValue(HeightProperty, PopupWindowUtils.BoxedDoubleNotANumber);
+        miningButton.SetValue(WidthProperty, PopupWindowUtils.BoxedDoubleNotANumber);
 
         miningButton.PreviewMouseUp += ownerWindow.MiningButton_PreviewMouseUp;
 
@@ -552,9 +575,9 @@ internal sealed class PopupContentGenerator : Decorator
             TextBox definitionsTextBox = PopupWindowUtils.CreateTextBox(nameof(LookupResult.FormattedDefinitions),
                 formattedDefinitions,
                 configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(0, 2, 2, 2),
+                BoxedDefinitionsFontSize,
+                PopupWindowUtils.BoxedVerticalAlignmentCenter,
+                PopupWindowUtils.BoxedThickness0222,
                 ownerWindow.DefinitionsTextBoxContextMenu);
 
             ownerWindow.AddEventHandlersToDefinitionsTextBox(definitionsTextBox);
@@ -565,9 +588,9 @@ internal sealed class PopupContentGenerator : Decorator
             TextBlock definitionsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(LookupResult.FormattedDefinitions),
                 formattedDefinitions,
                 configManager.DefinitionsColor,
-                configManager.DefinitionsFontSize,
-                VerticalAlignment.Center,
-                new Thickness(2));
+                BoxedDefinitionsFontSize,
+                PopupWindowUtils.BoxedVerticalAlignmentCenter,
+                PopupWindowUtils.BoxedThickness2222);
 
             _ = bottom.Children.Add(definitionsTextBlock);
         }

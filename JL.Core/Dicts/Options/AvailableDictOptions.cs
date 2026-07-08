@@ -61,6 +61,7 @@ public sealed class POrthographyInfoColorOption(string value)
 public sealed class POrthographyInfoFontSizeOption(double value)
 {
     public double Value { get; } = value;
+    public object BoxedValue { get; set; } = value;
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = [DictType.JMdict];
 }
 

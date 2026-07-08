@@ -2350,8 +2350,6 @@ internal sealed partial class PopupWindow : IDisposable
         }
 
         List<Button> buttons = new(DictUtils.Dicts.Values.Count);
-
-        double dictionaryTabFontSize = ConfigManager.Instance.PopupDictionaryTabFontSize;
         IOrderedEnumerable<Dict> orderedDicts = DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority);
         foreach (Dict dict in orderedDicts)
         {
@@ -2360,18 +2358,19 @@ internal sealed partial class PopupWindow : IDisposable
                 Button button = new()
                 {
                     Content = dict.Name,
-                    Margin = new Thickness(2, 0, 0, 0),
                     Tag = dict,
-                    Cursor = Cursors.Arrow,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    VerticalContentAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    FontSize = dictionaryTabFontSize,
-                    Padding = new Thickness(5, 3, 5, 3),
-                    Height = double.NaN,
-                    Width = double.NaN
+                    Cursor = Cursors.Arrow
                 };
+
+                button.SetValue(VerticalAlignmentProperty, PopupWindowUtils.BoxedVerticalAlignmentTop);
+                button.SetValue(VerticalContentAlignmentProperty, PopupWindowUtils.BoxedVerticalAlignmentCenter);
+                button.SetValue(MarginProperty, PopupWindowUtils.BoxedThickness2000);
+                button.SetValue(HorizontalAlignmentProperty, PopupWindowUtils.BoxedHorizontalAlignmentLeft);
+                button.SetValue(HorizontalContentAlignmentProperty, PopupWindowUtils.BoxedHorizontalAlignmentCenter);
+                button.SetValue(PaddingProperty, PopupWindowUtils.BoxedThickness5353);
+                button.SetValue(HeightProperty, PopupWindowUtils.BoxedDoubleNotANumber);
+                button.SetValue(WidthProperty, PopupWindowUtils.BoxedDoubleNotANumber);
+                button.SetValue(FontSizeProperty, PopupContentGenerator.BoxedPopupDictionaryTabFontSize);
 
                 button.Click += DictTypeButtonOnClick;
                 buttons.Add(button);

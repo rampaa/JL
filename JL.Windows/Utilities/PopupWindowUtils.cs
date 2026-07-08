@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core.Audio;
@@ -27,26 +28,48 @@ internal static class PopupWindowUtils
 
     public static Pen PitchAccentMarkerPen { get; private set; } = new();
 
+    private static readonly object s_boxedTextWrappingWrap = TextWrapping.Wrap;
+    public static readonly object BoxedHorizontalAlignmentLeft = HorizontalAlignment.Left;
+    public static readonly object BoxedHorizontalAlignmentCenter = HorizontalAlignment.Center;
+    private static readonly object s_boxedTrue = true;
+    private static readonly object s_boxedIntZero = 0;
+    private static readonly object s_boxedPanningModeNone = PanningMode.None;
+    private static readonly object s_boxedScrollBarVisibilityDisabled = ScrollBarVisibility.Disabled;
+    public static readonly object BoxedDefaultThickness = new Thickness();
+    public static readonly object BoxedThickness0222 = new Thickness(0, 2, 2, 2);
+    public static readonly object BoxedThickness2000 = new Thickness(2, 0, 0, 0);
+    public static readonly object BoxedThickness2222 = new Thickness(2, 2, 2, 2);
+    public static readonly object BoxedThickness3000 = new Thickness(3, 0, 0, 0);
+    public static readonly object BoxedThickness5000 = new Thickness(5, 0, 0, 0);
+    public static readonly object BoxedThickness5353 = new Thickness(5, 3, 5, 3);
+    public static readonly object BoxedThickness7000 = new Thickness(7, 0, 0, 0);
+    public static readonly object BoxedVerticalAlignmentCenter = VerticalAlignment.Center;
+    public static readonly object BoxedVerticalAlignmentTop = VerticalAlignment.Top;
+    public static readonly object BoxedDoubleNotANumber = double.NaN;
+    public static readonly object BoxedFalse = false;
 
-    public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin)
+    public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, object fontSize, object verticalAlignment, object margin)
     {
-        return new TextBlock
+        TextBlock textBlock = new()
         {
             Name = name,
             Text = text,
             Foreground = foregroundBrush,
-            FontSize = fontSize,
-            VerticalAlignment = verticalAlignment,
-            Margin = margin,
-            HorizontalAlignment = HorizontalAlignment.Left,
             Background = Brushes.Transparent,
-            Cursor = Cursors.Arrow,
-            TextWrapping = TextWrapping.Wrap,
-            Padding = new Thickness()
+            Cursor = Cursors.Arrow
         };
+
+        textBlock.SetValue(FrameworkElement.MarginProperty, margin);
+        textBlock.SetValue(FrameworkElement.HorizontalAlignmentProperty, BoxedHorizontalAlignmentLeft);
+        textBlock.SetValue(FrameworkElement.VerticalAlignmentProperty, verticalAlignment);
+        textBlock.SetValue(TextBlock.PaddingProperty, BoxedDefaultThickness);
+        textBlock.SetValue(TextBlock.TextWrappingProperty, s_boxedTextWrappingWrap);
+        textBlock.SetValue(TextBlock.FontSizeProperty, fontSize);
+
+        return textBlock;
     }
 
-    public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin, ContextMenu contextMenu)
+    public static TextBox CreateTextBox(string name, string text, Brush foregroundBrush, object fontSize, object verticalAlignment, object margin, ContextMenu contextMenu)
     {
         TextBox textBox = new()
         {
@@ -54,28 +77,29 @@ internal static class PopupWindowUtils
             Text = text,
             Foreground = foregroundBrush,
             CaretBrush = foregroundBrush,
-            FontSize = fontSize,
-            VerticalAlignment = verticalAlignment,
-            Margin = margin,
             ContextMenu = contextMenu,
-            HorizontalAlignment = HorizontalAlignment.Left,
             Background = Brushes.Transparent,
             Cursor = Cursors.Arrow,
-            SelectionBrush = ConfigManager.Instance.HighlightColor,
-            IsInactiveSelectionHighlightEnabled = true,
-            TextWrapping = TextWrapping.Wrap,
-            IsReadOnly = true,
-            IsUndoEnabled = false,
-            UndoLimit = 0,
-            BorderThickness = new Thickness(),
-            Padding = new Thickness(),
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled
+            SelectionBrush = ConfigManager.Instance.HighlightColor
         };
+
+        textBox.SetValue(FrameworkElement.MarginProperty, margin);
+        textBox.SetValue(FrameworkElement.HorizontalAlignmentProperty, BoxedHorizontalAlignmentLeft);
+        textBox.SetValue(FrameworkElement.VerticalAlignmentProperty, verticalAlignment);
+        textBox.SetValue(Control.PaddingProperty, BoxedDefaultThickness);
+        textBox.SetValue(Control.BorderThicknessProperty, BoxedDefaultThickness);
+        textBox.SetValue(TextBoxBase.IsReadOnlyProperty, s_boxedTrue);
+        textBox.SetValue(TextBoxBase.IsInactiveSelectionHighlightEnabledProperty, s_boxedTrue);
+        textBox.SetValue(TextBoxBase.UndoLimitProperty, s_boxedIntZero);
+        textBox.SetValue(TextBoxBase.IsUndoEnabledProperty, BoxedFalse);
+        textBox.SetValue(TextBoxBase.HorizontalScrollBarVisibilityProperty, s_boxedScrollBarVisibilityDisabled);
+        textBox.SetValue(TextBoxBase.VerticalScrollBarVisibilityProperty, s_boxedScrollBarVisibilityDisabled);
+        textBox.SetValue(TextBox.TextWrappingProperty, s_boxedTextWrappingWrap);
+        textBox.SetValue(Control.FontSizeProperty, fontSize);
 
         // Scrolling doesn't work when touching a TextBox inside a ListView
         // unless the TextBox's PanningMode is set to None explicitly.
-        textBox.SetValue(ScrollViewer.PanningModeProperty, PanningMode.None);
+        textBox.SetValue(ScrollViewer.PanningModeProperty, s_boxedPanningModeNone);
 
         return textBox;
     }
