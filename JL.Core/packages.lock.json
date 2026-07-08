@@ -82,9 +82,9 @@
       },
       "SourceGear.sqlite3": {
         "type": "Direct",
-        "requested": "[3.50.4.5, )",
-        "resolved": "3.50.4.5",
-        "contentHash": "UtnipXhJYZKQOQIfpws/msLK7IRhMplE1CZCaZLIQXRnGD474QVpO/J9nMlQQY8NZueGz1aidjoxDRnrC1NT3Q=="
+        "requested": "[3.53.3, )",
+        "resolved": "3.53.3",
+        "contentHash": "PaDT7JwQ00HmXZT1xSGSC0c24A5lVpJYHMrXBuJATdpB2t0nf4Kq9HyPaZhxVW0elPq4XI1s5BLh7qLuObmzFA=="
       },
       "SQLitePCLRaw.bundle_e_sqlite3": {
         "type": "Direct",
