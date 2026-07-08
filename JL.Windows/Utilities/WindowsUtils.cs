@@ -1171,10 +1171,15 @@ internal static class WindowsUtils
     public static ImageInfo? GetImageInfo(string imagePath)
     {
         string fullImagePath = Path.GetFullPath(imagePath, AppInfo.ApplicationPath);
+        if (!File.Exists(fullImagePath))
+        {
+            return null;
+        }
+
         try
         {
-            using FileStream imageStream = File.OpenRead(fullImagePath);
-            BitmapFrame frame = BitmapFrame.Create(imageStream, BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
+            Uri imageUri = new(fullImagePath);
+            BitmapFrame frame = BitmapFrame.Create(imageUri, BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
             return new ImageInfo(imagePath, frame.PixelWidth, frame.PixelHeight, frame.Width, frame.Height);
         }
         catch (Exception ex)
