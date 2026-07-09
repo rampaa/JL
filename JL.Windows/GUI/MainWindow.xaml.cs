@@ -355,6 +355,7 @@ internal sealed partial class MainWindow : IDisposable
                         _lookupDelayTimer.IsEnabled = false;
                         _tsukikageLookupDelayTimer.IsEnabled = false;
                         MainTextBox.Text = BacklogUtils.LastItem;
+                        UpdatePosition();
                     }
 
                     Debug.Assert(MainTextBox.Text.Length > 0);
@@ -401,6 +402,8 @@ internal sealed partial class MainWindow : IDisposable
             }
 
             MainTextBox.AppendText(subsequentText);
+            UpdatePosition();
+
             mergedText = previousText + subsequentText;
             if (backlogActive)
             {
@@ -412,6 +415,7 @@ internal sealed partial class MainWindow : IDisposable
             if (doNotShowAllBacklog)
             {
                 MainTextBox.Text = sanitizedNewText;
+
                 Debug.Assert(MainTextBox.Text.Length > 0);
                 if (backlogActive)
                 {

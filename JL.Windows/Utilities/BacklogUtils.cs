@@ -37,7 +37,8 @@ internal static class BacklogUtils
     public static void AddToBacklogShowAllBacklog(string text)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        TextBox mainTextBox = MainWindow.Instance.MainTextBox;
+        MainWindow mainWindow = MainWindow.Instance;
+        TextBox mainTextBox = mainWindow.MainTextBox;
 
         bool removeOldestItem = configManager.MaxBacklogCapacity is not -1 && s_backlog.Count > configManager.MaxBacklogCapacity;
         s_currentNode = s_backlog.AddLast(text);
@@ -99,6 +100,7 @@ internal static class BacklogUtils
             mainTextBox.Foreground = ConfigManager.Instance.MainWindowBacklogTextColor;
             mainTextBox.Text = s_currentNode.Previous.Value;
             s_currentNode = s_currentNode.Previous;
+            mainWindow.UpdatePosition();
         }
     }
 
@@ -130,6 +132,7 @@ internal static class BacklogUtils
 
             mainTextBox.Text = s_currentNode.Next.Value;
             s_currentNode = s_currentNode.Next;
+            mainWindow.UpdatePosition();
         }
     }
 
@@ -147,7 +150,8 @@ internal static class BacklogUtils
         }
 
         string text = s_currentNode.Value;
-        TextBox mainTextBox = MainWindow.Instance.MainTextBox;
+        MainWindow mainWindow = MainWindow.Instance;
+        TextBox mainTextBox = mainWindow.MainTextBox;
         if (text != mainTextBox.Text)
         {
             return;
@@ -177,6 +181,8 @@ internal static class BacklogUtils
         mainTextBox.Text = newCurrentNode is not null
             ? newCurrentNode.Value
             : "";
+
+        mainWindow.UpdatePosition();
     }
 
     public static void ShowAllBacklog()
@@ -215,6 +221,7 @@ internal static class BacklogUtils
             }
 
             mainTextBox.ScrollToEnd();
+            mainWindow.UpdatePosition();
         }
     }
 
@@ -242,9 +249,11 @@ internal static class BacklogUtils
 
         if (lastText is not null)
         {
-            TextBox mainTextBox = MainWindow.Instance.MainTextBox;
+            MainWindow mainWindow = MainWindow.Instance;
+            TextBox mainTextBox = mainWindow.MainTextBox;
             mainTextBox.Foreground = ConfigManager.Instance.MainWindowTextColor;
             mainTextBox.Text = lastText;
+            mainWindow.UpdatePosition();
         }
     }
 
@@ -264,9 +273,12 @@ internal static class BacklogUtils
             {
                 s_currentNode = s_backlog.Last;
                 Debug.Assert(s_currentNode is not null);
-                TextBox mainTextBox = MainWindow.Instance.MainTextBox;
+
+                MainWindow mainWindow = MainWindow.Instance;
+                TextBox mainTextBox = mainWindow.MainTextBox;
                 mainTextBox.Foreground = configManager.MainWindowTextColor;
                 mainTextBox.Text = s_currentNode.Value;
+                mainWindow.UpdatePosition();
             }
         }
     }

@@ -520,6 +520,7 @@ internal sealed class ConfigManager
                 mainTextBox.Text = allBacklogText;
                 mainTextBox.CaretIndex = mainTextBox.Text.Length;
                 mainTextBox.ScrollToEnd();
+                MainWindow.Instance.UpdatePosition();
             }
         }
         else if (!AlwaysShowBacklog)
@@ -530,6 +531,7 @@ internal sealed class ConfigManager
                 mainTextBox.Text = lastText;
                 mainTextBox.CaretIndex = mainTextBox.Text.Length;
                 mainTextBox.ScrollToEnd();
+                MainWindow.Instance.UpdatePosition();
             }
         }
 
