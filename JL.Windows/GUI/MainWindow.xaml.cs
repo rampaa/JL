@@ -161,31 +161,22 @@ internal sealed partial class MainWindow : IDisposable
 
     private async Task<bool> CopyFromClipboard()
     {
-        Stopwatch stopwatch = Stopwatch.StartNew();
-        try
+        while (Clipboard.ContainsText())
         {
-            while (Clipboard.ContainsText())
+            try
             {
-                try
-                {
-                    string text = Clipboard.GetText();
-                    WindowsUtils.LastWebSocketTextWasVertical = false;
-                    return CopyText(text);
-                }
-                catch (ExternalException ex)
-                {
-                    LoggerManager.Logger.Warning(ex, "CopyFromClipboard failed");
-                    await Task.Delay(5).ConfigureAwait(true);
-                }
+                string text = Clipboard.GetText();
+                WindowsUtils.LastWebSocketTextWasVertical = false;
+                return CopyText(text);
             }
+            catch (ExternalException ex)
+            {
+                LoggerManager.Logger.Warning(ex, "CopyFromClipboard failed");
+                await Task.Delay(5).ConfigureAwait(true);
+            }
+        }
 
-            return false;
-        }
-        finally
-        {
-            stopwatch.Stop();
-            Debug.WriteLine(stopwatch.ElapsedMilliseconds);
-        }
+        return false;
     }
 
     public async Task CopyFromWebSocket(string text, bool tsukikage)
