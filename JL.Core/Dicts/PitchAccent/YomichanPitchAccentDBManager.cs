@@ -18,6 +18,16 @@ internal static class YomichanPitchAccentDBManager
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
+    private const string Record = "Record";
+    private const string RowId = "rowid";
+    private const string Spelling = "spelling";
+    private const string Reading = "reading";
+    private const string Position = "position";
+
+    private const string RecordSearchKey = "record_search_key";
+    private const string RecordId = "record_id";
+    private const string SearchKey = "search_key";
+
     public static string GetQuery(int termCount)
     {
         if (s_queryCache.TryGetValue(termCount, out string? query))
@@ -26,11 +36,11 @@ internal static class YomichanPitchAccentDBManager
         }
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
-            """
-            SELECT r.spelling, r.reading, r.position, rsk.search_key
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            WHERE rsk.search_key IN (@1
+            $"""
+            SELECT r.{Spelling}, r.{Reading}, r.{Position}, rsk.{SearchKey}
+            FROM {Record} r
+            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+            WHERE rsk.{SearchKey} IN (@1
             """);
 
         for (int i = 1; i < termCount; i++)
@@ -58,21 +68,21 @@ internal static class YomichanPitchAccentDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            CREATE TABLE IF NOT EXISTS record
+            $"""
+            CREATE TABLE IF NOT EXISTS {Record}
             (
-                rowid INTEGER NOT NULL PRIMARY KEY,
-                spelling TEXT NOT NULL,
-                reading TEXT,
-                position INTEGER NOT NULL
+                {RowId} INTEGER NOT NULL PRIMARY KEY,
+                {Spelling} TEXT NOT NULL,
+                {Reading} TEXT,
+                {Position} INTEGER NOT NULL
             ) STRICT;
 
-            CREATE TABLE IF NOT EXISTS record_search_key
+            CREATE TABLE IF NOT EXISTS {RecordSearchKey}
             (
-                search_key TEXT NOT NULL,
-                record_id INTEGER NOT NULL,
-                PRIMARY KEY (search_key, record_id),
-                FOREIGN KEY (record_id) REFERENCES record (rowid) ON DELETE CASCADE
+                {SearchKey} TEXT NOT NULL,
+                {RecordId} INTEGER NOT NULL,
+                PRIMARY KEY ({SearchKey}, {RecordId}),
+                FOREIGN KEY ({RecordId}) REFERENCES {Record} ({RowId}) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -114,15 +124,15 @@ internal static class YomichanPitchAccentDBManager
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
-            """
-            INSERT INTO record (rowid, spelling, reading, position)
-            VALUES (@rowid, @spelling, @reading, @position)
+            $"""
+            INSERT INTO {Record} ({RowId}, {Spelling}, {Reading}, {Position})
+            VALUES (@{RowId}, @{Spelling}, @{Reading}, @{Position})
             """;
 
-        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
-        SqliteParameter spellingParam = new("@spelling", SqliteType.Text);
-        SqliteParameter readingParam = new("@reading", SqliteType.Text);
-        SqliteParameter positionParam = new("@position", SqliteType.Integer);
+        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter spellingParam = new($"@{Spelling}", SqliteType.Text);
+        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
+        SqliteParameter positionParam = new($"@{Position}", SqliteType.Integer);
         insertRecordCommand.Parameters.AddRange([
             rowidParam,
             spellingParam,
@@ -134,13 +144,13 @@ internal static class YomichanPitchAccentDBManager
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
         insertSearchKeyCommand.CommandText =
-            """
-            INSERT INTO record_search_key(record_id, search_key)
-            VALUES (@record_id, @search_key)
+            $"""
+            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
+            VALUES (@{RecordId}, @{SearchKey})
             """;
 
-        SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
         insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
@@ -233,11 +243,11 @@ internal static class YomichanPitchAccentDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT r.spelling, r.reading, r.position, json_group_array(rsk.search_key)
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            GROUP BY r.rowid;
+            $"""
+            SELECT r.{Spelling}, r.{Reading}, r.{Position}, json_group_array(rsk.{SearchKey})
+            FROM {Record} r
+            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+            GROUP BY r.{RowId};
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();

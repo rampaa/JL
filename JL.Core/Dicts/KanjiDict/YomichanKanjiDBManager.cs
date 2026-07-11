@@ -13,11 +13,20 @@ internal static class YomichanKanjiDBManager
 {
     public const int Version = 4;
 
+    private const string Record = "record";
+    private const string RowId = "rowid";
+    private const string Kanji = "kanji";
+    private const string OnReadings = "on_readings";
+    private const string KunReadings = "kun_readings";
+    private const string Glossary = "glossary";
+    private const string Stats = "stats";
+
+    private const string Term = "term";
     private const string SingleTermQuery =
-        """
-        SELECT r.rowid, r.on_readings, r.kun_readings, r.glossary, r.stats
-        FROM record r
-        WHERE r.kanji = @term;
+        $"""
+        SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}
+        FROM {Record} r
+        WHERE r.{Kanji} = @{Term};
         """;
 
     private enum ColumnIndex
@@ -37,15 +46,15 @@ internal static class YomichanKanjiDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            CREATE TABLE IF NOT EXISTS record
+            $"""
+            CREATE TABLE IF NOT EXISTS {Record}
             (
-                rowid INTEGER NOT NULL PRIMARY KEY,
-                kanji TEXT NOT NULL,
-                on_readings BLOB,
-                kun_readings BLOB,
-                glossary BLOB,
-                stats BLOB
+                {RowId} INTEGER NOT NULL PRIMARY KEY,
+                {Kanji} TEXT NOT NULL,
+                {OnReadings} BLOB,
+                {KunReadings} BLOB,
+                {Glossary} BLOB,
+                {Stats} BLOB
             ) STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -69,17 +78,17 @@ internal static class YomichanKanjiDBManager
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
-            """
-            INSERT INTO record (rowid, kanji, on_readings, kun_readings, glossary, stats)
-            VALUES (@rowid, @kanji, @on_readings, @kun_readings, @glossary, @stats);
+            $"""
+            INSERT INTO record ({RowId}, {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats})
+            VALUES (@{RowId}, @{Kanji}, @{OnReadings}, @{KunReadings}, @{Glossary}, @{Stats});
             """;
 
-        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
-        SqliteParameter kanjiParam = new("@kanji", SqliteType.Text);
-        SqliteParameter onReadingsParam = new("@on_readings", SqliteType.Blob);
-        SqliteParameter kunReadingsParam = new("@kun_readings", SqliteType.Blob);
-        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
-        SqliteParameter statsParam = new("@stats", SqliteType.Blob);
+        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter kanjiParam = new($"@{Kanji}", SqliteType.Text);
+        SqliteParameter onReadingsParam = new($"@{OnReadings}", SqliteType.Blob);
+        SqliteParameter kunReadingsParam = new($"@{KunReadings}", SqliteType.Blob);
+        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
+        SqliteParameter statsParam = new($"@{Stats}", SqliteType.Blob);
         insertRecordCommand.Parameters.AddRange([
             rowidParam,
             kanjiParam,
@@ -110,7 +119,7 @@ internal static class YomichanKanjiDBManager
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
-        createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_kanji ON record(kanji);";
+        createIndexCommand.CommandText = $"CREATE INDEX IF NOT EXISTS ix_record_kanji ON {Record}({Kanji});";
         _ = createIndexCommand.ExecuteNonQuery();
 
         transaction.Commit();
@@ -136,7 +145,7 @@ internal static class YomichanKanjiDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText = SingleTermQuery;
-        _ = command.Parameters.AddWithValue("@term", term);
+        _ = command.Parameters.AddWithValue($"@{Term}", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
@@ -161,9 +170,9 @@ internal static class YomichanKanjiDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT r.rowid, r.on_readings, r.kun_readings, r.glossary, r.stats, r.kanji
-            FROM record r;
+            $"""
+            SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats} r.{Kanji}
+            FROM {Record} r;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
