@@ -17,12 +17,26 @@ internal static class EpwingYomichanDBManager
 {
     public const int Version = 32;
 
+    private const string Record = "record";
+    private const string RowId = "rowid";
+    private const string PrimarySpelling = "primary_spelling";
+    private const string Reading = "reading";
+    private const string Glossary = "glossary";
+    private const string PartOfSpeech = "part_of_speech";
+    private const string GlossaryTags = "glossary_tags";
+    private const string ImageInfos = "image_infos";
+
+    private const string RecordSearchKey = "record_search_key";
+    private const string RecordId = "record_id";
+    private const string SearchKey = "search_key";
+
+    private const string Term = "term";
     private const string SingleTermQuery =
-        """
-        SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_infos
-        FROM record r
-        JOIN record_search_key rsk ON r.rowid = rsk.record_id
-        WHERE rsk.search_key = @term;
+        $"""
+        SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}
+        FROM {Record} r
+        JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+        WHERE rsk.{SearchKey} = @{Term};
         """;
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
@@ -35,11 +49,11 @@ internal static class EpwingYomichanDBManager
         }
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
-            """
-            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_infos, rsk.search_key
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            WHERE rsk.search_key IN (@1
+            $"""
+            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}, rsk.{SearchKey}
+            FROM {Record} r
+            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+            WHERE rsk.{SearchKey} IN (@1
             """);
 
         for (int i = 1; i < termCount; i++)
@@ -72,24 +86,24 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            CREATE TABLE IF NOT EXISTS record
+            $"""
+            CREATE TABLE IF NOT EXISTS {Record}
             (
-                rowid INTEGER NOT NULL PRIMARY KEY,
-                primary_spelling TEXT NOT NULL,
-                reading TEXT,
-                glossary BLOB NOT NULL,
-                part_of_speech BLOB,
-                glossary_tags BLOB,
-                image_infos BLOB
+                {RowId} INTEGER NOT NULL PRIMARY KEY,
+                {PrimarySpelling} TEXT NOT NULL,
+                {Reading} TEXT,
+                {Glossary} BLOB NOT NULL,
+                {PartOfSpeech} BLOB,
+                {GlossaryTags} BLOB,
+                {ImageInfos} BLOB
             ) STRICT;
 
-            CREATE TABLE IF NOT EXISTS record_search_key
+            CREATE TABLE IF NOT EXISTS {RecordSearchKey}
             (
-                search_key TEXT NOT NULL,
-                record_id INTEGER NOT NULL,
-                PRIMARY KEY (search_key, record_id),
-                FOREIGN KEY (record_id) REFERENCES record (rowid) ON DELETE CASCADE
+                {SearchKey} TEXT NOT NULL,
+                {RecordId} INTEGER NOT NULL,
+                PRIMARY KEY ({SearchKey}, {RecordId}),
+                FOREIGN KEY ({RecordId}) REFERENCES {Record} ({RowId}) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -131,18 +145,18 @@ internal static class EpwingYomichanDBManager
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
-            """
-            INSERT INTO record (rowid, primary_spelling, reading, glossary, part_of_speech, glossary_tags, image_infos)
-            VALUES (@rowid, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags, @image_infos);
+            $"""
+            INSERT INTO {Record} ({RowId}, {PrimarySpelling}, {Reading}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos})
+            VALUES (@{RowId}, @{PrimarySpelling}, @{Reading}, @{Glossary}, @{PartOfSpeech}, @{GlossaryTags}, @{ImageInfos});
             """;
 
-        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new("@primary_spelling", SqliteType.Text);
-        SqliteParameter readingParam = new("@reading", SqliteType.Text);
-        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
-        SqliteParameter partOfSpeechParam = new("@part_of_speech", SqliteType.Blob);
-        SqliteParameter glossaryTagsParam = new("@glossary_tags", SqliteType.Blob);
-        SqliteParameter imageInfosParam = new("@image_infos", SqliteType.Blob);
+        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
+        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
+        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
+        SqliteParameter partOfSpeechParam = new($"@{PartOfSpeech}", SqliteType.Blob);
+        SqliteParameter glossaryTagsParam = new($"@{GlossaryTags}", SqliteType.Blob);
+        SqliteParameter imageInfosParam = new($"@{ImageInfos}", SqliteType.Blob);
         insertRecordCommand.Parameters.AddRange([
             rowidParam,
             primarySpellingParam,
@@ -157,13 +171,13 @@ internal static class EpwingYomichanDBManager
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
         insertSearchKeyCommand.CommandText =
-            """
-            INSERT INTO record_search_key(record_id, search_key)
-            VALUES (@record_id, @search_key);
+            $"""
+            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
+            VALUES (@{RecordId}, @{SearchKey});
             """;
 
-        SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
         insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
@@ -256,7 +270,7 @@ internal static class EpwingYomichanDBManager
 
         command.CommandText = SingleTermQuery;
 
-        _ = command.Parameters.AddWithValue("@term", term);
+        _ = command.Parameters.AddWithValue($"@{Term}", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
@@ -280,11 +294,11 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT r.rowid, r.primary_spelling, r.reading, r.glossary, r.part_of_speech, r.glossary_tags, r.image_paths, json_group_array(rsk.search_key)
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            GROUP BY r.rowid;
+            $"""
+            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos} json_group_array(rsk.{SearchKey})
+            FROM {Record} r
+            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+            GROUP BY r.{RowId};
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();

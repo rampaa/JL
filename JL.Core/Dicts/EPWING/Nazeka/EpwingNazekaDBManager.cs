@@ -17,12 +17,25 @@ internal static class EpwingNazekaDBManager
 {
     public const int Version = 17;
 
+    private const string Record = "record";
+    private const string RowId = "rowid";
+    private const string PrimarySpelling = "primary_spelling";
+    private const string Reading = "reading";
+    private const string Glossary = "glossary";
+    private const string AlternativeSpellings = "alternative_spellings";
+    private const string ImageInfo = "image_info";
+
+    private const string RecordSearchKey = "record_search_key";
+    private const string RecordId = "record_id";
+    private const string SearchKey = "search_key";
+
+    private const string Term = "term";
     private const string SingleTermQuery =
-        """
-        SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_info
-        FROM record r
-        JOIN record_search_key rsk ON r.rowid = rsk.record_id
-        WHERE rsk.search_key = @term;
+        $"""
+        SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}
+        FROM {Record} r
+        JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+        WHERE rsk.{SearchKey} = @{Term};
         """;
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
@@ -35,11 +48,11 @@ internal static class EpwingNazekaDBManager
         }
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
-            """
-            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_info, rsk.search_key
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            WHERE rsk.search_key IN (@1
+            $"""
+            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}, rsk.{SearchKey}
+            FROM {Record} r
+            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+            WHERE rsk.{SearchKey} IN (@1
             """);
 
         for (int i = 1; i < termCount; i++)
@@ -71,23 +84,23 @@ internal static class EpwingNazekaDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            CREATE TABLE IF NOT EXISTS record
+            $"""
+            CREATE TABLE IF NOT EXISTS {Record}
             (
-                rowid INTEGER NOT NULL PRIMARY KEY,
-                primary_spelling TEXT NOT NULL,
-                reading TEXT,
-                alternative_spellings BLOB,
-                glossary BLOB NOT NULL,
-                image_info BLOB
+                {RowId} INTEGER NOT NULL PRIMARY KEY,
+                {PrimarySpelling} TEXT NOT NULL,
+                {Reading} TEXT,
+                {AlternativeSpellings} BLOB,
+                {Glossary} BLOB NOT NULL,
+                {ImageInfo} BLOB
             ) STRICT;
 
-            CREATE TABLE IF NOT EXISTS record_search_key
+            CREATE TABLE IF NOT EXISTS {RecordSearchKey}
             (
-                search_key TEXT NOT NULL,
-                record_id INTEGER NOT NULL,
-                PRIMARY KEY (search_key, record_id),
-                FOREIGN KEY (record_id) REFERENCES record (rowid) ON DELETE CASCADE
+                {SearchKey} TEXT NOT NULL,
+                {RecordId} INTEGER NOT NULL,
+                PRIMARY KEY ({SearchKey}, {RecordId}),
+                FOREIGN KEY ({RecordId}) REFERENCES {Record} ({RowId}) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -129,17 +142,17 @@ internal static class EpwingNazekaDBManager
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
-            """
-            INSERT INTO record (rowid, primary_spelling, reading, alternative_spellings, glossary, image_info)
-            VALUES (@rowid, @primary_spelling, @reading, @alternative_spellings, @glossary, @image_info);
+            $"""
+            INSERT INTO record ({RowId}, {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo})
+            VALUES (@{RowId}, @{PrimarySpelling}, @{Reading}, @{AlternativeSpellings}, @{Glossary}, @{ImageInfo});
             """;
 
-        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new("@primary_spelling", SqliteType.Text);
-        SqliteParameter readingParam = new("@reading", SqliteType.Text);
-        SqliteParameter alternativeSpellingsParam = new("@alternative_spellings", SqliteType.Blob);
-        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
-        SqliteParameter imageInfoParam = new("@image_info", SqliteType.Blob);
+        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
+        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
+        SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
+        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
+        SqliteParameter imageInfoParam = new($"@{ImageInfo}", SqliteType.Blob);
         insertRecordCommand.Parameters.AddRange([
             rowidParam,
             primarySpellingParam,
@@ -153,13 +166,13 @@ internal static class EpwingNazekaDBManager
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
         insertSearchKeyCommand.CommandText =
-            """
-            INSERT INTO record_search_key(record_id, search_key)
-            VALUES (@record_id, @search_key);
+            $"""
+            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
+            VALUES (@{RecordId}, @{SearchKey});
             """;
 
-        SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
         insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
@@ -251,7 +264,7 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText = SingleTermQuery;
 
-        _ = command.Parameters.AddWithValue("@term", term);
+        _ = command.Parameters.AddWithValue($"@{Term}", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
@@ -276,11 +289,11 @@ internal static class EpwingNazekaDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT r.rowid, r.primary_spelling, r.reading, r.alternative_spellings, r.glossary, r.image_info, json_group_array(rsk.search_key)
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            GROUP BY r.rowid;
+            $"""
+            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}, json_group_array(rsk.{SearchKey})
+            FROM {Record} r
+            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+            GROUP BY r.{RowId};
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
