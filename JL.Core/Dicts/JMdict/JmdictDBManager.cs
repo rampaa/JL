@@ -15,7 +15,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 20;
+    public const int Version = 21;
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
