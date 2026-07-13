@@ -13,11 +13,23 @@ internal static class KanjidicDBManager
 {
     public const int Version = 3;
 
+    private const string Record = "record";
+    private const string Kanji = "kanji";
+    private const string OnReadings = "on_readings";
+    private const string KunReadings = "kun_readings";
+    private const string NanoriReadings = "nanori_readings";
+    private const string RadicalNames = "radical_names";
+    private const string Glossary = "glossary";
+    private const string StrokeCount = "stroke_count";
+    private const string Grade = "grade";
+    private const string Frequency = "frequency";
+
+    private const string Term = "term";
     private const string SingleTermQuery =
-        """
-        SELECT r.on_readings, r.kun_readings, r.nanori_readings, r.radical_names, r.glossary, r.stroke_count, r.grade, r.frequency
-        FROM record r
-        WHERE r.kanji = @term;
+        $"""
+        SELECT r.{OnReadings}, r.{KunReadings}, r.{NanoriReadings}, r.{RadicalNames}, r.{Glossary}, r.{StrokeCount}, r.{Grade}, r.{Frequency}
+        FROM {Record} r
+        WHERE r.{Kanji} = @{Term};
         """;
 
     private enum ColumnIndex
@@ -39,18 +51,18 @@ internal static class KanjidicDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            CREATE TABLE IF NOT EXISTS record
+            $"""
+            CREATE TABLE IF NOT EXISTS {Record}
             (
-                kanji TEXT NOT NULL PRIMARY KEY,
-                on_readings BLOB,
-                kun_readings BLOB,
-                nanori_readings BLOB,
-                radical_names BLOB,
-                glossary BLOB,
-                stroke_count INTEGER NOT NULL,
-                grade INTEGER NOT NULL,
-                frequency INTEGER NOT NULL
+                {Kanji} TEXT NOT NULL PRIMARY KEY,
+                {OnReadings} BLOB,
+                {KunReadings} BLOB,
+                {NanoriReadings} BLOB,
+                {RadicalNames} BLOB,
+                {Glossary} BLOB,
+                {StrokeCount} INTEGER NOT NULL,
+                {Grade} INTEGER NOT NULL,
+                {Frequency} INTEGER NOT NULL
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -72,20 +84,20 @@ internal static class KanjidicDBManager
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
-            """
-            INSERT INTO record (kanji, on_readings, kun_readings, nanori_readings, radical_names, glossary, stroke_count, grade, frequency)
-            VALUES (@kanji, @on_readings, @kun_readings, @nanori_readings, @radical_names, @glossary, @stroke_count, @grade, @frequency);
+            $"""
+            INSERT INTO {Record} ({Kanji}, {OnReadings}, {KunReadings}, {NanoriReadings}, {RadicalNames}, {Glossary}, {StrokeCount}, {Grade}, {Frequency})
+            VALUES (@{Kanji}, @{OnReadings}, @{KunReadings}, @{NanoriReadings}, @{RadicalNames}, @{Glossary}, @{StrokeCount}, @{Grade}, @{Frequency});
             """;
 
-        SqliteParameter kanjiParam = new("@kanji", SqliteType.Text);
-        SqliteParameter onReadingsParam = new("@on_readings", SqliteType.Blob);
-        SqliteParameter kunReadingsParam = new("@kun_readings", SqliteType.Blob);
-        SqliteParameter nanoriReadingsParam = new("@nanori_readings", SqliteType.Blob);
-        SqliteParameter radicalNamesParam = new("@radical_names", SqliteType.Blob);
-        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
-        SqliteParameter strokeCountParam = new("@stroke_count", SqliteType.Integer);
-        SqliteParameter gradeParam = new("@grade", SqliteType.Integer);
-        SqliteParameter frequencyParam = new("@frequency", SqliteType.Integer);
+        SqliteParameter kanjiParam = new($"@{Kanji}", SqliteType.Text);
+        SqliteParameter onReadingsParam = new($"@{OnReadings}", SqliteType.Blob);
+        SqliteParameter kunReadingsParam = new($"@{KunReadings}", SqliteType.Blob);
+        SqliteParameter nanoriReadingsParam = new($"@{NanoriReadings}", SqliteType.Blob);
+        SqliteParameter radicalNamesParam = new($"@{RadicalNames}", SqliteType.Blob);
+        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
+        SqliteParameter strokeCountParam = new($"@{StrokeCount}", SqliteType.Integer);
+        SqliteParameter gradeParam = new($"@{Grade}", SqliteType.Integer);
+        SqliteParameter frequencyParam = new($"@{Frequency}", SqliteType.Integer);
         insertRecordCommand.Parameters.AddRange([
             kanjiParam,
             onReadingsParam,
@@ -142,7 +154,7 @@ internal static class KanjidicDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText = SingleTermQuery;
-        _ = command.Parameters.AddWithValue("@term", term);
+        _ = command.Parameters.AddWithValue($"@{Term}", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
@@ -162,9 +174,9 @@ internal static class KanjidicDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT r.on_readings, r.kun_readings, r.nanori_readings, r.radical_names, r.glossary, r.stroke_count, r.grade, r.frequency, r.kanji
-            FROM record r;
+            $"""
+            SELECT r.{OnReadings}, r.{KunReadings}, r.{NanoriReadings}, r.{RadicalNames}, r.{Glossary}, r.{StrokeCount}, r.{Grade}, r.{Frequency}, r.{Kanji}
+            FROM {Record} r;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
@@ -180,31 +192,11 @@ internal static class KanjidicDBManager
 
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)
     {
-        const int onReadingsIndex = (int)ColumnIndex.OnReadings;
-        string[]? onReadings = !dataReader.IsDBNull(onReadingsIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(onReadingsIndex))
-            : null;
-
-        const int kunReadingsIndex = (int)ColumnIndex.KunReadings;
-        string[]? kunReadings = !dataReader.IsDBNull(kunReadingsIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(kunReadingsIndex))
-            : null;
-
-        const int nanoriReadingsIndex = (int)ColumnIndex.NanoriReadings;
-        string[]? nanoriReadings = !dataReader.IsDBNull(nanoriReadingsIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(nanoriReadingsIndex))
-            : null;
-
-        const int radicalNamesIndex = (int)ColumnIndex.RadicalNames;
-        string[]? radicalNames = !dataReader.IsDBNull(radicalNamesIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(radicalNamesIndex))
-            : null;
-
-        const int glossaryIndex = (int)ColumnIndex.Glossary;
-        string[]? definitions = !dataReader.IsDBNull(glossaryIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(glossaryIndex))
-            : null;
-
+        string[]? onReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.OnReadings);
+        string[]? kunReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.KunReadings);
+        string[]? nanoriReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.NanoriReadings);
+        string[]? radicalNames = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.RadicalNames);
+        string[]? definitions = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
         byte strokeCount = dataReader.GetByte((int)ColumnIndex.StrokeCount);
         byte grade = dataReader.GetByte((int)ColumnIndex.Grade);
         int frequency = dataReader.GetInt32((int)ColumnIndex.Frequency);
