@@ -192,11 +192,35 @@ internal static class KanjidicDBManager
 
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)
     {
-        string[]? onReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.OnReadings);
-        string[]? kunReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.KunReadings);
-        string[]? nanoriReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.NanoriReadings);
-        string[]? radicalNames = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.RadicalNames);
-        string[]? definitions = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
+        // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
+        // As a result, dataReader.GetStream cannot use its fast SqliteBlob path.
+        // We therefore read the BLOBs directly instead of using GetNullableValueFromBlobStream.
+
+        const int onReadingsIndex = (int)ColumnIndex.OnReadings;
+        string[]? onReadings = !dataReader.IsDBNull(onReadingsIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(onReadingsIndex))
+            : null;
+
+        const int kunReadingsIndex = (int)ColumnIndex.KunReadings;
+        string[]? kunReadings = !dataReader.IsDBNull(kunReadingsIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(kunReadingsIndex))
+            : null;
+
+        const int nanoriReadingsIndex = (int)ColumnIndex.NanoriReadings;
+        string[]? nanoriReadings = !dataReader.IsDBNull(nanoriReadingsIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(nanoriReadingsIndex))
+            : null;
+
+        const int radicalNamesIndex = (int)ColumnIndex.RadicalNames;
+        string[]? radicalNames = !dataReader.IsDBNull(radicalNamesIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(radicalNamesIndex))
+            : null;
+
+        const int glossaryIndex = (int)ColumnIndex.Glossary;
+        string[]? definitions = !dataReader.IsDBNull(glossaryIndex)
+            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(glossaryIndex))
+            : null;
+
         byte strokeCount = dataReader.GetByte((int)ColumnIndex.StrokeCount);
         byte grade = dataReader.GetByte((int)ColumnIndex.Grade);
         int frequency = dataReader.GetInt32((int)ColumnIndex.Frequency);

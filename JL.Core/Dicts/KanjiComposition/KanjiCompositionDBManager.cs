@@ -37,6 +37,10 @@ internal static class KanjiCompositionDBManager
         }
 
         _ = dataReader.Read();
+
+        // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
+        // As a result, dataReader.GetStream cannot use its fast SqliteBlob path.
+        // We therefore read the BLOBs directly instead of using GetNullableValueFromBlobStream.
         return MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(0));
     }
 }
