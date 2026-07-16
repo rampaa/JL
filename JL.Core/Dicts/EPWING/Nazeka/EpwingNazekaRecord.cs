@@ -139,6 +139,11 @@ internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatabl
                && other.Definitions.SequenceEqual(Definitions)));
     }
 
+    public bool Equals([NotNullWhen(true)] IDictRecord? other)
+    {
+        return other is EpwingNazekaRecord epwingNazekaRecord && Equals(epwingNazekaRecord);
+    }
+
     public override int GetHashCode()
     {
         unchecked
