@@ -181,6 +181,11 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
                && other.WordClasses.SequenceEqual(WordClasses)));
     }
 
+    public bool Equals([NotNullWhen(true)] IDictRecord? other)
+    {
+        return other is CustomWordRecord customWordRecord && Equals(customWordRecord);
+    }
+
     public override int GetHashCode()
     {
         unchecked

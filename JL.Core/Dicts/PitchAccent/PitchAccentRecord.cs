@@ -102,6 +102,11 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
             && Reading == other.Reading;
     }
 
+    public bool Equals([NotNullWhen(true)] IDictRecord? other)
+    {
+        return other is PitchAccentRecord pitchAccentRecord && Equals(pitchAccentRecord);
+    }
+
     public static bool operator ==(PitchAccentRecord? left, PitchAccentRecord? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(PitchAccentRecord? left, PitchAccentRecord? right) => !(left == right);
 }

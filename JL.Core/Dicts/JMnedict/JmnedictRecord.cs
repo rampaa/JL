@@ -141,6 +141,11 @@ internal sealed class JmnedictRecord : IDictRecordWithMultipleReadings, IEquatab
             && Definitions.SequenceEqual(other.Definitions, ArrayComparer<string>.Instance)));
     }
 
+    public bool Equals([NotNullWhen(true)] IDictRecord? other)
+    {
+        return other is JmnedictRecord jmnedictRecord && Equals(jmnedictRecord);
+    }
+
     public static bool operator ==(JmnedictRecord? left, JmnedictRecord? right) => left?.Equals(right) ?? (right is null);
     public static bool operator !=(JmnedictRecord? left, JmnedictRecord? right) => !(left == right);
 }

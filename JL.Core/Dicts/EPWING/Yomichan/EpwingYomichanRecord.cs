@@ -161,6 +161,11 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
                && other.ImageInfos.SequenceEqual(ImageInfos)));
     }
 
+    public bool Equals([NotNullWhen(true)] IDictRecord? other)
+    {
+        return other is EpwingYomichanRecord record && Equals(record);
+    }
+
     public override int GetHashCode()
     {
         unchecked

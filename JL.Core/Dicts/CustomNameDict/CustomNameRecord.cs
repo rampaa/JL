@@ -45,6 +45,11 @@ internal sealed class CustomNameRecord : IDictRecord, IEquatable<CustomNameRecor
                && ImageInfo == other.ImageInfo;
     }
 
+    public bool Equals([NotNullWhen(true)] IDictRecord? other)
+    {
+        return other is CustomNameRecord customNameRecord && Equals(customNameRecord);
+    }
+
     public override int GetHashCode()
     {
         return HashCode.Combine(PrimarySpelling.GetHashCode(StringComparison.Ordinal),

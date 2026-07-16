@@ -141,6 +141,11 @@ internal sealed class YomichanKanjiRecord : IDictRecord, IEquatable<YomichanKanj
                 || (Definitions is not null && other.Definitions is not null && Definitions.SequenceEqual(other.Definitions)))));
     }
 
+    public bool Equals([NotNullWhen(true)] IDictRecord? other)
+    {
+        return other is YomichanKanjiRecord yomichanKanjiRecord && Equals(yomichanKanjiRecord);
+    }
+
     public bool Equals([NotNullWhen(true)] YomichanKanjiRecord? other)
     {
         return other is not null
