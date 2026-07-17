@@ -64,6 +64,10 @@ internal static class KanjidicLoader
                         dict.Updating = false;
                     }
                 }
+                else
+                {
+                    dict.Updating = false;
+                }
             }
             else
             {

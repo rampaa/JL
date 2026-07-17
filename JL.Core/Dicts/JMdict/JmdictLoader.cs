@@ -168,6 +168,10 @@ internal static class JmdictLoader
                         dict.Updating = false;
                     }
                 }
+                else
+                {
+                    dict.Updating = false;
+                }
             }
             else
             {

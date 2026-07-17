@@ -65,6 +65,10 @@ internal static class JmnedictLoader
                         dict.Updating = false;
                     }
                 }
+                else
+                {
+                    dict.Updating = false;
+                }
             }
             else
             {
