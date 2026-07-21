@@ -18,6 +18,7 @@ public sealed class LookupResult
         string? deconjugationProcess = null,
         int minDeconjugationProcessStepCount = 0,
         int entryId = 0,
+        int popularityScore = int.MinValue,
         byte[]? pitchPositions = null,
         string[]? wordClasses = null,
         ImageInfo[]? imageInfos = null,
@@ -43,6 +44,7 @@ public sealed class LookupResult
     internal string[]? WordClasses { get; } = wordClasses;
 
     // Yomichan dictionaries
+    public int Score { get; } = popularityScore;
     public ImageInfo[]? ImageInfos { get; } = imageInfos;
 
     // JMdict, Nazeka EPWING
@@ -244,7 +246,14 @@ public sealed class LookupResult
             }
         }
 
-        // 9. ThenBy: Index in Readings
+        // 9. ThenByDescending Yomichan popularity score
+        int comResult = other.Score.CompareTo(Score);
+        if (comResult is not 0)
+        {
+            return comResult;
+        }
+
+        // 10. ThenBy: Index in Readings
         int readingIndexOfMatchedTextScore = readingsContainMatchedText
             ? readingIndexOfMatchedText
             : int.MaxValue;
@@ -259,7 +268,7 @@ public sealed class LookupResult
             return cmpResult;
         }
 
-        // 10. ThenBy: EntryId
+        // 11. ThenBy: EntryId
         int idScore = EntryId > 0
             ? EntryId
             : int.MaxValue;
@@ -274,18 +283,18 @@ public sealed class LookupResult
             return cmpResult;
         }
 
-        // 11. ThenBy: Primary spelling
+        // 12. ThenBy: Primary spelling
         cmpResult = PrimarySpelling.CompareTo(otherPrimarySpelling, StringComparison.Ordinal);
         if (cmpResult is not 0)
         {
             return cmpResult;
         }
 
-        // 12. ThenByDescending: FormattedDefinitions length
+        // 13. ThenByDescending: FormattedDefinitions length
         cmpResult = (other.FormattedDefinitions?.Length ?? 0).CompareTo(FormattedDefinitions?.Length ?? 0);
         return cmpResult is not 0
             ? cmpResult
-            // 13. ThenBy: FormattedDefinitions
+            // 14. ThenBy: FormattedDefinitions
             : FormattedDefinitions.CompareTo(other.FormattedDefinitions, StringComparison.Ordinal);
     }
 

@@ -15,7 +15,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 32;
+    public const int Version = 33;
 
     private const string Record = "record";
     private const string RowId = "rowid";
@@ -25,7 +25,7 @@ internal static class EpwingYomichanDBManager
     private const string PartOfSpeech = "part_of_speech";
     private const string GlossaryTags = "glossary_tags";
     private const string ImageInfos = "image_infos";
-
+    private const string PopularityScore = "popularity_score";
     private const string RecordSearchKey = "record_search_key";
     private const string RecordId = "record_id";
     private const string SearchKey = "search_key";
@@ -33,7 +33,7 @@ internal static class EpwingYomichanDBManager
     private const string Term = "term";
     private const string SingleTermQuery =
         $"""
-        SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}
+        SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}
         FROM {Record} r
         JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
         WHERE rsk.{SearchKey} = @{Term};
@@ -50,7 +50,7 @@ internal static class EpwingYomichanDBManager
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             $"""
-            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}, rsk.{SearchKey}
+            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}, rsk.{SearchKey}
             FROM {Record} r
             JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
             WHERE rsk.{SearchKey} IN (@1
@@ -73,6 +73,7 @@ internal static class EpwingYomichanDBManager
         RowId = 0,
         PrimarySpelling,
         Reading,
+        PopularityScore,
         Glossary,
         PartOfSpeech,
         GlossaryTags,
@@ -92,6 +93,7 @@ internal static class EpwingYomichanDBManager
                 {RowId} INTEGER NOT NULL PRIMARY KEY,
                 {PrimarySpelling} TEXT NOT NULL,
                 {Reading} TEXT,
+                {PopularityScore} INTEGER NOT NULL,
                 {Glossary} BLOB NOT NULL,
                 {PartOfSpeech} BLOB,
                 {GlossaryTags} BLOB,
@@ -146,13 +148,14 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             $"""
-            INSERT INTO {Record} ({RowId}, {PrimarySpelling}, {Reading}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos})
-            VALUES (@{RowId}, @{PrimarySpelling}, @{Reading}, @{Glossary}, @{PartOfSpeech}, @{GlossaryTags}, @{ImageInfos});
+            INSERT INTO {Record} ({RowId}, {PrimarySpelling}, {Reading}, {PopularityScore}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos})
+            VALUES (@{RowId}, @{PrimarySpelling}, @{Reading}, @{PopularityScore}, @{Glossary}, @{PartOfSpeech}, @{GlossaryTags}, @{ImageInfos});
             """;
 
         SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
         SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
         SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
+        SqliteParameter popularityScoreParam = new($"@{PopularityScore}", SqliteType.Integer);
         SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
         SqliteParameter partOfSpeechParam = new($"@{PartOfSpeech}", SqliteType.Blob);
         SqliteParameter glossaryTagsParam = new($"@{GlossaryTags}", SqliteType.Blob);
@@ -161,6 +164,7 @@ internal static class EpwingYomichanDBManager
             rowidParam,
             primarySpellingParam,
             readingParam,
+            popularityScoreParam,
             glossaryParam,
             partOfSpeechParam,
             glossaryTagsParam,
@@ -186,6 +190,7 @@ internal static class EpwingYomichanDBManager
             rowidParam.Value = rowId;
             primarySpellingParam.Value = record.PrimarySpelling;
             readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
+            popularityScoreParam.Value = record.PopularityScore;
             glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
             partOfSpeechParam.Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
             glossaryTagsParam.Value = record.DefinitionTags is not null ? MessagePackSerializer.Serialize(record.DefinitionTags) : DBNull.Value;
@@ -295,7 +300,7 @@ internal static class EpwingYomichanDBManager
 
         command.CommandText =
             $"""
-            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos} json_group_array(rsk.{SearchKey})
+            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}, json_group_array(rsk.{SearchKey})
             FROM {Record} r
             JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
             GROUP BY r.{RowId};
@@ -333,11 +338,13 @@ internal static class EpwingYomichanDBManager
             ? dataReader.GetString(readingIndex)
             : null;
 
+        int popularityScore = dataReader.GetInt32((int)ColumnIndex.PopularityScore);
+
         string[] definitions = dataReader.GetValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
         string[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.PartOfSpeech);
         string[]? definitionTags = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.GlossaryTags);
         ImageInfo[]? imageInfos = dataReader.GetNullableValueFromBlobStream<ImageInfo[]>((int)ColumnIndex.ImageInfos);
 
-        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imageInfos);
+        return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos);
     }
 }

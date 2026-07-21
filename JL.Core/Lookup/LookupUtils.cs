@@ -1254,7 +1254,8 @@ public static class LookupUtils
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                     wordClasses: epwingResult.WordClasses,
-                    imageInfos: epwingResult.ImageInfos
+                    imageInfos: epwingResult.ImageInfos,
+                    popularityScore: epwingResult.PopularityScore
                 );
 
                 results.Add(result);
@@ -1280,6 +1281,7 @@ public static class LookupUtils
                 // ReSharper disable once NullableWarningSuppressionIsUsed
                 pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                 imageInfos: epwingResult.ImageInfos,
+                popularityScore: epwingResult.PopularityScore,
                 kanjiLookupResult: new KanjiLookupResult(kanjiCompositions)
             );
 

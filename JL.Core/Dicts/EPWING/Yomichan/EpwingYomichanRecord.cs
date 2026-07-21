@@ -15,6 +15,7 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
+    public int PopularityScore { get; }
     public string[]? Definitions { get; }
     public string[]? WordClasses { get; }
     public string[]? DefinitionTags { get; }
@@ -23,10 +24,11 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
     //public int Sequence { get; }
     //public string[]? TermTags { get; }
 
-    public EpwingYomichanRecord(string primarySpelling, string? reading, string[]? definitions, string[]? wordClasses, string[]? definitionTags, ImageInfo[]? imageInfo)
+    public EpwingYomichanRecord(string primarySpelling, string? reading, int popularityScore, string[]? definitions, string[]? wordClasses, string[]? definitionTags, ImageInfo[]? imageInfo)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
+        PopularityScore = popularityScore;
         Definitions = definitions;
         WordClasses = wordClasses;
         DefinitionTags = definitionTags;

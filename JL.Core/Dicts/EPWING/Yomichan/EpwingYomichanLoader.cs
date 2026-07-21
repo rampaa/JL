@@ -196,10 +196,10 @@ internal static class EpwingYomichanLoader
             wordClasses = null;
         }
 
-        //jsonElements[4].TryGetInt32(out int score);
+        _ = jsonElements[4].TryGetInt32(out int popularityScore);
         //jsonElements[6].TryGetInt32(out int sequence);
         //string[] termTags = jsonElements[7].ToString();
 
-        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags, imageInfos?.ToArray());
+        return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos?.ToArray());
     }
 }
