@@ -683,7 +683,7 @@ internal sealed class PopupContentGenerator : Decorator
         }
 
         Debug.Assert(result.ImageInfos is not null);
-        for (int i = 0; i < result.ImageInfos.Length; i++)
+        foreach (ImageInfo imageInfo in result.ImageInfos)
         {
             double imageWidth;
             double imageHeight;
@@ -691,25 +691,21 @@ internal sealed class PopupContentGenerator : Decorator
             int decodePixelWidth = 0;
             int decodePixelHeight = 0;
 
-            ImageInfo imageInfo = result.ImageInfos[i];
             if (imageInfo.Width > maxWidth || imageInfo.Height > maxHeight)
             {
                 if (maxWidth * imageInfo.Height < maxHeight * imageInfo.Width)
                 {
                     decodePixelWidth = double.ConvertToIntegerNative<int>(maxWidth * (imageInfo.PixelWidth / imageInfo.Width));
                     decodePixelHeight = double.ConvertToIntegerNative<int>((double)imageInfo.PixelHeight * decodePixelWidth / imageInfo.PixelWidth);
-
-                    imageWidth = decodePixelWidth * (imageInfo.Width / imageInfo.PixelWidth);
-                    imageHeight = decodePixelHeight * (imageInfo.Height / imageInfo.PixelHeight);
                 }
                 else
                 {
                     decodePixelHeight = double.ConvertToIntegerNative<int>(maxHeight * (imageInfo.PixelHeight / imageInfo.Height));
                     decodePixelWidth = double.ConvertToIntegerNative<int>((double)imageInfo.PixelWidth * decodePixelHeight / imageInfo.PixelHeight);
-
-                    imageWidth = decodePixelWidth * (imageInfo.Width / imageInfo.PixelWidth);
-                    imageHeight = decodePixelHeight * (imageInfo.Height / imageInfo.PixelHeight);
                 }
+
+                imageWidth = decodePixelWidth * (imageInfo.Width / imageInfo.PixelWidth);
+                imageHeight = decodePixelHeight * (imageInfo.Height / imageInfo.PixelHeight);
             }
             else
             {
