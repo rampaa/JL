@@ -17,13 +17,13 @@ public static class StatsDBUtils
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
-            """
-            INSERT INTO stats (profile_id, value)
-            VALUES (@profile_id, @stats);
+            $"""
+            INSERT INTO {ConfigDBManager.Stats} ({ConfigDBManager.ProfileId}, {ConfigDBManager.Value})
+            VALUES (@{ConfigDBManager.ProfileId}, @{ConfigDBManager.Stats});
             """;
 
-        _ = command.Parameters.AddWithValue("@profile_id", profileId);
-        _ = command.Parameters.AddWithValue("@stats", stats);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.ProfileId}", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Stats}", stats);
         _ = command.ExecuteNonQuery();
     }
 
@@ -36,14 +36,14 @@ public static class StatsDBUtils
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
-            """
-            UPDATE stats
-            SET value = @value
-            WHERE profile_id = @profileId;
+            $"""
+            UPDATE {ConfigDBManager.Stats}
+            SET {ConfigDBManager.Value} = @{ConfigDBManager.Value}
+            WHERE {ConfigDBManager.ProfileId} = @{ConfigDBManager.ProfileId};
             """;
 
-        _ = command.Parameters.AddWithValue("@profileId", profileId);
-        _ = command.Parameters.AddWithValue("@value", stats);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.ProfileId}", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Value}", stats);
         _ = command.ExecuteNonQuery();
     }
 
@@ -53,17 +53,17 @@ public static class StatsDBUtils
 
         using SqliteCommand insertOrUpdateLookupStatsCommand = connection.CreateCommand();
         insertOrUpdateLookupStatsCommand.CommandText =
-            """
-            INSERT INTO term_lookup_count (profile_id, term, count)
-            VALUES (@profile_id, @term, @count)
-            ON CONFLICT (profile_id, term)
-            DO UPDATE SET count = term_lookup_count.count + excluded.count;
+            $"""
+            INSERT INTO {ConfigDBManager.TermLookupCount} ({ConfigDBManager.ProfileId}, {ConfigDBManager.Term}, {ConfigDBManager.Count})
+            VALUES (@{ConfigDBManager.ProfileId}, @{ConfigDBManager.Term}, @{ConfigDBManager.Count})
+            ON CONFLICT ({ConfigDBManager.ProfileId}, {ConfigDBManager.Term})
+            DO UPDATE SET {ConfigDBManager.Count} = {ConfigDBManager.TermLookupCount}.{ConfigDBManager.Count} + excluded.{ConfigDBManager.Count};
             """;
 
-        _ = insertOrUpdateLookupStatsCommand.Parameters.AddWithValue("@profile_id", profileId);
+        _ = insertOrUpdateLookupStatsCommand.Parameters.AddWithValue($"@{ConfigDBManager.ProfileId}", profileId);
 
-        SqliteParameter termParam = new("@term", SqliteType.Text);
-        SqliteParameter countParam = new("@count", SqliteType.Integer);
+        SqliteParameter termParam = new($"@{ConfigDBManager.Term}", SqliteType.Text);
+        SqliteParameter countParam = new($"@{ConfigDBManager.Count}", SqliteType.Integer);
         insertOrUpdateLookupStatsCommand.Parameters.AddRange([termParam, countParam]);
         insertOrUpdateLookupStatsCommand.Prepare();
 
@@ -82,13 +82,13 @@ public static class StatsDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT value
-            FROM stats
-            WHERE profile_id = @profileId;
+            $"""
+            SELECT {ConfigDBManager.Value}
+            FROM {ConfigDBManager.Stats}
+            WHERE {ConfigDBManager.ProfileId} = @{ConfigDBManager.ProfileId};
             """;
 
-        _ = command.Parameters.AddWithValue("@profileId", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.ProfileId}", profileId);
 
         using SqliteDataReader reader = command.ExecuteReader();
 
@@ -105,14 +105,14 @@ public static class StatsDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT term, count
-            FROM term_lookup_count
-            WHERE profile_id = @profileId
-            ORDER BY count DESC;
+            $"""
+            SELECT {ConfigDBManager.Term}, {ConfigDBManager.Count}
+            FROM {ConfigDBManager.TermLookupCount}
+            WHERE {ConfigDBManager.ProfileId} = @{ConfigDBManager.ProfileId}
+            ORDER BY {ConfigDBManager.Count} DESC;
             """;
 
-        _ = command.Parameters.AddWithValue("@profileId", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.ProfileId}", profileId);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
@@ -163,12 +163,12 @@ public static class StatsDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            DELETE FROM term_lookup_count
-            WHERE profile_id = @profileId
+            $"""
+            DELETE FROM {ConfigDBManager.TermLookupCount}
+            WHERE {ConfigDBManager.ProfileId} = @{ConfigDBManager.ProfileId}
             """;
 
-        _ = command.Parameters.AddWithValue("@profileId", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.ProfileId}", profileId);
         _ = command.ExecuteNonQuery();
     }
 }

@@ -10,25 +10,37 @@ namespace JL.Core.Config;
 
 public static class ConfigDBManager
 {
+    internal const string Profile = "profile";
+    internal const string Setting = "setting";
+    internal const string Stats = "stats";
+    internal const string TermLookupCount = "term_lookup_count";
+
+    internal const string Name = "name";
+    internal const string Value = "value";
+    internal const string ProfileId = "profile_id";
+    internal const string Id = "id";
+    internal const string Term = "term";
+    internal const string Count = "count";
+
     private const string GetAllSettingsQuery =
-        """
-        SELECT name, value
-        FROM setting
-        WHERE profile_id = @profileId;
+        $"""
+        SELECT {Name}, {Value}
+        FROM {Setting}
+        WHERE {ProfileId} = @{ProfileId};
         """;
 
     private const string GetAllSettingsCountQuery =
-        """
+        $"""
         SELECT COUNT(*)
-        FROM setting
-        WHERE profile_id = @profileId;
+        FROM {Setting}
+        WHERE {ProfileId} = @{ProfileId};
         """;
 
     private const string UpdateSettingQuery =
-        """
-        UPDATE setting
-        SET value = @value
-        WHERE profile_id = @profileId AND name = @name;
+        $"""
+        UPDATE {Setting}
+        SET {Value} = @{Value}
+        WHERE {ProfileId} = @{ProfileId} AND {Name} = @{Name};
         """;
 
     private const string InsertedNewProfilesOnceV4SettingName = "InsertedNewProfilesOnceV4";
@@ -56,36 +68,36 @@ public static class ConfigDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            CREATE TABLE IF NOT EXISTS profile
+            $"""
+            CREATE TABLE IF NOT EXISTS {Profile}
             (
-                id INTEGER NOT NULL PRIMARY KEY,
-                name TEXT NOT NULL UNIQUE COLLATE NOCASE
+                {Id} INTEGER NOT NULL PRIMARY KEY,
+                {Name} TEXT NOT NULL UNIQUE COLLATE NOCASE
             ) STRICT;
 
-            CREATE TABLE IF NOT EXISTS setting
+            CREATE TABLE IF NOT EXISTS {Setting}
             (
-                profile_id INTEGER NOT NULL,
-                name TEXT NOT NULL,
-                value TEXT NOT NULL,
-                PRIMARY KEY (profile_id, name),
-                FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE CASCADE
+                {ProfileId} INTEGER NOT NULL,
+                {Name} TEXT NOT NULL,
+                {Value} TEXT NOT NULL,
+                PRIMARY KEY ({ProfileId}, {Name}),
+                FOREIGN KEY ({ProfileId}) REFERENCES {Profile} ({Id}) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
 
-            CREATE TABLE IF NOT EXISTS stats
+            CREATE TABLE IF NOT EXISTS {Stats}
             (
-                profile_id INTEGER NOT NULL PRIMARY KEY,
-                value TEXT NOT NULL,
-                FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE CASCADE
+                {ProfileId} INTEGER NOT NULL PRIMARY KEY,
+                {Value} TEXT NOT NULL,
+                FOREIGN KEY ({ProfileId}) REFERENCES {Profile} ({Id}) ON DELETE CASCADE
             ) STRICT;
 
-            CREATE TABLE IF NOT EXISTS term_lookup_count
+            CREATE TABLE IF NOT EXISTS {TermLookupCount}
             (
-                profile_id INTEGER NOT NULL,
-                term TEXT NOT NULL,
-                count INTEGER NOT NULL,
-                PRIMARY KEY (profile_id, term),
-                FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE CASCADE
+                {ProfileId} INTEGER NOT NULL,
+                {Term} TEXT NOT NULL,
+                {Count} INTEGER NOT NULL,
+                PRIMARY KEY ({ProfileId}, {Term}),
+                FOREIGN KEY ({ProfileId}) REFERENCES {Profile} ({Id}) ON DELETE CASCADE
             ) STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -174,7 +186,7 @@ public static class ConfigDBManager
     private static bool NeedToMigrate(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA table_info(setting);";
+        command.CommandText = $"PRAGMA table_info({Setting});";
         using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
         return reader.GetInt32(reader.GetOrdinal("pk")) is 2;
@@ -184,26 +196,26 @@ public static class ConfigDBManager
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
-            """
+            $"""
             PRAGMA foreign_keys = OFF;
 
             BEGIN TRANSACTION;
 
-            CREATE TABLE setting_new
+            CREATE TABLE {Setting}_new
             (
-                profile_id INTEGER NOT NULL,
-                name TEXT NOT NULL,
-                value TEXT NOT NULL,
-                PRIMARY KEY (profile_id, name),
-                FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE CASCADE
+                {ProfileId} INTEGER NOT NULL,
+                {Name} TEXT NOT NULL,
+                {Value} TEXT NOT NULL,
+                PRIMARY KEY ({ProfileId}, {Name}),
+                FOREIGN KEY ({ProfileId}) REFERENCES {Profile} ({Id}) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
 
-            INSERT INTO setting_new (profile_id, name, value)
-            SELECT profile_id, name, value FROM setting;
+            INSERT INTO {Setting}_new ({ProfileId}, {Name}, {Value})
+            SELECT {ProfileId}, {Name}, {Value} FROM {Setting};
 
-            DROP TABLE setting;
+            DROP TABLE {Setting};
 
-            ALTER TABLE setting_new RENAME TO setting;
+            ALTER TABLE {Setting}_new RENAME TO {Setting};
 
             COMMIT;
 
@@ -221,7 +233,7 @@ public static class ConfigDBManager
         // In order to trigger the restoration process we need to actually retrieve something from the database
         // https://www.sqlite.org/atomiccommit.html#_hot_rollback_journals
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "SELECT id FROM profile LIMIT 1";
+        command.CommandText = $"SELECT {Id} FROM {Profile} LIMIT 1";
         _ = command.ExecuteNonQuery();
     }
 
@@ -241,14 +253,14 @@ public static class ConfigDBManager
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
-            """
-            INSERT INTO setting (profile_id, name, value)
-            VALUES (@profileId, @name, @value);
+            $"""
+            INSERT INTO {Setting} ({ProfileId}, {Name}, {Value})
+            VALUES (@{ProfileId}, @{Name}, @{Value});
             """;
 
-        _ = command.Parameters.AddWithValue("@profileId", profileId ?? ProfileUtils.CurrentProfileId);
-        _ = command.Parameters.AddWithValue("@name", settingName);
-        _ = command.Parameters.AddWithValue("@value", value);
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", profileId ?? ProfileUtils.CurrentProfileId);
+        _ = command.Parameters.AddWithValue($"@{Name}", settingName);
+        _ = command.Parameters.AddWithValue($"@{Value}", value);
         _ = command.ExecuteNonQuery();
     }
 
@@ -258,9 +270,9 @@ public static class ConfigDBManager
 
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = UpdateSettingQuery;
-        _ = command.Parameters.AddWithValue("@profileId", profileId ?? ProfileUtils.CurrentProfileId);
-        _ = command.Parameters.AddWithValue("@name", settingName);
-        _ = command.Parameters.AddWithValue("@value", value);
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", profileId ?? ProfileUtils.CurrentProfileId);
+        _ = command.Parameters.AddWithValue($"@{Name}", settingName);
+        _ = command.Parameters.AddWithValue($"@{Value}", value);
         _ = command.ExecuteNonQuery();
     }
 
@@ -272,17 +284,16 @@ public static class ConfigDBManager
 
         string query =
             $"""
-            DELETE FROM setting
-            WHERE profile_id = @profileId AND name NOT IN {parameter}
+            DELETE FROM {Setting}
+            WHERE {ProfileId} = @{ProfileId} AND {Name} NOT IN {parameter}
             """;
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = query;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", ProfileUtils.CurrentProfileId);
         _ = command.Parameters.AddWithValue("@1", nameof(ProfileUtils.CurrentProfileId));
-
         for (int i = 0; i < excludedSettings.Length; i++)
         {
             _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 2), excludedSettings[i]);
@@ -298,13 +309,13 @@ public static class ConfigDBManager
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
         $"""
-        SELECT name, value
-        FROM setting
-        WHERE profile_id = @profileId AND name IN {DBUtils.GetParameter(settingNames.Length)}
+        SELECT {Name}, {Value}
+        FROM {Setting}
+        WHERE {ProfileId} = @{ProfileId} AND {Name} IN {DBUtils.GetParameter(settingNames.Length)}
         """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", ProfileUtils.CurrentProfileId);
         for (int i = 0; i < settingNames.Length; i++)
         {
             _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), settingNames[i]);
@@ -323,16 +334,17 @@ public static class ConfigDBManager
     public static void CopyProfileSettings(SqliteConnection connection, int sourceProfileId, int targetProfileId)
     {
         using SqliteCommand command = connection.CreateCommand();
+
         command.CommandText =
-            """
-            INSERT INTO setting (profile_id, name, value)
-            SELECT @targetProfileId, name, value
-            FROM setting
-            WHERE profile_id = @sourceProfileId
+            $"""
+            INSERT INTO {Setting} ({ProfileId}, {Name}, {Value})
+            SELECT @{nameof(targetProfileId)}, {Name}, {Value}
+            FROM {Setting}
+            WHERE {ProfileId} = @{nameof(sourceProfileId)}
             """;
 
-        _ = command.Parameters.AddWithValue("@sourceProfileId", sourceProfileId);
-        _ = command.Parameters.AddWithValue("@targetProfileId", targetProfileId);
+        _ = command.Parameters.AddWithValue($"@{nameof(sourceProfileId)}", sourceProfileId);
+        _ = command.Parameters.AddWithValue($"@{nameof(targetProfileId)}", targetProfileId);
         _ = command.ExecuteNonQuery();
     }
 
@@ -342,15 +354,15 @@ public static class ConfigDBManager
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
-        """
-        SELECT value
-        FROM setting
-        WHERE profile_id = @profileId AND name = @name;
+        $"""
+        SELECT {Value}
+        FROM {Setting}
+        WHERE {ProfileId} = @{ProfileId} AND {Name} = @{Name};
         """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        _ = command.Parameters.AddWithValue("@profileId", profileId);
-        _ = command.Parameters.AddWithValue("@name", configKey);
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", profileId);
+        _ = command.Parameters.AddWithValue($"@{Name}", configKey);
 
         using SqliteDataReader reader = command.ExecuteReader();
         string? configValue = null;
@@ -387,7 +399,7 @@ public static class ConfigDBManager
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = GetAllSettingsQuery;
-        _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", ProfileUtils.CurrentProfileId);
 
         using SqliteDataReader reader = command.ExecuteReader();
         if (!reader.HasRows)
@@ -408,7 +420,7 @@ public static class ConfigDBManager
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = GetAllSettingsCountQuery;
-        _ = command.Parameters.AddWithValue("@profileId", ProfileUtils.CurrentProfileId);
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", ProfileUtils.CurrentProfileId);
 
         using SqliteDataReader countReader = command.ExecuteReader();
         _ = countReader.Read();

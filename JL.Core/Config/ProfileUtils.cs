@@ -8,6 +8,8 @@ public static class ProfileUtils
     internal const string DefaultProfileName = "Default";
     internal const string MpvProfileName = "mpv";
     internal const string TsukikageProfileName = "Tsukikage";
+    internal const string CustomNames = "Custom_Names";
+    internal const string CustomWords = "Custom_Words";
 
     public static readonly string ProfileFolderPath = Path.Join(AppInfo.ApplicationPath, "Profiles");
     public static int CurrentProfileId { get; set; } = DefaultProfileId;
@@ -15,11 +17,11 @@ public static class ProfileUtils
 
     public static string GetProfileCustomNameDictPath(string profileName)
     {
-        return Path.Join(ProfileFolderPath, $"{profileName}_Custom_Names.txt");
+        return Path.Join(ProfileFolderPath, $"{profileName}_{CustomNames}.txt");
     }
 
     public static string GetProfileCustomWordDictPath(string profileName)
     {
-        return Path.Join(ProfileFolderPath, $"{profileName}_Custom_Words.txt");
+        return Path.Join(ProfileFolderPath, $"{profileName}_{CustomWords}.txt");
     }
 }

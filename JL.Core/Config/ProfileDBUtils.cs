@@ -11,12 +11,12 @@ public static class ProfileDBUtils
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
-            """
-            INSERT INTO profile (name)
-            VALUES (@name);
+            $"""
+            INSERT INTO {ConfigDBManager.Profile} ({ConfigDBManager.Name})
+            VALUES (@{ConfigDBManager.Name});
             """;
 
-        _ = command.Parameters.AddWithValue("@name", profileName);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Name}", profileName);
         _ = command.ExecuteNonQuery();
     }
 
@@ -24,13 +24,13 @@ public static class ProfileDBUtils
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
-            """
-            INSERT INTO profile (id, name)
-            VALUES (@id, @name);
+            $"""
+            INSERT INTO {ConfigDBManager.Profile} ({ConfigDBManager.Id}, {ConfigDBManager.Name})
+            VALUES (@{ConfigDBManager.Id}, @{ConfigDBManager.Name});
             """;
 
-        _ = command.Parameters.AddWithValue("@id", profileId);
-        _ = command.Parameters.AddWithValue("@name", profileName);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Id}", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Name}", profileName);
         _ = command.ExecuteNonQuery();
     }
 
@@ -39,14 +39,14 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT value
-            FROM setting
-            WHERE profile_id = @profileId AND name = @name;
+            $"""
+            SELECT {ConfigDBManager.Value}
+            FROM {ConfigDBManager.Setting}
+            WHERE {ConfigDBManager.ProfileId} = @{ConfigDBManager.ProfileId} AND {ConfigDBManager.Name} = @{ConfigDBManager.Name};
             """;
 
-        _ = command.Parameters.AddWithValue("@profileId", profileId);
-        _ = command.Parameters.AddWithValue("@name", nameof(ProfileUtils.CurrentProfileId));
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.ProfileId}", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Name}", nameof(ProfileUtils.CurrentProfileId));
 
         using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
@@ -58,13 +58,13 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT id
-            FROM profile
-            WHERE name = @name;
+            $"""
+            SELECT {ConfigDBManager.Id}
+            FROM {ConfigDBManager.Profile}
+            WHERE {ConfigDBManager.Name} = @{ConfigDBManager.Name};
             """;
 
-        _ = command.Parameters.AddWithValue("@name", profileName);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Name}", profileName);
 
         using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
@@ -83,11 +83,11 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT name
-            FROM profile
-            WHERE id != 0
-            ORDER BY name ASC;
+            $"""
+            SELECT {ConfigDBManager.Name}
+            FROM {ConfigDBManager.Profile}
+            WHERE {ConfigDBManager.Id} != 0
+            ORDER BY {ConfigDBManager.Name} ASC;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
@@ -106,9 +106,9 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT id
-            FROM profile;
+            $"""
+            SELECT {ConfigDBManager.Id}
+            FROM {ConfigDBManager.Profile};
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
@@ -127,11 +127,11 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
+            $"""
             SELECT EXISTS
             (
                 SELECT 1
-                FROM profile
+                FROM {ConfigDBManager.Profile}
                 WHERE id != 0
             );
             """;
@@ -146,16 +146,16 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
+            $"""
             SELECT EXISTS
             (
                 SELECT 1
-                FROM profile
-                WHERE id = @profileId
+                FROM {ConfigDBManager.Profile}
+                WHERE {ConfigDBManager.Id} = @{ConfigDBManager.Id}
             );
             """;
 
-        _ = command.Parameters.AddWithValue("@profileId", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Id}", profileId);
 
         using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
@@ -167,16 +167,16 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
+            $"""
             SELECT EXISTS
             (
                 SELECT 1
-                FROM profile
-                WHERE name = @name
+                FROM {ConfigDBManager.Profile}
+                WHERE {ConfigDBManager.Name} = @{ConfigDBManager.Name}
             );
             """;
 
-        _ = command.Parameters.AddWithValue("@name", profileName);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Name}", profileName);
 
         using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
@@ -195,13 +195,13 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT name
-            FROM profile
-            WHERE id = @id;
+            $"""
+            SELECT {ConfigDBManager.Name}
+            FROM {ConfigDBManager.Profile}
+            WHERE {ConfigDBManager.Id} = @{ConfigDBManager.Id};
             """;
 
-        _ = command.Parameters.AddWithValue("@id", profileId);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Id}", profileId);
 
         using SqliteDataReader reader = command.ExecuteReader();
         _ = reader.Read();
@@ -213,12 +213,12 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            DELETE FROM profile
-            WHERE name = @name
+            $"""
+            DELETE FROM {ConfigDBManager.Profile}
+            WHERE {ConfigDBManager.Name} = @{ConfigDBManager.Name}
             """;
 
-        _ = command.Parameters.AddWithValue("@name", profileName);
+        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Name}", profileName);
         _ = command.ExecuteNonQuery();
     }
 
