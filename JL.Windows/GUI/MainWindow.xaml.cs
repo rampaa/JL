@@ -824,6 +824,8 @@ internal sealed partial class MainWindow : IDisposable
             return;
         }
 
+        FirstPopupWindow.HidePopup();
+        FirstPopupWindow.Hide();
         Hide();
         await HandleAppClosing().ConfigureAwait(true);
         Application.Current.Shutdown();
@@ -2187,8 +2189,8 @@ internal sealed partial class MainWindow : IDisposable
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (WindowState is WindowState.Minimized)
         {
-            FirstPopupWindow.Hide();
             FirstPopupWindow.Owner = null;
+            FirstPopupWindow.Hide();
             FirstPopupWindow.Show();
 
             if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized)
@@ -2224,8 +2226,8 @@ internal sealed partial class MainWindow : IDisposable
 
         else
         {
-            FirstPopupWindow.Hide();
             FirstPopupWindow.Owner = this;
+            FirstPopupWindow.Hide();
             FirstPopupWindow.Show();
 
             if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized
@@ -2648,7 +2650,7 @@ internal sealed partial class MainWindow : IDisposable
         HandleTextBoxReadOnlyToggle();
     }
 
-    public void PopupAutoHideTimerEvent(object? sender, EventArgs e)
+    private void PopupAutoHideTimerEvent(object? sender, EventArgs e)
     {
         PopupAutoHideTimer.Stop();
 
