@@ -4,12 +4,13 @@ using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Frontend;
+using JL.Core.Japanese;
 using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
-using JL.Core.Utilities.Japanese;
+
 namespace JL.Core.External.AnkiConnect;
 
 public static class AnkiConnectUtils

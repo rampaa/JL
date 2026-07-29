@@ -2,10 +2,12 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using System.Xml;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Frontend;
+using JL.Core.Japanese;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
-using JL.Core.Utilities.Japanese;
 using JL.Core.Utilities.ObjectPool;
 using MessagePack;
 using Microsoft.Data.Sqlite;
@@ -15,6 +17,16 @@ namespace JL.Core.Dicts.JMnedict;
 internal static class JmnedictDBManager
 {
     public const int Version = 7;
+
+    private const string Record = "record";
+    private const string RowId = "rowid";
+    private const string JmnedictId = "jmnedict_id";
+    private const string PrimarySpelling = "primary_spelling";
+    private const string Readings = "readings";
+    private const string AlternativeSpellings = "alternative_spellings";
+    private const string Glossary = "glossary";
+    private const string NameTypes = "name_types";
+    private const string PrimarySpellingInHiragana = "primary_spelling_in_hiragana";
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
@@ -26,10 +38,10 @@ internal static class JmnedictDBManager
         }
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
-            """
-            SELECT r.rowid, r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
-            FROM record r
-            WHERE r.primary_spelling_in_hiragana IN (@1
+            $"""
+            SELECT r.{RowId}, r.{JmnedictId}, r.{PrimarySpelling}, r.{Readings}, r.{AlternativeSpellings}, r.{Glossary}, r.{NameTypes}, r.{PrimarySpellingInHiragana}
+            FROM {Record} r
+            WHERE r.{PrimarySpellingInHiragana} IN (@1
             """);
 
         for (int i = 1; i < termCount; i++)
@@ -62,17 +74,17 @@ internal static class JmnedictDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            CREATE TABLE IF NOT EXISTS record
+            $"""
+            CREATE TABLE IF NOT EXISTS {Record}
             (
-                rowid INTEGER NOT NULL PRIMARY KEY,
-                jmnedict_id INTEGER NOT NULL,
-                primary_spelling TEXT NOT NULL,
-                primary_spelling_in_hiragana TEXT NOT NULL,
-                readings BLOB,
-                alternative_spellings BLOB,
-                glossary BLOB NOT NULL,
-                name_types BLOB NOT NULL
+                {RowId} INTEGER NOT NULL PRIMARY KEY,
+                {JmnedictId} INTEGER NOT NULL,
+                {PrimarySpelling} TEXT NOT NULL,
+                {PrimarySpellingInHiragana} TEXT NOT NULL,
+                {Readings} BLOB,
+                {AlternativeSpellings} BLOB,
+                {Glossary} BLOB NOT NULL,
+                {NameTypes} BLOB NOT NULL
             ) STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -84,7 +96,207 @@ internal static class JmnedictDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static async Task ImportFromDisk(Dict dict)
+    {
+        string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        if (File.Exists(fullPath))
+        {
+            DictUtils.JmnedictEntities.Clear();
+
+            // ReSharper disable once UseAwaitUsing
+            using FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso);
+
+            // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
+            // And we do need EntityHandling property because we want to get unexpanded entity names
+            // The downside of using XmlTextReader is that it does not support async methods
+            // And we cannot set some settings (e.g. MaxCharactersFromEntities)
+            using XmlTextReader xmlTextReader = new(fileStream);
+            xmlTextReader.DtdProcessing = DtdProcessing.Parse;
+            xmlTextReader.WhitespaceHandling = WhitespaceHandling.None;
+            xmlTextReader.EntityHandling = EntityHandling.ExpandCharEntities;
+
+            int rowId = 1;
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+            Debug.Assert(connection is not null);
+
+            DBUtils.SetJournalModeToWal(connection);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+            SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand insertRecordCommand = connection.CreateCommand();
+            insertRecordCommand.CommandText =
+                $"""
+                INSERT INTO {Record} ({RowId}, {JmnedictId}, {PrimarySpelling}, {PrimarySpellingInHiragana}, {Readings}, {AlternativeSpellings}, {Glossary}, {NameTypes})
+                VALUES (@{RowId}, @{JmnedictId}, @{PrimarySpelling}, @{PrimarySpellingInHiragana}, @{Readings}, @{AlternativeSpellings}, @{Glossary}, @{NameTypes});
+                """;
+
+            SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+            SqliteParameter jmnedictIdParam = new($"@{JmnedictId}", SqliteType.Integer);
+            SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
+            SqliteParameter primarySpellingInHiraganaParam = new($"@{PrimarySpellingInHiragana}", SqliteType.Text);
+            SqliteParameter readingsParam = new($"@{Readings}", SqliteType.Blob);
+            SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
+            SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
+            SqliteParameter nameTypesParam = new($"@{NameTypes}", SqliteType.Blob);
+            insertRecordCommand.Parameters.AddRange([
+                rowidParam,
+                jmnedictIdParam,
+                primarySpellingParam,
+                primarySpellingInHiraganaParam,
+                readingsParam,
+                alternativeSpellingsParam,
+                glossaryParam,
+                nameTypesParam
+                ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+            insertRecordCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            int transactionRecordCount = 0;
+            HashSet<JmnedictRecord> jmnedictRecords = [];
+            while (xmlTextReader.ReadToFollowing("entry"))
+            {
+                Dictionary<string, JmnedictRecord> recordDictionary = JmnedictLoader.GetRecordsFromEntry(JmnedictLoader.ReadEntry(xmlTextReader));
+                foreach (JmnedictRecord jmnedictRecord in recordDictionary.Values)
+                {
+                    _ = jmnedictRecords.Add(jmnedictRecord);
+                }
+
+                foreach (JmnedictRecord jmnedictRecord in jmnedictRecords)
+                {
+                    rowidParam.Value = rowId;
+                    jmnedictIdParam.Value = jmnedictRecord.Id;
+                    primarySpellingParam.Value = jmnedictRecord.PrimarySpelling;
+                    primarySpellingInHiraganaParam.Value = JapaneseUtils.NormalizeText(jmnedictRecord.PrimarySpelling);
+                    readingsParam.Value = jmnedictRecord.Readings is not null ? MessagePackSerializer.Serialize(jmnedictRecord.Readings) : DBNull.Value;
+                    alternativeSpellingsParam.Value = jmnedictRecord.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(jmnedictRecord.AlternativeSpellings) : DBNull.Value;
+                    glossaryParam.Value = MessagePackSerializer.Serialize(jmnedictRecord.Definitions);
+                    nameTypesParam.Value = MessagePackSerializer.Serialize(jmnedictRecord.NameTypes);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    _ = insertRecordCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                    ++rowId;
+                    ++transactionRecordCount;
+                }
+
+                if (transactionRecordCount > 20000)
+                {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    // ReSharper disable once MethodHasAsyncOverload
+                    transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                    dict.Ready = true;
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                    transactionRecordCount = 0;
+                    insertRecordCommand.Transaction = transaction;
+                }
+
+                jmnedictRecords.Clear();
+            }
+
+            if (transactionRecordCount > 0)
+            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                dict.Ready = true;
+            }
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+            // ReSharper disable once MethodHasAsyncOverload
+            transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            if (rowId > 1)
+            {
+                // ReSharper disable once UseAwaitUsing
+                using SqliteCommand createIndexCommand = connection.CreateCommand();
+                createIndexCommand.CommandText = $"CREATE INDEX IF NOT EXISTS ix_record_{PrimarySpellingInHiragana} ON record({PrimarySpellingInHiragana});";
+#pragma warning disable CA1849 // Call async methods when in an async method
+                _ = createIndexCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                SqliteConnection.ClearAllPools();
+                DBUtils.SetJournalModeToDelete(connection);
+
+                // ReSharper disable once UseAwaitUsing
+                using SqliteCommand analyzeCommand = connection.CreateCommand();
+                analyzeCommand.CommandText = "ANALYZE;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+                _ = analyzeCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                // ReSharper disable once UseAwaitUsing
+                using SqliteCommand vacuumCommand = connection.CreateCommand();
+                vacuumCommand.CommandText = "VACUUM;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+                _ = vacuumCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+            }
+
+            dict.Size = rowId - 1;
+        }
+        else
+        {
+            if (dict.Updating)
+            {
+                return;
+            }
+
+            dict.Updating = true;
+            if (await FrontendManager.Frontend.ShowYesNoDialogAsync("Couldn't find JMnedict.xml. Would you like to download it now?",
+                "Download JMnedict?").ConfigureAwait(false))
+            {
+                Uri? uri = dict.Url;
+                Debug.Assert(uri is not null);
+
+                bool downloaded = await ResourceUpdater.DownloadBuiltInDict(fullPath,
+                    uri,
+                    nameof(DictType.JMnedict), false, false).ConfigureAwait(false);
+
+                if (downloaded)
+                {
+                    try
+                    {
+                        await ImportFromDisk(dict).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        dict.Updating = false;
+                    }
+                }
+                else
+                {
+                    dict.Updating = false;
+                }
+            }
+            else
+            {
+                dict.Active = false;
+                dict.Updating = false;
+            }
+        }
+    }
+
+    public static void ImportFromMemory(Dict dict)
     {
         int totalRecordCount = 0;
         ICollection<IList<IDictRecord>> dictRecordValues = dict.Contents.Values;
@@ -113,19 +325,19 @@ internal static class JmnedictDBManager
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
-            """
-            INSERT INTO record (rowid, jmnedict_id, primary_spelling, primary_spelling_in_hiragana, readings, alternative_spellings, glossary, name_types)
-            VALUES (@rowid, @jmnedict_id, @primary_spelling, @primary_spelling_in_hiragana, @readings, @alternative_spellings, @glossary, @name_types);
+            $"""
+            INSERT INTO {Record} ({RowId}, {JmnedictId}, {PrimarySpelling}, {PrimarySpellingInHiragana}, {Readings}, {AlternativeSpellings}, {Glossary}, {NameTypes})
+            VALUES (@{RowId}, @{JmnedictId}, @{PrimarySpelling}, @{PrimarySpellingInHiragana}, @{Readings}, @{AlternativeSpellings}, @{Glossary}, @{NameTypes});
             """;
 
-        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
-        SqliteParameter jmnedictIdParam = new("@jmnedict_id", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new("@primary_spelling", SqliteType.Text);
-        SqliteParameter primarySpellingInHiraganaParam = new("@primary_spelling_in_hiragana", SqliteType.Text);
-        SqliteParameter readingsParam = new("@readings", SqliteType.Blob);
-        SqliteParameter alternativeSpellingsParam = new("@alternative_spellings", SqliteType.Blob);
-        SqliteParameter glossaryParam = new("@glossary", SqliteType.Blob);
-        SqliteParameter nameTypesParam = new("@name_types", SqliteType.Blob);
+        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter jmnedictIdParam = new($"@{JmnedictId}", SqliteType.Integer);
+        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
+        SqliteParameter primarySpellingInHiraganaParam = new($"@{PrimarySpellingInHiragana}", SqliteType.Text);
+        SqliteParameter readingsParam = new($"@{Readings}", SqliteType.Blob);
+        SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
+        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
+        SqliteParameter nameTypesParam = new($"@{NameTypes}", SqliteType.Blob);
         insertRecordCommand.Parameters.AddRange([
             rowidParam,
             jmnedictIdParam,
@@ -155,7 +367,7 @@ internal static class JmnedictDBManager
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
-        createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_primary_spelling_in_hiragana ON record(primary_spelling_in_hiragana);";
+        createIndexCommand.CommandText = $"CREATE INDEX IF NOT EXISTS ix_record_{PrimarySpellingInHiragana} ON record({PrimarySpellingInHiragana});";
         _ = createIndexCommand.ExecuteNonQuery();
 
         transaction.Commit();
@@ -221,9 +433,9 @@ internal static class JmnedictDBManager
     //    using SqliteCommand command = connection.CreateCommand();
     //
     //    command.CommandText =
-    //        """
-    //        SELECT r.rowid, r.jmnedict_id, r.primary_spelling, r.readings, r.alternative_spellings, r.glossary, r.name_types, r.primary_spelling_in_hiragana
-    //        FROM record r;
+    //        $"""
+    //        SELECT r.{RowId}, r.{JmnedictId}, r.{PrimarySpelling}, r.{Readings}, r.{AlternativeSpellings}, r.{Glossary}, r.{NameTypes}, r.{PrimarySpellingInHiragana}
+    //        FROM {Record} r;
     //        """;
     //
     //    using SqliteDataReader dataReader = command.ExecuteReader();

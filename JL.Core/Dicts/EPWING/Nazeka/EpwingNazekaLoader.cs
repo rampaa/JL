@@ -1,15 +1,19 @@
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Dicts.Options;
 using JL.Core.Frontend;
+using JL.Core.Japanese;
+using JL.Core.Japanese.Fuseji;
+using JL.Core.Japanese.Mazegaki;
 using JL.Core.Utilities;
-using JL.Core.Utilities.Japanese;
-using JL.Core.Utilities.Japanese.Mazegaki;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaLoader
 {
+    public const int Size = 250000;
     public static async Task Load(Dict dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
@@ -22,6 +26,39 @@ internal static class EpwingNazekaLoader
 
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
+
+        GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
+        Debug.Assert(!nonNameDict || nonKanjiDict || generateMazegakiOption is not null);
+        bool generateMazegaki = nonKanjiDict && nonNameDict
+                                             // ReSharper disable once NullableWarningSuppressionIsUsed
+                                             && generateMazegakiOption!.Value;
+
+        GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
+        Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
+        bool generateFusejiVariants = nonKanjiDict
+                                // ReSharper disable once NullableWarningSuppressionIsUsed
+                                && generateFusejiVariantsOption!.Value;
+
+        int maxSearchKeyLengthForFusejiGeneration;
+        int maxTotalFuseji;
+        int maxConsecutiveFuseji;
+        if (generateFusejiVariants)
+        {
+            Debug.Assert(dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            maxSearchKeyLengthForFusejiGeneration = dict.Options.MaxSearchKeyLengthForFusejiGeneration.Value;
+
+            Debug.Assert(dict.Options.MaxTotalFusejiCount is not null);
+            maxTotalFuseji = dict.Options.MaxTotalFusejiCount.Value;
+
+            Debug.Assert(dict.Options.MaxConsecutiveFusejiCount is not null);
+            maxConsecutiveFuseji = dict.Options.MaxConsecutiveFusejiCount.Value;
+        }
+        else
+        {
+            maxSearchKeyLengthForFusejiGeneration = 0;
+            maxTotalFuseji = 0;
+            maxConsecutiveFuseji = 0;
+        }
 
         FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
@@ -97,17 +134,46 @@ internal static class EpwingNazekaLoader
                         EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions, imageInfo);
                         if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict))
                         {
-                            if (nonKanjiDict && nonNameDict)
+                            if (nonKanjiDict)
                             {
-                                string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                                if (primarySpellingInHiragana != readingInHiragana)
+                                if (generateFusejiVariants)
                                 {
-                                    _ = DictUtils.AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict);
+                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                    {
+                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, nazekaEpwingDict);
+                                    }
                                 }
 
-                                foreach (string variant in MazegakiVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
+                                if (nonNameDict)
                                 {
-                                    _ = DictUtils.AddRecordToDictionary(variant, record, nazekaEpwingDict);
+                                    string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
+                                    if (primarySpellingInHiragana != readingInHiragana)
+                                    {
+                                        if (DictUtils.AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict) && generateMazegaki)
+                                        {
+                                            if (generateFusejiVariants)
+                                            {
+                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                {
+                                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, nazekaEpwingDict);
+                                                }
+                                            }
+
+                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
+                                            {
+                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, nazekaEpwingDict))
+                                                {
+                                                    if (generateFusejiVariants)
+                                                    {
+                                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                        {
+                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, nazekaEpwingDict);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

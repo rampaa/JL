@@ -16,10 +16,10 @@ using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
 using JL.Core.Frontend;
+using JL.Core.Japanese;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Array;
 using JL.Core.Utilities.Database;
-using JL.Core.Utilities.Japanese;
 using JL.Core.Utilities.ObjectPool;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
@@ -339,9 +339,8 @@ public static class LookupUtils
         int lookupResultCount = 0;
 
         ReadOnlySpan<List<LookupResult>?> resultSlotsSpan = resultSlots.AsSpan(0, dicts.Length);
-        for (int i = 0; i < resultSlotsSpan.Length; i++)
+        foreach (List<LookupResult>? resultSlot in resultSlotsSpan)
         {
-            List<LookupResult>? resultSlot = resultSlotsSpan[i];
             if (resultSlot is not null)
             {
                 lookupResultCount += resultSlot.Count;
@@ -356,9 +355,8 @@ public static class LookupUtils
 
         LookupResult[] lookupResults = new LookupResult[lookupResultCount];
         Span<LookupResult> lookupResultsSpan = lookupResults;
-        for (int i = 0; i < resultSlotsSpan.Length; i++)
+        foreach (List<LookupResult>? resultSlot in resultSlotsSpan)
         {
-            List<LookupResult>? resultSlot = resultSlotsSpan[i];
             if (resultSlot is not null)
             {
                 ReadOnlySpan<LookupResult> resultSlotSpan = resultSlot.AsReadOnlySpan();
@@ -1496,7 +1494,6 @@ public static class LookupUtils
         List<LookupFrequencyResult> freqsList = new(wordFreqs.Length);
         bool frequencyExists = false;
 
-        // TODO: Precompute this? Can we make the return type an array if we do this without allocating more?
         foreach (Freq freq in wordFreqs)
         {
             bool useDB = freq.Options.UseDB.Value && freq.Ready && freqDictsFromDB is not null;

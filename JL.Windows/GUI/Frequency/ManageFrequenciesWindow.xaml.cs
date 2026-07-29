@@ -424,7 +424,7 @@ internal sealed partial class ManageFrequenciesWindow
         editButton.IsEnabled = false;
 
         Freq freq = (Freq)updateButton.Tag;
-        await ResourceUpdater.UpdateYomichanFreqDict(freq, true, false).ConfigureAwait(true);
+        _ = await ResourceUpdater.UpdateYomichanFreqDict(freq, true, false).ConfigureAwait(true);
 
         UpdateFreqsDisplay();
     }

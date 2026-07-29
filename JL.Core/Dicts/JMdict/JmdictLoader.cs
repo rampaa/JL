@@ -5,6 +5,9 @@ using System.Xml;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Frontend;
+using JL.Core.Japanese;
+using JL.Core.Japanese.Fuseji;
+using JL.Core.Japanese.Mazegaki;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 
@@ -13,6 +16,9 @@ namespace JL.Core.Dicts.JMdict;
 internal static class JmdictLoader
 {
     private static bool s_canHandleCulture = true;
+
+    // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739, 2023/12/16: 419334, 2024/02/22: 421519
+    public const int Size = 421519;
 
     private static readonly FrozenDictionary<string, string> s_iso6392BToEnglishNames = new KeyValuePair<string, string>[]
     {
@@ -127,9 +133,94 @@ internal static class JmdictLoader
                 Debug.Assert(properNamesEntriesOption is not null);
                 bool includeProperNames = properNamesEntriesOption.Value;
 
+                GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
+                Debug.Assert(generateMazegakiOption is not null);
+                bool generateMazegaki = generateMazegakiOption.Value;
+
+                GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
+                Debug.Assert(generateFusejiVariantsOption is not null);
+                bool generateFusejiVariants = generateFusejiVariantsOption.Value;
+
+                int maxSearchKeyLengthForFusejiGeneration;
+                int maxTotalFuseji;
+                int maxConsecutiveFuseji;
+                if (generateFusejiVariants)
+                {
+                    Debug.Assert(dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+                    maxSearchKeyLengthForFusejiGeneration = dict.Options.MaxSearchKeyLengthForFusejiGeneration.Value;
+
+                    Debug.Assert(dict.Options.MaxTotalFusejiCount is not null);
+                    maxTotalFuseji = dict.Options.MaxTotalFusejiCount.Value;
+
+                    Debug.Assert(dict.Options.MaxConsecutiveFusejiCount is not null);
+                    maxConsecutiveFuseji = dict.Options.MaxConsecutiveFusejiCount.Value;
+                }
+                else
+                {
+                    maxSearchKeyLengthForFusejiGeneration = 0;
+                    maxTotalFuseji = 0;
+                    maxConsecutiveFuseji = 0;
+                }
+
+                IDictionary<string, IList<IDictRecord>> jmdictDictionary = dict.Contents;
                 while (xmlReader.ReadToFollowing("entry"))
                 {
-                    JmdictRecordBuilder.AddToDictionary(ReadEntry(xmlReader), dict.Contents, includeProperNames);
+                    Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(ReadEntry(xmlReader), includeProperNames);
+                    if (recordDictionary is not null)
+                    {
+                        foreach ((string key, JmdictRecord record) in recordDictionary)
+                        {
+                            if (jmdictDictionary.TryGetValue(key, out IList<IDictRecord>? records))
+                            {
+                                records.Add(record);
+                            }
+                            else
+                            {
+                                jmdictDictionary[key] = [record];
+                            }
+
+                            if (generateFusejiVariants)
+                            {
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(key, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    if (!recordDictionary.ContainsKey(fusejiVariant))
+                                    {
+                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, jmdictDictionary);
+                                    }
+                                }
+                            }
+
+                            if (generateMazegaki && record.Readings is not null)
+                            {
+                                foreach (string reading in record.Readings)
+                                {
+                                    string readingInHiragana = JapaneseUtils.NormalizeText(reading);
+                                    if (readingInHiragana != key)
+                                    {
+                                        foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(key, readingInHiragana))
+                                        {
+                                            if (!recordDictionary.ContainsKey(mazegaki))
+                                            {
+                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, jmdictDictionary))
+                                                {
+                                                    if (generateFusejiVariants)
+                                                    {
+                                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                        {
+                                                            if (!recordDictionary.ContainsKey(fusejiVariant))
+                                                            {
+                                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, jmdictDictionary);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -159,7 +250,6 @@ internal static class JmdictLoader
                     try
                     {
                         await Load(dict).ConfigureAwait(false);
-
                         await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
                         await JmdictWordClassUtils.Load().ConfigureAwait(false);
                     }
@@ -181,7 +271,7 @@ internal static class JmdictLoader
         }
     }
 
-    private static JmdictEntry ReadEntry(XmlTextReader xmlReader)
+    public static JmdictEntry ReadEntry(XmlTextReader xmlReader)
     {
         int id = 0;
         List<KanjiElement> kanjiElements = [];

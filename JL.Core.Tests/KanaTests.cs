@@ -1,5 +1,5 @@
+using JL.Core.Japanese;
 using NUnit.Framework;
-using JL.Core.Utilities.Japanese;
 
 namespace JL.Core.Tests;
 

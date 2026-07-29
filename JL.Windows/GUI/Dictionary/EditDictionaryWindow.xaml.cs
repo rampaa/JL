@@ -183,11 +183,50 @@ internal sealed partial class EditDictionaryWindow
         if (_dict.Options.UseDB.Value != options.UseDB.Value)
         {
             _dict.Ready = false;
-            //if (dbExists && !(options.UseDB?.Value ?? false))
-            //{
-            //    DBUtils.DeleteDB(dbPath);
-            //    dbExists = false;
-            //}
+        }
+
+        // TODO: If JMdict, WordClass.json should be recreated
+        if (_dict.Options.GenerateMazegakiVariants is not null)
+        {
+            Debug.Assert(options.GenerateMazegakiVariants is not null);
+            if (_dict.Options.GenerateMazegakiVariants.Value != options.GenerateMazegakiVariants.Value)
+            {
+                _dict.Ready = false;
+                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                if (dbExists)
+                {
+                    DBUtils.DeleteDB(dbPath);
+                    dbExists = false;
+                }
+            }
+        }
+
+        if (_dict.Options.GenerateFusejiVariants is not null)
+        {
+            Debug.Assert(_dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            Debug.Assert(_dict.Options.MaxTotalFusejiCount is not null);
+            Debug.Assert(_dict.Options.MaxConsecutiveFusejiCount is not null);
+
+            Debug.Assert(options.GenerateFusejiVariants is not null);
+            Debug.Assert(options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            Debug.Assert(options.MaxTotalFusejiCount is not null);
+            Debug.Assert(options.MaxConsecutiveFusejiCount is not null);
+
+            if (_dict.Options.GenerateFusejiVariants.Value != options.GenerateFusejiVariants.Value
+                || _dict.Options.MaxSearchKeyLengthForFusejiGeneration.Value != options.MaxSearchKeyLengthForFusejiGeneration.Value
+                || _dict.Options.MaxTotalFusejiCount.Value != options.MaxTotalFusejiCount.Value
+                || _dict.Options.MaxConsecutiveFusejiCount.Value != options.MaxConsecutiveFusejiCount.Value)
+            {
+                _dict.Ready = false;
+                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                if (dbExists)
+                {
+                    DBUtils.DeleteDB(dbPath);
+                    dbExists = false;
+                }
+            }
         }
 
         _dict.Options = options;

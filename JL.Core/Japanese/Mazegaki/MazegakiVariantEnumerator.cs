@@ -1,7 +1,7 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace JL.Core.Utilities.Japanese.Mazegaki;
+namespace JL.Core.Japanese.Mazegaki;
 
 internal ref struct MazegakiVariantEnumerator
 {

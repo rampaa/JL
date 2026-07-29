@@ -38,6 +38,54 @@
                                TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
                 </DockPanel>
 
+                <CheckBox Name="GenerateMazegakiVariantsCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Generate mazegaki search key variants"
+                               Cursor="Help"
+                               ToolTip="Generate mazegaki search keys. Enabling this increases the DB size and loading time slighlty."
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="GenerateFusejiVariantsCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Generate fuseji search key variants"
+                               Cursor="Help"
+                               ToolTip="Generate fuseji variants as search keys. Enabling this increases the DB size and loading time greatly."
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <DockPanel x:Name="MaxSearchKeyLengthForFusejiGenerationDockPanel" Visibility="Collapsed">
+                    <hc:NumericUpDown x:Name="MaxSearchKeyLengthForFusejiGenerationNumericUpDown" Minimum="2" Maximum="10"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Max search key length for fuseji generation"
+                               Cursor="Help"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
+                <DockPanel x:Name="MaxTotalFusejiDockPanel" Visibility="Collapsed">
+                    <hc:NumericUpDown x:Name="MaxTotalFusejiCountNumericUpDown" Minimum="1" Maximum="4"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Max total fuseji count"
+                               Cursor="Help"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
+                <DockPanel x:Name="MaxConsecutiveFusejiDockPanel" Visibility="Collapsed">
+                    <hc:NumericUpDown x:Name="MaxConsecutiveFusejiCountNumericUpDown" Minimum="1" Maximum="4"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Max consecutive fuseji count"
+                               Cursor="Help"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
             </StackPanel>
         </ScrollViewer>
     </StackPanel>

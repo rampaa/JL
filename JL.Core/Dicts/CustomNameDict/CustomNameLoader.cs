@@ -1,6 +1,6 @@
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
-using JL.Core.Utilities.Japanese;
+using JL.Core.Japanese;
 
 namespace JL.Core.Dicts.CustomNameDict;
 

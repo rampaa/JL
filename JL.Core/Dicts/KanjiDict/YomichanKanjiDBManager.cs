@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
@@ -12,6 +13,8 @@ namespace JL.Core.Dicts.KanjiDict;
 internal static class YomichanKanjiDBManager
 {
     public const int Version = 4;
+
+    public const int Size = 20000;
 
     private const string Record = "record";
     private const string RowId = "rowid";
@@ -66,7 +69,202 @@ internal static class YomichanKanjiDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static async Task ImportFromDisk(Dict dict)
+    {
+        string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        if (!Directory.Exists(fullPath))
+        {
+            return;
+        }
+
+        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
+        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly);
+
+        int rowId = 1;
+
+        // ReSharper disable once UseAwaitUsing
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+        Debug.Assert(connection is not null);
+
+        DBUtils.SetJournalModeToWal(connection);
+
+        // ReSharper disable once UseAwaitUsing
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            $"""
+            INSERT INTO {Record} ({RowId}, {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats})
+            VALUES (@{RowId}, @{Kanji}, @{OnReadings}, @{KunReadings}, @{Glossary}, @{Stats});
+            """;
+
+        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter kanjiParam = new($"@{Kanji}", SqliteType.Text);
+        SqliteParameter onReadingsParam = new($"@{OnReadings}", SqliteType.Blob);
+        SqliteParameter kunReadingsParam = new($"@{KunReadings}", SqliteType.Blob);
+        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
+        SqliteParameter statsParam = new($"@{Stats}", SqliteType.Blob);
+        insertRecordCommand.Parameters.AddRange([
+            rowidParam,
+            kanjiParam,
+            onReadingsParam,
+            kunReadingsParam,
+            glossaryParam,
+            statsParam
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        insertRecordCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        int transactionRecordCount = 0;
+        foreach (string jsonFile in jsonFiles)
+        {
+#pragma warning disable CA1849 // Call async methods when in an async method
+            SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            insertRecordCommand.Transaction = transaction;
+
+            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+            await using (fileStream.ConfigureAwait(false))
+            {
+                await foreach (JsonElement[]? jsonObj in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                {
+                    Debug.Assert(jsonObj is not null);
+                    string kanji = jsonObj[0]
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
+                        .GetString()!.GetPooledString();
+                    if (string.IsNullOrWhiteSpace(kanji))
+                    {
+                        continue;
+                    }
+
+                    YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
+                    Debug.Assert(yomichanKanjiRecord is not { Definitions: null, KunReadings: null, OnReadings: null, Stats: null });
+                    //if (yomichanKanjiRecord is { Definitions: null, KunReadings: null, OnReadings: null, Stats: null })
+                    //{
+                    //    continue;
+                    //}
+
+                    rowidParam.Value = rowId;
+                    kanjiParam.Value = kanji;
+                    onReadingsParam.Value = yomichanKanjiRecord.OnReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.OnReadings) : DBNull.Value;
+                    kunReadingsParam.Value = yomichanKanjiRecord.KunReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.KunReadings) : DBNull.Value;
+                    glossaryParam.Value = yomichanKanjiRecord.Definitions is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Definitions) : DBNull.Value;
+                    statsParam.Value = yomichanKanjiRecord.Stats is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Stats) : DBNull.Value;
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    _ = insertRecordCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                    ++transactionRecordCount;
+                    if (transactionRecordCount > 20000)
+                    {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        // ReSharper disable once MethodHasAsyncOverload
+                        transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                        dict.Ready = true;
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                        transactionRecordCount = 0;
+                        insertRecordCommand.Transaction = transaction;
+                    }
+
+                    ++rowId;
+                }
+            }
+
+            if (transactionRecordCount > 0)
+            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                transactionRecordCount = 0;
+                dict.Ready = true;
+            }
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+            // ReSharper disable once MethodHasAsyncOverload
+            transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+        }
+
+        if (rowId > 1)
+        {
+            RemoveDuplicateRecords(connection);
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand createIndexCommand = connection.CreateCommand();
+            createIndexCommand.CommandText = $"CREATE INDEX IF NOT EXISTS ix_record_kanji ON {Record}({Kanji});";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = createIndexCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            SqliteConnection.ClearAllPools();
+            DBUtils.SetJournalModeToDelete(connection);
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand analyzeCommand = connection.CreateCommand();
+            analyzeCommand.CommandText = "ANALYZE;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = analyzeCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand vacuumCommand = connection.CreateCommand();
+            vacuumCommand.CommandText = "VACUUM;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = vacuumCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            dict.Size = GetDistinctKanjiCount(connection);
+        }
+        else
+        {
+            dict.Size = 0;
+        }
+    }
+
+    private static void RemoveDuplicateRecords(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            DELETE FROM {Record}
+            WHERE {RowId} NOT IN
+            (
+                SELECT MIN({RowId})
+                FROM {Record}
+                GROUP BY {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats}
+            );
+            """;
+
+        _ = command.ExecuteNonQuery();
+    }
+
+    private static int GetDistinctKanjiCount(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            SELECT COUNT(DISTINCT {Kanji})
+            FROM {Record};
+            """;
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        _ = reader.Read();
+        return reader.GetInt32(0);
+    }
+
+    public static void ImportFromMemory(Dict dict)
     {
         ulong rowId = 1;
 
@@ -79,7 +277,7 @@ internal static class YomichanKanjiDBManager
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             $"""
-            INSERT INTO record ({RowId}, {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats})
+            INSERT INTO {Record} ({RowId}, {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats})
             VALUES (@{RowId}, @{Kanji}, @{OnReadings}, @{KunReadings}, @{Glossary}, @{Stats});
             """;
 

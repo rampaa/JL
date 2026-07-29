@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core;
+using JL.Core.Dicts;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
 using JL.Core.Frontend;
@@ -124,6 +126,49 @@ internal sealed partial class EditFrequencyWindow
             //    DBUtils.DeleteDB(dbPath);
             //    dbExists = false;
             //}
+        }
+
+        if (_freq.Options.GenerateMazegakiVariants is not null)
+        {
+            Debug.Assert(options.GenerateMazegakiVariants is not null);
+            if (_freq.Options.GenerateMazegakiVariants.Value != options.GenerateMazegakiVariants.Value)
+            {
+                _freq.Ready = false;
+                _freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+
+                if (dbExists)
+                {
+                    DBUtils.DeleteDB(dbPath);
+                    dbExists = false;
+                }
+            }
+        }
+
+        if (_freq.Options.GenerateFusejiVariants is not null)
+        {
+            Debug.Assert(_freq.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            Debug.Assert(_freq.Options.MaxTotalFusejiCount is not null);
+            Debug.Assert(_freq.Options.MaxConsecutiveFusejiCount is not null);
+
+            Debug.Assert(options.GenerateFusejiVariants is not null);
+            Debug.Assert(options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            Debug.Assert(options.MaxTotalFusejiCount is not null);
+            Debug.Assert(options.MaxConsecutiveFusejiCount is not null);
+
+            if (_freq.Options.GenerateFusejiVariants.Value != options.GenerateFusejiVariants.Value
+                || _freq.Options.MaxSearchKeyLengthForFusejiGeneration.Value != options.MaxSearchKeyLengthForFusejiGeneration.Value
+                || _freq.Options.MaxTotalFusejiCount.Value != options.MaxTotalFusejiCount.Value
+                || _freq.Options.MaxConsecutiveFusejiCount.Value != options.MaxConsecutiveFusejiCount.Value)
+            {
+                _freq.Ready = false;
+                _freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+
+                if (dbExists)
+                {
+                    DBUtils.DeleteDB(dbPath);
+                    dbExists = false;
+                }
+            }
         }
 
         _freq.AutoUpdatable = _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;

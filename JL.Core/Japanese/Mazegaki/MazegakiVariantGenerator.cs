@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace JL.Core.Utilities.Japanese.Mazegaki;
+namespace JL.Core.Japanese.Mazegaki;
 
 internal static class MazegakiVariantGenerator
 {
@@ -15,7 +15,7 @@ internal static class MazegakiVariantGenerator
         return (mask & (1UL << index)) is not 0;
     }
 
-    public static MazegakiVariantEnumerable GenerateMixedVariants(string expression, string reading)
+    public static MazegakiVariantEnumerable GenerateMazegakiVariants(string expression, string reading)
     {
         return new MazegakiVariantEnumerable(expression, reading);
     }

@@ -1,19 +1,17 @@
 using System.Diagnostics;
-using JL.Core.Dicts.Interfaces;
+using JL.Core.Japanese;
 using JL.Core.Utilities;
-using JL.Core.Utilities.Japanese;
-using JL.Core.Utilities.Japanese.Mazegaki;
 
 namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictRecordBuilder
 {
-    public static void AddToDictionary(in JmdictEntry entry, IDictionary<string, IList<IDictRecord>> jmdictDictionary, bool includeProperNames)
+    public static Dictionary<string, JmdictRecord>? GetRecordsFromEntry(in JmdictEntry entry, bool includeProperNames)
     {
         // https://github.com/JMdictProject/JMdictIssues/issues/94#issuecomment-1535592300
         if (!includeProperNames && entry.Id is >= 5000000 and <= 5999999)
         {
-            return;
+            return null;
         }
 
         ReadOnlySpan<KanjiElement> kanjiElementsSpan = entry.KanjiElements.AsReadOnlySpan();
@@ -85,36 +83,7 @@ internal static class JmdictRecordBuilder
         }
 
         ProcessReadingElements(in entry, recordDictionary, allSpellingsWithoutSearchOnlyForms, firstPrimarySpelling, alternativeSpellingsForFirstPrimarySpelling, stagKArraysInHiragana, stagRArraysInHiragana, spellingsWithoutSearchOnlyFormsExist);
-
-        foreach ((string key, JmdictRecord record) in recordDictionary)
-        {
-            if (jmdictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
-            {
-                tempRecordList.Add(record);
-            }
-            else
-            {
-                jmdictDictionary[key] = [record];
-            }
-
-            if (record.Readings is not null)
-            {
-                foreach (string reading in record.Readings)
-                {
-                    string readingInHiragana = JapaneseUtils.NormalizeText(reading);
-                    if (readingInHiragana != key)
-                    {
-                        foreach (string variant in MazegakiVariantGenerator.GenerateMixedVariants(key, readingInHiragana))
-                        {
-                            if (!recordDictionary.ContainsKey(variant))
-                            {
-                                _ = DictUtils.AddRecordToDictionary(variant, record, jmdictDictionary);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        return recordDictionary;
     }
 
     private static void ProcessKanjiElements(in JmdictEntry entry, Dictionary<string, JmdictRecord> recordDictionary, string[] allSpellingsWithoutSearchOnlyForms, string[]?[] allKanjiOrthographyInfoWithoutSearchOnlyForms, string[]?[] stagKArraysInHiragana, string[]?[] stagRArraysInHiragana, string firstPrimarySpelling)

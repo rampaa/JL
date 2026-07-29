@@ -4,6 +4,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using JL.Core.Freqs.Options;
+using JL.Core.Japanese;
+using JL.Core.Japanese.Fuseji;
+using JL.Core.Japanese.Mazegaki;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Core.Utilities.ObjectPool;
@@ -13,14 +17,24 @@ namespace JL.Core.Freqs;
 
 internal static class FreqDBManager
 {
-    public const int Version = 11;
+    public const int Version = 12;
 
+    private const string Record = "record";
+    private const string RowId = "rowid";
+    private const string Spelling = "spelling";
+    private const string Frequency = "frequency";
+
+    private const string RecordSearchKey = "record_search_key";
+    private const string SearchKey = "search_key";
+    private const string RecordId = "record_id";
+
+    private const string Term = "term";
     private const string SingleTermQuery =
-        """
-        SELECT r.spelling, r.frequency
-        FROM record r
-        JOIN record_search_key rsk ON r.rowid = rsk.record_id
-        WHERE rsk.search_key = @term;
+        $"""
+        SELECT r.{Spelling}, r.{Frequency}
+        FROM {Record} r
+        JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+        WHERE rsk.{SearchKey} = @{Term};
         """;
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
@@ -33,11 +47,11 @@ internal static class FreqDBManager
         }
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
-            """
-            SELECT r.spelling, r.frequency, rsk.search_key
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            WHERE rsk.search_key IN (@1
+            $"""
+            SELECT r.{Spelling}, r.{Frequency}, rsk.{SearchKey}
+            FROM {Record} r
+            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+            WHERE rsk.{SearchKey} IN (@1
             """);
 
         for (int i = 1; i < termCount; i++)
@@ -64,20 +78,20 @@ internal static class FreqDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            CREATE TABLE IF NOT EXISTS record
+            $"""
+            CREATE TABLE IF NOT EXISTS {Record}
             (
-                rowid INTEGER NOT NULL PRIMARY KEY,
-                spelling TEXT NOT NULL,
-                frequency INTEGER NOT NULL
+                {RowId} INTEGER NOT NULL PRIMARY KEY,
+                {Spelling} TEXT NOT NULL,
+                {Frequency} INTEGER NOT NULL
             ) STRICT;
 
-            CREATE TABLE IF NOT EXISTS record_search_key
+            CREATE TABLE IF NOT EXISTS {RecordSearchKey}
             (
-                search_key TEXT NOT NULL,
-                record_id INTEGER NOT NULL,
-                PRIMARY KEY (search_key, record_id),
-                FOREIGN KEY (record_id) REFERENCES record (rowid) ON DELETE CASCADE
+                {SearchKey} TEXT NOT NULL,
+                {RecordId} INTEGER NOT NULL,
+                PRIMARY KEY ({SearchKey}, {RecordId}),
+                FOREIGN KEY ({RecordId}) REFERENCES {Record} ({RowId}) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
@@ -89,7 +103,7 @@ internal static class FreqDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Freq freq)
+    public static void ImportFromMemory(Freq freq)
     {
         ulong rowId = 1;
 
@@ -101,14 +115,14 @@ internal static class FreqDBManager
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
-            """
-            INSERT INTO record (rowid, spelling, frequency)
-            VALUES (@rowid, @spelling, @frequency);
+            $"""
+            INSERT INTO {Record} ({RowId}, {Spelling}, {Frequency})
+            VALUES (@{RowId}, @{Spelling}, @{Frequency});
             """;
 
-        SqliteParameter rowidParam = new("@rowid", SqliteType.Integer);
-        SqliteParameter spellingParam = new("@spelling", SqliteType.Text);
-        SqliteParameter frequencyParam = new("@frequency", SqliteType.Integer);
+        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter spellingParam = new($"@{Spelling}", SqliteType.Text);
+        SqliteParameter frequencyParam = new($"@{Frequency}", SqliteType.Integer);
         insertRecordCommand.Parameters.AddRange([
             rowidParam,
             spellingParam,
@@ -119,13 +133,13 @@ internal static class FreqDBManager
 
         using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
         insertSearchKeyCommand.CommandText =
-            """
-            INSERT INTO record_search_key (record_id, search_key)
-            VALUES (@record_id, @search_key);
+            $"""
+            INSERT INTO {RecordSearchKey} ({RecordId}, {SearchKey})
+            VALUES (@{RecordId}, @{SearchKey});
             """;
 
-        SqliteParameter recordIdParam = new("@record_id", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new("@search_key", SqliteType.Text);
+        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
         insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
         insertSearchKeyCommand.Prepare();
 
@@ -222,7 +236,7 @@ internal static class FreqDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText = SingleTermQuery;
-        _ = command.Parameters.AddWithValue("@term", term);
+        _ = command.Parameters.AddWithValue($"@{Term}", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
@@ -246,9 +260,9 @@ internal static class FreqDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT MAX(frequency)
-            FROM record
+            $"""
+            SELECT MAX({Frequency})
+            FROM {Record}
             """;
 
         using SqliteDataReader reader = command.ExecuteReader();
@@ -268,11 +282,11 @@ internal static class FreqDBManager
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
-            SELECT r.spelling, r.frequency, json_group_array(rsk.search_key)
-            FROM record r
-            JOIN record_search_key rsk ON r.rowid = rsk.record_id
-            GROUP BY r.rowid;
+            $"""
+            SELECT r.{Spelling}, r.{Frequency}, json_group_array(rsk.{SearchKey})
+            FROM {Record} r
+            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+            GROUP BY r.{RowId};
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
@@ -296,6 +310,711 @@ internal static class FreqDBManager
         }
 
         freq.Contents = freq.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+    }
+
+    private const int RowIdColumnIndex = 0;
+    private const int FrequencyColumnIndex = 1;
+
+    public static async Task ImportYomichanFreqFromDisk(Freq freq)
+    {
+        string fullPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
+        if (!Directory.Exists(fullPath))
+        {
+            return;
+        }
+
+        bool nonKanjiDict = freq.Type is not FreqType.YomichanKanji;
+
+        GenerateMazegakiVariantsOption? generateMazegakiOption = freq.Options.GenerateMazegakiVariants;
+        Debug.Assert(nonKanjiDict || generateMazegakiOption is not null);
+        bool generateMazegaki = nonKanjiDict
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && generateMazegakiOption!.Value;
+
+        GenerateFusejiVariantsOption? generateFusejiVariantsOption = freq.Options.GenerateFusejiVariants;
+        Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
+        bool generateFusejiVariants = nonKanjiDict
+                                // ReSharper disable once NullableWarningSuppressionIsUsed
+                                && generateFusejiVariantsOption!.Value;
+
+        int maxSearchKeyLengthForFusejiGeneration;
+        int maxTotalFuseji;
+        int maxConsecutiveFuseji;
+        if (generateFusejiVariants)
+        {
+            Debug.Assert(freq.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            maxSearchKeyLengthForFusejiGeneration = freq.Options.MaxSearchKeyLengthForFusejiGeneration.Value;
+
+            Debug.Assert(freq.Options.MaxTotalFusejiCount is not null);
+            maxTotalFuseji = freq.Options.MaxTotalFusejiCount.Value;
+
+            Debug.Assert(freq.Options.MaxConsecutiveFusejiCount is not null);
+            maxConsecutiveFuseji = freq.Options.MaxConsecutiveFusejiCount.Value;
+        }
+        else
+        {
+            maxSearchKeyLengthForFusejiGeneration = 0;
+            maxTotalFuseji = 0;
+            maxConsecutiveFuseji = 0;
+        }
+
+        ulong rowId = 1;
+
+        // ReSharper disable once UseAwaitUsing
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
+        Debug.Assert(connection is not null);
+
+        DBUtils.SetJournalModeToWal(connection);
+
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            $"""
+            INSERT INTO {Record} ({RowId}, {Spelling}, {Frequency})
+            VALUES (@{RowId}, @{Spelling}, @{Frequency});
+            """;
+
+        SqliteParameter rowIdParamForInsertRecordCommand = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter spellingParamForInsertRecordCommand = new($"@{Spelling}", SqliteType.Text);
+        SqliteParameter frequencyParamForInsertRecordCommand = new($"@{Frequency}", SqliteType.Integer);
+        insertRecordCommand.Parameters.AddRange([
+            rowIdParamForInsertRecordCommand,
+            spellingParamForInsertRecordCommand,
+            frequencyParamForInsertRecordCommand
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        insertRecordCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        using SqliteCommand insertRecordSearchKeyCommand = connection.CreateCommand();
+        insertRecordSearchKeyCommand.CommandText =
+            $"""
+            INSERT INTO {RecordSearchKey} ({SearchKey}, {RecordId})
+            VALUES (@{SearchKey}, @{RecordId});
+            """;
+
+        SqliteParameter searchKeyParamForInsertRecordSearchKeyCommand = new($"@{SearchKey}", SqliteType.Text);
+        SqliteParameter recordIdParamForInsertRecordSearchKeyCommand = new($"@{RecordId}", SqliteType.Integer);
+
+        insertRecordSearchKeyCommand.Parameters.AddRange([
+            searchKeyParamForInsertRecordSearchKeyCommand,
+            recordIdParamForInsertRecordSearchKeyCommand
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        insertRecordSearchKeyCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        using SqliteCommand selectSameRecordsCommand = connection.CreateCommand();
+        selectSameRecordsCommand.CommandText =
+            $"""
+            SELECT r.{RowId}, r.{Frequency}
+            FROM {Record} AS r
+            JOIN {RecordSearchKey} AS rs ON rs.{RecordId} = r.{RowId}
+            WHERE rs.{SearchKey} = @{SearchKey} AND r.{Spelling} = @{Spelling};
+            """;
+
+        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
+        SqliteParameter spellingParam = new($"@{Spelling}", SqliteType.Text);
+        selectSameRecordsCommand.Parameters.AddRange([
+            searchKeyParam,
+            spellingParam
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        selectSameRecordsCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        using SqliteCommand updateRecordCommand = connection.CreateCommand();
+        updateRecordCommand.CommandText =
+            $"""
+            UPDATE {Record}
+            SET {Frequency} = @{Frequency}
+            WHERE {RowId} = @{RowId};
+            """;
+
+        SqliteParameter frequencyParamForUpdateCommand = new($"@{Frequency}", SqliteType.Integer);
+        SqliteParameter rowIdParamForUpdateCommand = new($"@{RowId}", SqliteType.Integer);
+        updateRecordCommand.Parameters.AddRange([
+            frequencyParamForUpdateCommand,
+            rowIdParamForUpdateCommand
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        updateRecordCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        CommandsAndParameters commandsAndParameters = new(selectSameRecordsCommand, searchKeyParam, spellingParam, updateRecordCommand, frequencyParamForUpdateCommand, rowIdParamForUpdateCommand, insertRecordCommand, rowIdParamForInsertRecordCommand, spellingParamForInsertRecordCommand, frequencyParamForInsertRecordCommand, insertRecordSearchKeyCommand, searchKeyParamForInsertRecordSearchKeyCommand, recordIdParamForInsertRecordSearchKeyCommand);
+
+        int transactionRecordCount = 0;
+
+        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
+        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, freq.Type is FreqType.Yomichan ? "term_meta_bank_*.json" : "kanji_meta_bank_*.json", SearchOption.TopDirectoryOnly);
+        foreach (string jsonFile in jsonFiles)
+        {
+#pragma warning disable CA1849 // Call async methods when in an async method
+            SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            insertRecordCommand.Transaction = transaction;
+            insertRecordSearchKeyCommand.Transaction = transaction;
+            selectSameRecordsCommand.Transaction = transaction;
+            updateRecordCommand.Transaction = transaction;
+
+            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+            await using (fileStream.ConfigureAwait(false))
+            {
+                await foreach (JsonElement[]? jsonElements in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                {
+                    Debug.Assert(jsonElements is not null);
+
+                    string primarySpelling = jsonElements[0]
+                        // ReSharper disable once NullableWarningSuppressionIsUsed
+                        .GetString()!.GetPooledString();
+
+                    string primarySpellingInHiragana = JapaneseUtils.NormalizeText(primarySpelling).GetPooledString();
+                    string? reading = null;
+                    int frequency = -1;
+                    ref readonly JsonElement thirdElement = ref jsonElements[2];
+
+                    if (thirdElement.ValueKind is JsonValueKind.Number)
+                    {
+                        frequency = thirdElement.GetInt32();
+                    }
+                    else if (thirdElement.ValueKind is JsonValueKind.Object)
+                    {
+                        if (thirdElement.TryGetProperty("value", out JsonElement freqValue))
+                        {
+                            frequency = freqValue.GetInt32();
+                            if (frequency <= 0 && thirdElement.TryGetProperty("displayValue", out JsonElement displayValue))
+                            {
+                                frequency = TextUtils.ExtractFirstInt(displayValue.GetString());
+                            }
+                        }
+                        else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
+                        {
+                            reading = readingValue
+                                // ReSharper disable once NullableWarningSuppressionIsUsed
+                                .GetString()!.GetPooledString();
+                            JsonElement frequencyElement = thirdElement.GetProperty("frequency");
+
+                            if (frequencyElement.ValueKind is JsonValueKind.Number)
+                            {
+                                frequency = frequencyElement.GetInt32();
+                            }
+                            else if (frequencyElement.ValueKind is JsonValueKind.Object)
+                            {
+                                frequency = frequencyElement.GetProperty("value").GetInt32();
+                                if (frequency <= 0 && frequencyElement.TryGetProperty("displayValue", out JsonElement displayValue))
+                                {
+                                    frequency = TextUtils.ExtractFirstInt(displayValue.GetString());
+                                }
+                            }
+                            else // if (frequencyElement.ValueKind is JsonValueKind.String)
+                            {
+                                frequency = TextUtils.ExtractFirstInt(frequencyElement.GetString());
+                            }
+                        }
+                    }
+                    else // if (thirdElement.ValueKind is JsonValueKind.String)
+                    {
+                        string? freqStr = thirdElement.GetString();
+                        Debug.Assert(freqStr is not null);
+
+                        frequency = TextUtils.ExtractFirstInt(freqStr);
+                    }
+
+                    if (frequency <= 0)
+                    {
+                        continue;
+                    }
+
+                    if (frequency > freq.MaxValue)
+                    {
+                        freq.MaxValue = frequency;
+                    }
+
+                    if (primarySpelling == reading)
+                    {
+                        reading = null;
+                    }
+
+                    FrequencyRecord frequencyRecordWithPrimarySpelling = new(primarySpelling, frequency);
+                    if (reading is null)
+                    {
+                        AddOrUpdate(primarySpellingInHiragana, rowId, frequencyRecordWithPrimarySpelling, true, commandsAndParameters);
+                        ++transactionRecordCount;
+
+                        if (generateFusejiVariants)
+                        {
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            {
+                                AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithPrimarySpelling, false, commandsAndParameters);
+                                ++transactionRecordCount;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
+                        AddOrUpdate(readingInHiragana, rowId, frequencyRecordWithPrimarySpelling, true, commandsAndParameters);
+                        ++transactionRecordCount;
+
+                        if (generateFusejiVariants)
+                        {
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            {
+                                AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithPrimarySpelling, false, commandsAndParameters);
+                                ++transactionRecordCount;
+                            }
+                        }
+
+                        FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
+                        ++rowId;
+
+                        AddOrUpdate(primarySpellingInHiragana, rowId, frequencyRecordWithReading, true, commandsAndParameters);
+                        ++transactionRecordCount;
+
+                        if (generateFusejiVariants)
+                        {
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            {
+                                AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                                ++transactionRecordCount;
+                            }
+                        }
+
+                        if (generateMazegaki)
+                        {
+                            foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, reading))
+                            {
+                                AddOrUpdate(mazegakiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                                ++transactionRecordCount;
+
+                                if (generateFusejiVariants)
+                                {
+                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                    {
+                                        AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                                        ++transactionRecordCount;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (transactionRecordCount > 20000)
+                    {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        // ReSharper disable once MethodHasAsyncOverload
+                        transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                        freq.Ready = true;
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                        transactionRecordCount = 0;
+
+                        insertRecordCommand.Transaction = transaction;
+                        insertRecordSearchKeyCommand.Transaction = transaction;
+                        selectSameRecordsCommand.Transaction = transaction;
+                        updateRecordCommand.Transaction = transaction;
+                    }
+
+                    ++rowId;
+                }
+            }
+
+            if (transactionRecordCount > 0)
+            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                transactionRecordCount = 0;
+                freq.Ready = true;
+            }
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+            // ReSharper disable once MethodHasAsyncOverload
+            transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+        }
+
+        if (rowId > 1)
+        {
+            SqliteConnection.ClearAllPools();
+            DBUtils.SetJournalModeToDelete(connection);
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand analyzeCommand = connection.CreateCommand();
+            analyzeCommand.CommandText = "ANALYZE;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = analyzeCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand vacuumCommand = connection.CreateCommand();
+            vacuumCommand.CommandText = "VACUUM;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = vacuumCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            freq.Size = GetDistinctSearchKeyCount(connection);
+        }
+        else
+        {
+            freq.Size = 0;
+        }
+    }
+
+    public static async Task ImportNazekaFreqFromDisk(Freq freq)
+    {
+        string fullPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
+        if (!File.Exists(fullPath))
+        {
+            return;
+        }
+
+        GenerateMazegakiVariantsOption? generateMazegakiOption = freq.Options.GenerateMazegakiVariants;
+        Debug.Assert(generateMazegakiOption is not null);
+        bool generateMazegaki = generateMazegakiOption.Value;
+
+        GenerateFusejiVariantsOption? generateFusejiVariantsOption = freq.Options.GenerateFusejiVariants;
+        Debug.Assert(generateFusejiVariantsOption is not null);
+        bool generateFusejiVariants = generateFusejiVariantsOption.Value;
+
+        int maxSearchKeyLengthForFusejiGeneration;
+        int maxTotalFuseji;
+        int maxConsecutiveFuseji;
+        if (generateFusejiVariants)
+        {
+            Debug.Assert(freq.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            maxSearchKeyLengthForFusejiGeneration = freq.Options.MaxSearchKeyLengthForFusejiGeneration.Value;
+
+            Debug.Assert(freq.Options.MaxTotalFusejiCount is not null);
+            maxTotalFuseji = freq.Options.MaxTotalFusejiCount.Value;
+
+            Debug.Assert(freq.Options.MaxConsecutiveFusejiCount is not null);
+            maxConsecutiveFuseji = freq.Options.MaxConsecutiveFusejiCount.Value;
+        }
+        else
+        {
+            maxSearchKeyLengthForFusejiGeneration = 0;
+            maxTotalFuseji = 0;
+            maxConsecutiveFuseji = 0;
+        }
+
+        ulong rowId = 1;
+
+        // ReSharper disable once UseAwaitUsing
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
+        Debug.Assert(connection is not null);
+
+        DBUtils.SetJournalModeToWal(connection);
+
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            $"""
+            INSERT INTO {Record} ({RowId}, {Spelling}, {Frequency})
+            VALUES (@{RowId}, @{Spelling}, @{Frequency});
+            """;
+
+        SqliteParameter rowIdParamForInsertRecordCommand = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter spellingParamForInsertRecordCommand = new($"@{Spelling}", SqliteType.Text);
+        SqliteParameter frequencyParamForInsertRecordCommand = new($"@{Frequency}", SqliteType.Integer);
+        insertRecordCommand.Parameters.AddRange([
+            rowIdParamForInsertRecordCommand,
+            spellingParamForInsertRecordCommand,
+            frequencyParamForInsertRecordCommand
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        insertRecordCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        using SqliteCommand insertRecordSearchKeyCommand = connection.CreateCommand();
+        insertRecordSearchKeyCommand.CommandText =
+            $"""
+            INSERT INTO {RecordSearchKey} ({SearchKey}, {RecordId})
+            VALUES (@{SearchKey}, @{RecordId});
+            """;
+
+        SqliteParameter searchKeyParamForInsertRecordSearchKeyCommand = new($"@{SearchKey}", SqliteType.Text);
+        SqliteParameter recordIdParamForInsertRecordSearchKeyCommand = new($"@{RecordId}", SqliteType.Integer);
+
+        insertRecordSearchKeyCommand.Parameters.AddRange([
+            searchKeyParamForInsertRecordSearchKeyCommand,
+            recordIdParamForInsertRecordSearchKeyCommand
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        insertRecordSearchKeyCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        using SqliteCommand selectSameRecordsCommand = connection.CreateCommand();
+        selectSameRecordsCommand.CommandText =
+            $"""
+            SELECT r.{RowId}, r.{Frequency}
+            FROM {Record} AS r
+            JOIN {RecordSearchKey} AS rs ON rs.{RecordId} = r.{RowId}
+            WHERE rs.{SearchKey} = @{SearchKey} AND r.{Spelling} = @{Spelling};
+            """;
+
+        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
+        SqliteParameter spellingParam = new($"@{Spelling}", SqliteType.Text);
+        selectSameRecordsCommand.Parameters.AddRange([
+            searchKeyParam,
+            spellingParam
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        selectSameRecordsCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        using SqliteCommand updateRecordCommand = connection.CreateCommand();
+        updateRecordCommand.CommandText =
+            $"""
+            UPDATE {Record}
+            SET {Frequency} = @{Frequency}
+            WHERE {RowId} = @{RowId};
+            """;
+
+        SqliteParameter frequencyParamForUpdateCommand = new($"@{Frequency}", SqliteType.Integer);
+        SqliteParameter rowIdParamForUpdateCommand = new($"@{RowId}", SqliteType.Integer);
+        updateRecordCommand.Parameters.AddRange([
+            frequencyParamForUpdateCommand,
+            rowIdParamForUpdateCommand
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        updateRecordCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        CommandsAndParameters commandsAndParameters = new(selectSameRecordsCommand, searchKeyParam, spellingParam, updateRecordCommand, frequencyParamForUpdateCommand, rowIdParamForUpdateCommand, insertRecordCommand, rowIdParamForInsertRecordCommand, spellingParamForInsertRecordCommand, frequencyParamForInsertRecordCommand, insertRecordSearchKeyCommand, searchKeyParamForInsertRecordSearchKeyCommand, recordIdParamForInsertRecordSearchKeyCommand);
+
+        int transactionRecordCount = 0;
+
+        Dictionary<string, JsonElement[][]>? frequencyJson;
+        FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, JsonElement[][]>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+            Debug.Assert(frequencyJson is not null);
+        }
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        insertRecordCommand.Transaction = transaction;
+        insertRecordSearchKeyCommand.Transaction = transaction;
+        selectSameRecordsCommand.Transaction = transaction;
+        updateRecordCommand.Transaction = transaction;
+
+        foreach ((string reading, JsonElement[][] value) in frequencyJson)
+        {
+            foreach (JsonElement[] elementList in value)
+            {
+                int frequencyRank = elementList[1].GetInt32();
+                string exactSpelling = elementList[0]
+                    // ReSharper disable once NullableWarningSuppressionIsUsed
+                    .GetString()!.GetPooledString();
+
+                if (frequencyRank > freq.MaxValue)
+                {
+                    freq.MaxValue = frequencyRank;
+                }
+
+                FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
+                AddOrUpdate(reading, rowId, frequencyRecordWithExactSpelling, true, commandsAndParameters);
+                if (generateFusejiVariants)
+                {
+                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                    {
+                        AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithExactSpelling, false, commandsAndParameters);
+                    }
+                }
+
+                string exactSpellingInHiragana = JapaneseUtils.NormalizeText(exactSpelling).GetPooledString();
+                if (exactSpellingInHiragana != reading)
+                {
+                    FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
+                    ++rowId;
+
+                    AddOrUpdate(exactSpellingInHiragana, rowId, frequencyRecordWithReading, true, commandsAndParameters);
+                    if (generateFusejiVariants)
+                    {
+                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                        {
+                            AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                        }
+                    }
+
+                    if (generateMazegaki)
+                    {
+                        foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(exactSpellingInHiragana, reading))
+                        {
+                            AddOrUpdate(mazegakiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                            if (generateFusejiVariants)
+                            {
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (transactionRecordCount > 20000)
+                {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    // ReSharper disable once MethodHasAsyncOverload
+                    transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                    freq.Ready = true;
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                    transactionRecordCount = 0;
+
+                    insertRecordCommand.Transaction = transaction;
+                    insertRecordSearchKeyCommand.Transaction = transaction;
+                    selectSameRecordsCommand.Transaction = transaction;
+                    updateRecordCommand.Transaction = transaction;
+                }
+
+                ++rowId;
+            }
+        }
+
+        if (transactionRecordCount > 0)
+        {
+#pragma warning disable CA1849 // Call async methods when in an async method
+            transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            transactionRecordCount = 0;
+            freq.Ready = true;
+        }
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        // ReSharper disable once MethodHasAsyncOverload
+        transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        if (rowId > 1)
+        {
+            SqliteConnection.ClearAllPools();
+            DBUtils.SetJournalModeToDelete(connection);
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand analyzeCommand = connection.CreateCommand();
+            analyzeCommand.CommandText = "ANALYZE;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = analyzeCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand vacuumCommand = connection.CreateCommand();
+            vacuumCommand.CommandText = "VACUUM;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = vacuumCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            freq.Size = GetDistinctSearchKeyCount(connection);
+        }
+        else
+        {
+            freq.Size = 0;
+        }
+    }
+
+    private static int GetDistinctSearchKeyCount(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            SELECT COUNT(DISTINCT {SearchKey})
+            FROM {RecordSearchKey};
+            """;
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        _ = reader.Read();
+        return reader.GetInt32(0);
+    }
+
+    internal sealed record class CommandsAndParameters(SqliteCommand SelectSameRecordsCommand,
+        SqliteParameter SearchKeyParam,
+        SqliteParameter SpellingParam,
+        SqliteCommand UpdateRecordCommand,
+        SqliteParameter FrequencyParamForUpdateCommand,
+        SqliteParameter RowIdParamForUpdateCommand,
+        SqliteCommand InsertRecordCommand,
+        SqliteParameter RowIdParamForInsertRecordCommand,
+        SqliteParameter SpellingParamForInsertRecordCommand,
+        SqliteParameter FrequencyParamForInsertRecordCommand,
+        SqliteCommand InsertRecordSearchKeyCommand,
+        SqliteParameter SearchKeyParamForInsertRecordSearchKeyCommand,
+        SqliteParameter RecordIdParamForInsertRecordSearchKeyCommand);
+
+    internal static void AddOrUpdate(string searchKey,
+        ulong recordId,
+        FrequencyRecord record,
+        bool newRecord,
+        CommandsAndParameters commandsAndParameters)
+    {
+        int existingFrequency = 0;
+
+        commandsAndParameters.SearchKeyParam.Value = searchKey;
+        commandsAndParameters.SpellingParam.Value = record.Spelling;
+
+        using SqliteDataReader reader = commandsAndParameters.SelectSameRecordsCommand.ExecuteReader();
+        long rowId = 0;
+        if (reader.Read())
+        {
+            rowId = reader.GetInt64(RowIdColumnIndex);
+            existingFrequency = reader.GetInt32(FrequencyColumnIndex);
+        }
+
+        if (rowId is not 0)
+        {
+            if (existingFrequency > record.Frequency)
+            {
+                commandsAndParameters.FrequencyParamForUpdateCommand.Value = record.Frequency;
+                commandsAndParameters.RowIdParamForUpdateCommand.Value = rowId;
+                _ = commandsAndParameters.UpdateRecordCommand.ExecuteNonQuery();
+            }
+        }
+        else
+        {
+            if (newRecord)
+            {
+                commandsAndParameters.RowIdParamForInsertRecordCommand.Value = recordId;
+                commandsAndParameters.SpellingParamForInsertRecordCommand.Value = record.Spelling;
+                commandsAndParameters.FrequencyParamForInsertRecordCommand.Value = record.Frequency;
+                _ = commandsAndParameters.InsertRecordCommand.ExecuteNonQuery();
+            }
+
+            commandsAndParameters.SearchKeyParamForInsertRecordSearchKeyCommand.Value = searchKey;
+            commandsAndParameters.RecordIdParamForInsertRecordSearchKeyCommand.Value = recordId;
+            _ = commandsAndParameters.InsertRecordSearchKeyCommand.ExecuteNonQuery();
+        }
     }
 
     private static FrequencyRecord GetRecord(SqliteDataReader dataReader)

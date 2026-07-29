@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Config;
@@ -28,6 +29,13 @@ namespace JL.Core.Dicts;
 
 public static class DictUtils
 {
+    public delegate Task Load(Dict dict);
+    public delegate Task ImportFromDisk(Dict dict);
+    private delegate void ImportFromMemory(Dict dict);
+    private delegate void LoadFromDB(Dict dict);
+    private delegate void HandleLeftOvers(string fullPath);
+    public delegate void CreateDB(string dbPath);
+
     public static readonly string CustomWordDictPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
     public static readonly string CustomNameDictPath = Path.Join(AppInfo.ResourcesPath, "custom_names.txt");
     private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "dicts.json");
@@ -40,7 +48,7 @@ public static class DictUtils
 
     private static readonly SemaphoreSlim s_loadDictionariesSemaphoreSlim = new(1, 1);
 
-    internal static readonly SearchValues<char> s_invalidCharactersForPrimarySpellings = SearchValues.Create('�', '〓', '\n');
+    internal static readonly SearchValues<char> s_invalidCharactersForPrimarySpellings = SearchValues.Create('�', '\n');
     internal static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜');
 
     internal static bool DBIsUsedForAtLeastOneDict { get; private set; } = true;
@@ -71,12 +79,17 @@ public static class DictUtils
         {
             nameof(DictType.ProfileCustomWordDictionary), new Dict(DictType.ProfileCustomWordDictionary,
                 "Custom Word Dictionary (Profile)",
-                Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Words.txt"),
+                Path.Join(ProfileUtils.ProfileFolderPath, $"Default_{ProfileUtils.CustomWords}.txt"),
                 true, -1, 128,
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
-                    new NewlineBetweenDefinitionsOption(true)),
+                    new NewlineBetweenDefinitionsOption(true),
+                    generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -84,7 +97,7 @@ public static class DictUtils
         {
             nameof(DictType.ProfileCustomNameDictionary), new Dict(DictType.ProfileCustomNameDictionary,
                 "Custom Name Dictionary (Profile)",
-                Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Names.txt"),
+                Path.Join(ProfileUtils.ProfileFolderPath, $"Default_{ProfileUtils.CustomNames}.txt"),
                 true, 0, 128,
                 new DictOptions(
                     new UseDBOption(false),
@@ -92,7 +105,11 @@ public static class DictUtils
                     showImages: new ShowImagesOption(true),
                     showImageAtBottom: new ShowImageAtBottomOption(true),
                     maxImageWidth: new MaxImageWidthOption(0),
-                    maxImageHeight: new MaxImageHeightOption(0)),
+                    maxImageHeight: new MaxImageHeightOption(0),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -105,7 +122,12 @@ public static class DictUtils
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
-                    new NewlineBetweenDefinitionsOption(true)),
+                    new NewlineBetweenDefinitionsOption(true),
+                    generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -121,7 +143,11 @@ public static class DictUtils
                     showImages: new ShowImagesOption(true),
                     showImageAtBottom: new ShowImageAtBottomOption(true),
                     maxImageWidth: new MaxImageWidthOption(0),
-                    maxImageHeight: new MaxImageHeightOption(0)),
+                    maxImageHeight: new MaxImageHeightOption(0),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -148,7 +174,12 @@ public static class DictUtils
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
                     showCrossReferences: new ShowCrossReferencesOption(true),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
+                    generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)
                 ),
                 autoUpdatable: true,
                 url: s_jmdictUrl,
@@ -174,7 +205,11 @@ public static class DictUtils
                     new UseDBOption(true),
                     new NoAllOption(false),
                     new NewlineBetweenDefinitionsOption(true),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
                 autoUpdatable: true,
                 url: s_jmnedictUrl,
                 revision: null)
@@ -580,26 +615,40 @@ public static class DictUtils
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        LoadJmdict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadDict(dict, JmdictLoader.Load, JmdictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
+                            JmdictDBManager.CreateDB, JmdictDBManager.ImportFromDisk, JmdictDBManager.ImportFromMemory,
+                            null, tasks, dictsToBeRemoved, JmdictLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
+
                         break;
 
                     case DictType.JMnedict:
-                        LoadJmnedict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadDict(dict, JmnedictLoader.Load, JmnedictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
+                            JmnedictDBManager.CreateDB, JmnedictDBManager.ImportFromDisk, JmnedictDBManager.ImportFromMemory,
+                            null, tasks, dictsToBeRemoved, JmnedictLoader.Size, false, true, ref rebuildingAnyDB, ref dictCleared);
+
                         break;
 
                     case DictType.Kanjidic:
-                        LoadKanjidic(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadDict(dict, KanjidicLoader.Load, KanjidicDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
+                            KanjidicDBManager.CreateDB, KanjidicDBManager.ImportFromDisk, KanjidicDBManager.ImportFromMemory,
+                            KanjidicDBManager.LoadFromDB, tasks, dictsToBeRemoved, KanjidicLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
+
                         break;
 
                     case DictType.NonspecificWordYomichan:
                     case DictType.NonspecificKanjiWithWordSchemaYomichan:
                     case DictType.NonspecificNameYomichan:
                     case DictType.NonspecificYomichan:
-                        LoadYomichanDict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadDict(dict, EpwingYomichanLoader.Load, EpwingYomichanDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
+                            EpwingYomichanDBManager.CreateDB, EpwingYomichanDBManager.ImportFromDisk, EpwingYomichanDBManager.ImportFromMemory,
+                            EpwingYomichanDBManager.LoadFromDB, tasks, dictsToBeRemoved, EpwingYomichanLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
-                        LoadYomichanKanjiDict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadDict(dict, YomichanKanjiLoader.Load, YomichanKanjiDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
+                            YomichanKanjiDBManager.CreateDB, YomichanKanjiDBManager.ImportFromDisk, YomichanKanjiDBManager.ImportFromMemory,
+                            YomichanKanjiDBManager.LoadFromDB, tasks, dictsToBeRemoved, YomichanKanjiLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.CustomWordDictionary:
@@ -616,11 +665,16 @@ public static class DictUtils
                     case DictType.NonspecificKanjiNazeka:
                     case DictType.NonspecificNameNazeka:
                     case DictType.NonspecificNazeka:
-                        LoadNazekaDict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadDict(dict, EpwingNazekaLoader.Load, EpwingNazekaDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
+                            EpwingNazekaDBManager.CreateDB, EpwingNazekaDBManager.ImportFromDisk, EpwingNazekaDBManager.ImportFromMemory,
+                            EpwingNazekaDBManager.LoadFromDB, tasks, dictsToBeRemoved, EpwingNazekaLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.PitchAccentYomichan:
-                        LoadYomichanPitchAccentDict(dict, tasks, dictsToBeRemoved, ref rebuildingAnyDB, ref dictCleared);
+                        LoadDict(dict, YomichanPitchAccentLoader.Load, YomichanPitchAccentDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
+                            YomichanPitchAccentDBManager.CreateDB, YomichanPitchAccentDBManager.ImportFromDisk, YomichanPitchAccentDBManager.ImportFromMemory,
+                            YomichanPitchAccentDBManager.LoadFromDB, tasks, dictsToBeRemoved, YomichanPitchAccentLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+
                         break;
 
                     default:
@@ -703,13 +757,16 @@ public static class DictUtils
         bool useDB = dict.Options.UseDB.Value;
         string dbPath = dict.DBPath;
         string dbJournalPath = $"{dbPath}-journal";
+        string dbWalPath = $"{dbPath}-wal";
+        string dbShmPath = $"{dbPath}-shm";
         bool dbExists = File.Exists(dbPath);
-        bool dbExisted = dbExists;
         bool dbJournalExists = File.Exists(dbJournalPath);
+        bool dbWalExists = File.Exists(dbWalPath);
+        bool dbShmExists = File.Exists(dbShmPath);
 
         if (!dict.Updating)
         {
-            if (dbJournalExists)
+            if (dbJournalExists || dbWalExists || dbShmExists)
             {
                 if (dbExists)
                 {
@@ -717,7 +774,20 @@ public static class DictUtils
                     dbExists = false;
                 }
 
-                File.Delete(dbJournalPath);
+                if (dbJournalExists)
+                {
+                    File.Delete(dbJournalPath);
+                }
+
+                if (dbWalExists)
+                {
+                    File.Delete(dbWalPath);
+                }
+
+                if (dbShmExists)
+                {
+                    File.Delete(dbShmPath);
+                }
             }
             else if (dbExists && !DBUtils.RecordExists(dict.ReadOnlyConnectionString))
             {
@@ -733,10 +803,10 @@ public static class DictUtils
             rebuildingAnyDB = true;
         }
 
-        return new DBState(useDB, dbExists, dbExisted);
+        return new DBState(useDB, dbExists);
     }
 
-    private static void LoadJmdict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadDict(Dict dict, Load load, int version, HandleLeftOvers handleLeftOvers, CreateDB createDB, ImportFromDisk importFromDisk, ImportFromMemory importFromMemory, LoadFromDB? loadFromDB, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, int initialDictSize, bool preferLoadingFromDB, bool deleteDictFileOnError, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -744,45 +814,41 @@ public static class DictUtils
         }
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        ResourceUpdater.HandleLeftOverFiles(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, JmdictDBManager.Version, ref rebuildingAnyDB);
+        handleLeftOvers(fullDictPath);
+        DBState dBContext = PrepareDictDB(dict, version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
-        bool loadFromDB = dbExists && !dBContext.UseDB;
+        bool hasContent = dict.Contents.Count > 0;
 
-        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+        if (dict.Active && !useDB && !hasContent)
         {
-            bool dbExisted = dBContext.DBExisted;
             tasks.Add(Task.Run(async () =>
             {
+                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : initialDictSize, StringComparer.Ordinal);
                 try
                 {
-                    // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739, 2023/12/16: 419334, 2024/02/22: 421519
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 450000, StringComparer.Ordinal);
-
-                    if (loadFromDB)
+                    if (!dbExists || !preferLoadingFromDB)
                     {
-                        JmdictDBManager.LoadFromDB(dict);
-                        dict.Size = dict.Contents.Count;
+                        await load(dict).ConfigureAwait(false);
                     }
                     else
                     {
-                        await JmdictLoader.Load(dict).ConfigureAwait(false);
-                        if (dict.Active)
+                        Debug.Assert(loadFromDB is not null);
+                        loadFromDB(dict);
+                    }
+
+                    dict.Size = dict.Contents.Count;
+                    if (dict.Size is 0)
+                    {
+                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {dict.Name}");
+
+                        dict.Active = false;
+                        dictsToBeRemoved.Add(dict);
+                        if (deleteDictFileOnError && File.Exists(fullDictPath))
                         {
-                            dict.Size = dict.Contents.Count;
-
-                            if (!dbExists && (useDB || dbExisted))
-                            {
-                                JmdictDBManager.CreateDB(dict.DBPath);
-                                JmdictDBManager.InsertRecordsToDB(dict);
-
-                                if (useDB)
-                                {
-                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                }
-                            }
+                            File.Delete(fullDictPath);
                         }
                     }
                 }
@@ -793,175 +859,44 @@ public static class DictUtils
 
                     dict.Active = false;
                     dictsToBeRemoved.Add(dict);
-                    File.Delete(fullDictPath);
-                }
-                finally
-                {
-                    dict.Ready = true;
-                }
-            }, CancellationToken.None));
-        }
-
-        else if (dict.Contents.Count > 0 && (!dict.Active || dBContext.UseDB))
-        {
-            if (dBContext.UseDB && !dbExists)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    JmdictDBManager.CreateDB(dict.DBPath);
-                    JmdictDBManager.InsertRecordsToDB(dict);
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                    dict.Ready = true;
-                }, CancellationToken.None));
-            }
-            else
-            {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                dict.Ready = true;
-            }
-
-            dictCleared = true;
-        }
-
-        else
-        {
-            dict.Ready = true;
-        }
-    }
-
-    private static void LoadJmnedict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
-    {
-        if (dict.Updating)
-        {
-            return;
-        }
-
-        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        ResourceUpdater.HandleLeftOverFiles(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, JmnedictDBManager.Version, ref rebuildingAnyDB);
-
-        bool useDB = dBContext.UseDB;
-        bool dbExists = dBContext.DBExists;
-        // loadFromDB = dbExists && !useDB;
-
-        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
-        {
-            bool dbExisted = dBContext.DBExisted;
-            tasks.Add(Task.Run(async () =>
-            {
-                try
-                {
-                    // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055, 2023/12/16: 609238, 2024/02/22: 609265
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 620000, StringComparer.Ordinal);
-
-                    // We don't load JMnedict from DB because it is slower and allocates more memory for JMnedict for some reason
-                    await JmnedictLoader.Load(dict).ConfigureAwait(false);
-                    if (dict.Active)
+                    if (deleteDictFileOnError && File.Exists(fullDictPath))
                     {
-                        dict.Size = dict.Contents.Count;
-
-                        if (!dbExists && (useDB || dbExisted))
-                        {
-                            JmnedictDBManager.CreateDB(dict.DBPath);
-                            JmnedictDBManager.InsertRecordsToDB(dict);
-
-                            if (useDB)
-                            {
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            }
-                        }
+                        File.Delete(fullDictPath);
                     }
                 }
-                catch (Exception ex)
-                {
-                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-
-                    dict.Active = false;
-                    dictsToBeRemoved.Add(dict);
-                    File.Delete(fullDictPath);
-                }
                 finally
                 {
                     dict.Ready = true;
                 }
             }, CancellationToken.None));
         }
-
-        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+        else if (dict.Active && useDB && !dbExists)
         {
-            if (useDB && !dbExists)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    JmnedictDBManager.CreateDB(dict.DBPath);
-                    JmnedictDBManager.InsertRecordsToDB(dict);
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                    dict.Ready = true;
-                }, CancellationToken.None));
-            }
-            else
-            {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                dict.Ready = true;
-            }
-
-            dictCleared = true;
-        }
-
-        else
-        {
-            dict.Ready = true;
-        }
-    }
-
-    private static void LoadKanjidic(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
-    {
-        if (dict.Updating)
-        {
-            return;
-        }
-
-        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        ResourceUpdater.HandleLeftOverFiles(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, KanjidicDBManager.Version, ref rebuildingAnyDB);
-
-        bool useDB = dBContext.UseDB;
-        bool dbExists = dBContext.DBExists;
-        bool loadFromDB = dbExists && !dBContext.UseDB;
-
-        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
-        {
-            bool dbExisted = dBContext.DBExisted;
             tasks.Add(Task.Run(async () =>
             {
                 try
                 {
-                    // 2022/05/11: 13108, 2023/12/16: 13108, 2024/02/02 13108
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 13108, StringComparer.Ordinal);
-
-                    if (loadFromDB)
+                    createDB(dict.DBPath);
+                    if (!hasContent)
                     {
-                        KanjidicDBManager.LoadFromDB(dict);
-                        dict.Size = dict.Contents.Count;
+                        await importFromDisk(dict).ConfigureAwait(false);
                     }
                     else
                     {
-                        await KanjidicLoader.Load(dict).ConfigureAwait(false);
-                        if (dict.Active)
+                        importFromMemory(dict);
+                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                    }
+
+                    if (dict.Size is 0)
+                    {
+                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {dict.Name}");
+
+                        dict.Active = false;
+                        dictsToBeRemoved.Add(dict);
+                        if (deleteDictFileOnError && File.Exists(fullDictPath))
                         {
-                            dict.Size = dict.Contents.Count;
-
-                            if (!dbExists && (useDB || dbExisted))
-                            {
-                                KanjidicDBManager.CreateDB(dict.DBPath);
-                                KanjidicDBManager.InsertRecordsToDB(dict);
-
-                                if (useDB)
-                                {
-                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                                }
-                            }
+                            File.Delete(fullDictPath);
                         }
                     }
                 }
@@ -972,7 +907,10 @@ public static class DictUtils
 
                     dict.Active = false;
                     dictsToBeRemoved.Add(dict);
-                    File.Delete(fullDictPath);
+                    if (deleteDictFileOnError && File.Exists(fullDictPath))
+                    {
+                        File.Delete(fullDictPath);
+                    }
                 }
                 finally
                 {
@@ -980,218 +918,12 @@ public static class DictUtils
                 }
             }, CancellationToken.None));
         }
-
-        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+        else if (hasContent && (!dict.Active || useDB))
         {
-            if (useDB && !dbExists)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    KanjidicDBManager.CreateDB(dict.DBPath);
-                    KanjidicDBManager.InsertRecordsToDB(dict);
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                    dict.Ready = true;
-                }, CancellationToken.None));
-            }
-            else
-            {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                dict.Ready = true;
-            }
-
-            dictCleared = true;
-        }
-
-        else
-        {
+            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             dict.Ready = true;
-        }
-    }
-
-    private static void LoadYomichanDict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
-    {
-        if (dict.Updating)
-        {
-            return;
-        }
-
-        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        ResourceUpdater.HandleLeftOverFolders(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, EpwingYomichanDBManager.Version, ref rebuildingAnyDB);
-
-        bool useDB = dBContext.UseDB;
-        bool dbExists = dBContext.DBExists;
-        bool loadFromDB = dbExists && !dBContext.UseDB;
-
-        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
-        {
-            bool dbExisted = dBContext.DBExisted;
-            tasks.Add(Task.Run(async () =>
-            {
-                try
-                {
-                    int dictSize = dict.Size > 0
-                        ? dict.Size
-                        : 250000;
-
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(dictSize, StringComparer.Ordinal);
-
-                    if (loadFromDB)
-                    {
-                        EpwingYomichanDBManager.LoadFromDB(dict);
-                        dict.Size = dict.Contents.Count;
-                    }
-                    else
-                    {
-                        await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
-                        dict.Size = dict.Contents.Count;
-
-                        if (dict.Size is 0)
-                        {
-                            LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                            FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {dict.Name}");
-
-                            dict.Active = false;
-                            dictsToBeRemoved.Add(dict);
-                        }
-                        else if (!dbExists && (useDB || dbExisted))
-                        {
-                            EpwingYomichanDBManager.CreateDB(dict.DBPath);
-                            EpwingYomichanDBManager.InsertRecordsToDB(dict);
-
-                            if (useDB)
-                            {
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            }
-                        }
-                    }
-                }
-
-                catch (Exception ex)
-                {
-                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-
-                    dict.Active = false;
-                    dictsToBeRemoved.Add(dict);
-                }
-                finally
-                {
-                    dict.Ready = true;
-                }
-            }, CancellationToken.None));
-        }
-
-        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
-        {
-            if (useDB && !dbExists)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    EpwingYomichanDBManager.CreateDB(dict.DBPath);
-                    EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                    dict.Ready = true;
-                }, CancellationToken.None));
-            }
-            else
-            {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                dict.Ready = true;
-            }
-
             dictCleared = true;
         }
-
-        else
-        {
-            dict.Ready = true;
-        }
-    }
-
-    private static void LoadYomichanKanjiDict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
-    {
-        if (dict.Updating)
-        {
-            return;
-        }
-
-        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        ResourceUpdater.HandleLeftOverFolders(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, YomichanKanjiDBManager.Version, ref rebuildingAnyDB);
-
-        bool useDB = dBContext.UseDB;
-        bool dbExists = dBContext.DBExists;
-        bool loadFromDB = dbExists && !dBContext.UseDB;
-
-        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
-        {
-            bool dbExisted = dBContext.DBExisted;
-            tasks.Add(Task.Run(async () =>
-            {
-                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 250000, StringComparer.Ordinal);
-
-                try
-                {
-                    if (loadFromDB)
-                    {
-                        YomichanKanjiDBManager.LoadFromDB(dict);
-                        dict.Size = dict.Contents.Count;
-                    }
-                    else
-                    {
-                        await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
-                        dict.Size = dict.Contents.Count;
-
-                        if (!dbExists && (useDB || dbExisted))
-                        {
-                            YomichanKanjiDBManager.CreateDB(dict.DBPath);
-                            YomichanKanjiDBManager.InsertRecordsToDB(dict);
-
-                            if (useDB)
-                            {
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            }
-                        }
-                    }
-                }
-
-                catch (Exception ex)
-                {
-                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-
-                    dict.Active = false;
-                    dictsToBeRemoved.Add(dict);
-                }
-                finally
-                {
-                    dict.Ready = true;
-                }
-            }, CancellationToken.None));
-        }
-
-        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
-        {
-            if (useDB && !dbExists)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    YomichanKanjiDBManager.CreateDB(dict.DBPath);
-                    YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                    dict.Ready = true;
-                }, CancellationToken.None));
-            }
-            else
-            {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                dict.Ready = true;
-            }
-
-            dictCleared = true;
-        }
-
         else
         {
             dict.Ready = true;
@@ -1281,180 +1013,6 @@ public static class DictUtils
             dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             dictCleared = true;
             dict.Ready = true;
-        }
-
-        else
-        {
-            dict.Ready = true;
-        }
-    }
-
-    private static void LoadNazekaDict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
-    {
-        DBState dBContext = PrepareDictDB(dict, EpwingNazekaDBManager.Version, ref rebuildingAnyDB);
-
-        bool useDB = dBContext.UseDB;
-        bool dbExists = dBContext.DBExists;
-        bool loadFromDB = dbExists && !dBContext.UseDB;
-
-        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
-        {
-            bool dbExisted = dBContext.DBExisted;
-            tasks.Add(Task.Run(async () =>
-            {
-                try
-                {
-                    int size = dict.Size > 0
-                        ? dict.Size
-                        : 250000;
-
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
-
-                    if (loadFromDB)
-                    {
-                        EpwingNazekaDBManager.LoadFromDB(dict);
-                        dict.Size = dict.Contents.Count;
-                    }
-                    else
-                    {
-                        await EpwingNazekaLoader.Load(dict).ConfigureAwait(false);
-                        dict.Size = dict.Contents.Count;
-
-                        if (!dbExists && (useDB || dbExisted))
-                        {
-                            EpwingNazekaDBManager.CreateDB(dict.DBPath);
-                            EpwingNazekaDBManager.InsertRecordsToDB(dict);
-
-                            if (useDB)
-                            {
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-
-                    dict.Active = false;
-                    dictsToBeRemoved.Add(dict);
-                }
-                finally
-                {
-                    dict.Ready = true;
-                }
-            }, CancellationToken.None));
-        }
-
-        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
-        {
-            if (useDB && !dbExists)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    EpwingNazekaDBManager.CreateDB(dict.DBPath);
-                    EpwingNazekaDBManager.InsertRecordsToDB(dict);
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                    dict.Ready = true;
-                }, CancellationToken.None));
-            }
-            else
-            {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                dict.Ready = true;
-            }
-
-            dictCleared = true;
-        }
-
-        else
-        {
-            dict.Ready = true;
-        }
-    }
-
-    private static void LoadYomichanPitchAccentDict(Dict dict, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, ref bool rebuildingAnyDB, ref bool dictCleared)
-    {
-        if (dict.Updating)
-        {
-            return;
-        }
-
-        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        ResourceUpdater.HandleLeftOverFolders(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, YomichanPitchAccentDBManager.Version, ref rebuildingAnyDB);
-
-        bool useDB = dBContext.UseDB;
-        bool dbExists = dBContext.DBExists;
-        bool loadFromDB = dbExists && !dBContext.UseDB;
-
-        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
-        {
-            bool dbExisted = dBContext.DBExisted;
-            tasks.Add(Task.Run(async () =>
-            {
-                try
-                {
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 434991, StringComparer.Ordinal);
-
-                    if (loadFromDB)
-                    {
-                        YomichanPitchAccentDBManager.LoadFromDB(dict);
-                        dict.Size = dict.Contents.Count;
-                    }
-                    else
-                    {
-                        await YomichanPitchAccentLoader.Load(dict).ConfigureAwait(false);
-                        dict.Size = dict.Contents.Count;
-
-                        if (!dbExists && (useDB || dbExisted))
-                        {
-                            YomichanPitchAccentDBManager.CreateDB(dict.DBPath);
-                            YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-
-                            if (useDB)
-                            {
-                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-
-                    dict.Active = false;
-                    dictsToBeRemoved.Add(dict);
-                }
-                finally
-                {
-                    dict.Ready = true;
-                }
-            }, CancellationToken.None));
-        }
-
-        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
-        {
-            if (useDB && !dbExists)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    YomichanPitchAccentDBManager.CreateDB(dict.DBPath);
-                    YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                    dict.Ready = true;
-                }, CancellationToken.None));
-            }
-            else
-            {
-                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                dict.Ready = true;
-            }
-
-            dictCleared = true;
         }
 
         else
@@ -1597,6 +1155,11 @@ public static class DictUtils
             dict.Options.LoanwordEtymology ??= builtInJmdictOptions.LoanwordEtymology;
             dict.Options.ShowCrossReferences ??= builtInJmdictOptions.ShowCrossReferences;
             dict.Options.AutoUpdateAfterNDays ??= builtInJmdictOptions.AutoUpdateAfterNDays;
+            dict.Options.GenerateMazegakiVariants ??= builtInJmdictOptions.GenerateMazegakiVariants;
+            dict.Options.GenerateFusejiVariants ??= builtInJmdictOptions.GenerateFusejiVariants;
+            dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInJmdictOptions.MaxSearchKeyLengthForFusejiGeneration;
+            dict.Options.MaxTotalFusejiCount ??= builtInJmdictOptions.MaxTotalFusejiCount;
+            dict.Options.MaxConsecutiveFusejiCount ??= builtInJmdictOptions.MaxConsecutiveFusejiCount;
         }
         else if (dict.Type is DictType.Kanjidic)
         {
@@ -1609,18 +1172,33 @@ public static class DictUtils
 
             dict.Options.NewlineBetweenDefinitions ??= builtInJmnedictOptions.NewlineBetweenDefinitions;
             dict.Options.AutoUpdateAfterNDays ??= builtInJmnedictOptions.AutoUpdateAfterNDays;
+            dict.Options.GenerateFusejiVariants ??= builtInJmnedictOptions.GenerateFusejiVariants;
+            dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInJmnedictOptions.MaxSearchKeyLengthForFusejiGeneration;
+            dict.Options.MaxTotalFusejiCount ??= builtInJmnedictOptions.MaxTotalFusejiCount;
+            dict.Options.MaxConsecutiveFusejiCount ??= builtInJmnedictOptions.MaxConsecutiveFusejiCount;
         }
         else if (dict.Type is DictType.CustomWordDictionary or DictType.ProfileCustomWordDictionary)
         {
             DictOptions builtInCustomWordOptions = BuiltInDicts[nameof(DictType.CustomWordDictionary)].Options;
             dict.Options.NewlineBetweenDefinitions ??= builtInCustomWordOptions.NewlineBetweenDefinitions;
+            dict.Options.GenerateMazegakiVariants ??= builtInCustomWordOptions.GenerateMazegakiVariants;
+            dict.Options.GenerateFusejiVariants ??= builtInCustomWordOptions.GenerateFusejiVariants;
+            dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInCustomWordOptions.MaxSearchKeyLengthForFusejiGeneration;
+            dict.Options.MaxTotalFusejiCount ??= builtInCustomWordOptions.MaxTotalFusejiCount;
+            dict.Options.MaxConsecutiveFusejiCount ??= builtInCustomWordOptions.MaxConsecutiveFusejiCount;
         }
         else if (dict.Type is DictType.CustomNameDictionary or DictType.ProfileCustomNameDictionary)
         {
-            dict.Options.ShowImages = new ShowImagesOption(true);
-            dict.Options.ShowImageAtBottom = new ShowImageAtBottomOption(true);
-            dict.Options.MaxImageWidth = new MaxImageWidthOption(0);
-            dict.Options.MaxImageHeight = new MaxImageHeightOption(0);
+            DictOptions builtInCustomNameOptions = BuiltInDicts[nameof(DictType.CustomNameDictionary)].Options;
+            dict.Options.ShowImages ??= builtInCustomNameOptions.ShowImages;
+            dict.Options.ShowImageAtBottom ??= builtInCustomNameOptions.ShowImageAtBottom;
+            dict.Options.MaxImageWidth ??= builtInCustomNameOptions.MaxImageWidth;
+            dict.Options.MaxImageHeight ??= builtInCustomNameOptions.MaxImageHeight;
+            dict.Options.GenerateMazegakiVariants ??= builtInCustomNameOptions.GenerateMazegakiVariants;
+            dict.Options.GenerateFusejiVariants ??= builtInCustomNameOptions.GenerateFusejiVariants;
+            dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInCustomNameOptions.MaxSearchKeyLengthForFusejiGeneration;
+            dict.Options.MaxTotalFusejiCount ??= builtInCustomNameOptions.MaxTotalFusejiCount;
+            dict.Options.MaxConsecutiveFusejiCount ??= builtInCustomNameOptions.MaxConsecutiveFusejiCount;
         }
         else
         {
@@ -1655,6 +1233,26 @@ public static class DictUtils
             if (AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dict.Type))
             {
                 dict.Options.AutoUpdateAfterNDays ??= new AutoUpdateAfterNDaysOption(0);
+            }
+            if (GenerateMazegakiVariantsOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.GenerateMazegakiVariants ??= new GenerateMazegakiVariantsOption(false);
+            }
+            if (GenerateFusejiVariantsOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.GenerateFusejiVariants ??= new GenerateFusejiVariantsOption(false);
+            }
+            if (MaxSearchKeyLengthForFusejiGenerationOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= new MaxSearchKeyLengthForFusejiGenerationOption(9);
+            }
+            if (MaxTotalFusejiCountOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.MaxTotalFusejiCount ??= new MaxTotalFusejiCountOption(1);
+            }
+            if (MaxConsecutiveFusejiCountOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.MaxConsecutiveFusejiCount ??= new MaxConsecutiveFusejiCountOption(1);
             }
         }
     }
@@ -1749,18 +1347,35 @@ public static class DictUtils
 
     public static bool AddRecordToDictionary(string normalizedKey, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
     {
-        if (dictionary.TryGetValue(normalizedKey, out IList<IDictRecord>? records))
+        if (dictionary is Dictionary<string, IList<IDictRecord>> dict)
         {
-            if (records.Contains(record))
+            ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(dict, normalizedKey, out bool exists);
+            if (!exists)
+            {
+                records = [record];
+                return true;
+            }
+
+            Debug.Assert(records is not null);
+            List<IDictRecord> list = (List<IDictRecord>)records;
+
+            if (list.AsReadOnlySpan().Contains(record))
             {
                 return false;
             }
 
-            records.Add(record);
+            list.Add(record);
         }
         else
         {
-            dictionary[normalizedKey] = [record];
+            ConcurrentDictionary<string, IList<IDictRecord>> concurrent = (ConcurrentDictionary<string, IList<IDictRecord>>)dictionary;
+            List<IDictRecord> list = (List<IDictRecord>)concurrent.GetOrAdd(normalizedKey, static _ => new List<IDictRecord>(1));
+            if (list.Count > 0 && list.AsReadOnlySpan().Contains(record))
+            {
+                return false;
+            }
+
+            list.Add(record);
         }
 
         return true;

@@ -152,6 +152,7 @@ internal sealed partial class StatsWindow
         string? statType = ButtonSwapStats.Content.ToString();
         Debug.Assert(statType is not null);
 
+        // TODO: When migrating to .NET 11, use ToLowerOrdinal instead
 #pragma warning disable CA1308 // Normalize strings to uppercase
         statType = statType.ToLowerInvariant();
 #pragma warning restore CA1308 // Normalize strings to uppercase

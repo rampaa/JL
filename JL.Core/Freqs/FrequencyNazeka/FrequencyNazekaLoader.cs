@@ -1,9 +1,11 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
+using JL.Core.Freqs.Options;
+using JL.Core.Japanese;
+using JL.Core.Japanese.Fuseji;
+using JL.Core.Japanese.Mazegaki;
 using JL.Core.Utilities;
-using JL.Core.Utilities.Japanese;
-using JL.Core.Utilities.Japanese.Mazegaki;
 
 namespace JL.Core.Freqs.FrequencyNazeka;
 
@@ -15,6 +17,35 @@ internal static class FrequencyNazekaLoader
         if (!File.Exists(fullPath))
         {
             return;
+        }
+
+        GenerateMazegakiVariantsOption? generateMazegakiOption = freq.Options.GenerateMazegakiVariants;
+        Debug.Assert(generateMazegakiOption is not null);
+        bool generateMazegaki = generateMazegakiOption.Value;
+
+        GenerateFusejiVariantsOption? generateFusejiVariantsOption = freq.Options.GenerateFusejiVariants;
+        Debug.Assert(generateFusejiVariantsOption is not null);
+        bool generateFusejiVariants = generateFusejiVariantsOption.Value;
+
+        int maxSearchKeyLengthForFusejiGeneration;
+        int maxTotalFuseji;
+        int maxConsecutiveFuseji;
+        if (generateFusejiVariants)
+        {
+            Debug.Assert(freq.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            maxSearchKeyLengthForFusejiGeneration = freq.Options.MaxSearchKeyLengthForFusejiGeneration.Value;
+
+            Debug.Assert(freq.Options.MaxTotalFusejiCount is not null);
+            maxTotalFuseji = freq.Options.MaxTotalFusejiCount.Value;
+
+            Debug.Assert(freq.Options.MaxConsecutiveFusejiCount is not null);
+            maxConsecutiveFuseji = freq.Options.MaxConsecutiveFusejiCount.Value;
+        }
+        else
+        {
+            maxSearchKeyLengthForFusejiGeneration = 0;
+            maxTotalFuseji = 0;
+            maxConsecutiveFuseji = 0;
         }
 
         Dictionary<string, JsonElement[][]>? frequencyJson;
@@ -41,16 +72,40 @@ internal static class FrequencyNazekaLoader
 
                 FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
                 FreqUtils.AddOrUpdate(freq.Contents, reading, frequencyRecordWithExactSpelling);
+                if (generateFusejiVariants)
+                {
+                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                    {
+                        FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithExactSpelling);
+                    }
+                }
 
                 string exactSpellingInHiragana = JapaneseUtils.NormalizeText(exactSpelling).GetPooledString();
                 if (exactSpellingInHiragana != reading)
                 {
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
                     FreqUtils.AddOrUpdate(freq.Contents, exactSpellingInHiragana, frequencyRecordWithReading);
-
-                    foreach (string variant in MazegakiVariantGenerator.GenerateMixedVariants(exactSpellingInHiragana, reading))
+                    if (generateFusejiVariants)
                     {
-                        FreqUtils.AddOrUpdate(freq.Contents, variant, frequencyRecordWithReading);
+                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                        {
+                            FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithReading);
+                        }
+                    }
+
+                    if (generateMazegaki)
+                    {
+                        foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(exactSpellingInHiragana, reading))
+                        {
+                            FreqUtils.AddOrUpdate(freq.Contents, mazegakiVariant, frequencyRecordWithReading);
+                            if (generateFusejiVariants)
+                            {
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithReading);
+                                }
+                            }
+                        }
                     }
                 }
             }

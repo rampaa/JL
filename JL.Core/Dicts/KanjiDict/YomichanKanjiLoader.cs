@@ -8,6 +8,8 @@ namespace JL.Core.Dicts.KanjiDict;
 
 internal static class YomichanKanjiLoader
 {
+    public const int Size = 50000;
+
     public static async Task Load(Dict dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
@@ -16,6 +18,7 @@ internal static class YomichanKanjiLoader
             return;
         }
 
+        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {

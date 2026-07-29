@@ -5,6 +5,10 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Dicts.Options;
+using JL.Core.Japanese;
+using JL.Core.Japanese.Fuseji;
+using JL.Core.Japanese.Mazegaki;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Core.Utilities.ObjectPool;
@@ -16,7 +20,7 @@ internal static class YomichanPitchAccentDBManager
 {
     public const int Version = 10;
 
-    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
+    public const int Size = 250000;
 
     private const string Record = "Record";
     private const string RowId = "rowid";
@@ -27,6 +31,8 @@ internal static class YomichanPitchAccentDBManager
     private const string RecordSearchKey = "record_search_key";
     private const string RecordId = "record_id";
     private const string SearchKey = "search_key";
+
+    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
     public static string GetQuery(int termCount)
     {
@@ -94,7 +100,284 @@ internal static class YomichanPitchAccentDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertRecordsToDB(Dict dict)
+    public static async Task ImportFromDisk(Dict dict)
+    {
+        string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        if (!Directory.Exists(fullPath))
+        {
+            return;
+        }
+
+        GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
+        Debug.Assert(generateMazegakiOption is not null);
+        bool generateMazegaki = generateMazegakiOption.Value;
+
+        GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
+        Debug.Assert(generateFusejiVariantsOption is not null);
+        bool generateFusejiVariants = generateFusejiVariantsOption.Value;
+
+        int maxSearchKeyLengthForFusejiGeneration;
+        int maxTotalFuseji;
+        int maxConsecutiveFuseji;
+        if (generateFusejiVariants)
+        {
+            Debug.Assert(dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            maxSearchKeyLengthForFusejiGeneration = dict.Options.MaxSearchKeyLengthForFusejiGeneration.Value;
+
+            Debug.Assert(dict.Options.MaxTotalFusejiCount is not null);
+            maxTotalFuseji = dict.Options.MaxTotalFusejiCount.Value;
+
+            Debug.Assert(dict.Options.MaxConsecutiveFusejiCount is not null);
+            maxConsecutiveFuseji = dict.Options.MaxConsecutiveFusejiCount.Value;
+        }
+        else
+        {
+            maxSearchKeyLengthForFusejiGeneration = 0;
+            maxTotalFuseji = 0;
+            maxConsecutiveFuseji = 0;
+        }
+
+        ulong rowId = 1;
+
+        // ReSharper disable once UseAwaitUsing
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+        Debug.Assert(connection is not null);
+
+        DBUtils.SetJournalModeToWal(connection);
+
+        // ReSharper disable once UseAwaitUsing
+        using SqliteCommand insertRecordCommand = connection.CreateCommand();
+        insertRecordCommand.CommandText =
+            $"""
+            INSERT INTO {Record} ({RowId}, {Spelling}, {Reading}, {Position})
+            VALUES (@{RowId}, @{Spelling}, @{Reading}, @{Position});
+            """;
+
+        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
+        SqliteParameter spellingParam = new($"@{Spelling}", SqliteType.Text);
+        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
+        SqliteParameter positionParam = new($"@{Position}", SqliteType.Integer);
+        insertRecordCommand.Parameters.AddRange([
+            rowidParam,
+            spellingParam,
+            readingParam,
+            positionParam
+        ]);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        insertRecordCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        // ReSharper disable once UseAwaitUsing
+        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
+        insertSearchKeyCommand.CommandText =
+            $"""
+            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
+            VALUES (@{RecordId}, @{SearchKey});
+            """;
+
+        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
+        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
+        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
+#pragma warning disable CA1849 // Call async methods when in an async method
+        insertSearchKeyCommand.Prepare();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        HashSet<string> keys = new(StringComparer.Ordinal);
+        int transactionRecordCount = 0;
+
+        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
+        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term_meta_bank_*.json", SearchOption.TopDirectoryOnly);
+        foreach (string jsonFile in jsonFiles)
+        {
+#pragma warning disable CA1849 // Call async methods when in an async method
+            SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            insertRecordCommand.Transaction = transaction;
+            insertSearchKeyCommand.Transaction = transaction;
+
+            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+            await using (fileStream.ConfigureAwait(false))
+            {
+                await foreach (JsonElement[]? jsonObject in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                {
+                    Debug.Assert(jsonObject is not null);
+
+                    PitchAccentRecord record = new(jsonObject);
+                    if (record.Position is byte.MaxValue || string.IsNullOrWhiteSpace(record.Spelling))
+                    {
+                        continue;
+                    }
+
+                    rowidParam.Value = rowId;
+                    spellingParam.Value = record.Spelling;
+                    readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
+                    positionParam.Value = record.Position;
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    _ = insertRecordCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                    string spellingInHiragana = JapaneseUtils.NormalizeText(record.Spelling).GetPooledString();
+                    _ = keys.Add(spellingInHiragana);
+
+                    if (generateFusejiVariants)
+                    {
+                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(spellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                        {
+                            _ = keys.Add(fusejiVariant);
+                        }
+                    }
+
+                    if (record.Reading is not null)
+                    {
+                        string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
+                        if (spellingInHiragana != readingInHiragana)
+                        {
+                            if (keys.Add(readingInHiragana))
+                            {
+                                if (generateFusejiVariants)
+                                {
+                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                    {
+                                        _ = keys.Add(fusejiVariant);
+                                    }
+                                }
+
+                                if (generateMazegaki)
+                                {
+                                    foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(spellingInHiragana, readingInHiragana))
+                                    {
+                                        if (keys.Add(mazegaki))
+                                        {
+                                            if (generateFusejiVariants)
+                                            {
+                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                {
+                                                    _ = keys.Add(fusejiVariant);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    recordIdParam.Value = rowId;
+                    foreach (string key in keys)
+                    {
+                        searchKeyParam.Value = key;
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        _ = insertSearchKeyCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+                    }
+
+                    transactionRecordCount += keys.Count;
+                    keys.Clear();
+                    if (transactionRecordCount > 20000)
+                    {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        // ReSharper disable once MethodHasAsyncOverload
+                        transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                        dict.Ready = true;
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                        transactionRecordCount = 0;
+                        insertRecordCommand.Transaction = transaction;
+                        insertSearchKeyCommand.Transaction = transaction;
+                    }
+
+                    ++rowId;
+                }
+            }
+
+            if (transactionRecordCount > 0)
+            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                transactionRecordCount = 0;
+                dict.Ready = true;
+            }
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+            // ReSharper disable once MethodHasAsyncOverload
+            transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+        }
+
+        if (rowId > 1)
+        {
+            RemoveDuplicateRecords(connection);
+
+            SqliteConnection.ClearAllPools();
+            DBUtils.SetJournalModeToDelete(connection);
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand analyzeCommand = connection.CreateCommand();
+            analyzeCommand.CommandText = "ANALYZE;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = analyzeCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand vacuumCommand = connection.CreateCommand();
+            vacuumCommand.CommandText = "VACUUM;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = vacuumCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            dict.Size = GetDistinctSearchKeyCount(connection);
+        }
+        else
+        {
+            dict.Size = 0;
+        }
+    }
+
+    private static void RemoveDuplicateRecords(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            DELETE FROM {Record}
+            WHERE {RowId} NOT IN
+            (
+                SELECT MIN({RowId})
+                FROM {Record}
+                GROUP BY {Spelling}, {Reading}, {Position}
+            );
+            """;
+
+        _ = command.ExecuteNonQuery();
+    }
+
+    private static int GetDistinctSearchKeyCount(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            SELECT COUNT(DISTINCT {SearchKey})
+            FROM {RecordSearchKey};
+            """;
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        _ = reader.Read();
+        return reader.GetInt32(0);
+    }
+
+    public static void ImportFromMemory(Dict dict)
     {
         Dictionary<PitchAccentRecord, List<string>> recordToKeysDict = [];
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)

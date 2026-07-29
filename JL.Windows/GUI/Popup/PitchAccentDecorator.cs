@@ -2,9 +2,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using JL.Core.Utilities.Japanese;
+using JL.Core.Japanese;
 using JL.Windows.Utilities;
-using TextBox = System.Windows.Controls.TextBox;
 
 namespace JL.Windows.GUI.Popup;
 

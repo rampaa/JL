@@ -30,19 +30,43 @@ public static class FreqUtils
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
                 Path.Join(AppInfo.ResourcesPath, "freqlist_vns.json"),
-                true, 1, 57273, 35893, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                true, 1, 57273, 35893,
+                new FreqOptions(
+                    new UseDBOption(true),
+                    new HigherValueMeansHigherFrequencyOption(false),
+                    generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)))
         },
         {
             "Narou (Nazeka)",
             new Freq(FreqType.Nazeka, "Narou (Nazeka)",
                 Path.Join(AppInfo.ResourcesPath, "freqlist_narou.json"),
-                false, 2, 75588, 48528, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 2, 75588, 48528,
+                new FreqOptions(
+                    new UseDBOption(true),
+                    new HigherValueMeansHigherFrequencyOption(false),
+                    generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)))
         },
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)",
                 Path.Join(AppInfo.ResourcesPath, "freqlist_novels.json"),
-                false, 3, 114348, 74633, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 3, 114348, 74633,
+                new FreqOptions(
+                    new UseDBOption(true),
+                    new HigherValueMeansHigherFrequencyOption(false),
+                    generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
+                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
+                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
+                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)))
         }
     };
 
@@ -142,7 +166,6 @@ public static class FreqUtils
         string dbPath = freq.DBPath;
         string dbJournalPath = $"{dbPath}-journal";
         bool dbExists = File.Exists(dbPath);
-        bool dbExisted = dbExists;
         bool dbJournalExists = File.Exists(dbJournalPath);
 
         if (!freq.Updating)
@@ -172,190 +195,234 @@ public static class FreqUtils
             rebuildingAnyDB = true;
         }
 
-        return new DBState(useDB, dbExists, dbExisted);
+        return new DBState(useDB, dbExists);
     }
 
-    private static void LoadNazekaFreq(Freq freq, List<Task> tasks, ConcurrentBag<Freq> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
+    private static void LoadNazekaFreq(Freq freq, List<Task> tasks, ConcurrentBag<Freq> freqsToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
     {
+        string fullDictPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
         DBState dBContext = PrepareFreqDB(freq, FreqDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
-        bool loadFromDB = dbExists && !useDB;
+        bool hasContent = freq.Contents.Count > 0;
 
-        if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+        if (freq.Active && !useDB && !hasContent)
         {
-            bool dbExisted = dBContext.DBExisted;
             tasks.Add(Task.Run(async () =>
             {
+                int size = freq.Size > 0
+                    ? freq.Size
+                    : 114348;
+
+                freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
                 try
                 {
-                    int size = freq.Size > 0
-                        ? freq.Size
-                        : 114348;
-
-                    freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
-
-                    if (loadFromDB)
+                    if (!dbExists)
                     {
-                        FreqDBManager.LoadFromDB(freq);
-                        freq.Size = freq.Contents.Count;
+                        await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
                     }
                     else
                     {
-                        await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
-                        freq.Size = freq.Contents.Count;
+                        FreqDBManager.LoadFromDB(freq);
+                    }
 
-                        if (!dbExists && (useDB || dbExisted))
-                        {
-                            FreqDBManager.CreateDB(freq.DBPath);
-                            FreqDBManager.InsertRecordsToDB(freq);
+                    freq.Size = freq.Contents.Count;
+                    if (freq.Size is 0)
+                    {
+                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {freq.Name}");
 
-                            if (useDB)
-                            {
-                                freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-                            }
-                        }
+                        freq.Active = false;
+                        freqsToBeRemoved.Add(freq);
                     }
                 }
                 catch (Exception ex)
                 {
-                    string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
-                    LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
+                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
 
                     freq.Active = false;
-                    freqNamesToBeRemoved.Add(freq);
+                    freqsToBeRemoved.Add(freq);
                 }
                 finally
                 {
                     freq.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
-
-        else if (freq.Contents.Count > 0 && (!freq.Active || useDB))
+        else if (freq.Active && useDB && !dbExists)
         {
-            if (useDB && !dbExists)
+            tasks.Add(Task.Run(async () =>
             {
-                FreqDBManager.CreateDB(freq.DBPath);
-                FreqDBManager.InsertRecordsToDB(freq);
-            }
+                try
+                {
+                    FreqDBManager.CreateDB(freq.DBPath);
+                    if (!hasContent)
+                    {
+                        await FreqDBManager.ImportNazekaFreqFromDisk(freq).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        FreqDBManager.ImportFromMemory(freq);
+                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                    }
 
+                    if (freq.Size is 0)
+                    {
+                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {freq.Name}");
+
+                        freq.Active = false;
+                        freqsToBeRemoved.Add(freq);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+
+                    freq.Active = false;
+                    freqsToBeRemoved.Add(freq);
+                }
+                finally
+                {
+                    freq.Ready = true;
+                }
+            }, CancellationToken.None));
+        }
+        else if (hasContent && (!freq.Active || useDB))
+        {
             freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
             freq.Ready = true;
             freqCleared = true;
         }
-
-        else if (freq is { Active: true, Contents.Count: 0 } && useDB)
-        {
-            if (freq.MaxValue is 0)
-            {
-                FreqDBManager.SetMaxFrequencyValue(freq);
-            }
-
-            freq.Ready = true;
-        }
-
         else
         {
             freq.Ready = true;
         }
+
+        if (freq is { Active: true, MaxValue: 0 } && useDB)
+        {
+            FreqDBManager.SetMaxFrequencyValue(freq);
+        }
     }
 
-    private static void LoadYomichanFreq(Freq freq, List<Task> tasks, ConcurrentBag<Freq> freqNamesToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
+    private static void LoadYomichanFreq(Freq freq, List<Task> tasks, ConcurrentBag<Freq> freqsToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
     {
         if (freq.Updating)
         {
             return;
         }
 
-        string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
-        ResourceUpdater.HandleLeftOverFolders(fullFreqPath);
+        string fullDictPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
+        ResourceUpdater.HandleLeftOverFolders(fullDictPath);
         DBState dBContext = PrepareFreqDB(freq, FreqDBManager.Version, ref rebuildingAnyDB);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
-        bool loadFromDB = dbExists && !useDB;
-        if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
+        bool hasContent = freq.Contents.Count > 0;
+
+        if (freq.Active && !useDB && !hasContent)
         {
-            bool dbExisted = dBContext.DBExisted;
             tasks.Add(Task.Run(async () =>
             {
-                try
-                {
-                    int size = freq.Size > 0
+                int size = freq.Size > 0
                         ? freq.Size
                         : freq.Type is FreqType.Yomichan
                             ? 1504512
                             : 169623;
 
-                    freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
-
-                    if (loadFromDB)
+                freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
+                try
+                {
+                    if (!dbExists)
                     {
-                        FreqDBManager.LoadFromDB(freq);
-                        freq.Size = freq.Contents.Count;
+                        await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
                     }
                     else
                     {
-                        await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
-                        freq.Size = freq.Contents.Count;
+                        FreqDBManager.LoadFromDB(freq);
+                    }
 
-                        if (!dbExists && (useDB || dbExisted))
-                        {
-                            FreqDBManager.CreateDB(freq.DBPath);
-                            FreqDBManager.InsertRecordsToDB(freq);
+                    freq.Size = freq.Contents.Count;
+                    if (freq.Size is 0)
+                    {
+                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {freq.Name}");
 
-                            if (useDB)
-                            {
-                                freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-                            }
-                        }
+                        freq.Active = false;
+                        freqsToBeRemoved.Add(freq);
                     }
                 }
                 catch (Exception ex)
                 {
-                    LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
+                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
                     FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
 
                     freq.Active = false;
-                    freqNamesToBeRemoved.Add(freq);
+                    freqsToBeRemoved.Add(freq);
                 }
                 finally
                 {
                     freq.Ready = true;
                 }
-            }));
+            }, CancellationToken.None));
         }
-
-        else if (freq.Contents.Count > 0 && (!freq.Active || useDB))
+        else if (freq.Active && useDB && !dbExists)
         {
-            if (useDB && !dbExists)
+            tasks.Add(Task.Run(async () =>
             {
-                FreqDBManager.CreateDB(freq.DBPath);
-                FreqDBManager.InsertRecordsToDB(freq);
-            }
+                try
+                {
+                    FreqDBManager.CreateDB(freq.DBPath);
+                    if (!hasContent)
+                    {
+                        await FreqDBManager.ImportYomichanFreqFromDisk(freq).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        FreqDBManager.ImportFromMemory(freq);
+                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                    }
 
+                    if (freq.Size is 0)
+                    {
+                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {freq.Name}");
+
+                        freq.Active = false;
+                        freqsToBeRemoved.Add(freq);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+
+                    freq.Active = false;
+                    freqsToBeRemoved.Add(freq);
+                }
+                finally
+                {
+                    freq.Ready = true;
+                }
+            }, CancellationToken.None));
+        }
+        else if (hasContent && (!freq.Active || useDB))
+        {
             freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
             freq.Ready = true;
-
             freqCleared = true;
         }
-
-        else if (freq is { Active: true, Contents.Count: 0 } && useDB)
-        {
-            if (freq.MaxValue is 0)
-            {
-                FreqDBManager.SetMaxFrequencyValue(freq);
-            }
-
-            freq.Ready = true;
-        }
-
         else
         {
             freq.Ready = true;
+        }
+
+        if (freq is { Active: true, MaxValue: 0 } && useDB)
+        {
+            FreqDBManager.SetMaxFrequencyValue(freq);
         }
     }
 
@@ -432,6 +499,26 @@ public static class FreqUtils
         if (AutoUpdateAfterNDaysOption.ValidFreqTypes.Contains(freq.Type))
         {
             freq.Options.AutoUpdateAfterNDays ??= new AutoUpdateAfterNDaysOption(0);
+        }
+        if (GenerateMazegakiVariantsOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.GenerateMazegakiVariants ??= new GenerateMazegakiVariantsOption(false);
+        }
+        if (GenerateFusejiVariantsOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.GenerateFusejiVariants ??= new GenerateFusejiVariantsOption(false);
+        }
+        if (MaxSearchKeyLengthForFusejiGenerationOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.MaxSearchKeyLengthForFusejiGeneration ??= new MaxSearchKeyLengthForFusejiGenerationOption(9);
+        }
+        if (MaxTotalFusejiCountOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.MaxTotalFusejiCount ??= new MaxTotalFusejiCountOption(1);
+        }
+        if (MaxConsecutiveFusejiCountOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.MaxConsecutiveFusejiCount ??= new MaxConsecutiveFusejiCountOption(1);
         }
     }
 
@@ -521,7 +608,7 @@ public static class FreqUtils
                 int currentIndex = 0;
                 foreach (Freq freq in wordFreqs)
                 {
-                    if (freq is { Options.UseDB.Value: true, Active: true })
+                    if (freq is { Options.UseDB.Value: true, Active: true, Ready: true })
                     {
                         dbWordFreqs[currentIndex] = freq;
                         ++currentIndex;

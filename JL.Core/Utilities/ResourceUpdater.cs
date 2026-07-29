@@ -19,6 +19,7 @@ using JL.Core.Network;
 using JL.Core.Utilities.Database;
 using JL.Core.Utilities.ObjectPool;
 using JL.Core.WordClass;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Utilities;
 
@@ -295,13 +296,12 @@ public static class ResourceUpdater
         return false;
     }
 
-    public static async Task UpdateJmdict(bool isUpdate, bool noPrompt)
+    private static async Task<bool> UpdateBuiltInDict(bool isUpdate, bool noPrompt, DictType dictType, string dictTypeName, int size, DictUtils.CreateDB createDB, DictUtils.ImportFromDisk importFromDisk, DictUtils.Load load)
     {
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-
+        Dict dict = DictUtils.SingleDictTypeDicts[dictType];
         if (dict.Updating)
         {
-            return;
+            return false;
         }
 
         dict.Updating = true;
@@ -310,15 +310,53 @@ public static class ResourceUpdater
         Debug.Assert(uri is not null);
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        bool downloaded = await DownloadBuiltInDict(fullDictPath, uri, nameof(DictType.JMdict), isUpdate, noPrompt).ConfigureAwait(false);
+        bool downloaded = await DownloadBuiltInDict(fullDictPath, uri, dictTypeName, isUpdate, noPrompt).ConfigureAwait(false);
         if (downloaded)
         {
-            dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(450000, StringComparer.Ordinal);
-
+            bool useDB = dict.Options.UseDB.Value;
+            string dbPath = dict.DBPath;
+            bool dbExists = File.Exists(dbPath);
+            string backupDBPath = GetBackupPath(dbPath);
             try
             {
-                await Task.Run(() => JmdictLoader.Load(dict)).ConfigureAwait(false);
+                if (useDB)
+                {
+                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                    if (dbExists)
+                    {
+                        SqliteConnection.ClearAllPools();
+                        PathUtils.ReplaceFileAtomicallyOnSameVolume(backupDBPath, dbPath);
+                    }
+
+                    await Task.Run(async () =>
+                    {
+                        createDB(dbPath);
+                        await importFromDisk(dict).ConfigureAwait(false);
+                    }).ConfigureAwait(false);
+                    if (File.Exists(backupDBPath))
+                    {
+                        File.Delete(backupDBPath);
+                    }
+                }
+                else
+                {
+                    dict.Ready = false;
+                    await Task.Run(async () =>
+                    {
+                        dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                        await load(dict).ConfigureAwait(false);
+                    }).ConfigureAwait(false);
+
+                    if (dbExists)
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                    }
+
+                    if (!dict.Active)
+                    {
+                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                    }
+                }
 
                 string dictBackupPath = GetBackupPath(fullDictPath);
                 if (File.Exists(dictBackupPath))
@@ -326,33 +364,8 @@ public static class ResourceUpdater
                     File.Delete(dictBackupPath);
                 }
 
-                await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
-                await JmdictWordClassUtils.Load().ConfigureAwait(false);
-
-                string dbPath = dict.DBPath;
-                bool useDB = dict.Options.UseDB.Value;
-                bool dbExists = File.Exists(dbPath);
-
-                if (dbExists)
-                {
-                    DBUtils.DeleteDB(dbPath);
-                }
-
-                if (useDB || dbExists)
-                {
-                    await Task.Run(() =>
-                    {
-                        JmdictDBManager.CreateDB(dbPath);
-                        JmdictDBManager.InsertRecordsToDB(dict);
-                    }).ConfigureAwait(false);
-                }
-
-                if (!dict.Active || useDB)
-                {
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                }
-
                 FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
+                return true;
             }
             catch (Exception ex)
             {
@@ -366,12 +379,24 @@ public static class ResourceUpdater
                     File.Move(dictBackupPath, fullDictPath, true);
                 }
 
-                if (dict is { Active: true, Options.UseDB.Value: false })
+                if (File.Exists(backupDBPath))
                 {
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(450000, StringComparer.Ordinal);
+                    PathUtils.ReplaceFileAtomicallyOnSameVolume(dbPath, backupDBPath);
+                }
+
+                if (!dict.Active)
+                {
+                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                }
+                else if (!useDB)
+                {
                     try
                     {
-                        await Task.Run(() => JmdictLoader.Load(dict)).ConfigureAwait(false);
+                        await Task.Run(async () =>
+                        {
+                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                            await load(dict).ConfigureAwait(false);
+                        }).ConfigureAwait(false);
                     }
                     catch (Exception innerEx)
                     {
@@ -379,10 +404,24 @@ public static class ResourceUpdater
                         FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
                     }
                 }
-                else
+                else if (!File.Exists(dbPath))
                 {
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                    try
+                    {
+                        await Task.Run(async () =>
+                        {
+                            createDB(dbPath);
+                            await importFromDisk(dict).ConfigureAwait(false);
+                        }).ConfigureAwait(false);
+                    }
+                    catch (Exception innerEx)
+                    {
+                        LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
+                    }
                 }
+
+                return false;
             }
             finally
             {
@@ -391,221 +430,43 @@ public static class ResourceUpdater
                 ObjectPoolManager.ClearStringPoolIfDictsAreReady();
             }
         }
-        else
-        {
-            dict.Ready = true;
-            dict.Updating = false;
-            ObjectPoolManager.ClearStringPoolIfDictsAreReady();
-        }
+
+        dict.Ready = true;
+        dict.Updating = false;
+        ObjectPoolManager.ClearStringPoolIfDictsAreReady();
+        return false;
     }
 
-    public static async Task UpdateJmnedict(bool isUpdate, bool noPrompt)
+    public static async Task<bool> UpdateJmdict(bool isUpdate, bool noPrompt)
     {
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
-
-        if (dict.Updating)
+        bool updated = await UpdateBuiltInDict(isUpdate, noPrompt, DictType.JMdict, nameof(DictType.JMdict), JmdictLoader.Size, JmdictDBManager.CreateDB, JmdictDBManager.ImportFromDisk, JmdictLoader.Load).ConfigureAwait(false);
+        if (updated)
         {
-            return;
+            await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
+            await JmdictWordClassUtils.Load().ConfigureAwait(false);
+
+            return true;
         }
 
-        dict.Updating = true;
-
-        Uri? uri = dict.Url;
-        Debug.Assert(uri is not null);
-
-        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        bool downloaded = await DownloadBuiltInDict(fullDictPath, uri, nameof(DictType.JMnedict), isUpdate, noPrompt).ConfigureAwait(false);
-        if (downloaded)
-        {
-            dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(620000, StringComparer.Ordinal);
-
-            try
-            {
-                await Task.Run(() => JmnedictLoader.Load(dict)).ConfigureAwait(false);
-
-                string dictBackupPath = GetBackupPath(fullDictPath);
-                if (File.Exists(dictBackupPath))
-                {
-                    File.Delete(dictBackupPath);
-                }
-
-                string dbPath = dict.DBPath;
-                bool useDB = dict.Options.UseDB.Value;
-                bool dbExists = File.Exists(dbPath);
-
-                if (dbExists)
-                {
-                    DBUtils.DeleteDB(dbPath);
-                }
-
-                if (useDB || dbExists)
-                {
-                    await Task.Run(() =>
-                    {
-                        JmnedictDBManager.CreateDB(dbPath);
-                        JmnedictDBManager.InsertRecordsToDB(dict);
-                    }).ConfigureAwait(false);
-                }
-
-                if (!dict.Active || useDB)
-                {
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                }
-
-                FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
-            }
-            catch (Exception ex)
-            {
-                LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-
-                File.Delete(fullDictPath);
-                string dictBackupPath = GetBackupPath(fullDictPath);
-                if (File.Exists(dictBackupPath))
-                {
-                    File.Move(dictBackupPath, fullDictPath, true);
-                }
-
-                if (dict is { Active: true, Options.UseDB.Value: false })
-                {
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(620000, StringComparer.Ordinal);
-                    try
-                    {
-                        await Task.Run(() => JmnedictLoader.Load(dict)).ConfigureAwait(false);
-                    }
-                    catch (Exception innerEx)
-                    {
-                        LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
-                    }
-                }
-                else
-                {
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                }
-            }
-            finally
-            {
-                dict.Ready = true;
-                dict.Updating = false;
-                ObjectPoolManager.ClearStringPoolIfDictsAreReady();
-            }
-        }
-        else
-        {
-            dict.Ready = true;
-            dict.Updating = false;
-            ObjectPoolManager.ClearStringPoolIfDictsAreReady();
-        }
+        return false;
     }
 
-    public static async Task UpdateKanjidic(bool isUpdate, bool noPrompt)
+    public static Task<bool> UpdateJmnedict(bool isUpdate, bool noPrompt)
     {
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
-
-        if (dict.Updating)
-        {
-            return;
-        }
-
-        dict.Updating = true;
-
-        Uri? uri = dict.Url;
-        Debug.Assert(uri is not null);
-
-        string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        bool downloaded = await DownloadBuiltInDict(fullDictPath, uri, nameof(DictType.Kanjidic), isUpdate, noPrompt).ConfigureAwait(false);
-        if (downloaded)
-        {
-            dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
-
-            try
-            {
-                await Task.Run(() => KanjidicLoader.Load(dict)).ConfigureAwait(false);
-
-                string dictBackupPath = GetBackupPath(fullDictPath);
-                if (File.Exists(dictBackupPath))
-                {
-                    File.Delete(dictBackupPath);
-                }
-
-                string dbPath = dict.DBPath;
-                bool useDB = dict.Options.UseDB.Value;
-                bool dbExists = File.Exists(dbPath);
-
-                if (dbExists)
-                {
-                    DBUtils.DeleteDB(dbPath);
-                }
-
-                if (useDB || dbExists)
-                {
-                    await Task.Run(() =>
-                    {
-                        KanjidicDBManager.CreateDB(dbPath);
-                        KanjidicDBManager.InsertRecordsToDB(dict);
-                    }).ConfigureAwait(false);
-                }
-
-                if (!dict.Active || useDB)
-                {
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                }
-
-                FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
-            }
-            catch (Exception ex)
-            {
-                LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-
-                File.Delete(fullDictPath);
-                string dictBackupPath = GetBackupPath(fullDictPath);
-                if (File.Exists(dictBackupPath))
-                {
-                    File.Move(dictBackupPath, fullDictPath, true);
-                }
-
-                if (dict is { Active: true, Options.UseDB.Value: false })
-                {
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
-                    try
-                    {
-                        await Task.Run(() => KanjidicLoader.Load(dict)).ConfigureAwait(false);
-                    }
-                    catch (Exception innerEx)
-                    {
-                        LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
-                    }
-                }
-                else
-                {
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                }
-            }
-            finally
-            {
-                dict.Ready = true;
-                dict.Updating = false;
-                ObjectPoolManager.ClearStringPoolIfDictsAreReady();
-            }
-        }
-        else
-        {
-            dict.Ready = true;
-            dict.Updating = false;
-            ObjectPoolManager.ClearStringPoolIfDictsAreReady();
-        }
+        return UpdateBuiltInDict(isUpdate, noPrompt, DictType.JMnedict, nameof(DictType.JMnedict), JmnedictLoader.Size, JmnedictDBManager.CreateDB, JmnedictDBManager.ImportFromDisk, JmnedictLoader.Load);
     }
 
-    public static async Task UpdateYomichanDict(Dict dict, bool isUpdate, bool noPrompt)
+    public static Task<bool> UpdateKanjidic(bool isUpdate, bool noPrompt)
     {
+        return UpdateBuiltInDict(isUpdate, noPrompt, DictType.Kanjidic, nameof(DictType.Kanjidic), KanjidicLoader.Size, KanjidicDBManager.CreateDB, KanjidicDBManager.ImportFromDisk, KanjidicLoader.Load);
+    }
+
+    private static async Task<bool> UpdateYomichanDict(bool isUpdate, bool noPrompt, DictType dictType, int size, DictUtils.CreateDB createDB, DictUtils.ImportFromDisk importFromDisk, DictUtils.Load load)
+    {
+        Dict dict = DictUtils.SingleDictTypeDicts[dictType];
         if (dict.Updating)
         {
-            return;
+            return false;
         }
 
         dict.Updating = true;
@@ -618,26 +479,51 @@ public static class ResourceUpdater
         bool downloaded = await DownloadYomichanDict(uri, dict.Revision, dict.Name, fullDictPath, isUpdate, noPrompt).ConfigureAwait(false);
         if (downloaded)
         {
-            dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
-
+            bool useDB = dict.Options.UseDB.Value;
+            string dbPath = dict.DBPath;
+            bool dbExists = File.Exists(dbPath);
+            string backupDBPath = GetBackupPath(dbPath);
             try
             {
-                await Task.Run(async () =>
+                if (useDB)
                 {
-                    if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificNameYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificYomichan)
+                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                    if (dbExists)
                     {
-                        await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
+                        SqliteConnection.ClearAllPools();
+                        PathUtils.ReplaceFileAtomicallyOnSameVolume(backupDBPath, dbPath);
                     }
-                    else if (dict.Type is DictType.NonspecificKanjiYomichan)
+
+                    await Task.Run(async () =>
                     {
-                        await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
-                    }
-                    else if (dict.Type is DictType.PitchAccentYomichan)
+                        createDB(dbPath);
+                        await importFromDisk(dict).ConfigureAwait(false);
+                    }).ConfigureAwait(false);
+
+                    if (File.Exists(backupDBPath))
                     {
-                        await YomichanPitchAccentLoader.Load(dict).ConfigureAwait(false);
+                        File.Delete(backupDBPath);
                     }
-                }).ConfigureAwait(false);
+                }
+                else
+                {
+                    dict.Ready = false;
+                    await Task.Run(async () =>
+                    {
+                        dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                        await load(dict).ConfigureAwait(false);
+                    }).ConfigureAwait(false);
+
+                    if (dbExists)
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                    }
+
+                    if (!dict.Active)
+                    {
+                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                    }
+                }
 
                 string dictBackupPath = GetBackupPath(fullDictPath);
                 if (Directory.Exists(dictBackupPath))
@@ -645,43 +531,8 @@ public static class ResourceUpdater
                     Directory.Delete(dictBackupPath, true);
                 }
 
-                string dbPath = dict.DBPath;
-                bool useDB = dict.Options.UseDB.Value;
-                bool dbExists = File.Exists(dbPath);
-
-                if (dbExists)
-                {
-                    DBUtils.DeleteDB(dbPath);
-                }
-
-                if (useDB || dbExists)
-                {
-                    await Task.Run(() =>
-                    {
-                        if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificNameYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificYomichan)
-                        {
-                            EpwingYomichanDBManager.CreateDB(dbPath);
-                            EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                        }
-                        else if (dict.Type is DictType.NonspecificKanjiYomichan)
-                        {
-                            YomichanKanjiDBManager.CreateDB(dbPath);
-                            YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                        }
-                        else if (dict.Type is DictType.PitchAccentYomichan)
-                        {
-                            YomichanPitchAccentDBManager.CreateDB(dbPath);
-                            YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                        }
-                    }).ConfigureAwait(false);
-                }
-
-                if (!dict.Active || useDB)
-                {
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                }
-
                 FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
+                return true;
             }
             catch (Exception ex)
             {
@@ -695,39 +546,49 @@ public static class ResourceUpdater
                     Directory.Move(dictBackupPath, fullDictPath);
                 }
 
-                if (dict is { Active: true, Options.UseDB.Value: false })
+                if (File.Exists(backupDBPath))
                 {
-                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
+                    PathUtils.ReplaceFileAtomicallyOnSameVolume(dbPath, backupDBPath);
+                }
+
+                if (!dict.Active)
+                {
+                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                }
+                else if (!useDB)
+                {
                     try
                     {
                         await Task.Run(async () =>
                         {
-                            if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificNameYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificYomichan)
-                            {
-                                await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
-                            }
-                            else if (dict.Type is DictType.NonspecificKanjiYomichan)
-                            {
-                                await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
-                            }
-                            else if (dict.Type is DictType.PitchAccentYomichan)
-                            {
-                                await YomichanPitchAccentLoader.Load(dict).ConfigureAwait(false);
-                            }
+                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                            await load(dict).ConfigureAwait(false);
                         }).ConfigureAwait(false);
                     }
                     catch (Exception innerEx)
                     {
                         LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
                         FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
-                        dict.Active = false;
-                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                     }
                 }
-                else
+                else if (!File.Exists(dbPath))
                 {
-                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                    try
+                    {
+                        await Task.Run(async () =>
+                        {
+                            createDB(dbPath);
+                            await importFromDisk(dict).ConfigureAwait(false);
+                        }).ConfigureAwait(false);
+                    }
+                    catch (Exception innerEx)
+                    {
+                        LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
+                    }
                 }
+
+                return false;
             }
             finally
             {
@@ -736,19 +597,39 @@ public static class ResourceUpdater
                 ObjectPoolManager.ClearStringPoolIfDictsAreReady();
             }
         }
-        else
-        {
-            dict.Ready = true;
-            dict.Updating = false;
-            ObjectPoolManager.ClearStringPoolIfDictsAreReady();
-        }
+
+        dict.Ready = true;
+        dict.Updating = false;
+        ObjectPoolManager.ClearStringPoolIfDictsAreReady();
+        return false;
     }
 
-    public static async Task UpdateYomichanFreqDict(Freq freq, bool isUpdate, bool noPrompt)
+    public static async Task<bool> UpdateYomichanDict(Dict dict, bool isUpdate, bool noPrompt)
+    {
+        if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificNameYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificYomichan)
+        {
+            return await UpdateYomichanDict(isUpdate, noPrompt, dict.Type, EpwingYomichanDBManager.Size, EpwingYomichanDBManager.CreateDB, EpwingYomichanDBManager.ImportFromDisk, EpwingYomichanLoader.Load).ConfigureAwait(false);
+        }
+
+        if (dict.Type is DictType.NonspecificKanjiYomichan)
+        {
+            return await UpdateYomichanDict(isUpdate, noPrompt, dict.Type, YomichanKanjiDBManager.Size, YomichanKanjiDBManager.CreateDB, YomichanKanjiDBManager.ImportFromDisk, YomichanKanjiLoader.Load).ConfigureAwait(false);
+        }
+
+        if (dict.Type is DictType.PitchAccentYomichan)
+        {
+            return await UpdateYomichanDict(isUpdate, noPrompt, dict.Type, YomichanPitchAccentDBManager.Size, YomichanPitchAccentDBManager.CreateDB, YomichanPitchAccentDBManager.ImportFromDisk, YomichanPitchAccentLoader.Load).ConfigureAwait(false);
+        }
+
+        Debug.Assert(false);
+        return false;
+    }
+
+    public static async Task<bool> UpdateYomichanFreqDict(Freq freq, bool isUpdate, bool noPrompt)
     {
         if (freq.Updating)
         {
-            return;
+            return false;
         }
 
         freq.Updating = true;
@@ -757,76 +638,120 @@ public static class ResourceUpdater
         Debug.Assert(uri is not null);
         Debug.Assert(freq.Revision is not null);
 
-        string fullFreqPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
-        bool downloaded = await DownloadYomichanDict(uri, freq.Revision, freq.Name, fullFreqPath, isUpdate, noPrompt).ConfigureAwait(false);
+        string fullDictPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
+        bool downloaded = await DownloadYomichanDict(uri, freq.Revision, freq.Name, fullDictPath, isUpdate, noPrompt).ConfigureAwait(false);
         if (downloaded)
         {
-            freq.Ready = false;
-            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(13108, StringComparer.Ordinal);
-
+            bool useDB = freq.Options.UseDB.Value;
+            string dbPath = freq.DBPath;
+            bool dbExists = File.Exists(dbPath);
+            string backupDBPath = GetBackupPath(dbPath);
             try
             {
-                await Task.Run(() => FrequencyYomichanLoader.Load(freq)).ConfigureAwait(false);
+                if (useDB)
+                {
+                    freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                    if (dbExists)
+                    {
+                        SqliteConnection.ClearAllPools();
+                        PathUtils.ReplaceFileAtomicallyOnSameVolume(backupDBPath, dbPath);
+                    }
 
-                string dictBackupPath = GetBackupPath(fullFreqPath);
+                    await Task.Run(async () =>
+                    {
+                        FreqDBManager.CreateDB(dbPath);
+                        await FreqDBManager.ImportYomichanFreqFromDisk(freq).ConfigureAwait(false);
+                    }).ConfigureAwait(false);
+
+                    if (File.Exists(backupDBPath))
+                    {
+                        File.Delete(backupDBPath);
+                    }
+                }
+                else
+                {
+                    freq.Ready = false;
+                    await Task.Run(async () =>
+                    {
+                        freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(13108, StringComparer.Ordinal);
+                        await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
+                    }).ConfigureAwait(false);
+
+                    if (dbExists)
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                    }
+
+                    if (!freq.Active)
+                    {
+                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                    }
+                }
+
+                string dictBackupPath = GetBackupPath(fullDictPath);
                 if (Directory.Exists(dictBackupPath))
                 {
                     Directory.Delete(dictBackupPath, true);
                 }
 
-                string dbPath = freq.DBPath;
-                bool useDB = freq.Options.UseDB.Value;
-                bool dbExists = File.Exists(dbPath);
-
-                if (dbExists)
-                {
-                    DBUtils.DeleteDB(dbPath);
-                }
-
-                if (useDB || dbExists)
-                {
-                    await Task.Run(() =>
-                    {
-                        FreqDBManager.CreateDB(dbPath);
-                        FreqDBManager.InsertRecordsToDB(freq);
-                    }).ConfigureAwait(false);
-                }
-
-                if (!freq.Active || useDB)
-                {
-                    freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
-                }
-
                 FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {freq.Name}");
+                return true;
             }
             catch (Exception ex)
             {
-                LoggerManager.Logger.Error(ex, "Couldn't import '{FreqType}'-'{FreqName}' from '{FullFreqPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
+                LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
                 FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
 
-                Directory.Delete(fullFreqPath, true);
-                string dictBackupPath = GetBackupPath(fullFreqPath);
+                Directory.Delete(fullDictPath, true);
+                string dictBackupPath = GetBackupPath(fullDictPath);
                 if (Directory.Exists(dictBackupPath))
                 {
-                    Directory.Move(dictBackupPath, fullFreqPath);
+                    Directory.Move(dictBackupPath, fullDictPath);
                 }
 
-                if (freq is { Active: true, Options.UseDB.Value: false })
+                if (File.Exists(backupDBPath))
                 {
-                    freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(13108, StringComparer.Ordinal);
+                    PathUtils.ReplaceFileAtomicallyOnSameVolume(dbPath, backupDBPath);
+                }
+
+                if (!freq.Active)
+                {
+                    freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                }
+                else if (!useDB)
+                {
                     try
                     {
-                        await Task.Run(() => FrequencyYomichanLoader.Load(freq)).ConfigureAwait(false);
+                        await Task.Run(async () =>
+                        {
+                            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(13108, StringComparer.Ordinal);
+                            await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
+                        }).ConfigureAwait(false);
                     }
                     catch (Exception innerEx)
                     {
-                        LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{FreqType}'-'{FreqName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullFreqPath);
+                        LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{FreqType}'-'{FreqName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
                         FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {freq.Name}, deactivating it");
-
-                        freq.Active = false;
-                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                     }
                 }
+                else if (!File.Exists(dbPath))
+                {
+                    try
+                    {
+                        await Task.Run(async () =>
+                        {
+                            FreqDBManager.CreateDB(dbPath);
+                            await FreqDBManager.ImportYomichanFreqFromDisk(freq).ConfigureAwait(false);
+                        }).ConfigureAwait(false);
+                    }
+                    catch (Exception innerEx)
+                    {
+                        LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{FreqType}'-'{FreqName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {freq.Name}, deactivating it");
+                    }
+                }
+
+                return false;
             }
             finally
             {
@@ -835,11 +760,16 @@ public static class ResourceUpdater
                 ObjectPoolManager.ClearStringPoolIfDictsAreReady();
             }
         }
+
+        freq.Ready = true;
+        freq.Updating = false;
+        ObjectPoolManager.ClearStringPoolIfDictsAreReady();
+        return false;
     }
 
     internal static Task AutoUpdateDicts()
     {
-        List<Task> tasks = [];
+        List<Task<bool>> tasks = [];
         foreach (Dict dict in DictUtils.Dicts.Values.ToArray())
         {
             if (!dict.Active || !dict.AutoUpdatable)
@@ -881,7 +811,7 @@ public static class ResourceUpdater
 
     internal static Task AutoUpdateFreqDicts()
     {
-        List<Task> tasks = [];
+        List<Task<bool>> tasks = [];
         foreach (Freq freq in FreqUtils.FreqDicts.Values.ToArray())
         {
             if (!freq.Active || !freq.AutoUpdatable)

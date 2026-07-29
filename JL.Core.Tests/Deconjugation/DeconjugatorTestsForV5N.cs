@@ -593,7 +593,6 @@ internal sealed class DeconjugatorTestsForV5N
     }
 
     [Test]
-    // TOOD
     public void Deconjugate_PlainPastTeiruAffirmative_V5N()
     {
         const string termToDeconjugate = "死んでいた";

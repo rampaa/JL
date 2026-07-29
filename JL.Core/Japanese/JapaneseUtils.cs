@@ -3,12 +3,15 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using JL.Core.Utilities;
 using JL.Core.Utilities.ObjectPool;
 
-namespace JL.Core.Utilities.Japanese;
+namespace JL.Core.Japanese;
 
 public static partial class JapaneseUtils
 {
+    public const char NormalizedFuseji = '○';
+
     // Matches the following Unicode ranges:
     // × (\u00D7)
     // General Punctuation (2000-206F): ‥, …, •, ※
@@ -130,16 +133,7 @@ public static partial class JapaneseUtils
         #pragma warning restore format
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    public static readonly SearchValues<char> SmallCombiningKanaSet = SearchValues.Create(
-    [
-        #pragma warning disable format
-        'ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ',
-        'ャ', 'ュ', 'ョ',
-
-        'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ゎ',
-        'ゃ', 'ゅ', 'ょ'
-        #pragma warning restore format
-    ]);
+    public static readonly SearchValues<char> SmallCombiningKanaSet = SearchValues.Create('ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ', 'ャ', 'ュ', 'ョ', 'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ゎ', 'ゃ', 'ゅ', 'ょ');
 
     private static readonly char[] s_sentenceTerminatingCharacters =
     [
@@ -196,19 +190,9 @@ public static partial class JapaneseUtils
 
     private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters)]);
 
-    private static int FirstKatakanaOrIterationMarkIndex(ReadOnlySpan<char> text)
-    {
-        for (int i = 0; i < text.Length; i++)
-        {
-            char character = text[i];
-            if (s_katakanaToHiraganaDict.ContainsKey(character) || IsIterationMark(character))
-            {
-                return i;
-            }
-        }
+    public static readonly SearchValues<char> Fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '□', '△', '▽', '◎', '☆', '◇', '●', '⬤', '■', '▲', '▼', '◉', '★', '◆', '×');
 
-        return -1;
-    }
+    public static readonly SearchValues<char> KatakanaOrIterationMarkOrFuseji = SearchValues.Create([.. s_katakanaToHiraganaDict.Keys, '々', '〻', 'ゝ', 'ゞ', NormalizedFuseji, '〇', '◯', '□', '△', '▽', '◎', '☆', '◇', '●', '⬤', '■', '▲', '▼', '◉', '★', '◆', '×']);
 
     public static string NormalizeText(string text)
     {
@@ -219,17 +203,18 @@ public static partial class JapaneseUtils
             normalizedText = normalizedText.Normalize(NormalizationForm.FormKC);
         }
 
+        // TODO: When migrating to .NET 11, use ToUpperOrdinal instead
         // Normalizes vs to VS, xxx to XXX, h to H etc.
         normalizedText = normalizedText.ToUpperInvariant();
 
-        int firstKatakanaOrIterationMarkIndex = FirstKatakanaOrIterationMarkIndex(normalizedText);
-        if (firstKatakanaOrIterationMarkIndex < 0)
+        int firstKatakanaOrIterationMarkOrFusejiIndex = normalizedText.IndexOfAny(KatakanaOrIterationMarkOrFuseji);
+        if (firstKatakanaOrIterationMarkOrFusejiIndex < 0)
         {
             return normalizedText;
         }
 
-        StringBuilder textInHiraganaBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(normalizedText.AsSpan()[..firstKatakanaOrIterationMarkIndex]);
-        for (int i = firstKatakanaOrIterationMarkIndex; i < normalizedText.Length; i++)
+        StringBuilder textInHiraganaBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(normalizedText.AsSpan()[..firstKatakanaOrIterationMarkOrFusejiIndex]);
+        for (int i = firstKatakanaOrIterationMarkOrFusejiIndex; i < normalizedText.Length; i++)
         {
             char character = normalizedText[i];
             if (s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr))
@@ -250,6 +235,10 @@ public static partial class JapaneseUtils
                 {
                     AppendIterationMark(textInHiraganaBuilder, character);
                 }
+                else if (IsFuseji(character))
+                {
+                    _ = textInHiraganaBuilder.Append(NormalizedFuseji);
+                }
                 else
                 {
                     _ = textInHiraganaBuilder.Append(character);
@@ -265,6 +254,11 @@ public static partial class JapaneseUtils
     private static bool IsIterationMark(char character)
     {
         return character is '々' or '〻' or 'ゝ' or 'ゞ';
+    }
+
+    private static bool IsFuseji(char character)
+    {
+        return character is NormalizedFuseji or '〇' or '◯' or '□' or '△' or '▽' or '◎' or '☆' or '◇' or '●' or '⬤' or '■' or '▲' or '▼' or '◉' or '★' or '◆' or '×' or '＊' or '*' or '〓';
     }
 
     private static void AppendIterationMark(StringBuilder builder, char iterationMark)

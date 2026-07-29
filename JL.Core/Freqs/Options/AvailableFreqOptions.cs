@@ -22,3 +22,43 @@ public sealed class AutoUpdateAfterNDaysOption(int value)
     [JsonIgnore]
     public static readonly FreqType[] ValidFreqTypes = [FreqType.Yomichan, FreqType.YomichanKanji];
 }
+
+public sealed class GenerateMazegakiVariantsOption(bool value)
+{
+    public bool Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly FreqType[] ValidFreqTypes = [FreqType.Yomichan, FreqType.Nazeka];
+}
+
+public sealed class GenerateFusejiVariantsOption(bool value)
+{
+    public bool Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly FreqType[] ValidFreqTypes = [FreqType.Yomichan, FreqType.Nazeka];
+}
+
+public sealed class MaxSearchKeyLengthForFusejiGenerationOption(int value)
+{
+    public int Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly FreqType[] ValidFreqTypes = [FreqType.Yomichan, FreqType.Nazeka];
+}
+
+public sealed class MaxConsecutiveFusejiCountOption(int value)
+{
+    public int Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly FreqType[] ValidFreqTypes = [FreqType.Yomichan, FreqType.Nazeka];
+}
+
+public sealed class MaxTotalFusejiCountOption(int value)
+{
+    public int Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly FreqType[] ValidFreqTypes = [FreqType.Yomichan, FreqType.Nazeka];
+}

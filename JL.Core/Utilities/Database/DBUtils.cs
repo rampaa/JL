@@ -56,8 +56,16 @@ public static class DBUtils
 
     public static void SendOptimizePragmaToAllDBs()
     {
-        SendOptimizePragmaToAllDicts();
-        SendOptimizePragmaToAllFreqDicts();
+        if (DictUtils.DictsReady)
+        {
+            SendOptimizePragmaToAllDicts();
+        }
+
+        if (FreqUtils.FreqsReady)
+        {
+            SendOptimizePragmaToAllFreqDicts();
+        }
+
         ConfigDBManager.SendOptimizePragma();
     }
 
@@ -241,6 +249,20 @@ public static class DBUtils
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA synchronous = 1;";
+        _ = command.ExecuteNonQuery();
+    }
+
+    internal static void SetJournalModeToWal(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA synchronous = 0; PRAGMA journal_mode = WAL;";
+        _ = command.ExecuteNonQuery();
+    }
+
+    internal static void SetJournalModeToDelete(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1;";
         _ = command.ExecuteNonQuery();
     }
 

@@ -63,6 +63,7 @@ internal sealed partial class AddNameWindow
         string? nameType = nameTypeRadioButtonContent.ToString();
         Debug.Assert(nameType is not null);
 
+        // TODO: When migrating to .NET 11, use ToLowerOrdinal instead
 #pragma warning disable CA1308 // Normalize strings to uppercase
         nameType = nameType.ToLowerInvariant();
 #pragma warning restore CA1308 // Normalize strings to uppercase

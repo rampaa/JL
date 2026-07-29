@@ -593,7 +593,6 @@ internal sealed class DeconjugatorTestsForV5B
     }
 
     [Test]
-    // TOOD
     public void Deconjugate_PlainPastTeiruAffirmative_V5B()
     {
         const string termToDeconjugate = "選んでいた";

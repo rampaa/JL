@@ -7,7 +7,9 @@ namespace JL.Core.Dicts.KanjiComposition;
 
 internal static class KanjiCompositionDBManager
 {
-    private static readonly string s_readOnlyDBConnectionString = DBUtils.GetReadOnlyConnectionString(Path.Join(AppInfo.ResourcesPath, "Kanji Compositions.sqlite"));
+    private const string DBName = "Kanji Compositions.sqlite";
+    private static readonly string s_dbPath = Path.Join(AppInfo.ResourcesPath, DBName);
+    private static readonly string s_readOnlyDBConnectionString = DBUtils.GetReadOnlyConnectionString(s_dbPath);
 
     private const string SingleTermQuery =
         """
@@ -15,6 +17,18 @@ internal static class KanjiCompositionDBManager
         FROM record
         WHERE kanji = @kanji;
         """;
+
+    //public static void AnalyzeAndVacuum()
+    //{
+    //    using SqliteConnection connection = DBUtils.CreateDBConnection(s_dbPath);
+    //    using SqliteCommand command = connection.CreateCommand();
+    //
+    //    command.CommandText = $"ANALYZE;";
+    //    _ = command.ExecuteNonQuery();
+    //
+    //    command.CommandText = $"VACUUM;";
+    //    _ = command.ExecuteNonQuery();
+    //}
 
     public static string[]? GetRecordsFromDB(string kanji)
     {

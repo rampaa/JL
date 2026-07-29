@@ -1,7 +1,6 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Xml;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
 
@@ -9,6 +8,9 @@ namespace JL.Core.Dicts.KANJIDIC;
 
 internal static class KanjidicLoader
 {
+    // 2022/05/11: 13108, 2023/12/16: 13108, 2024/02/02 13108
+    public const int Size = 13108;
+
     public static async Task Load(Dict dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
@@ -27,13 +29,13 @@ internal static class KanjidicLoader
                 using XmlReader xmlReader = XmlReader.Create(fileStream, xmlReaderSettings);
                 while (xmlReader.ReadToFollowing("literal"))
                 {
-                    await ReadCharacter(xmlReader, dict.Contents).ConfigureAwait(false);
+                    (string key, KanjidicRecord record) = await ReadCharacter(xmlReader).ConfigureAwait(false);
+                    dict.Contents[key] = [record];
                 }
             }
 
             dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
         }
-
         else
         {
             if (dict.Updating)
@@ -77,7 +79,7 @@ internal static class KanjidicLoader
         }
     }
 
-    private static async Task ReadCharacter(XmlReader xmlReader, IDictionary<string, IList<IDictRecord>> kanjidicDictionary)
+    public static async Task<(string key, KanjidicRecord record)> ReadCharacter(XmlReader xmlReader)
     {
         string key = (await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString();
 
@@ -177,8 +179,8 @@ internal static class KanjidicLoader
         string[]? nanoriReadings = nanoriReadingList?.ToArray();
         string[]? radicalNames = radicalNameList?.ToArray();
 
-        KanjidicRecord entry = new(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
+        KanjidicRecord record = new(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
 
-        kanjidicDictionary[key] = [entry];
+        return (key, record);
     }
 }

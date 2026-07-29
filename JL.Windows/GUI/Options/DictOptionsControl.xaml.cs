@@ -197,6 +197,46 @@ internal sealed partial class DictOptionsControl
             maxImageHeightOption = new MaxImageHeightOption(double.ConvertToIntegerNative<int>(MaxImageHeightNumericUpDown.Value));
         }
 
+        GenerateMazegakiVariantsOption? generateMazegakiOption = null;
+        if (GenerateMazegakiVariantsOption.ValidDictTypes.Contains(type))
+        {
+            Debug.Assert(GenerateMazegakiVariantsCheckBox.IsChecked is not null);
+            generateMazegakiOption = new GenerateMazegakiVariantsOption(GenerateMazegakiVariantsCheckBox.IsChecked.Value);
+        }
+
+        GenerateFusejiVariantsOption? generateFusejiVariantsOption = null;
+        if (GenerateFusejiVariantsOption.ValidDictTypes.Contains(type))
+        {
+            Debug.Assert(GenerateFusejiVariantsCheckBox.IsChecked is not null);
+            generateFusejiVariantsOption = new GenerateFusejiVariantsOption(GenerateFusejiVariantsCheckBox.IsChecked.Value);
+        }
+
+        MaxSearchKeyLengthForFusejiGenerationOption? maxSearchKeyLengthForFusejiGenerationOption = null;
+        if (MaxSearchKeyLengthForFusejiGenerationOption.ValidDictTypes.Contains(type))
+        {
+            maxSearchKeyLengthForFusejiGenerationOption = new MaxSearchKeyLengthForFusejiGenerationOption((int)MaxSearchKeyLengthForFusejiGenerationNumericUpDown.Value);
+        }
+
+        MaxTotalFusejiCountOption? maxTotalFusejiCountOption = null;
+        if (MaxTotalFusejiCountOption.ValidDictTypes.Contains(type))
+        {
+            maxTotalFusejiCountOption = new MaxTotalFusejiCountOption((int)MaxTotalFusejiCountNumericUpDown.Value);
+        }
+
+        MaxConsecutiveFusejiCountOption? maxConsecutiveFusejiCountOption = null;
+        if (MaxConsecutiveFusejiCountOption.ValidDictTypes.Contains(type))
+        {
+            Debug.Assert(maxTotalFusejiCountOption is not null);
+
+            int maxConsecutiveFuseji = (int)MaxConsecutiveFusejiCountNumericUpDown.Value;
+            if (maxConsecutiveFuseji > maxTotalFusejiCountOption.Value)
+            {
+                maxConsecutiveFuseji = maxTotalFusejiCountOption.Value;
+            }
+
+            maxConsecutiveFusejiCountOption = new MaxConsecutiveFusejiCountOption(maxConsecutiveFuseji);
+        }
+
         DictOptions options = new(
             useDBOption,
             noAllOption,
@@ -221,7 +261,12 @@ internal sealed partial class DictOptionsControl
             showImagesOption,
             showImageAtBottomOption,
             maxImageWidthOption,
-            maxImageHeightOption);
+            maxImageHeightOption,
+            generateMazegakiOption,
+            generateFusejiVariantsOption,
+            maxSearchKeyLengthForFusejiGenerationOption,
+            maxTotalFusejiCountOption,
+            maxConsecutiveFusejiCountOption);
 
         return options;
     }
@@ -252,6 +297,12 @@ internal sealed partial class DictOptionsControl
         OptionUtils.ChangeVisibilityOfColorButton(PitchAccentMarkerColorOption.ValidDictTypes.Contains(dictType), PitchAccentMarkerColorButton, PitchAccentMarkerColorDockPanel, dictOptions?.PitchAccentMarkerColor?.Value, DictOptionManager.PitchAccentMarkerColor, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfColorButton(POrthographyInfoColorOption.ValidDictTypes.Contains(dictType), POrthographyInfoColorButton, POrthographyInfoColorDockPanel, dictOptions?.POrthographyInfoColor?.Value, DictOptionManager.POrthographyInfoColor, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfNumericUpDown(POrthographyInfoFontSizeOption.ValidDictTypes.Contains(dictType), POrthographyInfoFontSizeNumericUpDown, POrthographyInfoFontSizeDockPanel, dictOptions?.POrthographyInfoFontSize?.Value ?? 15, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(GenerateMazegakiVariantsOption.ValidDictTypes.Contains(dictType), GenerateMazegakiVariantsCheckBox, dictOptions?.GenerateMazegakiVariants?.Value ?? false, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(GenerateFusejiVariantsOption.ValidDictTypes.Contains(dictType), GenerateFusejiVariantsCheckBox, dictOptions?.GenerateFusejiVariants?.Value ?? false, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxSearchKeyLengthForFusejiGenerationOption.ValidDictTypes.Contains(dictType), MaxSearchKeyLengthForFusejiGenerationNumericUpDown, MaxSearchKeyLengthForFusejiGenerationDockPanel, dictOptions?.MaxSearchKeyLengthForFusejiGeneration?.Value ?? 9, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxTotalFusejiCountOption.ValidDictTypes.Contains(dictType), MaxTotalFusejiCountNumericUpDown, MaxTotalFusejiDockPanel, dictOptions?.MaxTotalFusejiCount?.Value ?? 1, ref showDictOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxConsecutiveFusejiCountOption.ValidDictTypes.Contains(dictType), MaxConsecutiveFusejiCountNumericUpDown, MaxConsecutiveFusejiDockPanel, dictOptions?.MaxConsecutiveFusejiCount?.Value ?? 1, ref showDictOptions);
+
         if (dictOptions is not null)
         {
             OptionUtils.ChangeVisibilityOfNumericUpDown(AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dictType), AutoUpdateAfterNDaysNumericUpDown, AutoUpdateAfterNDaysDockPanel, dictOptions.AutoUpdateAfterNDays?.Value ?? 0, ref showDictOptions);

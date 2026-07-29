@@ -11,12 +11,12 @@ using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
 using JL.Core.External.AnkiConnect;
+using JL.Core.Japanese;
 using JL.Core.Lookup;
 using JL.Core.Mining;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Bool;
-using JL.Core.Utilities.Japanese;
 using JL.Windows.Config;
 using JL.Windows.Interop;
 using JL.Windows.SpeechSynthesis;
@@ -430,7 +430,6 @@ internal sealed partial class PopupWindow : IDisposable
         _lastLookedUpText = textToLookUp;
 
         LookupResult[]? lookupResults = LookupUtils.LookupText(textToLookUp);
-
         if (lookupResults is not null && lookupResults.Length > 0)
         {
             PreviousTextBox = textBox;

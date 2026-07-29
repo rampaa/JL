@@ -2,14 +2,18 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
+using JL.Core.Dicts.Options;
+using JL.Core.Japanese;
+using JL.Core.Japanese.Fuseji;
+using JL.Core.Japanese.Mazegaki;
 using JL.Core.Utilities;
-using JL.Core.Utilities.Japanese;
-using JL.Core.Utilities.Japanese.Mazegaki;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanLoader
 {
+    public const int Size = 250000;
+
     public static async Task Load(Dict dict)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
@@ -18,12 +22,46 @@ internal static class EpwingYomichanLoader
             return;
         }
 
+        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term_bank_*.json", SearchOption.TopDirectoryOnly);
 
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiWithWordSchemaYomichan;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameYomichan;
-        IDictionary<string, IList<IDictRecord>> dictContents = dict.Contents;
 
+        GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
+        Debug.Assert(!nonNameDict || nonKanjiDict || generateMazegakiOption is not null);
+        bool generateMazegaki = nonKanjiDict && nonNameDict
+                                             // ReSharper disable once NullableWarningSuppressionIsUsed
+                                             && generateMazegakiOption!.Value;
+
+        GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
+        Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
+        bool generateFusejiVariants = nonKanjiDict
+                                // ReSharper disable once NullableWarningSuppressionIsUsed
+                                && generateFusejiVariantsOption!.Value;
+
+        int maxSearchKeyLengthForFusejiGeneration;
+        int maxTotalFuseji;
+        int maxConsecutiveFuseji;
+        if (generateFusejiVariants)
+        {
+            Debug.Assert(dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
+            maxSearchKeyLengthForFusejiGeneration = dict.Options.MaxSearchKeyLengthForFusejiGeneration.Value;
+
+            Debug.Assert(dict.Options.MaxTotalFusejiCount is not null);
+            maxTotalFuseji = dict.Options.MaxTotalFusejiCount.Value;
+
+            Debug.Assert(dict.Options.MaxConsecutiveFusejiCount is not null);
+            maxConsecutiveFuseji = dict.Options.MaxConsecutiveFusejiCount.Value;
+        }
+        else
+        {
+            maxSearchKeyLengthForFusejiGeneration = 0;
+            maxTotalFuseji = 0;
+            maxConsecutiveFuseji = 0;
+        }
+
+        IDictionary<string, IList<IDictRecord>> dictContents = dict.Contents;
         foreach (string jsonFile in jsonFiles)
         {
             FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
@@ -42,15 +80,46 @@ internal static class EpwingYomichanLoader
 
                         if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dictContents))
                         {
-                            if (nonKanjiDict && nonNameDict && record.Reading is not null)
+                            if (nonKanjiDict)
                             {
-                                string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
-                                if (primarySpellingInHiragana != readingInHiragana)
+                                if (generateFusejiVariants)
                                 {
-                                    _ = DictUtils.AddRecordToDictionary(readingInHiragana, record, dictContents);
-                                    foreach (string variant in MazegakiVariantGenerator.GenerateMixedVariants(primarySpellingInHiragana, readingInHiragana))
+                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                     {
-                                        _ = DictUtils.AddRecordToDictionary(variant, record, dictContents);
+                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                    }
+                                }
+
+                                if (nonNameDict && record.Reading is not null)
+                                {
+                                    string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
+                                    if (primarySpellingInHiragana != readingInHiragana)
+                                    {
+                                        if (generateFusejiVariants)
+                                        {
+                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                            {
+                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                            }
+                                        }
+
+                                        _ = DictUtils.AddRecordToDictionary(readingInHiragana, record, dictContents);
+                                        if (generateMazegaki)
+                                        {
+                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
+                                            {
+                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, dictContents))
+                                                {
+                                                    if (generateFusejiVariants)
+                                                    {
+                                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                        {
+                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -63,7 +132,7 @@ internal static class EpwingYomichanLoader
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static EpwingYomichanRecord? GetEpwingYomichanRecord(JsonElement[] jsonElements, Dict dict)
+    public static EpwingYomichanRecord? GetEpwingYomichanRecord(JsonElement[] jsonElements, Dict dict)
     {
         string primarySpelling;
         try

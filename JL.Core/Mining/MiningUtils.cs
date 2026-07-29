@@ -7,12 +7,12 @@ using JL.Core.Dicts;
 using JL.Core.External.AnkiConnect;
 using JL.Core.Freqs;
 using JL.Core.Frontend;
+using JL.Core.Japanese;
 using JL.Core.Lookup;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
-using JL.Core.WordClass;
-using JL.Core.Utilities.Japanese;
 using JL.Core.Utilities.ObjectPool;
+using JL.Core.WordClass;
 
 namespace JL.Core.Mining;
 

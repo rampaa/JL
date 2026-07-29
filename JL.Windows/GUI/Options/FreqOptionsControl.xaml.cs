@@ -42,7 +42,46 @@ internal sealed partial class FreqOptionsControl
             autoUpdateAfterNDaysOption = new AutoUpdateAfterNDaysOption(double.ConvertToIntegerNative<int>(AutoUpdateAfterNDaysNumericUpDown.Value));
         }
 
-        FreqOptions options = new(useDBOption, higherValueMeansHigherFrequencyOption, autoUpdateAfterNDaysOption);
+        GenerateMazegakiVariantsOption? generateMazegakiVariantsOption = null;
+        if (GenerateMazegakiVariantsOption.ValidFreqTypes.Contains(type))
+        {
+            Debug.Assert(GenerateMazegakiVariantsCheckBox.IsChecked is not null);
+            generateMazegakiVariantsOption = new GenerateMazegakiVariantsOption(GenerateMazegakiVariantsCheckBox.IsChecked.Value);
+        }
+
+        GenerateFusejiVariantsOption? generateFusejiVariantsOption = null;
+        if (GenerateFusejiVariantsOption.ValidFreqTypes.Contains(type))
+        {
+            Debug.Assert(GenerateFusejiVariantsCheckBox.IsChecked is not null);
+            generateFusejiVariantsOption = new GenerateFusejiVariantsOption(GenerateFusejiVariantsCheckBox.IsChecked.Value);
+        }
+
+        MaxSearchKeyLengthForFusejiGenerationOption? maxSearchKeyLengthForFusejiGenerationOption = null;
+        if (MaxSearchKeyLengthForFusejiGenerationOption.ValidFreqTypes.Contains(type))
+        {
+            maxSearchKeyLengthForFusejiGenerationOption = new MaxSearchKeyLengthForFusejiGenerationOption(double.ConvertToIntegerNative<int>(MaxSearchKeyLengthForFusejiGenerationNumericUpDown.Value));
+        }
+
+        MaxTotalFusejiCountOption? maxTotalFusejiCountOption = null;
+        if (MaxTotalFusejiCountOption.ValidFreqTypes.Contains(type))
+        {
+            maxTotalFusejiCountOption = new MaxTotalFusejiCountOption(double.ConvertToIntegerNative<int>(MaxTotalFusejiCountNumericUpDown.Value));
+        }
+
+        MaxConsecutiveFusejiCountOption? maxConsecutiveFusejiCountOption = null;
+        if (MaxConsecutiveFusejiCountOption.ValidFreqTypes.Contains(type))
+        {
+            maxConsecutiveFusejiCountOption = new MaxConsecutiveFusejiCountOption(double.ConvertToIntegerNative<int>(MaxConsecutiveFusejiCountNumericUpDown.Value));
+        }
+
+        FreqOptions options = new(useDBOption,
+            higherValueMeansHigherFrequencyOption,
+            autoUpdateAfterNDaysOption,
+            generateMazegakiVariantsOption,
+            generateFusejiVariantsOption,
+            maxSearchKeyLengthForFusejiGenerationOption,
+            maxTotalFusejiCountOption,
+            maxConsecutiveFusejiCountOption);
 
         return options;
     }
@@ -53,6 +92,12 @@ internal sealed partial class FreqOptionsControl
         OptionUtils.ChangeVisibilityOfCheckBox(UseDBOption.ValidFreqTypes.Contains(freqType), UseDBCheckBox, freqOptions?.UseDB.Value ?? true, ref showFreqOptions);
         OptionUtils.ChangeVisibilityOfCheckBox(HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freqType), HigherValueMeansHigherFrequencyCheckBox, freqOptions?.HigherValueMeansHigherFrequency.Value ?? false, ref showFreqOptions);
         // OptionUtils.ChangeVisibilityOfNumericUpDown(AutoUpdateAfterNDaysOption.ValidFreqTypes.Contains(freqType), AutoUpdateAfterNDaysNumericUpDown, AutoUpdateAfterNDaysDockPanel, freqOptions?.AutoUpdateAfterNDays?.Value ?? 0, ref showFreqOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freqType), HigherValueMeansHigherFrequencyCheckBox, freqOptions?.HigherValueMeansHigherFrequency.Value ?? false, ref showFreqOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(GenerateMazegakiVariantsOption.ValidFreqTypes.Contains(freqType), GenerateMazegakiVariantsCheckBox, freqOptions?.GenerateMazegakiVariants?.Value ?? false, ref showFreqOptions);
+        OptionUtils.ChangeVisibilityOfCheckBox(GenerateFusejiVariantsOption.ValidFreqTypes.Contains(freqType), GenerateFusejiVariantsCheckBox, freqOptions?.GenerateFusejiVariants?.Value ?? false, ref showFreqOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxSearchKeyLengthForFusejiGenerationOption.ValidFreqTypes.Contains(freqType), MaxSearchKeyLengthForFusejiGenerationNumericUpDown, MaxSearchKeyLengthForFusejiGenerationDockPanel, freqOptions?.MaxSearchKeyLengthForFusejiGeneration?.Value ?? 9, ref showFreqOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxTotalFusejiCountOption.ValidFreqTypes.Contains(freqType), MaxTotalFusejiCountNumericUpDown, MaxTotalFusejiDockPanel, freqOptions?.MaxTotalFusejiCount?.Value ?? 1, ref showFreqOptions);
+        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxConsecutiveFusejiCountOption.ValidFreqTypes.Contains(freqType), MaxConsecutiveFusejiCountNumericUpDown, MaxConsecutiveFusejiDockPanel, freqOptions?.MaxConsecutiveFusejiCount?.Value ?? 1, ref showFreqOptions);
 
         if (showFreqOptions)
         {

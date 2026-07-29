@@ -180,3 +180,68 @@ public sealed class MaxImageHeightOption(int value)
         DictType.NonspecificNameNazeka, DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificKanjiNazeka,
         DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary];
 }
+
+public sealed class GenerateMazegakiVariantsOption(bool value)
+{
+    public bool Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.JMdict,
+        DictType.NonspecificWordYomichan, DictType.NonspecificYomichan,
+        DictType.NonspecificWordNazeka, DictType.NonspecificNazeka,
+        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary,
+        DictType.PitchAccentYomichan];
+}
+
+public sealed class GenerateFusejiVariantsOption(bool value)
+{
+    public bool Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.JMdict, DictType.JMnedict,
+        DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
+        DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
+        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary,
+        DictType.PitchAccentYomichan];
+}
+
+public sealed class MaxSearchKeyLengthForFusejiGenerationOption(int value)
+{
+    public int Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.JMdict, DictType.JMnedict,
+        DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
+        DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
+        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary,
+        DictType.PitchAccentYomichan];
+}
+
+public sealed class MaxConsecutiveFusejiCountOption(int value)
+{
+    public int Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.JMdict, DictType.JMnedict,
+        DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
+        DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
+        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary,
+        DictType.PitchAccentYomichan];
+}
+
+public sealed class MaxTotalFusejiCountOption(int value)
+{
+    public int Value { get; } = value;
+
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
+        [DictType.JMdict, DictType.JMnedict,
+        DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
+        DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
+        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary,
+        DictType.PitchAccentYomichan];
+}

@@ -5,8 +5,8 @@ using System.Text;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
+using JL.Core.Japanese;
 using JL.Core.Utilities;
-using JL.Core.Utilities.Japanese;
 using JL.Core.Utilities.ObjectPool;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
@@ -20,7 +20,6 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
     public string[]? WordClasses { get; }
     public string[]? DefinitionTags { get; }
     public ImageInfo[]? ImageInfos { get; }
-    //public int Score { get; }
     //public int Sequence { get; }
     //public string[]? TermTags { get; }
 
