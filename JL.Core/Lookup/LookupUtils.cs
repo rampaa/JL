@@ -1125,6 +1125,7 @@ public static class LookupUtils
                     jmdictLookupResult: new JmdictLookupResult(jmdictResult.PrimarySpellingOrthographyInfo, jmdictResult.ReadingsOrthographyInfo, jmdictResult.AlternativeSpellingsOrthographyInfo, jmdictResult.MiscSharedByAllSenses, jmdictResult.Misc, jmdictResult.WordClasses)
                 );
 
+                // See: ヤンキー座り
                 if (!results.Contains(result))
                 {
                     results.Add(result);

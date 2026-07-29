@@ -366,6 +366,7 @@ internal static class FreqDBManager
 
         DBUtils.SetJournalModeToWal(connection);
 
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             $"""
@@ -386,6 +387,7 @@ internal static class FreqDBManager
         insertRecordCommand.Prepare();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand insertRecordSearchKeyCommand = connection.CreateCommand();
         insertRecordSearchKeyCommand.CommandText =
             $"""
@@ -405,6 +407,7 @@ internal static class FreqDBManager
         insertRecordSearchKeyCommand.Prepare();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand selectSameRecordsCommand = connection.CreateCommand();
         selectSameRecordsCommand.CommandText =
             $"""
@@ -425,6 +428,7 @@ internal static class FreqDBManager
         selectSameRecordsCommand.Prepare();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand updateRecordCommand = connection.CreateCommand();
         updateRecordCommand.CommandText =
             $"""
@@ -720,6 +724,7 @@ internal static class FreqDBManager
 
         DBUtils.SetJournalModeToWal(connection);
 
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
         insertRecordCommand.CommandText =
             $"""
@@ -740,6 +745,7 @@ internal static class FreqDBManager
         insertRecordCommand.Prepare();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand insertRecordSearchKeyCommand = connection.CreateCommand();
         insertRecordSearchKeyCommand.CommandText =
             $"""
@@ -759,6 +765,7 @@ internal static class FreqDBManager
         insertRecordSearchKeyCommand.Prepare();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand selectSameRecordsCommand = connection.CreateCommand();
         selectSameRecordsCommand.CommandText =
             $"""
@@ -779,6 +786,7 @@ internal static class FreqDBManager
         selectSameRecordsCommand.Prepare();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand updateRecordCommand = connection.CreateCommand();
         updateRecordCommand.CommandText =
             $"""
@@ -834,12 +842,16 @@ internal static class FreqDBManager
                 }
 
                 FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
+
                 AddOrUpdate(reading, rowId, frequencyRecordWithExactSpelling, true, commandsAndParameters);
+                ++transactionRecordCount;
+
                 if (generateFusejiVariants)
                 {
                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                     {
                         AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithExactSpelling, false, commandsAndParameters);
+                        ++transactionRecordCount;
                     }
                 }
 
@@ -850,11 +862,14 @@ internal static class FreqDBManager
                     ++rowId;
 
                     AddOrUpdate(exactSpellingInHiragana, rowId, frequencyRecordWithReading, true, commandsAndParameters);
+                    ++transactionRecordCount;
+
                     if (generateFusejiVariants)
                     {
                         foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                         {
                             AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                            ++transactionRecordCount;
                         }
                     }
 
@@ -863,11 +878,14 @@ internal static class FreqDBManager
                         foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(exactSpellingInHiragana, reading))
                         {
                             AddOrUpdate(mazegakiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                            ++transactionRecordCount;
+
                             if (generateFusejiVariants)
                             {
                                 foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
                                     AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
+                                    ++transactionRecordCount;
                                 }
                             }
                         }
@@ -909,7 +927,6 @@ internal static class FreqDBManager
             transaction.Commit();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-            transactionRecordCount = 0;
             freq.Ready = true;
         }
 

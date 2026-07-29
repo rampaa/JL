@@ -6,8 +6,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core;
-using JL.Core.Dicts;
-using JL.Core.Dicts.Interfaces;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
 using JL.Core.Frontend;
