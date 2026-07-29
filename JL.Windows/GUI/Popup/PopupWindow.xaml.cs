@@ -2317,18 +2317,16 @@ internal sealed partial class PopupWindow : IDisposable
 
         ConfigManager configManager = ConfigManager.Instance;
         bool hideWithNoResults = configManager.HideDictTabsWithNoResults;
-        ObservableCollection<Button> dictButtonsList = _dictTypeButtons;
-        HashSet<Dict> dictsWithResults = _dictsWithResults;
-        for (int i = 1; i < dictButtonsList.Count; i++)
+        for (int i = 1; i < _dictTypeButtons.Count; i++)
         {
-            Button button = dictButtonsList[i];
+            Button button = _dictTypeButtons[i];
             if (needToResetBackgroundColor && button.Background == Brushes.DodgerBlue)
             {
                 button.ClearValue(BackgroundProperty);
                 needToResetBackgroundColor = false;
             }
 
-            bool hasResults = dictsWithResults.Contains((Dict)button.Tag);
+            bool hasResults = _dictsWithResults.Contains((Dict)button.Tag);
             button.IsEnabled = hasResults;
             if (hideWithNoResults)
             {
@@ -2341,10 +2339,9 @@ internal sealed partial class PopupWindow : IDisposable
 
     private void RebuildDictButtons()
     {
-        ObservableCollection<Button> dictTypeButtons = _dictTypeButtons;
-        for (int i = 1; i < dictTypeButtons.Count; i++)
+        for (int i = 1; i < _dictTypeButtons.Count; i++)
         {
-            Button oldButton = dictTypeButtons[i];
+            Button oldButton = _dictTypeButtons[i];
             oldButton.Click -= DictTypeButtonOnClick;
         }
 
@@ -2408,10 +2405,9 @@ internal sealed partial class PopupWindow : IDisposable
 
     public void MakeDictTypeButtonsVisible()
     {
-        ObservableCollection<Button> dictButtonsList = _dictTypeButtons;
-        for (int i = 1; i < dictButtonsList.Count; i++)
+        for (int i = 1; i < _dictTypeButtons.Count; i++)
         {
-            Button button = dictButtonsList[i];
+            Button button = _dictTypeButtons[i];
             button.Visibility = Visibility.Visible;
         }
     }

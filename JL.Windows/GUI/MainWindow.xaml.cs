@@ -2670,15 +2670,14 @@ internal sealed partial class MainWindow : IDisposable
         bool hidPopup = false;
         if (hoveredPopup is null)
         {
-            PopupWindow firstPopupWindow = FirstPopupWindow;
-            if (firstPopupWindow.Opacity is not 0)
+            if (FirstPopupWindow.Opacity is not 0)
             {
                 TextBox textBox = MainTextBox;
-                PopupWindow? childPopup = PopupWindowUtils.PopupWindows[firstPopupWindow.PopupIndex + 1];
+                PopupWindow? childPopup = PopupWindowUtils.PopupWindows[FirstPopupWindow.PopupIndex + 1];
                 if ((childPopup is not null && childPopup.Opacity is not 0)
-                    || firstPopupWindow.CurrentSourceTextCharPosition != textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false))
+                    || FirstPopupWindow.CurrentSourceTextCharPosition != textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false))
                 {
-                    PopupWindowUtils.HidePopups(firstPopupWindow.PopupIndex);
+                    PopupWindowUtils.HidePopups(FirstPopupWindow.PopupIndex);
                     hidPopup = true;
                 }
             }
