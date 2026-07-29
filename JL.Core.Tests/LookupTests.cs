@@ -38,7 +38,7 @@ internal sealed class LookupTests
         foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
         {
             freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(StringComparer.Ordinal);
-            freq.Options = new Freqs.Options.FreqOptions(new Freqs.Options.UseDBOption(false), new Freqs.Options.HigherValueMeansHigherFrequencyOption(false));
+            freq.Options = new Freqs.Options.FreqOptions(new Freqs.Options.UseDBOption(false), new Freqs.Options.HigherValueMeansHigherFrequencyOption(false), generateMazegakiVariants: new Freqs.Options.GenerateMazegakiVariantsOption(false), generateFusejiVariants: new Freqs.Options.GenerateFusejiVariantsOption(false));
             FreqUtils.FreqDicts[key] = freq;
         }
 
