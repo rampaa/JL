@@ -13,8 +13,8 @@
   <!--Transitive dependencies-->
   <ItemGroup>
     <PackageReference Include="Serilog" Version="4.4.0" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
-    <PackageReference Include="sourcegear.sqlite3" Version="3.53.3" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
+    <PackageReference Include="sourcegear.sqlite3" Version="3.53.4" />
     
     <!--Do not update to 18.6.3 or later until we update to .NET 10+-->
     <PackageReference Include="Microsoft.NET.StringTools" Version="18.4.0" />
