@@ -49,9 +49,15 @@ public static class LookupResultUtils
     {
         return grade switch
         {
-            >= 1 and <= 6 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Kyouiku)"),
-            8 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jouyou)"),
-            9 or 10 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jinmeiyou)"),
+            1 => "1 (Kyouiku)",
+            2 => "2 (Kyouiku)",
+            3 => "3 (Kyouiku)",
+            4 => "4 (Kyouiku)",
+            5 => "5 (Kyouiku)",
+            6 => "6 (Kyouiku)",
+            8 => "8 (Jouyou)",
+            9 => "9 (Jinmeiyou)",
+            10 => "10 (Jinmeiyou)",
             _ => "Hyougai"
         };
     }
