@@ -50,7 +50,7 @@
                 <CheckBox Name="GenerateFusejiVariantsCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Generate fuseji search key variants"
                                Cursor="Help"
-                               ToolTip="Generate fuseji variants as search keys. Enabling this increases the DB size and loading time greatly."
+                               ToolTip="Generates fuseji variants as search keys. This greatly increases the DB size and loading time. Enabling this option for multiple frequency dictionaries is not recommended."
                                TextWrapping="Wrap"
                                HorizontalAlignment="Left"
                                Style="{StaticResource TextBlockDefault}" />
