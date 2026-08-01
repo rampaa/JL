@@ -12,6 +12,7 @@ using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Core.Utilities.ObjectPool;
+using JL.Core.WordClass;
 using JL.Windows.Config;
 using JL.Windows.GUI.Info;
 using JL.Windows.Interop;
@@ -37,6 +38,8 @@ internal sealed partial class ManageDictionariesWindow
             return s_instance;
         }
     }
+
+    public static bool RebuildWordClassFile { get; set; } // = false
 
     private nint _windowHandle;
 
@@ -84,6 +87,13 @@ internal sealed partial class ManageDictionariesWindow
             await DictUtils.SerializeDicts().ConfigureAwait(false);
             await DictUtils.LoadDictionaries().ConfigureAwait(false);
             await DictUtils.SerializeDicts().ConfigureAwait(false);
+
+            if (RebuildWordClassFile)
+            {
+                await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
+                await JmdictWordClassUtils.Load().ConfigureAwait(false);
+                RebuildWordClassFile = false;
+            }
 
             ObjectPoolManager.ClearStringPoolIfDictsAreReady();
         }).ConfigureAwait(false);

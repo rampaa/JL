@@ -185,7 +185,6 @@ internal sealed partial class EditDictionaryWindow
             _dict.Ready = false;
         }
 
-        // TODO: If JMdict, WordClass.json should be recreated
         if (_dict.Options.GenerateMazegakiVariants is not null)
         {
             Debug.Assert(options.GenerateMazegakiVariants is not null);
@@ -198,6 +197,11 @@ internal sealed partial class EditDictionaryWindow
                 {
                     DBUtils.DeleteDB(dbPath);
                     dbExists = false;
+                }
+
+                if (_dict.Type is DictType.JMdict)
+                {
+                    ManageDictionariesWindow.RebuildWordClassFile = true;
                 }
             }
         }

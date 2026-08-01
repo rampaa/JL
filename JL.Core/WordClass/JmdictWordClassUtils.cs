@@ -13,11 +13,11 @@ using Microsoft.Data.Sqlite;
 
 namespace JL.Core.WordClass;
 
-internal static class JmdictWordClassUtils
+public static class JmdictWordClassUtils
 {
     private static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
 
-    internal static async Task Load()
+    public static async Task Load()
     {
         if (!File.Exists(s_partOfSpeechFilePath))
         {
@@ -64,7 +64,7 @@ internal static class JmdictWordClassUtils
         DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(static entry => entry.Key, static IList<JmdictWordClass> (kvp) => kvp.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    internal static async Task Serialize()
+    public static async Task Serialize()
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new(StringComparer.Ordinal);
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
