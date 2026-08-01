@@ -314,9 +314,23 @@ internal sealed partial class MainWindow : IDisposable
             return false;
         }
 
-        bool mergeTexts = false;
-        string? subsequentText = null;
-        string? mergedText = null;
+        if (configManager.DiscardIdenticalTextAllBacklog && BacklogUtils.BacklogContains(sanitizedNewText))
+        {
+            if (configManager.MergeSequentialTextsWhenTheyMatch)
+            {
+                s_lastTextCopyTimestamp = Stopwatch.GetTimestamp();
+            }
+
+            if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
+            {
+                _lookupDelayTimer.IsEnabled = false;
+                _tsukikageLookupDelayTimer.IsEnabled = false;
+                MainTextBox.Text = BacklogUtils.LastItem;
+                UpdatePosition();
+            }
+
+            return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard || tsukikage;
+        }
 
         string previousText = BacklogUtils.LastItem ?? MainTextBox.Text;
         bool sameText = sanitizedNewText == previousText;
@@ -338,6 +352,9 @@ internal sealed partial class MainWindow : IDisposable
             return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard || tsukikage;
         }
 
+        bool mergeTexts = false;
+        string? subsequentText = null;
+        string? mergedText = null;
         if (configManager.MergeSequentialTextsWhenTheyMatch)
         {
             mergeTexts = (configManager.MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds is 0
@@ -408,6 +425,10 @@ internal sealed partial class MainWindow : IDisposable
             if (backlogActive)
             {
                 BacklogUtils.ReplaceLastBacklogText(mergedText);
+                if (configManager.DiscardIdenticalTextAllBacklog)
+                {
+                    BacklogUtils.UpdateUniqueBacklogItem(previousText, mergedText);
+                }
             }
         }
         else
@@ -420,11 +441,19 @@ internal sealed partial class MainWindow : IDisposable
                 if (backlogActive)
                 {
                     BacklogUtils.AddToBacklog(sanitizedNewText);
+                    if (configManager.DiscardIdenticalTextAllBacklog)
+                    {
+                        BacklogUtils.AddToUniqueBacklogItems(sanitizedNewText);
+                    }
                 }
             }
             else
             {
                 BacklogUtils.AddToBacklogShowAllBacklog(sanitizedNewText);
+                if (configManager.DiscardIdenticalTextAllBacklog)
+                {
+                    BacklogUtils.AddToUniqueBacklogItems(sanitizedNewText);
+                }
             }
         }
 

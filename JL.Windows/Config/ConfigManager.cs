@@ -75,6 +75,7 @@ internal sealed class ConfigManager
     private EffectMode MainTextBoxEffect { get; set; } = EffectMode.DropShadow;
     private bool HorizontallyCenterMainWindowText { get; set; } // = false;
     public bool DiscardIdenticalText { get; set; } // = false;
+    public bool DiscardIdenticalTextAllBacklog { get; set; } // = false;
     public bool MergeSequentialTextsWhenTheyMatch { get; private set; } // = false;
     public bool AllowPartialMatchingForTextMerge { get; private set; } // = false;
     public double MaxDelayBetweenCopiesForMergingMatchingSequentialTextsInMilliseconds { get; private set; } = 5000;
@@ -544,6 +545,21 @@ internal sealed class ConfigManager
         HidePopupsOnTextChange = ConfigDBManager.GetValueFromConfig(connection, configs, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange));
 
         DiscardIdenticalText = ConfigDBManager.GetValueFromConfig(connection, configs, DiscardIdenticalText, nameof(DiscardIdenticalText));
+
+        bool oldDiscardIdenticalTextAllBacklogValue = DiscardIdenticalTextAllBacklog;
+        DiscardIdenticalTextAllBacklog = ConfigDBManager.GetValueFromConfig(connection, configs, DiscardIdenticalTextAllBacklog, nameof(DiscardIdenticalTextAllBacklog));
+        if (oldDiscardIdenticalTextAllBacklogValue != DiscardIdenticalTextAllBacklog)
+        {
+            if (DiscardIdenticalTextAllBacklog)
+            {
+                BacklogUtils.UpdateUniqueBacklogItems();
+            }
+            else
+            {
+                BacklogUtils.ClearUniqueBacklogItems();
+            }
+        }
+
         MergeSequentialTextsWhenTheyMatch = ConfigDBManager.GetValueFromConfig(connection, configs, MergeSequentialTextsWhenTheyMatch, nameof(MergeSequentialTextsWhenTheyMatch));
         AllowPartialMatchingForTextMerge = ConfigDBManager.GetValueFromConfig(connection, configs, AllowPartialMatchingForTextMerge, nameof(AllowPartialMatchingForTextMerge));
 
@@ -1246,6 +1262,7 @@ internal sealed class ConfigManager
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
         preferenceWindow.DiscardIdenticalTextCheckBox.IsChecked = DiscardIdenticalText;
+        preferenceWindow.DiscardIdenticalTextAllBacklogCheckBox.IsChecked = DiscardIdenticalTextAllBacklog;
         preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked = MergeSequentialTextsWhenTheyMatch;
         preferenceWindow.AllowPartialMatchingForTextMergeCheckBox.IsChecked = AllowPartialMatchingForTextMerge;
         preferenceWindow.TextBoxUseCustomLineHeightCheckBox.IsChecked = TextBoxUseCustomLineHeight;
@@ -1599,6 +1616,9 @@ internal sealed class ConfigManager
 
             ConfigDBManager.UpdateSetting(connection, nameof(DiscardIdenticalText),
                 preferenceWindow.DiscardIdenticalTextCheckBox.IsChecked.ToString());
+
+            ConfigDBManager.UpdateSetting(connection, nameof(DiscardIdenticalTextAllBacklog),
+                preferenceWindow.DiscardIdenticalTextAllBacklogCheckBox.IsChecked.ToString());
 
             ConfigDBManager.UpdateSetting(connection, nameof(MergeSequentialTextsWhenTheyMatch),
                 preferenceWindow.MergeSequentialTextsWhenTheyMatchCheckBox.IsChecked.ToString());
@@ -1997,6 +2017,7 @@ internal sealed class ConfigManager
         ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.AutoReconnectToTsukikageWebSocket), bool.TrueString, tsukikageProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(HidePopupsOnTextChange), bool.FalseString, tsukikageProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(DiscardIdenticalText), bool.TrueString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(DiscardIdenticalTextAllBacklog), bool.TrueString, tsukikageProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromClipboard), bool.FalseString, tsukikageProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TrueString, tsukikageProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(TextOnlyVisibleOnHover), bool.TrueString, tsukikageProfileId);

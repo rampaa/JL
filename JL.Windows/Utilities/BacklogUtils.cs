@@ -17,6 +17,8 @@ internal static class BacklogUtils
 
     private static LinkedListNode<string>? s_currentNode;
 
+    private static readonly HashSet<string> s_uniqueBacklogItems = new(StringComparer.Ordinal);
+
     private const string RecordSeparator = "\u001E\n";
 
     public static string? LastItem => s_backlog.Last?.Value;
@@ -32,6 +34,11 @@ internal static class BacklogUtils
         }
 
         s_currentNode = s_backlog.AddLast(text);
+    }
+
+    public static void AddToUniqueBacklogItems(string text)
+    {
+        _ = s_uniqueBacklogItems.Add(text);
     }
 
     public static void AddToBacklogShowAllBacklog(string text)
@@ -62,6 +69,25 @@ internal static class BacklogUtils
 
         mainTextBox.CaretIndex = mainTextBox.Text.Length;
         mainTextBox.ScrollToEnd();
+    }
+
+    public static bool BacklogContains(string text)
+    {
+        return s_uniqueBacklogItems.Contains(text);
+    }
+
+    public static void UpdateUniqueBacklogItem(string oldText, string newText)
+    {
+        _ = s_uniqueBacklogItems.Remove(oldText);
+        _ = s_uniqueBacklogItems.Add(newText);
+    }
+
+    public static void UpdateUniqueBacklogItems()
+    {
+        foreach (string backlogItem in s_backlog)
+        {
+            _ = s_uniqueBacklogItems.Add(backlogItem);
+        }
     }
 
     public static void ReplaceLastBacklogText(string text)
@@ -171,6 +197,7 @@ internal static class BacklogUtils
         }
 
         LinkedListNode<string>? newCurrentNode = s_currentNode.Previous ?? s_currentNode.Next;
+        _ = s_uniqueBacklogItems.Remove(s_currentNode.Value);
         s_backlog.Remove(s_currentNode);
         s_currentNode = newCurrentNode;
 
@@ -247,6 +274,8 @@ internal static class BacklogUtils
         s_backlog.Clear();
         s_currentNode = null;
 
+        s_uniqueBacklogItems.Clear();
+
         if (lastText is not null)
         {
             MainWindow mainWindow = MainWindow.Instance;
@@ -257,6 +286,11 @@ internal static class BacklogUtils
         }
     }
 
+    public static void ClearUniqueBacklogItems()
+    {
+        s_uniqueBacklogItems.Clear();
+    }
+
     public static void TrimBacklog()
     {
         ConfigManager configManager = ConfigManager.Instance;
@@ -265,7 +299,13 @@ internal static class BacklogUtils
             bool changeCurrentNodeToLast = false;
             do
             {
-                changeCurrentNodeToLast = changeCurrentNodeToLast || s_backlog.First == s_currentNode;
+                LinkedListNode<string>? firstNode = s_backlog.First;
+                changeCurrentNodeToLast = changeCurrentNodeToLast || firstNode == s_currentNode;
+                if (firstNode is not null)
+                {
+                    _ = s_uniqueBacklogItems.Remove(firstNode.Value);
+                }
+
                 s_backlog.RemoveFirst();
             } while (s_backlog.Count > configManager.MaxBacklogCapacity);
 
