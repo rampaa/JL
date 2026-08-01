@@ -279,7 +279,7 @@ internal sealed partial class ManageDictionariesWindow
                 fullPath = AppInfo.ApplicationPath;
             }
 
-            using Process process = Process.Start("explorer.exe", fullPath);
+            using Process process = Process.Start(WindowsUtils.ExplorerPath, fullPath);
         }
     }
 

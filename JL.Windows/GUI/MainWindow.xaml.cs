@@ -644,10 +644,11 @@ internal sealed partial class MainWindow : IDisposable
         }
     }
 
-    private void LookupDelayTimer_Elapsed(object? sender, EventArgs e)
+    // ReSharper disable once AsyncVoidMethod
+    private async void LookupDelayTimer_Elapsed(object? sender, EventArgs e)
     {
         _lookupDelayTimer.Stop();
-        HandleDelayedLookup();
+        await HandleDelayedLookup().ConfigureAwait(false);
     }
 
     private async void TsukikageLookupDelayTimer_Elapsed(object? sender, EventArgs e)
@@ -656,8 +657,7 @@ internal sealed partial class MainWindow : IDisposable
         await HandleDelayedLookupForTsukikage().ConfigureAwait(false);
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void HandleDelayedLookup()
+    private async Task HandleDelayedLookup()
     {
         if (WindowState is WindowState.Minimized
             || MainTextBoxContextMenu.IsVisible

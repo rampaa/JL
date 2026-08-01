@@ -244,7 +244,7 @@ internal sealed partial class ManageFrequenciesWindow
 
             if (fullPath is not null)
             {
-                using Process process = Process.Start("explorer.exe", fullPath);
+                using Process process = Process.Start(WindowsUtils.ExplorerPath, fullPath);
             }
         }
     }

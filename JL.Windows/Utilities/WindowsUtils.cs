@@ -50,6 +50,9 @@ internal static class WindowsUtils
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
             .InformationalVersion.Split('-', '+')[0]);
 
+    public static readonly string ExplorerPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
+    private static readonly string s_updateHelperPath = Path.Join(AppInfo.ApplicationPath, "update-helper.cmd");
+
     private static readonly SemaphoreSlim s_dialogSemaphore = new(1, 1);
     public static readonly SemaphoreSlim AudioPlayerSemaphoreSlim = new(1, 1);
 
@@ -384,7 +387,7 @@ internal static class WindowsUtils
                 using Process? process = Process.Start(new ProcessStartInfo
                 {
                     WorkingDirectory = AppInfo.ApplicationPath,
-                    FileName = "update-helper.cmd",
+                    FileName = s_updateHelperPath,
                     Arguments = Environment.ProcessId.ToString(CultureInfo.InvariantCulture),
                     UseShellExecute = true
                 });
