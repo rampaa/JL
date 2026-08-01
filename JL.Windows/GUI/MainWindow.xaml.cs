@@ -314,24 +314,6 @@ internal sealed partial class MainWindow : IDisposable
             return false;
         }
 
-        if (configManager.DiscardIdenticalTextAllBacklog && BacklogUtils.BacklogContains(sanitizedNewText))
-        {
-            if (configManager.MergeSequentialTextsWhenTheyMatch)
-            {
-                s_lastTextCopyTimestamp = Stopwatch.GetTimestamp();
-            }
-
-            if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
-            {
-                _lookupDelayTimer.IsEnabled = false;
-                _tsukikageLookupDelayTimer.IsEnabled = false;
-                MainTextBox.Text = BacklogUtils.LastItem;
-                UpdatePosition();
-            }
-
-            return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard || tsukikage;
-        }
-
         string previousText = BacklogUtils.LastItem ?? MainTextBox.Text;
         bool sameText = sanitizedNewText == previousText;
         if (configManager.DiscardIdenticalText && sameText)
@@ -341,13 +323,30 @@ internal sealed partial class MainWindow : IDisposable
                 s_lastTextCopyTimestamp = Stopwatch.GetTimestamp();
             }
 
-            if (MainTextBox.Text.Length is 0 && BacklogUtils.LastItem is not null)
+            if (MainTextBox.Text.Length is 0)
             {
                 _lookupDelayTimer.IsEnabled = false;
                 _tsukikageLookupDelayTimer.IsEnabled = false;
-                MainTextBox.Text = BacklogUtils.LastItem;
+                MainTextBox.Text = previousText;
+                MainTextBox.Foreground = configManager.MainWindowTextColor;
                 UpdatePosition();
             }
+
+            return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard || tsukikage;
+        }
+
+        if (configManager.DiscardIdenticalTextAllBacklog && BacklogUtils.BacklogContains(sanitizedNewText))
+        {
+            if (configManager.MergeSequentialTextsWhenTheyMatch)
+            {
+                s_lastTextCopyTimestamp = Stopwatch.GetTimestamp();
+            }
+
+            _lookupDelayTimer.IsEnabled = false;
+            _tsukikageLookupDelayTimer.IsEnabled = false;
+            MainTextBox.Text = sanitizedNewText;
+            MainTextBox.Foreground = configManager.MainWindowTextColor;
+            UpdatePosition();
 
             return configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket || configManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard || tsukikage;
         }
