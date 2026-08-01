@@ -2212,16 +2212,12 @@ internal sealed partial class MainWindow : IDisposable
         MouseEnterDueToFirstPopupHide = false;
     }
 
-    private void Window_StateChanged(object sender, EventArgs e)
+    private async void Window_StateChanged(object sender, EventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (WindowState is WindowState.Minimized)
         {
-            FirstPopupWindow.Owner = null;
-            FirstPopupWindow.Hide();
-            FirstPopupWindow.Show();
-
             if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized)
             {
                 StatsUtils.StopTimeStatStopWatch();
@@ -2251,14 +2247,20 @@ internal sealed partial class MainWindow : IDisposable
                     WinApi.UnregisterAllGlobalHotKeys(WindowHandle);
                 }
             }
+
+            await Dispatcher.BeginInvoke(() =>
+            {
+                if (WindowState is WindowState.Minimized)
+                {
+                    FirstPopupWindow.Owner = null;
+                    FirstPopupWindow.Hide();
+                    FirstPopupWindow.Show();
+                }
+            }, DispatcherPriority.Background).Task.ConfigureAwait(false);
         }
 
         else
         {
-            FirstPopupWindow.Owner = this;
-            FirstPopupWindow.Hide();
-            FirstPopupWindow.Show();
-
             if (configManager.StopIncreasingTimeAndCharStatsWhenMinimized
                 && (coreConfigManager.CaptureTextFromClipboard || coreConfigManager.CaptureTextFromWebSocket || coreConfigManager.CaptureTextFromTsukikageWebsocket))
             {
@@ -2280,6 +2282,16 @@ internal sealed partial class MainWindow : IDisposable
             {
                 WinApi.BringToFront(WindowHandle);
             }
+
+            await Dispatcher.BeginInvoke(() =>
+            {
+                if (WindowState is not WindowState.Minimized)
+                {
+                    FirstPopupWindow.Owner = this;
+                    FirstPopupWindow.Hide();
+                    FirstPopupWindow.Show();
+                }
+            }, DispatcherPriority.Background).Task.ConfigureAwait(false);
         }
     }
 
