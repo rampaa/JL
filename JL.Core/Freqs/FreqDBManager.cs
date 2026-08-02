@@ -546,61 +546,77 @@ internal static class FreqDBManager
                     FrequencyRecord frequencyRecordWithPrimarySpelling = new(primarySpelling, frequency);
                     if (reading is null)
                     {
-                        AddOrUpdate(primarySpellingInHiragana, rowId, frequencyRecordWithPrimarySpelling, true, commandsAndParameters);
-                        ++transactionRecordCount;
-
-                        if (generateFusejiVariants)
+                        if (AddOrUpdate(primarySpellingInHiragana, rowId, frequencyRecordWithPrimarySpelling, true, commandsAndParameters))
                         {
-                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            ++transactionRecordCount;
+
+                            if (generateFusejiVariants)
                             {
-                                AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithPrimarySpelling, false, commandsAndParameters);
-                                ++transactionRecordCount;
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithPrimarySpelling, false, commandsAndParameters))
+                                    {
+                                        ++transactionRecordCount;
+                                    }
+                                }
                             }
                         }
                     }
                     else
                     {
                         string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                        AddOrUpdate(readingInHiragana, rowId, frequencyRecordWithPrimarySpelling, true, commandsAndParameters);
-                        ++transactionRecordCount;
-
-                        if (generateFusejiVariants)
+                        if (AddOrUpdate(readingInHiragana, rowId, frequencyRecordWithPrimarySpelling, true, commandsAndParameters))
                         {
-                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            ++transactionRecordCount;
+
+                            if (generateFusejiVariants)
                             {
-                                AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithPrimarySpelling, false, commandsAndParameters);
-                                ++transactionRecordCount;
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithPrimarySpelling, false, commandsAndParameters))
+                                    {
+                                        ++transactionRecordCount;
+                                    }
+                                }
                             }
                         }
 
                         FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
                         ++rowId;
 
-                        AddOrUpdate(primarySpellingInHiragana, rowId, frequencyRecordWithReading, true, commandsAndParameters);
-                        ++transactionRecordCount;
-
-                        if (generateFusejiVariants)
+                        if (AddOrUpdate(primarySpellingInHiragana, rowId, frequencyRecordWithReading, true, commandsAndParameters))
                         {
-                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
-                            {
-                                AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
-                                ++transactionRecordCount;
-                            }
-                        }
+                            ++transactionRecordCount;
 
-                        if (generateMazegaki)
-                        {
-                            foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, reading))
+                            if (generateFusejiVariants)
                             {
-                                AddOrUpdate(mazegakiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
-                                ++transactionRecordCount;
-
-                                if (generateFusejiVariants)
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
-                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                    if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
                                     {
-                                        AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
                                         ++transactionRecordCount;
+                                    }
+                                }
+                            }
+
+                            if (generateMazegaki)
+                            {
+                                foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, reading))
+                                {
+                                    if (AddOrUpdate(mazegakiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
+                                    {
+                                        ++transactionRecordCount;
+                                    }
+
+                                    if (generateFusejiVariants)
+                                    {
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        {
+                                            if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
+                                            {
+                                                ++transactionRecordCount;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -842,16 +858,19 @@ internal static class FreqDBManager
                 }
 
                 FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
-
-                AddOrUpdate(reading, rowId, frequencyRecordWithExactSpelling, true, commandsAndParameters);
-                ++transactionRecordCount;
-
-                if (generateFusejiVariants)
+                if (AddOrUpdate(reading, rowId, frequencyRecordWithExactSpelling, true, commandsAndParameters))
                 {
-                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                    ++transactionRecordCount;
+
+                    if (generateFusejiVariants)
                     {
-                        AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithExactSpelling, false, commandsAndParameters);
-                        ++transactionRecordCount;
+                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                        {
+                            if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithExactSpelling, false, commandsAndParameters))
+                            {
+                                ++transactionRecordCount;
+                            }
+                        }
                     }
                 }
 
@@ -861,31 +880,39 @@ internal static class FreqDBManager
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
                     ++rowId;
 
-                    AddOrUpdate(exactSpellingInHiragana, rowId, frequencyRecordWithReading, true, commandsAndParameters);
-                    ++transactionRecordCount;
-
-                    if (generateFusejiVariants)
+                    if (AddOrUpdate(exactSpellingInHiragana, rowId, frequencyRecordWithReading, true, commandsAndParameters))
                     {
-                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
-                        {
-                            AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
-                            ++transactionRecordCount;
-                        }
-                    }
+                        ++transactionRecordCount;
 
-                    if (generateMazegaki)
-                    {
-                        foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(exactSpellingInHiragana, reading))
+                        if (generateFusejiVariants)
                         {
-                            AddOrUpdate(mazegakiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
-                            ++transactionRecordCount;
-
-                            if (generateFusejiVariants)
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
                                 {
-                                    AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters);
                                     ++transactionRecordCount;
+                                }
+                            }
+                        }
+
+                        if (generateMazegaki)
+                        {
+                            foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(exactSpellingInHiragana, reading))
+                            {
+                                if (AddOrUpdate(mazegakiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
+                                {
+                                    ++transactionRecordCount;
+
+                                    if (generateFusejiVariants)
+                                    {
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        {
+                                            if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
+                                            {
+                                                ++transactionRecordCount;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -990,7 +1017,7 @@ internal static class FreqDBManager
         SqliteParameter SearchKeyParamForInsertRecordSearchKeyCommand,
         SqliteParameter RecordIdParamForInsertRecordSearchKeyCommand);
 
-    internal static void AddOrUpdate(string searchKey,
+    internal static bool AddOrUpdate(string searchKey,
         ulong recordId,
         FrequencyRecord record,
         bool newRecord,
@@ -1016,7 +1043,11 @@ internal static class FreqDBManager
                 commandsAndParameters.FrequencyParamForUpdateCommand.Value = record.Frequency;
                 commandsAndParameters.RowIdParamForUpdateCommand.Value = rowId;
                 _ = commandsAndParameters.UpdateRecordCommand.ExecuteNonQuery();
+
+                return true;
             }
+
+            return false;
         }
         else
         {
@@ -1031,6 +1062,8 @@ internal static class FreqDBManager
             commandsAndParameters.SearchKeyParamForInsertRecordSearchKeyCommand.Value = searchKey;
             commandsAndParameters.RecordIdParamForInsertRecordSearchKeyCommand.Value = recordId;
             _ = commandsAndParameters.InsertRecordSearchKeyCommand.ExecuteNonQuery();
+
+            return true;
         }
     }
 

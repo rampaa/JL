@@ -321,23 +321,26 @@ internal static class EpwingNazekaDBManager
                                 string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
                                 if (primarySpellingInHiragana != readingInHiragana)
                                 {
-                                    if (generateFusejiVariants)
+                                    if (keys.Add(readingInHiragana))
                                     {
-                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        if (generateFusejiVariants)
                                         {
-                                            _ = keys.Add(fusejiVariant);
-                                        }
-                                    }
-
-                                    if (keys.Add(readingInHiragana) && generateMazegaki)
-                                    {
-                                        foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
-                                        {
-                                            if (keys.Add(mazegaki) && generateFusejiVariants)
+                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                             {
-                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                _ = keys.Add(fusejiVariant);
+                                            }
+                                        }
+
+                                        if (generateMazegaki)
+                                        {
+                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
+                                            {
+                                                if (keys.Add(mazegaki) && generateFusejiVariants)
                                                 {
-                                                    _ = keys.Add(fusejiVariant);
+                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                    {
+                                                        _ = keys.Add(fusejiVariant);
+                                                    }
                                                 }
                                             }
                                         }

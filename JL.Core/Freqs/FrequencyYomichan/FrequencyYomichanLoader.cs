@@ -139,47 +139,46 @@ internal static class FrequencyYomichanLoader
                     FrequencyRecord frequencyRecordWithPrimarySpelling = new(primarySpelling, frequency);
                     if (reading is null)
                     {
-                        FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling);
-                        if (generateFusejiVariants)
+                        if (FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling) && generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithPrimarySpelling);
+                                _ = FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithPrimarySpelling);
                             }
                         }
                     }
                     else
                     {
                         string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                        FreqUtils.AddOrUpdate(freq.Contents, readingInHiragana, frequencyRecordWithPrimarySpelling);
-                        if (generateFusejiVariants)
+                        if (FreqUtils.AddOrUpdate(freq.Contents, readingInHiragana, frequencyRecordWithPrimarySpelling) && generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithPrimarySpelling);
+                                _ = FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithPrimarySpelling);
                             }
                         }
 
                         FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
-                        FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithReading);
-                        if (generateFusejiVariants)
+                        if (FreqUtils.AddOrUpdate(freq.Contents, primarySpellingInHiragana, frequencyRecordWithReading))
                         {
-                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            if (generateFusejiVariants)
                             {
-                                FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithReading);
-                            }
-                        }
-
-                        if (generateMazegaki)
-                        {
-                            foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, reading))
-                            {
-                                FreqUtils.AddOrUpdate(freq.Contents, mazegakiVariant, frequencyRecordWithReading);
-                                if (generateFusejiVariants)
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
-                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                    _ = FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithReading);
+                                }
+                            }
+
+                            if (generateMazegaki)
+                            {
+                                foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, reading))
+                                {
+                                    if (FreqUtils.AddOrUpdate(freq.Contents, mazegakiVariant, frequencyRecordWithReading) && generateFusejiVariants)
                                     {
-                                        FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithReading);
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        {
+                                            _ = FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithReading);
+                                        }
                                     }
                                 }
                             }

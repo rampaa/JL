@@ -545,7 +545,7 @@ public static class FreqUtils
         }
     }
 
-    internal static void AddOrUpdate(IDictionary<string, IList<FrequencyRecord>> contents, string key, FrequencyRecord record)
+    internal static bool AddOrUpdate(IDictionary<string, IList<FrequencyRecord>> contents, string key, FrequencyRecord record)
     {
         if (contents.TryGetValue(key, out IList<FrequencyRecord>? freqResult))
         {
@@ -553,16 +553,22 @@ public static class FreqUtils
             if (index < 0)
             {
                 freqResult.Add(record);
+                return true;
             }
-            else if (freqResult[index].Frequency > record.Frequency)
+
+            if (freqResult[index].Frequency > record.Frequency)
             {
                 freqResult[index] = record;
+                return true;
             }
         }
         else
         {
             contents[key] = [record];
+            return true;
         }
+
+        return false;
     }
 
     private static async Task UpdateRevisionInfo(Freq freq)

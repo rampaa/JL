@@ -390,17 +390,17 @@ internal static class EpwingYomichanDBManager
                                                 _ = keys.Add(fusejiVariant);
                                             }
                                         }
-                                    }
 
-                                    if (generateMazegaki)
-                                    {
-                                        foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
+                                        if (generateMazegaki)
                                         {
-                                            if (keys.Add(mazegaki) && generateFusejiVariants)
+                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
                                             {
-                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                if (keys.Add(mazegaki) && generateFusejiVariants)
                                                 {
-                                                    _ = keys.Add(fusejiVariant);
+                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                    {
+                                                        _ = keys.Add(fusejiVariant);
+                                                    }
                                                 }
                                             }
                                         }

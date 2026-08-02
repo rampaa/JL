@@ -95,26 +95,28 @@ internal static class EpwingYomichanLoader
                                     string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
                                     if (primarySpellingInHiragana != readingInHiragana)
                                     {
-                                        if (generateFusejiVariants)
+                                        if (DictUtils.AddRecordToDictionary(readingInHiragana, record, dictContents))
                                         {
-                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                            if (generateFusejiVariants)
                                             {
-                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
-                                            }
-                                        }
-
-                                        _ = DictUtils.AddRecordToDictionary(readingInHiragana, record, dictContents);
-                                        if (generateMazegaki)
-                                        {
-                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
-                                            {
-                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, dictContents))
+                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                 {
-                                                    if (generateFusejiVariants)
+                                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                                }
+                                            }
+
+                                            if (generateMazegaki)
+                                            {
+                                                foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
+                                                {
+                                                    if (DictUtils.AddRecordToDictionary(mazegaki, record, dictContents))
                                                     {
-                                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                        if (generateFusejiVariants)
                                                         {
-                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                            {
+                                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                                            }
                                                         }
                                                     }
                                                 }
