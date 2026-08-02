@@ -23,6 +23,10 @@ public static class NetworkUtils
     private static readonly Timer s_updaterTimer = new();
     private static readonly AtomicBool s_updatingJL = new(false);
 
+    public const string LocalhostStringToReplace = "://localhost:";
+    public const string AllIpAddressToReplace = "://0.0.0.0:";
+    public const string NormalizedLocalhostString = "://127.0.0.1:";
+
     public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
         if (!s_updatingJL.TrySetTrue())

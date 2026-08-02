@@ -7,6 +7,7 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Audio;
 using JL.Core.Frontend;
+using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.GUI.Info;
 using JL.Windows.SpeechSynthesis;
@@ -85,8 +86,8 @@ internal sealed partial class AddAudioSourceWindow
             case AudioSourceType.Url:
             case AudioSourceType.UrlJson:
                 uri = UriTextBox.Text
-                    .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
-                    .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase);
+                    .Replace(NetworkUtils.AllIpAddressToReplace, NetworkUtils.NormalizedLocalhostString, StringComparison.Ordinal)
+                    .Replace(NetworkUtils.LocalhostStringToReplace, NetworkUtils.NormalizedLocalhostString, StringComparison.OrdinalIgnoreCase);
 
                 if (string.IsNullOrEmpty(uri) || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.OrdinalIgnoreCase).Replace("{Reading}", "", StringComparison.OrdinalIgnoreCase), UriKind.Absolute))
                 {

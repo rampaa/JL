@@ -643,8 +643,8 @@ internal sealed partial class PreferencesWindow
         if (Uri.IsWellFormedUriString(AnkiUriTextBox.Text, UriKind.Absolute))
         {
             string normalizedUrl = AnkiUriTextBox.Text
-                .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
-                .Replace("://localhost:", "://127.0.0.1:", StringComparison.OrdinalIgnoreCase);
+                .Replace(NetworkUtils.AllIpAddressToReplace, NetworkUtils.NormalizedLocalhostString, StringComparison.Ordinal)
+                .Replace(NetworkUtils.LocalhostStringToReplace, NetworkUtils.NormalizedLocalhostString, StringComparison.OrdinalIgnoreCase);
             CoreConfigManager.Instance.AnkiConnectUri = new Uri(normalizedUrl);
             AnkiUriTextBox.Text = normalizedUrl;
         }

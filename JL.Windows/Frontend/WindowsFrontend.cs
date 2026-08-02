@@ -43,9 +43,9 @@ internal sealed class WindowsFrontend : IFrontend
 
     public byte[]? GetMonitorScreenshotAsByteArray() => ScreenshotUtils.GetMonitorScreenshot();
 
-    public void InsertSettingsForMpvProfile(SqliteConnection connection, int mpvProfileId) => ConfigManager.Instance.InsertSettingsForMpvProfile(connection, mpvProfileId);
+    public void InsertSettingsForMpvProfile(SqliteConnection connection, int mpvProfileId) => ConfigManager.InsertSettingsForMpvProfile(connection, mpvProfileId);
 
-    public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId) => ConfigManager.Instance.InsertSettingsForTsukikageProfile(connection, tsukikageProfileId);
+    public void InsertSettingsForTsukikageProfile(SqliteConnection connection, int tsukikageProfileId) => ConfigManager.InsertSettingsForTsukikageProfile(connection, tsukikageProfileId);
 
     public void PopupDictTypeButtonsNeedUpdating() => PopupWindowUtils.PopupDictTypeButtonsNeedUpdating();
 

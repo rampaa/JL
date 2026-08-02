@@ -18,6 +18,8 @@ namespace JL.Core.Mining;
 
 public static class MiningUtils
 {
+    private const string HtmlLineBreak = "<br/>";
+
     private const string PitchAccentStyle =
         """
         <style>
@@ -120,9 +122,9 @@ public static class MiningUtils
 
     private static string GetSourceText(LookupResult lookupResult, ReadOnlySpan<char> currentText, int currentCharPosition)
     {
-        string leadingSourcePart = currentText[..currentCharPosition].ToString().ReplaceLineEndings("<br/>");
-        string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString().ReplaceLineEndings("<br/>");
-        return $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}".ReplaceLineEndings("<br/>");
+        string leadingSourcePart = currentText[..currentCharPosition].ToString().ReplaceLineEndings(HtmlLineBreak);
+        string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString().ReplaceLineEndings(HtmlLineBreak);
+        return $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}".ReplaceLineEndings(HtmlLineBreak);
     }
 
     private static string? GetPrimarySpellingAndReadings(LookupResult lookupResult)
@@ -496,7 +498,7 @@ public static class MiningUtils
             JLField.Sentence => GetSentence(lookupResults[currentLookupResultIndex], currentText, currentCharPosition),
             JLField.SentenceNoBolding => JapaneseUtils.FindSentence(currentText, currentCharPosition),
             JLField.SourceText => GetSourceText(lookupResults[currentLookupResultIndex], currentText, currentCharPosition),
-            JLField.SourceTextNoBolding => currentText.ReplaceLineEndings("<br/>"),
+            JLField.SourceTextNoBolding => currentText.ReplaceLineEndings(HtmlLineBreak),
             JLField.Readings => GetReadings(lookupResults[currentLookupResultIndex]),
             JLField.ReadingsWithOrthographyInfo => GetReadingsWithOrthographyInfo(lookupResults[currentLookupResultIndex]),
             JLField.FirstReading => lookupResults[currentLookupResultIndex].Readings?[0],
@@ -518,8 +520,8 @@ public static class MiningUtils
             JLField.KanjiGrade => GetKanjiGrade(lookupResults[currentLookupResultIndex]),
             JLField.RadicalNames => GetRadicalNames(lookupResults[currentLookupResultIndex]),
             JLField.DefinitionsFromMultipleDictionaries => GetDefinitionsFromMultipleDictionaries(lookupResults, currentLookupResultIndex, lookupResults[currentLookupResultIndex]),
-            JLField.LeadingSourceTextPart => currentText[..currentCharPosition].ReplaceLineEndings("<br/>"),
-            JLField.TrailingSourceTextPart => currentText[(currentCharPosition + lookupResults[currentLookupResultIndex].MatchedText.Length)..].ReplaceLineEndings("<br/>"),
+            JLField.LeadingSourceTextPart => currentText[..currentCharPosition].ReplaceLineEndings(HtmlLineBreak),
+            JLField.TrailingSourceTextPart => currentText[(currentCharPosition + lookupResults[currentLookupResultIndex].MatchedText.Length)..].ReplaceLineEndings(HtmlLineBreak),
             JLField.DictionaryName => lookupResults[currentLookupResultIndex].Dict.Name,
             JLField.Frequencies => GetFrequency(lookupResults[currentLookupResultIndex]),
             JLField.RawFrequencies => GetRawFrequencies(lookupResults[currentLookupResultIndex]),
@@ -533,7 +535,7 @@ public static class MiningUtils
             JLField.PitchAccentCategories => GetPitchAccentCategories(lookupResults[currentLookupResultIndex]),
             JLField.PitchAccentCategoryForFirstReading => GetPitchAccentCategoryForFirstReading(lookupResults[currentLookupResultIndex]),
             JLField.SelectedSpelling or JLField.PrimarySpelling => lookupResults[currentLookupResultIndex].PrimarySpelling,
-            JLField.SelectedDefinitions or JLField.Definitions => lookupResults[currentLookupResultIndex].FormattedDefinitions?.ReplaceLineEndings("<br/>"),
+            JLField.SelectedDefinitions or JLField.Definitions => lookupResults[currentLookupResultIndex].FormattedDefinitions?.ReplaceLineEndings(HtmlLineBreak),
             JLField.Nothing or JLField.Audio or JLField.SentenceAudio or JLField.SourceTextAudio or JLField.MonitorScreenshot or JLField.Image or JLField.ImageClipboardOverMonitorScreenshot or JLField.DefinitionsImages or JLField.LocalTime => null,
             _ => null
         };
@@ -615,7 +617,7 @@ public static class MiningUtils
             // ReSharper disable once NullableWarningSuppressionIsUsed
             || jlFields!.Contains(JLField.SourceTextNoBolding))
         {
-            miningParams[JLField.SourceTextNoBolding] = currentText.ReplaceLineEndings("<br/>");
+            miningParams[JLField.SourceTextNoBolding] = currentText.ReplaceLineEndings(HtmlLineBreak);
         }
         AddSourceTextFields(miningParams, jlFields, lookupResult, currentText, currentCharPosition, useHtmlTags);
 
@@ -662,8 +664,8 @@ public static class MiningUtils
         string trailingSourcePart = currentTextSpan[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString();
         if (useHtmlTags)
         {
-            leadingSourcePart = leadingSourcePart.ReplaceLineEndings("<br/>");
-            trailingSourcePart = trailingSourcePart.ReplaceLineEndings("<br/>");
+            leadingSourcePart = leadingSourcePart.ReplaceLineEndings(HtmlLineBreak);
+            trailingSourcePart = trailingSourcePart.ReplaceLineEndings(HtmlLineBreak);
         }
 
         if (mineAllFields
@@ -927,7 +929,7 @@ public static class MiningUtils
                 || jlFields.Contains(JLField.SelectedDefinitions))
             {
                 formattedDefinitions = useHtmlTags
-                    ? formattedDefinitions.ReplaceLineEndings("<br/>")
+                    ? formattedDefinitions.ReplaceLineEndings(HtmlLineBreak)
                     : formattedDefinitions;
 
                 if (mineAllFields
@@ -953,7 +955,7 @@ public static class MiningUtils
                 || jlFields!.Contains(JLField.SelectedDefinitions)))
         {
             miningParams[JLField.SelectedDefinitions] = useHtmlTags
-                ? selectedDefinitions.ReplaceLineEndings("<br/>")
+                ? selectedDefinitions.ReplaceLineEndings(HtmlLineBreak)
                 : selectedDefinitions;
         }
 
@@ -991,7 +993,7 @@ public static class MiningUtils
                 || jlFields!.Contains(JLField.KanjiStats)))
         {
             miningParams[JLField.KanjiStats] = useHtmlTags
-                ? kanjiLookupResult.KanjiStats.ReplaceLineEndings("<br/>")
+                ? kanjiLookupResult.KanjiStats.ReplaceLineEndings(HtmlLineBreak)
                 : kanjiLookupResult.KanjiStats;
         }
 
@@ -1271,7 +1273,7 @@ public static class MiningUtils
             {
                 string? formattedDefinitions = firstLookupResults[i].FormattedDefinitions;
                 Debug.Assert(formattedDefinitions is not null);
-                _ = singleDictStringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings("<br/>")}</dd>");
+                _ = singleDictStringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings(HtmlLineBreak)}</dd>");
 
                 ++count;
             }
@@ -1304,7 +1306,7 @@ public static class MiningUtils
             {
                 string? formattedDefinitions = firstLookupResults[i].FormattedDefinitions;
                 Debug.Assert(formattedDefinitions is not null);
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings("<br/>")}</dd>");
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" <dt>{count}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings(HtmlLineBreak)}</dd>");
                 ++count;
             }
 
@@ -1320,7 +1322,7 @@ public static class MiningUtils
             {
                 string? formattedDefinitions = otherLookupResults[0].FormattedDefinitions;
                 Debug.Assert(formattedDefinitions is not null);
-                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{formattedDefinitions.ReplaceLineEndings("<br/>")} </details>");
+                _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"{formattedDefinitions.ReplaceLineEndings(HtmlLineBreak)} </details>");
             }
             else
             {
@@ -1329,7 +1331,7 @@ public static class MiningUtils
                 {
                     string? formattedDefinitions = otherLookupResultsSpan[j].FormattedDefinitions;
                     Debug.Assert(formattedDefinitions is not null);
-                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"<dt>{j + 1}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings("<br/>")}</dd>");
+                    _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"<dt>{j + 1}.</dt> <dd>{formattedDefinitions.ReplaceLineEndings(HtmlLineBreak)}</dd>");
                 }
 
                 _ = stringBuilder.Append(" </details>");

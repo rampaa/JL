@@ -301,14 +301,14 @@ internal sealed partial class PopupWindow : IDisposable
         SearchWithBrowser(false);
     }
 
-    private async void SearchWithAnkiConnect(object sender, RoutedEventArgs e)
-    {
-        await SearchWithAnkiConnect(false).ConfigureAwait(false);
-    }
-
     private void SearchWithBrowser(bool useSelectedListViewItemIfItExists)
     {
         WindowsUtils.SearchWithBrowser(GetSearchText(useSelectedListViewItemIfItExists));
+    }
+
+    private async void SearchWithAnkiConnect(object sender, RoutedEventArgs e)
+    {
+        await SearchWithAnkiConnect(false).ConfigureAwait(false);
     }
 
     private Task SearchWithAnkiConnect(bool useSelectedListViewItemIfItExists)
@@ -769,6 +769,20 @@ internal sealed partial class PopupWindow : IDisposable
         WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
     }
 
+    private void UpdatePosition(bool mayNeedCoordinateConversion, bool verticalText)
+    {
+        if (ConfigManager.Instance.FixedPopupPositioning && PopupIndex is 0)
+        {
+            ConfigManager configManager = ConfigManager.Instance;
+            UpdatePositionToFixedPosition(WindowsUtils.GetMousePosition(new Point(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition), mayNeedCoordinateConversion));
+        }
+
+        else
+        {
+            UpdatePosition(WindowsUtils.GetMousePosition(mayNeedCoordinateConversion), verticalText);
+        }
+    }
+
     private void UpdatePositionToFixedPosition(Point fixedPosition)
     {
         Screen activeScreen = WindowsUtils.ActiveScreen;
@@ -815,20 +829,6 @@ internal sealed partial class PopupWindow : IDisposable
         }
 
         WinApi.MoveWindowToPosition(WindowHandle, x, y);
-    }
-
-    private void UpdatePosition(bool mayNeedCoordinateConversion, bool verticalText)
-    {
-        if (ConfigManager.Instance.FixedPopupPositioning && PopupIndex is 0)
-        {
-            ConfigManager configManager = ConfigManager.Instance;
-            UpdatePositionToFixedPosition(WindowsUtils.GetMousePosition(new Point(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition), mayNeedCoordinateConversion));
-        }
-
-        else
-        {
-            UpdatePosition(WindowsUtils.GetMousePosition(mayNeedCoordinateConversion), verticalText);
-        }
     }
 
     private void DisplayResults()
@@ -1960,18 +1960,6 @@ internal sealed partial class PopupWindow : IDisposable
         }
     }
 
-    private void ToggleVisibilityOfDictTabs()
-    {
-        if (!MiningMode)
-        {
-            return;
-        }
-
-        DictTabButtonsItemsControl.Visibility = DictTabButtonsItemsControl.Visibility is Visibility.Visible
-            ? Visibility.Collapsed
-            : Visibility.Visible;
-    }
-
     private static void HandleToggleMinimizedStateKeyGesture()
     {
         PopupWindowUtils.HidePopups(0);
@@ -2526,6 +2514,18 @@ internal sealed partial class PopupWindow : IDisposable
     private void ToggleVisibilityOfDictTabs(object sender, RoutedEventArgs e)
     {
         ToggleVisibilityOfDictTabs();
+    }
+
+    private void ToggleVisibilityOfDictTabs()
+    {
+        if (!MiningMode)
+        {
+            return;
+        }
+
+        DictTabButtonsItemsControl.Visibility = DictTabButtonsItemsControl.Visibility is Visibility.Visible
+            ? Visibility.Collapsed
+            : Visibility.Visible;
     }
 
     private void HidePopup(object sender, RoutedEventArgs e)

@@ -126,8 +126,7 @@ internal sealed partial class MainWindow : IDisposable
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-        await using (connection.ConfigureAwait(true))
+        using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
             configManager.ApplyPreferences(connection);
         }
@@ -872,8 +871,7 @@ internal sealed partial class MainWindow : IDisposable
         await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(true);
         await WebSocketUtils.DisconnectFromTsukikageWebSocketConnection().ConfigureAwait(true);
 
-        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
-        await using (connection.ConfigureAwait(false))
+        using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
             ConfigManager.Instance.SaveBeforeClosing(connection);
             StatsUtils.IncrementStat(StatType.Time, StatsUtils.TimeStatStopWatch.ElapsedTicks);
@@ -984,7 +982,7 @@ internal sealed partial class MainWindow : IDisposable
 
         else if (keyGesture.IsEqual(configManager.ShowManageDictionariesWindowKeyGesture))
         {
-            if (DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => dict.Ready))
+            if (DictUtils.DictsReady && DictUtils.Dicts.Values.All(static dict => dict.Ready))
             {
                 return WindowsUtils.ShowManageDictionariesWindow();
             }
@@ -1538,11 +1536,6 @@ internal sealed partial class MainWindow : IDisposable
         WindowsUtils.ShowPreferencesWindow();
     }
 
-    private void SearchWithBrowser(object sender, RoutedEventArgs e)
-    {
-        SearchWithBrowser();
-    }
-
     private async void SearchWithAnkiConnect(object sender, RoutedEventArgs e)
     {
         await SearchWithAnkiConnect().ConfigureAwait(false);
@@ -1562,6 +1555,11 @@ internal sealed partial class MainWindow : IDisposable
     public void SearchWithBrowser()
     {
         WindowsUtils.SearchWithBrowser(GetTextForSearch());
+    }
+
+    private void SearchWithBrowser(object sender, RoutedEventArgs e)
+    {
+        SearchWithBrowser();
     }
 
     public Task SearchWithAnkiConnect()
@@ -2054,8 +2052,8 @@ internal sealed partial class MainWindow : IDisposable
         _lookupDelayTimer.IsEnabled = false;
         _tsukikageLookupDelayTimer.IsEnabled = false;
 
-        ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating);
-        ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating);
+        ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady && DictUtils.Dicts.Values.All(static dict => !dict.Updating);
+        ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady && FreqUtils.FreqDicts.Values.All(static freq => !freq.Updating);
 
         bool textSelected = !string.IsNullOrWhiteSpace(MainTextBox.SelectedText);
         SearchMenuItem.IsEnabled = textSelected;
