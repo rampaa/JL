@@ -165,12 +165,16 @@ public static class FreqUtils
         bool useDB = freq.Options.UseDB.Value;
         string dbPath = freq.DBPath;
         string dbJournalPath = $"{dbPath}-journal";
+        string dbWalPath = $"{dbPath}-wal";
+        string dbShmPath = $"{dbPath}-shm";
         bool dbExists = File.Exists(dbPath);
         bool dbJournalExists = File.Exists(dbJournalPath);
+        bool dbWalExists = File.Exists(dbWalPath);
+        bool dbShmExists = File.Exists(dbShmPath);
 
         if (!freq.Updating)
         {
-            if (dbJournalExists)
+            if (dbJournalExists || dbWalExists || dbShmExists)
             {
                 if (dbExists)
                 {
@@ -178,7 +182,20 @@ public static class FreqUtils
                     dbExists = false;
                 }
 
-                File.Delete(dbJournalPath);
+                if (dbJournalExists)
+                {
+                    File.Delete(dbJournalPath);
+                }
+
+                if (dbWalExists)
+                {
+                    File.Delete(dbWalPath);
+                }
+
+                if (dbShmExists)
+                {
+                    File.Delete(dbShmPath);
+                }
             }
             else if (dbExists && !DBUtils.RecordExists(freq.ReadOnlyConnectionString))
             {
