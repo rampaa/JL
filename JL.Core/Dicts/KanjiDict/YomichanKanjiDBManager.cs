@@ -369,7 +369,7 @@ internal static class YomichanKanjiDBManager
 
         command.CommandText =
             $"""
-            SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats} r.{Kanji}
+            SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}, r.{Kanji}
             FROM {Record} r;
             """;
 
