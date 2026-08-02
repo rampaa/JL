@@ -121,12 +121,9 @@ internal static class Deconjugator
             foreach (ref readonly Form form in formsToProcess.AsReadOnlySpan())
             {
                 ReadOnlySpan<char> textSpan = form.Text.AsSpan();
-                if (textSpan.Length is not 0)
+                if (textSpan.Length is not 0 && ruleBucketsByLastDecEndChar.TryGetValue(textSpan[^1], out RuleBucket bucket))
                 {
-                    if (ruleBucketsByLastDecEndChar.TryGetValue(textSpan[^1], out RuleBucket bucket))
-                    {
-                        ApplyBucket(form, bucket, newFormsToProcess, textSpan);
-                    }
+                    ApplyBucket(form, bucket, newFormsToProcess, textSpan);
                 }
 
                 ApplyBucket(form, RulesWithEmptyConEnd, newFormsToProcess, textSpan);

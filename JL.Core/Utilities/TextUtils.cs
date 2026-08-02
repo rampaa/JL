@@ -102,7 +102,7 @@ public static class TextUtils
             text = text.ReplaceLineEndings("");
         }
 
-        List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.s_regexReplacements;
+        List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.RegexReplacements;
         if (regexReplacements is not null)
         {
             foreach (ref readonly KeyValuePair<Regex, string> regexReplacementKeyValuePair in regexReplacements.AsReadOnlySpan())

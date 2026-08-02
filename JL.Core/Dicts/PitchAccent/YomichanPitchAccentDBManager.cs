@@ -248,14 +248,11 @@ internal static class YomichanPitchAccentDBManager
                                 {
                                     foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(spellingInHiragana, readingInHiragana))
                                     {
-                                        if (keys.Add(mazegaki))
+                                        if (keys.Add(mazegaki) && generateFusejiVariants)
                                         {
-                                            if (generateFusejiVariants)
+                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                             {
-                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                                {
-                                                    _ = keys.Add(fusejiVariant);
-                                                }
+                                                _ = keys.Add(fusejiVariant);
                                             }
                                         }
                                     }

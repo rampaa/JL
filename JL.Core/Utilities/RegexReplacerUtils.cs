@@ -9,7 +9,7 @@ public static partial class RegexReplacerUtils
     [GeneratedRegex(@"\|REGEX\|(?<regex>.+)\|BECOMES\|(?<replacement>.*)\|MODIFIER\|(?<modifiers>.*)\|END\|", RegexOptions.CultureInvariant)]
     private static partial Regex ReplacementRegex { get; }
 
-    internal static List<KeyValuePair<Regex, string>>? s_regexReplacements;
+    internal static List<KeyValuePair<Regex, string>>? RegexReplacements { get; private set; }
 
     private static readonly string s_filePath = Path.Join(ProfileUtils.ProfileFolderPath, "Regex_Replacements.txt");
 
@@ -20,7 +20,7 @@ public static partial class RegexReplacerUtils
 
     public static void PopulateRegexReplacements()
     {
-        s_regexReplacements?.Clear();
+        RegexReplacements?.Clear();
 
         List<string> filePaths = new(2);
 
@@ -37,15 +37,15 @@ public static partial class RegexReplacerUtils
 
         if (filePaths.Count is 0)
         {
-            if (s_regexReplacements?.Count is 0)
+            if (RegexReplacements?.Count is 0)
             {
-                s_regexReplacements = null;
+                RegexReplacements = null;
             }
 
             return;
         }
 
-        s_regexReplacements = [];
+        RegexReplacements = [];
         foreach (ref readonly string filePath in filePaths.AsReadOnlySpan())
         {
             foreach (string line in File.ReadLines(filePath))
@@ -73,7 +73,7 @@ public static partial class RegexReplacerUtils
                     try
                     {
                         Regex regex = new(regexPattern, regexOptions);
-                        s_regexReplacements.Add(KeyValuePair.Create(regex, match.Groups["replacement"].Value));
+                        RegexReplacements.Add(KeyValuePair.Create(regex, match.Groups["replacement"].Value));
                     }
                     catch (ArgumentException e)
                     {
@@ -84,9 +84,9 @@ public static partial class RegexReplacerUtils
             }
         }
 
-        if (s_regexReplacements.Count is 0)
+        if (RegexReplacements.Count is 0)
         {
-            s_regexReplacements = null;
+            RegexReplacements = null;
         }
     }
 }

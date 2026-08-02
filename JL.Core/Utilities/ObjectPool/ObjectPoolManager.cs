@@ -19,8 +19,8 @@ public static class ObjectPoolManager
     {
         if (DictUtils.DictsReady
             && FreqUtils.FreqsReady
-            && DictUtils.Dicts.Values.ToArray().All(static dict => !dict.Updating)
-            && FreqUtils.FreqDicts.Values.ToArray().All(static freq => !freq.Updating))
+            && DictUtils.Dicts.Values.All(static dict => !dict.Updating)
+            && FreqUtils.FreqDicts.Values.All(static freq => !freq.Updating))
         {
             s_stringPoolInstance.Reset();
         }

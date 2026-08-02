@@ -9,16 +9,6 @@ internal readonly struct VirtualRule(RuleType type, string decEnd, string conEnd
     public string ConTag { get; } = conTag;
     public string Detail { get; } = detail;
 
-    public bool Equals(VirtualRule other)
-    {
-        return Type == other.Type
-            && DecEnd == other.DecEnd
-            && ConEnd == other.ConEnd
-            && DecTag == other.DecTag
-            && ConTag == other.ConTag
-            && Detail == other.Detail;
-    }
-
     public override int GetHashCode()
     {
         unchecked
@@ -37,6 +27,16 @@ internal readonly struct VirtualRule(RuleType type, string decEnd, string conEnd
     public override bool Equals(object? obj)
     {
         return obj is VirtualRule other && Equals(other);
+    }
+
+    public bool Equals(VirtualRule other)
+    {
+        return Type == other.Type
+            && DecEnd == other.DecEnd
+            && ConEnd == other.ConEnd
+            && DecTag == other.DecTag
+            && ConTag == other.ConTag
+            && Detail == other.Detail;
     }
 
     public static bool operator ==(VirtualRule left, VirtualRule right) => left.Equals(right);

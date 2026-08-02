@@ -395,6 +395,17 @@ public static class ConfigDBManager
         return defaultValue;
     }
 
+    public static string GetValueFromConfig(SqliteConnection connection, Dictionary<string, string> configs, string defaultValue, string configKey)
+    {
+        if (configs.TryGetValue(configKey, out string? configValue))
+        {
+            return configValue;
+        }
+
+        InsertSetting(connection, configKey, defaultValue);
+        return defaultValue;
+    }
+
     public static Dictionary<string, string> GetAllConfigs(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
@@ -445,17 +456,6 @@ public static class ConfigDBManager
             UpdateSetting(connection, configKey, defaultValue.ToString());
         }
 
-        return defaultValue;
-    }
-
-    public static string GetValueFromConfig(SqliteConnection connection, Dictionary<string, string> configs, string defaultValue, string configKey)
-    {
-        if (configs.TryGetValue(configKey, out string? configValue))
-        {
-            return configValue;
-        }
-
-        InsertSetting(connection, configKey, defaultValue);
         return defaultValue;
     }
 

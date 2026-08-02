@@ -121,14 +121,11 @@ public static class CustomWordLoader
             string spelling = spellings[i];
 
             CustomWordRecord record = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
-            if (DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(spelling), record, customWordDictionary))
+            if (DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(spelling), record, customWordDictionary) && i is 0 && readings is not null)
             {
-                if (i is 0 && readings is not null)
+                foreach (string reading in readings)
                 {
-                    foreach (string reading in readings)
-                    {
-                        _ = DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(reading), record, customWordDictionary);
-                    }
+                    _ = DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(reading), record, customWordDictionary);
                 }
             }
         }
