@@ -396,16 +396,13 @@ internal static class JmdictDBManager
                                             {
                                                 if (!recordDictionary.ContainsKey(mazegaki))
                                                 {
-                                                    if (uniqueKeys.Add(mazegaki))
+                                                    if (uniqueKeys.Add(mazegaki) && generateFusejiVariants)
                                                     {
-                                                        if (generateFusejiVariants)
+                                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                         {
-                                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                            if (!recordDictionary.ContainsKey(fusejiVariant))
                                                             {
-                                                                if (!recordDictionary.ContainsKey(fusejiVariant))
-                                                                {
-                                                                    _ = uniqueKeys.Add(fusejiVariant);
-                                                                }
+                                                                _ = uniqueKeys.Add(fusejiVariant);
                                                             }
                                                         }
                                                     }

@@ -201,16 +201,13 @@ internal static class JmdictLoader
                                         {
                                             if (!recordDictionary.ContainsKey(mazegaki))
                                             {
-                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, jmdictDictionary))
+                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, jmdictDictionary) && generateFusejiVariants)
                                                 {
-                                                    if (generateFusejiVariants)
+                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                     {
-                                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                        if (!recordDictionary.ContainsKey(fusejiVariant))
                                                         {
-                                                            if (!recordDictionary.ContainsKey(fusejiVariant))
-                                                            {
-                                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, jmdictDictionary);
-                                                            }
+                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, jmdictDictionary);
                                                         }
                                                     }
                                                 }
