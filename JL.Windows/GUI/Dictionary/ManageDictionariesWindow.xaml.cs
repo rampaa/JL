@@ -405,6 +405,7 @@ internal sealed partial class ManageDictionariesWindow
         Dict dict = (Dict)updateButton.Tag;
         if (dict.Type is DictType.JMdict)
         {
+            RebuildWordClassFile = false;
             _ = await ResourceUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
         }
         else if (dict.Type is DictType.JMnedict)
