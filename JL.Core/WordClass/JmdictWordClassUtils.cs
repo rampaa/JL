@@ -204,7 +204,6 @@ public static class JmdictWordClassUtils
     private static void PopulateFromDB(Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary, SqliteConnection connection)
     {
         FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
-        connection.Open();
 
         Dictionary<long, WordClassCandidate> rowIdToWordClassCandidate = [];
         using SqliteCommand recordCommand = connection.CreateCommand();
