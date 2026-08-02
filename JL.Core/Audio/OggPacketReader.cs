@@ -29,7 +29,6 @@ internal sealed class OggPacketReader : IDisposable
 
     private readonly byte[] _pageBuffer;
     private readonly byte[] _packetBuffer;
-    private int _packetLength;
 
     private int _segmentCount;
     private int _segmentIndex;
@@ -45,7 +44,7 @@ internal sealed class OggPacketReader : IDisposable
 
     public bool TryReadPacket(out Span<byte> packet)
     {
-        _packetLength = 0;
+        int packetLength = 0;
         while (true)
         {
             if (_segmentIndex >= _segmentCount)
@@ -58,7 +57,7 @@ internal sealed class OggPacketReader : IDisposable
 
                 if (_isPacketContinued)
                 {
-                    if (_packetLength is 0)
+                    if (packetLength is 0)
                     {
                         // We started reading mid-stream with no data from the packet's earlier
                         // pages. Skip to the end of this continued packet before reading the next.
@@ -70,7 +69,7 @@ internal sealed class OggPacketReader : IDisposable
                 {
                     // New page starts fresh; discard any partially accumulated data
                     // from an incomplete packet on the previous page.
-                    _packetLength = 0;
+                    packetLength = 0;
                 }
             }
 
@@ -82,7 +81,7 @@ internal sealed class OggPacketReader : IDisposable
             // IMPORTANT: this span is invalidated by the next call to TryReadPacket, which
             // overwrites _pageBuffer via ReadPage. The caller must consume it before calling
             // TryReadPacket again.
-            if (!_isPacketContinued && _packetLength is 0 && segmentSize < 255)
+            if (!_isPacketContinued && packetLength is 0 && segmentSize < 255)
             {
                 packet = _pageBuffer.AsSpan(_pageOffset, segmentSize);
                 _pageOffset += segmentSize;
@@ -100,21 +99,21 @@ internal sealed class OggPacketReader : IDisposable
 
                 if (segmentSize > 0)
                 {
-                    if (_packetLength + segmentSize > _packetBuffer.Length)
+                    if (packetLength + segmentSize > _packetBuffer.Length)
                     {
                         // Packet exceeds maximum expected size; stream is likely corrupt.
                         packet = [];
                         return false;
                     }
 
-                    _pageBuffer.AsSpan(_pageOffset, segmentSize).CopyTo(_packetBuffer.AsSpan(_packetLength));
-                    _packetLength += segmentSize;
+                    _pageBuffer.AsSpan(_pageOffset, segmentSize).CopyTo(_packetBuffer.AsSpan(packetLength));
+                    packetLength += segmentSize;
                     _pageOffset += segmentSize;
                 }
 
                 if (segmentSize < 255)
                 {
-                    packet = _packetBuffer.AsSpan(0, _packetLength);
+                    packet = _packetBuffer.AsSpan(0, packetLength);
                     _isPacketContinued = false;
                     return true;
                 }
@@ -153,12 +152,9 @@ internal sealed class OggPacketReader : IDisposable
         _isPacketContinued = (_pageHeader[HeaderTypeFlagOffset] & ContinuationFlag) is not 0;
 
         int segmentCount = _pageHeader[SegmentCountOffset];
-        if (segmentCount > 0)
+        if (segmentCount > 0 && !TryReadExactly(_pageHeader.AsSpan(PageHeaderFixedSize, segmentCount)))
         {
-            if (!TryReadExactly(_pageHeader.AsSpan(PageHeaderFixedSize, segmentCount)))
-            {
-                return false;
-            }
+            return false;
         }
 
         _segmentCount = segmentCount;
@@ -172,15 +168,7 @@ internal sealed class OggPacketReader : IDisposable
             totalSize += size;
         }
 
-        if (totalSize > 0)
-        {
-            if (!TryReadExactly(_pageBuffer.AsSpan(0, totalSize)))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return totalSize <= 0 || TryReadExactly(_pageBuffer.AsSpan(0, totalSize));
     }
 
     // Reads exactly buffer.Length bytes into buffer.
