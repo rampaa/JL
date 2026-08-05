@@ -1256,6 +1256,7 @@ internal sealed class ConfigManager
         preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = coreConfigManager.CaptureTextFromWebSocket;
         preferenceWindow.AutoReconnectToWebSocketCheckBox.IsChecked = coreConfigManager.AutoReconnectToWebSocket;
         preferenceWindow.CaptureTextFromTsukikageWebSocketCheckBox.IsChecked = coreConfigManager.CaptureTextFromTsukikageWebsocket;
+        preferenceWindow.IgnoreHoveredTsukikageTextForStatsCheckBox.IsChecked = coreConfigManager.IgnoreHoveredTsukikageTextForStats;
         preferenceWindow.AutoReconnectToTsukikageWebSocketCheckBox.IsChecked = coreConfigManager.AutoReconnectToTsukikageWebSocket;
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked = OnlyCaptureTextWithJapaneseChars;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
@@ -1587,6 +1588,9 @@ internal sealed class ConfigManager
 
         ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.CaptureTextFromTsukikageWebsocket),
             preferenceWindow.CaptureTextFromTsukikageWebSocketCheckBox.IsChecked.ToString());
+
+        ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.IgnoreHoveredTsukikageTextForStats),
+            preferenceWindow.IgnoreHoveredTsukikageTextForStatsCheckBox.IsChecked.ToString());
 
         ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AutoReconnectToTsukikageWebSocket),
             preferenceWindow.AutoReconnectToTsukikageWebSocketCheckBox.IsChecked.ToString());
@@ -2017,6 +2021,7 @@ internal sealed class ConfigManager
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.CaptureTextFromTsukikageWebsocket), bool.TrueString, tsukikageProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.IgnoreHoveredTsukikageTextForStats), bool.TrueString, tsukikageProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(CoreConfigManager.AutoReconnectToTsukikageWebSocket), bool.TrueString, tsukikageProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(HidePopupsOnTextChange), bool.FalseString, tsukikageProfileId);
         ConfigDBManager.InsertSetting(connection, nameof(DiscardIdenticalText), bool.TrueString, tsukikageProfileId);

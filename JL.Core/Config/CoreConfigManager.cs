@@ -28,6 +28,7 @@ public sealed class CoreConfigManager
     public bool CaptureTextFromClipboard { get; set; } = true;
     public bool CaptureTextFromWebSocket { get; set; } // = false;
     public bool CaptureTextFromTsukikageWebsocket { get; set; } // = false;
+    public bool IgnoreHoveredTsukikageTextForStats { get; private set; } = true;
     public bool AutoReconnectToWebSocket { get; private set; } // = false;
     public bool AutoReconnectToTsukikageWebSocket { get; private set; } = true;
     public bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
@@ -83,6 +84,7 @@ public sealed class CoreConfigManager
     private void ApplyTsukikageSettings(SqliteConnection connection, Dictionary<string, string> configs)
     {
         CaptureTextFromTsukikageWebsocket = ConfigDBManager.GetValueFromConfig(connection, configs, CaptureTextFromTsukikageWebsocket, nameof(CaptureTextFromTsukikageWebsocket));
+        IgnoreHoveredTsukikageTextForStats = ConfigDBManager.GetValueFromConfig(connection, configs, IgnoreHoveredTsukikageTextForStats, nameof(IgnoreHoveredTsukikageTextForStats));
         AutoReconnectToTsukikageWebSocket = ConfigDBManager.GetValueFromConfig(connection, configs, AutoReconnectToTsukikageWebSocket, nameof(AutoReconnectToTsukikageWebSocket));
 
         string? tsukikageWebSocketUriStr = configs.GetValueOrDefault(nameof(TsukikageWebSocketUri));

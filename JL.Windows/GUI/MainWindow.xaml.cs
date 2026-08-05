@@ -166,7 +166,7 @@ internal sealed partial class MainWindow : IDisposable
             {
                 string text = Clipboard.GetText();
                 WindowsUtils.LastWebSocketTextWasVertical = false;
-                return CopyText(text);
+                return CopyText(text, false, true);
             }
             catch (ExternalException ex)
             {
@@ -221,7 +221,9 @@ internal sealed partial class MainWindow : IDisposable
                 WindowsUtils.LastWebSocketTextWasVertical = verticalText;
                 await Dispatcher.BeginInvoke(async () =>
                 {
-                    copiedText = CopyText(currentText, tsukikage)
+                    bool tsukikageTextNotHovered = charIndex is -1;
+                    bool keepStats = !tsukikage || tsukikageTextNotHovered || CoreConfigManager.Instance.IgnoreHoveredTsukikageTextForStats;
+                    copiedText = CopyText(currentText, tsukikage, keepStats)
                         && !FirstPopupWindow.MiningMode
                         && (tsukikage || configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket)
                         && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized || WindowState is WindowState.Minimized);
@@ -231,14 +233,22 @@ internal sealed partial class MainWindow : IDisposable
                         return;
                     }
 
-                    if (tsukikage && configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
+                    if (tsukikage)
                     {
-                        if (FirstPopupWindow.Opacity is not 0)
+                        if (tsukikageTextNotHovered)
                         {
-                            FirstPopupWindow.HidePopup();
+                            return;
                         }
 
-                        return;
+                        else if (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
+                        {
+                            if (FirstPopupWindow.Opacity is not 0)
+                            {
+                                FirstPopupWindow.HidePopup();
+                            }
+
+                            return;
+                        }
                     }
 
                     if (!PopupWindowUtils.TransparentDueToAutoLookup)
@@ -270,7 +280,7 @@ internal sealed partial class MainWindow : IDisposable
         }
     }
 
-    private bool CopyText(string text, bool tsukikage = false)
+    private bool CopyText(string text, bool tsukikage, bool keepStats)
     {
         ConfigManager configManager = ConfigManager.Instance;
 
@@ -420,7 +430,7 @@ internal sealed partial class MainWindow : IDisposable
             UpdatePosition();
 
             mergedText = previousText + subsequentText;
-            if (backlogActive)
+            if (backlogActive && keepStats)
             {
                 BacklogUtils.ReplaceLastBacklogText(mergedText);
                 if (configManager.DiscardIdenticalTextAllBacklog)
@@ -436,7 +446,7 @@ internal sealed partial class MainWindow : IDisposable
                 MainTextBox.Text = sanitizedNewText;
 
                 Debug.Assert(MainTextBox.Text.Length > 0);
-                if (backlogActive)
+                if (backlogActive && keepStats)
                 {
                     BacklogUtils.AddToBacklog(sanitizedNewText);
                     if (configManager.DiscardIdenticalTextAllBacklog)
@@ -445,7 +455,7 @@ internal sealed partial class MainWindow : IDisposable
                     }
                 }
             }
-            else
+            else if (keepStats)
             {
                 BacklogUtils.AddToBacklogShowAllBacklog(sanitizedNewText);
                 if (configManager.DiscardIdenticalTextAllBacklog)
@@ -483,7 +493,7 @@ internal sealed partial class MainWindow : IDisposable
             }
         }
 
-        if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || notMinimized)
+        if (keepStats && (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || notMinimized))
         {
             StatsUtils.StartTimeStatStopWatch();
             StatsUtils.SetIdleTimeTimerInterval(mergedText?.Length ?? sanitizedNewText.Length);
