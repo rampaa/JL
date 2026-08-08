@@ -267,7 +267,7 @@ internal static class EpwingYomichanLoader
             wordClasses = null;
         }
 
-        _ = jsonElements[4].TryGetInt32(out int popularityScore);
+        _ = jsonElements[4].TryGetDouble(out double popularityScore);
         //jsonElements[6].TryGetInt32(out int sequence);
         //string[] termTags = jsonElements[7].ToString();
 

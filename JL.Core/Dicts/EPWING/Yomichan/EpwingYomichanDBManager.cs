@@ -19,7 +19,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 33;
+    public const int Version = 34;
 
     public const int Size = 250000;
 
@@ -99,7 +99,7 @@ internal static class EpwingYomichanDBManager
                 {RowId} INTEGER NOT NULL PRIMARY KEY,
                 {PrimarySpelling} TEXT NOT NULL,
                 {Reading} TEXT,
-                {PopularityScore} INTEGER NOT NULL,
+                {PopularityScore} NUMERIC NOT NULL,
                 {Glossary} BLOB NOT NULL,
                 {PartOfSpeech} BLOB,
                 {GlossaryTags} BLOB,
@@ -161,7 +161,7 @@ internal static class EpwingYomichanDBManager
         SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
         SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
         SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
-        SqliteParameter popularityScoreParam = new($"@{PopularityScore}", SqliteType.Integer);
+        SqliteParameter popularityScoreParam = new($"@{PopularityScore}", SqliteType.Real);
         SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
         SqliteParameter partOfSpeechParam = new($"@{PartOfSpeech}", SqliteType.Blob);
         SqliteParameter glossaryTagsParam = new($"@{GlossaryTags}", SqliteType.Blob);
@@ -287,7 +287,7 @@ internal static class EpwingYomichanDBManager
         SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
         SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
         SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
-        SqliteParameter scoreParam = new($"@{PopularityScore}", SqliteType.Integer);
+        SqliteParameter scoreParam = new($"@{PopularityScore}", SqliteType.Real);
         SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
         SqliteParameter partOfSpeechParam = new($"@{PartOfSpeech}", SqliteType.Blob);
         SqliteParameter glossaryTagsParam = new($"@{GlossaryTags}", SqliteType.Blob);
@@ -643,7 +643,7 @@ internal static class EpwingYomichanDBManager
             ? dataReader.GetString(readingIndex)
             : null;
 
-        int popularityScore = dataReader.GetInt32((int)ColumnIndex.PopularityScore);
+        double popularityScore = dataReader.GetDouble((int)ColumnIndex.PopularityScore);
 
         string[] definitions = dataReader.GetValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
         string[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.PartOfSpeech);

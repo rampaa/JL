@@ -18,7 +18,7 @@ public sealed class LookupResult
         string? deconjugationProcess = null,
         int minDeconjugationProcessStepCount = 0,
         int entryId = 0,
-        int popularityScore = int.MinValue,
+        double popularityScore = double.MinValue,
         byte[]? pitchPositions = null,
         string[]? wordClasses = null,
         ImageInfo[]? imageInfos = null,
@@ -44,7 +44,7 @@ public sealed class LookupResult
     internal string[]? WordClasses { get; } = wordClasses;
 
     // Yomichan dictionaries
-    public int Score { get; } = popularityScore;
+    public double Score { get; } = popularityScore;
     public ImageInfo[]? ImageInfos { get; } = imageInfos;
 
     // JMdict, Nazeka EPWING
