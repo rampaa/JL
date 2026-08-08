@@ -44,7 +44,7 @@ public sealed class LookupResult
     internal string[]? WordClasses { get; } = wordClasses;
 
     // Yomichan dictionaries
-    public double Score { get; } = popularityScore;
+    public double PopularityScore { get; } = popularityScore;
     public ImageInfo[]? ImageInfos { get; } = imageInfos;
 
     // JMdict, Nazeka EPWING
@@ -247,7 +247,7 @@ public sealed class LookupResult
         }
 
         // 9. ThenByDescending Yomichan popularity score
-        int comResult = other.Score.CompareTo(Score);
+        int comResult = other.PopularityScore.CompareTo(PopularityScore);
         if (comResult is not 0)
         {
             return comResult;
