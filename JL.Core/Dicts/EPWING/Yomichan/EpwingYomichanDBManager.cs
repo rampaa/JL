@@ -99,7 +99,7 @@ internal static class EpwingYomichanDBManager
                 {RowId} INTEGER NOT NULL PRIMARY KEY,
                 {PrimarySpelling} TEXT NOT NULL,
                 {Reading} TEXT,
-                {PopularityScore} NUMERIC NOT NULL,
+                {PopularityScore} REAL NOT NULL,
                 {Glossary} BLOB NOT NULL,
                 {PartOfSpeech} BLOB,
                 {GlossaryTags} BLOB,
