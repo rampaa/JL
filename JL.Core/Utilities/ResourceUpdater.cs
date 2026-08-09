@@ -461,9 +461,9 @@ public static class ResourceUpdater
         return UpdateBuiltInDict(isUpdate, noPrompt, DictType.Kanjidic, nameof(DictType.Kanjidic), KanjidicLoader.Size, KanjidicDBManager.CreateDB, KanjidicDBManager.ImportFromDisk, KanjidicLoader.Load);
     }
 
-    private static async Task<bool> UpdateYomichanDict(bool isUpdate, bool noPrompt, DictType dictType, int size, DictUtils.CreateDB createDB, DictUtils.ImportFromDisk importFromDisk, DictUtils.Load load)
+    private static async Task<bool> UpdateYomichanDict(string dictName, bool isUpdate, bool noPrompt, int size, DictUtils.CreateDB createDB, DictUtils.ImportFromDisk importFromDisk, DictUtils.Load load)
     {
-        Dict dict = DictUtils.SingleDictTypeDicts[dictType];
+        Dict dict = DictUtils.Dicts[dictName];
         if (dict.Updating)
         {
             return false;
@@ -608,17 +608,17 @@ public static class ResourceUpdater
     {
         if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificNameYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificYomichan)
         {
-            return await UpdateYomichanDict(isUpdate, noPrompt, dict.Type, EpwingYomichanDBManager.Size, EpwingYomichanDBManager.CreateDB, EpwingYomichanDBManager.ImportFromDisk, EpwingYomichanLoader.Load).ConfigureAwait(false);
+            return await UpdateYomichanDict(dict.Name, isUpdate, noPrompt, EpwingYomichanDBManager.Size, EpwingYomichanDBManager.CreateDB, EpwingYomichanDBManager.ImportFromDisk, EpwingYomichanLoader.Load).ConfigureAwait(false);
         }
 
         if (dict.Type is DictType.NonspecificKanjiYomichan)
         {
-            return await UpdateYomichanDict(isUpdate, noPrompt, dict.Type, YomichanKanjiDBManager.Size, YomichanKanjiDBManager.CreateDB, YomichanKanjiDBManager.ImportFromDisk, YomichanKanjiLoader.Load).ConfigureAwait(false);
+            return await UpdateYomichanDict(dict.Name, isUpdate, noPrompt, YomichanKanjiDBManager.Size, YomichanKanjiDBManager.CreateDB, YomichanKanjiDBManager.ImportFromDisk, YomichanKanjiLoader.Load).ConfigureAwait(false);
         }
 
         if (dict.Type is DictType.PitchAccentYomichan)
         {
-            return await UpdateYomichanDict(isUpdate, noPrompt, dict.Type, YomichanPitchAccentDBManager.Size, YomichanPitchAccentDBManager.CreateDB, YomichanPitchAccentDBManager.ImportFromDisk, YomichanPitchAccentLoader.Load).ConfigureAwait(false);
+            return await UpdateYomichanDict(dict.Name, isUpdate, noPrompt, YomichanPitchAccentDBManager.Size, YomichanPitchAccentDBManager.CreateDB, YomichanPitchAccentDBManager.ImportFromDisk, YomichanPitchAccentLoader.Load).ConfigureAwait(false);
         }
 
         Debug.Assert(false);
