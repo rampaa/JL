@@ -46,10 +46,10 @@ public sealed class Stats
                 : Characters is 0
                     ? "0"
                     : "∞")}
-            Cards Mined: {CardsMined.ToString("N0", CultureInfo.InvariantCulture)}
-            Times Played Audio: {TimesPlayedAudio.ToString("N0", CultureInfo.InvariantCulture)}
-            Number of Lookups: {NumberOfLookups.ToString("N0", CultureInfo.InvariantCulture)}
-            Imoutos: {Imoutos.ToString("N0", CultureInfo.InvariantCulture)}
+            Cards mined: {CardsMined.ToString("N0", CultureInfo.InvariantCulture)}
+            Times played audio: {TimesPlayedAudio.ToString("N0", CultureInfo.InvariantCulture)}
+            Number of lookups: {NumberOfLookups.ToString("N0", CultureInfo.InvariantCulture)}
+            ???: {Imoutos.ToString("N0", CultureInfo.InvariantCulture)}
             """;
     }
 }
