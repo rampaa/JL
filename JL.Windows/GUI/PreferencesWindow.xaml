@@ -907,12 +907,34 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                        Cursor="Help"
-                                       ToolTip="Automatically saves the backlog to Backlogs folder before closing JL">
+                                       ToolTip="Automatically saves the backlog to Backlogs folder to disk">
                                 <DockPanel Margin="10,0,10,0">
-                                    <TextBlock HorizontalAlignment="Left" Text="Auto save backlog before closing JL"
+                                    <TextBlock HorizontalAlignment="Left" Text="Auto save backlog to disk"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Style="{StaticResource TextBlockDefault}" />
                                     <CheckBox x:Name="AutoSaveBacklogBeforeClosingCheckBox"
+                                              HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Include timestamps in saved backlogs"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}" />
+                                    <CheckBox x:Name="SaveBacklogTimestampsCheckBox"
+                                              HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                       Cursor="Help"
+                                       ToolTip="Automatically saves the session statistics to the Backlogs folder">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Auto save session stats to disk"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}" />
+                                    <CheckBox x:Name="AutoSaveSessionStatsBeforeClosingCheckBox"
                                               HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>

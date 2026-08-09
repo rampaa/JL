@@ -15,6 +15,7 @@ using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Core.Utilities.ObjectPool;
+using JL.Windows.Backlog;
 using JL.Windows.Config;
 using JL.Windows.GUI.Info;
 using JL.Windows.GUI.Profile;
@@ -695,7 +696,7 @@ internal sealed partial class PreferencesWindow
         _ = infoWindow.ShowDialog();
     }
 
-    private void ProfileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void ProfileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         string selectedProfileName = (string)((ComboBox)sender).SelectedItem;
         if (selectedProfileName == ProfileUtils.CurrentProfileName)
@@ -706,8 +707,14 @@ internal sealed partial class PreferencesWindow
         using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
+
+            BacklogUtils.StopBacklogTimer();
+            await BacklogUtils.WriteBacklog().ConfigureAwait(true);
+            BacklogUtils.ClearBacklog();
+
             ProfileUtils.CurrentProfileName = selectedProfileName;
             ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
+            ProfileUtils.CurrentProfileSessionStartTime = DateTime.Now;
             ProfileDBUtils.UpdateCurrentProfile(connection);
             StatsUtils.ProfileLifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.CurrentProfileId);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);

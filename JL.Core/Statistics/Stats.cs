@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 
@@ -31,5 +32,24 @@ public sealed class Stats
         Imoutos = 0;
         NumberOfLookups = 0;
         TermLookupCountDict.Clear();
+    }
+
+    public override string ToString()
+    {
+        return
+            $"""
+            Characters: {Characters.ToString("N0", CultureInfo.InvariantCulture)}
+            Lines: {Lines.ToString("N0", CultureInfo.InvariantCulture)}
+            Time: {Time.ToString(@"d\.hh\:mm\:ss", CultureInfo.InvariantCulture)}
+            Characters per minute: {(Time.TotalMinutes > 0
+                ? Math.Round(Characters / Time.TotalMinutes).ToString("N0", CultureInfo.InvariantCulture)
+                : Characters is 0
+                    ? "0"
+                    : "∞")}
+            Cards Mined: {CardsMined.ToString("N0", CultureInfo.InvariantCulture)}
+            Times Played Audio: {TimesPlayedAudio.ToString("N0", CultureInfo.InvariantCulture)}
+            Number of Lookups: {NumberOfLookups.ToString("N0", CultureInfo.InvariantCulture)}
+            Imoutos: {Imoutos.ToString("N0", CultureInfo.InvariantCulture)}
+            """;
     }
 }

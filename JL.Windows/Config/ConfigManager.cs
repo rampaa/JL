@@ -11,6 +11,7 @@ using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Windows.Backlog;
 using JL.Windows.GUI;
 using JL.Windows.GUI.CustomControls;
 using JL.Windows.GUI.Popup;
@@ -70,6 +71,8 @@ internal sealed class ConfigManager
     public int MaxBacklogCapacity { get; private set; } = -1;
     public bool AlwaysShowBacklog { get; private set; } // = false;
     public bool AutoSaveBacklogBeforeClosing { get; private set; } // = false;
+    public bool SaveBacklogTimestamps { get; private set; } // = false;
+    public bool AutoSaveSessionStatsBeforeClosing { get; private set; } // = false;
     public bool TextToSpeechOnTextChange { get; private set; } // = false;
     public bool HidePopupsOnTextChange { get; private set; } = true;
     public bool AlwaysShowMainTextBoxCaret { get; set; } // = false;
@@ -544,11 +547,19 @@ internal sealed class ConfigManager
         AlwaysShowBacklog = alwaysShowBacklog;
 
         AutoSaveBacklogBeforeClosing = ConfigDBManager.GetValueFromConfig(connection, configs, AutoSaveBacklogBeforeClosing, nameof(AutoSaveBacklogBeforeClosing));
+        AutoSaveSessionStatsBeforeClosing = ConfigDBManager.GetValueFromConfig(connection, configs, AutoSaveSessionStatsBeforeClosing, nameof(AutoSaveSessionStatsBeforeClosing));
+        if (AutoSaveBacklogBeforeClosing || AutoSaveSessionStatsBeforeClosing)
+        {
+            BacklogUtils.InitializeOrRestartBacklogTimer();
+        }
+        else
+        {
+            BacklogUtils.StopBacklogTimer();
+        }
 
+        SaveBacklogTimestamps = ConfigDBManager.GetValueFromConfig(connection, configs, SaveBacklogTimestamps, nameof(SaveBacklogTimestamps));
         TextToSpeechOnTextChange = ConfigDBManager.GetValueFromConfig(connection, configs, TextToSpeechOnTextChange, nameof(TextToSpeechOnTextChange));
-
         HidePopupsOnTextChange = ConfigDBManager.GetValueFromConfig(connection, configs, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange));
-
         DiscardIdenticalText = ConfigDBManager.GetValueFromConfig(connection, configs, DiscardIdenticalText, nameof(DiscardIdenticalText));
 
         bool oldDiscardIdenticalTextAllBacklogValue = DiscardIdenticalTextAllBacklog;
@@ -1265,6 +1276,8 @@ internal sealed class ConfigManager
         preferenceWindow.MaxBacklogCapacityNumericUpDown.Value = MaxBacklogCapacity;
         preferenceWindow.AlwaysShowBacklogCheckBox.IsChecked = AlwaysShowBacklog;
         preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
+        preferenceWindow.AutoSaveSessionStatsBeforeClosingCheckBox.IsChecked = AutoSaveSessionStatsBeforeClosing;
+        preferenceWindow.SaveBacklogTimestampsCheckBox.IsChecked = SaveBacklogTimestamps;
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
         preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
         preferenceWindow.DiscardIdenticalTextCheckBox.IsChecked = DiscardIdenticalText;
@@ -1615,6 +1628,12 @@ internal sealed class ConfigManager
 
         ConfigDBManager.UpdateSetting(connection, nameof(AutoSaveBacklogBeforeClosing),
             preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked.ToString());
+
+        ConfigDBManager.UpdateSetting(connection, nameof(AutoSaveSessionStatsBeforeClosing),
+            preferenceWindow.AutoSaveSessionStatsBeforeClosingCheckBox.IsChecked.ToString());
+
+        ConfigDBManager.UpdateSetting(connection, nameof(SaveBacklogTimestamps),
+            preferenceWindow.SaveBacklogTimestampsCheckBox.IsChecked.ToString());
 
         ConfigDBManager.UpdateSetting(connection, nameof(TextToSpeechOnTextChange),
             preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked.ToString());

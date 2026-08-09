@@ -231,5 +231,6 @@ public static class ProfileDBUtils
     {
         ProfileUtils.CurrentProfileId = GetCurrentProfileIdFromDB(connection, ProfileUtils.GlobalProfileId);
         ProfileUtils.CurrentProfileName = GetProfileName(connection, ProfileUtils.CurrentProfileId);
+        ProfileUtils.CurrentProfileSessionStartTime = DateTime.Now;
     }
 }

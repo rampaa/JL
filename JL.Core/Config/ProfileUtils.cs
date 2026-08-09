@@ -14,6 +14,7 @@ public static class ProfileUtils
     public static readonly string ProfileFolderPath = Path.Join(AppInfo.ApplicationPath, "Profiles");
     public static int CurrentProfileId { get; set; } = DefaultProfileId;
     public static string CurrentProfileName { get; set; } = DefaultProfileName;
+    public static DateTime CurrentProfileSessionStartTime { get; set; } = DateTime.Now;
 
     public static string GetProfileCustomNameDictPath(string profileName)
     {

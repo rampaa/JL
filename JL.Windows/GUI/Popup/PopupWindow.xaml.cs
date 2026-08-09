@@ -17,6 +17,7 @@ using JL.Core.Mining;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Bool;
+using JL.Windows.Backlog;
 using JL.Windows.Config;
 using JL.Windows.Interop;
 using JL.Windows.SpeechSynthesis;
