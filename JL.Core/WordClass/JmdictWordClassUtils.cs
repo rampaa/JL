@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -186,8 +187,10 @@ public static class JmdictWordClassUtils
                 }
 
                 JmdictWordClass record = new(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings);
-                if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? results))
+                ref List<JmdictWordClass>? results = ref CollectionsMarshal.GetValueRefOrAddDefault(jmdictWordClassDictionary, key, out bool exists);
+                if (exists)
                 {
+                    Debug.Assert(results is not null);
                     if (!results.AsReadOnlySpan().Contains(record))
                     {
                         results.Add(record);
@@ -195,7 +198,7 @@ public static class JmdictWordClassUtils
                 }
                 else
                 {
-                    jmdictWordClassDictionary[key] = [record];
+                    results = [record];
                 }
             }
         }
@@ -360,8 +363,10 @@ public static class JmdictWordClassUtils
             }
 
             JmdictWordClass record = new(data.PrimarySpelling, data.WordClasses, data.Readings);
-            if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? results))
+            ref List<JmdictWordClass>? results = ref CollectionsMarshal.GetValueRefOrAddDefault(jmdictWordClassDictionary, key, out bool exists);
+            if (exists)
             {
+                Debug.Assert(results is not null);
                 if (!results.AsReadOnlySpan().Contains(record))
                 {
                     results.Add(record);
@@ -369,7 +374,7 @@ public static class JmdictWordClassUtils
             }
             else
             {
-                jmdictWordClassDictionary[key] = [record];
+                results = [record];
             }
         }
     }

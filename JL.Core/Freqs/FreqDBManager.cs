@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using JL.Core.Freqs.Options;
@@ -199,13 +200,15 @@ internal static class FreqDBManager
         {
             FrequencyRecord record = GetRecord(dataReader);
             string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
-            if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
+            ref List<FrequencyRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+            if (exists)
             {
+                Debug.Assert(result is not null);
                 result.Add(record);
             }
             else
             {
-                results[searchKey] = [record];
+                result = [record];
             }
         }
 

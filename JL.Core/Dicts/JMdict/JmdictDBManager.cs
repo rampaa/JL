@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
@@ -333,13 +334,15 @@ internal static class JmdictDBManager
                 {
                     foreach ((string key, JmdictRecord record) in recordDictionary)
                     {
-                        if (recordsToKeys.TryGetValue(record, out List<string>? keys))
+                        ref List<string>? keys = ref CollectionsMarshal.GetValueRefOrAddDefault(recordsToKeys, record, out bool exists);
+                        if (exists)
                         {
+                            Debug.Assert(keys is not null);
                             keys.Add(key);
                         }
                         else
                         {
-                            recordsToKeys[record] = [key];
+                            keys = [key];
                         }
                     }
 
@@ -562,13 +565,15 @@ internal static class JmdictDBManager
             for (int i = 0; i < recordsCount; i++)
             {
                 JmdictRecord record = (JmdictRecord)records[i];
-                if (recordToKeysDict.TryGetValue(record, out List<string>? keys))
+                ref List<string>? keys = ref CollectionsMarshal.GetValueRefOrAddDefault(recordToKeysDict, record, out bool exists);
+                if (exists)
                 {
+                    Debug.Assert(keys is not null);
                     keys.Add(key);
                 }
                 else
                 {
-                    recordToKeysDict[record] = [key];
+                    keys = [key];
                 }
             }
         }
@@ -730,13 +735,15 @@ internal static class JmdictDBManager
         {
             JmdictRecord record = GetRecord(dataReader);
             string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+            if (exists)
             {
+                Debug.Assert(result is not null);
                 result.Add(record);
             }
             else
             {
-                results[searchKey] = [record];
+                result = [record];
             }
         }
 

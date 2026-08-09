@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
@@ -412,13 +413,15 @@ internal static class JmnedictDBManager
         {
             JmnedictRecord record = GetRecord(dataReader);
             string searchKey = dataReader.GetString((int)ColumnIndex.PrimarySpellingInHiragana);
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+            if (exists)
             {
+                Debug.Assert(result is not null);
                 result.Add(record);
             }
             else
             {
-                results[searchKey] = [record];
+                result = [record];
             }
         }
 

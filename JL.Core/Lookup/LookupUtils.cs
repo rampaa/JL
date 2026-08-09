@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using JL.Core.Config;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -703,8 +704,7 @@ public static class LookupUtils
 
         if (wordDict.TryGetValue(textInHiragana, out IList<IDictRecord>? tempResult))
         {
-            _ = results.TryAdd(textInHiragana,
-                new IntermediaryResult(matchedText, dict, tempResult));
+            _ = results.TryAdd(textInHiragana, new IntermediaryResult(matchedText, dict, tempResult));
         }
 
         if (deconjugationResults is not null)
@@ -718,8 +718,10 @@ public static class LookupUtils
                     List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
                     if (resultsList.Count > 0)
                     {
-                        if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? result))
+                        ref IntermediaryResult? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, deconjugationResult.Text, out bool exists);
+                        if (exists)
                         {
+                            Debug.Assert(result is not null);
                             if (result.MatchedText == deconjugationResult.OriginalText)
                             {
                                 foreach (IDictRecord record in resultsList)
@@ -763,12 +765,11 @@ public static class LookupUtils
                                 processNodes.Add([deconjugationResult.Process]);
                             }
 
-                            results.Add(deconjugationResult.Text,
-                                new IntermediaryResult(matchedText,
-                                    dict,
-                                    resultsList,
-                                    deconjugationResult.Text,
-                                    processNodes));
+                            result = new IntermediaryResult(matchedText,
+                                dict,
+                                resultsList,
+                                deconjugationResult.Text,
+                                processNodes);
                         }
                     }
                 }
@@ -967,8 +968,7 @@ public static class LookupUtils
             string textInHiragana = textInHiraganaList[i];
             if (nameDict.TryGetValue(textInHiragana, out IList<IDictRecord>? result))
             {
-                results.Add(textInHiragana,
-                    new IntermediaryResult(textList[i], dict, result));
+                results.Add(textInHiragana, new IntermediaryResult(textList[i], dict, result));
             }
         }
     }
