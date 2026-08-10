@@ -617,7 +617,7 @@ public static class DictUtils
                     case DictType.JMdict:
                         LoadDict(dict, JmdictLoader.Load, JmdictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             JmdictDBManager.CreateDB, JmdictDBManager.ImportFromDisk, JmdictDBManager.ImportFromMemory,
-                            null, tasks, dictsToBeRemoved, JmdictLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
+                            JmdictDBManager.LoadFromDB, tasks, dictsToBeRemoved, JmdictLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
