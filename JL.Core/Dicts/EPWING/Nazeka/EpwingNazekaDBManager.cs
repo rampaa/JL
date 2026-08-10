@@ -401,7 +401,7 @@ internal static class EpwingNazekaDBManager
                             }
                         }
 
-                        if (transactionRecordCount > 20000)
+                        if (transactionRecordCount > DBUtils.TransactionBatchSize)
                         {
 #pragma warning disable CA1849 // Call async methods when in an async method
                             transaction.Commit();
@@ -456,7 +456,7 @@ internal static class EpwingNazekaDBManager
                         ++rowId;
                         ++transactionRecordCount;
 
-                        if (transactionRecordCount > 20000)
+                        if (transactionRecordCount > DBUtils.TransactionBatchSize)
                         {
 #pragma warning disable CA1849 // Call async methods when in an async method
                             transaction.Commit();

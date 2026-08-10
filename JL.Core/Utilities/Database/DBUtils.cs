@@ -11,6 +11,8 @@ namespace JL.Core.Utilities.Database;
 
 public static class DBUtils
 {
+    internal const int TransactionBatchSize = 200_000;
+
     internal static readonly string s_freqDBFolderPath = Path.Join(AppInfo.ResourcesPath, "Frequency Databases");
     internal static readonly string s_dictDBFolderPath = Path.Join(AppInfo.ResourcesPath, "Dictionary Databases");
 
@@ -255,14 +257,14 @@ public static class DBUtils
     internal static void SetJournalModeToWal(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA synchronous = 0; PRAGMA journal_mode = WAL;";
+        command.CommandText = "PRAGMA synchronous = 0; PRAGMA journal_mode = WAL; PRAGMA cache_size = -200000;";
         _ = command.ExecuteNonQuery();
     }
 
     internal static void SetJournalModeToDelete(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1;";
+        command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1; PRAGMA cache_size = -2000;";
         _ = command.ExecuteNonQuery();
     }
 

@@ -428,7 +428,7 @@ internal static class JmdictDBManager
 
                         transactionRecordCount += uniqueKeys.Count;
                         uniqueKeys.Clear();
-                        if (transactionRecordCount > 20000)
+                        if (transactionRecordCount > DBUtils.TransactionBatchSize)
                         {
 #pragma warning disable CA1849 // Call async methods when in an async method
                             transaction.Commit();
