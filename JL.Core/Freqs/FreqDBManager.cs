@@ -111,7 +111,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.SetSynchronousModeToNormal(connection);
+        DBUtils.ConfigureForBulkWrite(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
@@ -164,6 +164,8 @@ internal static class FreqDBManager
         }
 
         transaction.Commit();
+
+        DBUtils.ConfigureForRead(connection);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
@@ -367,7 +369,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.SetJournalModeToWal(connection);
+        DBUtils.ConfigureForBulkWrite(connection);
 
         // ReSharper disable once UseAwaitUsing
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
@@ -673,8 +675,7 @@ internal static class FreqDBManager
 
         if (rowId > 1)
         {
-            SqliteConnection.ClearAllPools();
-            DBUtils.SetJournalModeToDelete(connection);
+            DBUtils.ConfigureForRead(connection);
 
             // ReSharper disable once UseAwaitUsing
             using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -741,7 +742,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.SetJournalModeToWal(connection);
+        DBUtils.ConfigureForBulkWrite(connection);
 
         // ReSharper disable once UseAwaitUsing
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
@@ -967,8 +968,7 @@ internal static class FreqDBManager
 
         if (rowId > 1)
         {
-            SqliteConnection.ClearAllPools();
-            DBUtils.SetJournalModeToDelete(connection);
+            DBUtils.ConfigureForRead(connection);
 
             // ReSharper disable once UseAwaitUsing
             using SqliteCommand analyzeCommand = connection.CreateCommand();

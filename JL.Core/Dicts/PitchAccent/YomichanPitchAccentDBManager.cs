@@ -144,7 +144,7 @@ internal static class YomichanPitchAccentDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.SetJournalModeToWal(connection);
+        DBUtils.ConfigureForBulkWrite(connection);
 
         // ReSharper disable once UseAwaitUsing
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
@@ -319,8 +319,7 @@ internal static class YomichanPitchAccentDBManager
         {
             RemoveDuplicateRecords(connection);
 
-            SqliteConnection.ClearAllPools();
-            DBUtils.SetJournalModeToDelete(connection);
+            DBUtils.ConfigureForRead(connection);
 
             // ReSharper disable once UseAwaitUsing
             using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -402,7 +401,7 @@ internal static class YomichanPitchAccentDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.SetSynchronousModeToNormal(connection);
+        DBUtils.ConfigureForBulkWrite(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         using SqliteCommand insertRecordCommand = connection.CreateCommand();
@@ -456,6 +455,8 @@ internal static class YomichanPitchAccentDBManager
         }
 
         transaction.Commit();
+
+        DBUtils.ConfigureForRead(connection);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";

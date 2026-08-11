@@ -247,25 +247,36 @@ public static class DBUtils
         return reader.GetBoolean(0);
     }
 
-    internal static void SetSynchronousModeToNormal(SqliteConnection connection)
+    internal static void ConfigureForBulkWrite(SqliteConnection connection)
     {
+        SqliteConnection.ClearAllPools();
+
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA synchronous = 1;";
+        command.CommandText = "PRAGMA journal_mode = WAL; PRAGMA synchronous = 0; PRAGMA foreign_keys = OFF; PRAGMA cache_size = -200000;";
         _ = command.ExecuteNonQuery();
     }
 
-    internal static void SetJournalModeToWal(SqliteConnection connection)
+    internal static void ConfigureForRead(SqliteConnection connection)
     {
+        SqliteConnection.ClearAllPools();
+
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA synchronous = 0; PRAGMA journal_mode = WAL; PRAGMA cache_size = -200000;";
+        command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1; PRAGMA foreign_keys = ON; PRAGMA cache_size = -2000";
         _ = command.ExecuteNonQuery();
+
+        ValidateForeignKeys(connection);
     }
 
-    internal static void SetJournalModeToDelete(SqliteConnection connection)
+    private static void ValidateForeignKeys(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1; PRAGMA cache_size = -2000;";
-        _ = command.ExecuteNonQuery();
+        command.CommandText = "PRAGMA foreign_key_check;";
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        if (reader.Read())
+        {
+            throw new InvalidOperationException($"Foreign key violation: table={reader.GetString(0)}, parent={reader.GetString(2)}, fk_index={reader.GetInt64(3)}");
+        }
     }
 
     //internal static bool IsDBCorrupt(SqliteConnection connection)
