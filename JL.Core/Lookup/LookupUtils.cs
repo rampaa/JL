@@ -525,7 +525,8 @@ public static class LookupUtils
             string textInHiragana = JapaneseUtils.NormalizeText(currentText);
             textInHiraganaList.Add(textInHiragana);
 
-            if (i != textLength - 1 || textInHiragana[0] is not JapaneseUtils.NormalizedFuseji)
+            bool currentTextLengthAcceptable = textInHiragana.Length < 30;
+            if (currentTextLengthAcceptable && (i != textLength - 1 || textInHiragana[0] is not JapaneseUtils.NormalizedFuseji))
             {
                 List<Form> deconjugationResults = Deconjugator.Deconjugate(textInHiragana);
                 estimatedDeconjugatedTextCapacity += deconjugationResults.Count;
@@ -536,7 +537,7 @@ public static class LookupUtils
                 deconjugationResultsList.Add([]);
             }
 
-            if (doesNotStartWithLongVowelMark)
+            if (currentTextLengthAcceptable && doesNotStartWithLongVowelMark)
             {
                 int longVowelMarkCount = 0;
                 if (countLongVowelMark)
