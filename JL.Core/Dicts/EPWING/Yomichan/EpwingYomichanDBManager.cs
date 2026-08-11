@@ -470,8 +470,8 @@ internal static class EpwingYomichanDBManager
 
         if (rowId > 1)
         {
+            DBUtils.EnableForeignKeySupport(connection);
             RemoveDuplicateRecords(connection);
-
             DBUtils.ConfigureForRead(connection);
 
             // ReSharper disable once UseAwaitUsing

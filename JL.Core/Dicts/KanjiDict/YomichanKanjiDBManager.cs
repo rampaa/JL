@@ -199,6 +199,7 @@ internal static class YomichanKanjiDBManager
 
         if (rowId > 1)
         {
+            DBUtils.EnableForeignKeySupport(connection);
             RemoveDuplicateRecords(connection);
 
             // ReSharper disable once UseAwaitUsing

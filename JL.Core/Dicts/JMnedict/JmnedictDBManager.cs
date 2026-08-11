@@ -235,7 +235,6 @@ internal static class JmnedictDBManager
                 _ = createIndexCommand.ExecuteNonQuery();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-                SqliteConnection.ClearAllPools();
                 DBUtils.ConfigureForRead(connection);
 
                 // ReSharper disable once UseAwaitUsing
