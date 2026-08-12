@@ -336,10 +336,12 @@ internal static class YomichanPitchAccentDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
             dict.Size = GetDistinctSearchKeyCount(connection);
+            dict.MaxSearchKeyLength = GetMaxSearchKeyLength(connection);
         }
         else
         {
             dict.Size = 0;
+            dict.MaxSearchKeyLength = 0;
         }
     }
 
@@ -366,6 +368,20 @@ internal static class YomichanPitchAccentDBManager
         command.CommandText =
             $"""
             SELECT COUNT(DISTINCT {SearchKey})
+            FROM {RecordSearchKey};
+            """;
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        _ = reader.Read();
+        return reader.GetInt32(0);
+    }
+
+    public static int GetMaxSearchKeyLength(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            SELECT MAX(LENGTH({SearchKey}))
             FROM {RecordSearchKey};
             """;
 
@@ -537,6 +553,9 @@ internal static class YomichanPitchAccentDBManager
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
+
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
         while (dataReader.Read())
         {
             PitchAccentRecord record = GetRecord(dataReader);
@@ -545,13 +564,20 @@ internal static class YomichanPitchAccentDBManager
 
             foreach (string searchKey in searchKeys)
             {
-                if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
+                if (exists)
                 {
+                    Debug.Assert(result is not null);
                     result.Add(record);
                 }
                 else
                 {
-                    dict.Contents[searchKey] = [record];
+                    result = [record];
+                }
+
+                if (searchKey.Length > dict.MaxSearchKeyLength)
+                {
+                    dict.MaxSearchKeyLength = searchKey.Length;
                 }
             }
         }

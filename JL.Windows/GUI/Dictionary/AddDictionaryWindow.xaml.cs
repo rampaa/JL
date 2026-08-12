@@ -113,10 +113,15 @@ internal sealed partial class AddDictionaryWindow
         string? revision = (string?)NameTextBox.Tag;
 
         DictOptions options = _dictOptionsControl.GetDictOptions(type, autoUpdatable);
-        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options, autoUpdatable: autoUpdatable, indexUrl, revision);
+
+        int maxSearchKeyLength = DictUtils.KanjiDictTypes.Contains(type)
+            ? 1
+            : 0;
+
+        Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options, maxSearchKeyLength, autoUpdatable: autoUpdatable, indexUrl, revision);
         DictUtils.Dicts.Add(name, dict);
 
-        if (dict.Type is DictType.PitchAccentYomichan)
+        if (type is DictType.PitchAccentYomichan)
         {
             DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan] = dict;
         }

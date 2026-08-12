@@ -132,13 +132,13 @@ internal static class EpwingNazekaLoader
                         }
 
                         EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions, imageInfo);
-                        if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, nazekaEpwingDict) && nonKanjiDict)
+                        if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dict) && nonKanjiDict)
                         {
                             if (generateFusejiVariants)
                             {
                                 foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
-                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, nazekaEpwingDict);
+                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                 }
                             }
 
@@ -147,13 +147,13 @@ internal static class EpwingNazekaLoader
                                 string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
                                 if (primarySpellingInHiragana != readingInHiragana)
                                 {
-                                    if (DictUtils.AddRecordToDictionary(readingInHiragana, record, nazekaEpwingDict))
+                                    if (DictUtils.AddRecordToDictionary(readingInHiragana, record, dict))
                                     {
                                         if (generateFusejiVariants)
                                         {
                                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                             {
-                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, nazekaEpwingDict);
+                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                             }
                                         }
 
@@ -161,13 +161,13 @@ internal static class EpwingNazekaLoader
                                         {
                                             foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
                                             {
-                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, nazekaEpwingDict))
+                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, dict))
                                                 {
                                                     if (generateFusejiVariants)
                                                     {
                                                         foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                         {
-                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, nazekaEpwingDict);
+                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                                         }
                                                     }
                                                 }
@@ -193,7 +193,7 @@ internal static class EpwingNazekaLoader
 
                             if (primarySpellingInHiragana != alternativeSpellingInHiragana)
                             {
-                                _ = DictUtils.AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imageInfo), nazekaEpwingDict);
+                                _ = DictUtils.AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imageInfo), dict);
                             }
                         }
                     }
@@ -211,7 +211,7 @@ internal static class EpwingNazekaLoader
                         }
 
                         EpwingNazekaRecord record = new(reading, null, null, definitions, imageInfo);
-                        _ = DictUtils.AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.NormalizeText(reading).GetPooledString() : reading, record, nazekaEpwingDict);
+                        _ = DictUtils.AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.NormalizeText(reading).GetPooledString() : reading, record, dict);
                     }
                 }
             }

@@ -34,6 +34,9 @@ public static class JmdictWordClassUtils
         }
 
         IList<JmdictWordClass>[] jmdictWordClasses = DictUtils.WordClassDictionary.Values.ToArray();
+
+        Debug.Assert(DictUtils.WordClassDictionary is Dictionary<string, IList<JmdictWordClass>>);
+        Dictionary<string, IList<JmdictWordClass>> dictionary = (Dictionary<string, IList<JmdictWordClass>>)DictUtils.WordClassDictionary;
         foreach (IList<JmdictWordClass> jmdictWordClassList in jmdictWordClasses)
         {
             int jmdictWordClassListCount = jmdictWordClassList.Count;
@@ -49,13 +52,15 @@ public static class JmdictWordClassUtils
                     foreach (string reading in jmdictWordClass.Readings)
                     {
                         string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                        if (DictUtils.WordClassDictionary.TryGetValue(readingInHiragana, out IList<JmdictWordClass>? result))
+                        ref IList<JmdictWordClass>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, readingInHiragana, out bool exists);
+                        if (exists)
                         {
+                            Debug.Assert(result is not null);
                             result.Add(jmdictWordClass);
                         }
                         else
                         {
-                            DictUtils.WordClassDictionary[readingInHiragana] = [jmdictWordClass];
+                            result = [jmdictWordClass];
                         }
                     }
                 }

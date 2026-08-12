@@ -56,6 +56,8 @@ internal static class FrequencyNazekaLoader
             Debug.Assert(frequencyJson is not null);
         }
 
+        Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
+        Dictionary<string, IList<FrequencyRecord>> dictionary = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
         foreach ((string reading, JsonElement[][] value) in frequencyJson)
         {
             foreach (JsonElement[] elementList in value)
@@ -71,11 +73,11 @@ internal static class FrequencyNazekaLoader
                 }
 
                 FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
-                if (FreqUtils.AddOrUpdate(freq.Contents, reading, frequencyRecordWithExactSpelling) && generateFusejiVariants)
+                if (FreqUtils.AddOrUpdate(dictionary, reading, frequencyRecordWithExactSpelling) && generateFusejiVariants)
                 {
                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                     {
-                        _ = FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithExactSpelling);
+                        _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithExactSpelling);
                     }
                 }
 
@@ -83,13 +85,13 @@ internal static class FrequencyNazekaLoader
                 if (exactSpellingInHiragana != reading)
                 {
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
-                    if (FreqUtils.AddOrUpdate(freq.Contents, exactSpellingInHiragana, frequencyRecordWithReading))
+                    if (FreqUtils.AddOrUpdate(dictionary, exactSpellingInHiragana, frequencyRecordWithReading))
                     {
                         if (generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                _ = FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithReading);
+                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading);
                             }
                         }
 
@@ -97,11 +99,11 @@ internal static class FrequencyNazekaLoader
                         {
                             foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(exactSpellingInHiragana, reading))
                             {
-                                if (FreqUtils.AddOrUpdate(freq.Contents, mazegakiVariant, frequencyRecordWithReading) && generateFusejiVariants)
+                                if (FreqUtils.AddOrUpdate(dictionary, mazegakiVariant, frequencyRecordWithReading) && generateFusejiVariants)
                                 {
                                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                     {
-                                        _ = FreqUtils.AddOrUpdate(freq.Contents, fusejiVariant, frequencyRecordWithReading);
+                                        _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading);
                                     }
                                 }
                             }

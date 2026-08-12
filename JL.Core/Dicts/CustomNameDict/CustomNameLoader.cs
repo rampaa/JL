@@ -58,14 +58,25 @@ public static class CustomNameLoader
                     reading = null;
                 }
 
-                AddToDictionary(spelling, reading, nameType, extraInfo, imageInfo, customNameDictionary);
+                AddToDictionary(dict, spelling, reading, nameType, extraInfo, imageInfo);
             }
         }
     }
 
-    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, ImageInfo? imageInfo, IDictionary<string, IList<IDictRecord>> customNameDictionary)
+    public static void AddToDictionary(Dict dict, string spelling, string? reading, string nameType, string? extraInfo, ImageInfo? imageInfo)
     {
         CustomNameRecord record = new(spelling, reading, nameType, extraInfo, imageInfo);
-        _ = DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(spelling), record, customNameDictionary);
+        string normalizedSpelling = JapaneseUtils.NormalizeText(spelling);
+        if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, dict))
+        {
+            if (normalizedSpelling.Length > dict.MaxSearchKeyLength)
+            {
+                dict.MaxSearchKeyLength = normalizedSpelling.Length;
+                if (DictUtils.MaxSearchKeyLength > normalizedSpelling.Length)
+                {
+                    DictUtils.MaxSearchKeyLength = normalizedSpelling.Length;
+                }
+            }
+        }
     }
 }

@@ -386,9 +386,13 @@ internal sealed partial class PopupWindow : IDisposable
         }
 
         ReadOnlySpan<char> searchSpan = textBoxText;
-        if (textBoxText.Length - charPosition > configManager.MaxSearchLength)
+        int maxSearchLength = configManager.MaxSearchLength > DictUtils.MaxSearchKeyLength && DictUtils.MaxSearchKeyLength > 0
+            ? DictUtils.MaxSearchKeyLength
+            : configManager.MaxSearchLength;
+
+        if (textBoxText.Length - charPosition > maxSearchLength)
         {
-            int newLength = charPosition + configManager.MaxSearchLength;
+            int newLength = charPosition + maxSearchLength;
             if (char.IsLowSurrogate(textBoxText[newLength - 1]))
             {
                 --newLength;

@@ -245,7 +245,7 @@ internal sealed partial class EditDictionaryWindow
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);
-            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, options, _dict.AutoUpdatable, _dict.Url, _dict.Revision));
+            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, options, _dict.MaxSearchKeyLength, _dict.AutoUpdatable, _dict.Url, _dict.Revision));
         }
 
         Close();

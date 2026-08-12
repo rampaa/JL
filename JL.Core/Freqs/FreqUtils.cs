@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Freqs.FrequencyNazeka;
@@ -562,26 +563,26 @@ public static class FreqUtils
         }
     }
 
-    internal static bool AddOrUpdate(IDictionary<string, IList<FrequencyRecord>> contents, string key, FrequencyRecord record)
+    internal static bool AddOrUpdate(Dictionary<string, IList<FrequencyRecord>> dictionary, string key, FrequencyRecord record)
     {
-        if (contents.TryGetValue(key, out IList<FrequencyRecord>? freqResult))
+        ref IList<FrequencyRecord>? freqResult = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        if (!exists)
         {
-            int index = freqResult.IndexOf(record);
-            if (index < 0)
-            {
-                freqResult.Add(record);
-                return true;
-            }
-
-            if (freqResult[index].Frequency > record.Frequency)
-            {
-                freqResult[index] = record;
-                return true;
-            }
+            freqResult = [record];
+            return true;
         }
-        else
+
+        Debug.Assert(freqResult is not null);
+        int index = freqResult.IndexOf(record);
+        if (index < 0)
         {
-            contents[key] = [record];
+            freqResult.Add(record);
+            return true;
+        }
+
+        if (freqResult[index].Frequency > record.Frequency)
+        {
+            freqResult[index] = record;
             return true;
         }
 

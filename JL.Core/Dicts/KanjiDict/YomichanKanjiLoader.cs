@@ -43,7 +43,7 @@ internal static class YomichanKanjiLoader
                     //    continue;
                     //}
 
-                    _ = DictUtils.AddRecordToDictionary(kanji, yomichanKanjiRecord, dict.Contents);
+                    _ = DictUtils.AddRecordToDictionary(kanji, yomichanKanjiRecord, dict);
                 }
             }
         }

@@ -213,7 +213,7 @@ internal sealed partial class AddWordWindow
         Dict dict = DictUtils.SingleDictTypeDicts[dictType];
         if (dict.Active)
         {
-            CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);
+            CustomWordLoader.AddToDictionary(dict, spellings, readings, definitions, rawPartOfSpeech, wordClasses);
         }
 
         PopupWindowUtils.HidePopups(0);

@@ -61,7 +61,6 @@ internal static class EpwingYomichanLoader
             maxConsecutiveFuseji = 0;
         }
 
-        IDictionary<string, IList<IDictRecord>> dictContents = dict.Contents;
         foreach (string jsonFile in jsonFiles)
         {
             FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
@@ -78,7 +77,7 @@ internal static class EpwingYomichanLoader
                             ? JapaneseUtils.NormalizeText(record.PrimarySpelling).GetPooledString()
                             : record.PrimarySpelling.GetPooledString();
 
-                        if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dictContents))
+                        if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dict))
                         {
                             if (nonKanjiDict)
                             {
@@ -86,7 +85,7 @@ internal static class EpwingYomichanLoader
                                 {
                                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                     {
-                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                     }
                                 }
 
@@ -95,13 +94,13 @@ internal static class EpwingYomichanLoader
                                     string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
                                     if (primarySpellingInHiragana != readingInHiragana)
                                     {
-                                        if (DictUtils.AddRecordToDictionary(readingInHiragana, record, dictContents))
+                                        if (DictUtils.AddRecordToDictionary(readingInHiragana, record, dict))
                                         {
                                             if (generateFusejiVariants)
                                             {
                                                 foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                 {
-                                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                                 }
                                             }
 
@@ -109,13 +108,13 @@ internal static class EpwingYomichanLoader
                                             {
                                                 foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
                                                 {
-                                                    if (DictUtils.AddRecordToDictionary(mazegaki, record, dictContents))
+                                                    if (DictUtils.AddRecordToDictionary(mazegaki, record, dict))
                                                     {
                                                         if (generateFusejiVariants)
                                                         {
                                                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                             {
-                                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dictContents);
+                                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                                             }
                                                         }
                                                     }

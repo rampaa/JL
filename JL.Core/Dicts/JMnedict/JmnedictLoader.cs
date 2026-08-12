@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
@@ -32,19 +33,27 @@ internal static class JmnedictLoader
                 xmlTextReader.WhitespaceHandling = WhitespaceHandling.None;
                 xmlTextReader.EntityHandling = EntityHandling.ExpandCharEntities;
 
-                IDictionary<string, IList<IDictRecord>> jmnedictDictionary = dict.Contents;
+                Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+                Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
                 while (xmlTextReader.ReadToFollowing("entry"))
                 {
                     Dictionary<string, JmnedictRecord> recordDictionary = GetRecordsFromEntry(ReadEntry(xmlTextReader));
                     foreach ((string key, JmnedictRecord jmnedictRecord) in recordDictionary)
                     {
-                        if (jmnedictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
+                        ref IList<IDictRecord>? tempRecordList = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
+                        if (exists)
                         {
+                            Debug.Assert(tempRecordList is not null);
                             tempRecordList.Add(jmnedictRecord);
                         }
                         else
                         {
-                            jmnedictDictionary[key] = [jmnedictRecord];
+                            tempRecordList = [jmnedictRecord];
+                        }
+
+                        if (key.Length > dict.MaxSearchKeyLength)
+                        {
+                            dict.MaxSearchKeyLength = key.Length;
                         }
                     }
                 }

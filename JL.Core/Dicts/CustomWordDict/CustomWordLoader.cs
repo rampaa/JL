@@ -88,13 +88,12 @@ public static class CustomWordLoader
                     readings = null;
                 }
 
-                AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses, customWordDictionary);
+                AddToDictionary(dict, spellings, readings, definitions, partOfSpeech, wordClasses);
             }
         }
     }
 
-    public static void AddToDictionary(string[] spellings, string[]? readings, string[] definitions,
-        ReadOnlySpan<char> rawPartOfSpeech, string[]? wordClasses, IDictionary<string, IList<IDictRecord>> customWordDictionary)
+    public static void AddToDictionary(Dict dict, string[] spellings, string[]? readings, string[] definitions, ReadOnlySpan<char> rawPartOfSpeech, string[]? wordClasses)
     {
         bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
 
@@ -121,13 +120,30 @@ public static class CustomWordLoader
             string spelling = spellings[i];
 
             CustomWordRecord record = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
-            if (DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(spelling), record, customWordDictionary) && i is 0 && readings is not null)
+            string normalizedSpelling = JapaneseUtils.NormalizeText(spelling);
+            if (normalizedSpelling.Length > dict.MaxSearchKeyLength)
+            {
+                dict.MaxSearchKeyLength = normalizedSpelling.Length;
+            }
+
+            if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, dict) && i is 0 && readings is not null)
             {
                 foreach (string reading in readings)
                 {
-                    _ = DictUtils.AddRecordToDictionary(JapaneseUtils.NormalizeText(reading), record, customWordDictionary);
+                    string normalizedReading = JapaneseUtils.NormalizeText(reading);
+                    if (normalizedReading.Length > dict.MaxSearchKeyLength)
+                    {
+                        dict.MaxSearchKeyLength = normalizedReading.Length;
+                    }
+
+                    _ = DictUtils.AddRecordToDictionary(normalizedReading, record, dict);
                 }
             }
+        }
+
+        if (DictUtils.MaxSearchKeyLength > dict.MaxSearchKeyLength)
+        {
+            DictUtils.MaxSearchKeyLength = dict.MaxSearchKeyLength;
         }
     }
 }

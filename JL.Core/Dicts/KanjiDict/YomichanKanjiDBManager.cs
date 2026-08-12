@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
@@ -226,10 +227,12 @@ internal static class YomichanKanjiDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
             dict.Size = GetDistinctKanjiCount(connection);
+            dict.MaxSearchKeyLength = 1;
         }
         else
         {
             dict.Size = 0;
+            dict.MaxSearchKeyLength = 0;
         }
     }
 
@@ -376,17 +379,27 @@ internal static class YomichanKanjiDBManager
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
+
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
         while (dataReader.Read())
         {
             YomichanKanjiRecord record = GetRecord(dataReader);
             string kanji = dataReader.GetString((int)ColumnIndex.Kanji);
-            if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
+            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, kanji, out bool exists);
+            if (exists)
             {
+                Debug.Assert(result is not null);
                 result.Add(record);
             }
             else
             {
-                dict.Contents[kanji] = [record];
+                result = [record];
+            }
+
+            if (kanji.Length > dict.MaxSearchKeyLength)
+            {
+                dict.MaxSearchKeyLength = kanji.Length;
             }
         }
 

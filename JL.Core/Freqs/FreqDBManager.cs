@@ -295,6 +295,9 @@ internal static class FreqDBManager
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
+
+        Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
+        Dictionary<string, IList<FrequencyRecord>> contents = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
         while (dataReader.Read())
         {
             FrequencyRecord record = GetRecord(dataReader);
@@ -303,13 +306,15 @@ internal static class FreqDBManager
 
             foreach (string searchKey in searchKeys)
             {
-                if (freq.Contents.TryGetValue(searchKey, out IList<FrequencyRecord>? result))
+                ref IList<FrequencyRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
+                if (exists)
                 {
+                    Debug.Assert(result is not null);
                     result.Add(record);
                 }
                 else
                 {
-                    freq.Contents[searchKey] = [record];
+                    result = [record];
                 }
             }
         }

@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
@@ -162,7 +163,8 @@ internal static class JmdictLoader
                     maxConsecutiveFuseji = 0;
                 }
 
-                IDictionary<string, IList<IDictRecord>> jmdictDictionary = dict.Contents;
+                Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+                Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
                 while (xmlReader.ReadToFollowing("entry"))
                 {
                     Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(ReadEntry(xmlReader), includeProperNames);
@@ -170,13 +172,20 @@ internal static class JmdictLoader
                     {
                         foreach ((string key, JmdictRecord record) in recordDictionary)
                         {
-                            if (jmdictDictionary.TryGetValue(key, out IList<IDictRecord>? records))
+                            ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
+                            if (exists)
                             {
+                                Debug.Assert(records is not null);
                                 records.Add(record);
                             }
                             else
                             {
-                                jmdictDictionary[key] = [record];
+                                records = [record];
+                            }
+
+                            if (key.Length > dict.MaxSearchKeyLength)
+                            {
+                                dict.MaxSearchKeyLength = key.Length;
                             }
 
                             if (generateFusejiVariants)
@@ -185,7 +194,7 @@ internal static class JmdictLoader
                                 {
                                     if (!recordDictionary.ContainsKey(fusejiVariant))
                                     {
-                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, jmdictDictionary);
+                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                     }
                                 }
                             }
@@ -201,13 +210,13 @@ internal static class JmdictLoader
                                         {
                                             if (!recordDictionary.ContainsKey(mazegaki))
                                             {
-                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, jmdictDictionary) && generateFusejiVariants)
+                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, dict) && generateFusejiVariants)
                                                 {
                                                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                     {
                                                         if (!recordDictionary.ContainsKey(fusejiVariant))
                                                         {
-                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, jmdictDictionary);
+                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                                         }
                                                     }
                                                 }

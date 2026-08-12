@@ -338,6 +338,11 @@ internal static class KanjidicDBManager
             IDictRecord[] record = [GetRecord(dataReader)];
             string kanji = dataReader.GetString((int)ColumnIndex.Kanji);
             dict.Contents[kanji] = record;
+
+            if (kanji.Length > dict.MaxSearchKeyLength)
+            {
+                dict.MaxSearchKeyLength = kanji.Length;
+            }
         }
 
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);

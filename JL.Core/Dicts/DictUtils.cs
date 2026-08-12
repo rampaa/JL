@@ -35,6 +35,7 @@ public static class DictUtils
     private delegate void LoadFromDB(Dict dict);
     private delegate void HandleLeftOvers(string fullPath);
     public delegate void CreateDB(string dbPath);
+    private delegate int GetMaxSearchKeyLength(SqliteConnection connection);
 
     public static readonly string CustomWordDictPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
     public static readonly string CustomNameDictPath = Path.Join(AppInfo.ResourcesPath, "custom_names.txt");
@@ -63,6 +64,8 @@ public static class DictUtils
     internal static bool DBIsUsedForAtLeastOneYomichanOrNazekaWordDict { get; private set; } = true;
     internal static bool DBIsUsedForPitchDict { get; private set; } // false;
 
+    public static int MaxSearchKeyLength { get; internal set; }
+
     internal static Dict? PitchDict { get; private set; }
 
     private static Dict[] s_allDicts = [];
@@ -90,6 +93,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                0,
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -110,6 +114,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                0,
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -128,6 +133,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                0,
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -148,6 +154,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                0,
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -181,6 +188,7 @@ public static class DictUtils
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)
                 ),
+                37,
                 autoUpdatable: true,
                 url: s_jmdictUrl,
                 revision: null)
@@ -193,6 +201,7 @@ public static class DictUtils
                     new UseDBOption(true),
                     new NoAllOption(false),
                     autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)),
+                1,
                 autoUpdatable: true,
                 url: s_kanjidicUrl,
                 revision: null)
@@ -210,6 +219,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                41,
                 autoUpdatable: true,
                 url: s_jmnedictUrl,
                 revision: null)
@@ -606,6 +616,7 @@ public static class DictUtils
             Dict[] dicts = Dicts.Values.ToArray();
             CheckDBUsageForDicts(dicts);
             PopulateDictTypeArrays(dicts);
+            CalculateMaxSearchKeyLength(dicts);
 
             int customDictionaryTaskCount = 0;
             AtomicBool anyCustomDictionaryTaskIsActuallyUsed = new(false);
@@ -617,21 +628,21 @@ public static class DictUtils
                     case DictType.JMdict:
                         LoadDict(dict, JmdictLoader.Load, JmdictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             JmdictDBManager.CreateDB, JmdictDBManager.ImportFromDisk, JmdictDBManager.ImportFromMemory,
-                            JmdictDBManager.LoadFromDB, tasks, dictsToBeRemoved, JmdictLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
+                            JmdictDBManager.LoadFromDB, JmdictDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, JmdictLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
                     case DictType.JMnedict:
                         LoadDict(dict, JmnedictLoader.Load, JmnedictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             JmnedictDBManager.CreateDB, JmnedictDBManager.ImportFromDisk, JmnedictDBManager.ImportFromMemory,
-                            null, tasks, dictsToBeRemoved, JmnedictLoader.Size, false, true, ref rebuildingAnyDB, ref dictCleared);
+                            null, JmnedictDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, JmnedictLoader.Size, false, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
                     case DictType.Kanjidic:
                         LoadDict(dict, KanjidicLoader.Load, KanjidicDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             KanjidicDBManager.CreateDB, KanjidicDBManager.ImportFromDisk, KanjidicDBManager.ImportFromMemory,
-                            KanjidicDBManager.LoadFromDB, tasks, dictsToBeRemoved, KanjidicLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
+                            KanjidicDBManager.LoadFromDB, null, tasks, dictsToBeRemoved, KanjidicLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
@@ -641,14 +652,14 @@ public static class DictUtils
                     case DictType.NonspecificYomichan:
                         LoadDict(dict, EpwingYomichanLoader.Load, EpwingYomichanDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
                             EpwingYomichanDBManager.CreateDB, EpwingYomichanDBManager.ImportFromDisk, EpwingYomichanDBManager.ImportFromMemory,
-                            EpwingYomichanDBManager.LoadFromDB, tasks, dictsToBeRemoved, EpwingYomichanLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+                            EpwingYomichanDBManager.LoadFromDB, EpwingYomichanDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, EpwingYomichanLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
                         LoadDict(dict, YomichanKanjiLoader.Load, YomichanKanjiDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
                             YomichanKanjiDBManager.CreateDB, YomichanKanjiDBManager.ImportFromDisk, YomichanKanjiDBManager.ImportFromMemory,
-                            YomichanKanjiDBManager.LoadFromDB, tasks, dictsToBeRemoved, YomichanKanjiLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+                            YomichanKanjiDBManager.LoadFromDB, null, tasks, dictsToBeRemoved, YomichanKanjiLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.CustomWordDictionary:
@@ -667,13 +678,13 @@ public static class DictUtils
                     case DictType.NonspecificNazeka:
                         LoadDict(dict, EpwingNazekaLoader.Load, EpwingNazekaDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             EpwingNazekaDBManager.CreateDB, EpwingNazekaDBManager.ImportFromDisk, EpwingNazekaDBManager.ImportFromMemory,
-                            EpwingNazekaDBManager.LoadFromDB, tasks, dictsToBeRemoved, EpwingNazekaLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+                            EpwingNazekaDBManager.LoadFromDB, EpwingNazekaDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, EpwingNazekaLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.PitchAccentYomichan:
                         LoadDict(dict, YomichanPitchAccentLoader.Load, YomichanPitchAccentDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
                             YomichanPitchAccentDBManager.CreateDB, YomichanPitchAccentDBManager.ImportFromDisk, YomichanPitchAccentDBManager.ImportFromMemory,
-                            YomichanPitchAccentDBManager.LoadFromDB, tasks, dictsToBeRemoved, YomichanPitchAccentLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+                            YomichanPitchAccentDBManager.LoadFromDB, YomichanPitchAccentDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, YomichanPitchAccentLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
@@ -727,6 +738,7 @@ public static class DictUtils
                 CheckSingleDictActiveness();
                 CheckDBUsageForDicts(dictsSnapshot);
                 PopulateDictTypeArrays(dictsSnapshot);
+                CalculateMaxSearchKeyLength(dictsSnapshot);
 
                 if (dictsSnapshot.All(static d => !d.Updating)
                     && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed.Read()))
@@ -806,7 +818,7 @@ public static class DictUtils
         return new DBState(useDB, dbExists);
     }
 
-    private static void LoadDict(Dict dict, Load load, int version, HandleLeftOvers handleLeftOvers, CreateDB createDB, ImportFromDisk importFromDisk, ImportFromMemory importFromMemory, LoadFromDB? loadFromDB, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, int initialDictSize, bool preferLoadingFromDB, bool deleteDictFileOnError, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadDict(Dict dict, Load load, int version, HandleLeftOvers handleLeftOvers, CreateDB createDB, ImportFromDisk importFromDisk, ImportFromMemory importFromMemory, LoadFromDB? loadFromDB, GetMaxSearchKeyLength? getMaxSearchKeyLength, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, int initialDictSize, bool preferLoadingFromDB, bool deleteDictFileOnError, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -927,6 +939,22 @@ public static class DictUtils
         else
         {
             dict.Ready = true;
+        }
+
+        if (dict is { MaxSearchKeyLength: 0, Active: true, Options.UseDB.Value: true })
+        {
+            if (getMaxSearchKeyLength is not null)
+            {
+                using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
+                if (connection is not null)
+                {
+                    dict.MaxSearchKeyLength = getMaxSearchKeyLength(connection);
+                }
+            }
+            else if (KanjiDictTypes.Contains(dict.Type))
+            {
+                dict.MaxSearchKeyLength = 1;
+            }
         }
     }
 
@@ -1345,39 +1373,31 @@ public static class DictUtils
         DBIsUsedForJmdict = dbIsUsedForJmdict;
     }
 
-    public static bool AddRecordToDictionary(string normalizedKey, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
+    public static bool AddRecordToDictionary(string normalizedKey, IDictRecord record, Dict dict)
     {
-        if (dictionary is Dictionary<string, IList<IDictRecord>> dict)
+        if (normalizedKey.Length > dict.MaxSearchKeyLength)
         {
-            ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(dict, normalizedKey, out bool exists);
-            if (!exists)
-            {
-                records = [record];
-                return true;
-            }
-
-            Debug.Assert(records is not null);
-            List<IDictRecord> list = (List<IDictRecord>)records;
-
-            if (list.AsReadOnlySpan().Contains(record))
-            {
-                return false;
-            }
-
-            list.Add(record);
-        }
-        else
-        {
-            ConcurrentDictionary<string, IList<IDictRecord>> concurrent = (ConcurrentDictionary<string, IList<IDictRecord>>)dictionary;
-            List<IDictRecord> list = (List<IDictRecord>)concurrent.GetOrAdd(normalizedKey, static _ => new List<IDictRecord>(1));
-            if (list.Count > 0 && list.AsReadOnlySpan().Contains(record))
-            {
-                return false;
-            }
-
-            list.Add(record);
+            dict.MaxSearchKeyLength = normalizedKey.Length;
         }
 
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> dictContents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
+        ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(dictContents, normalizedKey, out bool exists);
+        if (!exists)
+        {
+            records = [record];
+            return true;
+        }
+
+        Debug.Assert(records is not null);
+        List<IDictRecord> list = (List<IDictRecord>)records;
+
+        if (list.AsReadOnlySpan().Contains(record))
+        {
+            return false;
+        }
+
+        list.Add(record);
         return true;
     }
 
@@ -1418,6 +1438,17 @@ public static class DictUtils
         s_nameDicts = nameDicts.ToArray();
         s_kanjiDicts = kanjiDicts.ToArray();
         s_otherDicts = otherDicts.ToArray();
+    }
+
+    private static void CalculateMaxSearchKeyLength(Dict[] dicts)
+    {
+        foreach (Dict dict in dicts)
+        {
+            if (dict.Type is not DictType.PitchAccentYomichan && dict.MaxSearchKeyLength > MaxSearchKeyLength)
+            {
+                MaxSearchKeyLength = dict.MaxSearchKeyLength;
+            }
+        }
     }
 
     internal static Dict[] GetDictForLookupCategoryType(LookupCategory lookupCategory)

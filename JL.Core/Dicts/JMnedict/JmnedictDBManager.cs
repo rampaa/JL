@@ -253,6 +253,7 @@ internal static class JmnedictDBManager
             }
 
             dict.Size = rowId - 1;
+            dict.MaxSearchKeyLength = GetMaxSearchKeyLength(connection);
         }
         else
         {
@@ -294,6 +295,20 @@ internal static class JmnedictDBManager
                 dict.Updating = false;
             }
         }
+    }
+
+    public static int GetMaxSearchKeyLength(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            SELECT MAX(LENGTH({PrimarySpellingInHiragana}))
+            FROM {Record};
+            """;
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        _ = reader.Read();
+        return reader.GetInt32(0);
     }
 
     public static void ImportFromMemory(Dict dict)
@@ -383,7 +398,7 @@ internal static class JmnedictDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, string query)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, int maxSearchKeyLengthForDict)
     {
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
@@ -394,13 +409,18 @@ internal static class JmnedictDBManager
 
         using SqliteCommand command = connection.CreateCommand();
 
+        int validTermCount = terms.Length > maxSearchKeyLengthForDict && maxSearchKeyLengthForDict > 0
+            ? maxSearchKeyLengthForDict
+            : terms.Length;
+
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = query;
+        command.CommandText = GetQuery(validTermCount);
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        for (int i = 0; i < terms.Length; i++)
+        int offset = terms.Length - validTermCount;
+        for (int i = 0; i < validTermCount; i++)
         {
-            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), terms[i]);
+            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), terms[offset + i]);
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();

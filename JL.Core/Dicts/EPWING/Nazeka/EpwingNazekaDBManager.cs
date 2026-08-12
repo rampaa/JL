@@ -517,11 +517,13 @@ internal static class EpwingNazekaDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
             dict.Size = GetDistinctSearchKeyCount(connection);
+            dict.MaxSearchKeyLength = GetMaxSearchKeyLength(connection);
         }
         else
         {
             DBUtils.DeleteDB(dict.DBPath);
             dict.Size = 0;
+            dict.MaxSearchKeyLength = 0;
         }
     }
 
@@ -548,6 +550,20 @@ internal static class EpwingNazekaDBManager
         command.CommandText =
             $"""
             SELECT COUNT(DISTINCT {SearchKey})
+            FROM {RecordSearchKey};
+            """;
+
+        using SqliteDataReader reader = command.ExecuteReader();
+        _ = reader.Read();
+        return reader.GetInt32(0);
+    }
+
+    public static int GetMaxSearchKeyLength(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            SELECT MAX(LENGTH({SearchKey}))
             FROM {RecordSearchKey};
             """;
 
@@ -655,7 +671,7 @@ internal static class EpwingNazekaDBManager
         _ = vacuumCommand.ExecuteNonQuery();
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, string query)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, int maxSearchKeyLengthForDict)
     {
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
@@ -666,13 +682,18 @@ internal static class EpwingNazekaDBManager
 
         using SqliteCommand command = connection.CreateCommand();
 
+        int validTermCount = terms.Length > maxSearchKeyLengthForDict && maxSearchKeyLengthForDict > 0
+            ? maxSearchKeyLengthForDict
+            : terms.Length;
+
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = query;
+        command.CommandText = GetQuery(validTermCount);
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        for (int i = 0; i < terms.Length; i++)
+        int offset = terms.Length - validTermCount;
+        for (int i = 0; i < validTermCount; i++)
         {
-            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), terms[i]);
+            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), terms[offset + i]);
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
@@ -753,15 +774,24 @@ internal static class EpwingNazekaDBManager
             string[]? searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
             Debug.Assert(searchKeys is not null);
 
+            Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+            Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
             foreach (string searchKey in searchKeys)
             {
-                if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
+                if (exists)
                 {
+                    Debug.Assert(result is not null);
                     result.Add(record);
                 }
                 else
                 {
-                    dict.Contents[searchKey] = [record];
+                    result = [record];
+                }
+
+                if (searchKey.Length > dict.MaxSearchKeyLength)
+                {
+                    dict.MaxSearchKeyLength = searchKey.Length;
                 }
             }
         }

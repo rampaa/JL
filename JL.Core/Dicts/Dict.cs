@@ -17,6 +17,7 @@ public sealed class Dict : IEquatable<Dict>
 
     // ReSharper disable once MemberCanBeInternal
     public int Size { get; internal set; }
+    public int MaxSearchKeyLength { get; internal set; }
 
     public DictOptions Options { get; set; }
     public bool AutoUpdatable { get; set; }
@@ -33,7 +34,7 @@ public sealed class Dict : IEquatable<Dict>
     [JsonIgnore] public IDictionary<string, IList<IDictRecord>> Contents { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
 
-    public Dict(DictType type, string name, string path, bool active, int priority, int size, DictOptions options, bool autoUpdatable = false, Uri? url = null, string? revision = null)
+    public Dict(DictType type, string name, string path, bool active, int priority, int size, DictOptions options, int maxSearchKeyLength = 0, bool autoUpdatable = false, Uri? url = null, string? revision = null)
     {
         Type = type;
         Name = name;
@@ -41,6 +42,7 @@ public sealed class Dict : IEquatable<Dict>
         Active = active;
         Priority = priority;
         Size = size;
+        MaxSearchKeyLength = maxSearchKeyLength;
         Options = options;
         AutoUpdatable = autoUpdatable;
         Url = url;

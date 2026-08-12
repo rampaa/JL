@@ -332,7 +332,7 @@ internal sealed class ConfigManager
 
     #region Advanced
 
-    public int MaxSearchLength { get; private set; } = 37;
+    public int MaxSearchLength { get; private set; } = 41;
     public int MaxNumResultsNotInMiningMode { get; private set; } = 7;
 
 #pragma warning disable CA1056 // URI-like properties should not be strings

@@ -96,7 +96,7 @@ internal sealed partial class AddNameWindow
         Dict dict = DictUtils.SingleDictTypeDicts[dictType];
         if (dict.Active)
         {
-            CustomNameLoader.AddToDictionary(spelling, reading, nameType, extraInfo, null, dict.Contents);
+            CustomNameLoader.AddToDictionary(dict, spelling, reading, nameType, extraInfo, null);
         }
 
         PopupWindowUtils.HidePopups(0);
