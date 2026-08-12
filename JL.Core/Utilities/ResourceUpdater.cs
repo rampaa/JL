@@ -364,6 +364,11 @@ public static class ResourceUpdater
                     File.Delete(dictBackupPath);
                 }
 
+                if (dict.MaxSearchKeyLength > DictUtils.MaxSearchKeyLength)
+                {
+                    DictUtils.MaxSearchKeyLength = dict.MaxSearchKeyLength;
+                }
+
                 FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
                 return true;
             }
@@ -529,6 +534,11 @@ public static class ResourceUpdater
                 if (Directory.Exists(dictBackupPath))
                 {
                     Directory.Delete(dictBackupPath, true);
+                }
+
+                if (dict.MaxSearchKeyLength > DictUtils.MaxSearchKeyLength)
+                {
+                    DictUtils.MaxSearchKeyLength = dict.MaxSearchKeyLength;
                 }
 
                 FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
