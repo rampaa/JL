@@ -29,12 +29,13 @@ namespace JL.Core.Dicts;
 
 public static class DictUtils
 {
-    public delegate Task Load(Dict dict);
-    public delegate Task ImportFromDisk(Dict dict);
+    internal delegate Task Load(Dict dict);
+
+    internal delegate Task ImportFromDisk(Dict dict);
     private delegate void ImportFromMemory(Dict dict);
     private delegate void LoadFromDB(Dict dict);
     private delegate void HandleLeftOvers(string fullPath);
-    public delegate void CreateDB(string dbPath);
+    internal delegate void CreateDB(string dbPath);
     private delegate int GetMaxSearchKeyLength(SqliteConnection connection);
 
     public static readonly string CustomWordDictPath = Path.Join(AppInfo.ResourcesPath, "custom_words.txt");
@@ -93,7 +94,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
-                0,
+                maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -114,7 +115,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
-                0,
+                maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -133,7 +134,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
-                0,
+                maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
                 revision: null)
@@ -154,7 +155,7 @@ public static class DictUtils
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
                     maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
                     maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
-                0,
+                maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
                 revision: null)

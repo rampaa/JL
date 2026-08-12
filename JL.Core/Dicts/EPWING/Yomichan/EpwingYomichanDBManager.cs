@@ -48,7 +48,7 @@ internal static class EpwingYomichanDBManager
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
-    public static string GetQuery(int termCount)
+    private static string GetQuery(int termCount)
     {
         if (s_queryCache.TryGetValue(termCount, out string? query))
         {

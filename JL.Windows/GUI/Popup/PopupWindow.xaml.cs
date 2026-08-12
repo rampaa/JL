@@ -1610,7 +1610,7 @@ internal sealed partial class PopupWindow : IDisposable
             }
         }
 
-        else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeygesture))
+        else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeyGesture))
         {
             return WindowsUtils.OpenLastestNoteInAnki();
         }

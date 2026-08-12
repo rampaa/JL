@@ -704,6 +704,7 @@ internal sealed partial class PreferencesWindow
             return;
         }
 
+        // ReSharper disable once UseAwaitUsing
         using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
@@ -721,6 +722,7 @@ internal sealed partial class PreferencesWindow
         }
 
         ConfigManager configManager = ConfigManager.Instance;
+        // ReSharper disable once UseAwaitUsing
         using (SqliteConnection preferencesConnection = ConfigDBManager.CreateReadWriteDBConnection())
         {
             configManager.ApplyPreferences(preferencesConnection);

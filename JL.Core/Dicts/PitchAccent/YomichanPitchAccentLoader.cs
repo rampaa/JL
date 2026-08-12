@@ -21,7 +21,6 @@ internal static class YomichanPitchAccentLoader
             return;
         }
 
-        IDictionary<string, IList<IDictRecord>> pitchDict = dict.Contents;
         GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
         Debug.Assert(generateMazegakiOption is not null);
         bool generateMazegaki = generateMazegakiOption.Value;

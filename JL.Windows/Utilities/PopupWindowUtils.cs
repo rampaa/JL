@@ -46,7 +46,7 @@ internal static class PopupWindowUtils
     public static readonly object BoxedVerticalAlignmentCenter = VerticalAlignment.Center;
     public static readonly object BoxedVerticalAlignmentTop = VerticalAlignment.Top;
     public static readonly object BoxedDoubleNotANumber = double.NaN;
-    public static readonly object BoxedFalse = false;
+    private static readonly object s_boxedFalse = false;
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, object fontSize, object verticalAlignment, object margin)
     {
@@ -91,7 +91,7 @@ internal static class PopupWindowUtils
         textBox.SetValue(TextBoxBase.IsReadOnlyProperty, s_boxedTrue);
         textBox.SetValue(TextBoxBase.IsInactiveSelectionHighlightEnabledProperty, s_boxedTrue);
         textBox.SetValue(TextBoxBase.UndoLimitProperty, s_boxedIntZero);
-        textBox.SetValue(TextBoxBase.IsUndoEnabledProperty, BoxedFalse);
+        textBox.SetValue(TextBoxBase.IsUndoEnabledProperty, s_boxedFalse);
         textBox.SetValue(TextBoxBase.HorizontalScrollBarVisibilityProperty, s_boxedScrollBarVisibilityDisabled);
         textBox.SetValue(TextBoxBase.VerticalScrollBarVisibilityProperty, s_boxedScrollBarVisibilityDisabled);
         textBox.SetValue(TextBox.TextWrappingProperty, s_boxedTextWrappingWrap);

@@ -127,6 +127,7 @@ internal sealed partial class MainWindow : IDisposable
         }
 
         ConfigManager configManager = ConfigManager.Instance;
+        // ReSharper disable once UseAwaitUsing
         using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
             configManager.ApplyPreferences(connection);
@@ -241,7 +242,7 @@ internal sealed partial class MainWindow : IDisposable
                             return;
                         }
 
-                        else if (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
+                        if (configManager.RequireLookupKeyPress && !configManager.LookupKeyKeyGesture.IsPressed())
                         {
                             if (FirstPopupWindow.Opacity is not 0)
                             {
@@ -882,6 +883,7 @@ internal sealed partial class MainWindow : IDisposable
         await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(true);
         await WebSocketUtils.DisconnectFromTsukikageWebSocketConnection().ConfigureAwait(true);
 
+        // ReSharper disable once UseAwaitUsing
         using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
             ConfigManager.Instance.SaveBeforeClosing(connection);
@@ -1159,7 +1161,7 @@ internal sealed partial class MainWindow : IDisposable
                 : 1;
         }
 
-        else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeygesture))
+        else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeyGesture))
         {
             return WindowsUtils.OpenLastestNoteInAnki();
         }

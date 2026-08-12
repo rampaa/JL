@@ -56,7 +56,7 @@ internal static class JmdictDBManager
     public const string SearchKey = "search_key";
     public const string RecordId = "record_id";
 
-    public static string GetQuery(int termCount)
+    private static string GetQuery(int termCount)
     {
         if (s_queryCache.TryGetValue(termCount, out string? query))
         {

@@ -40,7 +40,7 @@ internal static class FreqDBManager
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
-    public static string GetQuery(int termCount)
+    private static string GetQuery(int termCount)
     {
         if (s_queryCache.TryGetValue(termCount, out string? query))
         {
@@ -1057,22 +1057,20 @@ internal static class FreqDBManager
 
             return false;
         }
-        else
+
+        if (newRecord)
         {
-            if (newRecord)
-            {
-                commandsAndParameters.RowIdParamForInsertRecordCommand.Value = recordId;
-                commandsAndParameters.SpellingParamForInsertRecordCommand.Value = record.Spelling;
-                commandsAndParameters.FrequencyParamForInsertRecordCommand.Value = record.Frequency;
-                _ = commandsAndParameters.InsertRecordCommand.ExecuteNonQuery();
-            }
-
-            commandsAndParameters.SearchKeyParamForInsertRecordSearchKeyCommand.Value = searchKey;
-            commandsAndParameters.RecordIdParamForInsertRecordSearchKeyCommand.Value = recordId;
-            _ = commandsAndParameters.InsertRecordSearchKeyCommand.ExecuteNonQuery();
-
-            return true;
+            commandsAndParameters.RowIdParamForInsertRecordCommand.Value = recordId;
+            commandsAndParameters.SpellingParamForInsertRecordCommand.Value = record.Spelling;
+            commandsAndParameters.FrequencyParamForInsertRecordCommand.Value = record.Frequency;
+            _ = commandsAndParameters.InsertRecordCommand.ExecuteNonQuery();
         }
+
+        commandsAndParameters.SearchKeyParamForInsertRecordSearchKeyCommand.Value = searchKey;
+        commandsAndParameters.RecordIdParamForInsertRecordSearchKeyCommand.Value = recordId;
+        _ = commandsAndParameters.InsertRecordSearchKeyCommand.ExecuteNonQuery();
+
+        return true;
     }
 
     private static FrequencyRecord GetRecord(SqliteDataReader dataReader)

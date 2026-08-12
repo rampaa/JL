@@ -4,7 +4,7 @@ using JL.Core.Dicts.Interfaces;
 
 namespace JL.Core.Lookup;
 
-internal class IntermediaryResult(
+internal sealed class IntermediaryResult(
     string matchedText,
     Dict dict,
     IList<IDictRecord> resultsList,

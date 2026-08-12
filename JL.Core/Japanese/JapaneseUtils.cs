@@ -10,7 +10,7 @@ namespace JL.Core.Japanese;
 
 public static partial class JapaneseUtils
 {
-    public const char NormalizedFuseji = '○';
+    internal const char NormalizedFuseji = '○';
 
     // Matches the following Unicode ranges:
     // × (\u00D7)
@@ -190,9 +190,9 @@ public static partial class JapaneseUtils
 
     private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters)]);
 
-    public static readonly SearchValues<char> Fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '□', '△', '▽', '◎', '☆', '◇', '●', '⬤', '■', '▲', '▼', '◉', '★', '◆', '×');
+    internal static readonly SearchValues<char> s_fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '□', '△', '▽', '◎', '☆', '◇', '●', '⬤', '■', '▲', '▼', '◉', '★', '◆', '×');
 
-    public static readonly SearchValues<char> KatakanaOrIterationMarkOrFuseji = SearchValues.Create([.. s_katakanaToHiraganaDict.Keys, '々', '〻', 'ゝ', 'ゞ', NormalizedFuseji, '〇', '◯', '□', '△', '▽', '◎', '☆', '◇', '●', '⬤', '■', '▲', '▼', '◉', '★', '◆', '×']);
+    private static readonly SearchValues<char> s_katakanaOrIterationMarkOrFuseji = SearchValues.Create([.. s_katakanaToHiraganaDict.Keys, '々', '〻', 'ゝ', 'ゞ', NormalizedFuseji, '〇', '◯', '□', '△', '▽', '◎', '☆', '◇', '●', '⬤', '■', '▲', '▼', '◉', '★', '◆', '×']);
 
     public static string NormalizeText(string text)
     {
@@ -207,7 +207,7 @@ public static partial class JapaneseUtils
         // Normalizes vs to VS, xxx to XXX, h to H etc.
         normalizedText = normalizedText.ToUpperInvariant();
 
-        int firstKatakanaOrIterationMarkOrFusejiIndex = normalizedText.IndexOfAny(KatakanaOrIterationMarkOrFuseji);
+        int firstKatakanaOrIterationMarkOrFusejiIndex = normalizedText.IndexOfAny(s_katakanaOrIterationMarkOrFuseji);
         if (firstKatakanaOrIterationMarkOrFusejiIndex < 0)
         {
             return normalizedText;

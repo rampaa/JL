@@ -327,7 +327,7 @@ internal sealed class ConfigManager
     public KeyGesture MakeMainWindowOpaqueKeyGesture { get; private set; } = new(Key.F6, ModifierKeys.Alt);
     public KeyGesture BringMainWindowToTopKeyGesture { get; private set; } = new(Key.F7, ModifierKeys.Alt);
     public KeyGesture ToggleTextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
-    public KeyGesture OpenLastCreatedNoteInAnkiKeygesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
+    public KeyGesture OpenLastCreatedNoteInAnkiKeyGesture { get; private set; } = new(Key.None, ModifierKeys.Windows);
     #endregion
 
     #region Advanced
@@ -377,7 +377,7 @@ internal sealed class ConfigManager
 
     public static void ResetConfigs()
     {
-        using SqliteConnection? connection = ConfigDBManager.CreateReadWriteDBConnection();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         Instance.SaveBeforeClosing(connection);
         ConfigDBManager.DeleteAllSettingsFromProfile(connection, MainWindowTopPositionSettingName, MainWindowLeftPositionSettingName);
 
@@ -755,7 +755,7 @@ internal sealed class ConfigManager
         MakeMainWindowOpaqueKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(MakeMainWindowOpaqueKeyGesture), MakeMainWindowOpaqueKeyGesture);
         BringMainWindowToTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(BringMainWindowToTopKeyGesture), BringMainWindowToTopKeyGesture);
         ToggleTextOnlyVisibleOnHoverKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleTextOnlyVisibleOnHoverKeyGesture), ToggleTextOnlyVisibleOnHoverKeyGesture);
-        OpenLastCreatedNoteInAnkiKeygesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(OpenLastCreatedNoteInAnkiKeygesture), OpenLastCreatedNoteInAnkiKeygesture);
+        OpenLastCreatedNoteInAnkiKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(OpenLastCreatedNoteInAnkiKeyGesture), OpenLastCreatedNoteInAnkiKeyGesture);
         AlwaysOnTopKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
         TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
         ToggleAlwaysShowMainTextBoxCaretKeyGesture = KeyGestureUtils.GetKeyGestureFromConfig(connection, configs, nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture), ToggleAlwaysShowMainTextBoxCaretKeyGesture);
@@ -1137,7 +1137,7 @@ internal sealed class ConfigManager
         preferenceWindow.ToggleTextOnlyVisibleOnHoverKeyGestureTextBox.Text =
             ToggleTextOnlyVisibleOnHoverKeyGesture.ToFormattedString();
         preferenceWindow.OpenLastCreatedNoteInAnkiKeygestureTextBox.Text =
-            OpenLastCreatedNoteInAnkiKeygesture.ToFormattedString();
+            OpenLastCreatedNoteInAnkiKeyGesture.ToFormattedString();
         preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
             AlwaysOnTopKeyGesture.ToFormattedString();
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
@@ -1415,6 +1415,7 @@ internal sealed class ConfigManager
 
     public async Task SavePreferences(PreferencesWindow preferenceWindow)
     {
+        // ReSharper disable once UseAwaitUsing
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
 
 #pragma warning disable CA1849 // Call async methods when in an async method
@@ -1479,7 +1480,7 @@ internal sealed class ConfigManager
             preferenceWindow.BringMainWindowToTopKeyGestureTextBox.Text);
         KeyGestureUtils.UpdateKeyGesture(connection, nameof(ToggleTextOnlyVisibleOnHoverKeyGesture),
             preferenceWindow.ToggleTextOnlyVisibleOnHoverKeyGestureTextBox.Text);
-        KeyGestureUtils.UpdateKeyGesture(connection, nameof(OpenLastCreatedNoteInAnkiKeygesture),
+        KeyGestureUtils.UpdateKeyGesture(connection, nameof(OpenLastCreatedNoteInAnkiKeyGesture),
             preferenceWindow.OpenLastCreatedNoteInAnkiKeygestureTextBox.Text);
         KeyGestureUtils.UpdateKeyGesture(connection, nameof(AlwaysOnTopKeyGesture),
             preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);

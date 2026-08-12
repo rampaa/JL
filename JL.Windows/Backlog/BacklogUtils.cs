@@ -83,7 +83,7 @@ internal static class BacklogUtils
         }
 
         s_currentNode = s_backlog.AddLast(new BacklogItem(text, DateTime.Now));
-        if (configManager.AutoSaveBacklogBeforeClosing && configManager.MaxBacklogCapacity is not 0)
+        if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
         {
             lock (s_pendingItemsLock)
             {
@@ -107,7 +107,7 @@ internal static class BacklogUtils
 
         BacklogItem item = new(text, DateTime.Now);
         s_currentNode = s_backlog.AddLast(item);
-        if (configManager.AutoSaveBacklogBeforeClosing && configManager.MaxBacklogCapacity is not 0)
+        if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
         {
             lock (s_pendingItemsLock)
             {
@@ -162,14 +162,14 @@ internal static class BacklogUtils
         {
             lock (s_pendingItemsLock)
             {
-                lastNode.Value = new BacklogItem(text, lastNode.Value.Timestamp);
+                lastNode.Value = lastNode.Value with { Text = text };
             }
         }
         else
         {
             s_currentNode = s_backlog.AddLast(new BacklogItem(text, DateTime.Now));
             ConfigManager configManager = ConfigManager.Instance;
-            if (configManager.AutoSaveBacklogBeforeClosing && configManager.MaxBacklogCapacity is not 0)
+            if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
             {
                 lock (s_pendingItemsLock)
                 {
@@ -361,7 +361,7 @@ internal static class BacklogUtils
         await s_semaphoreSlimForBacklogFile.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (configManager.AutoSaveBacklogBeforeClosing && configManager.MaxBacklogCapacity is not 0)
+            if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
             {
                 await WritePendingItemsToBacklogFile().ConfigureAwait(false);
             }
@@ -401,21 +401,13 @@ internal static class BacklogUtils
                     }
 
                     BacklogItem backlogItem = currentNode.Value.Value;
-                    if (addTimestamps)
-                    {
-                        _ = stringBuilder.Append(string.Create(CultureInfo.InvariantCulture, $"[{backlogItem.Timestamp:yyyy.MM.dd HH:mm:ss}]\n{backlogItem.Text}"));
-                    }
-                    else
-                    {
-                        _ = stringBuilder.Append(backlogItem.Text);
-                    }
+                    _ = stringBuilder.Append(addTimestamps
+                        ? string.Create(CultureInfo.InvariantCulture, $"[{backlogItem.Timestamp:yyyy.MM.dd HH:mm:ss}]\n{backlogItem.Text}")
+                        : backlogItem.Text);
 
                     appendRecordSeparator = true;
-
                     LinkedListNode<LinkedListNode<BacklogItem>>? nextNode = currentNode.Next;
-
                     s_pendingBacklogItemsForBacklogFile.Remove(currentNode);
-
                     currentNode = nextNode;
                 }
             }
@@ -449,7 +441,7 @@ internal static class BacklogUtils
     public static async Task WriteBacklog()
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (!configManager.AutoSaveBacklogBeforeClosing && !configManager.AutoSaveSessionStatsBeforeClosing)
+        if (configManager is { AutoSaveBacklogBeforeClosing: false, AutoSaveSessionStatsBeforeClosing: false })
         {
             return;
         }
@@ -457,7 +449,7 @@ internal static class BacklogUtils
         await s_semaphoreSlimForBacklogFile.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (configManager.AutoSaveBacklogBeforeClosing && configManager.MaxBacklogCapacity is not 0)
+            if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
             {
                 await WritePendingItemsToBacklogFile().ConfigureAwait(false);
                 string tempBacklogPath = GetBacklogFilePath(false, "");

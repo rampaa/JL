@@ -22,8 +22,6 @@ internal static class EpwingNazekaLoader
             return;
         }
 
-        IDictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
-
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
 

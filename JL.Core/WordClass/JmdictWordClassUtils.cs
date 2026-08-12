@@ -104,7 +104,7 @@ public static class JmdictWordClassUtils
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         foreach ((string key, IList<IDictRecord> jmdictRecordList) in dict.Contents)
         {
-            if (key.ContainsAny(JapaneseUtils.Fuseji))
+            if (key.ContainsAny(JapaneseUtils.s_fuseji))
             {
                 continue;
             }
@@ -321,7 +321,7 @@ public static class JmdictWordClassUtils
             }
 
             string key = searchKeyReader.GetString(searchKeyColumnIndex);
-            if (key.ContainsAny(JapaneseUtils.Fuseji))
+            if (key.ContainsAny(JapaneseUtils.s_fuseji))
             {
                 continue;
             }

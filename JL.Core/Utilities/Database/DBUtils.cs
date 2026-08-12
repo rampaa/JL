@@ -175,7 +175,7 @@ public static class DBUtils
         return parameter;
     }
 
-    public static string GetParameterName(int index)
+    internal static string GetParameterName(int index)
     {
         Debug.Assert(index <= 32767);
         return (uint)index < (uint)s_parameterNames.Length

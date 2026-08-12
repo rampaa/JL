@@ -35,7 +35,7 @@ internal static class YomichanPitchAccentDBManager
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
-    public static string GetQuery(int termCount)
+    private static string GetQuery(int termCount)
     {
         if (s_queryCache.TryGetValue(termCount, out string? query))
         {
@@ -497,7 +497,6 @@ internal static class YomichanPitchAccentDBManager
             _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(index), term);
             ++index;
         }
-
         using SqliteDataReader dataReader = command.ExecuteReader();
         if (!dataReader.HasRows)
         {
