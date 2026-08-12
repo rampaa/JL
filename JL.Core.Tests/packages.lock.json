@@ -75,20 +75,20 @@
       },
       "Microsoft.Data.Sqlite": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "58JwZ39lCvRXHfV5O6RQfbHEDu8ZsXI7weRoVRR4jrGRxxkS+qyeuGrN2xD+9VYEICApYr0iTSL6PuU+DdsvPg==",
+        "resolved": "10.0.11",
+        "contentHash": "7je7UELzm131GiLYc4PpZvfKXIgIyzPM+v+tjcd/nbnuWRfgcONYKzDTqJlURxwVCFsVnlpmq6y6yn4qvR8QXQ==",
         "dependencies": {
-          "Microsoft.Data.Sqlite.Core": "10.0.10",
-          "SQLitePCLRaw.bundle_e_sqlite3": "2.1.11",
-          "SQLitePCLRaw.core": "2.1.11"
+          "Microsoft.Data.Sqlite.Core": "10.0.11",
+          "SQLitePCLRaw.bundle_e_sqlite3": "2.1.12",
+          "SQLitePCLRaw.core": "2.1.12"
         }
       },
       "Microsoft.Data.Sqlite.Core": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "TPCs0ldm7AWqcKmp6f/Xr+14sat7hx4rHfRlS4RgCURBH2thEWbAKEyX7cCWr63zVJVOJIJZTg2cBiUXa8ys6g==",
+        "resolved": "10.0.11",
+        "contentHash": "hubA20AGenQ4Sx0ElWaPpB8DISjXpdx463+1zOGRslsT0e/t/06ITv+pHsop8CcJ0d8PZLfgnT7juCDVD79Dkw==",
         "dependencies": {
-          "SQLitePCLRaw.core": "2.1.11"
+          "SQLitePCLRaw.core": "2.1.12"
         }
       },
       "Microsoft.Extensions.DependencyModel": {
@@ -98,8 +98,8 @@
       },
       "Microsoft.Extensions.ObjectPool": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "Tx0R6PY9MNSh0mDKSxbpHLuuec93IxF1cel+1ithQnMNr/vbfLSSHOQHGHIppAJCGfPcEo/wO1Ylj+QpXtzo3A=="
+        "resolved": "10.0.11",
+        "contentHash": "p76ztQFROBOlHgdV1vXfmTjRyu073Av7ZlsiLR93ka6+nzkLCeV2ONXq0DO/BGf71REqGW29Uy/20fzQHAjB7Q=="
       },
       "Microsoft.NET.StringTools": {
         "type": "Transitive",
@@ -285,8 +285,8 @@
         "dependencies": {
           "CommunityToolkit.HighPerformance": "[8.4.2, )",
           "MessagePack": "[3.1.8, )",
-          "Microsoft.Data.Sqlite": "[10.0.10, )",
-          "Microsoft.Extensions.ObjectPool": "[10.0.10, )",
+          "Microsoft.Data.Sqlite": "[10.0.11, )",
+          "Microsoft.Extensions.ObjectPool": "[10.0.11, )",
           "Microsoft.NET.StringTools": "[18.4.0, )",
           "NAudio.Wasapi": "[2.3.0, )",
           "OpusSharp": "[1.6.8, )",
