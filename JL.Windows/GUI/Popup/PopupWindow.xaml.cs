@@ -441,6 +441,9 @@ internal sealed partial class PopupWindow : IDisposable
             LookupResult firstLookupResult = lookupResults[0];
             LastSelectedText = firstLookupResult.MatchedText;
 
+            _lookupDelayTimer.Stop();
+            _lastCharPosition = -1;
+
             StatsUtils.IncrementStat(StatType.NumberOfLookups);
             if (CoreConfigManager.Instance.TrackTermLookupCounts)
             {
@@ -615,6 +618,9 @@ internal sealed partial class PopupWindow : IDisposable
             LookupResult firstLookupResult = lookupResults[0];
             LastSelectedText = firstLookupResult.MatchedText;
             LastLookupResults = lookupResults;
+
+            _lookupDelayTimer.Stop();
+            _lastCharPosition = -1;
 
             StatsUtils.IncrementStat(StatType.NumberOfLookups);
             if (CoreConfigManager.Instance.TrackTermLookupCounts)
@@ -2587,6 +2593,10 @@ internal sealed partial class PopupWindow : IDisposable
         _firstVisibleListViewItemIndex = 0;
         CurrentSourceTextCharPosition = 0;
         _lastInteractedTextBox = null;
+
+        _enableMiningModeTimer.Stop();
+        _lookupDelayTimer.Stop();
+        _lastCharPosition = -1;
 
         if (_duplicateCheckCancellationTokenSource is not null)
         {

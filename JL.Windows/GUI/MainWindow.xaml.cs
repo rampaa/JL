@@ -260,18 +260,21 @@ internal sealed partial class MainWindow : IDisposable
                     }
 
                     bool enableMiningMode = tsukikage && configManager.MiningModeMouseButton.IsPressed();
-                    if (!tsukikage || configManager.MainWindowLookupDelay is 0)
+                    if (charIndex >= 0 && charIndex < MainTextBox.Text.Length)
                     {
-                        MoveWindowToScreen();
-                        await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, enableMiningMode, true, verticalText).ConfigureAwait(true);
-                        if (configManager.AutoPauseOrResumeMpvOnHoverChange && FirstPopupWindow.Opacity is not 0)
+                        if (!tsukikage || configManager.MainWindowLookupDelay is 0)
                         {
-                            MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
+                            MoveWindowToScreen();
+                            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, enableMiningMode, true, verticalText).ConfigureAwait(true);
+                            if (configManager.AutoPauseOrResumeMpvOnHoverChange && FirstPopupWindow.Opacity is not 0)
+                            {
+                                MpvUtils.PausePlayback().SafeFireAndForget("Unexpected error while pausing playback");
+                            }
                         }
-                    }
-                    else
-                    {
-                        InitDelayedLookup(charIndex);
+                        else
+                        {
+                            InitDelayedLookup(charIndex);
+                        }
                     }
                 }, DispatcherPriority.Send).Task.ConfigureAwait(true);
             }
@@ -285,7 +288,6 @@ internal sealed partial class MainWindow : IDisposable
     private bool CopyText(string text, bool tsukikage, bool keepStats)
     {
         ConfigManager configManager = ConfigManager.Instance;
-
         if (text.Length is 0)
         {
             if (!configManager.AlwaysShowBacklog)
@@ -314,7 +316,7 @@ internal sealed partial class MainWindow : IDisposable
             return false;
         }
 
-        string sanitizedNewText = TextUtils.SanitizeText(text);
+        string sanitizedNewText = TextUtils.SanitizeText(text, tsukikage);
         if (sanitizedNewText.Length is 0)
         {
             return false;
@@ -2773,5 +2775,12 @@ internal sealed partial class MainWindow : IDisposable
         _tsukikageLookupDelayTimer.Tick -= TsukikageLookupDelayTimer_Elapsed;
         PopupAutoHideTimer.Tick -= PopupAutoHideTimerEvent;
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
+    }
+
+    private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        _lastCharPosition = -1;
+        _lookupDelayTimer.Stop();
+        _tsukikageLookupDelayTimer.Stop();
     }
 }

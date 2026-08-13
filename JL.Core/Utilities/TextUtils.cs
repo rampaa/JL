@@ -12,6 +12,7 @@ public static class TextUtils
     internal static readonly Encoding s_utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
 
     private const char HighSurrogateStart = '\uD800';
+    private const char ReplacementCharacter = '\uFFFD';
     private const char Noncharacter = '\uFFFE';
     private static readonly SearchValues<char> s_digits = SearchValues.Create('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
     private static readonly SearchValues<char> s_digitsAndGroupSeparator = SearchValues.Create('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ',');
@@ -48,7 +49,7 @@ public static class TextUtils
         return -1;
     }
 
-    private static string RemoveInvalidUnicodeSequences(ReadOnlySpan<char> text, int index)
+    private static string RemoveInvalidUnicodeSequences(ReadOnlySpan<char> text, int index, bool keepLength)
     {
         StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get().Append(text[..index]);
         for (int i = index + 1; i < text.Length; i++)
@@ -60,21 +61,37 @@ public static class TextUtils
                 _ = sb.Append(c);
             }
 
-            else if (c is not Noncharacter && !char.IsLowSurrogate(c))
+            else if (c is Noncharacter)
             {
-                if (char.IsHighSurrogate(c))
+                if (keepLength)
                 {
-                    if (i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
-                    {
-                        _ = sb.Append(c).Append(text[i + 1]);
-                        ++i;
-                    }
+                    _ = sb.Append(ReplacementCharacter);
                 }
+            }
 
-                else
+            else if (char.IsHighSurrogate(c))
+            {
+                if (i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
                 {
-                    _ = sb.Append(c);
+                    _ = sb.Append(c).Append(text[++i]);
                 }
+                else if (keepLength)
+                {
+                    _ = sb.Append(ReplacementCharacter);
+                }
+            }
+
+            else if (char.IsLowSurrogate(c))
+            {
+                if (keepLength)
+                {
+                    _ = sb.Append(ReplacementCharacter);
+                }
+            }
+
+            else
+            {
+                _ = sb.Append(c);
             }
         }
 
@@ -83,31 +100,34 @@ public static class TextUtils
         return validString;
     }
 
-    public static string SanitizeText(string text)
+    public static string SanitizeText(string text, bool keepLength)
     {
         int firstInvalidUnicodeCharIndex = FirstInvalidUnicodeSequenceIndex(text);
         if (firstInvalidUnicodeCharIndex >= 0)
         {
-            text = RemoveInvalidUnicodeSequences(text, firstInvalidUnicodeCharIndex);
+            text = RemoveInvalidUnicodeSequences(text, firstInvalidUnicodeCharIndex, keepLength);
         }
 
-        CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-        if (coreConfigManager.TextBoxTrimWhiteSpaceCharacters)
+        if (!keepLength)
         {
-            text = text.Trim();
-        }
-
-        if (coreConfigManager.TextBoxRemoveNewlines)
-        {
-            text = text.ReplaceLineEndings("");
-        }
-
-        List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.RegexReplacements;
-        if (regexReplacements is not null)
-        {
-            foreach (ref readonly KeyValuePair<Regex, string> regexReplacementKeyValuePair in regexReplacements.AsReadOnlySpan())
+            CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+            if (coreConfigManager.TextBoxTrimWhiteSpaceCharacters)
             {
-                text = regexReplacementKeyValuePair.Key.Replace(text, regexReplacementKeyValuePair.Value);
+                text = text.Trim();
+            }
+
+            if (coreConfigManager.TextBoxRemoveNewlines)
+            {
+                text = text.ReplaceLineEndings("");
+            }
+
+            List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.RegexReplacements;
+            if (regexReplacements is not null)
+            {
+                foreach (ref readonly KeyValuePair<Regex, string> regexReplacementKeyValuePair in regexReplacements.AsReadOnlySpan())
+                {
+                    text = regexReplacementKeyValuePair.Key.Replace(text, regexReplacementKeyValuePair.Value);
+                }
             }
         }
 

@@ -43,7 +43,7 @@
 
         <c:EffectWrapper x:Name="MainTextBoxEffectWrapper" Margin="5,20,5,5">
             <TextBox x:Name="MainTextBox" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                 Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}"
+                 Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}" TextChanged="MainTextBox_TextChanged"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove" TextBlock.LineHeight="Auto" TextBlock.LineStackingStrategy="MaxHeight"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
                  MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" PreviewTouchDown="MainTextBox_PreviewTouchDown" PreviewTouchUp="MainTextBox_PreviewTouchUp"
