@@ -24,7 +24,6 @@ public static class TextUtils
         for (int i = text.IndexOfAnyInRange(HighSurrogateStart, Noncharacter); (uint)i < (uint)text.Length; i++)
         {
             ref readonly char c = ref text[i];
-
             if (c < HighSurrogateStart)
             {
                 continue;
@@ -55,40 +54,37 @@ public static class TextUtils
         for (int i = index + 1; i < text.Length; i++)
         {
             char c = text[i];
-
             if (c < HighSurrogateStart)
             {
                 _ = sb.Append(c);
             }
-
-            else if (c is Noncharacter)
-            {
-                if (keepLength)
-                {
-                    _ = sb.Append(ReplacementCharacter);
-                }
-            }
-
             else if (char.IsHighSurrogate(c))
             {
-                if (i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
+                if ((uint)(i + 1) < (uint)text.Length)
                 {
-                    _ = sb.Append(c).Append(text[++i]);
+                    char nextChar = text[i + 1];
+                    if (char.IsLowSurrogate(nextChar))
+                    {
+                        _ = sb.Append(c).Append(nextChar);
+                        ++i;
+                    }
+                    else if (keepLength)
+                    {
+                        _ = sb.Append(ReplacementCharacter);
+                    }
                 }
                 else if (keepLength)
                 {
                     _ = sb.Append(ReplacementCharacter);
                 }
             }
-
-            else if (char.IsLowSurrogate(c))
+            else if (c is Noncharacter || char.IsLowSurrogate(c))
             {
                 if (keepLength)
                 {
                     _ = sb.Append(ReplacementCharacter);
                 }
             }
-
             else
             {
                 _ = sb.Append(c);
