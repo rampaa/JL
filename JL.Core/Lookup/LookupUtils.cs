@@ -418,14 +418,14 @@ public static class LookupUtils
         int textLength = text.Length;
         List<string> textList = new(textLength);
         List<string> textInHiraganaList = new(textLength);
-        List<List<Form>> deconjugationResultsList = new(textLength);
+        List<List<Form>?> deconjugationResultsList = new(textLength);
         List<List<string>?>? textWithoutLongVowelMarksList = null;
         List<List<List<Form>>?>? deconjugatedTextWithoutLongVowelMarksList = null;
         int estimatedDeconjugatedTextCapacity = 0;
         int textWithoutLongVowelMarksCount = 0;
         int estimatedDeconjugatedTextWithoutLongVowelMarksListCount = 0;
 
-        bool doesNotStartWithLongVowelMark = text[0] is not 'ー' and not '〜';
+        bool doesNotStartWithLongVowelMark = !JapaneseUtils.s_longVowelMarkChars.Contains(text[0]);
         bool countLongVowelMark = doesNotStartWithLongVowelMark;
 
         for (int i = 0; i < textLength; i++)
@@ -450,25 +450,26 @@ public static class LookupUtils
             }
             else
             {
-                deconjugationResultsList.Add([]);
+                deconjugationResultsList.Add(null);
             }
 
+            // TODO: Count non-consecutive long vowel marks
             if (doesNotStartWithLongVowelMark && textInHiragana.Length <= 20)
             {
                 int longVowelMarkCount = 0;
                 if (countLongVowelMark)
                 {
-                    int firstLongVowelMarkIndex = textInHiragana.IndexOfAny(DictUtils.s_longVowelMarkChars);
+                    int firstLongVowelMarkIndex = textInHiragana.IndexOfAny(JapaneseUtils.s_longVowelMarkChars);
                     if (firstLongVowelMarkIndex is not -1)
                     {
-                        int lastLongVowelMarkIndex = textInHiragana.LastIndexOfAny(DictUtils.s_longVowelMarkChars);
+                        int lastLongVowelMarkIndex = textInHiragana.LastIndexOfAny(JapaneseUtils.s_longVowelMarkChars);
                         if (firstLongVowelMarkIndex != lastLongVowelMarkIndex)
                         {
                             longVowelMarkCount = 2;
                             for (int j = firstLongVowelMarkIndex + 1; j < lastLongVowelMarkIndex; j++)
                             {
                                 char character = textInHiragana[j];
-                                if (character is 'ー' or '〜')
+                                if (JapaneseUtils.s_longVowelMarkChars.Contains(character))
                                 {
                                     ++longVowelMarkCount;
                                 }
@@ -525,7 +526,7 @@ public static class LookupUtils
         if (DictUtils.DBIsUsedForAtLeastOneWordDict || dbIsUsedForPitchDict || dbIsUsedForAtLeastOneWordFreqDict)
         {
             HashSet<string> deconjugatedTextsHashSet = new(Math.Min(estimatedDeconjugatedTextCapacity + estimatedDeconjugatedTextWithoutLongVowelMarksListCount, 256), StringComparer.Ordinal);
-            foreach (ref readonly List<Form> deconjugationResults in deconjugationResultsList.AsReadOnlySpan())
+            foreach (ref readonly List<Form>? deconjugationResults in deconjugationResultsList.AsReadOnlySpan())
             {
                 foreach (ref readonly Form form in deconjugationResults.AsReadOnlySpan())
                 {
@@ -552,17 +553,19 @@ public static class LookupUtils
                 }
             }
 
-            deconjugatedTexts = deconjugatedTextsHashSet.ToArray();
+            deconjugatedTexts = deconjugatedTextsHashSet.Count > 0 ? deconjugatedTextsHashSet.ToArray() : null;
         }
 
         HashSet<string>? allSearchKeys = null;
         bool dbIsUsedForAtLeastOneYomichanOrNazekaWordDict = DictUtils.DBIsUsedForAtLeastOneYomichanOrNazekaWordDict;
         if (dbIsUsedForPitchDict || dbIsUsedForAtLeastOneYomichanOrNazekaWordDict)
         {
-            Debug.Assert(deconjugatedTexts is not null);
-            allSearchKeys = new HashSet<string>(textInHiraganaList.Count + deconjugatedTexts.Length + textWithoutLongVowelMarksCount, StringComparer.Ordinal);
+            allSearchKeys = new HashSet<string>(textInHiraganaList.Count + (deconjugatedTexts?.Length ?? 0) + textWithoutLongVowelMarksCount, StringComparer.Ordinal);
             allSearchKeys.UnionWith(textInHiraganaList);
-            allSearchKeys.UnionWith(deconjugatedTexts);
+            if (deconjugatedTexts is not null)
+            {
+                allSearchKeys.UnionWith(deconjugatedTexts);
+            }
 
             if (textWithoutLongVowelMarksList is not null)
             {
@@ -629,7 +632,6 @@ public static class LookupUtils
             foreach (ref readonly Form deconjugationResult in deconjugationResults.AsReadOnlySpan())
             {
                 Debug.Assert(deconjugationResult.Process is not null);
-
                 if (verbDict.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
                     List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
@@ -695,7 +697,7 @@ public static class LookupUtils
     }
 
     private static void GetWordResults(ReadOnlySpan<string> textList, ReadOnlySpan<string> textInHiraganaList,
-        ReadOnlySpan<List<Form>> deconjugationResultsList, string[]? deconjugatedTexts, ReadOnlySpan<List<List<Form>>?> deconjugationResultListForTextWithoutLongVowelMarkList, ReadOnlySpan<List<string>?> textWithoutLongVowelMarkList, ReadOnlySpan<string> allTextWithoutLongVowelMark, Dict dict, bool useDB, Dictionary<string, IntermediaryResult> results, GetRecordsFromDB? getRecordsFromDB)
+        ReadOnlySpan<List<Form>?> deconjugationResultsList, string[]? deconjugatedTexts, ReadOnlySpan<List<List<Form>>?> deconjugationResultListForTextWithoutLongVowelMarkList, ReadOnlySpan<List<string>?> textWithoutLongVowelMarkList, ReadOnlySpan<string> allTextWithoutLongVowelMark, Dict dict, bool useDB, Dictionary<string, IntermediaryResult> results, GetRecordsFromDB? getRecordsFromDB)
     {
         Dictionary<string, IList<IDictRecord>>? dbWordDict = null;
         Dictionary<string, IList<IDictRecord>>? dbVerbDict = null;
@@ -706,8 +708,11 @@ public static class LookupUtils
             Debug.Assert(getRecordsFromDB is not null);
             dbWordDict = getRecordsFromDB(dict.ReadOnlyConnectionString, textInHiraganaList, dict.MaxSearchKeyLength);
 
-            Debug.Assert(deconjugatedTexts is not null);
-            dbVerbDict = getRecordsFromDB(dict.ReadOnlyConnectionString, deconjugatedTexts, dict.MaxSearchKeyLength);
+            if (deconjugatedTexts is not null)
+            {
+                dbVerbDict = getRecordsFromDB(dict.ReadOnlyConnectionString, deconjugatedTexts, dict.MaxSearchKeyLength);
+            }
+
             if (!allTextWithoutLongVowelMark.IsEmpty)
             {
                 dbWordDictForLongVowelConversion = getRecordsFromDB(dict.ReadOnlyConnectionString, allTextWithoutLongVowelMark, dict.MaxSearchKeyLength);
@@ -881,7 +886,7 @@ public static class LookupUtils
             string textInHiragana = textInHiraganaList[i];
             if (nameDict.TryGetValue(textInHiragana, out IList<IDictRecord>? result))
             {
-                results.Add(textInHiragana, new IntermediaryResult(textList[i], dict, result));
+                _ = results.TryAdd(textInHiragana, new IntermediaryResult(textList[i], dict, result));
             }
         }
     }
@@ -1139,6 +1144,7 @@ public static class LookupUtils
                 pitchPositions: pitchAccentDictExists && allReadings is not null ? GetPitchPosition(kanji, allReadings, pitchAccentDict!) : null,
                 kanjiLookupResult: new KanjiLookupResult(kanjiCompositions, yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings, kanjiStats: yomichanKanjiDictResult.BuildFormattedStats())
             );
+
             results.Add(result);
         }
     }

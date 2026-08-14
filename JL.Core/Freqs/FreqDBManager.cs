@@ -18,7 +18,7 @@ namespace JL.Core.Freqs;
 
 internal static class FreqDBManager
 {
-    public const int Version = 12;
+    public const int Version = 13;
 
     private const string Record = "record";
     private const string RowId = "rowid";

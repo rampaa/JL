@@ -13,7 +13,7 @@ namespace JL.Core.Dicts.KANJIDIC;
 
 internal static class KanjidicDBManager
 {
-    public const int Version = 3;
+    public const int Version = 4;
 
     private const string Record = "record";
     private const string Kanji = "kanji";

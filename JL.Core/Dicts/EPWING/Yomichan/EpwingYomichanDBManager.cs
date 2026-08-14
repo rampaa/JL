@@ -20,7 +20,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 34;
+    public const int Version = 35;
 
     public const int Size = 250000;
 
