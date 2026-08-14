@@ -453,45 +453,44 @@ public static class LookupUtils
                 deconjugationResultsList.Add(null);
             }
 
-            // TODO: Count non-consecutive long vowel marks
             if (doesNotStartWithLongVowelMark && textInHiragana.Length <= 20)
             {
-                int longVowelMarkCount = 0;
+                int nonConsecutiveLongVowelMarkCount = 0;
                 if (countLongVowelMark)
                 {
-                    int firstLongVowelMarkIndex = textInHiragana.IndexOfAny(JapaneseUtils.s_longVowelMarkChars);
-                    if (firstLongVowelMarkIndex is not -1)
+                    int longVowelMarkIndex = textInHiragana.IndexOfAny(JapaneseUtils.s_longVowelMarkChars);
+                    if (longVowelMarkIndex is not -1)
                     {
-                        int lastLongVowelMarkIndex = textInHiragana.LastIndexOfAny(JapaneseUtils.s_longVowelMarkChars);
-                        if (firstLongVowelMarkIndex != lastLongVowelMarkIndex)
-                        {
-                            longVowelMarkCount = 2;
-                            for (int j = firstLongVowelMarkIndex + 1; j < lastLongVowelMarkIndex; j++)
-                            {
-                                char character = textInHiragana[j];
-                                if (JapaneseUtils.s_longVowelMarkChars.Contains(character))
-                                {
-                                    ++longVowelMarkCount;
-                                }
+                        nonConsecutiveLongVowelMarkCount = 1;
 
-                                if (longVowelMarkCount is 4)
+                        int nextSearchStartIndex = longVowelMarkIndex + 1;
+                        while (nextSearchStartIndex < textInHiragana.Length)
+                        {
+                            int offset = textInHiragana.AsSpan(nextSearchStartIndex).IndexOfAny(JapaneseUtils.s_longVowelMarkChars);
+                            if (offset is -1)
+                            {
+                                break;
+                            }
+
+                            if (offset > 0)
+                            {
+                                ++nonConsecutiveLongVowelMarkCount;
+                                if (nonConsecutiveLongVowelMarkCount is 4)
                                 {
                                     break;
                                 }
                             }
-                        }
-                        else
-                        {
-                            longVowelMarkCount = 1;
+
+                            nextSearchStartIndex += offset + 1;
                         }
                     }
                 }
 
-                if (longVowelMarkCount > 0)
+                if (nonConsecutiveLongVowelMarkCount > 0)
                 {
                     textWithoutLongVowelMarksList ??= new List<List<string>?>(textLength);
                     deconjugatedTextWithoutLongVowelMarksList ??= new List<List<List<Form>>?>(textLength);
-                    if (longVowelMarkCount < 4)
+                    if (nonConsecutiveLongVowelMarkCount < 4)
                     {
                         List<string> textsWithoutLongVowelMarks = JapaneseUtils.NormalizeLongVowelMark(textInHiragana);
                         textWithoutLongVowelMarksCount += textsWithoutLongVowelMarks.Count;
