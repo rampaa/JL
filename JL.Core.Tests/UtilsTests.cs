@@ -78,7 +78,7 @@ internal sealed class UtilsTests
         // Arrange
         const string expected = "はぁ、『高校生活を振り返って』というテーマの作文でしたが";
 
-        const string text = "「......はぁ、『高校生活を振り返って』というテーマの作文でしたが」";
+        const string text = "「………はぁ、『高校生活を振り返って』というテーマの作文でしたが」";
         const int position = 15;
 
         // Act
@@ -92,9 +92,9 @@ internal sealed class UtilsTests
     public void FindSentence_WorksWithMultiplePunctuationMarksInARow()
     {
         // Arrange
-        const string expected = "今日の晩ご飯はなんと.";
+        const string expected = "今日の晩ご飯はなんと。";
 
-        const string text = "『今日の晩ご飯はなんと......、カレーでしたっ！！』みたいな。";
+        const string text = "『今日の晩ご飯はなんと。。。。。。。、カレーでしたっ！！』みたいな。";
         const int position = 0;
 
         // Act
