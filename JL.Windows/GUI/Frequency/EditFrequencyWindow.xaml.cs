@@ -12,6 +12,7 @@ using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Windows.GUI.Options;
+using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 
