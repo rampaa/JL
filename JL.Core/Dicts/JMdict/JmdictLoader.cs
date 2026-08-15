@@ -144,7 +144,6 @@ internal static class JmdictLoader
 
                 int maxSearchKeyLengthForFusejiGeneration;
                 int maxTotalFuseji;
-                int maxConsecutiveFuseji;
                 if (generateFusejiVariants)
                 {
                     Debug.Assert(dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
@@ -152,15 +151,11 @@ internal static class JmdictLoader
 
                     Debug.Assert(dict.Options.MaxTotalFusejiCount is not null);
                     maxTotalFuseji = dict.Options.MaxTotalFusejiCount.Value;
-
-                    Debug.Assert(dict.Options.MaxConsecutiveFusejiCount is not null);
-                    maxConsecutiveFuseji = dict.Options.MaxConsecutiveFusejiCount.Value;
                 }
                 else
                 {
                     maxSearchKeyLengthForFusejiGeneration = 0;
                     maxTotalFuseji = 0;
-                    maxConsecutiveFuseji = 0;
                 }
 
                 Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
@@ -190,7 +185,7 @@ internal static class JmdictLoader
 
                             if (generateFusejiVariants)
                             {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(key, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(key, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
                                     if (!recordDictionary.ContainsKey(fusejiVariant))
                                     {
@@ -212,7 +207,7 @@ internal static class JmdictLoader
                                             {
                                                 if (DictUtils.AddRecordToDictionary(mazegaki, record, dict) && generateFusejiVariants)
                                                 {
-                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                     {
                                                         if (!recordDictionary.ContainsKey(fusejiVariant))
                                                         {

@@ -223,20 +223,6 @@ internal sealed partial class DictOptionsControl
             maxTotalFusejiCountOption = new MaxTotalFusejiCountOption((int)MaxTotalFusejiCountNumericUpDown.Value);
         }
 
-        MaxConsecutiveFusejiCountOption? maxConsecutiveFusejiCountOption = null;
-        if (MaxConsecutiveFusejiCountOption.ValidDictTypes.Contains(type))
-        {
-            Debug.Assert(maxTotalFusejiCountOption is not null);
-
-            int maxConsecutiveFuseji = (int)MaxConsecutiveFusejiCountNumericUpDown.Value;
-            if (maxConsecutiveFuseji > maxTotalFusejiCountOption.Value)
-            {
-                maxConsecutiveFuseji = maxTotalFusejiCountOption.Value;
-            }
-
-            maxConsecutiveFusejiCountOption = new MaxConsecutiveFusejiCountOption(maxConsecutiveFuseji);
-        }
-
         DictOptions options = new(
             useDBOption,
             noAllOption,
@@ -265,8 +251,7 @@ internal sealed partial class DictOptionsControl
             generateMazegakiOption,
             generateFusejiVariantsOption,
             maxSearchKeyLengthForFusejiGenerationOption,
-            maxTotalFusejiCountOption,
-            maxConsecutiveFusejiCountOption);
+            maxTotalFusejiCountOption);
 
         return options;
     }
@@ -301,7 +286,6 @@ internal sealed partial class DictOptionsControl
         OptionUtils.ChangeVisibilityOfCheckBox(GenerateFusejiVariantsOption.ValidDictTypes.Contains(dictType), GenerateFusejiVariantsCheckBox, dictOptions?.GenerateFusejiVariants?.Value ?? false, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfNumericUpDown(MaxSearchKeyLengthForFusejiGenerationOption.ValidDictTypes.Contains(dictType), MaxSearchKeyLengthForFusejiGenerationNumericUpDown, MaxSearchKeyLengthForFusejiGenerationDockPanel, dictOptions?.MaxSearchKeyLengthForFusejiGeneration?.Value ?? 9, ref showDictOptions);
         OptionUtils.ChangeVisibilityOfNumericUpDown(MaxTotalFusejiCountOption.ValidDictTypes.Contains(dictType), MaxTotalFusejiCountNumericUpDown, MaxTotalFusejiDockPanel, dictOptions?.MaxTotalFusejiCount?.Value ?? 1, ref showDictOptions);
-        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxConsecutiveFusejiCountOption.ValidDictTypes.Contains(dictType), MaxConsecutiveFusejiCountNumericUpDown, MaxConsecutiveFusejiDockPanel, dictOptions?.MaxConsecutiveFusejiCount?.Value ?? 1, ref showDictOptions);
 
         if (dictOptions is not null)
         {

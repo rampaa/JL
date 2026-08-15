@@ -28,8 +28,7 @@ public sealed class DictOptions(
     GenerateMazegakiVariantsOption? generateMazegakiVariants = null,
     GenerateFusejiVariantsOption? generateFusejiVariants = null,
     MaxSearchKeyLengthForFusejiGenerationOption? maxSearchKeyLengthForFusejiGeneration = null,
-    MaxTotalFusejiCountOption? maxTotalFusejiCount = null,
-    MaxConsecutiveFusejiCountOption? maxConsecutiveFusejiCount = null)
+    MaxTotalFusejiCountOption? maxTotalFusejiCount = null)
 {
     public UseDBOption UseDB { get; } = useDB;
     public NoAllOption NoAll { get; } = noAll;
@@ -63,5 +62,4 @@ public sealed class DictOptions(
     public GenerateFusejiVariantsOption? GenerateFusejiVariants { get; internal set; } = generateFusejiVariants;
     public MaxSearchKeyLengthForFusejiGenerationOption? MaxSearchKeyLengthForFusejiGeneration { get; internal set; } = maxSearchKeyLengthForFusejiGeneration;
     public MaxTotalFusejiCountOption? MaxTotalFusejiCount { get; internal set; } = maxTotalFusejiCount;
-    public MaxConsecutiveFusejiCountOption? MaxConsecutiveFusejiCount { get; internal set; } = maxConsecutiveFusejiCount;
 }

@@ -143,7 +143,6 @@ internal static class EpwingNazekaDBManager
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
-        int maxConsecutiveFuseji;
         if (generateFusejiVariants)
         {
             Debug.Assert(dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
@@ -151,15 +150,11 @@ internal static class EpwingNazekaDBManager
 
             Debug.Assert(dict.Options.MaxTotalFusejiCount is not null);
             maxTotalFuseji = dict.Options.MaxTotalFusejiCount.Value;
-
-            Debug.Assert(dict.Options.MaxConsecutiveFusejiCount is not null);
-            maxConsecutiveFuseji = dict.Options.MaxConsecutiveFusejiCount.Value;
         }
         else
         {
             maxSearchKeyLengthForFusejiGeneration = 0;
             maxTotalFuseji = 0;
-            maxConsecutiveFuseji = 0;
         }
 
         ulong rowId = 1;
@@ -311,7 +306,7 @@ internal static class EpwingNazekaDBManager
                         {
                             if (generateFusejiVariants)
                             {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
                                     _ = keys.Add(fusejiVariant);
                                 }
@@ -326,7 +321,7 @@ internal static class EpwingNazekaDBManager
                                     {
                                         if (generateFusejiVariants)
                                         {
-                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                             {
                                                 _ = keys.Add(fusejiVariant);
                                             }
@@ -338,7 +333,7 @@ internal static class EpwingNazekaDBManager
                                             {
                                                 if (keys.Add(mazegaki) && generateFusejiVariants)
                                                 {
-                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                     {
                                                         _ = keys.Add(fusejiVariant);
                                                     }

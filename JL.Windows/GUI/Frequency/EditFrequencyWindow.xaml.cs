@@ -12,7 +12,6 @@ using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Windows.GUI.Options;
-using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 
@@ -146,17 +145,14 @@ internal sealed partial class EditFrequencyWindow
         {
             Debug.Assert(_freq.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
             Debug.Assert(_freq.Options.MaxTotalFusejiCount is not null);
-            Debug.Assert(_freq.Options.MaxConsecutiveFusejiCount is not null);
 
             Debug.Assert(options.GenerateFusejiVariants is not null);
             Debug.Assert(options.MaxSearchKeyLengthForFusejiGeneration is not null);
             Debug.Assert(options.MaxTotalFusejiCount is not null);
-            Debug.Assert(options.MaxConsecutiveFusejiCount is not null);
 
             if (_freq.Options.GenerateFusejiVariants.Value != options.GenerateFusejiVariants.Value
                 || _freq.Options.MaxSearchKeyLengthForFusejiGeneration.Value != options.MaxSearchKeyLengthForFusejiGeneration.Value
-                || _freq.Options.MaxTotalFusejiCount.Value != options.MaxTotalFusejiCount.Value
-                || _freq.Options.MaxConsecutiveFusejiCount.Value != options.MaxConsecutiveFusejiCount.Value)
+                || _freq.Options.MaxTotalFusejiCount.Value != options.MaxTotalFusejiCount.Value)
             {
                 _freq.Ready = false;
                 _freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;

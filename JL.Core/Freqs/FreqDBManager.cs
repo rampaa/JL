@@ -349,7 +349,6 @@ internal static class FreqDBManager
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
-        int maxConsecutiveFuseji;
         if (generateFusejiVariants)
         {
             Debug.Assert(freq.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
@@ -357,15 +356,11 @@ internal static class FreqDBManager
 
             Debug.Assert(freq.Options.MaxTotalFusejiCount is not null);
             maxTotalFuseji = freq.Options.MaxTotalFusejiCount.Value;
-
-            Debug.Assert(freq.Options.MaxConsecutiveFusejiCount is not null);
-            maxConsecutiveFuseji = freq.Options.MaxConsecutiveFusejiCount.Value;
         }
         else
         {
             maxSearchKeyLengthForFusejiGeneration = 0;
             maxTotalFuseji = 0;
-            maxConsecutiveFuseji = 0;
         }
 
         ulong rowId = 1;
@@ -562,7 +557,7 @@ internal static class FreqDBManager
 
                             if (generateFusejiVariants)
                             {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
                                     if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithPrimarySpelling, false, commandsAndParameters))
                                     {
@@ -581,7 +576,7 @@ internal static class FreqDBManager
 
                             if (generateFusejiVariants)
                             {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
                                     if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithPrimarySpelling, false, commandsAndParameters))
                                     {
@@ -600,7 +595,7 @@ internal static class FreqDBManager
 
                             if (generateFusejiVariants)
                             {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
                                     if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
                                     {
@@ -620,7 +615,7 @@ internal static class FreqDBManager
 
                                     if (generateFusejiVariants)
                                     {
-                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                         {
                                             if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
                                             {
@@ -722,7 +717,6 @@ internal static class FreqDBManager
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
-        int maxConsecutiveFuseji;
         if (generateFusejiVariants)
         {
             Debug.Assert(freq.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
@@ -730,15 +724,11 @@ internal static class FreqDBManager
 
             Debug.Assert(freq.Options.MaxTotalFusejiCount is not null);
             maxTotalFuseji = freq.Options.MaxTotalFusejiCount.Value;
-
-            Debug.Assert(freq.Options.MaxConsecutiveFusejiCount is not null);
-            maxConsecutiveFuseji = freq.Options.MaxConsecutiveFusejiCount.Value;
         }
         else
         {
             maxSearchKeyLengthForFusejiGeneration = 0;
             maxTotalFuseji = 0;
-            maxConsecutiveFuseji = 0;
         }
 
         ulong rowId = 1;
@@ -873,7 +863,7 @@ internal static class FreqDBManager
 
                     if (generateFusejiVariants)
                     {
-                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                         {
                             if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithExactSpelling, false, commandsAndParameters))
                             {
@@ -895,7 +885,7 @@ internal static class FreqDBManager
 
                         if (generateFusejiVariants)
                         {
-                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
                                 if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
                                 {
@@ -914,7 +904,7 @@ internal static class FreqDBManager
 
                                     if (generateFusejiVariants)
                                     {
-                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                         {
                                             if (AddOrUpdate(fusejiVariant, rowId, frequencyRecordWithReading, false, commandsAndParameters))
                                             {

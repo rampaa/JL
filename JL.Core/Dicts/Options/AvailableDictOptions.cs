@@ -220,19 +220,6 @@ public sealed class MaxSearchKeyLengthForFusejiGenerationOption(int value)
         DictType.PitchAccentYomichan];
 }
 
-public sealed class MaxConsecutiveFusejiCountOption(int value)
-{
-    public int Value { get; } = value;
-
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes =
-        [DictType.JMdict, DictType.JMnedict,
-        DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
-        DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
-        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary,
-        DictType.PitchAccentYomichan];
-}
-
 public sealed class MaxTotalFusejiCountOption(int value)
 {
     public int Value { get; } = value;

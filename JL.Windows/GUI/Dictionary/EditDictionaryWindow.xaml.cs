@@ -210,17 +210,14 @@ internal sealed partial class EditDictionaryWindow
         {
             Debug.Assert(_dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
             Debug.Assert(_dict.Options.MaxTotalFusejiCount is not null);
-            Debug.Assert(_dict.Options.MaxConsecutiveFusejiCount is not null);
 
             Debug.Assert(options.GenerateFusejiVariants is not null);
             Debug.Assert(options.MaxSearchKeyLengthForFusejiGeneration is not null);
             Debug.Assert(options.MaxTotalFusejiCount is not null);
-            Debug.Assert(options.MaxConsecutiveFusejiCount is not null);
 
             if (_dict.Options.GenerateFusejiVariants.Value != options.GenerateFusejiVariants.Value
                 || _dict.Options.MaxSearchKeyLengthForFusejiGeneration.Value != options.MaxSearchKeyLengthForFusejiGeneration.Value
-                || _dict.Options.MaxTotalFusejiCount.Value != options.MaxTotalFusejiCount.Value
-                || _dict.Options.MaxConsecutiveFusejiCount.Value != options.MaxConsecutiveFusejiCount.Value)
+                || _dict.Options.MaxTotalFusejiCount.Value != options.MaxTotalFusejiCount.Value)
             {
                 _dict.Ready = false;
                 _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;

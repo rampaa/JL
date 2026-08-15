@@ -31,7 +31,6 @@ internal static class YomichanPitchAccentLoader
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
-        int maxConsecutiveFuseji;
         if (generateFusejiVariants)
         {
             Debug.Assert(dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
@@ -39,15 +38,11 @@ internal static class YomichanPitchAccentLoader
 
             Debug.Assert(dict.Options.MaxTotalFusejiCount is not null);
             maxTotalFuseji = dict.Options.MaxTotalFusejiCount.Value;
-
-            Debug.Assert(dict.Options.MaxConsecutiveFusejiCount is not null);
-            maxConsecutiveFuseji = dict.Options.MaxConsecutiveFusejiCount.Value;
         }
         else
         {
             maxSearchKeyLengthForFusejiGeneration = 0;
             maxTotalFuseji = 0;
-            maxConsecutiveFuseji = 0;
         }
 
         // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
@@ -72,7 +67,7 @@ internal static class YomichanPitchAccentLoader
                     {
                         if (generateFusejiVariants)
                         {
-                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(spellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(spellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
                                 _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                             }
@@ -87,7 +82,7 @@ internal static class YomichanPitchAccentLoader
                                 {
                                     if (generateFusejiVariants)
                                     {
-                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                         {
                                             _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                         }
@@ -101,7 +96,7 @@ internal static class YomichanPitchAccentLoader
                                             {
                                                 if (generateFusejiVariants)
                                                 {
-                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                     {
                                                         _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                                     }

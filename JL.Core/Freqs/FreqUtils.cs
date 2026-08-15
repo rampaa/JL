@@ -38,8 +38,8 @@ public static class FreqUtils
                     generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)))
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1))
+                )
         },
         {
             "Narou (Nazeka)",
@@ -52,8 +52,9 @@ public static class FreqUtils
                     generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)))
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)
+                    )
+                )
         },
         {
             "Novel (Nazeka)",
@@ -66,8 +67,8 @@ public static class FreqUtils
                     generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)))
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1))
+                )
         }
     };
 
@@ -533,10 +534,6 @@ public static class FreqUtils
         if (MaxTotalFusejiCountOption.ValidFreqTypes.Contains(freq.Type))
         {
             freq.Options.MaxTotalFusejiCount ??= new MaxTotalFusejiCountOption(1);
-        }
-        if (MaxConsecutiveFusejiCountOption.ValidFreqTypes.Contains(freq.Type))
-        {
-            freq.Options.MaxConsecutiveFusejiCount ??= new MaxConsecutiveFusejiCountOption(1);
         }
     }
 

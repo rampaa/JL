@@ -10,7 +10,7 @@ internal ref struct FusejiVariantEnumerator
     private readonly AvailableGraphemeIndicesBuffer _availableGraphemeIndicesBuffer;
     private readonly int _totalGraphemeCount;
     private readonly int _availableGraphemeCount;
-    private readonly int _maxAllowedConsecutiveMasks;
+    private readonly int _originalMaskedGraphemeCount;
     private readonly int _maxMasksWeCanInsert;
     private readonly ulong _originalMaskBitmask;
 
@@ -21,7 +21,7 @@ internal ref struct FusejiVariantEnumerator
     private int _currentCombinationSize;
     private ulong _currentCombinationBitmask;
 
-    public FusejiVariantEnumerator(ReadOnlySpan<char> text, int maxTotalFuseji, int maxConsecutiveFuseji, int maxSearchKeyLengthForFusejiGeneration)
+    public FusejiVariantEnumerator(ReadOnlySpan<char> text, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration)
     {
         Current = "";
         if (text.Length > maxSearchKeyLengthForFusejiGeneration)
@@ -60,14 +60,20 @@ internal ref struct FusejiVariantEnumerator
             graphemeCharacterOffsets,
             maxTotalFuseji,
             out _originalMaskBitmask);
+        _originalMaskedGraphemeCount = originalMaskedGraphemeCount;
 
         int maxAcceptableGraphemeCount = Math.Max(_totalGraphemeCount - 2, 1);
         int maxAllowedTotalMasks = Math.Min(maxAcceptableGraphemeCount, maxTotalFuseji);
-        _maxAllowedConsecutiveMasks = Math.Min(maxAcceptableGraphemeCount, maxConsecutiveFuseji);
 
         bool tooManyOriginalMasks = originalMaskedGraphemeCount > maxAllowedTotalMasks;
-        bool tooManyConsecutiveOriginalMasks = HasTooManyConsecutiveMaskedGraphemes(_originalMaskBitmask, _maxAllowedConsecutiveMasks);
-        if (tooManyOriginalMasks || tooManyConsecutiveOriginalMasks)
+        if (tooManyOriginalMasks)
+        {
+            _hasNoValidVariants = true;
+            return;
+        }
+
+        bool originalFailsAnchorRule = !IsDecipherable(_originalMaskBitmask, originalMaskedGraphemeCount, _totalGraphemeCount);
+        if (originalFailsAnchorRule)
         {
             _hasNoValidVariants = true;
             return;
@@ -172,11 +178,13 @@ internal ref struct FusejiVariantEnumerator
             bitmask = SetBit(bitmask, graphemeIndex);
         }
 
-        if (HasTooManyConsecutiveMaskedGraphemes(bitmask, _maxAllowedConsecutiveMasks))
+        int totalMaskedGraphemeCount = _originalMaskedGraphemeCount + _currentCombinationSize;
+        if (!IsDecipherable(bitmask, totalMaskedGraphemeCount, _totalGraphemeCount))
         {
             combinationBitmask = 0;
             return false;
         }
+
         combinationBitmask = bitmask;
         return true;
     }
@@ -373,18 +381,18 @@ internal ref struct FusejiVariantEnumerator
         return bitmask & (bitmask - 1);
     }
 
-    // Two masked graphemes are "consecutive" when their bits are adjacent. Shifting the
-    // bitmask by 1..maxAllowedConsecutiveMasks and AND-ing with itself leaves a nonzero
-    // result only if a run longer than maxAllowedConsecutiveMasks exists.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool HasTooManyConsecutiveMaskedGraphemes(ulong maskBitmask, int maxAllowedConsecutiveMasks)
+    private static bool IsDecipherable(ulong maskBitmask, int maskedGraphemeCount, int totalGraphemeCount)
     {
-        ulong overlapBitmask = maskBitmask;
-        for (int shiftAmount = 1; shiftAmount <= maxAllowedConsecutiveMasks; shiftAmount++)
+        bool firstGraphemeUnmasked = !IsBitSet(maskBitmask, 0);
+        bool lastGraphemeUnmasked = !IsBitSet(maskBitmask, totalGraphemeCount - 1);
+        if (firstGraphemeUnmasked && lastGraphemeUnmasked)
         {
-            overlapBitmask &= maskBitmask >> shiftAmount;
+            return true;
         }
 
-        return overlapBitmask is not 0;
+        int unmaskedGraphemeCount = totalGraphemeCount - maskedGraphemeCount;
+        int requiredUnmaskedGraphemeCount = (totalGraphemeCount + 1) / 2;
+        return unmaskedGraphemeCount >= requiredUnmaskedGraphemeCount;
     }
 }

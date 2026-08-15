@@ -91,8 +91,7 @@ public static class DictUtils
                     generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
                 maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
@@ -112,8 +111,7 @@ public static class DictUtils
                     maxImageHeight: new MaxImageHeightOption(0),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
                 maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
@@ -131,8 +129,7 @@ public static class DictUtils
                     generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
                 maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
@@ -152,8 +149,7 @@ public static class DictUtils
                     maxImageHeight: new MaxImageHeightOption(0),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
                 maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
@@ -185,8 +181,7 @@ public static class DictUtils
                     generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)
                 ),
                 37,
                 autoUpdatable: true,
@@ -217,8 +212,7 @@ public static class DictUtils
                     autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
                     generateFusejiVariants: new GenerateFusejiVariantsOption(false),
                     maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1),
-                    maxConsecutiveFusejiCount: new MaxConsecutiveFusejiCountOption(1)),
+                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
                 41,
                 autoUpdatable: true,
                 url: s_jmnedictUrl,
@@ -1187,7 +1181,6 @@ public static class DictUtils
             dict.Options.GenerateFusejiVariants ??= builtInJmdictOptions.GenerateFusejiVariants;
             dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInJmdictOptions.MaxSearchKeyLengthForFusejiGeneration;
             dict.Options.MaxTotalFusejiCount ??= builtInJmdictOptions.MaxTotalFusejiCount;
-            dict.Options.MaxConsecutiveFusejiCount ??= builtInJmdictOptions.MaxConsecutiveFusejiCount;
         }
         else if (dict.Type is DictType.Kanjidic)
         {
@@ -1203,7 +1196,6 @@ public static class DictUtils
             dict.Options.GenerateFusejiVariants ??= builtInJmnedictOptions.GenerateFusejiVariants;
             dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInJmnedictOptions.MaxSearchKeyLengthForFusejiGeneration;
             dict.Options.MaxTotalFusejiCount ??= builtInJmnedictOptions.MaxTotalFusejiCount;
-            dict.Options.MaxConsecutiveFusejiCount ??= builtInJmnedictOptions.MaxConsecutiveFusejiCount;
         }
         else if (dict.Type is DictType.CustomWordDictionary or DictType.ProfileCustomWordDictionary)
         {
@@ -1213,7 +1205,6 @@ public static class DictUtils
             dict.Options.GenerateFusejiVariants ??= builtInCustomWordOptions.GenerateFusejiVariants;
             dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInCustomWordOptions.MaxSearchKeyLengthForFusejiGeneration;
             dict.Options.MaxTotalFusejiCount ??= builtInCustomWordOptions.MaxTotalFusejiCount;
-            dict.Options.MaxConsecutiveFusejiCount ??= builtInCustomWordOptions.MaxConsecutiveFusejiCount;
         }
         else if (dict.Type is DictType.CustomNameDictionary or DictType.ProfileCustomNameDictionary)
         {
@@ -1226,7 +1217,6 @@ public static class DictUtils
             dict.Options.GenerateFusejiVariants ??= builtInCustomNameOptions.GenerateFusejiVariants;
             dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInCustomNameOptions.MaxSearchKeyLengthForFusejiGeneration;
             dict.Options.MaxTotalFusejiCount ??= builtInCustomNameOptions.MaxTotalFusejiCount;
-            dict.Options.MaxConsecutiveFusejiCount ??= builtInCustomNameOptions.MaxConsecutiveFusejiCount;
         }
         else
         {
@@ -1277,10 +1267,6 @@ public static class DictUtils
             if (MaxTotalFusejiCountOption.ValidDictTypes.Contains(dict.Type))
             {
                 dict.Options.MaxTotalFusejiCount ??= new MaxTotalFusejiCountOption(1);
-            }
-            if (MaxConsecutiveFusejiCountOption.ValidDictTypes.Contains(dict.Type))
-            {
-                dict.Options.MaxConsecutiveFusejiCount ??= new MaxConsecutiveFusejiCountOption(1);
             }
         }
     }

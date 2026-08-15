@@ -6,8 +6,7 @@ public sealed class FreqOptions(UseDBOption useDB,
     GenerateMazegakiVariantsOption? generateMazegakiVariants = null,
     GenerateFusejiVariantsOption? generateFusejiVariants = null,
     MaxSearchKeyLengthForFusejiGenerationOption? maxSearchKeyLengthForFusejiGeneration = null,
-    MaxTotalFusejiCountOption? maxTotalFusejiCount = null,
-    MaxConsecutiveFusejiCountOption? maxConsecutiveFusejiCount = null)
+    MaxTotalFusejiCountOption? maxTotalFusejiCount = null)
 {
     public UseDBOption UseDB { get; } = useDB;
     public HigherValueMeansHigherFrequencyOption HigherValueMeansHigherFrequency { get; } = higherValueMeansHigherFrequency;
@@ -19,5 +18,4 @@ public sealed class FreqOptions(UseDBOption useDB,
     public GenerateFusejiVariantsOption? GenerateFusejiVariants { get; internal set; } = generateFusejiVariants;
     public MaxSearchKeyLengthForFusejiGenerationOption? MaxSearchKeyLengthForFusejiGeneration { get; internal set; } = maxSearchKeyLengthForFusejiGeneration;
     public MaxTotalFusejiCountOption? MaxTotalFusejiCount { get; internal set; } = maxTotalFusejiCount;
-    public MaxConsecutiveFusejiCountOption? MaxConsecutiveFusejiCount { get; internal set; } = maxConsecutiveFusejiCount;
 }

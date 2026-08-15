@@ -42,7 +42,6 @@ internal static class EpwingYomichanLoader
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
-        int maxConsecutiveFuseji;
         if (generateFusejiVariants)
         {
             Debug.Assert(dict.Options.MaxSearchKeyLengthForFusejiGeneration is not null);
@@ -50,15 +49,11 @@ internal static class EpwingYomichanLoader
 
             Debug.Assert(dict.Options.MaxTotalFusejiCount is not null);
             maxTotalFuseji = dict.Options.MaxTotalFusejiCount.Value;
-
-            Debug.Assert(dict.Options.MaxConsecutiveFusejiCount is not null);
-            maxConsecutiveFuseji = dict.Options.MaxConsecutiveFusejiCount.Value;
         }
         else
         {
             maxSearchKeyLengthForFusejiGeneration = 0;
             maxTotalFuseji = 0;
-            maxConsecutiveFuseji = 0;
         }
 
         foreach (string jsonFile in jsonFiles)
@@ -83,7 +78,7 @@ internal static class EpwingYomichanLoader
                             {
                                 if (generateFusejiVariants)
                                 {
-                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                     {
                                         _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                     }
@@ -98,7 +93,7 @@ internal static class EpwingYomichanLoader
                                         {
                                             if (generateFusejiVariants)
                                             {
-                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                 {
                                                     _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                                 }
@@ -112,7 +107,7 @@ internal static class EpwingYomichanLoader
                                                     {
                                                         if (generateFusejiVariants)
                                                         {
-                                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxConsecutiveFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                             {
                                                                 _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
                                                             }

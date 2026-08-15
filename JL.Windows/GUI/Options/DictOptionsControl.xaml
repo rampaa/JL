@@ -96,16 +96,6 @@
                                TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
                 </DockPanel>
 
-                <DockPanel x:Name="MaxConsecutiveFusejiDockPanel" Visibility="Collapsed">
-                    <hc:NumericUpDown x:Name="MaxConsecutiveFusejiCountNumericUpDown" Minimum="1" Maximum="4"
-                                      HorizontalAlignment="Left" VerticalAlignment="Center"
-                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
-                    <TextBlock Text="Max consecutive fuseji count"
-                               Cursor="Help"
-                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
-                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
-                </DockPanel>
-
                 <CheckBox Name="WordClassInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show part-of-speech info" ToolTip="e.g. n, v5s" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>

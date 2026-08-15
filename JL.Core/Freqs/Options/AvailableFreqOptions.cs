@@ -47,14 +47,6 @@ public sealed class MaxSearchKeyLengthForFusejiGenerationOption(int value)
     public static readonly FreqType[] ValidFreqTypes = [FreqType.Yomichan, FreqType.Nazeka];
 }
 
-public sealed class MaxConsecutiveFusejiCountOption(int value)
-{
-    public int Value { get; } = value;
-
-    [JsonIgnore]
-    public static readonly FreqType[] ValidFreqTypes = [FreqType.Yomichan, FreqType.Nazeka];
-}
-
 public sealed class MaxTotalFusejiCountOption(int value)
 {
     public int Value { get; } = value;

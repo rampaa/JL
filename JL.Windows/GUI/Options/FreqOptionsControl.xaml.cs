@@ -68,20 +68,13 @@ internal sealed partial class FreqOptionsControl
             maxTotalFusejiCountOption = new MaxTotalFusejiCountOption(double.ConvertToIntegerNative<int>(MaxTotalFusejiCountNumericUpDown.Value));
         }
 
-        MaxConsecutiveFusejiCountOption? maxConsecutiveFusejiCountOption = null;
-        if (MaxConsecutiveFusejiCountOption.ValidFreqTypes.Contains(type))
-        {
-            maxConsecutiveFusejiCountOption = new MaxConsecutiveFusejiCountOption(double.ConvertToIntegerNative<int>(MaxConsecutiveFusejiCountNumericUpDown.Value));
-        }
-
         FreqOptions options = new(useDBOption,
             higherValueMeansHigherFrequencyOption,
             autoUpdateAfterNDaysOption,
             generateMazegakiVariantsOption,
             generateFusejiVariantsOption,
             maxSearchKeyLengthForFusejiGenerationOption,
-            maxTotalFusejiCountOption,
-            maxConsecutiveFusejiCountOption);
+            maxTotalFusejiCountOption);
 
         return options;
     }
@@ -97,7 +90,6 @@ internal sealed partial class FreqOptionsControl
         OptionUtils.ChangeVisibilityOfCheckBox(GenerateFusejiVariantsOption.ValidFreqTypes.Contains(freqType), GenerateFusejiVariantsCheckBox, freqOptions?.GenerateFusejiVariants?.Value ?? false, ref showFreqOptions);
         OptionUtils.ChangeVisibilityOfNumericUpDown(MaxSearchKeyLengthForFusejiGenerationOption.ValidFreqTypes.Contains(freqType), MaxSearchKeyLengthForFusejiGenerationNumericUpDown, MaxSearchKeyLengthForFusejiGenerationDockPanel, freqOptions?.MaxSearchKeyLengthForFusejiGeneration?.Value ?? 9, ref showFreqOptions);
         OptionUtils.ChangeVisibilityOfNumericUpDown(MaxTotalFusejiCountOption.ValidFreqTypes.Contains(freqType), MaxTotalFusejiCountNumericUpDown, MaxTotalFusejiDockPanel, freqOptions?.MaxTotalFusejiCount?.Value ?? 1, ref showFreqOptions);
-        OptionUtils.ChangeVisibilityOfNumericUpDown(MaxConsecutiveFusejiCountOption.ValidFreqTypes.Contains(freqType), MaxConsecutiveFusejiCountNumericUpDown, MaxConsecutiveFusejiDockPanel, freqOptions?.MaxConsecutiveFusejiCount?.Value ?? 1, ref showFreqOptions);
 
         if (showFreqOptions)
         {
