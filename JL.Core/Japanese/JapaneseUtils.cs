@@ -349,9 +349,9 @@ public static partial class JapaneseUtils
 
     private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters)]);
 
-    internal static readonly SearchValues<char> s_fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '□', '△', '▽', '◎', '☆', '◇', '●', '⬤', '■', '▲', '▼', '◉', '★', '◆', '×');
+    internal static readonly SearchValues<char> s_fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#');
     internal static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜', '~');
-    internal static readonly SearchValues<char> s_charsToSkip = SearchValues.Create(' ', '　', '・', '.', '･', '·', '＝', '=', '゠');
+    private static readonly SearchValues<char> s_charsToStrip = SearchValues.Create(' ', '・', '.', '·', '=', '゠', '☆', '★', '†', '‡', '♥', '♡');
     private static readonly SearchValues<char> s_longVowelMarksAndSmallVowelHiragana = SearchValues.Create(
     [
         'ー', '〜', '~', .. SmallVowelHiraganaToFinalVowelDict.Keys
@@ -384,8 +384,8 @@ public static partial class JapaneseUtils
     private static readonly SearchValues<char> s_charactersToNormalize = SearchValues.Create(
     [
         '々', '〻', 'ゝ', 'ゞ', // IsIterationMark
-        NormalizedFuseji, '〇', '◯', '□', '△', '▽', '◎', '☆', '◇', '●', '⬤', '■', '▲', '▼', '◉', '★', '◆', '×', // s_fuseji
-        ' ', '　', '・', '.', '･', '·', '＝', '=', '゠', // s_charsToSkip
+        NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#', // s_fuseji
+        ' ', '・', '.', '·', '=', '゠', '☆', '★', '†', '‡', '♥', '♡', // s_charsToStrip
         VariationSelectorSupplementHighSurrogate,
         .. SmallVowelHiraganaToFinalVowelDict.Keys,
         .. s_normalizationDict.Keys,
@@ -474,7 +474,7 @@ public static partial class JapaneseUtils
                     }
                 }
 
-                if (i > 0 && s_charsToSkip.Contains(character))
+                if (i > 0 && s_charsToStrip.Contains(character))
                 {
                     continue;
                 }
