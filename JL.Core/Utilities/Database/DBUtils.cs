@@ -267,6 +267,20 @@ public static class DBUtils
         ValidateForeignKeys(connection);
     }
 
+    internal static void SetEncodingToUtf16LE(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA encoding = 'UTF-16le';";
+        _ = command.ExecuteNonQuery();
+    }
+
+    internal static void SetPageSizeTo64k(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA page_size = 65536;";
+        _ = command.ExecuteNonQuery();
+    }
+
     internal static void EnableForeignKeySupport(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();

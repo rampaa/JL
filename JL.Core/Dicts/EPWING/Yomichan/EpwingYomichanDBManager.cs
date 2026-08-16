@@ -91,6 +91,10 @@ internal static class EpwingYomichanDBManager
     public static void CreateDB(string dbPath)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
+
+        DBUtils.SetEncodingToUtf16LE(connection);
+        DBUtils.SetPageSizeTo64k(connection);
+
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
