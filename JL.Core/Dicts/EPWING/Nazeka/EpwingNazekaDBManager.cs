@@ -21,7 +21,7 @@ namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaDBManager
 {
-    public const int Version = 20;
+    public const int Version = 21;
 
     private const string Record = "record";
     private const string RowId = "rowid";

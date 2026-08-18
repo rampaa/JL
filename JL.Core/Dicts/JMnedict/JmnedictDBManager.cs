@@ -17,7 +17,7 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictDBManager
 {
-    public const int Version = 9;
+    public const int Version = 10;
 
     private const string Record = "record";
     private const string RowId = "rowid";

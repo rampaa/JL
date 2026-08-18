@@ -425,7 +425,7 @@ public static class LookupUtils
         int textWithoutLongVowelMarksCount = 0;
         int estimatedDeconjugatedTextWithoutLongVowelMarksListCount = 0;
 
-        bool doesNotStartWithLongVowelMark = !JapaneseUtils.s_longVowelMarkChars.Contains(text[0]);
+        bool doesNotStartWithLongVowelMark = !JapaneseUtils.s_longVowelMarkCharsNotNormalized.Contains(text[0]);
         bool countLongVowelMark = doesNotStartWithLongVowelMark;
 
         for (int i = 0; i < textLength; i++)
@@ -455,36 +455,9 @@ public static class LookupUtils
 
             if (doesNotStartWithLongVowelMark && textInHiragana.Length <= 20)
             {
-                int nonConsecutiveLongVowelMarkCount = 0;
-                if (countLongVowelMark)
-                {
-                    int longVowelMarkIndex = textInHiragana.IndexOfAny(JapaneseUtils.s_longVowelMarkChars);
-                    if (longVowelMarkIndex is not -1)
-                    {
-                        nonConsecutiveLongVowelMarkCount = 1;
-
-                        int nextSearchStartIndex = longVowelMarkIndex + 1;
-                        while (nextSearchStartIndex < textInHiragana.Length)
-                        {
-                            int offset = textInHiragana.AsSpan(nextSearchStartIndex).IndexOfAny(JapaneseUtils.s_longVowelMarkChars);
-                            if (offset is -1)
-                            {
-                                break;
-                            }
-
-                            if (offset > 0)
-                            {
-                                ++nonConsecutiveLongVowelMarkCount;
-                                if (nonConsecutiveLongVowelMarkCount is 4)
-                                {
-                                    break;
-                                }
-                            }
-
-                            nextSearchStartIndex += offset + 1;
-                        }
-                    }
-                }
+                int nonConsecutiveLongVowelMarkCount = countLongVowelMark
+                    ? JapaneseUtils.CountNonConsecutiveLongVowelMarks(textInHiragana)
+                    : 0;
 
                 if (nonConsecutiveLongVowelMarkCount > 0)
                 {

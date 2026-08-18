@@ -351,6 +351,7 @@ public static partial class JapaneseUtils
 
     internal static readonly SearchValues<char> s_fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#');
     internal static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜', '~');
+    internal static readonly SearchValues<char> s_longVowelMarkCharsNotNormalized = SearchValues.Create('ー', '〜', '~', '～');
     private static readonly SearchValues<char> s_charsToStrip = SearchValues.Create(' ', '・', '.', '·', '=', '゠', '☆', '★', '†', '‡', '♥', '♡');
     private static readonly SearchValues<char> s_longVowelMarksAndSmallVowelHiragana = SearchValues.Create(
     [
@@ -387,7 +388,6 @@ public static partial class JapaneseUtils
         NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#', // s_fuseji
         ' ', '・', '.', '·', '=', '゠', '☆', '★', '†', '‡', '♥', '♡', // s_charsToStrip
         VariationSelectorSupplementHighSurrogate,
-        .. SmallVowelHiraganaToFinalVowelDict.Keys,
         .. s_normalizationDict.Keys,
         .. BuildHighSurrogates(s_supplementaryNormalizationDict),
         .. BuildVariationSelectorRange()
@@ -486,7 +486,7 @@ public static partial class JapaneseUtils
                 {
                     AppendIterationMark(normalizedTextBuilder, normalizedChar);
                 }
-                else if (!IsElongationRepeat(normalizedTextBuilder, normalizedChar))
+                else
                 {
                     _ = normalizedTextBuilder.Append(normalizedChar);
                 }
@@ -501,7 +501,7 @@ public static partial class JapaneseUtils
                 {
                     _ = normalizedTextBuilder.Append(NormalizedFuseji);
                 }
-                else if (!IsElongationRepeat(normalizedTextBuilder, character))
+                else
                 {
                     _ = normalizedTextBuilder.Append(character);
 
@@ -529,14 +529,6 @@ public static partial class JapaneseUtils
         string textInHiragana = normalizedTextBuilder.ToString();
         ObjectPoolManager.StringBuilderPool.Return(normalizedTextBuilder);
         return textInHiragana;
-    }
-
-    private static bool IsElongationRepeat(StringBuilder builder, char character)
-    {
-        return builder.Length > 0
-            && SmallVowelHiraganaToFinalVowelDict.TryGetValue(character, out char vowel)
-            && s_kanaFinalVowelDict.TryGetValue(builder[^1], out char previousVowel)
-            && vowel == previousVowel;
     }
 
     private static bool IsIterationMark(char character)
@@ -594,6 +586,77 @@ public static partial class JapaneseUtils
         }
     }
 
+    private static char GetAlternativeVowel(char vowel)
+    {
+        return vowel switch
+        {
+            'お' => 'う',
+            'え' => 'い',
+            _ => '\0'
+        };
+    }
+
+    private static bool IsElongationTrigger(char currentCharacter, char previousCharacter, out char vowel, out char alternativeVowel)
+    {
+        if (!s_kanaFinalVowelDict.TryGetValue(previousCharacter, out vowel))
+        {
+            alternativeVowel = '\0';
+            return false;
+        }
+
+        alternativeVowel = GetAlternativeVowel(vowel);
+        return s_longVowelMarkChars.Contains(currentCharacter) || (SmallVowelHiraganaToFinalVowelDict.TryGetValue(currentCharacter, out char smallVowelTarget)
+            && (smallVowelTarget == vowel || smallVowelTarget == alternativeVowel));
+    }
+
+    private static bool IsElongationContinuation(char character, char vowel, char alternativeVowel)
+    {
+        return s_longVowelMarkChars.Contains(character)
+            || (SmallVowelHiraganaToFinalVowelDict.TryGetValue(character, out char target)
+                && (target == vowel || target == alternativeVowel));
+    }
+
+    internal static int CountNonConsecutiveLongVowelMarks(ReadOnlySpan<char> text)
+    {
+        const int maxCount = 4;
+
+        int count = 0;
+        int searchStartIndex = 0;
+
+        while (searchStartIndex < text.Length)
+        {
+            int candidateOffset = text[searchStartIndex..].IndexOfAny(s_longVowelMarksAndSmallVowelHiragana);
+            if (candidateOffset is -1)
+            {
+                break;
+            }
+
+            int candidateIndex = searchStartIndex + candidateOffset;
+            if (candidateIndex is 0
+                || !IsElongationTrigger(text[candidateIndex], text[candidateIndex - 1], out char vowel, out char alternativeVowel))
+            {
+                searchStartIndex = candidateIndex + 1;
+                continue;
+            }
+
+            ++count;
+            if (count == maxCount)
+            {
+                break;
+            }
+
+            int runEndIndex = candidateIndex + 1;
+            while (runEndIndex < text.Length && IsElongationContinuation(text[runEndIndex], vowel, alternativeVowel))
+            {
+                ++runEndIndex;
+            }
+
+            searchStartIndex = runEndIndex;
+        }
+
+        return count;
+    }
+
     internal static List<string> NormalizeLongVowelMark(ReadOnlySpan<char> text)
     {
         List<StringBuilder> stringBuilders = new(4)
@@ -604,19 +667,13 @@ public static partial class JapaneseUtils
         for (int i = 1; i < text.Length; i++)
         {
             char currentCharacter = text[i];
-            if (s_longVowelMarkChars.Contains(currentCharacter) && s_kanaFinalVowelDict.TryGetValue(text[i - 1], out char vowel))
+
+            if (s_longVowelMarksAndSmallVowelHiragana.Contains(currentCharacter)
+                && IsElongationTrigger(currentCharacter, text[i - 1], out char vowel, out char alternativeVowel))
             {
-                while (i + 1 < text.Length)
+                while (i + 1 < text.Length && IsElongationContinuation(text[i + 1], vowel, alternativeVowel))
                 {
-                    char nextCharacter = text[i + 1];
-                    if (s_longVowelMarksAndSmallVowelHiragana.Contains(nextCharacter))
-                    {
-                        ++i;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    ++i;
                 }
 
                 if (vowel is not 'お' and not 'え')
@@ -628,13 +685,6 @@ public static partial class JapaneseUtils
                 }
                 else
                 {
-                    char alternativeVowel = vowel switch
-                    {
-                        'お' => 'う',
-                        'え' => 'い',
-                        _ => ' '
-                    };
-
                     int stringBuildersCount = stringBuilders.Count;
                     for (int j = 0; j < stringBuildersCount; j++)
                     {
