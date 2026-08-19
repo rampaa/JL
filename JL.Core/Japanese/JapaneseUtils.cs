@@ -90,9 +90,12 @@ public static partial class JapaneseUtils
 
         new('ヮ', 'ゎ'),
 
-        new('ヰ', 'ゐ'), new('ヱ', 'ゑ'), new('ヵ', 'ゕ'), new('ヶ', 'ゖ'),
+        new('ヰ', 'い'), new('ヱ', 'え'), new('ヵ', 'ゕ'), new('ヶ', 'ゖ'),
 
         new('ヴ', 'ゔ'), new('ヽ', 'ゝ'), new('ヾ', 'ゞ'), new('ッ', 'っ'),
+
+        // Hiragana normalization
+        new('ゐ', 'い'), new('ゑ', 'え'),
 
         // CJK Radicals Supplement to Kanji
         new('⺁', '厂'), new('⺂', '乛'), new('⺃', '乚'), new('⺄', '乙'), new('⺅', '亻'),
@@ -216,7 +219,7 @@ public static partial class JapaneseUtils
 
         new('い', 'い'), new('き', 'い'), new('し', 'い'), new('ち', 'い'), new('に', 'い'), new('ひ', 'い'),
         new('み', 'い'), new('り', 'い'), new('ぎ', 'い'), new('じ', 'い'), new('ぢ', 'い'), new('び', 'い'),
-        new('ぴ', 'い'), new('ぃ', 'い'), new('ゐ', 'い'),
+        new('ぴ', 'い'), new('ぃ', 'い'),
 
         new('う', 'う'), new('く', 'う'), new('す', 'う'), new('つ', 'う'), new('ぬ', 'う'), new('ふ', 'う'),
         new('む', 'う'), new('る', 'う'), new('ぐ', 'う'), new('ず', 'う'), new('づ', 'う'), new('ぶ', 'う'),
@@ -224,7 +227,7 @@ public static partial class JapaneseUtils
 
         new('え', 'え'), new('け', 'え'), new('せ', 'え'), new('て', 'え'), new('ね', 'え'), new('へ', 'え'),
         new('め', 'え'), new('れ', 'え'), new('げ', 'え'), new('ぜ', 'え'), new('で', 'え'), new('べ', 'え'),
-        new('ぺ', 'え'), new('ぇ', 'え'), new('ゖ', 'え'), new('ゑ', 'え'),
+        new('ぺ', 'え'), new('ぇ', 'え'), new('ゖ', 'え'),
 
         new('お', 'お'), new('こ', 'お'), new('そ', 'お'), new('と', 'お'), new('の', 'お'), new('ほ', 'お'),
         new('も', 'お'), new('ろ', 'お'), new('ご', 'お'), new('ぞ', 'お'), new('ど', 'お'), new('ぼ', 'お'),
@@ -278,8 +281,8 @@ public static partial class JapaneseUtils
         new("𛃶", 'り'), new("𛃷", 'り'), new("𛃸", 'る'), new("𛃹", 'る'), new("𛃺", 'る'), new("𛃻", 'る'), new("𛃼", 'る'),
         new("𛃽", 'る'), new("𛃾", 'れ'), new("𛃿", 'れ'), new("𛄀", 'れ'), new("𛄁", 'れ'), new("𛄂", 'ろ'), new("𛄃", 'ろ'),
         new("𛄄", 'ろ'), new("𛄅", 'ろ'), new("𛄆", 'ろ'), new("𛄇", 'ろ'), new("𛄈", 'わ'), new("𛄉", 'わ'), new("𛄊", 'わ'),
-        new("𛄋", 'わ'), new("𛄌", 'わ'), new("𛄍", 'ゐ'), new("𛄎", 'ゐ'), new("𛄏", 'ゐ'), new("𛄐", 'ゐ'), new("𛄑", 'ゐ'),
-        new("𛄒", 'ゑ'), new("𛄓", 'ゑ'), new("𛄔", 'ゑ'), new("𛄕", 'ゑ'), new("𛄖", 'を'), new("𛄗", 'を'), new("𛄘", 'を'),
+        new("𛄋", 'わ'), new("𛄌", 'わ'), new("𛄍", 'い'), new("𛄎", 'い'), new("𛄏", 'い'), new("𛄐", 'い'), new("𛄑", 'い'),
+        new("𛄒", 'え'), new("𛄓", 'え'), new("𛄔", 'え'), new("𛄕", 'え'), new("𛄖", 'を'), new("𛄗", 'を'), new("𛄘", 'を'),
         new("𛄙", 'を'), new("𛄚", 'を'), new("𛄛", 'を'), new("𛄜", 'を'), new("𛄝", 'ん'), new("𛄞", 'ん')
     }.ToFrozenDictionary(StringComparer.Ordinal);
 

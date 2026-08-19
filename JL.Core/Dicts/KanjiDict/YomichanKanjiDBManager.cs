@@ -13,7 +13,7 @@ namespace JL.Core.Dicts.KanjiDict;
 
 internal static class YomichanKanjiDBManager
 {
-    public const int Version = 6;
+    public const int Version = 7;
 
     public const int Size = 20000;
 

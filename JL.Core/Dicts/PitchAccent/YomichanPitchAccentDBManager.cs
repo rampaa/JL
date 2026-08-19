@@ -19,7 +19,7 @@ namespace JL.Core.Dicts.PitchAccent;
 
 internal static class YomichanPitchAccentDBManager
 {
-    public const int Version = 13;
+    public const int Version = 14;
 
     public const int Size = 250000;
 
