@@ -11,6 +11,7 @@ namespace JL.Core.Japanese;
 public static partial class JapaneseUtils
 {
     internal const char NormalizedFuseji = '○';
+    private const char HiraganaSmallTsu = 'っ';
 
     private const char VariationSelectorRangeStart = '\uFE00';
     private const char VariationSelectorRangeEnd = '\uFE0F';
@@ -347,8 +348,7 @@ public static partial class JapaneseUtils
 
     private static readonly FrozenDictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToFrozenDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
 
-    private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters)]);
-
+    private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys, .. s_leftToRightBracketDict.Values, .. s_sentenceTerminatingCharacters]);
     internal static readonly SearchValues<char> s_fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#');
     internal static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜', '~');
     internal static readonly SearchValues<char> s_longVowelMarkCharsNotNormalized = SearchValues.Create('ー', '〜', '~', '～');
@@ -387,6 +387,7 @@ public static partial class JapaneseUtils
         '々', '〻', 'ゝ', 'ゞ', // IsIterationMark
         NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#', // s_fuseji
         ' ', '・', '.', '·', '=', '゠', '☆', '★', '†', '‡', '♥', '♡', // s_charsToStrip
+        HiraganaSmallTsu,
         VariationSelectorSupplementHighSurrogate,
         .. s_normalizationDict.Keys,
         .. BuildHighSurrogates(s_supplementaryNormalizationDict),
@@ -486,7 +487,7 @@ public static partial class JapaneseUtils
                 {
                     AppendIterationMark(normalizedTextBuilder, normalizedChar);
                 }
-                else
+                else if (!IsRepeatedSmallTsu(normalizedTextBuilder, normalizedChar))
                 {
                     _ = normalizedTextBuilder.Append(normalizedChar);
                 }
@@ -501,10 +502,9 @@ public static partial class JapaneseUtils
                 {
                     _ = normalizedTextBuilder.Append(NormalizedFuseji);
                 }
-                else
+                else if (!IsRepeatedSmallTsu(normalizedTextBuilder, character))
                 {
                     _ = normalizedTextBuilder.Append(character);
-
                     if (nonLastChar)
                     {
                         ReadOnlySpan<char> remainingSpan = normalizedText.AsSpan(i + 1);
@@ -529,6 +529,13 @@ public static partial class JapaneseUtils
         string textInHiragana = normalizedTextBuilder.ToString();
         ObjectPoolManager.StringBuilderPool.Return(normalizedTextBuilder);
         return textInHiragana;
+    }
+
+    private static bool IsRepeatedSmallTsu(StringBuilder builder, char character)
+    {
+        return character is HiraganaSmallTsu
+            && builder.Length > 0
+            && builder[^1] is HiraganaSmallTsu;
     }
 
     private static bool IsIterationMark(char character)
