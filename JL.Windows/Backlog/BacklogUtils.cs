@@ -449,6 +449,7 @@ internal static class BacklogUtils
         await s_semaphoreSlimForBacklogFile.WaitAsync().ConfigureAwait(false);
         try
         {
+            _ = Directory.CreateDirectory(s_backlogDirectory);
             if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
             {
                 await WritePendingItemsToBacklogFile().ConfigureAwait(false);

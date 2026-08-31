@@ -999,7 +999,7 @@ internal sealed partial class MainWindow : IDisposable
 
         else if (keyGesture.IsEqual(configManager.ShowManageDictionariesWindowKeyGesture))
         {
-            if (DictUtils.DictsReady && DictUtils.Dicts.Values.All(static dict => dict.Ready))
+            if (DictUtils.DictsReady && DictUtils.Dicts.Values.All(static dict => !dict.Updating))
             {
                 return WindowsUtils.ShowManageDictionariesWindow();
             }
