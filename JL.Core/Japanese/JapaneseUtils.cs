@@ -299,7 +299,7 @@ public static partial class JapaneseUtils
 
     public static readonly SearchValues<char> SmallCombiningKanaSet = SearchValues.Create('ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ', 'ャ', 'ュ', 'ョ', 'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ゎ', 'ゃ', 'ゅ', 'ょ');
 
-    private static readonly char[] s_sentenceTerminatingCharacters =
+    private static readonly char[] s_sentenceTerminatingCharactersArray =
     [
         '。',
         '！',
@@ -314,6 +314,8 @@ public static partial class JapaneseUtils
         '\u001E',
         '\n'
     ];
+
+    private static readonly SearchValues<char> s_sentenceTerminatingCharacters = SearchValues.Create(s_sentenceTerminatingCharactersArray);
 
     private static readonly FrozenDictionary<char, char> s_leftToRightBracketDict = new KeyValuePair<char, char>[]
     {
@@ -351,7 +353,7 @@ public static partial class JapaneseUtils
 
     private static readonly FrozenDictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToFrozenDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
 
-    private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys, .. s_leftToRightBracketDict.Values, .. s_sentenceTerminatingCharacters]);
+    private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys, .. s_leftToRightBracketDict.Values, .. s_sentenceTerminatingCharactersArray]);
     internal static readonly SearchValues<char> s_fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#');
     internal static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜', '~');
     internal static readonly SearchValues<char> s_longVowelMarkCharsNotNormalized = SearchValues.Create('ー', '〜', '~', '～');
@@ -798,35 +800,19 @@ public static partial class JapaneseUtils
 
     internal static string FindSentence(ReadOnlySpan<char> text, int position)
     {
-        int startPosition = -1;
-        int endPosition = -1;
+        int startPosition = text[..(position + 1)].LastIndexOfAny(s_sentenceTerminatingCharacters) + 1;
 
-        foreach (char terminatingCharacter in s_sentenceTerminatingCharacters)
+        int endPosition = text[position..].IndexOfAny(s_sentenceTerminatingCharacters);
+        endPosition = endPosition < 0
+            ? text.Length - 1
+            : endPosition + position;
+
+        if (startPosition > endPosition)
         {
-            int tempIndex = text.LastIndexOf(terminatingCharacter, position);
-            if (tempIndex > startPosition)
-            {
-                startPosition = tempIndex;
-            }
-
-            tempIndex = text.IndexOf(terminatingCharacter, position);
-            if (tempIndex >= 0 && (endPosition < 0 || tempIndex < endPosition))
-            {
-                endPosition = tempIndex;
-            }
+            return "";
         }
 
-        ++startPosition;
-
-        if (endPosition < 0)
-        {
-            endPosition = text.Length - 1;
-        }
-
-        ReadOnlySpan<char> sentence = startPosition <= endPosition
-            ? text[startPosition..(endPosition + 1)].Trim()
-            : "";
-
+        ReadOnlySpan<char> sentence = text[startPosition..(endPosition + 1)].Trim();
         if (sentence.Length <= 1)
         {
             return sentence.ToString();
@@ -850,38 +836,30 @@ public static partial class JapaneseUtils
                 {
                     sentence = sentence[1..^1];
                 }
-                else if (!sentence.Contains(rightBracket))
-                {
-                    sentence = sentence[1..];
-                }
                 else
                 {
-                    char sentenceFirstChar = sentence[0];
-                    int numberOfLeftBrackets = sentence.Count(sentenceFirstChar);
                     int numberOfRightBrackets = sentence.Count(rightBracket);
 
-                    if (numberOfLeftBrackets == numberOfRightBrackets + 1)
+                    if (numberOfRightBrackets is 0)
+                    {
+                        sentence = sentence[1..];
+                    }
+                    else if (sentence.Count(sentence[0]) == numberOfRightBrackets + 1)
                     {
                         sentence = sentence[1..];
                     }
                 }
             }
-
             else if (s_rightToLeftBracketDict.TryGetValue(sentence[^1], out char leftBracket))
             {
-                if (!sentence.Contains(leftBracket))
+                int numberOfLeftBrackets = sentence.Count(leftBracket);
+                if (numberOfLeftBrackets is 0)
                 {
                     sentence = sentence[..^1];
                 }
-                else
+                else if (sentence.Count(sentence[^1]) == numberOfLeftBrackets + 1)
                 {
-                    int numberOfLeftBrackets = sentence.Count(leftBracket);
-                    int numberOfRightBrackets = sentence.Count(sentence[^1]);
-
-                    if (numberOfRightBrackets == numberOfLeftBrackets + 1)
-                    {
-                        sentence = sentence[..^1];
-                    }
+                    sentence = sentence[..^1];
                 }
             }
         }
