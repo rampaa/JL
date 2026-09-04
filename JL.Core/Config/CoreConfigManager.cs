@@ -15,6 +15,7 @@ public sealed class CoreConfigManager
     public static CoreConfigManager Instance { get; private set; } = new();
 
     public Uri AnkiConnectUri { get; set; } = new("http://127.0.0.1:8765");
+    public string AnkiConnectApiKey { get; set; } = "";
     public bool AnkiIntegration { get; set; } // = false;
     public bool ForceSyncAnki { get; private set; } // = false;
     public bool AutoShowAnkiNoteAfterMining { get; set; } // = false;
@@ -256,6 +257,7 @@ public sealed class CoreConfigManager
         MinCharactersPerMinuteBeforeStoppingTimeTracking = ConfigDBManager.GetValueFromConfig(connection, configs, MinCharactersPerMinuteBeforeStoppingTimeTracking, nameof(MinCharactersPerMinuteBeforeStoppingTimeTracking));
         LookupCategory = ConfigDBManager.GetValueEnumValueFromConfig(connection, configs, LookupCategory, nameof(LookupCategory));
         MpvNamedPipePath = ConfigDBManager.GetValueFromConfig(connection, configs, MpvNamedPipePath, nameof(MpvNamedPipePath));
+        AnkiConnectApiKey = ConfigDBManager.GetValueFromConfig(connection, configs, AnkiConnectApiKey, nameof(AnkiConnectApiKey));
 
         transaction.Commit();
 

@@ -9,9 +9,20 @@ namespace JL.Core.External.AnkiConnect;
 
 internal static class AnkiConnectClient
 {
+    private static string? AnkiConnectApiKey
+    {
+        get
+        {
+            string ankiConnectApikey = CoreConfigManager.Instance.AnkiConnectApiKey;
+            return ankiConnectApikey.Length is 0
+                ? null
+                : ankiConnectApikey;
+        }
+    }
+
     public static ValueTask<Response?> AddNoteToDeck(Note note)
     {
-        RequestWithParameters<Note> req = new("addNote", 6, new Dictionary<string, Note>(1, StringComparer.Ordinal)
+        RequestWithParameters<Note> req = new("addNote", 6, AnkiConnectApiKey, new Dictionary<string, Note>(1, StringComparer.Ordinal)
         {
             {
                 "note", note
@@ -22,19 +33,19 @@ internal static class AnkiConnectClient
 
     public static ValueTask<Response?> GetDeckNamesResponse()
     {
-        Request req = new("deckNames", 6);
+        Request req = new("deckNames", 6, AnkiConnectApiKey);
         return Send(req, CancellationToken.None);
     }
 
     public static ValueTask<Response?> GetModelNamesResponse()
     {
-        Request req = new("modelNames", 6);
+        Request req = new("modelNames", 6, AnkiConnectApiKey);
         return Send(req, CancellationToken.None);
     }
 
     public static ValueTask<Response?> GetModelFieldNamesResponse(string modelName, CancellationToken cancellationToken)
     {
-        RequestWithParameters<string> req = new("modelFieldNames", 6, new Dictionary<string, string>(1, StringComparer.Ordinal)
+        RequestWithParameters<string> req = new("modelFieldNames", 6, AnkiConnectApiKey, new Dictionary<string, string>(1, StringComparer.Ordinal)
         {
             {
                 "modelName", modelName
@@ -45,7 +56,7 @@ internal static class AnkiConnectClient
 
     public static ValueTask<Response?> GetCanAddNotesResponse(List<Note> notes, CancellationToken cancellationToken)
     {
-        RequestWithParameters<List<Note>> req = new("canAddNotes", 6, new Dictionary<string, List<Note>>(1, StringComparer.Ordinal)
+        RequestWithParameters<List<Note>> req = new("canAddNotes", 6, AnkiConnectApiKey, new Dictionary<string, List<Note>>(1, StringComparer.Ordinal)
         {
             {
                 "notes", notes
@@ -57,7 +68,7 @@ internal static class AnkiConnectClient
 
     public static async Task GuiBrowse(string query)
     {
-        RequestWithParameters<string> req = new("guiBrowse", 6, new Dictionary<string, string>(1, StringComparer.Ordinal)
+        RequestWithParameters<string> req = new("guiBrowse", 6, AnkiConnectApiKey, new Dictionary<string, string>(1, StringComparer.Ordinal)
         {
             {
                 "query", query
@@ -84,7 +95,7 @@ internal static class AnkiConnectClient
 
     public static async Task Sync()
     {
-        Request req = new("sync", 6);
+        Request req = new("sync", 6, AnkiConnectApiKey);
         _ = await Send(req, CancellationToken.None).ConfigureAwait(false);
     }
 

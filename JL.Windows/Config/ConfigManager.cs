@@ -1201,6 +1201,7 @@ internal sealed class ConfigManager
         preferenceWindow.SearchUrlTextBox.Text = SearchUrl;
         preferenceWindow.BrowserPathTextBox.Text = BrowserPath;
         preferenceWindow.MpvNamedPipePathTextBox.Text = coreConfigManager.MpvNamedPipePath;
+        preferenceWindow.AnkiConnectApiKeyTextBox.Text = coreConfigManager.AnkiConnectApiKey;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.MainWindowLookupDelayNumericUpDown.Value = MainWindowLookupDelay;
         preferenceWindow.PopupLookupDelayNumericUpDown.Value = PopupLookupDelay;
@@ -1527,6 +1528,7 @@ internal sealed class ConfigManager
         ConfigDBManager.UpdateSetting(connection, nameof(SearchUrl), preferenceWindow.SearchUrlTextBox.Text);
         ConfigDBManager.UpdateSetting(connection, nameof(BrowserPath), preferenceWindow.BrowserPathTextBox.Text);
         ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.MpvNamedPipePath), preferenceWindow.MpvNamedPipePathTextBox.Text);
+        ConfigDBManager.UpdateSetting(connection, nameof(CoreConfigManager.AnkiConnectApiKey), preferenceWindow.AnkiConnectApiKeyTextBox.Text);
 
         ConfigDBManager.UpdateSetting(connection, nameof(MaxSearchLength), preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture));
 
