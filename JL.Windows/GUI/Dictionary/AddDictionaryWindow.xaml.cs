@@ -8,10 +8,8 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
-using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Windows.GUI.Options;
-using JL.Windows.Utilities;
 using Microsoft.Win32;
 
 namespace JL.Windows.GUI.Dictionary;
@@ -258,7 +256,6 @@ internal sealed partial class AddDictionaryWindow
 
             default:
                 LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(AddDictionaryWindow), nameof(BrowsePathButton_OnClick), selectedDictType);
-                WindowsUtils.Alert(AlertLevel.Error, $"Invalid dictionary type: {selectedDictType}");
                 break;
         }
     }

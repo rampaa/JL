@@ -31,6 +31,7 @@ using JL.Windows.GUI;
 using JL.Windows.GUI.Audio;
 using JL.Windows.GUI.Dictionary;
 using JL.Windows.GUI.Frequency;
+using JL.Windows.GUI.Notification;
 using JL.Windows.Interop;
 using JL.Windows.SpeechSynthesis;
 using NAudio.Vorbis;
@@ -395,11 +396,10 @@ internal static class WindowsUtils
                 await application.Dispatcher.BeginInvoke(application.Shutdown, DispatcherPriority.Send).Task.ConfigureAwait(false);
             }
         }
-
         else
         {
             LoggerManager.Logger.Error("Couldn't update JL. {StatusCode} {ReasonPhrase}", downloadResponse.StatusCode, downloadResponse.ReasonPhrase);
-            Alert(AlertLevel.Error, "Couldn't update JL");
+            NotificationManager.Notify(NotificationLevel.Error, "Couldn't update JL. Check the logs for more details.");
         }
     }
 
@@ -467,7 +467,7 @@ internal static class WindowsUtils
                 _ = Interlocked.Exchange(ref s_audioPlayer, null);
 
                 LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
-                Alert(AlertLevel.Error, "Error playing audio");
+                NotificationManager.Notify(NotificationLevel.Error, "Error playing audio");
             }
 
             audioPlayer.PlaybackStopped += async (_, _) =>
@@ -497,7 +497,7 @@ internal static class WindowsUtils
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
-            Alert(AlertLevel.Error, "Error playing audio");
+            NotificationManager.Notify(NotificationLevel.Error, "Error playing audio");
         }
         finally
         {
@@ -521,7 +521,7 @@ internal static class WindowsUtils
             if (filePaths.Length is 0)
             {
                 LoggerManager.Logger.Warning("Motivation folder is empty!");
-                Alert(AlertLevel.Warning, "Motivation folder is empty!");
+                NotificationManager.Notify(NotificationLevel.Warning, "Motivation folder is empty!");
                 return;
             }
 
@@ -542,7 +542,7 @@ internal static class WindowsUtils
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Error motivating");
-            Alert(AlertLevel.Error, "Error motivating");
+            NotificationManager.Notify(NotificationLevel.Error, "Error motivating");
         }
     }
 
@@ -596,34 +596,6 @@ internal static class WindowsUtils
                 : c is >= 'a' and <= 'f'
                     ? c - 'a' + 10
                     : throw new FormatException($"Invalid hex digit: {c}");
-    }
-
-    public static void Alert(AlertLevel alertLevel, string message)
-    {
-        Application? application = Application.Current;
-        if (application is null)
-        {
-            return;
-        }
-
-        _ = application.Dispatcher.BeginInvoke(async () =>
-        {
-            List<AlertWindow> alertWindowList = application.Windows.OfType<AlertWindow>().ToList();
-
-            AlertWindow alertWindow = new();
-            alertWindow.Show();
-
-            double offset = 30 * Dpi.DpiScaleX;
-            double offsetBetweenAlerts = 2 * Dpi.DpiScaleY;
-            double x = ActiveScreen.WorkingArea.Right - offset - (alertWindow.Width * Dpi.DpiScaleX);
-            double y = ActiveScreen.WorkingArea.Top + offset + alertWindowList.Sum(aw => (aw.ActualHeight * Dpi.DpiScaleX) + offsetBetweenAlerts);
-            WinApi.MoveWindowToPosition(alertWindow.WindowHandle, x, y);
-
-            alertWindow.SetAlert(alertLevel, message);
-
-            await Task.Delay(4004).ConfigureAwait(true);
-            alertWindow.Close();
-        }, DispatcherPriority.Render);
     }
 
     private static double MeasureTextWidth(double fontSize, string text)

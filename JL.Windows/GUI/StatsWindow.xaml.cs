@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Interop;
 using JL.Core.Config;
-using JL.Core.Frontend;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Config;
@@ -136,11 +135,9 @@ internal sealed partial class StatsWindow
 
                 default:
                     LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatsMode), nameof(StatsWindow), nameof(ButtonSwapStats_OnClick), mode);
-                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid stats mode: {mode}");
                     break;
             }
         }
-
         else
         {
             LoggerManager.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
@@ -184,7 +181,6 @@ internal sealed partial class StatsWindow
 
             UpdateStatsDisplay(statsMode);
         }
-
         else
         {
             LoggerManager.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
@@ -224,7 +220,6 @@ internal sealed partial class StatsWindow
             infoDataGridWindow.Owner = this;
             _ = infoDataGridWindow.ShowDialog();
         }
-
         else
         {
             LoggerManager.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());

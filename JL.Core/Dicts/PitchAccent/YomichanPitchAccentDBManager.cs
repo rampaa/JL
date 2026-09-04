@@ -528,7 +528,7 @@ internal static class YomichanPitchAccentDBManager
         if (connection is null)
         {
             LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", readOnlyConnectingString);
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
+            // FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
             return null;
         }
 

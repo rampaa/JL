@@ -8,11 +8,9 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
-using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Windows.GUI.Options;
-using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 
@@ -317,7 +315,6 @@ internal sealed partial class EditFrequencyWindow
 
             default:
                 LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(EditFrequencyWindow), nameof(BrowsePathButton_OnClick), selectedFreqType);
-                WindowsUtils.Alert(AlertLevel.Error, $"Invalid frequency type: {selectedFreqType}");
                 break;
         }
     }

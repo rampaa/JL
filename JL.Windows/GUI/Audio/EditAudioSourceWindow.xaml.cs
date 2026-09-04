@@ -6,7 +6,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Audio;
-using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
@@ -71,7 +70,6 @@ internal sealed partial class EditAudioSourceWindow
 
             default:
                 LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(EditAudioSourceWindow), nameof(EditAudioSourceWindow), _audioSource.Type);
-                WindowsUtils.Alert(AlertLevel.Error, $"Invalid audio source type: {_audioSource.Type}");
                 break;
         }
     }
@@ -99,7 +97,7 @@ internal sealed partial class EditAudioSourceWindow
         switch (type)
         {
             case AudioSourceType.LocalPath:
-                uri = UriTextBox.Text;
+                uri = UriTextBox.Text.Trim('"');
                 string fullPath = Path.GetFullPath(uri, AppInfo.ApplicationPath);
 
                 if (string.IsNullOrWhiteSpace(uri)

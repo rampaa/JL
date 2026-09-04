@@ -41,7 +41,7 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    await FrontendManager.Frontend.ShowOkDialogAsync($"This may take a while. Please don't shut down the program until {dictName} is downloaded.", "Info").ConfigureAwait(false);
+                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"This may take a while. Please don't shut down the program until {dictName} is downloaded.");
                 }
 
                 using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
@@ -63,7 +63,7 @@ public static class ResourceUpdater
 
                     if (!noPrompt)
                     {
-                        await FrontendManager.Frontend.ShowOkDialogAsync($"{dictName} has been downloaded successfully.", "Info").ConfigureAwait(false);
+                        FrontendManager.Frontend.Notify(NotificationLevel.Information, $"{dictName} has been downloaded successfully.");
                     }
 
                     return true;
@@ -71,26 +71,12 @@ public static class ResourceUpdater
 
                 if (response.StatusCode is HttpStatusCode.NotModified)
                 {
-                    if (!noPrompt)
-                    {
-                        await FrontendManager.Frontend.ShowOkDialogAsync($"{dictName} is up to date.", "Info").ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        FrontendManager.Frontend.Alert(AlertLevel.Information, $"{dictName} is up to date.");
-                    }
+                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"{dictName} is up to date.");
                 }
                 else
                 {
                     LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", dictName, response.StatusCode);
-                    if (!noPrompt)
-                    {
-                        await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {dictName}.", "Info").ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
-                    }
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Unexpected error while downloading {dictName}. Check the logs for more details.");
                 }
             }
         }
@@ -98,14 +84,7 @@ public static class ResourceUpdater
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
-            if (!noPrompt)
-            {
-                await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {dictName}.", "Info").ConfigureAwait(false);
-            }
-            else
-            {
-                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {dictName}.");
-            }
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Unexpected error while downloading {dictName}. Check the logs for more details.");
 
             string tempDictPath = PathUtils.GetTempPath(fullDictPath);
             if (File.Exists(tempDictPath))
@@ -161,36 +140,21 @@ public static class ResourceUpdater
                 using HttpResponseMessage indexResponse = await NetworkUtils.Client.SendAsync(indexRequest, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 if (indexJsonExists && indexResponse.StatusCode is HttpStatusCode.NotModified)
                 {
-                    if (!noPrompt)
-                    {
-                        await FrontendManager.Frontend.ShowOkDialogAsync($"{name} is up to date.", "Info").ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        FrontendManager.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
-                    }
-
+                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"{name} is up to date.");
                     return false;
                 }
 
                 if (!indexResponse.IsSuccessStatusCode)
                 {
                     LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, indexResponse.StatusCode);
-                    if (!noPrompt)
-                    {
-                        await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {name}.", "Info").ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
-                    }
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Unexpected error while downloading {name}. Check the logs for more details.");
 
                     return false;
                 }
 
                 if (!noPrompt)
                 {
-                    await FrontendManager.Frontend.ShowOkDialogAsync($"This may take a while. Please don't shut down the program until {name} is downloaded.", "Info").ConfigureAwait(false);
+                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"This may take a while. Please don't shut down the program until {name} is downloaded.");
                 }
 
                 JsonElement indexJsonElement = await indexResponse.Content.ReadFromJsonAsync<JsonElement>().ConfigureAwait(false);
@@ -198,15 +162,7 @@ public static class ResourceUpdater
                 Debug.Assert(newRevision is not null);
                 if (indexJsonExists && revision == newRevision)
                 {
-                    if (!noPrompt)
-                    {
-                        await FrontendManager.Frontend.ShowOkDialogAsync($"{name} is up to date.", "Info").ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        FrontendManager.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
-                    }
-
+                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"{name} is up to date.");
                     return false;
                 }
 
@@ -218,29 +174,14 @@ public static class ResourceUpdater
                 using HttpResponseMessage response = await NetworkUtils.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 if (response.StatusCode is HttpStatusCode.NotModified)
                 {
-                    if (!noPrompt)
-                    {
-                        await FrontendManager.Frontend.ShowOkDialogAsync($"{name} is up to date.", "Info").ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        FrontendManager.Frontend.Alert(AlertLevel.Information, $"{name} is up to date.");
-                    }
-
+                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"{name} is up to date.");
                     return false;
                 }
 
                 if (!response.IsSuccessStatusCode)
                 {
                     LoggerManager.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}", name, response.StatusCode);
-                    if (!noPrompt)
-                    {
-                        await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {name}.", "Info").ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
-                    }
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Unexpected error while downloading {name}. Check the logs for more details.");
 
                     return false;
                 }
@@ -267,7 +208,7 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    await FrontendManager.Frontend.ShowOkDialogAsync($"{name} has been downloaded successfully.", "Info").ConfigureAwait(false);
+                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"{name} has been downloaded successfully.");
                 }
 
                 return true;
@@ -277,14 +218,7 @@ public static class ResourceUpdater
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Unexpected error while downloading {DictName}", name);
-            if (!noPrompt)
-            {
-                await FrontendManager.Frontend.ShowOkDialogAsync($"Unexpected error while downloading {name}.", "Info").ConfigureAwait(false);
-            }
-            else
-            {
-                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Unexpected error while downloading {name}.");
-            }
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Unexpected error while downloading {name}. Check the logs for more details.");
 
             string tempDictPath = PathUtils.GetTempPath(fullDictPath);
             if (Directory.Exists(tempDictPath))
@@ -369,13 +303,13 @@ public static class ResourceUpdater
                     DictUtils.MaxSearchKeyLength = dict.MaxSearchKeyLength;
                 }
 
-                FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
+                FrontendManager.Frontend.Notify(NotificationLevel.Success, $"Finished updating {dict.Name}");
                 return true;
             }
             catch (Exception ex)
             {
                 LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {dict.Name}. Check the logs for more details.");
 
                 File.Delete(fullDictPath);
                 string dictBackupPath = GetBackupPath(fullDictPath);
@@ -406,7 +340,7 @@ public static class ResourceUpdater
                     catch (Exception innerEx)
                     {
                         LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it. Check the logs for more details.");
                     }
                 }
                 else if (!File.Exists(dbPath))
@@ -422,7 +356,7 @@ public static class ResourceUpdater
                     catch (Exception innerEx)
                     {
                         LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it. Check the logs for more details.");
                     }
                 }
 
@@ -541,13 +475,13 @@ public static class ResourceUpdater
                     DictUtils.MaxSearchKeyLength = dict.MaxSearchKeyLength;
                 }
 
-                FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {dict.Name}");
+                FrontendManager.Frontend.Notify(NotificationLevel.Success, $"Finished updating {dict.Name}");
                 return true;
             }
             catch (Exception ex)
             {
                 LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {dict.Name}. Check the logs for more details.");
 
                 Directory.Delete(fullDictPath, true);
                 string dictBackupPath = GetBackupPath(fullDictPath);
@@ -578,7 +512,7 @@ public static class ResourceUpdater
                     catch (Exception innerEx)
                     {
                         LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it. Check the logs for more details.");
                     }
                 }
                 else if (!File.Exists(dbPath))
@@ -594,7 +528,7 @@ public static class ResourceUpdater
                     catch (Exception innerEx)
                     {
                         LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't re-import {dict.Name}, deactivating it. Check the logs for more details.");
                     }
                 }
 
@@ -704,13 +638,13 @@ public static class ResourceUpdater
                     Directory.Delete(dictBackupPath, true);
                 }
 
-                FrontendManager.Frontend.Alert(AlertLevel.Success, $"Finished updating {freq.Name}");
+                FrontendManager.Frontend.Notify(NotificationLevel.Success, $"Finished updating {freq.Name}");
                 return true;
             }
             catch (Exception ex)
             {
                 LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+                FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
 
                 Directory.Delete(fullDictPath, true);
                 string dictBackupPath = GetBackupPath(fullDictPath);
@@ -741,7 +675,7 @@ public static class ResourceUpdater
                     catch (Exception innerEx)
                     {
                         LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{FreqType}'-'{FreqName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {freq.Name}, deactivating it");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't re-import {freq.Name}, deactivating it. Check the logs for more details.");
                     }
                 }
                 else if (!File.Exists(dbPath))
@@ -757,7 +691,7 @@ public static class ResourceUpdater
                     catch (Exception innerEx)
                     {
                         LoggerManager.Logger.Error(innerEx, "Couldn't re-import '{FreqType}'-'{FreqName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't re-import {freq.Name}, deactivating it");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't re-import {freq.Name}, deactivating it. Check the logs for more details.");
                     }
                 }
 
@@ -806,7 +740,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            FrontendManager.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Name}...");
+            FrontendManager.Frontend.Notify(NotificationLevel.Information, $"Updating {dict.Name}...");
             tasks.Add(dict.Type is DictType.JMdict
                 ? UpdateJmdict(pathExists, true)
                 : dict.Type is DictType.JMnedict
@@ -843,7 +777,7 @@ public static class ResourceUpdater
                 continue;
             }
 
-            FrontendManager.Frontend.Alert(AlertLevel.Information, $"Updating {freq.Name}...");
+            FrontendManager.Frontend.Notify(NotificationLevel.Information, $"Updating {freq.Name}...");
             tasks.Add(UpdateYomichanFreqDict(freq, pathExists, true));
         }
 

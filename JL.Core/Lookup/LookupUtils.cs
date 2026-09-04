@@ -16,7 +16,6 @@ using JL.Core.Dicts.KANJIDIC;
 using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
-using JL.Core.Frontend;
 using JL.Core.Japanese;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Array;
@@ -341,7 +340,6 @@ public static class LookupUtils
                 default:
                 {
                     LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(LookupUtils), nameof(LookupText), dict.Type);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
                     break;
                 }
             }
@@ -828,7 +826,6 @@ public static class LookupUtils
 
             default:
                 LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(LookupUtils), nameof(GetValidDeconjugatedResults), dict.Type);
-                FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
                 break;
         }
 

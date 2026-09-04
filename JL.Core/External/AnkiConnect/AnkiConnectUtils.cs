@@ -145,40 +145,41 @@ public static class AnkiConnectUtils
         CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
         if (!coreConfigManager.AnkiIntegration)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Please setup mining first in the preferences");
             return;
         }
 
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig(CancellationToken.None).ConfigureAwait(false);
         if (ankiConfigDict is null)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Please setup mining first in the preferences");
             return;
         }
 
-        AnkiConfig? ankiConfig;
         ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults;
         LookupResult lookupResult = lookupResultsSpan[currentLookupResultIndex];
+
+        MineType mineType;
         if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {
-            _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
+            mineType = MineType.Word;
         }
         else if (DictUtils.KanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
-            _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
+            mineType = MineType.Kanji;
         }
         else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
         {
-            _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
+            mineType = MineType.Name;
         }
         else
         {
-            _ = ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
+            mineType = MineType.Other;
         }
 
-        if (ankiConfig is null)
+        if (!ankiConfigDict.TryGetValue(mineType, out AnkiConfig? ankiConfig))
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Please setup mining first in the preferences for {mineType} dictionaries");
             return;
         }
 
@@ -189,8 +190,9 @@ public static class AnkiConnectUtils
 
         if (fields.Count is 0)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Cannot mine {selectedSpelling} because there is nothing to mine");
+            // TODO: Make this message more clear
             LoggerManager.Logger.Information("Cannot mine {SelectedSpelling} because there is nothing to mine", selectedSpelling);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Cannot mine {selectedSpelling} because there is nothing to mine");
             return;
         }
 
@@ -200,15 +202,15 @@ public static class AnkiConnectUtils
         bool? canAddNote = await CanAddNote(note).ConfigureAwait(false);
         if (canAddNote is null)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Mining failed for {selectedSpelling}");
             LoggerManager.Logger.Error("Mining failed for {SelectedSpelling}", selectedSpelling);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Mining failed for {selectedSpelling}");
             return;
         }
 
         if (!coreConfigManager.AllowDuplicateCards && !canAddNote.Value)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Cannot mine {selectedSpelling} because it is a duplicate card");
             LoggerManager.Logger.Information("Cannot mine {SelectedSpelling} because it is a duplicate card", selectedSpelling);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Cannot mine {selectedSpelling} because it is a duplicate card");
             return;
         }
 
@@ -462,8 +464,8 @@ public static class AnkiConnectUtils
         Response? response = await AnkiConnectClient.AddNoteToDeck(note).ConfigureAwait(false);
         if (response is null)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, $"Mining failed for {selectedSpelling}");
             LoggerManager.Logger.Error("Mining failed for {SelectedSpelling}", selectedSpelling);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Mining failed for {selectedSpelling}");
             return;
         }
 
@@ -474,7 +476,7 @@ public static class AnkiConnectUtils
         LoggerManager.Logger.Information("{Message}", message);
         if (coreConfigManager.NotifyWhenMiningSucceeds)
         {
-            FrontendManager.Frontend.Alert(showNoAudioMessage || showDuplicateCardMessage ? AlertLevel.Warning : AlertLevel.Success, message);
+            FrontendManager.Frontend.Notify(showNoAudioMessage || showDuplicateCardMessage ? NotificationLevel.Warning : NotificationLevel.Success, message);
         }
 
         if (coreConfigManager.ForceSyncAnki)

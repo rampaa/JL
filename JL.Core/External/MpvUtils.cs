@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text.Json;
 using JL.Core.Config;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 
 namespace JL.Core.External;
@@ -64,11 +65,13 @@ public static class MpvUtils
         {
             s_pausedByJL = false;
             LoggerManager.Logger.Warning("Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={MpvNamedPipePath} to your mpv.conf file.", CoreConfigManager.Instance.MpvNamedPipePath);
+            FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={CoreConfigManager.Instance.MpvNamedPipePath} to your mpv.conf file.");
         }
         catch (Exception ex)
         {
             s_pausedByJL = false;
             LoggerManager.Logger.Error(ex, "An unexpected error occurred while attempting to pause playback in mpv");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "An unexpected error occurred while attempting to pause playback in mpv");
         }
         finally
         {
@@ -98,11 +101,13 @@ public static class MpvUtils
         {
             s_pausedByJL = false;
             LoggerManager.Logger.Warning("Connection timed out. Is mpv running?");
+            FrontendManager.Frontend.Notify(NotificationLevel.Warning, "Connection timed out. Is mpv running?");
         }
         catch (Exception ex)
         {
             s_pausedByJL = false;
             LoggerManager.Logger.Error(ex, "An unexpected error occurred while attempting to resume playback in mpv");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "An unexpected error occurred while attempting to resume playback in mpv");
         }
         finally
         {

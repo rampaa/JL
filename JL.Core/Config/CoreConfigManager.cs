@@ -76,7 +76,7 @@ public sealed class CoreConfigManager
             {
                 ConfigDBManager.UpdateSetting(connection, nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
                 LoggerManager.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
-                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+                FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
             }
         }
     }
@@ -128,7 +128,7 @@ public sealed class CoreConfigManager
             else
             {
                 LoggerManager.Logger.Warning("Couldn't save Tsukikage WebSocket address, invalid URL");
-                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't save Tsukikage WebSocket address, invalid URL");
+                FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't save Tsukikage WebSocket address, invalid URL");
             }
         }
     }
@@ -181,7 +181,7 @@ public sealed class CoreConfigManager
                 else
                 {
                     LoggerManager.Logger.Warning("Couldn't save WebSocket address, invalid URL");
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't save WebSocket address, invalid URL");
                 }
             }
 

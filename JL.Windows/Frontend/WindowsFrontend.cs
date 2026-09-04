@@ -2,6 +2,7 @@ using JL.Core.Dicts;
 using JL.Core.Frontend;
 using JL.Windows.Config;
 using JL.Windows.GUI;
+using JL.Windows.GUI.Notification;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
@@ -19,11 +20,9 @@ internal sealed class WindowsFrontend : IFrontend
 
     public Task PlayAudio(byte[] audio, string audioFormat) => WindowsUtils.PlayAudio(audio, audioFormat);
 
-    public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
+    public void Notify(NotificationLevel notificationLevel, string message) => NotificationManager.Notify(notificationLevel, message);
 
     public async Task<bool> ShowYesNoDialogAsync(string text, string caption) => await WindowsUtils.ShowYesNoDialogAsync(text, caption, await WindowsUtils.GetVisibleOwnedWindowOrOwner(_mainWindow).ConfigureAwait(true)).ConfigureAwait(false);
-
-    public async Task ShowOkDialogAsync(string text, string caption) => await WindowsUtils.ShowOkDialogAsync(text, caption, await WindowsUtils.GetVisibleOwnedWindowOrOwner(_mainWindow).ConfigureAwait(true)).ConfigureAwait(false);
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => WindowsUtils.UpdateJL(downloadUrlOfLatestJLRelease);
 

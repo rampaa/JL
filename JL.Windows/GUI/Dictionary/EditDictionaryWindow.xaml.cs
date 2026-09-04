@@ -9,7 +9,6 @@ using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
-using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Windows.GUI.Options;
@@ -396,7 +395,6 @@ internal sealed partial class EditDictionaryWindow
 
             default:
                 LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(EditDictionaryWindow), nameof(BrowsePathButton_OnClick), selectedDictType);
-                WindowsUtils.Alert(AlertLevel.Error, $"Invalid dictionary type: {selectedDictType}");
                 break;
         }
     }

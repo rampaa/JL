@@ -39,7 +39,6 @@ public static class AudioUtils
         try
         {
             using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-
             if (response.IsSuccessStatusCode)
             {
                 string audioFormat = response.Content.Headers.ContentType?.MediaType?.Split('/').LastOrDefault("mp3") ?? "mp3";
@@ -49,7 +48,6 @@ public static class AudioUtils
                 }
 
                 byte[] audioData = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-
                 return HashUtils.GetMd5String(audioData) is NetworkUtils.Jpod101NoAudioMd5Hash
                     ? null
                     : new AudioResponse(AudioSourceType.Url, audioFormat, audioData);
@@ -61,6 +59,7 @@ public static class AudioUtils
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Error getting audio from {Url}", url.OriginalString);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Error getting audio from {url.OriginalString}");
             return null;
         }
     }
@@ -70,7 +69,6 @@ public static class AudioUtils
         try
         {
             using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-
             if (response.IsSuccessStatusCode)
             {
                 JsonElement jsonElement = await response.Content.ReadFromJsonAsync<JsonElement>().ConfigureAwait(false);
@@ -88,7 +86,6 @@ public static class AudioUtils
                                 if (Uri.TryCreate(urlStr, UriKind.Absolute, out Uri? resultUrl))
                                 {
                                     AudioResponse? audioResponse = await GetAudioFromUrl(resultUrl).ConfigureAwait(false);
-
                                     if (audioResponse is not null)
                                     {
                                         return audioResponse;
@@ -106,6 +103,7 @@ public static class AudioUtils
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Error getting audio from {Url}", url.OriginalString);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Error getting audio from {url.OriginalString}");
             return null;
         }
     }
@@ -169,7 +167,6 @@ public static class AudioUtils
 
                     default:
                         LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AudioUtils), nameof(GetPrioritizedAudio), audioSource.Type);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSource.Type}");
                         break;
                 }
 
@@ -252,7 +249,7 @@ public static class AudioUtils
         }
         else
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
             throw new SerializationException("Couldn't load Config/AudioSourceConfig.json");
         }
     }

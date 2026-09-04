@@ -108,7 +108,8 @@ internal sealed class WebSocketConnection : IDisposable
                                 }
                                 else if (result.MessageType is WebSocketMessageType.Close)
                                 {
-                                    LoggerManager.Logger.Information("WebSocket server is closed");
+                                    LoggerManager.Logger.Information("WebSocket server at {WebSocketUri} is closed", _webSocketUri);
+                                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"WebSocket server at {_webSocketUri} is closed");
                                     break;
                                 }
                             }
@@ -124,8 +125,8 @@ internal sealed class WebSocketConnection : IDisposable
                                 if (!cancellationToken.IsCancellationRequested
                                     && (tsukikage ? coreConfigManager.CaptureTextFromTsukikageWebsocket : coreConfigManager.CaptureTextFromWebSocket))
                                 {
-                                    LoggerManager.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
-                                    // FrontendManager.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
+                                    LoggerManager.Logger.Warning(webSocketException, "WebSocket server at {WebSocketUri} is closed unexpectedly", _webSocketUri);
+                                    FrontendManager.Frontend.Notify(NotificationLevel.Information, $"WebSocket server at {_webSocketUri} is closed unexpectedly");
                                 }
                                 else if (webSocketClient.State is WebSocketState.Open)
                                 {
@@ -154,25 +155,26 @@ internal sealed class WebSocketConnection : IDisposable
                         if (!cancellationToken.IsCancellationRequested
                             && (tsukikage ? coreConfigManager.CaptureTextFromTsukikageWebsocket : coreConfigManager.CaptureTextFromWebSocket))
                         {
-                            LoggerManager.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
-                            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
+                            LoggerManager.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server at {WebSocketUri}, probably because it is not running", _webSocketUri);
+                            FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Couldn't connect to the WebSocket server at {_webSocketUri}, probably because it is not running");
                         }
                     }
                     else
                     {
-                        LoggerManager.Logger.Verbose(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
+                        LoggerManager.Logger.Verbose(webSocketException, "Couldn't connect to the WebSocket server at {WebSocketUri}, probably because it is not running", _webSocketUri);
                     }
                 }
 
                 catch (OperationCanceledException)
                 {
-                    LoggerManager.Logger.Debug("WebSocket connection was cancelled.");
+                    LoggerManager.Logger.Debug("Connection was cancelled for the websocket server at {WebSocketUri}.", _webSocketUri);
                     return;
                 }
 
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "An unexpected error occured while listening the websocket server at {WebSocketUri}", _webSocketUri);
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"An unexpected error occured while listening the websocket server at {_webSocketUri}. Check the logs for more details.");
                     return;
                 }
             }

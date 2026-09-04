@@ -6,7 +6,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Audio;
-using JL.Core.Frontend;
 using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.GUI.Info;
@@ -55,7 +54,7 @@ internal sealed partial class AddAudioSourceWindow
         switch (type)
         {
             case AudioSourceType.LocalPath:
-                uri = UriTextBox.Text;
+                uri = UriTextBox.Text.Trim('"');
                 string fullPath = Path.GetFullPath(uri, AppInfo.ApplicationPath);
 
                 if (string.IsNullOrWhiteSpace(uri)
@@ -202,7 +201,6 @@ internal sealed partial class AddAudioSourceWindow
 
             default:
                 LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AddAudioSourceWindow), nameof(AudioSourceTypeComboBox_SelectionChanged), audioSourceType);
-                WindowsUtils.Alert(AlertLevel.Error, $"Invalid audio source type: {audioSourceType}");
                 break;
         }
     }

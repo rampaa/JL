@@ -432,7 +432,7 @@ public static class JmdictWordClassUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", jmdictDict.Type.GetDescription(), jmdictDict.Name, fullJmdictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {jmdictDict.Name}");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {jmdictDict.Name}. Check the logs for more details.");
                 }
                 finally
                 {

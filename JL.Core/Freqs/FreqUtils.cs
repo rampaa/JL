@@ -107,7 +107,6 @@ public static class FreqUtils
                 default:
                 {
                     LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(FreqType), nameof(FreqUtils), nameof(LoadFrequencies), freq.Type);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid frequency type: {freq.Type}");
                     break;
                 }
             }
@@ -121,7 +120,7 @@ public static class FreqUtils
             {
                 if (rebuildingAnyDB)
                 {
-                    FrontendManager.Frontend.Alert(AlertLevel.Information, "Rebuilding frequency databases because their schemas are out of date...");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Information, "Rebuilding frequency databases because their schemas are out of date...");
                 }
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -155,7 +154,7 @@ public static class FreqUtils
 
             if (freqSnapshot.All(static f => !f.Updating))
             {
-                FrontendManager.Frontend.Alert(AlertLevel.Success, "Finished loading frequency dictionaries");
+                FrontendManager.Frontend.Notify(NotificationLevel.Success, "Finished loading frequency dictionaries");
             }
         }
 
@@ -250,7 +249,7 @@ public static class FreqUtils
                     if (freq.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {freq.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dict has been deactivated.");
 
                         freq.Active = false;
                         freqsToBeRemoved.Add(freq);
@@ -259,7 +258,7 @@ public static class FreqUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
 
                     freq.Active = false;
                     freqsToBeRemoved.Add(freq);
@@ -290,7 +289,7 @@ public static class FreqUtils
                     if (freq.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {freq.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}");
 
                         freq.Active = false;
                         freqsToBeRemoved.Add(freq);
@@ -299,7 +298,7 @@ public static class FreqUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
 
                     freq.Active = false;
                     freqsToBeRemoved.Add(freq);
@@ -368,7 +367,7 @@ public static class FreqUtils
                     if (freq.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {freq.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}");
 
                         freq.Active = false;
                         freqsToBeRemoved.Add(freq);
@@ -377,7 +376,7 @@ public static class FreqUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
 
                     freq.Active = false;
                     freqsToBeRemoved.Add(freq);
@@ -408,7 +407,7 @@ public static class FreqUtils
                     if (freq.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {freq.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}");
 
                         freq.Active = false;
                         freqsToBeRemoved.Add(freq);
@@ -417,7 +416,7 @@ public static class FreqUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
 
                     freq.Active = false;
                     freqsToBeRemoved.Add(freq);
@@ -508,7 +507,7 @@ public static class FreqUtils
         }
         else
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't load Config/freqs.json");
             throw new SerializationException("Couldn't load Config/freqs.json");
         }
     }

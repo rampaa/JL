@@ -86,9 +86,7 @@ public static class NetworkUtils
                                 if (await FrontendManager.Frontend.ShowYesNoDialogAsync(
                                         string.Create(CultureInfo.InvariantCulture, $"JL v{latestJLVersion} is available.{changelog}\n\nWould you like to download it now?"), "Update JL?").ConfigureAwait(false))
                                 {
-                                    await FrontendManager.Frontend.ShowOkDialogAsync(
-                                        "This may take a while. Please don't manually shut down the program until it's updated.", "Info").ConfigureAwait(false);
-
+                                    FrontendManager.Frontend.Notify(NotificationLevel.Information, "This may take a while. Please don't manually shut down the program until it's updated.");
                                     await FrontendManager.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
                                 }
 
@@ -98,13 +96,13 @@ public static class NetworkUtils
 
                         if (!isAutoCheck && !foundRelease)
                         {
-                            await FrontendManager.Frontend.ShowOkDialogAsync("JL is up to date", "Info").ConfigureAwait(false);
+                            FrontendManager.Frontend.Notify(NotificationLevel.Information, "JL is up to date.");
                         }
                     }
 
                     else if (!isAutoCheck)
                     {
-                        await FrontendManager.Frontend.ShowOkDialogAsync("JL is up to date", "Info").ConfigureAwait(false);
+                        FrontendManager.Frontend.Notify(NotificationLevel.Information, "JL is up to date.");
                     }
                 }
             }
@@ -112,13 +110,13 @@ public static class NetworkUtils
             else
             {
                 LoggerManager.Logger.Error("Couldn't check for JL updates. GitHub API problem. {StatusCode} {ReasonPhrase}", gitHubApiResponse.StatusCode, gitHubApiResponse.ReasonPhrase);
-                FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't check for JL updates. GitHub API problem.");
+                FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't check for JL updates. GitHub API problem. Check the logs for more details.");
             }
         }
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Couldn't check for JL updates");
-            FrontendManager.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
+            FrontendManager.Frontend.Notify(NotificationLevel.Warning, "Couldn't check for JL updates. Check the logs for more details.");
         }
         finally
         {

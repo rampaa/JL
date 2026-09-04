@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -17,10 +17,8 @@
     <PackageReference Include="HandyControl" Version="3.4.0" />
     <PackageReference Include="HandyControl.Lang.en" Version="3.4.0" />
 
-    <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
-    <PackageReference Include="NAudio.WinForms" Version="2.3.0" />
-    <PackageReference Include="NVorbis" Version="0.10.5" />
     <PackageReference Include="System.Speech" Version="10.0.11" />
+    <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.11" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,5 +55,38 @@
     <PlatformTarget>ARM64</PlatformTarget>
     <DefineConstants>$(DefineConstants);ARM64</DefineConstants>
   </PropertyGroup>
-  
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <_SdkTrimOutputDir Condition="'$(PublishDir)' != ''">$(PublishDir)</_SdkTrimOutputDir>
+    <_SdkTrimOutputDir Condition="'$(_SdkTrimOutputDir)' == ''">$(TargetDir)</_SdkTrimOutputDir>
+    <_SdkTrimOutputDir>$(_SdkTrimOutputDir.TrimEnd('\'))</_SdkTrimOutputDir>
+    <_SdkTrimStagingDir>$(_SdkTrimOutputDir)\SdkTrimStaging</_SdkTrimStagingDir>
+    <_SdkTrimRspFile>$(_SdkTrimOutputDir)\illink_args.rsp</_SdkTrimRspFile>
+  </PropertyGroup>
+
+  <Target Name="TrimSDK" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+
+    <RemoveDir Directories="$(_SdkTrimStagingDir)" />
+    <MakeDir Directories="$(_SdkTrimStagingDir)" />
+
+    <ItemGroup>
+      <_SdkTrimReference Include="@(ReferencePath)" Condition="'%(Filename)' != 'Microsoft.Windows.SDK.NET'" />
+      <_SdkTrimRspLines Include="-a;&quot;$(_SdkTrimOutputDir)\$(TargetName).dll&quot;" />
+      <_SdkTrimRspLines Include="-d;&quot;$(_SdkTrimOutputDir)&quot;" />
+      <_SdkTrimRspLines Include="-out;&quot;$(_SdkTrimStagingDir)&quot;" />
+      <_SdkTrimRspLines Include="--action;copy;--action;link;Microsoft.Windows.SDK.NET;--action;link;WinRT.Runtime" />
+      <_SdkTrimRspLines Include="--skip-unresolved;true;--disable-opt;unreachablebodies" />
+      <_SdkTrimRspLines Include="--warn;0" />
+      <_SdkTrimRspLines Include="-reference;&quot;%(_SdkTrimReference.Identity)&quot;" />
+    </ItemGroup>
+
+    <WriteLinesToFile File="$(_SdkTrimRspFile)" Lines="@(_SdkTrimRspLines)" Overwrite="true" />
+    <Exec Command="dotnet &quot;$([System.IO.Path]::GetDirectoryName('$(ILLinkTasksAssembly)'))\illink.dll&quot; @&quot;$(_SdkTrimRspFile)&quot;" />
+
+    <Copy SourceFiles="$(_SdkTrimStagingDir)\Microsoft.Windows.SDK.NET.dll;$(_SdkTrimStagingDir)\WinRT.Runtime.dll" DestinationFolder="$(_SdkTrimOutputDir)" OverwriteReadOnlyFiles="true" />
+
+    <RemoveDir Directories="$(_SdkTrimStagingDir)" />
+    <Delete Files="$(_SdkTrimRspFile)" />
+  </Target>
+
 </Project>

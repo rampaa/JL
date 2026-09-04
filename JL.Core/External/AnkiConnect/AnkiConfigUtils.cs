@@ -21,7 +21,6 @@ public static class AnkiConfigUtils
             _ = Directory.CreateDirectory(AppInfo.ConfigPath);
 
             string tempConfigFilePath = PathUtils.GetTempPath(s_configFilePath);
-
             FileStream fileStream = new(tempConfigFilePath, FileStreamOptionsPresets.s_asyncCreateFso);
             await using (fileStream.ConfigureAwait(false))
             {
@@ -33,8 +32,8 @@ public static class AnkiConfigUtils
         }
         catch (Exception ex)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
             LoggerManager.Logger.Error(ex, "Couldn't write AnkiConfig");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't write AnkiConfig. Check the logs for more details.");
         }
     }
 
@@ -47,7 +46,6 @@ public static class AnkiConfigUtils
 
         if (!File.Exists(s_configFilePath))
         {
-            // FrontendManager.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
             LoggerManager.Logger.Warning("AnkiConfig.json doesn't exist");
             return null;
         }
@@ -97,8 +95,8 @@ public static class AnkiConfigUtils
         }
         catch (Exception ex)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
             LoggerManager.Logger.Error(ex, "Couldn't read AnkiConfig");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't read AnkiConfig. Check the logs for more details.");
             return null;
         }
     }

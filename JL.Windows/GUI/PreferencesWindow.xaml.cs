@@ -18,6 +18,7 @@ using JL.Core.Utilities.ObjectPool;
 using JL.Windows.Backlog;
 using JL.Windows.Config;
 using JL.Windows.GUI.Info;
+using JL.Windows.GUI.Notification;
 using JL.Windows.GUI.Profile;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
@@ -368,15 +369,15 @@ internal sealed partial class PreferencesWindow
 
             else
             {
-                WindowsUtils.Alert(AlertLevel.Error, "Error getting model names from Anki");
                 LoggerManager.Logger.Error("Error getting model names from Anki");
+                NotificationManager.Notify(NotificationLevel.Error, "Error getting model names from Anki");
             }
         }
 
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck names from Anki");
             LoggerManager.Logger.Error("Error getting deck names from Anki");
+            NotificationManager.Notify(NotificationLevel.Error, "Error getting deck names from Anki");
         }
     }
 
@@ -391,7 +392,7 @@ internal sealed partial class PreferencesWindow
         string? modelName = modelNamesComboBox.SelectionBoxItem.ToString();
         if (string.IsNullOrEmpty(modelName))
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Please select a note type first");
+            NotificationManager.Notify(NotificationLevel.Error, "Please select a note type first");
             return;
         }
 
@@ -408,7 +409,7 @@ internal sealed partial class PreferencesWindow
         }
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
+            NotificationManager.Notify(NotificationLevel.Error, "Error getting fields from AnkiConnect");
             LoggerManager.Logger.Error("Error getting fields from AnkiConnect");
         }
     }
@@ -475,8 +476,8 @@ internal sealed partial class PreferencesWindow
         if (deckNamesSelector.SelectedItem is null ||
             modelNamesSelector.SelectedItem is null)
         {
-            WindowsUtils.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineType} dictionaries"));
             LoggerManager.Logger.Error("Save failed: Incomplete Anki config for {MineType} dictionaries", mineType);
+            NotificationManager.Notify(NotificationLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed for {mineType} Anki config: Please complete the Anki configuration for {mineType} dictionaries first."));
             return null;
         }
 
@@ -555,8 +556,8 @@ internal sealed partial class PreferencesWindow
             return AnkiConfigUtils.WriteAnkiConfig(ankiConfigDict);
         }
 
-        WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
         LoggerManager.Logger.Error("Error saving AnkiConfig");
+        NotificationManager.Notify(NotificationLevel.Error, "Error saving AnkiConfig");
         coreConfigManager.AnkiIntegration = false;
         return Task.CompletedTask;
     }
@@ -651,7 +652,7 @@ internal sealed partial class PreferencesWindow
         }
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+            NotificationManager.Notify(NotificationLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
         }
     }
 

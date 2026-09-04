@@ -12,7 +12,7 @@ using JL.Core.Utilities;
 using JL.Core.Utilities.ObjectPool;
 using JL.Windows.Config;
 using JL.Windows.GUI;
-using JL.Windows.Utilities;
+using JL.Windows.GUI.Notification;
 using Timer = System.Timers.Timer;
 
 namespace JL.Windows.Backlog;
@@ -373,7 +373,7 @@ internal static class BacklogUtils
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             LoggerManager.Logger.Error(ex, "Error writing pending items to backlog file");
-            WindowsUtils.Alert(AlertLevel.Error, "Error writing pending items to backlog file. Check the logs for more details.");
+            NotificationManager.Notify(NotificationLevel.Error, "Error writing pending items to backlog file. Check the logs for more details.");
         }
         finally
         {
@@ -432,6 +432,7 @@ internal static class BacklogUtils
         return Path.Join(s_backlogDirectory, fileName);
     }
 
+    // TODO: Also write lookup count of each term if it's available?
     private static async Task WriteSessionStats()
     {
         string tempStatsFilePath = GetBacklogFilePath(false, "_Stats");
@@ -474,7 +475,7 @@ internal static class BacklogUtils
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             LoggerManager.Logger.Error(ex, "Error writing the backlog file");
-            WindowsUtils.Alert(AlertLevel.Error, "Error writing the backlog file. Check the logs for more details.");
+            NotificationManager.Notify(NotificationLevel.Error, "Error writing the backlog file. Check the logs for more details.");
         }
         finally
         {

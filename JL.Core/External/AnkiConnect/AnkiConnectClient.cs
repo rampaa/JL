@@ -112,8 +112,8 @@ internal static class AnkiConnectClient
                 return response;
             }
 
-            FrontendManager.Frontend.Alert(AlertLevel.Error, response.Error);
             LoggerManager.Logger.Error("{JsonError}", response.Error);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, response.Error);
 
             return null;
         }
@@ -123,14 +123,14 @@ internal static class AnkiConnectClient
         }
         catch (HttpRequestException ex)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
             LoggerManager.Logger.Error(ex, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
             return null;
         }
         catch (Exception ex)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't connect to AnkiConnect");
             LoggerManager.Logger.Error(ex, "Couldn't connect to AnkiConnect");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't connect to AnkiConnect. Check the logs for more details.");
             return null;
         }
     }

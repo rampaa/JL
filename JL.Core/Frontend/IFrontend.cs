@@ -7,11 +7,9 @@ public interface IFrontend
 {
     public Task PlayAudio(byte[] audio, string audioFormat);
 
-    public void Alert(AlertLevel alertLevel, string message);
+    public void Notify(NotificationLevel notificationLevel, string message);
 
     public Task<bool> ShowYesNoDialogAsync(string text, string caption);
-
-    public Task ShowOkDialogAsync(string text, string caption);
 
     public Task CopyFromWebSocket(string text, bool tsukikage);
 

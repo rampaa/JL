@@ -1,6 +1,6 @@
 namespace JL.Core.Frontend;
 
-public enum AlertLevel
+public enum NotificationLevel
 {
     Error,
     Warning,

@@ -7,13 +7,11 @@ internal sealed class DummyFrontend : IFrontend
 {
     public Task PlayAudio(byte[] audio, string audioFormat) => Task.CompletedTask;
 
-    public void Alert(AlertLevel alertLevel, string message)
+    public void Notify(NotificationLevel notificationLevel, string message)
     {
     }
 
     public Task<bool> ShowYesNoDialogAsync(string text, string caption) => Task.FromResult(true);
-
-    public Task ShowOkDialogAsync(string text, string caption) => Task.CompletedTask;
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => Task.CompletedTask;
 

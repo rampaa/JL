@@ -14,6 +14,7 @@ using JL.Core.Utilities;
 using JL.Windows.Backlog;
 using JL.Windows.GUI;
 using JL.Windows.GUI.CustomControls;
+using JL.Windows.GUI.Notification;
 using JL.Windows.GUI.Popup;
 using JL.Windows.Interop;
 using JL.Windows.Utilities;
@@ -857,7 +858,7 @@ internal sealed class ConfigManager
                 {
                     ConfigDBManager.UpdateSetting(connection, nameof(SearchUrl), SearchUrl);
                     LoggerManager.Logger.Warning("Couldn't save Search URL, invalid URL");
-                    WindowsUtils.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
+                    NotificationManager.Notify(NotificationLevel.Error, "Couldn't save Search URL, invalid URL");
                 }
             }
         }
@@ -872,7 +873,7 @@ internal sealed class ConfigManager
             {
                 ConfigDBManager.UpdateSetting(connection, nameof(BrowserPath), BrowserPath);
                 LoggerManager.Logger.Warning("Couldn't save Browser Path, invalid path");
-                WindowsUtils.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
+                NotificationManager.Notify(NotificationLevel.Error, "Couldn't save Browser Path, invalid path");
             }
             else
             {
@@ -915,7 +916,6 @@ internal sealed class ConfigManager
                 default:
                     ConfigDBManager.UpdateSetting(connection, PopupPositionRelativeToCursorSettingName, "BottomRight");
                     LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", PopupPositionRelativeToCursorSettingName, nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorStr);
-                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor option: {popupPositionRelativeToCursorStr}");
                     break;
             }
         }
@@ -947,7 +947,6 @@ internal sealed class ConfigManager
                 default:
                     ConfigDBManager.UpdateSetting(connection, PopupPositionRelativeToCursorForVerticalTextSettingName, BottomLeft);
                     LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", PopupPositionRelativeToCursorForVerticalTextSettingName, nameof(ConfigManager), nameof(ApplyPreferences), popupPositionRelativeToCursorForVerticalTextStr);
-                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid popup position relative to cursor for vertical text option: {popupPositionRelativeToCursorForVerticalTextStr}");
                     break;
             }
         }
@@ -974,7 +973,6 @@ internal sealed class ConfigManager
                 default:
                     ConfigDBManager.UpdateSetting(connection, PopupFlipSettingName, "Both");
                     LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", PopupFlipSettingName, nameof(ConfigManager), nameof(ApplyPreferences), popupFlipStr);
-                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid {PopupFlipSettingName}: {popupFlipStr}");
                     break;
             }
         }
@@ -1001,7 +999,6 @@ internal sealed class ConfigManager
                 default:
                     ConfigDBManager.UpdateSetting(connection, PopupFlipForVerticalTextSettingName, "Both");
                     LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", PopupFlipForVerticalTextSettingName, nameof(ConfigManager), nameof(ApplyPreferences), popupFlipForVerticalTextStr);
-                    WindowsUtils.Alert(AlertLevel.Error, $"Invalid {PopupFlipForVerticalTextSettingName}: {popupFlipForVerticalTextStr}");
                     break;
             }
         }

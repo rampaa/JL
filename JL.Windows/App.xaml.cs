@@ -8,6 +8,7 @@ using System.Windows;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Windows.Frontend;
+using JL.Windows.GUI.Notification;
 using JL.Windows.Interop;
 
 namespace JL.Windows;
@@ -38,11 +39,14 @@ internal sealed partial class App
 
         if (!HasModifyPermission(AppContext.BaseDirectory))
         {
-            LoggerManager.Logger.Information(
+            string msg =
                 """
                 JL is installed in a secure location that requires admin rights to modify files.
                 If you'd rather not give admin rights to JL, consider installing it in a location where they're not needed (e.g., the desktop).
-                """);
+                """;
+
+            LoggerManager.Logger.Warning(msg);
+            NotificationManager.Notify(NotificationLevel.Warning, msg);
 
             using Process? process = Process.Start(new ProcessStartInfo
             {
@@ -104,11 +108,13 @@ internal sealed partial class App
     private static void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
     {
         LoggerManager.Logger.Fatal((Exception)args.ExceptionObject, "Unhandled exception");
+        NotificationManager.Notify(NotificationLevel.Error, "An unhandled exception occured. Check the logs for more details.");
     }
 
     private static void LogUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
     {
         LoggerManager.Logger.Fatal(args.Exception, "Unobserved task exception");
+        NotificationManager.Notify(NotificationLevel.Error, "An unhandled exception occured. Check the logs for more details.");
     }
 
     private void Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)

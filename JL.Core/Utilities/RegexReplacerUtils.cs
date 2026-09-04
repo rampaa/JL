@@ -78,7 +78,7 @@ public static partial class RegexReplacerUtils
                     catch (ArgumentException e)
                     {
                         LoggerManager.Logger.Error(e, "Invalid RegEx: {RegexPattern}", regexPattern);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid RegEx: {regexPattern}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Invalid RegEx: {regexPattern}. Check the logs for more details.");
                     }
                 }
             }

@@ -1630,7 +1630,7 @@ public static class MiningUtils
         LoggerManager.Logger.Information("Mined {SelectedSpelling}", selectedSpelling);
         if (CoreConfigManager.Instance.NotifyWhenMiningSucceeds)
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Success, $"Mined {selectedSpelling}");
+            FrontendManager.Frontend.Notify(NotificationLevel.Success, $"Mined {selectedSpelling}");
         }
     }
 

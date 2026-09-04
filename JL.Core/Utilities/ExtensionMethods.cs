@@ -291,6 +291,7 @@ public static class ExtensionMethods
                 string? message = (string?)state;
                 Debug.Assert(message is not null);
                 LoggerManager.Logger.Error(t.Exception, "{Message}", message);
+                // FrontendManager.Frontend.Notify(NotificationLevel.Error, message);
             },
             errorMessage,
             CancellationToken.None,

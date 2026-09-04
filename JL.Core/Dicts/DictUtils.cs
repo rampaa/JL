@@ -685,7 +685,6 @@ public static class DictUtils
                     default:
                     {
                         LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(DictType), nameof(DictUtils), nameof(LoadDictionaries), dict.Type);
-                        FrontendManager.Frontend.Alert(AlertLevel.Error, $"Invalid dictionary type: {dict.Type}");
                         break;
                     }
                 }
@@ -699,7 +698,7 @@ public static class DictUtils
                 {
                     if (rebuildingAnyDB)
                     {
-                        FrontendManager.Frontend.Alert(AlertLevel.Information, "Rebuilding some databases because their schemas are out of date...");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Information, "Rebuilding some databases because their schemas are out of date...");
                     }
 
                     await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -737,7 +736,7 @@ public static class DictUtils
                 if (dictsSnapshot.All(static d => !d.Updating)
                     && (tasks.Count > customDictionaryTaskCount || anyCustomDictionaryTaskIsActuallyUsed.Read()))
                 {
-                    FrontendManager.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Success, "Finished loading dictionaries");
                 }
 
                 ProfileCustomWordsCancellationTokenSource.Dispose();
@@ -848,7 +847,7 @@ public static class DictUtils
                     if (dict.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {dict.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {dict.Name}. The dict has been deactivated.");
 
                         dict.Active = false;
                         dictsToBeRemoved.Add(dict);
@@ -861,7 +860,7 @@ public static class DictUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {dict.Name}. Check the logs for more details.");
 
                     dict.Active = false;
                     dictsToBeRemoved.Add(dict);
@@ -896,7 +895,7 @@ public static class DictUtils
                     if (dict.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                        FrontendManager.Frontend.Alert(AlertLevel.Warning, $"No valid records found for {dict.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {dict.Name}. The dict has been deactivated.");
 
                         dict.Active = false;
                         dictsToBeRemoved.Add(dict);
@@ -909,7 +908,7 @@ public static class DictUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {dict.Name}. Check the logs for more details.");
 
                     dict.Active = false;
                     dictsToBeRemoved.Add(dict);
@@ -1150,7 +1149,7 @@ public static class DictUtils
         }
         else
         {
-            FrontendManager.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't load Config/dicts.json");
             throw new SerializationException("Couldn't load Config/dicts.json");
         }
     }
