@@ -9,7 +9,6 @@ using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Windows.GUI.Notification;
 using JL.Windows.Utilities;
-using NAudio.Wave;
 
 namespace JL.Windows.SpeechSynthesis;
 
@@ -69,21 +68,9 @@ internal static class SpeechSynthesisUtils
 
     public static async Task TextToSpeech(string voiceName, string text)
     {
-        if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing)
+        if (WindowsAudioUtils.IsPlaying())
         {
-            await WindowsUtils.AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                WindowsUtils.AudioPlayer.Stop();
-            }
-            catch (Exception ex)
-            {
-                LoggerManager.Logger.Error(ex, "Error while stopping audio player");
-            }
-            finally
-            {
-                _ = WindowsUtils.AudioPlayerSemaphoreSlim.Release();
-            }
+            await WindowsAudioUtils.PausePlaying().ConfigureAwait(false);
         }
 
         if (s_synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)

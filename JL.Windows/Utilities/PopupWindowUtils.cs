@@ -11,7 +11,6 @@ using JL.Core.Lookup;
 using JL.Windows.Config;
 using JL.Windows.GUI;
 using JL.Windows.GUI.Popup;
-using NAudio.Wave;
 
 namespace JL.Windows.Utilities;
 
@@ -133,7 +132,7 @@ internal static class PopupWindowUtils
 
     public static Task PlayAudio(string primarySpelling, string? reading)
     {
-        if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing
+        if (WindowsAudioUtils.IsPlaying()
             && s_primarySpellingOfLastPlayedAudio == primarySpelling
             && s_readingOfLastPlayedAudio == reading)
         {

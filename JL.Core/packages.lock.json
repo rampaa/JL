@@ -46,25 +46,6 @@
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
-      "NAudio.Wasapi": {
-        "type": "Direct",
-        "requested": "[2.3.0, )",
-        "resolved": "2.3.0",
-        "contentHash": "y5K2BxrLnvohgu5znzg5wRsai3YcuNXfrpo68i7PmCQqpK5MC/R24e5aO3OyN/XhfRr12e0QYV0OnUWEHi5SzA==",
-        "dependencies": {
-          "NAudio.Core": "2.3.0"
-        }
-      },
-      "OpusSharp": {
-        "type": "Direct",
-        "requested": "[1.6.8, )",
-        "resolved": "1.6.8",
-        "contentHash": "YdV2utTYl7eeeZHKDfgCmy6Vg0eXjctGTlw3Onm6b4MsHaCIpECTMCCib5Ni8QcsjV5F2dUPH3j4G8Hp4LJGyA==",
-        "dependencies": {
-          "OpusSharp.Core": "1.6.1.4",
-          "OpusSharp.Natives": "1.6.1.4"
-        }
-      },
       "Serilog": {
         "type": "Direct",
         "requested": "[4.4.0, )",
@@ -113,21 +94,6 @@
         "dependencies": {
           "SQLitePCLRaw.core": "2.1.12"
         }
-      },
-      "NAudio.Core": {
-        "type": "Transitive",
-        "resolved": "2.3.0",
-        "contentHash": "jMd7r6dB6tAtXhOYL58ntPqwERNm1/Rhw5MKOIYvsnXzuX+PTGsa2VMam6n0npZYSwlSidKa4GAm4bFcXFUlcg=="
-      },
-      "OpusSharp.Core": {
-        "type": "Transitive",
-        "resolved": "1.6.1.4",
-        "contentHash": "yoUV2RRHMF6S+z4VyexSWLY9se/NNf1Ej20+jlzmdgoxn6wiwkN021HrmJrSXYMBJKHRIfFYDNlT27k8cPMsOw=="
-      },
-      "OpusSharp.Natives": {
-        "type": "Transitive",
-        "resolved": "1.6.1.4",
-        "contentHash": "tZBCuOp42RH51ri6Up2sOj64EpOrCAAq36ZmuwSAT/nKjfg0x4HR4D0AgChztgvJQTK9C/MZ9J2WIjUzkvgesg=="
       },
       "SQLite": {
         "type": "Transitive",

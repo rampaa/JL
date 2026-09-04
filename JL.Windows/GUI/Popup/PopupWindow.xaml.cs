@@ -1516,7 +1516,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         else if (keyGesture.IsEqual(configManager.MotivationKeyGesture))
         {
-            return WindowsUtils.Motivate();
+            return WindowsAudioUtils.Motivate();
         }
 
         else if (keyGesture.IsEqual(configManager.NextDictKeyGesture))

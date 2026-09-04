@@ -18,7 +18,7 @@ internal sealed class WindowsFrontend : IFrontend
         _mainWindow = mainWindow;
     }
 
-    public Task PlayAudio(byte[] audio, string audioFormat) => WindowsUtils.PlayAudio(audio, audioFormat);
+    public Task PlayAudio(byte[] audio, string audioFormat) => WindowsAudioUtils.PlayAudio(audio, audioFormat);
 
     public void Notify(NotificationLevel notificationLevel, string message) => NotificationManager.Notify(notificationLevel, message);
 

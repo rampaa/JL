@@ -4,7 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.Json;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Web;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,9 +33,6 @@ using JL.Windows.GUI.Dictionary;
 using JL.Windows.GUI.Frequency;
 using JL.Windows.GUI.Notification;
 using JL.Windows.Interop;
-using JL.Windows.SpeechSynthesis;
-using NAudio.Vorbis;
-using NAudio.Wave;
 using ColorPicker = HandyControl.Controls.ColorPicker;
 using Point = System.Windows.Point;
 using Rectangle = System.Drawing.Rectangle;
@@ -55,13 +52,6 @@ internal static class WindowsUtils
     private static readonly string s_updateHelperPath = Path.Join(AppInfo.ApplicationPath, "update-helper.cmd");
 
     private static readonly SemaphoreSlim s_dialogSemaphore = new(1, 1);
-    public static readonly SemaphoreSlim AudioPlayerSemaphoreSlim = new(1, 1);
-
-    private static long s_lastAudioPlayTimestamp;
-    private static WaveOutEvent? s_audioPlayer;
-
-    public static WaveOutEvent? AudioPlayer => Volatile.Read(ref s_audioPlayer);
-
     public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.Instance.PopupFont.Source);
     public static GlyphTypeface? PopupGlyphTypeface { get; set; } = PopupFontTypeFace.TryGetGlyphTypeface(out GlyphTypeface glyphTypeface) ? glyphTypeface : null;
 
@@ -428,121 +418,6 @@ internal static class WindowsUtils
                     }
                 }, DispatcherPriority.Render).Task.ConfigureAwait(false);
             }
-        }
-    }
-
-    public static async Task PlayAudio(byte[] audio, string audioFormat)
-    {
-        await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-        try
-        {
-            WaveOutEvent? oldPlayer = Interlocked.Exchange(ref s_audioPlayer, null);
-            oldPlayer?.Stop();
-
-            MemoryStream memoryStream = new(audio);
-
-#pragma warning disable CA2000 // Dispose objects before losing scope
-            WaveStream waveProvider = audioFormat switch
-            {
-                "ogg" or "oga" => new VorbisWaveReader(memoryStream),
-                "opus" => new OpusWaveStream(memoryStream),
-                _ => new StreamMediaFoundationReader(memoryStream)
-            };
-#pragma warning restore CA2000 // Dispose objects before losing scope
-
-            WaveOutEvent audioPlayer = new();
-
-            try
-            {
-                audioPlayer.Init(waveProvider);
-                _ = Interlocked.Exchange(ref s_audioPlayer, audioPlayer);
-                audioPlayer.Play();
-            }
-            catch (Exception ex)
-            {
-                audioPlayer.Dispose();
-                await waveProvider.DisposeAsync().ConfigureAwait(false);
-                await memoryStream.DisposeAsync().ConfigureAwait(false);
-                _ = Interlocked.Exchange(ref s_audioPlayer, null);
-
-                LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
-                NotificationManager.Notify(NotificationLevel.Error, "Error playing audio");
-            }
-
-            audioPlayer.PlaybackStopped += async (_, _) =>
-            {
-                await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
-                try
-                {
-                    audioPlayer.Dispose();
-                    await waveProvider.DisposeAsync().ConfigureAwait(false);
-                    await memoryStream.DisposeAsync().ConfigureAwait(false);
-
-                    if (AudioPlayer == audioPlayer)
-                    {
-                        _ = Interlocked.Exchange(ref s_audioPlayer, null);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LoggerManager.Logger.Error(ex, "Error while disposing audio player");
-                }
-                finally
-                {
-                    _ = AudioPlayerSemaphoreSlim.Release();
-                }
-            };
-        }
-        catch (Exception ex)
-        {
-            LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
-            NotificationManager.Notify(NotificationLevel.Error, "Error playing audio");
-        }
-        finally
-        {
-            _ = AudioPlayerSemaphoreSlim.Release();
-        }
-    }
-
-    public static async Task Motivate()
-    {
-        if (AudioPlayer?.PlaybackState is PlaybackState.Playing && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
-        {
-            s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
-            return;
-        }
-
-        s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
-
-        try
-        {
-            string[] filePaths = Directory.GetFiles(Path.Join(AppInfo.ResourcesPath, "Motivation"));
-            if (filePaths.Length is 0)
-            {
-                LoggerManager.Logger.Warning("Motivation folder is empty!");
-                NotificationManager.Notify(NotificationLevel.Warning, "Motivation folder is empty!");
-                return;
-            }
-
-#pragma warning disable CA5394 // Do not use insecure randomness
-            string randomFilePath = filePaths[Random.Shared.Next(filePaths.Length)];
-#pragma warning restore CA5394 // Do not use insecure randomness
-
-            byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
-
-            await Task.Run(async () =>
-            {
-                SpeechSynthesisUtils.StopTextToSpeech();
-                await PlayAudio(audioData, "mp3").ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            StatsUtils.IncrementStat(StatType.Imoutos);
-        }
-        catch (Exception ex)
-        {
-            LoggerManager.Logger.Error(ex, "Error motivating");
-            NotificationManager.Notify(NotificationLevel.Error, "Error motivating");
         }
     }
 

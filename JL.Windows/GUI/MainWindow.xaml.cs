@@ -1030,7 +1030,7 @@ internal sealed partial class MainWindow : IDisposable
 
         else if (keyGesture.IsEqual(configManager.MotivationKeyGesture))
         {
-            return WindowsUtils.Motivate();
+            return WindowsAudioUtils.Motivate();
         }
 
         else if (keyGesture.IsEqual(configManager.ShowStatsKeyGesture))
