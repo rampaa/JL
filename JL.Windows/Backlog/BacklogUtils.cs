@@ -432,11 +432,31 @@ internal static class BacklogUtils
         return Path.Join(s_backlogDirectory, fileName);
     }
 
-    // TODO: Also write lookup count of each term if it's available?
     private static async Task WriteSessionStats()
     {
         string tempStatsFilePath = GetBacklogFilePath(false, "_Stats");
-        await File.WriteAllTextAsync(tempStatsFilePath, StatsUtils.SessionStats.ToString()).ConfigureAwait(false);
+
+        Stats sessionStats = StatsUtils.SessionStats;
+        string sessionStatsStr;
+        if (CoreConfigManager.Instance.TrackTermLookupCounts && sessionStats.TermLookupCountDict.Count > 0)
+        {
+            StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
+            _ = sb.Append(sessionStats.ToString()).Append("\n\n");
+            _ = sb.Append("Term\tLookup Count\n");
+            foreach ((string term, int count) in sessionStats.TermLookupCountDict)
+            {
+                _ = sb.Append(CultureInfo.InvariantCulture, $"{term}\t{count}\n");
+            }
+
+            sessionStatsStr = sb.ToString();
+            ObjectPoolManager.StringBuilderPool.Return(sb);
+        }
+        else
+        {
+            sessionStatsStr = sessionStats.ToString();
+        }
+
+        await File.WriteAllTextAsync(tempStatsFilePath, sessionStatsStr).ConfigureAwait(false);
     }
 
     public static async Task WriteBacklog()
