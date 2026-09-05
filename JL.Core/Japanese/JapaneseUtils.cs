@@ -342,7 +342,6 @@ public static partial class JapaneseUtils
         new('＂', '＂'),
         new('＇', '＇'),
         new('“', '”'),
-        new('‘', '’'),
         new('«', '»'),
         new('‹', '›'),
         new('｢', '｣'),
