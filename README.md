@@ -20,7 +20,7 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 
 ## System requirements
 * .NET Desktop Runtime 9.0 or later
-* Japanese Supplemental Fonts, installed through **Settings → System → Optional features → Add a feature**
+* Japanese Supplemental Fonts, installed through **Windows Settings → System → Optional features → Add a feature** for Windows 10
 
 Installing the following free codecs is **highly recommended**:
 * [AV1 Video Extension](https://apps.microsoft.com/detail/9mvzqvxjbq9v) (for AVIF image support)
