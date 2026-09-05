@@ -408,7 +408,6 @@ public static partial class JapaneseUtils
             normalizedText = normalizedText.Normalize(NormalizationForm.FormKC);
         }
 
-        // TODO: Benchmark SearchKey<char>.ContainsAny vs ContainsAnyInRange
         if (normalizedText.ContainsAnyInRange('a', 'z'))
         {
             // TODO: When migrating to .NET 11, use ToUpperOrdinal instead
@@ -422,7 +421,6 @@ public static partial class JapaneseUtils
             return normalizedText;
         }
 
-        // TODO: Benchmark char[] (both stackalloc + ArrayPool) vs StringBuilder
         StringBuilder normalizedTextBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(normalizedText.AsSpan()[..normalizationStartOffset]);
         for (int i = normalizationStartOffset; i < normalizedText.Length; i++)
         {

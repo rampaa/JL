@@ -190,9 +190,8 @@ public static class AnkiConnectUtils
 
         if (fields.Count is 0)
         {
-            // TODO: Make this message more clear
-            LoggerManager.Logger.Information("Cannot mine {SelectedSpelling} because there is nothing to mine", selectedSpelling);
-            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Cannot mine {selectedSpelling} because there is nothing to mine");
+            LoggerManager.Logger.Information("Cannot mine {SelectedSpelling} because none of the configured fields have a value", selectedSpelling);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Cannot mine {selectedSpelling} because none of the configured fields have a value");
             return;
         }
 
