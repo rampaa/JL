@@ -76,7 +76,7 @@ internal sealed class UtilsTests
     public void FindSentence_WorksWithNestedQuotes()
     {
         // Arrange
-        const string expected = "はぁ、『高校生活を振り返って』というテーマの作文でしたが";
+        const string expected = "………はぁ、『高校生活を振り返って』というテーマの作文でしたが";
 
         const string text = "「………はぁ、『高校生活を振り返って』というテーマの作文でしたが」";
         const int position = 15;
@@ -188,7 +188,7 @@ internal sealed class UtilsTests
     public void FindSentence_idk3()
     {
         // Arrange
-        const string expected = "申し訳ありません。";
+        const string expected = "……申し訳ありません。";
 
         const string text = "「……申し訳ありません。稽古をしていたのですが。　少し、考える事があって……没頭しておりました」";
         const int position = 10;

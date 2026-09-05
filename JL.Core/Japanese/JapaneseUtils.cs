@@ -304,13 +304,9 @@ public static partial class JapaneseUtils
         '。',
         '！',
         '？',
-        '…',
-        '‥',
         '︒',
         '!',
         '?',
-        '︙',
-        '︰',
         '\u001E',
         '\n'
     ];
@@ -353,7 +349,7 @@ public static partial class JapaneseUtils
 
     private static readonly FrozenDictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToFrozenDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
 
-    private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys, .. s_leftToRightBracketDict.Values, .. s_sentenceTerminatingCharactersArray]);
+    private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys, .. s_leftToRightBracketDict.Values, .. s_sentenceTerminatingCharactersArray, '…', '‥', '︙', '︰']);
     internal static readonly SearchValues<char> s_fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#');
     internal static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜', '~');
     internal static readonly SearchValues<char> s_longVowelMarkCharsNotNormalized = SearchValues.Create('ー', '〜', '~', '～');
