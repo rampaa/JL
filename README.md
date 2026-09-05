@@ -19,7 +19,20 @@ Download from the [releases page](https://github.com/rampaa/JL/releases).
 </p>
 
 ## System requirements
-* .NET Desktop Runtime 10.0 or later
+* .NET Desktop Runtime 9.0 or later
+* Japanese Supplemental Fonts, installed through **Settings → System → Optional features → Add a feature**
+
+Installing the following free codecs is **highly recommended**:
+* [AV1 Video Extension](https://apps.microsoft.com/detail/9mvzqvxjbq9v) (for AVIF image support)
+* [Web Media Extensions](https://apps.microsoft.com/detail/9n5tdp8vcmhs) (for OGG and Opus audio support; should be preinstalled on Windows 10 22H2)
+* [WebP Image Extension](https://apps.microsoft.com/detail/9pg2dk419drg) (should be preinstalled on Windows 10 22H2)
+* [MPEG-2 Video Extension](https://apps.microsoft.com/detail/9n95q1zzpmh4) (should be preinstalled on Windows 10 22H2)
+* [VP9 Video Extensions](https://apps.microsoft.com/detail/9n4d0msmp0pt) (should be preinstalled on Windows 10 22H2)
+* [HEIF Image Extension](https://apps.microsoft.com/detail/9pmmsr1cgpwg) (should be preinstalled on Windows 10 22H2)
+* [Raw Image Extension](https://apps.microsoft.com/detail/9nctdw2w1bh8) (should be preinstalled on Windows 10 22H2)
+* [JPEG XL Image Extension](https://apps.microsoft.com/detail/9mzprth5c0tb) (Windows 11 and later only)
+* [AVC Encoder Video Extension](https://apps.microsoft.com/detail/9pb0trcnrhfx) (Windows 11 and later only)
+
 
 ## Features
 * Highly customizable (i.e. You can change the size/color/opacity/hotkey of pretty much everything)
