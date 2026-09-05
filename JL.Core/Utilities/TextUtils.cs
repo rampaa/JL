@@ -116,6 +116,10 @@ public static class TextUtils
             {
                 text = text.ReplaceLineEndings("");
             }
+            else
+            {
+                text = text.ReplaceLineEndings("\n");
+            }
 
             List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.RegexReplacements;
             if (regexReplacements is not null)

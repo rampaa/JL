@@ -304,11 +304,16 @@ public static partial class JapaneseUtils
         '。',
         '！',
         '？',
-        '︒',
         '!',
         '?',
+        '‼',
+        '⁉',
+        '︒',
+        '︕',
+        '︖',
         '\u001E',
-        '\n'
+        '\n',
+        '\r'
     ];
 
     private static readonly SearchValues<char> s_sentenceTerminatingCharacters = SearchValues.Create(s_sentenceTerminatingCharactersArray);
@@ -318,6 +323,9 @@ public static partial class JapaneseUtils
         // ReSharper disable BadExpressionBracesLineBreaks
         new('「', '」'),
         new('『', '』'),
+        new('〖', '〗'),
+        new('〚', '〛'),
+        new('〘', '〙'),
         new('【', '】'),
         new('《', '》'),
         new('〔', '〕'),
@@ -329,6 +337,8 @@ public static partial class JapaneseUtils
         new('〝', '〟'),
         new('＂', '＂'),
         new('＇', '＇'),
+        new('“', '”'),
+        new('‘', '’'),
         new('｢', '｣'),
         new('⟨', '⟩'),
         new('(', ')'),
