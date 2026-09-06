@@ -7,6 +7,7 @@ using JL.Core.Utilities;
 using JL.Windows.Config;
 using JL.Windows.External.Magpie;
 using JL.Windows.GUI;
+using JL.Windows.GUI.Popup;
 using JL.Windows.Utilities;
 using static JL.Windows.Interop.WinApi.NativeMethods;
 
@@ -38,6 +39,9 @@ internal static partial class WinApi
         internal const int WM_SYSCOMMAND = 0x0112;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
         internal const int MOD_NOREPEAT = 0x4000;
+
+        internal const uint EVENT_OBJECT_REORDER = 0x8004;
+        internal const uint WINEVENT_SKIPOWNPROCESS = 0x0002;
 
         // ReSharper disable UnusedMember.Global
         internal enum ChangeWindowMessageFilterExAction
@@ -165,10 +169,37 @@ internal static partial class WinApi
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool AttachThreadInput(uint idAttach, uint idAttachTo, [MarshalAs(UnmanagedType.Bool)] bool fAttach);
+
+        internal delegate void WinEventCallback(
+            nint hWinEventHook,
+            uint eventType,
+            nint hwnd,
+            int idObject,
+            int idChild,
+            uint idEventThread,
+            uint dwmsEventTime);
+
+        [LibraryImport("user32.dll", EntryPoint = "SetWinEventHook", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial nint SetWinEventHook(
+            uint eventMin,
+            uint eventMax,
+            nint hmodWinEventProc,
+            WinEventCallback lpfnWinEventProc,
+            uint idProcess,
+            uint idThread,
+            uint dwFlags);
+
+        [LibraryImport("user32.dll", EntryPoint = "UnhookWinEvent", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool UnhookWinEvent(nint hWinEventHook);
     }
 #pragma warning restore IDE1006 // Naming rule violation
 
     private static uint s_clipboardSequenceNo;
+    private static nint s_windowReorderEventHook;
+    private static readonly WinEventCallback s_winEventProc = WinEventProc;
 
     public static void SubscribeToWndProc(Window windowSource)
     {
@@ -394,6 +425,53 @@ internal static partial class WinApi
 
         const int keyDownMask = 0x8000;
         return virtualKey is not 0 && (GetAsyncKeyState(virtualKey) & keyDownMask) is not 0;
+    }
+
+    public static void SubscribeToWindowReorder()
+    {
+        if (s_windowReorderEventHook is 0)
+        {
+            s_windowReorderEventHook = SetWinEventHook(
+                EVENT_OBJECT_REORDER,
+                EVENT_OBJECT_REORDER,
+                0,
+                s_winEventProc,
+                0,
+                0,
+                WINEVENT_SKIPOWNPROCESS);
+        }
+    }
+
+    public static void UnsubscribeFromWindowReorder()
+    {
+        if (s_windowReorderEventHook is not 0)
+        {
+            _ = UnhookWinEvent(s_windowReorderEventHook);
+            s_windowReorderEventHook = 0;
+        }
+    }
+
+    private static void WinEventProc(
+        nint hWinEventHook,
+        uint eventType,
+        nint hwnd,
+        int idObject,
+        int idChild,
+        uint idEventThread,
+        uint dwmsEventTime)
+    {
+        PopupWindow firstPopupWindow = MainWindow.Instance.FirstPopupWindow;
+        if (!firstPopupWindow.MiningMode)
+        {
+            return;
+        }
+
+        nint foregroundWindowHandle = GetForegroundWindow();
+        _ = GetWindowThreadProcessId(foregroundWindowHandle, out uint processId);
+        if (processId != Environment.ProcessId)
+        {
+            firstPopupWindow.HidePopup();
+        }
     }
 
     private static nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)

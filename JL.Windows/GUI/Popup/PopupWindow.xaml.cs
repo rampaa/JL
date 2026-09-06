@@ -1957,6 +1957,10 @@ internal sealed partial class PopupWindow : IDisposable
     private void EnableMiningMode()
     {
         MiningMode = true;
+        if (PopupIndex is 0)
+        {
+            WinApi.SubscribeToWindowReorder();
+        }
 
         if (PopupWindowUtils.TransparentDueToAutoLookup)
         {
@@ -2579,6 +2583,11 @@ internal sealed partial class PopupWindow : IDisposable
         }
 
         MiningMode = false;
+        if (isFirstPopup)
+        {
+            WinApi.UnsubscribeFromWindowReorder();
+        }
+
         TitleBarGrid.Visibility = Visibility.Collapsed;
         DictTabButtonsItemsControl.Visibility = Visibility.Collapsed;
 
@@ -2821,20 +2830,6 @@ internal sealed partial class PopupWindow : IDisposable
             _duplicateCheckCancellationTokenSource.Cancel();
             _duplicateCheckCancellationTokenSource.Dispose();
             _duplicateCheckCancellationTokenSource = null;
-        }
-    }
-
-    private void Window_LostFocus(object sender, RoutedEventArgs e)
-    {
-        if (Opacity is 0)
-        {
-            return;
-        }
-
-        ConfigManager configManager = ConfigManager.Instance;
-        if (configManager is { Focusable: true, AlwaysOnTop: true })
-        {
-            WinApi.BringToFront(WindowHandle);
         }
     }
 }
