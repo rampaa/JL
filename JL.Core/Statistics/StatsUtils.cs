@@ -156,9 +156,10 @@ public static class StatsUtils
 
             case StatType.Time:
             {
-                SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
-                ProfileLifetimeStats.Time = ProfileLifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
-                LifetimeStats.Time = LifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
+                TimeSpan elapsed = TimeSpan.FromTicks((long)Math.Round((double)amount * TimeSpan.TicksPerSecond / Stopwatch.Frequency));
+                SessionStats.Time = SessionStats.Time.Add(elapsed);
+                ProfileLifetimeStats.Time = ProfileLifetimeStats.Time.Add(elapsed);
+                LifetimeStats.Time = LifetimeStats.Time.Add(elapsed);
 
                 break;
             }
