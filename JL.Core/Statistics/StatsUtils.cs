@@ -14,6 +14,7 @@ public static class StatsUtils
     public static Stats LifetimeStats { get; internal set; } = new();
 
     public static readonly Stopwatch TimeStatStopWatch = new();
+    public static readonly Lock TermLookupCountsLock = new();
     private static readonly Timer s_statsTimer = new();
     private static readonly Timer s_idleTimeTimer = new()
     {
@@ -220,7 +221,10 @@ public static class StatsUtils
             _ => SessionStats
         };
 
-        stats.ResetStats();
+        lock (TermLookupCountsLock)
+        {
+            stats.ResetStats();
+        }
 
         if (statsMode is StatsMode.Profile or StatsMode.Lifetime)
         {
@@ -230,8 +234,11 @@ public static class StatsUtils
 
     public static void IncrementTermLookupCount(string deconjugatedMatchedText)
     {
-        SessionStats.IncrementLookupStat(deconjugatedMatchedText);
-        ProfileLifetimeStats.IncrementLookupStat(deconjugatedMatchedText);
-        LifetimeStats.IncrementLookupStat(deconjugatedMatchedText);
+        lock (TermLookupCountsLock)
+        {
+            SessionStats.IncrementLookupStat(deconjugatedMatchedText);
+            ProfileLifetimeStats.IncrementLookupStat(deconjugatedMatchedText);
+            LifetimeStats.IncrementLookupStat(deconjugatedMatchedText);
+        }
     }
 }

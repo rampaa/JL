@@ -438,18 +438,31 @@ internal static class BacklogUtils
 
         Stats sessionStats = StatsUtils.SessionStats;
         string sessionStatsStr;
-        if (CoreConfigManager.Instance.TrackTermLookupCounts && sessionStats.TermLookupCountDict.Count > 0)
+        if (CoreConfigManager.Instance.TrackTermLookupCounts)
         {
-            StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
-            _ = sb.Append(sessionStats.ToString()).Append("\n\n");
-            _ = sb.Append("Term\tLookup Count\n");
-            foreach ((string term, int count) in sessionStats.TermLookupCountDict)
+            KeyValuePair<string, int>[] lookupStats;
+            lock (StatsUtils.TermLookupCountsLock)
             {
-                _ = sb.Append(CultureInfo.InvariantCulture, $"{term}\t{count}\n");
+                lookupStats = sessionStats.TermLookupCountDict.ToArray();
             }
 
-            sessionStatsStr = sb.ToString();
-            ObjectPoolManager.StringBuilderPool.Return(sb);
+            if (lookupStats.Length > 0)
+            {
+                StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
+                _ = sb.Append(sessionStats.ToString()).Append("\n\n");
+                _ = sb.Append("Term\tLookup Count\n");
+                foreach ((string term, int count) in lookupStats)
+                {
+                    _ = sb.Append(CultureInfo.InvariantCulture, $"{term}\t{count}\n");
+                }
+
+                sessionStatsStr = sb.ToString();
+                ObjectPoolManager.StringBuilderPool.Return(sb);
+            }
+            else
+            {
+                sessionStatsStr = sessionStats.ToString();
+            }
         }
         else
         {

@@ -137,8 +137,11 @@ public static class StatsDBUtils
         UpdateStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
         if (CoreConfigManager.Instance.TrackTermLookupCounts)
         {
-            UpsertTermLookupCounts(connection, StatsUtils.LifetimeStats.TermLookupCountDict, ProfileUtils.GlobalProfileId);
-            StatsUtils.LifetimeStats.TermLookupCountDict.Clear();
+            lock (StatsUtils.TermLookupCountsLock)
+            {
+                UpsertTermLookupCounts(connection, StatsUtils.LifetimeStats.TermLookupCountDict, ProfileUtils.GlobalProfileId);
+                StatsUtils.LifetimeStats.TermLookupCountDict.Clear();
+            }
         }
     }
 
@@ -147,8 +150,11 @@ public static class StatsDBUtils
         UpdateStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
         if (CoreConfigManager.Instance.TrackTermLookupCounts)
         {
-            UpsertTermLookupCounts(connection, StatsUtils.ProfileLifetimeStats.TermLookupCountDict, ProfileUtils.CurrentProfileId);
-            StatsUtils.ProfileLifetimeStats.TermLookupCountDict.Clear();
+            lock (StatsUtils.TermLookupCountsLock)
+            {
+                UpsertTermLookupCounts(connection, StatsUtils.ProfileLifetimeStats.TermLookupCountDict, ProfileUtils.CurrentProfileId);
+                StatsUtils.ProfileLifetimeStats.TermLookupCountDict.Clear();
+            }
         }
     }
 

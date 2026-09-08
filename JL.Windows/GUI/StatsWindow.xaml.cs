@@ -70,7 +70,10 @@ internal sealed partial class StatsWindow
 
     private void LoadTermLookupCounts(SqliteConnection connection)
     {
-        _sessionLookupCountsForCurrentProfile = StatsUtils.SessionStats.TermLookupCountDict.ToArray();
+        lock (StatsUtils.TermLookupCountsLock)
+        {
+            _sessionLookupCountsForCurrentProfile = StatsUtils.SessionStats.TermLookupCountDict.ToArray();
+        }
         _termLookupCountsForCurrentProfile = StatsDBUtils.GetTermLookupCountsFromDB(connection, ProfileUtils.CurrentProfileId);
         _termLookupCountsForLifetime = StatsDBUtils.GetTermLookupCountsFromDB(connection, ProfileUtils.GlobalProfileId);
     }

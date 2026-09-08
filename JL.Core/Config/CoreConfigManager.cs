@@ -263,12 +263,20 @@ public sealed class CoreConfigManager
 
         if (TrackTermLookupCounts)
         {
-            if (StatsUtils.ProfileLifetimeStats.TermLookupCountDict.Count > 0)
+            bool hasProfileTermLookupCounts;
+            bool hasLifetimeTermLookupCounts;
+            lock (StatsUtils.TermLookupCountsLock)
+            {
+                hasProfileTermLookupCounts = StatsUtils.ProfileLifetimeStats.TermLookupCountDict.Count > 0;
+                hasLifetimeTermLookupCounts = StatsUtils.LifetimeStats.TermLookupCountDict.Count > 0;
+            }
+
+            if (hasProfileTermLookupCounts)
             {
                 StatsDBUtils.UpdateProfileLifetimeStats(connection);
             }
 
-            if (StatsUtils.LifetimeStats.TermLookupCountDict.Count > 0)
+            if (hasLifetimeTermLookupCounts)
             {
                 StatsDBUtils.UpdateLifetimeStats(connection);
             }
@@ -277,7 +285,10 @@ public sealed class CoreConfigManager
         TrackTermLookupCounts = ConfigDBManager.GetValueFromConfig(connection, configs, TrackTermLookupCounts, nameof(TrackTermLookupCounts));
         if (!TrackTermLookupCounts)
         {
-            StatsUtils.SessionStats.TermLookupCountDict.Clear();
+            lock (StatsUtils.TermLookupCountsLock)
+            {
+                StatsUtils.SessionStats.TermLookupCountDict.Clear();
+            }
         }
     }
 }
