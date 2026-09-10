@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
@@ -17,8 +17,8 @@
     <PackageReference Include="HandyControl" Version="3.4.0" />
     <PackageReference Include="HandyControl.Lang.en" Version="3.4.0" />
 
-    <PackageReference Include="System.Speech" Version="10.0.11" />
-    <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.11" PrivateAssets="all" />
+    <PackageReference Include="System.Speech" Version="10.0.12" />
+    <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.12" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
