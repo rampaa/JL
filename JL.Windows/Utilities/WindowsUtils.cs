@@ -1017,25 +1017,4 @@ internal static class WindowsUtils
         }
         while (!copied);
     }
-
-    public static ImageInfo? GetImageInfo(string imagePath)
-    {
-        string fullImagePath = Path.GetFullPath(imagePath, AppInfo.ApplicationPath);
-        if (!File.Exists(fullImagePath))
-        {
-            return null;
-        }
-
-        try
-        {
-            Uri imageUri = new(fullImagePath);
-            BitmapFrame frame = BitmapFrame.Create(imageUri, BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
-            return new ImageInfo(imagePath, frame.PixelWidth, frame.PixelHeight, frame.Width, frame.Height);
-        }
-        catch (Exception ex)
-        {
-            LoggerManager.Logger.Warning(ex, "Failed to read image dimensions for '{ImagePath}'", fullImagePath);
-            return null;
-        }
-    }
 }

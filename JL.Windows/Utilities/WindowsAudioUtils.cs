@@ -38,7 +38,6 @@ internal static class WindowsAudioUtils
 
             MediaSource mediaSource;
             InMemoryRandomAccessStream? mediaStream = null;
-
             try
             {
 #pragma warning disable CA2000 // Dispose objects before losing scope

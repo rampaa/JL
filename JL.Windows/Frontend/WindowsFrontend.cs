@@ -3,6 +3,7 @@ using JL.Core.Frontend;
 using JL.Windows.Config;
 using JL.Windows.GUI;
 using JL.Windows.GUI.Notification;
+using JL.Windows.Images;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
@@ -48,7 +49,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public void PopupDictTypeButtonsNeedUpdating() => PopupWindowUtils.PopupDictTypeButtonsNeedUpdating();
 
-    public ImageInfo? GetImageInfo(string imagePath) => WindowsUtils.GetImageInfo(imagePath);
+    public ImageInfo? GetImageInfo(string imagePath) => ImageUtils.GetImageInfo(imagePath);
 
     public Version JLVersion => WindowsUtils.JLVersion;
 }
