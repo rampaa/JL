@@ -381,6 +381,11 @@ internal static partial class WinApi
         _ = SetWindowPos(windowHandle, 0, double.ConvertToIntegerNative<int>(x), double.ConvertToIntegerNative<int>(y), 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
 
+    public static void MoveWindowToPositionAndBringToFront(nint windowHandle, double x, double y)
+    {
+        _ = SetWindowPos(windowHandle, HWND_TOPMOST, double.ConvertToIntegerNative<int>(x), double.ConvertToIntegerNative<int>(y), 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+
     public static nint GetActiveWindowHandle()
     {
         return GetForegroundWindow();

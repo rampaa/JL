@@ -426,8 +426,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (spanToLookup.SequenceEqual(_lastLookedUpText) && Opacity is not 0 && MiningMode == enableMiningMode)
         {
-            UpdatePosition(mayNeedCoordinateConversion, verticalText);
-            WinApi.BringToFront(WindowHandle);
+            UpdatePositionAndBringToFront(mayNeedCoordinateConversion, verticalText);
             return;
         }
 
@@ -603,8 +602,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         if (selectedText == _lastLookedUpText && Opacity is not 0)
         {
-            UpdatePosition(false, false);
-            WinApi.BringToFront(WindowHandle);
+            UpdatePositionAndBringToFront(false, false);
             return Task.CompletedTask;
         }
 
@@ -717,7 +715,7 @@ internal sealed partial class PopupWindow : IDisposable
         return LookupOnCharPosition(textBox, charPosition, enableMiningMode, false, false);
     }
 
-    private void UpdatePosition(Point cursorPosition, bool verticalText)
+    private Point GetPopupPosition(Point cursorPosition, bool verticalText)
     {
         double mouseX = cursorPosition.X;
         double mouseY = cursorPosition.Y;
@@ -777,7 +775,19 @@ internal sealed partial class PopupWindow : IDisposable
             && mouseY >= newTop
             && mouseY <= newTop + currentHeight;
 
-        WinApi.MoveWindowToPosition(WindowHandle, newLeft, newTop);
+        return new Point(newLeft, newTop);
+    }
+
+    private void UpdatePosition(Point cursorPosition, bool verticalText)
+    {
+        Point position = GetPopupPosition(cursorPosition, verticalText);
+        WinApi.MoveWindowToPosition(WindowHandle, position.X, position.Y);
+    }
+
+    private void UpdatePositionAndBringToFront(Point cursorPosition, bool verticalText)
+    {
+        Point position = GetPopupPosition(cursorPosition, verticalText);
+        WinApi.MoveWindowToPositionAndBringToFront(WindowHandle, position.X, position.Y);
     }
 
     private void UpdatePosition(bool mayNeedCoordinateConversion, bool verticalText)
@@ -794,7 +804,20 @@ internal sealed partial class PopupWindow : IDisposable
         }
     }
 
-    private void UpdatePositionToFixedPosition(Point fixedPosition)
+    private void UpdatePositionAndBringToFront(bool mayNeedCoordinateConversion, bool verticalText)
+    {
+        if (ConfigManager.Instance.FixedPopupPositioning && PopupIndex is 0)
+        {
+            ConfigManager configManager = ConfigManager.Instance;
+            UpdatePositionToFixedPositionAndBringToFront(WindowsUtils.GetMousePosition(new Point(configManager.FixedPopupXPosition, configManager.FixedPopupYPosition), mayNeedCoordinateConversion));
+        }
+        else
+        {
+            UpdatePositionAndBringToFront(WindowsUtils.GetMousePosition(mayNeedCoordinateConversion), verticalText);
+        }
+    }
+
+    private Point GetFixedPopupPosition(Point fixedPosition)
     {
         Screen activeScreen = WindowsUtils.ActiveScreen;
         ConfigManager configManager = ConfigManager.Instance;
@@ -839,7 +862,19 @@ internal sealed partial class PopupWindow : IDisposable
             y = Math.Max(y is -1 ? activeScreen.WorkingArea.Top : activeScreen.Bounds.Top, y - currentHeight);
         }
 
-        WinApi.MoveWindowToPosition(WindowHandle, x, y);
+        return new Point(x, y);
+    }
+
+    private void UpdatePositionToFixedPosition(Point fixedPosition)
+    {
+        Point position = GetFixedPopupPosition(fixedPosition);
+        WinApi.MoveWindowToPosition(WindowHandle, position.X, position.Y);
+    }
+
+    private void UpdatePositionToFixedPositionAndBringToFront(Point fixedPosition)
+    {
+        Point position = GetFixedPopupPosition(fixedPosition);
+        WinApi.MoveWindowToPositionAndBringToFront(WindowHandle, position.X, position.Y);
     }
 
     private void DisplayResults()
