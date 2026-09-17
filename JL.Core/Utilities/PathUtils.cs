@@ -4,6 +4,8 @@ public static class PathUtils
 {
     private const string TempFileExtension = ".tmp";
 
+    public static readonly char[] InvalidFileNameChars = Path.GetInvalidFileNameChars();
+
     public static string GetPortablePath(string path)
     {
         string fullPath = Path.GetFullPath(path, AppInfo.ApplicationPath);

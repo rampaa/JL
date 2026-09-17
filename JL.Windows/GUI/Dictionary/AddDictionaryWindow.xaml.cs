@@ -72,7 +72,7 @@ internal sealed partial class AddDictionaryWindow
         string name = NameTextBox.Text;
         if (string.IsNullOrWhiteSpace(name)
             || name.Length > 128
-            || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            || name.ContainsAny(PathUtils.InvalidFileNameChars))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             NameTextBox.ToolTip = "Invalid dictionary name!";
