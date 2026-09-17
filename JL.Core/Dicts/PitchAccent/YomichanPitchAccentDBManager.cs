@@ -362,7 +362,7 @@ internal static class YomichanPitchAccentDBManager
                 ) d ON d.{Spelling} = r.{Spelling}
                     AND d.{Reading} IS r.{Reading}
                     AND d.{Position} IS r.{Position}
-                WHERE r.{RowId} <> d.{RowId}_to_keep
+                WHERE r.{RowId} != d.{RowId}_to_keep
             );
 
             DELETE FROM {RecordSearchKey}

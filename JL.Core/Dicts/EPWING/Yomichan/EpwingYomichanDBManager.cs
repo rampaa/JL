@@ -518,7 +518,7 @@ internal static class EpwingYomichanDBManager
                     AND d.{PartOfSpeech} IS r.{PartOfSpeech}
                     AND d.{GlossaryTags} IS r.{GlossaryTags}
                     AND d.{ImageInfos} IS r.{ImageInfos}
-                WHERE r.{RowId} <> d.{RowId}_to_keep
+                WHERE r.{RowId} != d.{RowId}_to_keep
             );
 
             DELETE FROM {RecordSearchKey}

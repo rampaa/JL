@@ -546,7 +546,7 @@ internal static class EpwingNazekaDBManager
                     AND d.{AlternativeSpellings} IS r.{AlternativeSpellings}
                     AND d.{Glossary} = r.{Glossary}
                     AND d.{ImageInfo} IS r.{ImageInfo}
-                WHERE r.{RowId} <> d.{RowId}_to_keep
+                WHERE r.{RowId} != d.{RowId}_to_keep
             );
 
             DELETE FROM {RecordSearchKey}

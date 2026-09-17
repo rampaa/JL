@@ -260,7 +260,7 @@ internal static class YomichanKanjiDBManager
                     AND d.{KunReadings} IS r.{KunReadings}
                     AND d.{Glossary} = r.{Glossary}
                     AND d.{Stats} IS r.{Stats}
-                WHERE r.{RowId} <> d.{RowId}_to_keep
+                WHERE r.{RowId} != d.{RowId}_to_keep
             );
             """;
 
