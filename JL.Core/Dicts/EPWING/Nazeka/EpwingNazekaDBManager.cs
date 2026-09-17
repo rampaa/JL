@@ -497,7 +497,6 @@ internal static class EpwingNazekaDBManager
 
         if (rowId > 1)
         {
-            DBUtils.EnableForeignKeySupport(connection);
             RemoveDuplicateRecords(connection);
             DBUtils.ConfigureForRead(connection);
 
@@ -532,11 +531,30 @@ internal static class EpwingNazekaDBManager
         command.CommandText =
             $"""
             DELETE FROM {Record}
-            WHERE {RowId} NOT IN
+            WHERE {RowId} IN
             (
-                SELECT MIN({RowId})
+                SELECT r.{RowId}
+                FROM {Record} r
+                JOIN
+                (
+                    SELECT MIN({RowId}) AS {RowId}_to_keep, {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo}
+                    FROM {Record}
+                    GROUP BY {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo}
+                    HAVING COUNT(*) > 1
+                ) d ON d.{PrimarySpelling} = r.{PrimarySpelling}
+                    AND d.{Reading} IS r.{Reading}
+                    AND d.{AlternativeSpellings} IS r.{AlternativeSpellings}
+                    AND d.{Glossary} = r.{Glossary}
+                    AND d.{ImageInfo} IS r.{ImageInfo}
+                WHERE r.{RowId} <> d.{RowId}_to_keep
+            );
+
+            DELETE FROM {RecordSearchKey}
+            WHERE NOT EXISTS
+            (
+                SELECT 1
                 FROM {Record}
-                GROUP BY {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo}
+                WHERE {Record}.{RowId} = {RecordSearchKey}.{RecordId}
             );
             """;
 

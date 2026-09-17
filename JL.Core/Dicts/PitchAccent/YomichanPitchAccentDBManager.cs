@@ -316,7 +316,6 @@ internal static class YomichanPitchAccentDBManager
 
         if (rowId > 1)
         {
-            DBUtils.EnableForeignKeySupport(connection);
             RemoveDuplicateRecords(connection);
             DBUtils.ConfigureForRead(connection);
 
@@ -350,11 +349,28 @@ internal static class YomichanPitchAccentDBManager
         command.CommandText =
             $"""
             DELETE FROM {Record}
-            WHERE {RowId} NOT IN
+            WHERE {RowId} IN
             (
-                SELECT MIN({RowId})
+                SELECT r.{RowId}
+                FROM {Record} r
+                JOIN
+                (
+                    SELECT MIN({RowId}) AS {RowId}_to_keep, {Spelling}, {Reading}, {Position}
+                    FROM {Record}
+                    GROUP BY {Spelling}, {Reading}, {Position}
+                    HAVING COUNT(*) > 1
+                ) d ON d.{Spelling} = r.{Spelling}
+                    AND d.{Reading} IS r.{Reading}
+                    AND d.{Position} IS r.{Position}
+                WHERE r.{RowId} <> d.{RowId}_to_keep
+            );
+
+            DELETE FROM {RecordSearchKey}
+            WHERE NOT EXISTS
+            (
+                SELECT 1
                 FROM {Record}
-                GROUP BY {Spelling}, {Reading}, {Position}
+                WHERE {Record}.{RowId} = {RecordSearchKey}.{RecordId}
             );
             """;
 

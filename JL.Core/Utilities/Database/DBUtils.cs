@@ -281,13 +281,6 @@ public static class DBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    internal static void EnableForeignKeySupport(SqliteConnection connection)
-    {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA foreign_keys = ON;";
-        _ = command.ExecuteNonQuery();
-    }
-
     private static void ValidateForeignKeys(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();

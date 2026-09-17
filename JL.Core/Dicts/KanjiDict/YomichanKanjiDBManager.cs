@@ -204,7 +204,6 @@ internal static class YomichanKanjiDBManager
 
         if (rowId > 1)
         {
-            DBUtils.EnableForeignKeySupport(connection);
             RemoveDuplicateRecords(connection);
 
             // ReSharper disable once UseAwaitUsing
@@ -246,11 +245,22 @@ internal static class YomichanKanjiDBManager
         command.CommandText =
             $"""
             DELETE FROM {Record}
-            WHERE {RowId} NOT IN
+            WHERE {RowId} IN
             (
-                SELECT MIN({RowId})
-                FROM {Record}
-                GROUP BY {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats}
+                SELECT r.{RowId}
+                FROM {Record} r
+                JOIN
+                (
+                    SELECT MIN({RowId}) AS {RowId}_to_keep, {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats}
+                    FROM {Record}
+                    GROUP BY {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats}
+                    HAVING COUNT(*) > 1
+                ) d ON d.{Kanji} = r.{Kanji}
+                    AND d.{OnReadings} IS r.{OnReadings}
+                    AND d.{KunReadings} IS r.{KunReadings}
+                    AND d.{Glossary} = r.{Glossary}
+                    AND d.{Stats} IS r.{Stats}
+                WHERE r.{RowId} <> d.{RowId}_to_keep
             );
             """;
 

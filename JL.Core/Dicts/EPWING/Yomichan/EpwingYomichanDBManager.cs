@@ -469,7 +469,6 @@ internal static class EpwingYomichanDBManager
 
         if (rowId > 1)
         {
-            DBUtils.EnableForeignKeySupport(connection);
             RemoveDuplicateRecords(connection);
             DBUtils.ConfigureForRead(connection);
 
@@ -503,11 +502,31 @@ internal static class EpwingYomichanDBManager
         command.CommandText =
             $"""
             DELETE FROM {Record}
-            WHERE {RowId} NOT IN
+            WHERE {RowId} IN
             (
-                SELECT MIN({RowId})
+                SELECT r.{RowId}
+                FROM {Record} r
+                JOIN
+                (
+                    SELECT MIN({RowId}) AS {RowId}_to_keep, {PrimarySpelling}, {Reading}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
+                    FROM {Record}
+                    GROUP BY {PrimarySpelling}, {Reading}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
+                    HAVING COUNT(*) > 1
+                ) d ON d.{PrimarySpelling} = r.{PrimarySpelling}
+                    AND d.{Reading} IS r.{Reading}
+                    AND d.{Glossary} = r.{Glossary}
+                    AND d.{PartOfSpeech} IS r.{PartOfSpeech}
+                    AND d.{GlossaryTags} IS r.{GlossaryTags}
+                    AND d.{ImageInfos} IS r.{ImageInfos}
+                WHERE r.{RowId} <> d.{RowId}_to_keep
+            );
+
+            DELETE FROM {RecordSearchKey}
+            WHERE NOT EXISTS
+            (
+                SELECT 1
                 FROM {Record}
-                GROUP BY {PrimarySpelling}, {Reading}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
+                WHERE {Record}.{RowId} = {RecordSearchKey}.{RecordId}
             );
             """;
 
