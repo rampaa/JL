@@ -611,9 +611,18 @@ internal static class ImageUtils
                     }
                     else if (densityUnit is 1)
                     {
-                        if (densityX is 0 || densityY is 0)
+                        if (densityX is 0 && densityY is 0)
                         {
-                            return false;
+                            continue;
+                        }
+
+                        if (densityX is 0)
+                        {
+                            densityX = densityY;
+                        }
+                        else if (densityY is 0)
+                        {
+                            densityY = densityX;
                         }
 
                         nativeDensityX = densityX;
@@ -625,9 +634,18 @@ internal static class ImageUtils
                     }
                     else if (densityUnit is 2)
                     {
-                        if (densityX is 0 || densityY is 0)
+                        if (densityX is 0 && densityY is 0)
                         {
-                            return false;
+                            continue;
+                        }
+
+                        if (densityX is 0)
+                        {
+                            densityX = densityY;
+                        }
+                        else if (densityY is 0)
+                        {
+                            densityY = densityX;
                         }
 
                         nativeDensityX = densityX;
