@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
@@ -5,6 +6,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Japanese;
@@ -24,18 +26,18 @@ internal static class EpwingYomichanDBManager
 
     public const int Size = 250000;
 
-    private const string Record = "record";
-    private const string RowId = "rowid";
-    private const string PrimarySpelling = "primary_spelling";
-    private const string Reading = "reading";
-    private const string Glossary = "glossary";
-    private const string PartOfSpeech = "part_of_speech";
-    private const string GlossaryTags = "glossary_tags";
-    private const string ImageInfos = "image_infos";
-    private const string PopularityScore = "popularity_score";
-    private const string RecordSearchKey = "record_search_key";
-    private const string RecordId = "record_id";
-    private const string SearchKey = "search_key";
+    internal const string Record = "record";
+    internal const string RowId = "rowid";
+    internal const string PrimarySpelling = "primary_spelling";
+    internal const string Reading = "reading";
+    internal const string Glossary = "glossary";
+    internal const string PartOfSpeech = "part_of_speech";
+    internal const string GlossaryTags = "glossary_tags";
+    internal const string ImageInfos = "image_infos";
+    internal const string PopularityScore = "popularity_score";
+    internal const string RecordSearchKey = "record_search_key";
+    internal const string RecordId = "record_id";
+    internal const string SearchKey = "search_key";
 
     private const string Term = "term";
     private const string SingleTermQuery =
@@ -87,6 +89,16 @@ internal static class EpwingYomichanDBManager
         ImageInfos,
         SearchKey
     }
+
+    private const int ImportRecordBatchSize = 64;
+    internal const int VariantSearchKeyRecordBatchSize = 8192;
+    private const int VariantSearchKeyTransactionBatchSize = 20_000_000;
+    private const long WholeFileParsingThreshold = 32 * 1024 * 1024;
+
+    private static readonly int s_workerCount = Environment.ProcessorCount;
+    private static readonly int s_outputChannelCapacity = s_workerCount * 16;
+    private static readonly int s_importRecordBatchChannelCapacity =
+        Math.Max(1, s_outputChannelCapacity / ImportRecordBatchSize);
 
     public static void CreateDB(string dbPath)
     {
@@ -150,73 +162,34 @@ internal static class EpwingYomichanDBManager
             }
         }
 
-        ulong rowId = 1;
+        long rowId = 1;
 
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
         DBUtils.ConfigureForBulkWrite(connection);
+
+        using RecordInserter recordInserter = new(connection);
+        using SearchKeyInserter searchKeyInserter = new(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
-
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {PrimarySpelling}, {Reading}, {PopularityScore}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos})
-            VALUES (@{RowId}, @{PrimarySpelling}, @{Reading}, @{PopularityScore}, @{Glossary}, @{PartOfSpeech}, @{GlossaryTags}, @{ImageInfos});
-            """;
-
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
-        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
-        SqliteParameter popularityScoreParam = new($"@{PopularityScore}", SqliteType.Real);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter partOfSpeechParam = new($"@{PartOfSpeech}", SqliteType.Blob);
-        SqliteParameter glossaryTagsParam = new($"@{GlossaryTags}", SqliteType.Blob);
-        SqliteParameter imageInfosParam = new($"@{ImageInfos}", SqliteType.Blob);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            primarySpellingParam,
-            readingParam,
-            popularityScoreParam,
-            glossaryParam,
-            partOfSpeechParam,
-            glossaryTagsParam,
-            imageInfosParam
-        ]);
-
-        insertRecordCommand.Prepare();
-
-        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-        insertSearchKeyCommand.CommandText =
-            $"""
-            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
-            VALUES (@{RecordId}, @{SearchKey});
-            """;
-
-        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
-        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
-        insertSearchKeyCommand.Prepare();
 
         foreach ((EpwingYomichanRecord record, List<string> keys) in recordToKeysDict)
         {
-            rowidParam.Value = rowId;
-            primarySpellingParam.Value = record.PrimarySpelling;
-            readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            popularityScoreParam.Value = record.PopularityScore;
-            glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
-            partOfSpeechParam.Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
-            glossaryTagsParam.Value = record.DefinitionTags is not null ? MessagePackSerializer.Serialize(record.DefinitionTags) : DBNull.Value;
-            imageInfosParam.Value = record.ImageInfos is not null ? MessagePackSerializer.Serialize(record.ImageInfos) : DBNull.Value;
-            _ = insertRecordCommand.ExecuteNonQuery();
+            byte[] definitions = MessagePackSerializer.Serialize(record.Definitions);
+            byte[]? wordClasses = record.WordClasses is not null
+                ? MessagePackSerializer.Serialize(record.WordClasses)
+                : null;
+            byte[]? definitionTags = record.DefinitionTags is not null
+                ? MessagePackSerializer.Serialize(record.DefinitionTags)
+                : null;
+            byte[]? imageInfos = record.ImageInfos is not null
+                ? MessagePackSerializer.Serialize(record.ImageInfos)
+                : null;
 
-            recordIdParam.Value = rowId;
-            foreach (ref readonly string key in keys.AsReadOnlySpan())
-            {
-                searchKeyParam.Value = key;
-                _ = insertSearchKeyCommand.ExecuteNonQuery();
-            }
+            recordInserter.Insert(rowId, record.PrimarySpelling, record.Reading, record.PopularityScore,
+                definitions, wordClasses, definitionTags, imageInfos);
 
+            searchKeyInserter.Insert(rowId, keys.AsReadOnlySpan());
             ++rowId;
         }
 
@@ -245,15 +218,13 @@ internal static class EpwingYomichanDBManager
         bool nonNameDict = dict.Type is not DictType.NonspecificNameYomichan;
 
         GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
-        Debug.Assert(!nonNameDict || nonKanjiDict || generateMazegakiOption is not null);
+        Debug.Assert(!nonKanjiDict || !nonNameDict || generateMazegakiOption is not null);
         bool generateMazegaki = nonKanjiDict && nonNameDict
-                                             // ReSharper disable once NullableWarningSuppressionIsUsed
                                              && generateMazegakiOption!.Value;
 
         GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
         Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
         bool generateFusejiVariants = nonKanjiDict
-                                // ReSharper disable once NullableWarningSuppressionIsUsed
                                 && generateFusejiVariantsOption!.Value;
 
         int maxSearchKeyLengthForFusejiGeneration;
@@ -272,6 +243,9 @@ internal static class EpwingYomichanDBManager
             maxTotalFuseji = 0;
         }
 
+        ImportOptions importOptions = new(nonKanjiDict, nonNameDict, generateMazegaki,
+            generateFusejiVariants, maxSearchKeyLengthForFusejiGeneration, maxTotalFuseji);
+
         ulong rowId = 1;
 
         // ReSharper disable once UseAwaitUsing
@@ -280,150 +254,36 @@ internal static class EpwingYomichanDBManager
 
         DBUtils.ConfigureForBulkWrite(connection);
 
-        // ReSharper disable once UseAwaitUsing
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {PrimarySpelling}, {Reading}, {PopularityScore}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos})
-            VALUES (@{RowId}, @{PrimarySpelling}, @{Reading}, @{PopularityScore}, @{Glossary}, @{PartOfSpeech}, @{GlossaryTags}, @{ImageInfos});
-            """;
+        using RecordInserter recordInserter = new(connection);
+        using SearchKeyInserter searchKeyInserter = new(connection);
 
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
-        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
-        SqliteParameter scoreParam = new($"@{PopularityScore}", SqliteType.Real);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter partOfSpeechParam = new($"@{PartOfSpeech}", SqliteType.Blob);
-        SqliteParameter glossaryTagsParam = new($"@{GlossaryTags}", SqliteType.Blob);
-        SqliteParameter imageInfosParam = new($"@{ImageInfos}", SqliteType.Blob);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            primarySpellingParam,
-            readingParam,
-            scoreParam,
-            glossaryParam,
-            partOfSpeechParam,
-            glossaryTagsParam,
-            imageInfosParam
-        ]);
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache = new();
 
-#pragma warning disable CA1849 // Call async methods when in an async method
-        insertRecordCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-        // ReSharper disable once UseAwaitUsing
-        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-        insertSearchKeyCommand.CommandText =
-            $"""
-            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
-            VALUES (@{RecordId}, @{SearchKey});
-            """;
-
-        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
-
-        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
-#pragma warning disable CA1849 // Call async methods when in an async method
-        insertSearchKeyCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-        HashSet<string> keys = new(StringComparer.Ordinal);
         int transactionRecordCount = 0;
 
         // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
-        IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term_bank_*.json", SearchOption.TopDirectoryOnly);
-        foreach (string jsonFile in jsonFiles)
+        string[] jsonFiles = [.. Directory.EnumerateFiles(fullPath, "term_bank_*.json", SearchOption.TopDirectoryOnly)];
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+        SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+        try
         {
-#pragma warning disable CA1849 // Call async methods when in an async method
-            SqliteTransaction transaction = connection.BeginTransaction();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-            insertRecordCommand.Transaction = transaction;
-            insertSearchKeyCommand.Transaction = transaction;
-
-            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-            await using (fileStream.ConfigureAwait(false))
+            await foreach (ImportRecordBatch batch in GetImportRecordBatches(jsonFiles, dict, importOptions, imageInfoCache).ConfigureAwait(false))
             {
-                await foreach (JsonElement[]? jsonElements in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                try
                 {
-                    Debug.Assert(jsonElements is not null);
-
-                    EpwingYomichanRecord? record = EpwingYomichanLoader.GetEpwingYomichanRecord(jsonElements, dict);
-                    if (record is not null)
+                    for (int i = 0; i < batch.Count; i++)
                     {
-                        rowidParam.Value = rowId;
-                        primarySpellingParam.Value = record.PrimarySpelling;
-                        readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
-                        scoreParam.Value = record.PopularityScore;
-                        glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
-                        partOfSpeechParam.Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
-                        glossaryTagsParam.Value = record.DefinitionTags is not null ? MessagePackSerializer.Serialize(record.DefinitionTags) : DBNull.Value;
-                        imageInfosParam.Value = record.ImageInfos is not null ? MessagePackSerializer.Serialize(record.ImageInfos) : DBNull.Value;
+                        ref readonly EpwingYomichanImportRecord record = ref batch.Records[i];
 
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        _ = insertRecordCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
+                        recordInserter.Insert((long)rowId, in record);
+                        searchKeyInserter.Insert((long)rowId, record.SearchKey, record.AdditionalSearchKey);
 
-                        string primarySpellingInHiragana = nonKanjiDict
-                            ? JapaneseUtils.NormalizeText(record.PrimarySpelling).GetPooledString()
-                            : record.PrimarySpelling.GetPooledString();
+                        transactionRecordCount += record.AdditionalSearchKey is null ? 1 : 2;
+                        ++rowId;
 
-                        _ = keys.Add(primarySpellingInHiragana);
-
-                        if (nonKanjiDict)
-                        {
-                            if (generateFusejiVariants)
-                            {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                {
-                                    _ = keys.Add(fusejiVariant);
-                                }
-                            }
-
-                            if (nonNameDict && record.Reading is not null)
-                            {
-                                string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
-                                if (primarySpellingInHiragana != readingInHiragana)
-                                {
-                                    if (keys.Add(readingInHiragana))
-                                    {
-                                        if (generateFusejiVariants)
-                                        {
-                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                            {
-                                                _ = keys.Add(fusejiVariant);
-                                            }
-                                        }
-
-                                        if (generateMazegaki)
-                                        {
-                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
-                                            {
-                                                if (keys.Add(mazegaki) && generateFusejiVariants)
-                                                {
-                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                                    {
-                                                        _ = keys.Add(fusejiVariant);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        recordIdParam.Value = rowId;
-                        foreach (string key in keys)
-                        {
-                            searchKeyParam.Value = key;
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            _ = insertSearchKeyCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-                        }
-
-                        transactionRecordCount += keys.Count;
-                        keys.Clear();
                         if (transactionRecordCount > DBUtils.TransactionBatchSize)
                         {
 #pragma warning disable CA1849 // Call async methods when in an async method
@@ -442,12 +302,13 @@ internal static class EpwingYomichanDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
                             transactionRecordCount = 0;
-                            insertRecordCommand.Transaction = transaction;
-                            insertSearchKeyCommand.Transaction = transaction;
                         }
-
-                        ++rowId;
                     }
+                }
+                finally
+                {
+                    batch.Records.AsSpan(0, batch.Count).Clear();
+                    ArrayPool<EpwingYomichanImportRecord>.Shared.Return(batch.Records);
                 }
             }
 
@@ -460,7 +321,9 @@ internal static class EpwingYomichanDBManager
                 transactionRecordCount = 0;
                 dict.Ready = true;
             }
-
+        }
+        finally
+        {
 #pragma warning disable CA1849 // Call async methods when in an async method
             // ReSharper disable once MethodHasAsyncOverload
             transaction.Dispose();
@@ -470,6 +333,79 @@ internal static class EpwingYomichanDBManager
         if (rowId > 1)
         {
             RemoveDuplicateRecords(connection);
+        }
+
+        if (rowId > 1 && (importOptions.GenerateMazegaki || importOptions.GenerateFusejiVariants))
+        {
+            DBUtils.FlushWalLog(connection);
+
+            transactionRecordCount = 0;
+            long lastVariantSearchKeyRecordRowId = 0;
+            VariantSearchKeyRecord[] variantSearchKeyRecords = new VariantSearchKeyRecord[VariantSearchKeyRecordBatchSize];
+
+            using VariantSearchKeyRecordReader variantSearchKeyRecordReader = new(connection);
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+            transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            try
+            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                int variantSearchKeyRecordCount;
+                while ((variantSearchKeyRecordCount = variantSearchKeyRecordReader.Read(
+                        variantSearchKeyRecords,
+                        lastVariantSearchKeyRecordRowId,
+                        out long newLastVariantSearchKeyRecordRowId)) > 0)
+#pragma warning restore CA1849 // Call async methods when in an async method
+                {
+                    lastVariantSearchKeyRecordRowId = newLastVariantSearchKeyRecordRowId;
+
+                    await foreach (VariantSearchKeys variantSearchKeys in GetVariantSearchKeysInParallel(
+                                       variantSearchKeyRecords,
+                                       variantSearchKeyRecordCount,
+                                       importOptions).ConfigureAwait(false))
+                    {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                        searchKeyInserter.Insert(variantSearchKeys.RowId, variantSearchKeys.SearchKeys);
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                        transactionRecordCount += variantSearchKeys.SearchKeys.Length;
+                        if (transactionRecordCount > VariantSearchKeyTransactionBatchSize)
+                        {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                            transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                            // ReSharper disable once MethodHasAsyncOverload
+                            transaction.Dispose();
+                            transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                            transactionRecordCount = 0;
+                        }
+                    }
+                }
+
+                if (transactionRecordCount > 0)
+                {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                    transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+                }
+            }
+            finally
+            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                // ReSharper disable once MethodHasAsyncOverload
+                transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+            }
+        }
+
+        if (rowId > 1)
+        {
             DBUtils.ConfigureForRead(connection);
 
             // ReSharper disable once UseAwaitUsing
@@ -705,5 +641,315 @@ internal static class EpwingYomichanDBManager
         ImageInfo[]? imageInfos = dataReader.GetNullableValueFromBlobStream<ImageInfo[]>((int)ColumnIndex.ImageInfos);
 
         return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos);
+    }
+
+    private static async IAsyncEnumerable<ImportRecordBatch> GetImportRecordBatches(string[] jsonFiles, Dict dict,
+        ImportOptions importOptions, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+    {
+        if (jsonFiles.Length is 0)
+        {
+            yield break;
+        }
+
+        using CancellationTokenSource stopOnConsumerExit = new();
+        Channel<ImportRecordBatch> outputChannel = Channel.CreateBounded<ImportRecordBatch>(new BoundedChannelOptions(s_importRecordBatchChannelCapacity)
+        {
+            FullMode = BoundedChannelFullMode.Wait,
+            SingleWriter = false,
+            SingleReader = true
+        });
+
+        ConcurrentQueue<string> jsonFileQueue = new(jsonFiles);
+
+        Task[] workerTasks = new Task[Math.Min(s_workerCount, jsonFiles.Length)];
+        for (int i = 0; i < workerTasks.Length; i++)
+        {
+            workerTasks[i] = Task.Run(() => CreateImportRecords(
+                jsonFileQueue, dict, importOptions, outputChannel.Writer, imageInfoCache, stopOnConsumerExit.Token));
+        }
+
+        Task outputCompletionTask = CompleteOutputChannel(workerTasks, outputChannel.Writer);
+
+        try
+        {
+            await foreach (ImportRecordBatch batch in outputChannel.Reader.ReadAllAsync().ConfigureAwait(false))
+            {
+                yield return batch;
+            }
+        }
+        finally
+        {
+            // A failed insert can leave producers waiting on a full channel.
+            await stopOnConsumerExit.CancelAsync().ConfigureAwait(false);
+            try
+            {
+                await outputCompletionTask.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (stopOnConsumerExit.IsCancellationRequested)
+            {
+            }
+            finally
+            {
+                while (outputChannel.Reader.TryRead(out ImportRecordBatch unusedBatch))
+                {
+                    unusedBatch.Records.AsSpan(0, unusedBatch.Count).Clear();
+                    ArrayPool<EpwingYomichanImportRecord>.Shared.Return(unusedBatch.Records);
+                }
+            }
+        }
+    }
+
+    private static async Task CreateImportRecords(ConcurrentQueue<string> jsonFiles, Dict dict,
+        ImportOptions importOptions, ChannelWriter<ImportRecordBatch> writer,
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache, CancellationToken cancellationToken)
+    {
+        EpwingYomichanImportRecord[] records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
+        int recordCount = 0;
+
+        try
+        {
+            while (jsonFiles.TryDequeue(out string? jsonFile))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+                await using (fileStream.ConfigureAwait(false))
+                {
+                    if (fileStream.Length <= WholeFileParsingThreshold)
+                    {
+                        byte[] jsonBytes = GC.AllocateUninitializedArray<byte>(checked((int)fileStream.Length));
+                        await fileStream.ReadExactlyAsync(jsonBytes, cancellationToken).ConfigureAwait(false);
+
+                        int offset = jsonBytes.AsSpan().StartsWith(Encoding.UTF8.Preamble)
+                            ? Encoding.UTF8.Preamble.Length
+                            : 0;
+
+                        JsonReaderState readerState = EpwingYomichanLoader.InitialJsonReaderState;
+                        bool started = false;
+                        bool completed = false;
+
+                        while (!completed)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            recordCount += EpwingYomichanLoader.ReadImportRecords(jsonBytes, ref offset, ref readerState,
+                                ref started, dict, importOptions.NonKanjiDict, importOptions.NonNameDict, imageInfoCache,
+                                records, recordCount, ImportRecordBatchSize - recordCount, out completed);
+
+                            if (recordCount == ImportRecordBatchSize)
+                            {
+                                await writer.WriteAsync(new ImportRecordBatch(records, recordCount), cancellationToken).ConfigureAwait(false);
+
+                                records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
+                                recordCount = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        await foreach (JsonElement jsonElement in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(
+                                           fileStream, JsonOptions.DefaultJso, cancellationToken: cancellationToken).ConfigureAwait(false))
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            if (!EpwingYomichanLoader.TryGetImportRecord(jsonElement, dict, importOptions.NonKanjiDict,
+                                    importOptions.NonNameDict, imageInfoCache, out EpwingYomichanImportRecord record))
+                            {
+                                continue;
+                            }
+
+                            records[recordCount] = record;
+                            ++recordCount;
+                            if (recordCount == ImportRecordBatchSize)
+                            {
+                                await writer.WriteAsync(new ImportRecordBatch(records, recordCount), cancellationToken).ConfigureAwait(false);
+
+                                records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
+                                recordCount = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (recordCount > 0)
+            {
+                await writer.WriteAsync(new ImportRecordBatch(records, recordCount), cancellationToken).ConfigureAwait(false);
+
+                records = [];
+                recordCount = 0;
+            }
+            else
+            {
+                ArrayPool<EpwingYomichanImportRecord>.Shared.Return(records);
+                records = [];
+            }
+        }
+        catch
+        {
+            if (records.Length > 0)
+            {
+                records.AsSpan(0, recordCount).Clear();
+                ArrayPool<EpwingYomichanImportRecord>.Shared.Return(records);
+            }
+
+            throw;
+        }
+    }
+
+    private static async IAsyncEnumerable<VariantSearchKeys> GetVariantSearchKeysInParallel(
+        VariantSearchKeyRecord[] sources, int sourceCount, ImportOptions importOptions)
+    {
+        using CancellationTokenSource stopOnConsumerExit = new();
+        Channel<VariantSearchKeys> outputChannel = Channel.CreateBounded<VariantSearchKeys>(new BoundedChannelOptions(s_outputChannelCapacity)
+        {
+            FullMode = BoundedChannelFullMode.Wait,
+            SingleWriter = false,
+            SingleReader = true
+        });
+
+        int workerCount = Math.Min(s_workerCount, sourceCount);
+        Task[] workerTasks = new Task[workerCount];
+        for (int workerIndex = 0; workerIndex < workerTasks.Length; workerIndex++)
+        {
+            int currentWorkerIndex = workerIndex;
+            workerTasks[workerIndex] = Task.Run(() => CreateVariantSearchKeys(
+                sources, sourceCount, currentWorkerIndex, workerCount, importOptions,
+                outputChannel.Writer, stopOnConsumerExit.Token));
+        }
+
+        Task outputCompletionTask = CompleteOutputChannel(workerTasks, outputChannel.Writer);
+
+        try
+        {
+            await foreach (VariantSearchKeys searchKeys in outputChannel.Reader.ReadAllAsync().ConfigureAwait(false))
+            {
+                yield return searchKeys;
+            }
+        }
+        finally
+        {
+            await stopOnConsumerExit.CancelAsync().ConfigureAwait(false);
+            try
+            {
+                await outputCompletionTask.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (stopOnConsumerExit.IsCancellationRequested)
+            {
+            }
+        }
+    }
+
+    private static async Task CreateVariantSearchKeys(VariantSearchKeyRecord[] sources, int sourceCount,
+        int workerIndex, int workerCount, ImportOptions importOptions,
+        ChannelWriter<VariantSearchKeys> writer, CancellationToken cancellationToken)
+    {
+        HashSet<string> keys = new(StringComparer.Ordinal);
+        List<string> variantSearchKeys = [];
+
+        for (int i = workerIndex; i < sourceCount; i += workerCount)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            VariantSearchKeyRecord source = sources[i];
+
+            string[] searchKeys = GenerateVariantSearchKeys(source.PrimarySpelling, source.Reading,
+                in importOptions, keys, variantSearchKeys);
+
+            if (searchKeys.Length > 0)
+            {
+                await writer.WriteAsync(new VariantSearchKeys(source.RowId, searchKeys), cancellationToken).ConfigureAwait(false);
+            }
+        }
+    }
+
+    private static string[] GenerateVariantSearchKeys(string primarySpelling, string? reading,
+        in ImportOptions importOptions, HashSet<string> keys, List<string> variantSearchKeys)
+    {
+        Debug.Assert(keys.Count is 0);
+        Debug.Assert(variantSearchKeys.Count is 0);
+
+        string primarySpellingInHiragana = importOptions.NonKanjiDict
+            ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
+            : primarySpelling.GetPooledString();
+
+        string? readingInHiragana = importOptions.NonKanjiDict && importOptions.NonNameDict && reading is not null
+            ? JapaneseUtils.NormalizeText(reading).GetPooledString()
+            : null;
+
+        _ = keys.Add(primarySpellingInHiragana);
+
+        if (importOptions.NonKanjiDict)
+        {
+            if (importOptions.GenerateFusejiVariants)
+            {
+                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana,
+                             importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
+                {
+                    _ = TryAddVariantSearchKey(fusejiVariant, readingInHiragana, keys, variantSearchKeys);
+                }
+            }
+
+            if (readingInHiragana is not null
+                && keys.Add(readingInHiragana))
+            {
+                if (importOptions.GenerateFusejiVariants)
+                {
+                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana,
+                                 importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
+                    {
+                        _ = TryAddVariantSearchKey(fusejiVariant, readingInHiragana, keys, variantSearchKeys);
+                    }
+                }
+
+                if (importOptions.GenerateMazegaki)
+                {
+                    foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(
+                                 primarySpellingInHiragana, readingInHiragana))
+                    {
+                        if (TryAddVariantSearchKey(mazegaki, readingInHiragana, keys, variantSearchKeys)
+                            && importOptions.GenerateFusejiVariants)
+                        {
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki,
+                                         importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
+                            {
+                                _ = TryAddVariantSearchKey(fusejiVariant, readingInHiragana, keys, variantSearchKeys);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        string[] result = variantSearchKeys.ToArray();
+        variantSearchKeys.Clear();
+        keys.Clear();
+        return result;
+    }
+
+    private static bool TryAddVariantSearchKey(string searchKey, string? readingSearchKey,
+        HashSet<string> keys, List<string> variantSearchKeys)
+    {
+        if (!keys.Add(searchKey))
+        {
+            return false;
+        }
+
+        if (searchKey != readingSearchKey)
+        {
+            variantSearchKeys.Add(searchKey);
+        }
+
+        return true;
+    }
+
+    private static async Task CompleteOutputChannel<T>(Task[] workerTasks, ChannelWriter<T> writer)
+    {
+        try
+        {
+            await Task.WhenAll(workerTasks).ConfigureAwait(false);
+            _ = writer.TryComplete();
+        }
+        catch (Exception ex)
+        {
+            _ = writer.TryComplete(ex);
+            throw;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
@@ -10,7 +11,10 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanUtils
 {
-    public static string[]? GetDefinitions(JsonElement jsonElement, Dict dict, ref List<ImageInfo>? imageInfos)
+    private static readonly ImageInfo s_missingImageInfo = new("", 0, 0, 0, 0);
+
+    internal static string[]? GetDefinitions(JsonElement jsonElement, Dict dict, ref List<ImageInfo>? imageInfos,
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache)
     {
         List<string> definitions = new(jsonElement.GetArrayLength());
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
@@ -22,12 +26,14 @@ internal static class EpwingYomichanUtils
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
             {
-                YomichanContent objContent = GetDefinitionsFromJsonObject(definitionElement, dict, ref imageInfos, null);
+                YomichanContent<string?> objContent = GetDefinitionsFromJsonObject(
+                    definitionElement, dict, ref imageInfos, null, imageInfoCache);
+
                 if (objContent.Tag is "img")
                 {
                     if (objContent.Content is not null)
                     {
-                        ImageInfo? imageInfo = FrontendManager.Frontend.GetImageInfo(objContent.Content);
+                        ImageInfo? imageInfo = GetImageInfo(objContent.Content, imageInfoCache);
                         if (imageInfo is not null)
                         {
                             imageInfos ??= [];
@@ -55,7 +61,26 @@ internal static class EpwingYomichanUtils
         return definitions.TrimToArray();
     }
 
-    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict, ref List<ImageInfo>? imageInfos, string? parentTag, bool isOrderedList, int orderedListIndex)
+    internal static ImageInfo? GetImageInfo(string imagePath, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+    {
+        if (imageInfoCache.TryGetValue(imagePath, out ImageInfo? imageInfo))
+        {
+            return ReferenceEquals(imageInfo, s_missingImageInfo) ? null : imageInfo;
+        }
+
+        imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
+        if (!imageInfoCache.TryAdd(imagePath, imageInfo ?? s_missingImageInfo)
+            && imageInfoCache.TryGetValue(imagePath, out ImageInfo? cachedImageInfo))
+        {
+            imageInfo = ReferenceEquals(cachedImageInfo, s_missingImageInfo) ? null : cachedImageInfo;
+        }
+
+        return imageInfo;
+    }
+
+    private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict,
+        ref List<ImageInfo>? imageInfos, string? parentTag, bool isOrderedList, int orderedListIndex,
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache)
     {
         bool first = true;
         string? lastTag = null;
@@ -69,7 +94,8 @@ internal static class EpwingYomichanUtils
             }
             else if (definitionElement.ValueKind is JsonValueKind.Array)
             {
-                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, ref imageInfos, null, isOrderedList, orderedListIndex);
+                AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, ref imageInfos,
+                    null, isOrderedList, orderedListIndex, imageInfoCache);
                 lastTag = null;
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
@@ -80,7 +106,8 @@ internal static class EpwingYomichanUtils
                     parentTag = null;
                 }
 
-                YomichanContent contentResult = GetDefinitionsFromJsonObject(definitionElement, dict, ref imageInfos, parentTag);
+                YomichanContent<string?> contentResult = GetDefinitionsFromJsonObject(
+                    definitionElement, dict, ref imageInfos, parentTag, imageInfoCache);
                 string? content = contentResult.Content;
                 if (content is not null)
                 {
@@ -160,7 +187,7 @@ internal static class EpwingYomichanUtils
 
                         case "img":
                         {
-                            ImageInfo? imageInfo = FrontendManager.Frontend.GetImageInfo(content);
+                            ImageInfo? imageInfo = GetImageInfo(content, imageInfoCache);
                             if (imageInfo is not null)
                             {
                                 imageInfos ??= [];
@@ -203,7 +230,8 @@ internal static class EpwingYomichanUtils
         }
     }
 
-    private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict, ref List<ImageInfo>? imagePaths, string? parentTag)
+    private static YomichanContent<string?> GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict,
+        ref List<ImageInfo>? imagePaths, string? parentTag, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
     {
         while (true)
         {
@@ -269,14 +297,14 @@ internal static class EpwingYomichanUtils
                             // Heuristic for Japanese-English dictionaries whose CSS is stored in a separate file and thus cannot be parsed currently
                             : jsonElement.TryGetProperty("data", out JsonElement dataElement) && dataElement.TryGetProperty("class", out _) && char.IsAscii(contentText[0]));
 
-                    return new YomichanContent(parentTag ?? tag, contentText, appendWhitespace, marker);
+                    return new YomichanContent<string?>(parentTag ?? tag, contentText, appendWhitespace, marker);
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Array)
                 {
                     StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
 
-                    AppendDefinitionsFromJsonArray(sb, contentElement, dict, ref imagePaths, tag, tag is "ol", 0);
+                    AppendDefinitionsFromJsonArray(sb, contentElement, dict, ref imagePaths, tag, tag is "ol", 0, imageInfoCache);
                     string? content = null;
                     if (sb.Length > 0)
                     {
@@ -284,7 +312,7 @@ internal static class EpwingYomichanUtils
                     }
 
                     ObjectPoolManager.StringBuilderPool.Return(sb);
-                    return new YomichanContent(parentTag ?? tag, content, false, marker);
+                    return new YomichanContent<string?>(parentTag ?? tag, content, false, marker);
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Object)
@@ -299,7 +327,7 @@ internal static class EpwingYomichanUtils
                 string? tag = tagElement.GetString();
                 if (tag is "th")
                 {
-                    return new YomichanContent("th", "×", false, null);
+                    return new YomichanContent<string?>("th", "×", false, null);
                 }
 
                 if (tag is "img" && jsonElement.TryGetProperty("path", out JsonElement imagePathJsonElement))
@@ -330,12 +358,12 @@ internal static class EpwingYomichanUtils
                     string? imagePath = imagePathJsonElement.GetString();
                     Debug.Assert(imagePath is not null);
 
-                    return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false, null);
+                    return new YomichanContent<string?>("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false, null);
                 }
 
                 if (jsonElement.TryGetProperty("title", out JsonElement titleJsonElement))
                 {
-                    return new YomichanContent(parentTag ?? tag, titleJsonElement.GetString(), false, null);
+                    return new YomichanContent<string?>(parentTag ?? tag, titleJsonElement.GetString(), false, null);
                 }
             }
             else if (jsonElement.TryGetProperty("type", out JsonElement typeJsonElement))
@@ -343,7 +371,7 @@ internal static class EpwingYomichanUtils
                 string? type = typeJsonElement.GetString();
                 if (type is "text" && jsonElement.TryGetProperty("text", out JsonElement textElement))
                 {
-                    return new YomichanContent("span", textElement.GetString(), false, null);
+                    return new YomichanContent<string?>("span", textElement.GetString(), false, null);
                 }
 
                 if (type is "image" && jsonElement.TryGetProperty("path", out JsonElement imagePathJsonElement))
@@ -373,7 +401,7 @@ internal static class EpwingYomichanUtils
 
                     string? imagePath = imagePathJsonElement.GetString();
                     Debug.Assert(imagePath is not null);
-                    return new YomichanContent("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false, null);
+                    return new YomichanContent<string?>("img", PathUtils.GetPortablePath(Path.Join(dict.Path, imagePath)), false, null);
                 }
             }
 

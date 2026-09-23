@@ -252,7 +252,14 @@ public static class DBUtils
         SqliteConnection.ClearAllPools();
 
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA journal_mode = WAL; PRAGMA synchronous = 0; PRAGMA foreign_keys = OFF; PRAGMA cache_size = -200000;";
+        command.CommandText = "PRAGMA journal_mode = WAL; PRAGMA wal_autocheckpoint = 8192; PRAGMA synchronous = 0; PRAGMA foreign_keys = OFF; PRAGMA cache_size = -400000; PRAGMA cache_spill = 13000;";
+        _ = command.ExecuteNonQuery();
+    }
+
+    internal static void FlushWalLog(SqliteConnection connection)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA wal_checkpoint(PASSIVE);";
         _ = command.ExecuteNonQuery();
     }
 
