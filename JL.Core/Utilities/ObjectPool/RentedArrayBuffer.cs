@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace JL.Core.Utilities.ObjectPool;
 
@@ -28,6 +29,11 @@ internal sealed class RentedArrayBuffer<T>(int capacity) : IDisposable
 
     public void Dispose()
     {
+        if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+        {
+            Array.AsSpan(0, Count).Clear();
+        }
+
         ArrayPool<T>.Shared.Return(Array);
     }
 }
