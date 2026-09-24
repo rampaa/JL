@@ -647,7 +647,6 @@ internal static class EpwingYomichanLoader
                         json,
                         dict,
                         ref imageInfos,
-                        ContentTag.None,
                         imageInfoCache,
                         out YomichanContent<ContentTag> objectContent))
                 {
@@ -702,13 +701,11 @@ internal static class EpwingYomichanLoader
     }
 
     private static bool TryAppendDefinitionsFromJsonArray(ref Utf8JsonReader reader, ReadOnlySpan<byte> json,
-        StringBuilder stringBuilder, Dict dict, ref List<ImageInfo>? imageInfos, ContentTag parentTag,
-        bool isOrderedList, int orderedListIndex, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+        StringBuilder stringBuilder, Dict dict, ref List<ImageInfo>? imageInfos,
+        bool isOrderedList, string? inheritedMarker, ref int orderedListIndex, ref ContentTag lastTag,
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache)
     {
         Debug.Assert(reader.TokenType is JsonTokenType.StartArray);
-
-        bool first = true;
-        ContentTag lastTag = ContentTag.None;
 
         while (reader.Read())
         {
@@ -732,15 +729,15 @@ internal static class EpwingYomichanLoader
                         stringBuilder,
                         dict,
                         ref imageInfos,
-                        ContentTag.None,
                         isOrderedList,
-                        orderedListIndex,
+                        inheritedMarker,
+                        ref orderedListIndex,
+                        ref lastTag,
                         imageInfoCache))
                 {
                     return false;
                 }
 
-                lastTag = ContentTag.None;
                 continue;
             }
 
@@ -749,136 +746,143 @@ internal static class EpwingYomichanLoader
                 continue;
             }
 
-            if (first)
-            {
-                first = false;
-                parentTag = ContentTag.None;
-            }
-
             if (!TryGetDefinitionsFromJsonObject(
                     ref reader,
                     json,
                     dict,
                     ref imageInfos,
-                    parentTag,
                     imageInfoCache,
                     out YomichanContent<ContentTag> contentResult))
             {
                 return false;
             }
 
-            string? content = contentResult.Content;
-            if (content is not null)
-            {
-                switch (contentResult.Tag)
-                {
-                    case ContentTag.Span:
-                        _ = stringBuilder.Append(content);
-                        if (contentResult.AppendWhitespace)
-                        {
-                            _ = stringBuilder.Append(' ');
-                        }
-                        break;
-
-                    case ContentTag.A:
-                    case ContentTag.Ruby:
-                        _ = stringBuilder.Append(content);
-                        break;
-
-                    case ContentTag.Rp:
-                        break;
-
-                    case ContentTag.Rt:
-                        _ = stringBuilder.Append('[').Append(content).Append(']');
-                        break;
-
-                    case ContentTag.Li:
-                    {
-                        content = content.TrimStart();
-                        string? marker = contentResult.Marker;
-
-                        if (isOrderedList)
-                        {
-                            ++orderedListIndex;
-                            marker = $"{orderedListIndex}.";
-                        }
-                        else
-                        {
-                            marker ??= "•";
-                        }
-
-                        if (content.StartsWith('•') || content.StartsWith(marker, StringComparison.Ordinal))
-                        {
-                            _ = stringBuilder.Append('\n').Append(marker).Append('\n').Append(content);
-                        }
-                        else
-                        {
-                            _ = stringBuilder.Append('\n').Append(marker).Append(' ').Append(content);
-                        }
-
-                        break;
-                    }
-
-                    case ContentTag.Ul:
-                    case ContentTag.Ol:
-                        _ = stringBuilder.Append('\n').Append(content.AsSpan().Trim()).Append('\n');
-                        break;
-
-                    case ContentTag.Th:
-                    case ContentTag.Td:
-                        _ = stringBuilder.Append(" | ").Append(content.AsSpan().TrimStart());
-                        break;
-
-                    case ContentTag.Tr:
-                        _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart()).Append(" |");
-                        break;
-
-                    case ContentTag.Img:
-                    {
-                        ImageInfo? imageInfo = EpwingYomichanUtils.GetImageInfo(content, imageInfoCache);
-                        if (imageInfo is not null)
-                        {
-                            imageInfos ??= [];
-                            imageInfos.Add(imageInfo);
-                        }
-
-                        break;
-                    }
-
-                    case ContentTag.Div:
-                        if (lastTag is ContentTag.Div && stringBuilder.Length > 0 && stringBuilder[^1] is '\n')
-                        {
-                            _ = stringBuilder.Append(content.AsSpan().Trim()).Append('\n');
-                        }
-                        else
-                        {
-                            _ = stringBuilder.Append('\n').Append(content.AsSpan().Trim()).Append('\n');
-                        }
-                        break;
-
-                    case ContentTag.None:
-                    case ContentTag.Br:
-                    case ContentTag.Other:
-                        _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart());
-                        break;
-                    default:
-                        break;
-                }
-
-                lastTag = contentResult.Tag;
-            }
-            else if (contentResult.Tag is ContentTag.Br)
-            {
-                _ = stringBuilder.Append('\n');
-                lastTag = contentResult.Tag;
-            }
+            AppendDefinitionContent(stringBuilder, contentResult, ref imageInfos, isOrderedList, inheritedMarker,
+                ref orderedListIndex, ref lastTag, imageInfoCache);
         }
 
         return false;
     }
 
+    private static void AppendDefinitionContent(StringBuilder stringBuilder, YomichanContent<ContentTag> contentResult,
+        ref List<ImageInfo>? imageInfos, bool isOrderedList, string? inheritedMarker, ref int orderedListIndex, ref ContentTag lastTag,
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+    {
+        string? content = contentResult.Content;
+        if (content is not null)
+        {
+            switch (contentResult.Tag)
+            {
+                case ContentTag.Span:
+                    _ = stringBuilder.Append(content);
+                    if (contentResult.AppendWhitespace)
+                    {
+                        _ = stringBuilder.Append(' ');
+                    }
+                    break;
+
+                case ContentTag.A:
+                case ContentTag.Ruby:
+                    _ = stringBuilder.Append(content);
+                    break;
+
+                case ContentTag.Rp:
+                    break;
+
+                case ContentTag.Rt:
+                    _ = stringBuilder.Append('[').Append(content).Append(']');
+                    break;
+
+                case ContentTag.Li:
+                {
+                    content = content.TrimStart();
+                    ++orderedListIndex;
+                    string? marker = contentResult.Marker ?? inheritedMarker;
+                    if (marker is "none")
+                    {
+                        _ = stringBuilder.Append('\n').Append(content);
+                        break;
+                    }
+
+                    if (marker is not null)
+                    {
+                        marker = EpwingYomichanUtils.GetListMarker(marker, orderedListIndex);
+                    }
+
+                    marker ??= isOrderedList ? $"{orderedListIndex}." : "•";
+                    if (marker.Length is 0)
+                    {
+                        _ = stringBuilder.Append('\n').Append(content);
+                        break;
+                    }
+
+                    if (content.StartsWith('•') || content.StartsWith(marker, StringComparison.Ordinal))
+                    {
+                        _ = stringBuilder.Append('\n').Append(marker).Append('\n').Append(content);
+                    }
+                    else
+                    {
+                        _ = stringBuilder.Append('\n').Append(marker).Append(' ').Append(content);
+                    }
+                    break;
+                }
+
+                case ContentTag.Ul:
+                case ContentTag.Ol:
+                    _ = stringBuilder.Append('\n').Append(content.AsSpan().Trim()).Append('\n');
+                    break;
+
+                case ContentTag.Th:
+                case ContentTag.Td:
+                    _ = stringBuilder.Append(" | ").Append(content.AsSpan().TrimStart());
+                    break;
+
+                case ContentTag.Tr:
+                    _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart()).Append(" |");
+                    break;
+
+                case ContentTag.Img:
+                {
+                    ImageInfo? imageInfo = EpwingYomichanUtils.GetImageInfo(content, imageInfoCache);
+                    if (imageInfo is not null)
+                    {
+                        imageInfos ??= [];
+                        imageInfos.Add(imageInfo);
+                    }
+                    break;
+                }
+
+                case ContentTag.Div:
+                    if (lastTag is ContentTag.Div && stringBuilder.Length > 0 && stringBuilder[^1] is '\n')
+                    {
+                        _ = stringBuilder.Append(content.AsSpan().Trim()).Append('\n');
+                    }
+                    else
+                    {
+                        _ = stringBuilder.Append('\n').Append(content.AsSpan().Trim()).Append('\n');
+                    }
+                    break;
+
+                case ContentTag.None:
+                case ContentTag.Br:
+                case ContentTag.Other:
+                    _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart());
+                    break;
+                default:
+                    break;
+            }
+
+            lastTag = contentResult.Tag;
+        }
+        else if (contentResult.Tag is ContentTag.Br)
+        {
+            _ = stringBuilder.Append('\n');
+            lastTag = contentResult.Tag;
+        }
+    }
+
     private static bool TryGetDefinitionsFromJsonObject(ref Utf8JsonReader reader, ReadOnlySpan<byte> json,
-        Dict dict, ref List<ImageInfo>? imageInfos, ContentTag parentTag,
+        Dict dict, ref List<ImageInfo>? imageInfos,
         ConcurrentDictionary<string, ImageInfo> imageInfoCache, out YomichanContent<ContentTag> result)
     {
         Debug.Assert(reader.TokenType is JsonTokenType.StartObject);
@@ -892,6 +896,7 @@ internal static class EpwingYomichanLoader
         bool contentPresent = false;
         ContentValueKind contentKind = ContentValueKind.None;
         string? contentText = null;
+        bool emptyContentArray = false;
         int contentOffset = 0;
         int contentLength = 0;
         YomichanContent<ContentTag> parsedNestedContent = default;
@@ -920,8 +925,11 @@ internal static class EpwingYomichanLoader
         string? text = null;
         bool invalidText = false;
 
-        bool smallHeight = false;
-        bool smallWidth = false;
+        double height = double.PositiveInfinity;
+        double width = double.PositiveInfinity;
+        bool heightSpecified = false;
+        bool widthSpecified = false;
+        bool sizeUnitsEm = false;
         bool invalidHeight = false;
         bool invalidWidth = false;
 
@@ -968,8 +976,7 @@ internal static class EpwingYomichanLoader
                     }
                 }
 
-                if (contentPresent && previousTag != tag
-                    && contentKind is ContentValueKind.Array or ContentValueKind.ObjectValue)
+                if (contentPresent && previousTag != tag && contentKind is ContentValueKind.Array)
                 {
                     RemoveImagesFromReplacedContent(ref imageInfos, imageInfoCountBeforeContent);
                     contentNeedsParsing = true;
@@ -1026,6 +1033,7 @@ internal static class EpwingYomichanLoader
                 contentNeedsParsing = false;
                 invalidContent = false;
                 contentText = null;
+                emptyContentArray = false;
                 parsedNestedContent = default;
 
                 if (reader.TokenType is JsonTokenType.String)
@@ -1039,6 +1047,11 @@ internal static class EpwingYomichanLoader
                 if (reader.TokenType is JsonTokenType.StartArray)
                 {
                     contentKind = ContentValueKind.Array;
+                    if (tag is ContentTag.Th)
+                    {
+                        Utf8JsonReader nextReader = reader;
+                        emptyContentArray = nextReader.Read() && nextReader.TokenType is JsonTokenType.EndArray;
+                    }
                     int contentStart = checked((int)reader.TokenStartIndex);
                     int contentDepth = reader.CurrentDepth;
 
@@ -1050,15 +1063,18 @@ internal static class EpwingYomichanLoader
                     }
 
                     StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
+                    int orderedListIndex = 0;
+                    ContentTag lastTag = ContentTag.None;
                     bool success = TryAppendDefinitionsFromJsonArray(
                         ref reader,
                         json,
                         stringBuilder,
                         dict,
                         ref imageInfos,
-                        tag,
                         tag is ContentTag.Ol,
-                        0,
+                        NormalizeListMarker(listStyleType),
+                        ref orderedListIndex,
+                        ref lastTag,
                         imageInfoCache);
 
                     if (!success)
@@ -1106,7 +1122,6 @@ internal static class EpwingYomichanLoader
                             json,
                             dict,
                             ref imageInfos,
-                            parentTag is ContentTag.None ? tag : parentTag,
                             imageInfoCache,
                             out parsedNestedContent))
                     {
@@ -1140,6 +1155,7 @@ internal static class EpwingYomichanLoader
                     return false;
                 }
 
+                string? previousListStyleType = listStyleType;
                 stylePresent = true;
                 invalidStyle = reader.TokenType is not JsonTokenType.StartObject;
                 if (invalidStyle)
@@ -1152,6 +1168,13 @@ internal static class EpwingYomichanLoader
                 else
                 {
                     invalidStyle = !TryReadStyle(ref reader, out listStyleType, out styleMarginRight);
+                }
+
+                if (!invalidStyle && contentPresent && contentKind is ContentValueKind.Array
+                    && previousListStyleType != listStyleType)
+                {
+                    RemoveImagesFromReplacedContent(ref imageInfos, imageInfoCountBeforeContent);
+                    contentNeedsParsing = true;
                 }
 
                 continue;
@@ -1208,6 +1231,23 @@ internal static class EpwingYomichanLoader
                 continue;
             }
 
+            if (reader.ValueTextEquals("sizeUnits"u8))
+            {
+                if (!reader.Read())
+                {
+                    result = default;
+                    return false;
+                }
+
+                sizeUnitsEm = reader.TokenType is JsonTokenType.String && reader.ValueTextEquals("em"u8);
+                if (reader.TokenType is JsonTokenType.StartArray or JsonTokenType.StartObject)
+                {
+                    reader.Skip();
+                }
+
+                continue;
+            }
+
             if (reader.ValueTextEquals("title"u8))
             {
                 if (!reader.Read())
@@ -1237,6 +1277,15 @@ internal static class EpwingYomichanLoader
             bool isHeight = reader.ValueTextEquals("height"u8);
             if (isHeight || reader.ValueTextEquals("width"u8))
             {
+                if (isHeight)
+                {
+                    heightSpecified = true;
+                }
+                else
+                {
+                    widthSpecified = true;
+                }
+
                 if (!reader.Read())
                 {
                     result = default;
@@ -1261,12 +1310,12 @@ internal static class EpwingYomichanLoader
                         if (isHeight)
                         {
                             invalidHeight = false;
-                            smallHeight = dimension <= 5D;
+                            height = dimension;
                         }
                         else
                         {
                             invalidWidth = false;
-                            smallWidth = dimension <= 5D;
+                            width = dimension;
                         }
                     }
                 }
@@ -1335,7 +1384,6 @@ internal static class EpwingYomichanLoader
                             nestedJson,
                             dict,
                             ref imageInfos,
-                            parentTag is ContentTag.None ? tag : parentTag,
                             imageInfoCache,
                             out parsedNestedContent))
                     {
@@ -1344,7 +1392,39 @@ internal static class EpwingYomichanLoader
                     }
                 }
 
-                result = parsedNestedContent;
+                string? childText = parsedNestedContent.Content;
+                string? marker = NormalizeListMarker(listStyleType);
+                string? objectText;
+                if (parsedNestedContent.Tag is ContentTag.Br)
+                {
+                    objectText = "\n";
+                }
+                else if (childText is null || parsedNestedContent.Tag is ContentTag.Rp)
+                {
+                    objectText = null;
+                }
+                else if (parsedNestedContent.Tag is ContentTag.Span)
+                {
+                    objectText = parsedNestedContent.AppendWhitespace ? childText + " " : childText;
+                }
+                else if (parsedNestedContent.Tag is ContentTag.A or ContentTag.Ruby)
+                {
+                    objectText = childText;
+                }
+                else
+                {
+                    StringBuilder objectStringBuilder = ObjectPoolManager.StringBuilderPool.Get();
+                    int objectOrderedListIndex = 0;
+                    ContentTag lastTag = ContentTag.None;
+                    AppendDefinitionContent(objectStringBuilder, parsedNestedContent, ref imageInfos, tag is ContentTag.Ol,
+                        NormalizeListMarker(listStyleType), ref objectOrderedListIndex, ref lastTag, imageInfoCache);
+                    objectText = objectStringBuilder.Length > 0 ? objectStringBuilder.ToString() : null;
+                    ObjectPoolManager.StringBuilderPool.Return(objectStringBuilder);
+                }
+
+                bool appendWhitespace = tag is ContentTag.Span && objectText is not null
+                    && (stylePresent ? styleMarginRight : dataClassPresent && objectText.Length > 0 && char.IsAscii(objectText[0]));
+                result = new YomichanContent<ContentTag>(tag, objectText, appendWhitespace, marker);
                 return true;
             }
 
@@ -1360,16 +1440,24 @@ internal static class EpwingYomichanLoader
                         return false;
                     }
 
+                    if (tag is ContentTag.Th)
+                    {
+                        Utf8JsonReader nextReader = nestedReader;
+                        emptyContentArray = nextReader.Read() && nextReader.TokenType is JsonTokenType.EndArray;
+                    }
                     StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
+                    int orderedListIndex = 0;
+                    ContentTag lastTag = ContentTag.None;
                     bool success = TryAppendDefinitionsFromJsonArray(
                         ref nestedReader,
                         nestedJson,
                         stringBuilder,
                         dict,
                         ref imageInfos,
-                        tag,
                         tag is ContentTag.Ol,
-                        0,
+                        NormalizeListMarker(listStyleType),
+                        ref orderedListIndex,
+                        ref lastTag,
                         imageInfoCache);
 
                     if (!success)
@@ -1385,34 +1473,28 @@ internal static class EpwingYomichanLoader
 
                     ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                 }
-
-                result = new YomichanContent<ContentTag>(
-                    parentTag is ContentTag.None ? tag : parentTag,
-                    contentText,
-                    false,
-                    NormalizeListMarker(listStyleType));
-
-                return true;
             }
 
-            if (contentKind is ContentValueKind.StringValue)
+            if (contentKind is ContentValueKind.StringValue or ContentValueKind.Array)
             {
-                Debug.Assert(contentText is not null);
-
-                if (tag is ContentTag.A
+                if (contentKind is ContentValueKind.StringValue
+                    && tag is ContentTag.A
                     && invalidHref)
                 {
                     result = default;
                     return false;
                 }
 
-                if (tag is ContentTag.A
+                if (contentKind is ContentValueKind.StringValue
+                    && tag is ContentTag.A
                     && href is not null
                     && !href.AsSpan().StartsWith("?query=", StringComparison.Ordinal))
                 {
                     contentText = $"{contentText}: {href}";
                 }
-                else if (tag is ContentTag.Th && string.IsNullOrWhiteSpace(contentText))
+                else if (tag is ContentTag.Th
+                    && ((contentKind is ContentValueKind.StringValue && string.IsNullOrWhiteSpace(contentText))
+                        || emptyContentArray))
                 {
                     contentText = "×";
                 }
@@ -1431,13 +1513,12 @@ internal static class EpwingYomichanLoader
                     }
                     else if (dataClassPresent)
                     {
-                        Debug.Assert(contentText.Length > 0);
-                        appendWhitespace = char.IsAscii(contentText[0]);
+                        appendWhitespace = contentText is { Length: > 0 } && char.IsAscii(contentText[0]);
                     }
                 }
 
                 result = new YomichanContent<ContentTag>(
-                    parentTag is ContentTag.None ? tag : parentTag,
+                    tag,
                     contentText,
                     appendWhitespace,
                     NormalizeListMarker(listStyleType));
@@ -1457,27 +1538,22 @@ internal static class EpwingYomichanLoader
                 return true;
             }
 
+            if (tag is ContentTag.Br)
+            {
+                result = new YomichanContent<ContentTag>(ContentTag.Br, null, false, null);
+                return true;
+            }
+
             if (tag is ContentTag.Img && pathPresent)
             {
-                if (invalidHeight)
+                if (invalidHeight || invalidWidth)
                 {
                     result = default;
                     return false;
                 }
 
-                if (smallHeight)
-                {
-                    result = default;
-                    return true;
-                }
-
-                if (invalidWidth)
-                {
-                    result = default;
-                    return false;
-                }
-
-                if (smallWidth)
+                double maximumSize = sizeUnitsEm ? 1D : 16D;
+                if (height <= maximumSize && width <= maximumSize)
                 {
                     result = default;
                     return true;
@@ -1490,9 +1566,17 @@ internal static class EpwingYomichanLoader
                 }
 
                 Debug.Assert(path is not null);
+                string imagePath = PathUtils.GetPortablePath(Path.Join(dict.Path, path));
+                if (EpwingYomichanUtils.IsSmallImageWithMissingDimension(imagePath, height, width,
+                    heightSpecified, widthSpecified, sizeUnitsEm, imageInfoCache))
+                {
+                    result = default;
+                    return true;
+                }
+
                 result = new YomichanContent<ContentTag>(
                     ContentTag.Img,
-                    PathUtils.GetPortablePath(Path.Join(dict.Path, path)),
+                    imagePath,
                     false,
                     null);
 
@@ -1508,7 +1592,7 @@ internal static class EpwingYomichanLoader
                 }
 
                 result = new YomichanContent<ContentTag>(
-                    parentTag is ContentTag.None ? tag : parentTag,
+                    tag,
                     title,
                     false,
                     null);
@@ -1540,25 +1624,14 @@ internal static class EpwingYomichanLoader
 
         if (type is ContentType.Image && pathPresent)
         {
-            if (invalidHeight)
+            if (invalidHeight || invalidWidth)
             {
                 result = default;
                 return false;
             }
 
-            if (smallHeight)
-            {
-                result = default;
-                return true;
-            }
-
-            if (invalidWidth)
-            {
-                result = default;
-                return false;
-            }
-
-            if (smallWidth)
+            double maximumSize = sizeUnitsEm ? 1D : 16D;
+            if (height <= maximumSize && width <= maximumSize)
             {
                 result = default;
                 return true;
@@ -1571,9 +1644,17 @@ internal static class EpwingYomichanLoader
             }
 
             Debug.Assert(path is not null);
+            string imagePath = PathUtils.GetPortablePath(Path.Join(dict.Path, path));
+            if (EpwingYomichanUtils.IsSmallImageWithMissingDimension(imagePath, height, width,
+                heightSpecified, widthSpecified, sizeUnitsEm, imageInfoCache))
+            {
+                result = default;
+                return true;
+            }
+
             result = new YomichanContent<ContentTag>(
                 ContentTag.Img,
-                PathUtils.GetPortablePath(Path.Join(dict.Path, path)),
+                imagePath,
                 false,
                 null);
 
@@ -1742,14 +1823,7 @@ internal static class EpwingYomichanLoader
             _ => marker
         };
 
-        if (marker.Length > 2 && marker[0] is '"' && marker[^1] is '"')
-        {
-            marker = marker[1..^1];
-        }
-
-        return marker.Length is 0 || char.IsAsciiLetter(marker[0])
-            ? null
-            : marker;
+        return marker;
     }
 
     private static ContentTag GetContentTag(ref Utf8JsonReader reader)
