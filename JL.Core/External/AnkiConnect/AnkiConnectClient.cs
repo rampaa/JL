@@ -116,7 +116,7 @@ internal static class AnkiConnectClient
                 return null;
             }
 
-            Response? response = await postResponse.Content.ReadFromJsonAsync<Response>(cancellationToken).ConfigureAwait(false);
+            Response? response = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
             Debug.Assert(response is not null);
             if (response.Error is null)
             {
