@@ -211,8 +211,8 @@ internal static class EpwingYomichanDBManager
         GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
         Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
         bool generateFusejiVariants = nonKanjiDict
-                                      // ReSharper disable once NullableWarningSuppressionIsUsed
-                                && generateFusejiVariantsOption!.Value;
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && generateFusejiVariantsOption!.Value;
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
