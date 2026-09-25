@@ -24,6 +24,10 @@
     </None>
   </ItemGroup>
 
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Platform)'=='x64'">
     <PlatformTarget>x64</PlatformTarget>
     <DefineConstants>$(DefineConstants);X64</DefineConstants>
