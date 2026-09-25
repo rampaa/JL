@@ -237,7 +237,6 @@ internal static class EpwingYomichanLoader
             return false;
         }
 
-        definitions?.DeduplicateStringsInArray();
         return true;
     }
 
@@ -618,9 +617,7 @@ internal static class EpwingYomichanLoader
             {
                 if (definitionList is not null)
                 {
-                    definitions = definitionList.TrimToArray();
-                    Debug.Assert(definitions is not null);
-                    definitions.DeduplicateStringsInArray();
+                    definitions = definitionList.ToArray();
                 }
                 else if (firstDefinition is not null)
                 {
@@ -648,7 +645,10 @@ internal static class EpwingYomichanLoader
                         dict,
                         ref imageInfos,
                         imageInfoCache,
-                        out YomichanContent<ContentTag> objectContent))
+                        null,
+                        out YomichanContent<ContentTag> objectContent,
+                        out _,
+                        out _))
                 {
                     definitions = null;
                     return false;
@@ -703,7 +703,8 @@ internal static class EpwingYomichanLoader
     private static bool TryAppendDefinitionsFromJsonArray(ref Utf8JsonReader reader, ReadOnlySpan<byte> json,
         StringBuilder stringBuilder, Dict dict, ref List<ImageInfo>? imageInfos,
         bool isOrderedList, string? inheritedMarker, ref int orderedListIndex, ref ContentTag lastTag,
-        ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache, List<int>? tableRowSpans, bool isTableRow,
+        ref int tableColumnIndex)
     {
         Debug.Assert(reader.TokenType is JsonTokenType.StartArray);
 
@@ -733,7 +734,10 @@ internal static class EpwingYomichanLoader
                         inheritedMarker,
                         ref orderedListIndex,
                         ref lastTag,
-                        imageInfoCache))
+                        imageInfoCache,
+                        tableRowSpans,
+                        isTableRow,
+                        ref tableColumnIndex))
                 {
                     return false;
                 }
@@ -752,13 +756,25 @@ internal static class EpwingYomichanLoader
                     dict,
                     ref imageInfos,
                     imageInfoCache,
-                    out YomichanContent<ContentTag> contentResult))
+                    tableRowSpans,
+                    out YomichanContent<ContentTag> contentResult,
+                    out int colSpan,
+                    out int rowSpan))
             {
                 return false;
             }
 
-            AppendDefinitionContent(stringBuilder, contentResult, ref imageInfos, isOrderedList, inheritedMarker,
-                ref orderedListIndex, ref lastTag, imageInfoCache);
+            if (isTableRow && (contentResult.Tag is ContentTag.TH or ContentTag.TD))
+            {
+                Debug.Assert(tableRowSpans is not null);
+                EpwingYomichanUtils.AppendTableCell(stringBuilder, contentResult.Content, colSpan, rowSpan,
+                    tableRowSpans, ref tableColumnIndex);
+            }
+            else
+            {
+                AppendDefinitionContent(stringBuilder, contentResult, ref imageInfos, isOrderedList, inheritedMarker,
+                    ref orderedListIndex, ref lastTag, imageInfoCache);
+            }
         }
 
         return false;
@@ -786,14 +802,14 @@ internal static class EpwingYomichanLoader
                     _ = stringBuilder.Append(content);
                     break;
 
-                case ContentTag.Rp:
+                case ContentTag.RP:
                     break;
 
-                case ContentTag.Rt:
+                case ContentTag.RT:
                     _ = stringBuilder.Append('[').Append(content).Append(']');
                     break;
 
-                case ContentTag.Li:
+                case ContentTag.LI:
                 {
                     content = content.TrimStart();
                     ++orderedListIndex;
@@ -827,17 +843,17 @@ internal static class EpwingYomichanLoader
                     break;
                 }
 
-                case ContentTag.Ul:
-                case ContentTag.Ol:
+                case ContentTag.UL:
+                case ContentTag.OL:
                     _ = stringBuilder.Append('\n').Append(content.AsSpan().Trim()).Append('\n');
                     break;
 
-                case ContentTag.Th:
-                case ContentTag.Td:
+                case ContentTag.TH:
+                case ContentTag.TD:
                     _ = stringBuilder.Append(" | ").Append(content.AsSpan().TrimStart());
                     break;
 
-                case ContentTag.Tr:
+                case ContentTag.TR:
                     _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart()).Append(" |");
                     break;
 
@@ -864,7 +880,11 @@ internal static class EpwingYomichanLoader
                     break;
 
                 case ContentTag.None:
-                case ContentTag.Br:
+                case ContentTag.BR:
+                case ContentTag.Table:
+                case ContentTag.THead:
+                case ContentTag.TBody:
+                case ContentTag.TFoot:
                 case ContentTag.Other:
                     _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart());
                     break;
@@ -874,7 +894,7 @@ internal static class EpwingYomichanLoader
 
             lastTag = contentResult.Tag;
         }
-        else if (contentResult.Tag is ContentTag.Br)
+        else if (contentResult.Tag is ContentTag.BR)
         {
             _ = stringBuilder.Append('\n');
             lastTag = contentResult.Tag;
@@ -883,9 +903,13 @@ internal static class EpwingYomichanLoader
 
     private static bool TryGetDefinitionsFromJsonObject(ref Utf8JsonReader reader, ReadOnlySpan<byte> json,
         Dict dict, ref List<ImageInfo>? imageInfos,
-        ConcurrentDictionary<string, ImageInfo> imageInfoCache, out YomichanContent<ContentTag> result)
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache, List<int>? tableRowSpans,
+        out YomichanContent<ContentTag> result, out int colSpan, out int rowSpan)
     {
         Debug.Assert(reader.TokenType is JsonTokenType.StartObject);
+
+        colSpan = 1;
+        rowSpan = 1;
 
         bool tagPresent = false;
         ContentTag tag = ContentTag.None;
@@ -900,6 +924,8 @@ internal static class EpwingYomichanLoader
         int contentOffset = 0;
         int contentLength = 0;
         YomichanContent<ContentTag> parsedNestedContent = default;
+        int nestedColSpan = 1;
+        int nestedRowSpan = 1;
         // Content may precede its tag, so nested content is reparsed only when the final tag is known.
         bool contentNeedsParsing = false;
         bool invalidContent = false;
@@ -976,6 +1002,12 @@ internal static class EpwingYomichanLoader
                     }
                 }
 
+                if (tableRowSpans is { Count: > 0 } && (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot))
+                {
+                    // Row spans do not cross row groups.
+                    tableRowSpans.Clear();
+                }
+
                 if (contentPresent && previousTag != tag && contentKind is ContentValueKind.Array)
                 {
                     RemoveImagesFromReplacedContent(ref imageInfos, imageInfoCountBeforeContent);
@@ -1047,7 +1079,7 @@ internal static class EpwingYomichanLoader
                 if (reader.TokenType is JsonTokenType.StartArray)
                 {
                     contentKind = ContentValueKind.Array;
-                    if (tag is ContentTag.Th)
+                    if (tag is ContentTag.TH)
                     {
                         Utf8JsonReader nextReader = reader;
                         emptyContentArray = nextReader.Read() && nextReader.TokenType is JsonTokenType.EndArray;
@@ -1065,17 +1097,30 @@ internal static class EpwingYomichanLoader
                     StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
                     int orderedListIndex = 0;
                     ContentTag lastTag = ContentTag.None;
+                    int tableColumnIndex = 0;
+                    List<int>? childTableRowSpans = null;
+                    if (tag is ContentTag.Table)
+                    {
+                        childTableRowSpans = [];
+                    }
+                    else if (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot or ContentTag.TR)
+                    {
+                        childTableRowSpans = tableRowSpans;
+                    }
                     bool success = TryAppendDefinitionsFromJsonArray(
                         ref reader,
                         json,
                         stringBuilder,
                         dict,
                         ref imageInfos,
-                        tag is ContentTag.Ol,
+                        tag is ContentTag.OL,
                         NormalizeListMarker(listStyleType),
                         ref orderedListIndex,
                         ref lastTag,
-                        imageInfoCache);
+                        imageInfoCache,
+                        childTableRowSpans,
+                        tag is ContentTag.TR && childTableRowSpans is not null,
+                        ref tableColumnIndex);
 
                     if (!success)
                     {
@@ -1094,6 +1139,11 @@ internal static class EpwingYomichanLoader
 
                     contentOffset = contentStart;
                     contentLength = checked((int)reader.BytesConsumed) - contentStart;
+
+                    if (tag is ContentTag.TR && childTableRowSpans is not null)
+                    {
+                        EpwingYomichanUtils.AdvanceTableRow(stringBuilder, childTableRowSpans, tableColumnIndex);
+                    }
 
                     if (stringBuilder.Length > 0)
                     {
@@ -1117,13 +1167,26 @@ internal static class EpwingYomichanLoader
                         continue;
                     }
 
+                    List<int>? childTableRowSpans = null;
+                    if (tag is ContentTag.Table)
+                    {
+                        childTableRowSpans = [];
+                    }
+                    else if (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot or ContentTag.TR)
+                    {
+                        childTableRowSpans = tableRowSpans;
+                    }
+
                     if (!TryGetDefinitionsFromJsonObject(
                             ref reader,
                             json,
                             dict,
                             ref imageInfos,
                             imageInfoCache,
-                            out parsedNestedContent))
+                            childTableRowSpans,
+                            out parsedNestedContent,
+                            out nestedColSpan,
+                            out nestedRowSpan))
                     {
                         if (!MoveReaderToObjectEnd(ref reader, contentDepth))
                         {
@@ -1274,6 +1337,35 @@ internal static class EpwingYomichanLoader
                 continue;
             }
 
+            bool isColSpan = tableRowSpans is not null && reader.ValueTextEquals("colSpan"u8);
+            if (isColSpan || (tableRowSpans is not null && reader.ValueTextEquals("rowSpan"u8)))
+            {
+                if (!reader.Read())
+                {
+                    result = default;
+                    return false;
+                }
+
+                if (reader.TokenType is JsonTokenType.Number && reader.TryGetInt32(out int span) && span > 0)
+                {
+                    if (isColSpan)
+                    {
+                        colSpan = span;
+                    }
+                    else
+                    {
+                        rowSpan = span;
+                    }
+                }
+
+                if (reader.TokenType is JsonTokenType.StartArray or JsonTokenType.StartObject)
+                {
+                    reader.Skip();
+                }
+
+                continue;
+            }
+
             bool isHeight = reader.ValueTextEquals("height"u8);
             if (isHeight || reader.ValueTextEquals("width"u8))
             {
@@ -1377,6 +1469,16 @@ internal static class EpwingYomichanLoader
                 {
                     ReadOnlySpan<byte> nestedJson = json.Slice(contentOffset, contentLength);
                     Utf8JsonReader nestedReader = new(nestedJson, true, InitialJsonReaderState);
+                    List<int>? childTableRowSpans = null;
+                    if (tag is ContentTag.Table)
+                    {
+                        childTableRowSpans = [];
+                    }
+                    else if (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot or ContentTag.TR)
+                    {
+                        childTableRowSpans = tableRowSpans;
+                    }
+
                     if (!nestedReader.Read()
                         || nestedReader.TokenType is not JsonTokenType.StartObject
                         || !TryGetDefinitionsFromJsonObject(
@@ -1385,7 +1487,10 @@ internal static class EpwingYomichanLoader
                             dict,
                             ref imageInfos,
                             imageInfoCache,
-                            out parsedNestedContent))
+                            childTableRowSpans,
+                            out parsedNestedContent,
+                            out nestedColSpan,
+                            out nestedRowSpan))
                     {
                         result = default;
                         return false;
@@ -1395,11 +1500,22 @@ internal static class EpwingYomichanLoader
                 string? childText = parsedNestedContent.Content;
                 string? marker = NormalizeListMarker(listStyleType);
                 string? objectText;
-                if (parsedNestedContent.Tag is ContentTag.Br)
+                if (tag is ContentTag.TR && tableRowSpans is not null
+                    && (parsedNestedContent.Tag is ContentTag.TH or ContentTag.TD))
+                {
+                    StringBuilder objectStringBuilder = ObjectPoolManager.StringBuilderPool.Get();
+                    int tableColumnIndex = 0;
+                    EpwingYomichanUtils.AppendTableCell(objectStringBuilder, childText, nestedColSpan, nestedRowSpan,
+                        tableRowSpans, ref tableColumnIndex);
+                    EpwingYomichanUtils.AdvanceTableRow(objectStringBuilder, tableRowSpans, tableColumnIndex);
+                    objectText = objectStringBuilder.Length > 0 ? objectStringBuilder.ToString() : null;
+                    ObjectPoolManager.StringBuilderPool.Return(objectStringBuilder);
+                }
+                else if (parsedNestedContent.Tag is ContentTag.BR)
                 {
                     objectText = "\n";
                 }
-                else if (childText is null || parsedNestedContent.Tag is ContentTag.Rp)
+                else if (childText is null || parsedNestedContent.Tag is ContentTag.RP)
                 {
                     objectText = null;
                 }
@@ -1416,7 +1532,7 @@ internal static class EpwingYomichanLoader
                     StringBuilder objectStringBuilder = ObjectPoolManager.StringBuilderPool.Get();
                     int objectOrderedListIndex = 0;
                     ContentTag lastTag = ContentTag.None;
-                    AppendDefinitionContent(objectStringBuilder, parsedNestedContent, ref imageInfos, tag is ContentTag.Ol,
+                    AppendDefinitionContent(objectStringBuilder, parsedNestedContent, ref imageInfos, tag is ContentTag.OL,
                         NormalizeListMarker(listStyleType), ref objectOrderedListIndex, ref lastTag, imageInfoCache);
                     objectText = objectStringBuilder.Length > 0 ? objectStringBuilder.ToString() : null;
                     ObjectPoolManager.StringBuilderPool.Return(objectStringBuilder);
@@ -1440,7 +1556,7 @@ internal static class EpwingYomichanLoader
                         return false;
                     }
 
-                    if (tag is ContentTag.Th)
+                    if (tag is ContentTag.TH)
                     {
                         Utf8JsonReader nextReader = nestedReader;
                         emptyContentArray = nextReader.Read() && nextReader.TokenType is JsonTokenType.EndArray;
@@ -1448,23 +1564,41 @@ internal static class EpwingYomichanLoader
                     StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
                     int orderedListIndex = 0;
                     ContentTag lastTag = ContentTag.None;
+                    int tableColumnIndex = 0;
+                    List<int>? childTableRowSpans = null;
+                    if (tag is ContentTag.Table)
+                    {
+                        childTableRowSpans = [];
+                    }
+                    else if (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot or ContentTag.TR)
+                    {
+                        childTableRowSpans = tableRowSpans;
+                    }
                     bool success = TryAppendDefinitionsFromJsonArray(
                         ref nestedReader,
                         nestedJson,
                         stringBuilder,
                         dict,
                         ref imageInfos,
-                        tag is ContentTag.Ol,
+                        tag is ContentTag.OL,
                         NormalizeListMarker(listStyleType),
                         ref orderedListIndex,
                         ref lastTag,
-                        imageInfoCache);
+                        imageInfoCache,
+                        childTableRowSpans,
+                        tag is ContentTag.TR && childTableRowSpans is not null,
+                        ref tableColumnIndex);
 
                     if (!success)
                     {
                         ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                         result = default;
                         return false;
+                    }
+
+                    if (tag is ContentTag.TR && childTableRowSpans is not null)
+                    {
+                        EpwingYomichanUtils.AdvanceTableRow(stringBuilder, childTableRowSpans, tableColumnIndex);
                     }
 
                     contentText = stringBuilder.Length > 0
@@ -1492,7 +1626,7 @@ internal static class EpwingYomichanLoader
                 {
                     contentText = $"{contentText}: {href}";
                 }
-                else if (tag is ContentTag.Th
+                else if (tag is ContentTag.TH
                     && ((contentKind is ContentValueKind.StringValue && string.IsNullOrWhiteSpace(contentText))
                         || emptyContentArray))
                 {
@@ -1517,6 +1651,11 @@ internal static class EpwingYomichanLoader
                     }
                 }
 
+                if (tableRowSpans is { Count: > 0 } && (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot))
+                {
+                    tableRowSpans.Clear();
+                }
+
                 result = new YomichanContent<ContentTag>(
                     tag,
                     contentText,
@@ -1532,15 +1671,31 @@ internal static class EpwingYomichanLoader
 
         if (tagPresent)
         {
-            if (tag is ContentTag.Th)
+            if (tag is ContentTag.TR && tableRowSpans is { Count: > 0 })
             {
-                result = new YomichanContent<ContentTag>(ContentTag.Th, "×", false, null);
+                StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
+                EpwingYomichanUtils.AdvanceTableRow(stringBuilder, tableRowSpans, 0);
+                string content = stringBuilder.ToString();
+                ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
+                result = new YomichanContent<ContentTag>(ContentTag.TR, content, false, null);
                 return true;
             }
 
-            if (tag is ContentTag.Br)
+            if (tag is ContentTag.TH)
             {
-                result = new YomichanContent<ContentTag>(ContentTag.Br, null, false, null);
+                result = new YomichanContent<ContentTag>(ContentTag.TH, "×", false, null);
+                return true;
+            }
+
+            if (tag is ContentTag.TD && tableRowSpans is not null)
+            {
+                result = new YomichanContent<ContentTag>(ContentTag.TD, null, false, null);
+                return true;
+            }
+
+            if (tag is ContentTag.BR)
+            {
+                result = new YomichanContent<ContentTag>(ContentTag.BR, null, false, null);
                 return true;
             }
 
@@ -1810,18 +1965,18 @@ internal static class EpwingYomichanLoader
 
     private static string? NormalizeListMarker(string? marker)
     {
-        if (marker is null)
+        if (marker is "disc")
         {
-            return null;
+            marker = "•";
         }
-
-        marker = marker switch
+        else if (marker is "circle")
         {
-            "disc" => "•",
-            "circle" => "◦",
-            "square" => "▪",
-            _ => marker
-        };
+            marker = "◦";
+        }
+        else if (marker is "square")
+        {
+            marker = "▪";
+        }
 
         return marker;
     }
@@ -1847,42 +2002,42 @@ internal static class EpwingYomichanLoader
 
         if (reader.ValueTextEquals("rp"u8))
         {
-            return ContentTag.Rp;
+            return ContentTag.RP;
         }
 
         if (reader.ValueTextEquals("rt"u8))
         {
-            return ContentTag.Rt;
+            return ContentTag.RT;
         }
 
         if (reader.ValueTextEquals("li"u8))
         {
-            return ContentTag.Li;
+            return ContentTag.LI;
         }
 
         if (reader.ValueTextEquals("ul"u8))
         {
-            return ContentTag.Ul;
+            return ContentTag.UL;
         }
 
         if (reader.ValueTextEquals("ol"u8))
         {
-            return ContentTag.Ol;
+            return ContentTag.OL;
         }
 
         if (reader.ValueTextEquals("th"u8))
         {
-            return ContentTag.Th;
+            return ContentTag.TH;
         }
 
         if (reader.ValueTextEquals("td"u8))
         {
-            return ContentTag.Td;
+            return ContentTag.TD;
         }
 
         if (reader.ValueTextEquals("tr"u8))
         {
-            return ContentTag.Tr;
+            return ContentTag.TR;
         }
 
         ContentTag tag = ContentTag.Other;
@@ -1896,7 +2051,23 @@ internal static class EpwingYomichanLoader
         }
         else if (reader.ValueTextEquals("br"u8))
         {
-            tag = ContentTag.Br;
+            tag = ContentTag.BR;
+        }
+        else if (reader.ValueTextEquals("table"u8))
+        {
+            tag = ContentTag.Table;
+        }
+        else if (reader.ValueTextEquals("thead"u8))
+        {
+            tag = ContentTag.THead;
+        }
+        else if (reader.ValueTextEquals("tbody"u8))
+        {
+            tag = ContentTag.TBody;
+        }
+        else if (reader.ValueTextEquals("tfoot"u8))
+        {
+            tag = ContentTag.TFoot;
         }
 
         return tag;
@@ -1919,17 +2090,21 @@ internal static class EpwingYomichanLoader
         Span,
         A,
         Ruby,
-        Rp,
-        Rt,
-        Li,
-        Ul,
-        Ol,
-        Th,
-        Td,
-        Tr,
+        RP,
+        RT,
+        LI,
+        UL,
+        OL,
+        TH,
+        TD,
+        TR,
+        Table,
+        THead,
+        TBody,
+        TFoot,
         Img,
         Div,
-        Br,
+        BR,
         Other
     }
 

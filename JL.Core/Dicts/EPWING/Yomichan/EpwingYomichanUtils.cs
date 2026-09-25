@@ -142,16 +142,94 @@ internal static class EpwingYomichanUtils
     {
         // Add support for decimal-leading-zero, alphabetic, Roman and Japanese counter styles if a dictionary uses them.
         // The same applies to inherit, unset and initial.
-        return marker switch
+        if (marker.Length > 1 && (marker[0] is '"' or '\'') && marker[^1] == marker[0])
         {
-            { Length: > 1 } when (marker[0] is '"' or '\'') && marker[^1] == marker[0] => marker[1..^1],
-            _ => marker.Length > 0 && char.IsAsciiLetter(marker[0]) ? $"{index}." : marker
-        };
+            return marker[1..^1];
+        }
+
+        if (marker.Length > 0 && char.IsAsciiLetter(marker[0]))
+        {
+            marker = $"{index}.";
+        }
+
+        return marker;
+    }
+
+    internal static void AppendTableCell(StringBuilder stringBuilder, string? content, int colSpan, int rowSpan,
+        List<int> rowSpans, ref int columnIndex)
+    {
+        while (columnIndex < rowSpans.Count && rowSpans[columnIndex] > 0)
+        {
+            _ = stringBuilder.Append(" | ");
+            ++columnIndex;
+        }
+
+        _ = stringBuilder.Append(" | ");
+        if (content is not null)
+        {
+            _ = stringBuilder.Append(content.AsSpan().TrimStart());
+        }
+
+        int endColumn = columnIndex + colSpan;
+        if (rowSpan > 1)
+        {
+            while (rowSpans.Count < endColumn)
+            {
+                rowSpans.Add(0);
+            }
+
+            int i = columnIndex;
+            while (i < endColumn)
+            {
+                rowSpans[i] = rowSpan;
+                ++i;
+            }
+        }
+
+        int remainingColumns = colSpan - 1;
+        while (remainingColumns > 0)
+        {
+            _ = stringBuilder.Append(" | ");
+            --remainingColumns;
+        }
+
+        columnIndex = endColumn;
+    }
+
+    internal static void AdvanceTableRow(StringBuilder stringBuilder, List<int> rowSpans, int columnIndex)
+    {
+        int lastSpannedColumn = rowSpans.Count - 1;
+        while (lastSpannedColumn >= columnIndex && rowSpans[lastSpannedColumn] is 0)
+        {
+            --lastSpannedColumn;
+        }
+
+        while (columnIndex <= lastSpannedColumn)
+        {
+            _ = stringBuilder.Append(" | ");
+            ++columnIndex;
+        }
+
+        int i = 0;
+        while (i < rowSpans.Count)
+        {
+            if (rowSpans[i] > 0)
+            {
+                --rowSpans[i];
+            }
+
+            ++i;
+        }
+
+        while (rowSpans.Count > 0 && rowSpans[^1] is 0)
+        {
+            rowSpans.RemoveAt(rowSpans.Count - 1);
+        }
     }
 
     private static void AppendDefinitionsFromJsonArray(StringBuilder stringBuilder, JsonElement jsonElement, Dict dict,
         ref List<ImageInfo>? imageInfos, bool isOrderedList, string? inheritedMarker, ref int orderedListIndex, ref string? lastTag,
-        ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache, List<int>? tableRowSpans, bool isTableRow, ref int tableColumnIndex)
     {
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
         {
@@ -163,14 +241,33 @@ internal static class EpwingYomichanUtils
             else if (definitionElement.ValueKind is JsonValueKind.Array)
             {
                 AppendDefinitionsFromJsonArray(stringBuilder, definitionElement, dict, ref imageInfos,
-                    isOrderedList, inheritedMarker, ref orderedListIndex, ref lastTag, imageInfoCache);
+                    isOrderedList, inheritedMarker, ref orderedListIndex, ref lastTag, imageInfoCache,
+                    tableRowSpans, isTableRow, ref tableColumnIndex);
             }
             else if (definitionElement.ValueKind is JsonValueKind.Object)
             {
                 YomichanContent<string?> contentResult = GetDefinitionsFromJsonObject(
-                    definitionElement, dict, ref imageInfos, imageInfoCache);
-                AppendDefinitionContent(stringBuilder, contentResult, ref imageInfos, isOrderedList, inheritedMarker,
-                    ref orderedListIndex, ref lastTag, imageInfoCache);
+                    definitionElement, dict, ref imageInfos, imageInfoCache, tableRowSpans);
+                if (isTableRow && (contentResult.Tag is "th" or "td"))
+                {
+                    int colSpan = definitionElement.TryGetProperty("colSpan", out JsonElement colSpanElement)
+                        && colSpanElement.ValueKind is JsonValueKind.Number
+                        && colSpanElement.TryGetInt32(out int colSpanValue) && colSpanValue > 0
+                        ? colSpanValue
+                        : 1;
+                    int rowSpan = definitionElement.TryGetProperty("rowSpan", out JsonElement rowSpanElement)
+                        && rowSpanElement.ValueKind is JsonValueKind.Number
+                        && rowSpanElement.TryGetInt32(out int rowSpanValue) && rowSpanValue > 0
+                        ? rowSpanValue
+                        : 1;
+                    Debug.Assert(tableRowSpans is not null);
+                    AppendTableCell(stringBuilder, contentResult.Content, colSpan, rowSpan, tableRowSpans, ref tableColumnIndex);
+                }
+                else
+                {
+                    AppendDefinitionContent(stringBuilder, contentResult, ref imageInfos, isOrderedList, inheritedMarker,
+                        ref orderedListIndex, ref lastTag, imageInfoCache);
+                }
             }
         }
     }
@@ -292,7 +389,7 @@ internal static class EpwingYomichanUtils
     }
 
     private static YomichanContent<string?> GetDefinitionsFromJsonObject(JsonElement jsonElement, Dict dict,
-        ref List<ImageInfo>? imagePaths, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+        ref List<ImageInfo>? imagePaths, ConcurrentDictionary<string, ImageInfo> imageInfoCache, List<int>? tableRowSpans = null)
     {
         string? marker = jsonElement.TryGetProperty("style", out JsonElement styleElement) && styleElement.TryGetProperty("listStyleType", out JsonElement listStyleTypeElement)
             ? listStyleTypeElement.GetString()
@@ -300,13 +397,18 @@ internal static class EpwingYomichanUtils
 
         if (marker is not null)
         {
-            marker = marker switch
+            if (marker is "disc")
             {
-                "disc" => "•",
-                "circle" => "◦",
-                "square" => "▪",
-                _ => marker
-            };
+                marker = "•";
+            }
+            else if (marker is "circle")
+            {
+                marker = "◦";
+            }
+            else if (marker is "square")
+            {
+                marker = "▪";
+            }
         }
 
         if (jsonElement.TryGetProperty("content", out JsonElement contentElement))
@@ -315,6 +417,12 @@ internal static class EpwingYomichanUtils
             if (jsonElement.TryGetProperty("tag", out JsonElement tagElement))
             {
                 tag = tagElement.GetString();
+            }
+
+            if (tableRowSpans is { Count: > 0 } && (tag is "thead" or "tbody" or "tfoot"))
+            {
+                // Row spans do not cross row groups.
+                tableRowSpans.Clear();
             }
 
             if (contentElement.ValueKind is JsonValueKind.String)
@@ -354,8 +462,28 @@ internal static class EpwingYomichanUtils
 
                 int orderedListIndex = 0;
                 string? lastTag = null;
+                int tableColumnIndex = 0;
+                List<int>? childTableRowSpans = null;
+                if (tag is "table")
+                {
+                    childTableRowSpans = [];
+                }
+                else if (tag is "thead" or "tbody" or "tfoot" or "tr")
+                {
+                    childTableRowSpans = tableRowSpans;
+                }
                 AppendDefinitionsFromJsonArray(sb, contentElement, dict, ref imagePaths, tag is "ol",
-                    marker, ref orderedListIndex, ref lastTag, imageInfoCache);
+                    marker, ref orderedListIndex, ref lastTag, imageInfoCache,
+                    childTableRowSpans, tag is "tr" && childTableRowSpans is not null, ref tableColumnIndex);
+                if (tag is "tr" && childTableRowSpans is not null)
+                {
+                    AdvanceTableRow(sb, childTableRowSpans, tableColumnIndex);
+                }
+                else if (tableRowSpans is { Count: > 0 } && (tag is "thead" or "tbody" or "tfoot"))
+                {
+                    tableRowSpans.Clear();
+                }
+
                 string? content = null;
                 if (sb.Length > 0)
                 {
@@ -378,9 +506,38 @@ internal static class EpwingYomichanUtils
 
             if (contentElement.ValueKind is JsonValueKind.Object)
             {
-                YomichanContent<string?> childContent = GetDefinitionsFromJsonObject(contentElement, dict, ref imagePaths, imageInfoCache);
+                List<int>? childTableRowSpans = null;
+                if (tag is "table")
+                {
+                    childTableRowSpans = [];
+                }
+                else if (tag is "thead" or "tbody" or "tfoot" or "tr")
+                {
+                    childTableRowSpans = tableRowSpans;
+                }
+                YomichanContent<string?> childContent = GetDefinitionsFromJsonObject(contentElement, dict, ref imagePaths,
+                    imageInfoCache, childTableRowSpans);
                 string? content;
-                if (childContent.Tag is "br")
+                if (tag is "tr" && childTableRowSpans is not null && (childContent.Tag is "th" or "td"))
+                {
+                    StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
+                    int colSpan = contentElement.TryGetProperty("colSpan", out JsonElement colSpanElement)
+                        && colSpanElement.ValueKind is JsonValueKind.Number
+                        && colSpanElement.TryGetInt32(out int colSpanValue) && colSpanValue > 0
+                        ? colSpanValue
+                        : 1;
+                    int rowSpan = contentElement.TryGetProperty("rowSpan", out JsonElement rowSpanElement)
+                        && rowSpanElement.ValueKind is JsonValueKind.Number
+                        && rowSpanElement.TryGetInt32(out int rowSpanValue) && rowSpanValue > 0
+                        ? rowSpanValue
+                        : 1;
+                    int tableColumnIndex = 0;
+                    AppendTableCell(sb, childContent.Content, colSpan, rowSpan, childTableRowSpans, ref tableColumnIndex);
+                    AdvanceTableRow(sb, childTableRowSpans, tableColumnIndex);
+                    content = sb.Length > 0 ? sb.ToString() : null;
+                    ObjectPoolManager.StringBuilderPool.Return(sb);
+                }
+                else if (childContent.Tag is "br")
                 {
                     content = "\n";
                 }
@@ -407,6 +564,11 @@ internal static class EpwingYomichanUtils
                     ObjectPoolManager.StringBuilderPool.Return(sb);
                 }
 
+                if (tableRowSpans is { Count: > 0 } && (tag is "thead" or "tbody" or "tfoot"))
+                {
+                    tableRowSpans.Clear();
+                }
+
                 bool appendWhitespace = tag is "span" && content is not null
                     && (jsonElement.TryGetProperty("style", out styleElement)
                         ? styleElement.TryGetProperty("marginRight", out _)
@@ -418,9 +580,28 @@ internal static class EpwingYomichanUtils
         else if (jsonElement.TryGetProperty("tag", out JsonElement tagElement))
         {
             string? tag = tagElement.GetString();
+            if (tableRowSpans is { Count: > 0 } && (tag is "thead" or "tbody" or "tfoot"))
+            {
+                tableRowSpans.Clear();
+            }
+
+            if (tag is "tr" && tableRowSpans is { Count: > 0 })
+            {
+                StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
+                AdvanceTableRow(sb, tableRowSpans, 0);
+                string content = sb.ToString();
+                ObjectPoolManager.StringBuilderPool.Return(sb);
+                return new YomichanContent<string?>(tag, content, false, null);
+            }
+
             if (tag is "th")
             {
                 return new YomichanContent<string?>("th", "×", false, null);
+            }
+
+            if (tag is "td" && tableRowSpans is not null)
+            {
+                return new YomichanContent<string?>("td", null, false, null);
             }
 
             if (tag is "br")
