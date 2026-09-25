@@ -379,28 +379,26 @@ internal static class YomichanPitchAccentDBManager
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT COUNT(DISTINCT {SearchKey})
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
 
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT MAX(LENGTH({SearchKey}))
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -500,29 +498,27 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(SqliteConnection connection, HashSet<string> terms)
     {
-        using SqliteCommand command = connection.CreateCommand();
-
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = GetQuery(terms.Count);
+        using SqliteRecordReader reader = new(connection, GetQuery(terms.Count));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         int index = 1;
         foreach (string term in terms)
         {
-            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(index), term);
+            reader.Bind(index, term);
             ++index;
         }
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+
+        if (!reader.Read())
         {
             return null;
         }
 
         Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-        while (dataReader.Read())
+        do
         {
-            PitchAccentRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
+            PitchAccentRecord record = GetRecord(reader);
+            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
             ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
             if (exists)
             {
@@ -534,6 +530,7 @@ internal static class YomichanPitchAccentDBManager
                 result = [record];
             }
         }
+        while (reader.Read());
 
         return results;
     }
@@ -556,9 +553,7 @@ internal static class YomichanPitchAccentDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
+        const string query =
             $"""
             SELECT r.{Spelling}, r.{Reading}, r.{Position}, json_group_array(rsk.{SearchKey})
             FROM {Record} r
@@ -566,14 +561,13 @@ internal static class YomichanPitchAccentDBManager
             GROUP BY r.{RowId};
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-
+        using SqliteRecordReader reader = new(connection, query);
         Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
         Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
-        while (dataReader.Read())
+        while (reader.Read())
         {
-            PitchAccentRecord record = GetRecord(dataReader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
+            PitchAccentRecord record = GetRecord(reader);
+            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
             Debug.Assert(searchKeys is not null);
 
             foreach (string searchKey in searchKeys)
@@ -599,16 +593,16 @@ internal static class YomichanPitchAccentDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static PitchAccentRecord GetRecord(SqliteDataReader dataReader)
+    private static PitchAccentRecord GetRecord(SqliteRecordReader reader)
     {
-        string spelling = dataReader.GetString((int)ColumnIndex.Spelling);
+        string spelling = reader.GetString((int)ColumnIndex.Spelling);
 
         const int readingIndex = (int)ColumnIndex.Reading;
-        string? reading = !dataReader.IsDBNull(readingIndex)
-            ? dataReader.GetString(readingIndex)
+        string? reading = !reader.IsNull(readingIndex)
+            ? reader.GetString(readingIndex)
             : null;
 
-        byte position = dataReader.GetByte((int)ColumnIndex.Position);
+        byte position = checked((byte)reader.GetInt64((int)ColumnIndex.Position));
 
         return new PitchAccentRecord(spelling, reading, position);
     }

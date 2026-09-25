@@ -182,30 +182,27 @@ internal static class FreqDBManager
 
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(SqliteConnection connection, HashSet<string> terms)
     {
-        using SqliteCommand command = connection.CreateCommand();
-
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = GetQuery(terms.Count);
+        using SqliteRecordReader reader = new(connection, GetQuery(terms.Count));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         int index = 1;
         foreach (string term in terms)
         {
-            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(index), term);
+            reader.Bind(index, term);
             ++index;
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+        if (!reader.Read())
         {
             return null;
         }
 
         Dictionary<string, List<FrequencyRecord>> results = new(StringComparer.Ordinal);
-        while (dataReader.Read())
+        do
         {
-            FrequencyRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
+            FrequencyRecord record = GetRecord(reader);
+            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
             ref List<FrequencyRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
             if (exists)
             {
@@ -217,6 +214,7 @@ internal static class FreqDBManager
                 result = [record];
             }
         }
+        while (reader.Read());
 
         return results;
     }
@@ -242,22 +240,20 @@ internal static class FreqDBManager
             return null;
         }
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText = SingleTermQuery;
-        _ = command.Parameters.AddWithValue($"@{Term}", term);
-
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        reader.Bind(1, term);
+        if (!reader.Read())
         {
             return null;
         }
 
         List<FrequencyRecord> records = [];
-        while (dataReader.Read())
+        do
         {
-            records.Add(GetRecord(dataReader));
+            records.Add(GetRecord(reader));
         }
+        while (reader.Read());
+
         return records;
     }
 
@@ -266,17 +262,15 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(freq.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
+        const string query =
             $"""
             SELECT MAX({Frequency})
             FROM {Record}
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
-        freq.MaxValue = !reader.IsDBNull(0)
+        freq.MaxValue = !reader.IsNull(0)
             ? reader.GetInt32(0)
             : 0;
     }
@@ -288,9 +282,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(freq.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
+        const string query =
             $"""
             SELECT r.{Spelling}, r.{Frequency}, json_group_array(rsk.{SearchKey})
             FROM {Record} r
@@ -298,14 +290,13 @@ internal static class FreqDBManager
             GROUP BY r.{RowId};
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-
+        using SqliteRecordReader reader = new(connection, query);
         Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
         Dictionary<string, IList<FrequencyRecord>> contents = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
-        while (dataReader.Read())
+        while (reader.Read())
         {
-            FrequencyRecord record = GetRecord(dataReader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
+            FrequencyRecord record = GetRecord(reader);
+            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
             Debug.Assert(searchKeys is not null);
 
             foreach (string searchKey in searchKeys)
@@ -993,14 +984,13 @@ internal static class FreqDBManager
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT COUNT(DISTINCT {SearchKey})
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -1067,10 +1057,10 @@ internal static class FreqDBManager
         return true;
     }
 
-    private static FrequencyRecord GetRecord(SqliteDataReader dataReader)
+    private static FrequencyRecord GetRecord(SqliteRecordReader reader)
     {
-        string spelling = dataReader.GetString((int)ColumnIndex.Spelling);
-        int frequency = dataReader.GetInt32((int)ColumnIndex.Frequency);
+        string spelling = reader.GetString((int)ColumnIndex.Spelling);
+        int frequency = reader.GetInt32((int)ColumnIndex.Frequency);
 
         return new FrequencyRecord(spelling, frequency);
     }

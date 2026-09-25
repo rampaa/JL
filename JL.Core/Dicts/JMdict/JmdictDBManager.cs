@@ -544,28 +544,26 @@ internal static class JmdictDBManager
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT COUNT(DISTINCT {SearchKey})
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
 
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT MAX(LENGTH({SearchKey}))
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -729,33 +727,30 @@ internal static class JmdictDBManager
             return null;
         }
 
-        using SqliteCommand command = connection.CreateCommand();
-
         int validTermCount = terms.Length > maxSearchKeyLengthForDict && maxSearchKeyLengthForDict > 0
             ? maxSearchKeyLengthForDict
             : terms.Length;
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = GetQuery(validTermCount);
+        using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         int offset = terms.Length - validTermCount;
         for (int i = 0; i < validTermCount; i++)
         {
-            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), terms[offset + i]);
+            reader.Bind(i + 1, terms[offset + i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+        if (!reader.Read())
         {
             return null;
         }
 
         Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-        while (dataReader.Read())
+        do
         {
-            JmdictRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
+            JmdictRecord record = GetRecord(reader);
+            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
             ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
             if (exists)
             {
@@ -767,6 +762,7 @@ internal static class JmdictDBManager
                 result = [record];
             }
         }
+        while (reader.Read());
 
         return results;
     }
@@ -776,9 +772,7 @@ internal static class JmdictDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
+        const string query =
             $"""
             SELECT r.{RowId},
                    r.{EdictId},
@@ -809,11 +803,11 @@ internal static class JmdictDBManager
             GROUP BY r.{RowId};
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        while (dataReader.Read())
+        using SqliteRecordReader reader = new(connection, query);
+        while (reader.Read())
         {
-            JmdictRecord record = GetRecord(dataReader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
+            JmdictRecord record = GetRecord(reader);
+            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
             Debug.Assert(searchKeys is not null);
 
             Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
@@ -841,30 +835,31 @@ internal static class JmdictDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static JmdictRecord GetRecord(SqliteDataReader dataReader)
+    private static JmdictRecord GetRecord(SqliteRecordReader reader)
     {
-        int edictId = dataReader.GetInt32((int)ColumnIndex.EdictId);
-        string primarySpelling = dataReader.GetString((int)ColumnIndex.PrimarySpelling);
-        string[]? primarySpellingOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.PrimarySpellingOrthographyInfo);
-        string[]?[]? spellingRestrictions = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.SpellingRestrictions);
-        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.AlternativeSpellings);
-        string[]?[]? alternativeSpellingsOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.AlternativeSpellingsOrthographyInfo);
-        string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Readings);
-        string[]?[]? readingsOrthographyInfo = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.ReadingsOrthographyInfo);
-        string[]?[]? readingRestrictions = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.ReadingRestrictions);
-        string[][] definitions = dataReader.GetValueFromBlobStream<string[][]>((int)ColumnIndex.Glossary);
-        string?[]? definitionInfo = dataReader.GetNullableValueFromBlobStream<string?[]>((int)ColumnIndex.GlossaryInfo);
-        string[]? wordClassesSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.WordClassesSharedByAllSenses);
-        string[]?[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.WordClasses);
-        string[]? fieldsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.FieldsSharedByAllSenses);
-        string[]?[]? fields = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Fields);
-        string[]? miscSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.MiscSharedByAllSenses);
-        string[]?[]? misc = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Misc);
-        string[]? dialectsSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.DialectsSharedByAllSenses);
-        string[]?[]? dialects = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.Dialects);
-        LoanwordSource[]? loanwordEtymology = dataReader.GetNullableValueFromBlobStream<LoanwordSource[]>((int)ColumnIndex.LoanwordEtymology);
-        string[]?[]? crossReferences = dataReader.GetNullableValueFromBlobStream<string[]?[]>((int)ColumnIndex.CrossReferences);
-        string[]? info = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Info);
+        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
+        int edictId = reader.GetInt32((int)ColumnIndex.EdictId);
+        string primarySpelling = reader.GetString((int)ColumnIndex.PrimarySpelling);
+        string[]? primarySpellingOrthographyInfo = reader.DeserializeNullable<string[]>((int)ColumnIndex.PrimarySpellingOrthographyInfo, Record, PrimarySpellingOrthographyInfo, rowId);
+        string[]?[]? spellingRestrictions = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.SpellingRestrictions, Record, SpellingRestrictions, rowId);
+        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings, Record, AlternativeSpellings, rowId);
+        string[]?[]? alternativeSpellingsOrthographyInfo = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.AlternativeSpellingsOrthographyInfo, Record, AlternativeSpellingsOrthographyInfo, rowId);
+        string[]? readings = reader.DeserializeNullable<string[]>((int)ColumnIndex.Readings, Record, Readings, rowId);
+        string[]?[]? readingsOrthographyInfo = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.ReadingsOrthographyInfo, Record, ReadingsOrthographyInfo, rowId);
+        string[]?[]? readingRestrictions = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.ReadingRestrictions, Record, ReadingRestrictions, rowId);
+        string[][] definitions = reader.Deserialize<string[][]>(Record, Glossary, rowId);
+        string?[]? definitionInfo = reader.DeserializeNullable<string?[]>((int)ColumnIndex.GlossaryInfo, Record, GlossaryInfo, rowId);
+        string[]? wordClassesSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.WordClassesSharedByAllSenses, Record, PartOfSpeechSharedByAllSenses, rowId);
+        string[]?[]? wordClasses = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.WordClasses, Record, PartOfSpeech, rowId);
+        string[]? fieldsSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.FieldsSharedByAllSenses, Record, FieldsSharedByAllSenses, rowId);
+        string[]?[]? fields = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Fields, Record, Fields, rowId);
+        string[]? miscSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.MiscSharedByAllSenses, Record, MiscSharedByAllSenses, rowId);
+        string[]?[]? misc = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Misc, Record, Misc, rowId);
+        string[]? dialectsSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.DialectsSharedByAllSenses, Record, DialectsSharedByAllSenses, rowId);
+        string[]?[]? dialects = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Dialects, Record, Dialects, rowId);
+        LoanwordSource[]? loanwordEtymology = reader.DeserializeNullable<LoanwordSource[]>((int)ColumnIndex.LoanwordEtymology, Record, LoanwordEtymology, rowId);
+        string[]?[]? crossReferences = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.CrossReferences, Record, CrossReferences, rowId);
+        string[]? info = reader.DeserializeNullable<string[]>((int)ColumnIndex.Info, Record, Info, rowId);
 
         return new JmdictRecord(edictId, primarySpelling, definitions, wordClasses, wordClassesSharedByAllSenses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, fieldsSharedByAllSenses, misc, miscSharedByAllSenses, definitionInfo, dialects, dialectsSharedByAllSenses, loanwordEtymology, crossReferences, info);
     }

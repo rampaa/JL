@@ -272,12 +272,6 @@ public static class ExtensionMethods
         return MessagePackSerializer.Deserialize<T>(stream);
     }
 
-    internal static T GetValueFromBlobStream<T>(this SqliteDataReader dataReader, int index) where T : notnull
-    {
-        using Stream stream = dataReader.GetStream(index);
-        return MessagePackSerializer.Deserialize<T>(stream);
-    }
-
     public static void SafeFireAndForget(this Task task, string errorMessage)
     {
         if (task.IsCompletedSuccessfully)

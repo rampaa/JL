@@ -563,28 +563,26 @@ internal static class EpwingNazekaDBManager
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT COUNT(DISTINCT {SearchKey})
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
 
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT MAX(LENGTH({SearchKey}))
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -697,33 +695,30 @@ internal static class EpwingNazekaDBManager
             return null;
         }
 
-        using SqliteCommand command = connection.CreateCommand();
-
         int validTermCount = terms.Length > maxSearchKeyLengthForDict && maxSearchKeyLengthForDict > 0
             ? maxSearchKeyLengthForDict
             : terms.Length;
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = GetQuery(validTermCount);
+        using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         int offset = terms.Length - validTermCount;
         for (int i = 0; i < validTermCount; i++)
         {
-            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), terms[offset + i]);
+            reader.Bind(i + 1, terms[offset + i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+        if (!reader.Read())
         {
             return null;
         }
 
         Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-        while (dataReader.Read())
+        do
         {
-            EpwingNazekaRecord epwingNazekaRecord = GetRecord(dataReader);
-            string searchKey = dataReader.GetString((int)ColumnIndex.SearchKey);
+            EpwingNazekaRecord epwingNazekaRecord = GetRecord(reader);
+            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
             ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
             if (exists)
             {
@@ -735,6 +730,7 @@ internal static class EpwingNazekaDBManager
                 result = [epwingNazekaRecord];
             }
         }
+        while (reader.Read());
 
         return results;
     }
@@ -748,23 +744,19 @@ internal static class EpwingNazekaDBManager
             return null;
         }
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText = SingleTermQuery;
-
-        _ = command.Parameters.AddWithValue($"@{Term}", term);
-
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        reader.Bind(1, term);
+        if (!reader.Read())
         {
             return null;
         }
 
         List<IDictRecord> results = [];
-        while (dataReader.Read())
+        do
         {
-            results.Add(GetRecord(dataReader));
+            results.Add(GetRecord(reader));
         }
+        while (reader.Read());
 
         return results;
     }
@@ -774,9 +766,7 @@ internal static class EpwingNazekaDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
+        const string query =
             $"""
             SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}, json_group_array(rsk.{SearchKey})
             FROM {Record} r
@@ -784,11 +774,11 @@ internal static class EpwingNazekaDBManager
             GROUP BY r.{RowId};
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        while (dataReader.Read())
+        using SqliteRecordReader reader = new(connection, query);
+        while (reader.Read())
         {
-            EpwingNazekaRecord record = GetRecord(dataReader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
+            EpwingNazekaRecord record = GetRecord(reader);
+            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
             Debug.Assert(searchKeys is not null);
 
             Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
@@ -816,22 +806,19 @@ internal static class EpwingNazekaDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader)
+    private static EpwingNazekaRecord GetRecord(SqliteRecordReader reader)
     {
-        string primarySpelling = dataReader.GetString((int)ColumnIndex.PrimarySpelling);
+        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
+        string primarySpelling = reader.GetString((int)ColumnIndex.PrimarySpelling);
 
         const int readingIndex = (int)ColumnIndex.Reading;
-        string? reading = !dataReader.IsDBNull(readingIndex)
-            ? dataReader.GetString(readingIndex)
+        string? reading = !reader.IsNull(readingIndex)
+            ? reader.GetString(readingIndex)
             : null;
 
-        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.AlternativeSpellings);
-        string[] definitions = dataReader.GetValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
-
-        const int imageInfoIndex = (int)ColumnIndex.ImageInfo;
-        ImageInfo? imageInfo = !dataReader.IsDBNull(imageInfoIndex)
-            ? dataReader.GetValueFromBlobStream<ImageInfo>((int)ColumnIndex.ImageInfo)
-            : null;
+        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings, Record, AlternativeSpellings, rowId);
+        string[] definitions = reader.Deserialize<string[]>(Record, Glossary, rowId);
+        ImageInfo? imageInfo = reader.DeserializeNullable<ImageInfo>((int)ColumnIndex.ImageInfo, Record, ImageInfo, rowId);
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions, imageInfo);
     }

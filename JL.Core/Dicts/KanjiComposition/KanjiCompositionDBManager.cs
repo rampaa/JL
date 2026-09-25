@@ -1,6 +1,5 @@
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
-using MessagePack;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.KanjiComposition;
@@ -39,22 +38,15 @@ internal static class KanjiCompositionDBManager
             return null;
         }
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText = SingleTermQuery;
-        _ = command.Parameters.AddWithValue("@kanji", kanji);
-
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        reader.Bind(1, kanji);
+        if (!reader.Read())
         {
             return null;
         }
 
-        _ = dataReader.Read();
-
         // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
-        // As a result, dataReader.GetStream cannot use its fast SqliteBlob path.
-        // We therefore read the BLOBs directly instead of using GetNullableValueFromBlobStream.
-        return MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(0));
+        // As a result, SqliteBlob cannot be used to read its BLOBs.
+        return reader.Deserialize<string[]>(0);
     }
 }

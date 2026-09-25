@@ -308,19 +308,11 @@ internal static class KanjidicDBManager
             return null;
         }
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText = SingleTermQuery;
-        _ = command.Parameters.AddWithValue($"@{Term}", term);
-
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
-        {
-            return null;
-        }
-
-        _ = dataReader.Read();
-        return [GetRecord(dataReader)];
+        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        reader.Bind(1, term);
+        return reader.Read()
+            ? [GetRecord(reader)]
+            : null;
     }
 
     public static void LoadFromDB(Dict dict)
@@ -328,19 +320,17 @@ internal static class KanjidicDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
+        const string query =
             $"""
             SELECT r.{OnReadings}, r.{KunReadings}, r.{NanoriReadings}, r.{RadicalNames}, r.{Glossary}, r.{StrokeCount}, r.{Grade}, r.{Frequency}, r.{Kanji}
             FROM {Record} r;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        while (dataReader.Read())
+        using SqliteRecordReader reader = new(connection, query);
+        while (reader.Read())
         {
-            IDictRecord[] record = [GetRecord(dataReader)];
-            string kanji = dataReader.GetString((int)ColumnIndex.Kanji);
+            IDictRecord[] record = [GetRecord(reader)];
+            string kanji = reader.GetString((int)ColumnIndex.Kanji);
             dict.Contents[kanji] = record;
 
             if (kanji.Length > dict.MaxSearchKeyLength)
@@ -352,40 +342,39 @@ internal static class KanjidicDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
-    private static KanjidicRecord GetRecord(SqliteDataReader dataReader)
+    private static KanjidicRecord GetRecord(SqliteRecordReader reader)
     {
         // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
-        // As a result, dataReader.GetStream cannot use its fast SqliteBlob path.
-        // We therefore read the BLOBs directly instead of using GetNullableValueFromBlobStream.
+        // As a result, SqliteBlob cannot be used to read its BLOBs.
 
         const int onReadingsIndex = (int)ColumnIndex.OnReadings;
-        string[]? onReadings = !dataReader.IsDBNull(onReadingsIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(onReadingsIndex))
+        string[]? onReadings = !reader.IsNull(onReadingsIndex)
+            ? reader.Deserialize<string[]>(onReadingsIndex)
             : null;
 
         const int kunReadingsIndex = (int)ColumnIndex.KunReadings;
-        string[]? kunReadings = !dataReader.IsDBNull(kunReadingsIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(kunReadingsIndex))
+        string[]? kunReadings = !reader.IsNull(kunReadingsIndex)
+            ? reader.Deserialize<string[]>(kunReadingsIndex)
             : null;
 
         const int nanoriReadingsIndex = (int)ColumnIndex.NanoriReadings;
-        string[]? nanoriReadings = !dataReader.IsDBNull(nanoriReadingsIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(nanoriReadingsIndex))
+        string[]? nanoriReadings = !reader.IsNull(nanoriReadingsIndex)
+            ? reader.Deserialize<string[]>(nanoriReadingsIndex)
             : null;
 
         const int radicalNamesIndex = (int)ColumnIndex.RadicalNames;
-        string[]? radicalNames = !dataReader.IsDBNull(radicalNamesIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(radicalNamesIndex))
+        string[]? radicalNames = !reader.IsNull(radicalNamesIndex)
+            ? reader.Deserialize<string[]>(radicalNamesIndex)
             : null;
 
         const int glossaryIndex = (int)ColumnIndex.Glossary;
-        string[]? definitions = !dataReader.IsDBNull(glossaryIndex)
-            ? MessagePackSerializer.Deserialize<string[]>(dataReader.GetFieldValue<byte[]>(glossaryIndex))
+        string[]? definitions = !reader.IsNull(glossaryIndex)
+            ? reader.Deserialize<string[]>(glossaryIndex)
             : null;
 
-        byte strokeCount = dataReader.GetByte((int)ColumnIndex.StrokeCount);
-        byte grade = dataReader.GetByte((int)ColumnIndex.Grade);
-        int frequency = dataReader.GetInt32((int)ColumnIndex.Frequency);
+        byte strokeCount = checked((byte)reader.GetInt64((int)ColumnIndex.StrokeCount));
+        byte grade = checked((byte)reader.GetInt64((int)ColumnIndex.Grade));
+        int frequency = reader.GetInt32((int)ColumnIndex.Frequency);
         return new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
     }
 }

@@ -269,14 +269,13 @@ internal static class YomichanKanjiDBManager
 
     private static int GetDistinctKanjiCount(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT COUNT(DISTINCT {Kanji})
             FROM {Record};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -359,22 +358,19 @@ internal static class YomichanKanjiDBManager
             return null;
         }
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText = SingleTermQuery;
-        _ = command.Parameters.AddWithValue($"@{Term}", term);
-
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        reader.Bind(1, term);
+        if (!reader.Read())
         {
             return null;
         }
 
         List<IDictRecord> results = [];
-        while (dataReader.Read())
+        do
         {
-            results.Add(GetRecord(dataReader));
+            results.Add(GetRecord(reader));
         }
+        while (reader.Read());
 
         return results;
     }
@@ -384,22 +380,19 @@ internal static class YomichanKanjiDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
+        const string query =
             $"""
             SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}, r.{Kanji}
             FROM {Record} r;
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-
+        using SqliteRecordReader reader = new(connection, query);
         Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
         Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
-        while (dataReader.Read())
+        while (reader.Read())
         {
-            YomichanKanjiRecord record = GetRecord(dataReader);
-            string kanji = dataReader.GetString((int)ColumnIndex.Kanji);
+            YomichanKanjiRecord record = GetRecord(reader);
+            string kanji = reader.GetString((int)ColumnIndex.Kanji);
             ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, kanji, out bool exists);
             if (exists)
             {
@@ -420,12 +413,13 @@ internal static class YomichanKanjiDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)
+    private static YomichanKanjiRecord GetRecord(SqliteRecordReader reader)
     {
-        string[]? onReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.OnReadings);
-        string[]? kunReadings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.KunReadings);
-        string[]? definitions = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Glossary);
-        string[]? stats = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Stats);
+        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
+        string[]? onReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.OnReadings, Record, OnReadings, rowId);
+        string[]? kunReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.KunReadings, Record, KunReadings, rowId);
+        string[]? definitions = reader.DeserializeNullable<string[]>((int)ColumnIndex.Glossary, Record, Glossary, rowId);
+        string[]? stats = reader.DeserializeNullable<string[]>((int)ColumnIndex.Stats, Record, Stats, rowId);
 
         return new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats);
     }

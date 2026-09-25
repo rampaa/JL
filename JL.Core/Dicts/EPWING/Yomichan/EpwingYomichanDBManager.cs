@@ -456,28 +456,26 @@ internal static class EpwingYomichanDBManager
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT COUNT(DISTINCT {SearchKey})
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
 
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT MAX(LENGTH({SearchKey}))
             FROM {RecordSearchKey};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -495,7 +493,7 @@ internal static class EpwingYomichanDBManager
             ? maxSearchKeyLengthForDict
             : terms.Length;
 
-        using YomichanRecordReader reader = new(connection, GetQuery(validTermCount));
+        using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
 
         int offset = terms.Length - validTermCount;
         for (int i = 0; i < validTermCount; i++)
@@ -508,8 +506,8 @@ internal static class EpwingYomichanDBManager
         {
             results ??= new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
 
-            EpwingYomichanRecord record = reader.GetRecord();
-            string searchKey = reader.GetString(YomichanColumnIndex.SearchKey);
+            EpwingYomichanRecord record = GetRecord(reader);
+            string searchKey = reader.GetString((int)YomichanColumnIndex.SearchKey);
             ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
             if (exists)
             {
@@ -534,14 +532,14 @@ internal static class EpwingYomichanDBManager
             return null;
         }
 
-        using YomichanRecordReader reader = new(connection, SingleTermQuery);
+        using SqliteRecordReader reader = new(connection, SingleTermQuery);
         reader.Bind(1, term);
 
         List<IDictRecord>? results = null;
         while (reader.Read())
         {
             results ??= [];
-            results.Add(reader.GetRecord());
+            results.Add(GetRecord(reader));
         }
 
         return results;
@@ -552,8 +550,7 @@ internal static class EpwingYomichanDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}, json_group_array(rsk.{SearchKey})
             FROM {Record} r
@@ -561,11 +558,11 @@ internal static class EpwingYomichanDBManager
             GROUP BY r.{RowId};
             """;
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        while (dataReader.Read())
+        using SqliteRecordReader reader = new(connection, query);
+        while (reader.Read())
         {
-            EpwingYomichanRecord record = GetRecord(dataReader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString((int)YomichanColumnIndex.SearchKey), JsonOptions.DefaultJso);
+            EpwingYomichanRecord record = GetRecord(reader);
+            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)YomichanColumnIndex.SearchKey), JsonOptions.DefaultJso);
             Debug.Assert(searchKeys is not null);
 
             Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
@@ -593,21 +590,21 @@ internal static class EpwingYomichanDBManager
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader)
+    private static EpwingYomichanRecord GetRecord(SqliteRecordReader reader)
     {
-        string primarySpelling = dataReader.GetString((int)YomichanColumnIndex.PrimarySpelling);
+        long rowId = reader.GetInt64((int)YomichanColumnIndex.RowId);
+        string primarySpelling = reader.GetString((int)YomichanColumnIndex.PrimarySpelling);
 
         const int readingIndex = (int)YomichanColumnIndex.Reading;
-        string? reading = !dataReader.IsDBNull(readingIndex)
-            ? dataReader.GetString(readingIndex)
+        string? reading = !reader.IsNull(readingIndex)
+            ? reader.GetString(readingIndex)
             : null;
 
-        double popularityScore = dataReader.GetDouble((int)YomichanColumnIndex.PopularityScore);
-
-        string[] definitions = dataReader.GetValueFromBlobStream<string[]>((int)YomichanColumnIndex.Glossary);
-        string[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]>((int)YomichanColumnIndex.PartOfSpeech);
-        string[]? definitionTags = dataReader.GetNullableValueFromBlobStream<string[]>((int)YomichanColumnIndex.GlossaryTags);
-        ImageInfo[]? imageInfos = dataReader.GetNullableValueFromBlobStream<ImageInfo[]>((int)YomichanColumnIndex.ImageInfos);
+        double popularityScore = reader.GetDouble((int)YomichanColumnIndex.PopularityScore);
+        string[] definitions = reader.Deserialize<string[]>(Record, Glossary, rowId);
+        string[]? wordClasses = reader.DeserializeNullable<string[]>((int)YomichanColumnIndex.PartOfSpeech, Record, PartOfSpeech, rowId);
+        string[]? definitionTags = reader.DeserializeNullable<string[]>((int)YomichanColumnIndex.GlossaryTags, Record, GlossaryTags, rowId);
+        ImageInfo[]? imageInfos = reader.DeserializeNullable<ImageInfo[]>((int)YomichanColumnIndex.ImageInfos, Record, ImageInfos, rowId);
 
         return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos);
     }

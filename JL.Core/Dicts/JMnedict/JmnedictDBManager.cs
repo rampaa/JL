@@ -303,14 +303,13 @@ internal static class JmnedictDBManager
 
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
+        const string query =
             $"""
             SELECT MAX(LENGTH({PrimarySpellingInHiragana}))
             FROM {Record};
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using SqliteRecordReader reader = new(connection, query);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -411,33 +410,30 @@ internal static class JmnedictDBManager
             return null;
         }
 
-        using SqliteCommand command = connection.CreateCommand();
-
         int validTermCount = terms.Length > maxSearchKeyLengthForDict && maxSearchKeyLengthForDict > 0
             ? maxSearchKeyLengthForDict
             : terms.Length;
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = GetQuery(validTermCount);
+        using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         int offset = terms.Length - validTermCount;
         for (int i = 0; i < validTermCount; i++)
         {
-            _ = command.Parameters.AddWithValue(DBUtils.GetParameterName(i + 1), terms[offset + i]);
+            reader.Bind(i + 1, terms[offset + i]);
         }
 
-        using SqliteDataReader dataReader = command.ExecuteReader();
-        if (!dataReader.HasRows)
+        if (!reader.Read())
         {
             return null;
         }
 
         Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-        while (dataReader.Read())
+        do
         {
-            JmnedictRecord record = GetRecord(dataReader);
-            string searchKey = dataReader.GetString((int)ColumnIndex.PrimarySpellingInHiragana);
+            JmnedictRecord record = GetRecord(reader);
+            string searchKey = reader.GetString((int)ColumnIndex.PrimarySpellingInHiragana);
             ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
             if (exists)
             {
@@ -449,6 +445,7 @@ internal static class JmnedictDBManager
                 result = [record];
             }
         }
+        while (reader.Read());
 
         return results;
     }
@@ -484,14 +481,15 @@ internal static class JmnedictDBManager
     //    dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     //}
 
-    private static JmnedictRecord GetRecord(SqliteDataReader dataReader)
+    private static JmnedictRecord GetRecord(SqliteRecordReader reader)
     {
-        int jmnedictId = dataReader.GetInt32((int)ColumnIndex.JmnedictId);
-        string primarySpelling = dataReader.GetString((int)ColumnIndex.PrimarySpelling);
-        string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.Readings);
-        string[]? alternativeSpellings = dataReader.GetNullableValueFromBlobStream<string[]>((int)ColumnIndex.AlternativeSpellings);
-        string[][] definitions = dataReader.GetValueFromBlobStream<string[][]>((int)ColumnIndex.Glossary);
-        string[][] nameTypes = dataReader.GetValueFromBlobStream<string[][]>((int)ColumnIndex.NameTypes);
+        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
+        int jmnedictId = reader.GetInt32((int)ColumnIndex.JmnedictId);
+        string primarySpelling = reader.GetString((int)ColumnIndex.PrimarySpelling);
+        string[]? readings = reader.DeserializeNullable<string[]>((int)ColumnIndex.Readings, Record, Readings, rowId);
+        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings, Record, AlternativeSpellings, rowId);
+        string[][] definitions = reader.Deserialize<string[][]>(Record, Glossary, rowId);
+        string[][] nameTypes = reader.Deserialize<string[][]>(Record, NameTypes, rowId);
 
         return new JmnedictRecord(jmnedictId, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);
     }
