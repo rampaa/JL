@@ -205,7 +205,7 @@ public static class DBUtils
         }
         catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
+            LoggerManager.Logger.Error(ex, "Failed to create connection for {ReadOnlyConnectionString}", readOnlyConnectionString);
             connection.Dispose();
             return null;
         }
@@ -281,7 +281,7 @@ public static class DBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    internal static void SetPageSizeTo64k(SqliteConnection connection)
+    internal static void SetPageSizeTo64K(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA page_size = 65536;";

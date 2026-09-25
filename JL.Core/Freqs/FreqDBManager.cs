@@ -78,7 +78,7 @@ internal static class FreqDBManager
         using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
 
         DBUtils.SetEncodingToUtf16LE(connection);
-        DBUtils.SetPageSizeTo64k(connection);
+        DBUtils.SetPageSizeTo64K(connection);
 
         using SqliteCommand command = connection.CreateCommand();
 
@@ -224,7 +224,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DBName}.", readOnlyConnectionString);
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for freq dict {DBName}", readOnlyConnectionString);
             return null;
         }
 
@@ -236,7 +236,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}", readOnlyConnectionString);
             return null;
         }
 

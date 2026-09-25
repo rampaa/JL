@@ -22,8 +22,8 @@ internal static class ImageUtils
 
     private const uint RiffSignature = 0x46464952;
     private const uint WebpSignature = 0x50424557;
-    private const uint Vp8xSignature = 0x58385056;
-    private const uint Vp8lSignature = 0x4C385056;
+    private const uint Vp8XSignature = 0x58385056;
+    private const uint Vp8LSignature = 0x4C385056;
     private const uint Vp8Signature = 0x20385056;
     private const ulong PngSignature = 0x0A1A0A0D474E5089;
     private const uint IhdrChunkType = 0x49484452;
@@ -139,7 +139,7 @@ internal static class ImageUtils
 
         uint chunkType = BinaryPrimitives.ReadUInt32LittleEndian(header.Slice(12, 4));
 
-        if (chunkType is Vp8xSignature)
+        if (chunkType is Vp8XSignature)
         {
             if (chunkSize is not 10 || bytesRead < 30)
             {
@@ -154,7 +154,7 @@ internal static class ImageUtils
                 return false;
             }
         }
-        else if (chunkType is Vp8lSignature)
+        else if (chunkType is Vp8LSignature)
         {
             if (chunkSize < 5 || bytesRead < 25 || header[20] is not 0x2F)
             {
@@ -318,8 +318,6 @@ internal static class ImageUtils
         }
 
         double dpiX = DefaultDpi;
-        double dpiY = DefaultDpi;
-
         if (pixelAspectRatio is not 0)
         {
             double aspectRatio = (pixelAspectRatio + 15.0) / 64.0;
@@ -327,7 +325,6 @@ internal static class ImageUtils
         }
 
         Span<byte> imageDescriptor = stackalloc byte[9];
-
         while (reader.TryReadByte(out byte blockType))
         {
             if (blockType is 0x2C)
@@ -345,14 +342,13 @@ internal static class ImageUtils
                     return false;
                 }
 
-                imageInfo = CreateImageInfo(imagePath, width, height, dpiX, dpiY);
+                imageInfo = CreateImageInfo(imagePath, width, height, dpiX, DefaultDpi);
                 return true;
             }
 
             if (blockType is 0x21)
             {
-                if (!reader.TryReadByte(out _)
-                    || !TrySkipGifSubBlocks(ref reader))
+                if (!reader.TryReadByte(out _) || !TrySkipGifSubBlocks(ref reader))
                 {
                     return false;
                 }
@@ -770,8 +766,7 @@ internal static class ImageUtils
 
             if (IsJpegStartOfFrame(marker))
             {
-                if (payloadLength < 5
-                    || !reader.TryReadExactly(frameHeader))
+                if (payloadLength < 5 || !reader.TryReadExactly(frameHeader))
                 {
                     return false;
                 }

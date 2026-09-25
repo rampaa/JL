@@ -112,14 +112,7 @@ public static class TextUtils
                 text = text.Trim();
             }
 
-            if (coreConfigManager.TextBoxRemoveNewlines)
-            {
-                text = text.ReplaceLineEndings("");
-            }
-            else
-            {
-                text = text.ReplaceLineEndings("\n");
-            }
+            text = text.ReplaceLineEndings(coreConfigManager.TextBoxRemoveNewlines ? "" : "\n");
 
             List<KeyValuePair<Regex, string>>? regexReplacements = RegexReplacerUtils.RegexReplacements;
             if (regexReplacements is not null)

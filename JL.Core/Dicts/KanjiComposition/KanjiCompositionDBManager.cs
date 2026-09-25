@@ -34,19 +34,17 @@ internal static class KanjiCompositionDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(s_readOnlyDBConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", s_readOnlyDBConnectionString);
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}", s_readOnlyDBConnectionString);
             return null;
         }
 
         using SqliteRecordReader reader = new(connection, SingleTermQuery);
         reader.Bind(1, kanji);
-        if (!reader.Read())
-        {
-            return null;
-        }
 
         // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
         // As a result, SqliteBlob cannot be used to read its BLOBs.
-        return reader.Deserialize<string[]>(0);
+        return reader.Read()
+            ? reader.Deserialize<string[]>(0)
+            : null;
     }
 }

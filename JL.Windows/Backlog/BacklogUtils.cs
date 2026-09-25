@@ -449,7 +449,7 @@ internal static class BacklogUtils
             if (lookupStats.Length > 0)
             {
                 StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
-                _ = sb.Append(sessionStats.ToString()).Append("\n\n");
+                _ = sb.Append(sessionStats).Append("\n\n");
                 _ = sb.Append("Term\tLookup Count\n");
                 foreach ((string term, int count) in lookupStats)
                 {

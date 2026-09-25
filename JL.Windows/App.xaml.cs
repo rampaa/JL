@@ -39,11 +39,10 @@ internal sealed partial class App
 
         if (!HasModifyPermission(AppContext.BaseDirectory))
         {
-            string msg =
-                """
-                JL is installed in a secure location that requires admin rights to modify files.
-                If you'd rather not give admin rights to JL, consider installing it in a location where they're not needed (e.g., the desktop).
-                """;
+            const string msg = """
+                               JL is installed in a secure location that requires admin rights to modify files.
+                               If you'd rather not give admin rights to JL, consider installing it in a location where they're not needed (e.g., the desktop).
+                               """;
 
             LoggerManager.Logger.Warning(msg);
             NotificationManager.Notify(NotificationLevel.Warning, msg);

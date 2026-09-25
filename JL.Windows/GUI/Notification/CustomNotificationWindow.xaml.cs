@@ -1,4 +1,3 @@
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -8,7 +7,7 @@ using JL.Windows.Interop;
 
 namespace JL.Windows.GUI.Notification;
 
-internal sealed partial class CustomNotificationWindow : Window
+internal sealed partial class CustomNotificationWindow
 {
     public nint WindowHandle { get; private set; }
 

@@ -38,12 +38,14 @@ internal static class EpwingYomichanLoader
         GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
         Debug.Assert(!nonKanjiDict || !nonNameDict || generateMazegakiOption is not null);
         bool generateMazegaki = nonKanjiDict && nonNameDict
+                                             // ReSharper disable once NullableWarningSuppressionIsUsed
                                              && generateMazegakiOption!.Value;
 
         GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
         Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
         bool generateFusejiVariants = nonKanjiDict
-                                && generateFusejiVariantsOption!.Value;
+                                      // ReSharper disable once NullableWarningSuppressionIsUsed
+                                      && generateFusejiVariantsOption!.Value;
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
@@ -131,8 +133,7 @@ internal static class EpwingYomichanLoader
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    public static EpwingYomichanRecord? GetEpwingYomichanRecord(JsonElement jsonElement, Dict dict,
-        ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+    private static EpwingYomichanRecord? GetEpwingYomichanRecord(JsonElement jsonElement, Dict dict, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
     {
         if (!TryGetPrimarySpellingAndReading(jsonElement, out string primarySpelling, out string? reading)
             || !TryGetDefinitionTags(jsonElement, out string[]? definitionTags)
@@ -150,7 +151,7 @@ internal static class EpwingYomichanLoader
         return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos?.ToArray());
     }
 
-    internal static bool TryGetPrimarySpellingAndReading(JsonElement jsonElement, out string primarySpelling, out string? reading)
+    private static bool TryGetPrimarySpellingAndReading(JsonElement jsonElement, out string primarySpelling, out string? reading)
     {
         try
         {
@@ -161,7 +162,7 @@ internal static class EpwingYomichanLoader
         catch (InvalidOperationException ex)
         {
             LoggerManager.Logger.Error(ex, "Failed to get the primary spelling for EPWING Yomichan record: {JsonElement}", jsonElement);
-            primarySpelling = string.Empty;
+            primarySpelling = "";
             reading = null;
             return false;
         }
@@ -195,7 +196,7 @@ internal static class EpwingYomichanLoader
         return true;
     }
 
-    internal static bool TryGetDefinitionTags(JsonElement jsonElement, out string[]? definitionTags)
+    private static bool TryGetDefinitionTags(JsonElement jsonElement, out string[]? definitionTags)
     {
         definitionTags = null;
 
@@ -221,7 +222,7 @@ internal static class EpwingYomichanLoader
         return true;
     }
 
-    internal static bool TryGetDefinitions(JsonElement jsonElement, Dict dict, ConcurrentDictionary<string, ImageInfo> imageInfoCache,
+    private static bool TryGetDefinitions(JsonElement jsonElement, Dict dict, ConcurrentDictionary<string, ImageInfo> imageInfoCache,
         out string[]? definitions, out List<ImageInfo>? imageInfos)
     {
         imageInfos = null;
@@ -240,7 +241,7 @@ internal static class EpwingYomichanLoader
         return true;
     }
 
-    internal static bool TryGetWordClasses(JsonElement jsonElement, out string[]? wordClasses)
+    private static bool TryGetWordClasses(JsonElement jsonElement, out string[]? wordClasses)
     {
         string? wordClassesStr;
         try
@@ -764,7 +765,7 @@ internal static class EpwingYomichanLoader
                 return false;
             }
 
-            if (isTableRow && (contentResult.Tag is ContentTag.TH or ContentTag.TD))
+            if (isTableRow && contentResult.Tag is ContentTag.TH or ContentTag.TD)
             {
                 Debug.Assert(tableRowSpans is not null);
                 EpwingYomichanUtils.AppendTableCell(stringBuilder, contentResult.Content, colSpan, rowSpan,
@@ -888,7 +889,9 @@ internal static class EpwingYomichanLoader
                 case ContentTag.Other:
                     _ = stringBuilder.Append('\n').Append(content.AsSpan().TrimStart());
                     break;
+
                 default:
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(YomichanContent<>), nameof(EpwingYomichanLoader), nameof(AppendDefinitionContent), contentResult.Tag);
                     break;
             }
 
@@ -1002,7 +1005,7 @@ internal static class EpwingYomichanLoader
                     }
                 }
 
-                if (tableRowSpans is { Count: > 0 } && (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot))
+                if (tableRowSpans is { Count: > 0 } && tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot)
                 {
                     // Row spans do not cross row groups.
                     tableRowSpans.Clear();
@@ -1443,13 +1446,7 @@ internal static class EpwingYomichanLoader
             }
         }
 
-        if (reader.TokenType is not JsonTokenType.EndObject)
-        {
-            result = default;
-            return false;
-        }
-
-        if (invalidTag || invalidStyle)
+        if (reader.TokenType is not JsonTokenType.EndObject || invalidTag || invalidStyle)
         {
             result = default;
             return false;
@@ -1501,12 +1498,11 @@ internal static class EpwingYomichanLoader
                 string? marker = NormalizeListMarker(listStyleType);
                 string? objectText;
                 if (tag is ContentTag.TR && tableRowSpans is not null
-                    && (parsedNestedContent.Tag is ContentTag.TH or ContentTag.TD))
+                    && parsedNestedContent.Tag is ContentTag.TH or ContentTag.TD)
                 {
                     StringBuilder objectStringBuilder = ObjectPoolManager.StringBuilderPool.Get();
                     int tableColumnIndex = 0;
-                    EpwingYomichanUtils.AppendTableCell(objectStringBuilder, childText, nestedColSpan, nestedRowSpan,
-                        tableRowSpans, ref tableColumnIndex);
+                    EpwingYomichanUtils.AppendTableCell(objectStringBuilder, childText, nestedColSpan, nestedRowSpan, tableRowSpans, ref tableColumnIndex);
                     EpwingYomichanUtils.AdvanceTableRow(objectStringBuilder, tableRowSpans, tableColumnIndex);
                     objectText = objectStringBuilder.Length > 0 ? objectStringBuilder.ToString() : null;
                     ObjectPoolManager.StringBuilderPool.Return(objectStringBuilder);
@@ -1651,7 +1647,7 @@ internal static class EpwingYomichanLoader
                     }
                 }
 
-                if (tableRowSpans is { Count: > 0 } && (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot))
+                if (tableRowSpans is { Count: > 0 } && tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot)
                 {
                     tableRowSpans.Clear();
                 }

@@ -64,7 +64,7 @@ public static class MpvUtils
         catch (TimeoutException)
         {
             s_pausedByJL = false;
-            LoggerManager.Logger.Warning("Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={MpvNamedPipePath} to your mpv.conf file.", CoreConfigManager.Instance.MpvNamedPipePath);
+            LoggerManager.Logger.Warning("Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={MpvNamedPipePath} to your mpv.conf file", CoreConfigManager.Instance.MpvNamedPipePath);
             FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={CoreConfigManager.Instance.MpvNamedPipePath} to your mpv.conf file.");
         }
         catch (Exception ex)

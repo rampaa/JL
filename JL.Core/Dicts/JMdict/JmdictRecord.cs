@@ -345,6 +345,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
     {
         if (crossReferencesElement is not null)
         {
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (crossReferencesElement.Length is 1)
             {
                 _ = defBuilder.Append('(').Append(crossReferencesElement[0]).Append(") ");

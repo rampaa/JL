@@ -751,17 +751,17 @@ internal sealed class PopupContentGenerator : Decorator
         }
         catch (NotSupportedException ex)
         {
-            LoggerManager.Logger.Error(ex, "Image type is not supported: {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, dictName);
+            LoggerManager.Logger.Error(ex, "Image type is not supported: {ImagePath}. Disabling 'Show images' option for {DictName}", imagePath, dictName);
             return null;
         }
         catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
         {
-            LoggerManager.Logger.Error(ex, "Image path is not found {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, dictName);
+            LoggerManager.Logger.Error(ex, "Image path is not found {ImagePath}. Disabling 'Show images' option for {DictName}", imagePath, dictName);
             return null;
         }
         catch (Exception ex)
         {
-            LoggerManager.Logger.Error(ex, "Unexpected error while decoding image: {ImagePath}. Disabling 'Show images' option for {DictName}.", imagePath, dictName);
+            LoggerManager.Logger.Error(ex, "Unexpected error while decoding image: {ImagePath}. Disabling 'Show images' option for {DictName}", imagePath, dictName);
             return null;
         }
     }

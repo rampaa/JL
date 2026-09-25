@@ -4,7 +4,6 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Web;
 using System.Windows;
 using System.Windows.Controls;
@@ -783,52 +782,6 @@ internal static class WindowsUtils
                 Application? application = Application.Current;
                 return application is not null
                     && await application.Dispatcher.InvokeAsync(() => HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes, DispatcherPriority.Render).Task.ConfigureAwait(false);
-            }
-        }
-        finally
-        {
-            _ = s_dialogSemaphore.Release();
-        }
-    }
-
-    public static async Task ShowOkDialogAsync(string text, string caption, Window? owner)
-    {
-        await s_dialogSemaphore.WaitAsync().ConfigureAwait(false);
-
-        try
-        {
-            if (owner is not null)
-            {
-                await owner.Dispatcher.BeginInvoke(() =>
-                {
-                    if (owner is { IsLoaded: true, IsVisible: true, Opacity: > 0, WindowState: not WindowState.Minimized, Dispatcher.HasShutdownStarted: false } && PresentationSource.FromVisual(owner) is not null)
-                    {
-                        try
-                        {
-                            _ = HandyControl.Controls.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                        catch (InvalidOperationException ex)
-                        {
-                            LoggerManager.Logger.Error(ex, "Could not assign {OwnerName} as the owner of message box", owner.Name);
-                            _ = HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                    }
-                    else
-                    {
-                        _ = HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                }, DispatcherPriority.Render).Task.ConfigureAwait(false);
-            }
-            else
-            {
-                Application? application = Application.Current;
-                if (application is not null)
-                {
-                    await application.Dispatcher.BeginInvoke(() =>
-                    {
-                        _ = HandyControl.Controls.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-                    }, DispatcherPriority.Render).Task.ConfigureAwait(false);
-                }
             }
         }
         finally

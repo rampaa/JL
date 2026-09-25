@@ -90,7 +90,7 @@ internal static class EpwingYomichanDBManager
         using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
 
         DBUtils.SetEncodingToUtf16LE(connection);
-        DBUtils.SetPageSizeTo64k(connection);
+        DBUtils.SetPageSizeTo64K(connection);
 
         using SqliteCommand command = connection.CreateCommand();
 
@@ -205,11 +205,13 @@ internal static class EpwingYomichanDBManager
         GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
         Debug.Assert(!nonKanjiDict || !nonNameDict || generateMazegakiOption is not null);
         bool generateMazegaki = nonKanjiDict && nonNameDict
+                                             // ReSharper disable once NullableWarningSuppressionIsUsed
                                              && generateMazegakiOption!.Value;
 
         GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
         Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
         bool generateFusejiVariants = nonKanjiDict
+                                      // ReSharper disable once NullableWarningSuppressionIsUsed
                                 && generateFusejiVariantsOption!.Value;
 
         int maxSearchKeyLengthForFusejiGeneration;
@@ -303,7 +305,6 @@ internal static class EpwingYomichanDBManager
                 transaction.Commit();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-                transactionRecordCount = 0;
                 dict.Ready = true;
             }
         }
@@ -485,7 +486,7 @@ internal static class EpwingYomichanDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}", readOnlyConnectionString);
             return null;
         }
 
@@ -528,7 +529,7 @@ internal static class EpwingYomichanDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}", readOnlyConnectionString);
             return null;
         }
 
@@ -653,6 +654,7 @@ internal static class EpwingYomichanDBManager
             }
             catch (OperationCanceledException) when (stopOnConsumerExit.IsCancellationRequested)
             {
+                LoggerManager.Logger.Debug("Output channel completion task was canceled due to consumer exit");
             }
             finally
             {
@@ -799,13 +801,12 @@ internal static class EpwingYomichanDBManager
             }
             catch (OperationCanceledException) when (stopOnConsumerExit.IsCancellationRequested)
             {
+                LoggerManager.Logger.Debug("Output channel completion task was canceled due to consumer exit");
             }
         }
     }
 
-    private static async Task CreateVariantSearchKeys(VariantSearchKeyRecord[] sources, int sourceCount,
-        int workerIndex, int workerCount, ImportOptions importOptions,
-        ChannelWriter<VariantSearchKeys> writer, CancellationToken cancellationToken)
+    private static async Task CreateVariantSearchKeys(VariantSearchKeyRecord[] sources, int sourceCount, int workerIndex, int workerCount, ImportOptions importOptions, ChannelWriter<VariantSearchKeys> writer, CancellationToken cancellationToken)
     {
         HashSet<string> keys = new(StringComparer.Ordinal);
         List<string> variantSearchKeys = [];
@@ -815,9 +816,7 @@ internal static class EpwingYomichanDBManager
             cancellationToken.ThrowIfCancellationRequested();
             VariantSearchKeyRecord source = sources[i];
 
-            string[] searchKeys = GenerateVariantSearchKeys(source.PrimarySpelling, source.Reading,
-                in importOptions, keys, variantSearchKeys);
-
+            string[] searchKeys = GenerateVariantSearchKeys(source.PrimarySpelling, source.Reading, in importOptions, keys, variantSearchKeys);
             if (searchKeys.Length > 0)
             {
                 await writer.WriteAsync(new VariantSearchKeys(source.RowId, searchKeys), cancellationToken).ConfigureAwait(false);
@@ -825,8 +824,7 @@ internal static class EpwingYomichanDBManager
         }
     }
 
-    private static string[] GenerateVariantSearchKeys(string primarySpelling, string? reading,
-        in ImportOptions importOptions, HashSet<string> keys, List<string> variantSearchKeys)
+    private static string[] GenerateVariantSearchKeys(string primarySpelling, string? reading, in ImportOptions importOptions, HashSet<string> keys, List<string> variantSearchKeys)
     {
         Debug.Assert(keys.Count is 0);
         Debug.Assert(variantSearchKeys.Count is 0);
@@ -835,7 +833,7 @@ internal static class EpwingYomichanDBManager
             ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
             : primarySpelling.GetPooledString();
 
-        string? readingInHiragana = importOptions.NonKanjiDict && importOptions.NonNameDict && reading is not null
+        string? readingInHiragana = importOptions is { NonKanjiDict: true, NonNameDict: true } && reading is not null
             ? JapaneseUtils.NormalizeText(reading).GetPooledString()
             : null;
 
@@ -845,20 +843,17 @@ internal static class EpwingYomichanDBManager
         {
             if (importOptions.GenerateFusejiVariants)
             {
-                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana,
-                             importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
+                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
                 {
                     _ = TryAddVariantSearchKey(fusejiVariant, readingInHiragana, keys, variantSearchKeys);
                 }
             }
 
-            if (readingInHiragana is not null
-                && keys.Add(readingInHiragana))
+            if (readingInHiragana is not null && keys.Add(readingInHiragana))
             {
                 if (importOptions.GenerateFusejiVariants)
                 {
-                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana,
-                                 importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
+                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
                     {
                         _ = TryAddVariantSearchKey(fusejiVariant, readingInHiragana, keys, variantSearchKeys);
                     }
@@ -866,14 +861,11 @@ internal static class EpwingYomichanDBManager
 
                 if (importOptions.GenerateMazegaki)
                 {
-                    foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(
-                                 primarySpellingInHiragana, readingInHiragana))
+                    foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
                     {
-                        if (TryAddVariantSearchKey(mazegaki, readingInHiragana, keys, variantSearchKeys)
-                            && importOptions.GenerateFusejiVariants)
+                        if (TryAddVariantSearchKey(mazegaki, readingInHiragana, keys, variantSearchKeys) && importOptions.GenerateFusejiVariants)
                         {
-                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki,
-                                         importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, importOptions.MaxTotalFuseji, importOptions.MaxSearchKeyLengthForFusejiGeneration))
                             {
                                 _ = TryAddVariantSearchKey(fusejiVariant, readingInHiragana, keys, variantSearchKeys);
                             }
@@ -889,8 +881,7 @@ internal static class EpwingYomichanDBManager
         return result;
     }
 
-    private static bool TryAddVariantSearchKey(string searchKey, string? readingSearchKey,
-        HashSet<string> keys, List<string> variantSearchKeys)
+    private static bool TryAddVariantSearchKey(string searchKey, string? readingSearchKey, HashSet<string> keys, List<string> variantSearchKeys)
     {
         if (!keys.Add(searchKey))
         {

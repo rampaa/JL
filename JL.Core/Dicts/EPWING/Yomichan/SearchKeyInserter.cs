@@ -53,9 +53,8 @@ internal sealed class SearchKeyInserter : IDisposable
         result = raw.sqlite3_step(_statement);
         if (result is not raw.SQLITE_DONE)
         {
-            int stepResult = result;
             _ = raw.sqlite3_reset(_statement);
-            SqliteException.ThrowExceptionForRC(stepResult, _connectionHandle);
+            SqliteException.ThrowExceptionForRC(result, _connectionHandle);
         }
 
         result = raw.sqlite3_reset(_statement);
@@ -75,9 +74,8 @@ internal sealed class SearchKeyInserter : IDisposable
             result = raw.sqlite3_step(_statement);
             if (result is not raw.SQLITE_DONE)
             {
-                int stepResult = result;
                 _ = raw.sqlite3_reset(_statement);
-                SqliteException.ThrowExceptionForRC(stepResult, _connectionHandle);
+                SqliteException.ThrowExceptionForRC(result, _connectionHandle);
             }
 
             result = raw.sqlite3_reset(_statement);
@@ -96,9 +94,9 @@ internal sealed class SearchKeyInserter : IDisposable
             SqliteException.ThrowExceptionForRC(result, _connectionHandle);
         }
 
-        for (int i = 0; i < searchKeys.Length; i++)
+        foreach (ReadOnlySpan<char> searchKey in searchKeys)
         {
-            result = raw.sqlite3_bind_text16(_statement, 1, searchKeys[i].AsSpan());
+            result = raw.sqlite3_bind_text16(_statement, 1, searchKey);
             if (result is not raw.SQLITE_OK)
             {
                 SqliteException.ThrowExceptionForRC(result, _connectionHandle);
@@ -107,9 +105,8 @@ internal sealed class SearchKeyInserter : IDisposable
             result = raw.sqlite3_step(_statement);
             if (result is not raw.SQLITE_DONE)
             {
-                int stepResult = result;
                 _ = raw.sqlite3_reset(_statement);
-                SqliteException.ThrowExceptionForRC(stepResult, _connectionHandle);
+                SqliteException.ThrowExceptionForRC(result, _connectionHandle);
             }
 
             result = raw.sqlite3_reset(_statement);

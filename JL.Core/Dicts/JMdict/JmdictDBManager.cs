@@ -118,6 +118,7 @@ internal static class JmdictDBManager
         Readings,
         ReadingsOrthographyInfo,
         ReadingRestrictions,
+        // ReSharper disable once UnusedMember.Local
         Glossary,
         GlossaryInfo,
         WordClassesSharedByAllSenses,
@@ -139,7 +140,7 @@ internal static class JmdictDBManager
         using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
 
         DBUtils.SetEncodingToUtf16LE(connection);
-        DBUtils.SetPageSizeTo64k(connection);
+        DBUtils.SetPageSizeTo64K(connection);
 
         using SqliteCommand command = connection.CreateCommand();
 
@@ -723,7 +724,7 @@ internal static class JmdictDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}.", readOnlyConnectionString);
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}", readOnlyConnectionString);
             return null;
         }
 

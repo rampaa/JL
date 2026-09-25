@@ -108,7 +108,7 @@ internal static class EpwingYomichanUtils
         }
 
         ImageInfo? imageInfo = GetImageInfo(imagePath, imageInfoCache);
-        return imageInfo is not null && imageInfo.PixelWidth <= 16 && imageInfo.PixelHeight <= 16;
+        return imageInfo is { PixelWidth: <= 16, PixelHeight: <= 16 };
     }
 
     private static bool IsSmallImageWithMissingDimension(JsonElement jsonElement, string imagePath,
@@ -142,7 +142,7 @@ internal static class EpwingYomichanUtils
     {
         // Add support for decimal-leading-zero, alphabetic, Roman and Japanese counter styles if a dictionary uses them.
         // The same applies to inherit, unset and initial.
-        if (marker.Length > 1 && (marker[0] is '"' or '\'') && marker[^1] == marker[0])
+        if (marker.Length > 1 && marker[0] is '"' or '\'' && marker[^1] == marker[0])
         {
             return marker[1..^1];
         }
@@ -248,7 +248,7 @@ internal static class EpwingYomichanUtils
             {
                 YomichanContent<string?> contentResult = GetDefinitionsFromJsonObject(
                     definitionElement, dict, ref imageInfos, imageInfoCache, tableRowSpans);
-                if (isTableRow && (contentResult.Tag is "th" or "td"))
+                if (isTableRow && contentResult.Tag is "th" or "td")
                 {
                     int colSpan = definitionElement.TryGetProperty("colSpan", out JsonElement colSpanElement)
                         && colSpanElement.ValueKind is JsonValueKind.Number
@@ -419,7 +419,7 @@ internal static class EpwingYomichanUtils
                 tag = tagElement.GetString();
             }
 
-            if (tableRowSpans is { Count: > 0 } && (tag is "thead" or "tbody" or "tfoot"))
+            if (tableRowSpans is { Count: > 0 } && tag is "thead" or "tbody" or "tfoot")
             {
                 // Row spans do not cross row groups.
                 tableRowSpans.Clear();
@@ -479,7 +479,7 @@ internal static class EpwingYomichanUtils
                 {
                     AdvanceTableRow(sb, childTableRowSpans, tableColumnIndex);
                 }
-                else if (tableRowSpans is { Count: > 0 } && (tag is "thead" or "tbody" or "tfoot"))
+                else if (tableRowSpans is { Count: > 0 } && tag is "thead" or "tbody" or "tfoot")
                 {
                     tableRowSpans.Clear();
                 }
@@ -518,7 +518,7 @@ internal static class EpwingYomichanUtils
                 YomichanContent<string?> childContent = GetDefinitionsFromJsonObject(contentElement, dict, ref imagePaths,
                     imageInfoCache, childTableRowSpans);
                 string? content;
-                if (tag is "tr" && childTableRowSpans is not null && (childContent.Tag is "th" or "td"))
+                if (tag is "tr" && childTableRowSpans is not null && childContent.Tag is "th" or "td")
                 {
                     StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
                     int colSpan = contentElement.TryGetProperty("colSpan", out JsonElement colSpanElement)
@@ -564,7 +564,7 @@ internal static class EpwingYomichanUtils
                     ObjectPoolManager.StringBuilderPool.Return(sb);
                 }
 
-                if (tableRowSpans is { Count: > 0 } && (tag is "thead" or "tbody" or "tfoot"))
+                if (tableRowSpans is { Count: > 0 } && tag is "thead" or "tbody" or "tfoot")
                 {
                     tableRowSpans.Clear();
                 }
@@ -580,7 +580,7 @@ internal static class EpwingYomichanUtils
         else if (jsonElement.TryGetProperty("tag", out JsonElement tagElement))
         {
             string? tag = tagElement.GetString();
-            if (tableRowSpans is { Count: > 0 } && (tag is "thead" or "tbody" or "tfoot"))
+            if (tableRowSpans is { Count: > 0 } && tag is "thead" or "tbody" or "tfoot")
             {
                 tableRowSpans.Clear();
             }

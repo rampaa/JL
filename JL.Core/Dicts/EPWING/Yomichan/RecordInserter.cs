@@ -107,9 +107,8 @@ internal sealed class RecordInserter : IDisposable
         result = raw.sqlite3_step(_statement);
         if (result is not raw.SQLITE_DONE)
         {
-            int stepResult = result;
             _ = raw.sqlite3_reset(_statement);
-            SqliteException.ThrowExceptionForRC(stepResult, _connectionHandle);
+            SqliteException.ThrowExceptionForRC(result, _connectionHandle);
         }
 
         result = raw.sqlite3_reset(_statement);

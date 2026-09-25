@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Net.Http.Json;
 using JL.Core.Config;
 using JL.Core.Frontend;
 using JL.Core.Network;
@@ -134,7 +133,7 @@ internal static class AnkiConnectClient
         }
         catch (HttpRequestException ex)
         {
-            LoggerManager.Logger.Error(ex, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
+            LoggerManager.Logger.Error(ex, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed");
             FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't connect to AnkiConnect. Please ensure Anki is open and AnkiConnect is installed.");
             return null;
         }

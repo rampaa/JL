@@ -25,6 +25,7 @@ public static class LookupResultUtils
             string? pathText = process.GetFormattedText();
             if (pathText is not null)
             {
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                 if (i is 0)
                 {
                     _ = deconjugationProcessBuilder.Append('～').Append(pathText);

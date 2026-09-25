@@ -274,6 +274,7 @@ internal sealed partial class AddWordWindow
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         _ = Activate();
+        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
         if (string.IsNullOrEmpty(SpellingsTextBox.Text))
         {
             _ = SpellingsTextBox.Focus();

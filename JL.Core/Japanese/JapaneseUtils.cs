@@ -294,7 +294,7 @@ public static partial class JapaneseUtils
         new('ぃ', 'い'),
         new('ぅ', 'う'),
         new('ぇ', 'え'),
-        new('ぉ', 'お'),
+        new('ぉ', 'お')
     }.ToFrozenDictionary();
 
     public static readonly SearchValues<char> SmallCombiningKanaSet = SearchValues.Create('ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ', 'ャ', 'ュ', 'ョ', 'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ゎ', 'ゃ', 'ゅ', 'ょ');
@@ -460,33 +460,31 @@ public static partial class JapaneseUtils
                         ++i;
                         continue;
                     }
+
+                    _ = normalizedTextBuilder.Append(runeSpan);
+                    if (i + 2 < normalizedText.Length)
+                    {
+                        ReadOnlySpan<char> remainingSpan = normalizedText.AsSpan(i + 2);
+                        normalizationStartOffset = remainingSpan.IndexOfAny(s_charactersToNormalize);
+                        if (normalizationStartOffset < 0)
+                        {
+                            _ = normalizedTextBuilder.Append(remainingSpan);
+                            break;
+                        }
+
+                        if (normalizationStartOffset > 0)
+                        {
+                            _ = normalizedTextBuilder.Append(normalizedText.AsSpan(i + 2, normalizationStartOffset));
+                        }
+
+                        i += 1 + normalizationStartOffset;
+                    }
                     else
                     {
-                        _ = normalizedTextBuilder.Append(runeSpan);
-                        if (i + 2 < normalizedText.Length)
-                        {
-                            ReadOnlySpan<char> remainingSpan = normalizedText.AsSpan(i + 2);
-                            normalizationStartOffset = remainingSpan.IndexOfAny(s_charactersToNormalize);
-                            if (normalizationStartOffset < 0)
-                            {
-                                _ = normalizedTextBuilder.Append(remainingSpan);
-                                break;
-                            }
-
-                            if (normalizationStartOffset > 0)
-                            {
-                                _ = normalizedTextBuilder.Append(normalizedText.AsSpan(i + 2, normalizationStartOffset));
-                            }
-
-                            i += 1 + normalizationStartOffset;
-                        }
-                        else
-                        {
-                            ++i;
-                        }
-
-                        continue;
+                        ++i;
                     }
+
+                    continue;
                 }
 
                 if (i > 0 && s_charsToStrip.Contains(character))
@@ -568,6 +566,7 @@ public static partial class JapaneseUtils
         if (iterationMark is 'ゞ')
         {
             char previousChar = builder[^1];
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (s_hiraganaToDakutenDict.TryGetValue(previousChar, out char dakuten))
             {
                 _ = builder.Append(dakuten);
@@ -591,6 +590,7 @@ public static partial class JapaneseUtils
             else if (builder.Length > 1)
             {
                 char twoPreviousChar = builder[^2];
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                 if (!char.IsLowSurrogate(twoPreviousChar))
                 {
                     _ = builder.Append(twoPreviousChar).Append(previousChar);
@@ -848,12 +848,7 @@ public static partial class JapaneseUtils
                 else
                 {
                     int numberOfRightBrackets = sentence.Count(rightBracket);
-
-                    if (numberOfRightBrackets is 0)
-                    {
-                        sentence = sentence[1..];
-                    }
-                    else if (sentence.Count(sentence[0]) == numberOfRightBrackets + 1)
+                    if (numberOfRightBrackets is 0 || sentence.Count(sentence[0]) == numberOfRightBrackets + 1)
                     {
                         sentence = sentence[1..];
                     }
@@ -862,11 +857,7 @@ public static partial class JapaneseUtils
             else if (s_rightToLeftBracketDict.TryGetValue(sentence[^1], out char leftBracket))
             {
                 int numberOfLeftBrackets = sentence.Count(leftBracket);
-                if (numberOfLeftBrackets is 0)
-                {
-                    sentence = sentence[..^1];
-                }
-                else if (sentence.Count(sentence[^1]) == numberOfLeftBrackets + 1)
+                if (numberOfLeftBrackets is 0 || sentence.Count(sentence[^1]) == numberOfLeftBrackets + 1)
                 {
                     sentence = sentence[..^1];
                 }

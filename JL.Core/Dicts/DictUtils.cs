@@ -846,7 +846,7 @@ public static class DictUtils
                     dict.Size = dict.Contents.Count;
                     if (dict.Size is 0)
                     {
-                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", dict.Type.GetDescription(), dict.Name, fullDictPath);
                         FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {dict.Name}. The dict has been deactivated.");
 
                         dict.Active = false;
@@ -894,7 +894,7 @@ public static class DictUtils
 
                     if (dict.Size is 0)
                     {
-                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated.", dict.Type.GetDescription(), dict.Name, fullDictPath);
+                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", dict.Type.GetDescription(), dict.Name, fullDictPath);
                         FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {dict.Name}. The dict has been deactivated.");
 
                         dict.Active = false;

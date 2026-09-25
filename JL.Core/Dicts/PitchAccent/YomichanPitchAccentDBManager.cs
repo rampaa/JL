@@ -74,7 +74,7 @@ internal static class YomichanPitchAccentDBManager
         using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
 
         DBUtils.SetEncodingToUtf16LE(connection);
-        DBUtils.SetPageSizeTo64k(connection);
+        DBUtils.SetPageSizeTo64K(connection);
 
         using SqliteCommand command = connection.CreateCommand();
 
@@ -540,7 +540,7 @@ internal static class YomichanPitchAccentDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectingString);
         if (connection is null)
         {
-            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}.", readOnlyConnectingString);
+            LoggerManager.Logger.Error("Failed to create a read-only connection to the database for dict {DBName}", readOnlyConnectingString);
             // FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Failed to create a read-only connection to the database for dict {dbName}.");
             return null;
         }

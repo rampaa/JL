@@ -167,7 +167,7 @@ internal sealed class WebSocketConnection : IDisposable
 
                 catch (OperationCanceledException)
                 {
-                    LoggerManager.Logger.Debug("Connection was cancelled for the websocket server at {WebSocketUri}.", _webSocketUri);
+                    LoggerManager.Logger.Debug("Connection was cancelled for the websocket server at {WebSocketUri}", _webSocketUri);
                     return;
                 }
 

@@ -56,7 +56,7 @@ internal static class WindowsAudioUtils
             MediaPlayer mediaPlayer = new() { AutoPlay = true, Source = mediaSource };
             _ = Interlocked.Exchange(ref s_audioPlayer, mediaPlayer);
 
-            IRandomAccessStream? capturedMediaStream = mediaStream;
+            IRandomAccessStream capturedMediaStream = mediaStream;
 
             mediaPlayer.MediaFailed += async (_, args) =>
             {

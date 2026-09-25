@@ -32,7 +32,7 @@ internal static class MazegakiVariantGenerator
         {
             Span<ExpressionRun> runs = expression.Length <= MaxStackRuns
                 ? stackalloc ExpressionRun[expression.Length]
-                : (rentedRuns = ArrayPool<ExpressionRun>.Shared.Rent(expression.Length));
+                : rentedRuns = ArrayPool<ExpressionRun>.Shared.Rent(expression.Length);
 
             int runCount = ParseRuns(expression, runs);
             ReadOnlySpan<ExpressionRun> activeRuns = runs[..runCount];
@@ -43,7 +43,7 @@ internal static class MazegakiVariantGenerator
 
             Span<byte> ways = waysSize <= StackAllocBytesThreshold
                 ? stackalloc byte[waysSize]
-                : (rentedWays = ArrayPool<byte>.Shared.Rent(waysSize));
+                : rentedWays = ArrayPool<byte>.Shared.Rent(waysSize);
 
             return TryProcessIterative(expression, reading, activeRuns, ways, segments, out count, out kanjiCount);
         }
