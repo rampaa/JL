@@ -42,7 +42,8 @@ internal static class ImageUtils
         try
         {
             ImageInfo? imageInfo;
-            switch (GetImageFormat(Path.GetExtension(imagePath.AsSpan())))
+            ImageFormat imageFormat = GetImageFormat(Path.GetExtension(imagePath.AsSpan()));
+            switch (imageFormat)
             {
                 case ImageFormat.Webp:
                     if (TryGetWebpImageInfo(fullImagePath, imagePath, out imageInfo))
@@ -93,7 +94,10 @@ internal static class ImageUtils
                     break;
 
                 case ImageFormat.Unknown:
+                    break;
+
                 default:
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(ImageFormat), nameof(ImageUtils), nameof(GetImageInfo), imageFormat);
                     break;
             }
 
@@ -778,13 +782,6 @@ internal static class ImageUtils
                 {
                     return false;
                 }
-
-                if (!reader.TrySeek(segmentEnd))
-                {
-                    return false;
-                }
-
-                continue;
             }
 
             if (!reader.TrySeek(segmentEnd))

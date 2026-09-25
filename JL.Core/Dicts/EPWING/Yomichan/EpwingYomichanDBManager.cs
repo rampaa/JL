@@ -85,6 +85,19 @@ internal static class EpwingYomichanDBManager
     private static readonly int s_outputChannelCapacity = s_workerCount * 16;
     private static readonly int s_importRecordBatchChannelCapacity = Math.Max(1, s_outputChannelCapacity / ImportRecordBatchSize);
 
+    private enum ColumnIndex
+    {
+        RowId = 0,
+        PrimarySpelling,
+        Reading,
+        PopularityScore,
+        Glossary,
+        PartOfSpeech,
+        GlossaryTags,
+        ImageInfos,
+        SearchKey
+    }
+
     public static void CreateDB(string dbPath)
     {
         using SqliteConnection connection = DBUtils.CreateDBConnection(dbPath);
@@ -508,7 +521,7 @@ internal static class EpwingYomichanDBManager
             results ??= new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
 
             EpwingYomichanRecord record = GetRecord(reader);
-            string searchKey = reader.GetString((int)YomichanColumnIndex.SearchKey);
+            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
             ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
             if (exists)
             {
@@ -563,7 +576,7 @@ internal static class EpwingYomichanDBManager
         while (reader.Read())
         {
             EpwingYomichanRecord record = GetRecord(reader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)YomichanColumnIndex.SearchKey), JsonOptions.DefaultJso);
+            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
             Debug.Assert(searchKeys is not null);
 
             Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
@@ -593,19 +606,19 @@ internal static class EpwingYomichanDBManager
 
     private static EpwingYomichanRecord GetRecord(SqliteRecordReader reader)
     {
-        long rowId = reader.GetInt64((int)YomichanColumnIndex.RowId);
-        string primarySpelling = reader.GetString((int)YomichanColumnIndex.PrimarySpelling);
+        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
+        string primarySpelling = reader.GetString((int)ColumnIndex.PrimarySpelling);
 
-        const int readingIndex = (int)YomichanColumnIndex.Reading;
+        const int readingIndex = (int)ColumnIndex.Reading;
         string? reading = !reader.IsNull(readingIndex)
             ? reader.GetString(readingIndex)
             : null;
 
-        double popularityScore = reader.GetDouble((int)YomichanColumnIndex.PopularityScore);
+        double popularityScore = reader.GetDouble((int)ColumnIndex.PopularityScore);
         string[] definitions = reader.Deserialize<string[]>(Record, Glossary, rowId);
-        string[]? wordClasses = reader.DeserializeNullable<string[]>((int)YomichanColumnIndex.PartOfSpeech, Record, PartOfSpeech, rowId);
-        string[]? definitionTags = reader.DeserializeNullable<string[]>((int)YomichanColumnIndex.GlossaryTags, Record, GlossaryTags, rowId);
-        ImageInfo[]? imageInfos = reader.DeserializeNullable<ImageInfo[]>((int)YomichanColumnIndex.ImageInfos, Record, ImageInfos, rowId);
+        string[]? wordClasses = reader.DeserializeNullable<string[]>((int)ColumnIndex.PartOfSpeech, Record, PartOfSpeech, rowId);
+        string[]? definitionTags = reader.DeserializeNullable<string[]>((int)ColumnIndex.GlossaryTags, Record, GlossaryTags, rowId);
+        ImageInfo[]? imageInfos = reader.DeserializeNullable<ImageInfo[]>((int)ColumnIndex.ImageInfos, Record, ImageInfos, rowId);
 
         return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos);
     }
@@ -619,6 +632,7 @@ internal static class EpwingYomichanDBManager
         }
 
         using CancellationTokenSource stopOnConsumerExit = new();
+        CancellationToken stopOnConsumerExitToken = stopOnConsumerExit.Token;
         Channel<ImportRecordBatch> outputChannel = Channel.CreateBounded<ImportRecordBatch>(new BoundedChannelOptions(s_importRecordBatchChannelCapacity)
         {
             FullMode = BoundedChannelFullMode.Wait,
@@ -631,15 +645,14 @@ internal static class EpwingYomichanDBManager
         Task[] workerTasks = new Task[Math.Min(s_workerCount, jsonFiles.Length)];
         for (int i = 0; i < workerTasks.Length; i++)
         {
-            workerTasks[i] = Task.Run(() => CreateImportRecords(
-                jsonFileQueue, dict, importOptions, outputChannel.Writer, imageInfoCache, stopOnConsumerExit.Token));
+            workerTasks[i] = Task.Run(() => CreateImportRecords(jsonFileQueue, dict, importOptions, outputChannel.Writer, imageInfoCache, stopOnConsumerExitToken), CancellationToken.None);
         }
 
         Task outputCompletionTask = CompleteOutputChannel(workerTasks, outputChannel.Writer);
 
         try
         {
-            await foreach (ImportRecordBatch batch in outputChannel.Reader.ReadAllAsync().ConfigureAwait(false))
+            await foreach (ImportRecordBatch batch in outputChannel.Reader.ReadAllAsync(CancellationToken.None).ConfigureAwait(false))
             {
                 yield return batch;
             }
@@ -678,7 +691,11 @@ internal static class EpwingYomichanDBManager
         {
             while (jsonFiles.TryDequeue(out string? jsonFile))
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
                 await using (fileStream.ConfigureAwait(false))
                 {
@@ -697,7 +714,11 @@ internal static class EpwingYomichanDBManager
 
                         while (!completed)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                return;
+                            }
+
                             recordCount += EpwingYomichanLoader.ReadImportRecords(jsonBytes, ref offset, ref readerState,
                                 ref started, dict, importOptions.NonKanjiDict, importOptions.NonNameDict, imageInfoCache,
                                 records, recordCount, ImportRecordBatchSize - recordCount, out completed);
@@ -713,18 +734,21 @@ internal static class EpwingYomichanDBManager
                     }
                     else
                     {
-                        await foreach (JsonElement jsonElement in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(
-                                           fileStream, JsonOptions.DefaultJso, cancellationToken: cancellationToken).ConfigureAwait(false))
+                        await foreach (JsonElement jsonElement in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(fileStream, JsonOptions.DefaultJso, cancellationToken: cancellationToken).ConfigureAwait(false))
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-                            if (!EpwingYomichanLoader.TryGetImportRecord(jsonElement, dict, importOptions.NonKanjiDict,
-                                    importOptions.NonNameDict, imageInfoCache, out EpwingYomichanImportRecord record))
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                return;
+                            }
+
+                            if (!EpwingYomichanLoader.TryGetImportRecord(jsonElement, dict, importOptions.NonKanjiDict, importOptions.NonNameDict, imageInfoCache, out EpwingYomichanImportRecord record))
                             {
                                 continue;
                             }
 
                             records[recordCount] = record;
                             ++recordCount;
+
                             if (recordCount == ImportRecordBatchSize)
                             {
                                 await writer.WriteAsync(new ImportRecordBatch(records, recordCount), cancellationToken).ConfigureAwait(false);
@@ -750,22 +774,18 @@ internal static class EpwingYomichanDBManager
                 records = [];
             }
         }
-        catch
+        finally
         {
             if (records.Length > 0)
             {
                 records.AsSpan(0, recordCount).Clear();
                 ArrayPool<EpwingYomichanImportRecord>.Shared.Return(records);
             }
-
-            throw;
         }
     }
 
-    private static async IAsyncEnumerable<VariantSearchKeys> GetVariantSearchKeysInParallel(
-        VariantSearchKeyRecord[] sources, int sourceCount, ImportOptions importOptions)
+    private static async IAsyncEnumerable<VariantSearchKeys> GetVariantSearchKeysInParallel(VariantSearchKeyRecord[] sources, int sourceCount, ImportOptions importOptions)
     {
-        using CancellationTokenSource stopOnConsumerExit = new();
         Channel<VariantSearchKeys> outputChannel = Channel.CreateBounded<VariantSearchKeys>(new BoundedChannelOptions(s_outputChannelCapacity)
         {
             FullMode = BoundedChannelFullMode.Wait,
@@ -773,21 +793,21 @@ internal static class EpwingYomichanDBManager
             SingleReader = true
         });
 
+        using CancellationTokenSource stopOnConsumerExit = new();
+        CancellationToken stopOnConsumerExitToken = stopOnConsumerExit.Token;
+
         int workerCount = Math.Min(s_workerCount, sourceCount);
         Task[] workerTasks = new Task[workerCount];
         for (int workerIndex = 0; workerIndex < workerTasks.Length; workerIndex++)
         {
             int currentWorkerIndex = workerIndex;
-            workerTasks[workerIndex] = Task.Run(() => CreateVariantSearchKeys(
-                sources, sourceCount, currentWorkerIndex, workerCount, importOptions,
-                outputChannel.Writer, stopOnConsumerExit.Token));
+            workerTasks[workerIndex] = Task.Run(() => CreateVariantSearchKeys(sources, sourceCount, currentWorkerIndex, workerCount, importOptions, outputChannel.Writer, stopOnConsumerExitToken), CancellationToken.None);
         }
 
         Task outputCompletionTask = CompleteOutputChannel(workerTasks, outputChannel.Writer);
-
         try
         {
-            await foreach (VariantSearchKeys searchKeys in outputChannel.Reader.ReadAllAsync().ConfigureAwait(false))
+            await foreach (VariantSearchKeys searchKeys in outputChannel.Reader.ReadAllAsync(CancellationToken.None).ConfigureAwait(false))
             {
                 yield return searchKeys;
             }
@@ -813,7 +833,11 @@ internal static class EpwingYomichanDBManager
 
         for (int i = workerIndex; i < sourceCount; i += workerCount)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
             VariantSearchKeyRecord source = sources[i];
 
             string[] searchKeys = GenerateVariantSearchKeys(source.PrimarySpelling, source.Reading, in importOptions, keys, variantSearchKeys);
