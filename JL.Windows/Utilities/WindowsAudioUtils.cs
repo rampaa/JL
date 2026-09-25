@@ -65,9 +65,9 @@ internal static class WindowsAudioUtils
                 await DisposeMedia(mediaPlayer, mediaSource, capturedMediaStream).ConfigureAwait(false);
             };
 
-            mediaPlayer.MediaEnded += (_, _) =>
+            mediaPlayer.MediaEnded += async (_, _) =>
             {
-                _ = DisposeMedia(mediaPlayer, mediaSource, capturedMediaStream);
+                await DisposeMedia(mediaPlayer, mediaSource, capturedMediaStream).ConfigureAwait(false);
             };
         }
         catch (Exception ex)
