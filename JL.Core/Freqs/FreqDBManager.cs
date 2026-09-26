@@ -472,11 +472,10 @@ internal static class FreqDBManager
                 {
                     Debug.Assert(jsonElements is not null);
 
-                    string primarySpelling = jsonElements[0]
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        .GetString()!.GetPooledString();
+                    string? primarySpelling = jsonElements[0].GetString();
+                    Debug.Assert(primarySpelling is not null);
 
-                    string primarySpellingInHiragana = JapaneseUtils.NormalizeText(primarySpelling).GetPooledString();
+                    string primarySpellingInHiragana = JapaneseUtils.NormalizeText(primarySpelling);
                     string? reading = null;
                     int frequency = -1;
                     ref readonly JsonElement thirdElement = ref jsonElements[2];
@@ -497,9 +496,7 @@ internal static class FreqDBManager
                         }
                         else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
                         {
-                            reading = readingValue
-                                // ReSharper disable once NullableWarningSuppressionIsUsed
-                                .GetString()!.GetPooledString();
+                            reading = readingValue.GetString();
                             JsonElement frequencyElement = thirdElement.GetProperty("frequency");
 
                             if (frequencyElement.ValueKind is JsonValueKind.Number)
@@ -564,7 +561,7 @@ internal static class FreqDBManager
                     }
                     else
                     {
-                        string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
+                        string readingInHiragana = JapaneseUtils.NormalizeText(reading);
                         if (AddOrUpdate(readingInHiragana, rowId, frequencyRecordWithPrimarySpelling, true, commandsAndParameters))
                         {
                             ++transactionRecordCount;
@@ -842,9 +839,8 @@ internal static class FreqDBManager
             foreach (JsonElement[] elementList in value)
             {
                 int frequencyRank = elementList[1].GetInt32();
-                string exactSpelling = elementList[0]
-                    // ReSharper disable once NullableWarningSuppressionIsUsed
-                    .GetString()!.GetPooledString();
+                string? exactSpelling = elementList[0].GetString();
+                Debug.Assert(exactSpelling is not null);
 
                 if (frequencyRank > freq.MaxValue)
                 {
@@ -868,7 +864,7 @@ internal static class FreqDBManager
                     }
                 }
 
-                string exactSpellingInHiragana = JapaneseUtils.NormalizeText(exactSpelling).GetPooledString();
+                string exactSpellingInHiragana = JapaneseUtils.NormalizeText(exactSpelling);
                 if (exactSpellingInHiragana != reading)
                 {
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);

@@ -370,8 +370,7 @@ internal static class EpwingYomichanLoader
         return recordCount;
     }
 
-    internal static bool TryGetImportRecord(JsonElement jsonElement, Dict dict, bool nonKanjiDict, bool nonNameDict,
-        ConcurrentDictionary<string, ImageInfo> imageInfoCache, out EpwingYomichanImportRecord record)
+    internal static bool TryGetImportRecord(JsonElement jsonElement, Dict dict, bool nonKanjiDict, bool nonNameDict, ConcurrentDictionary<string, ImageInfo> imageInfoCache, out EpwingYomichanImportRecord record)
     {
         if (!TryGetPrimarySpellingAndReading(jsonElement, out string primarySpelling, out string? reading)
             || !TryGetDefinitionTags(jsonElement, out string[]? definitionTags)
@@ -388,13 +387,13 @@ internal static class EpwingYomichanLoader
         _ = jsonElement[4].TryGetDouble(out double popularityScore);
 
         string searchKey = nonKanjiDict
-            ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
-            : primarySpelling.GetPooledString();
+            ? JapaneseUtils.NormalizeText(primarySpelling)
+            : primarySpelling;
 
         string? additionalSearchKey = null;
         if (nonKanjiDict && nonNameDict && reading is not null)
         {
-            string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
+            string readingInHiragana = JapaneseUtils.NormalizeText(reading);
             if (searchKey != readingInHiragana)
             {
                 additionalSearchKey = readingInHiragana;
@@ -427,7 +426,7 @@ internal static class EpwingYomichanLoader
 
         string? primarySpellingValue = reader.GetString();
         Debug.Assert(primarySpellingValue is not null);
-        string primarySpelling = primarySpellingValue.GetPooledString();
+        string primarySpelling = primarySpellingValue;
 
         if (!reader.Read())
         {
@@ -451,7 +450,7 @@ internal static class EpwingYomichanLoader
 
         reading = string.IsNullOrWhiteSpace(reading) || reading == primarySpelling
             ? null
-            : reading.GetPooledString();
+            : reading;
 
         if (string.IsNullOrWhiteSpace(primarySpelling))
         {
@@ -540,13 +539,13 @@ internal static class EpwingYomichanLoader
         string[]? wordClasses = SplitSpaceSeparatedTags(wordClassesStr);
 
         string searchKey = nonKanjiDict
-            ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
-            : primarySpelling.GetPooledString();
+            ? JapaneseUtils.NormalizeText(primarySpelling)
+            : primarySpelling;
 
         string? additionalSearchKey = null;
         if (nonKanjiDict && nonNameDict && reading is not null)
         {
-            string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
+            string readingInHiragana = JapaneseUtils.NormalizeText(reading);
             if (searchKey != readingInHiragana)
             {
                 additionalSearchKey = readingInHiragana;
@@ -683,15 +682,14 @@ internal static class EpwingYomichanLoader
                 string trimmedDefinition = definition.Trim();
                 if (trimmedDefinition.Length is not 0)
                 {
-                    string pooledDefinition = trimmedDefinition.GetPooledString();
                     if (firstDefinition is null)
                     {
-                        firstDefinition = pooledDefinition;
+                        firstDefinition = trimmedDefinition;
                     }
                     else
                     {
                         definitionList ??= [firstDefinition];
-                        definitionList.Add(pooledDefinition);
+                        definitionList.Add(trimmedDefinition);
                     }
                 }
             }

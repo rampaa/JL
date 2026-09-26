@@ -623,8 +623,7 @@ internal static class EpwingYomichanDBManager
         return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos);
     }
 
-    private static async IAsyncEnumerable<ImportRecordBatch> GetImportRecordBatches(string[] jsonFiles, Dict dict,
-        ImportOptions importOptions, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+    private static async IAsyncEnumerable<ImportRecordBatch> GetImportRecordBatches(string[] jsonFiles, Dict dict, ImportOptions importOptions, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
     {
         if (jsonFiles.Length is 0)
         {
@@ -680,9 +679,7 @@ internal static class EpwingYomichanDBManager
         }
     }
 
-    private static async Task CreateImportRecords(ConcurrentQueue<string> jsonFiles, Dict dict,
-        ImportOptions importOptions, ChannelWriter<ImportRecordBatch> writer,
-        ConcurrentDictionary<string, ImageInfo> imageInfoCache, CancellationToken cancellationToken)
+    private static async Task CreateImportRecords(ConcurrentQueue<string> jsonFiles, Dict dict, ImportOptions importOptions, ChannelWriter<ImportRecordBatch> writer, ConcurrentDictionary<string, ImageInfo> imageInfoCache, CancellationToken cancellationToken)
     {
         EpwingYomichanImportRecord[] records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
         int recordCount = 0;
@@ -719,11 +716,8 @@ internal static class EpwingYomichanDBManager
                                 return;
                             }
 
-                            recordCount += EpwingYomichanLoader.ReadImportRecords(jsonBytes, ref offset, ref readerState,
-                                ref started, dict, importOptions.NonKanjiDict, importOptions.NonNameDict, imageInfoCache,
-                                records, recordCount, ImportRecordBatchSize - recordCount, out completed);
-
-                            if (recordCount == ImportRecordBatchSize)
+                            recordCount += EpwingYomichanLoader.ReadImportRecords(jsonBytes, ref offset, ref readerState, ref started, dict, importOptions.NonKanjiDict, importOptions.NonNameDict, imageInfoCache, records, recordCount, ImportRecordBatchSize - recordCount, out completed);
+                            if (recordCount is ImportRecordBatchSize)
                             {
                                 await writer.WriteAsync(new ImportRecordBatch(records, recordCount), cancellationToken).ConfigureAwait(false);
 
@@ -854,11 +848,11 @@ internal static class EpwingYomichanDBManager
         Debug.Assert(variantSearchKeys.Count is 0);
 
         string primarySpellingInHiragana = importOptions.NonKanjiDict
-            ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
-            : primarySpelling.GetPooledString();
+            ? JapaneseUtils.NormalizeText(primarySpelling)
+            : primarySpelling;
 
         string? readingInHiragana = importOptions is { NonKanjiDict: true, NonNameDict: true } && reading is not null
-            ? JapaneseUtils.NormalizeText(reading).GetPooledString()
+            ? JapaneseUtils.NormalizeText(reading)
             : null;
 
         _ = keys.Add(primarySpellingInHiragana);

@@ -218,7 +218,7 @@ internal static class YomichanPitchAccentDBManager
                     _ = insertRecordCommand.ExecuteNonQuery();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-                    string spellingInHiragana = JapaneseUtils.NormalizeText(record.Spelling).GetPooledString();
+                    string spellingInHiragana = JapaneseUtils.NormalizeText(record.Spelling);
                     _ = keys.Add(spellingInHiragana);
 
                     if (generateFusejiVariants)
@@ -231,7 +231,7 @@ internal static class YomichanPitchAccentDBManager
 
                     if (record.Reading is not null)
                     {
-                        string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
+                        string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading);
                         if (spellingInHiragana != readingInHiragana)
                         {
                             if (keys.Add(readingInHiragana))

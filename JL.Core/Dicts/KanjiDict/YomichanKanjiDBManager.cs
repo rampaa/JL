@@ -135,9 +135,8 @@ internal static class YomichanKanjiDBManager
                 await foreach (JsonElement[]? jsonObj in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
                 {
                     Debug.Assert(jsonObj is not null);
-                    string kanji = jsonObj[0]
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        .GetString()!.GetPooledString();
+                    string? kanji = jsonObj[0].GetString();
+                    Debug.Assert(kanji is not null);
                     if (string.IsNullOrWhiteSpace(kanji))
                     {
                         continue;
