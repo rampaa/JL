@@ -6,6 +6,8 @@ namespace JL.Core.Japanese.Mazegaki;
 
 internal static class MazegakiVariantGenerator
 {
+    internal const int MinKanjiRunCount = 2;
+    internal const int MaxKanjiRunCount = (sizeof(ulong) * 8) - 1;
     private const int StackAllocBytesThreshold = 2048;
     private const int MaxStackRuns = 128;
 
@@ -34,7 +36,12 @@ internal static class MazegakiVariantGenerator
                 ? stackalloc ExpressionRun[expression.Length]
                 : rentedRuns = ArrayPool<ExpressionRun>.Shared.Rent(expression.Length);
 
-            int runCount = ParseRuns(expression, runs);
+            int runCount = ParseRuns(expression, runs, out int kanjiRunCount);
+            if (kanjiRunCount < MinKanjiRunCount || kanjiRunCount > MaxKanjiRunCount)
+            {
+                return false;
+            }
+
             ReadOnlySpan<ExpressionRun> activeRuns = runs[..runCount];
 
             int readingLength = reading.Length;
@@ -152,9 +159,10 @@ internal static class MazegakiVariantGenerator
         return true;
     }
 
-    private static int ParseRuns(ReadOnlySpan<char> expression, Span<ExpressionRun> runs)
+    private static int ParseRuns(ReadOnlySpan<char> expression, Span<ExpressionRun> runs, out int kanjiRunCount)
     {
         int runCount = 0;
+        kanjiRunCount = 0;
         int i = 0;
         int expressionLength = expression.Length;
 
@@ -176,6 +184,10 @@ internal static class MazegakiVariantGenerator
 
             runs[runCount] = new ExpressionRun(start, i - start, isKanji);
             ++runCount;
+            if (isKanji)
+            {
+                ++kanjiRunCount;
+            }
         }
 
         return runCount;
