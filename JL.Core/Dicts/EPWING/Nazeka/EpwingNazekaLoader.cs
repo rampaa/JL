@@ -26,16 +26,20 @@ internal static class EpwingNazekaLoader
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
 
         GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
-        Debug.Assert(!nonNameDict || nonKanjiDict || generateMazegakiOption is not null);
-        bool generateMazegaki = nonKanjiDict && nonNameDict
-                                             // ReSharper disable once NullableWarningSuppressionIsUsed
-                                             && generateMazegakiOption!.Value;
+        bool generateMazegaki = false;
+        if (nonKanjiDict && nonNameDict)
+        {
+            Debug.Assert(generateMazegakiOption is not null);
+            generateMazegaki = generateMazegakiOption.Value;
+        }
 
         GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
-        Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
-        bool generateFusejiVariants = nonKanjiDict
-                                // ReSharper disable once NullableWarningSuppressionIsUsed
-                                && generateFusejiVariantsOption!.Value;
+        bool generateFusejiVariants = false;
+        if (nonKanjiDict)
+        {
+            Debug.Assert(generateFusejiVariantsOption is not null);
+            generateFusejiVariants = generateFusejiVariantsOption.Value;
+        }
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
@@ -53,6 +57,10 @@ internal static class EpwingNazekaLoader
             maxTotalFuseji = 0;
         }
 
+        HashSet<string> searchKeys = [];
+        List<(string SearchKey, EpwingNazekaRecord Record)> alternativeRecords = [];
+        Dictionary<string, ImageInfo?> imageInfoCache = new(StringComparer.Ordinal);
+
         FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
@@ -63,9 +71,9 @@ internal static class EpwingNazekaLoader
                 while (await enumerator.MoveNextAsync().ConfigureAwait(false))
                 {
                     JsonElement jsonObj = enumerator.Current;
-                    string reading = jsonObj.GetProperty("r")
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        .GetString()!.GetPooledString();
+                    string? reading = jsonObj.GetProperty("r").GetString();
+                    Debug.Assert(reading is not null);
+                    reading = reading.GetPooledString();
 
                     JsonElement spellingJsonArray = jsonObj.GetProperty("s");
                     List<string>? spellingList = new(spellingJsonArray.GetArrayLength());
@@ -100,7 +108,6 @@ internal static class EpwingNazekaLoader
                     }
 
                     string[] definitions = definitionList.ToArray();
-                    definitions.DeduplicateStringsInArray();
 
                     if (spellingList is not null)
                     {
@@ -110,66 +117,21 @@ internal static class EpwingNazekaLoader
                             continue;
                         }
 
+                        string readingInHiragana = nonKanjiDict && nonNameDict
+                            ? JapaneseUtils.NormalizeText(reading).GetPooledString()
+                            : "";
+
                         string primarySpellingInHiragana = nonKanjiDict
                             ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
-                            : primarySpelling.GetPooledString();
+                            : primarySpelling;
 
-                        ImageInfo? imageInfo = null;
-                        if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
-                        {
-                            string? imagePath = imagePathProperty.GetString();
-                            if (imagePath is not null)
-                            {
-                                imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
-                            }
-                        }
+                        ImageInfo? imageInfo = GetImageInfo(jsonObj, imageInfoCache);
 
                         EpwingNazekaRecord record = new(primarySpelling, reading, spellingList.RemoveAtToArray(0), definitions, imageInfo);
-                        if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dict) && nonKanjiDict)
-                        {
-                            if (generateFusejiVariants)
-                            {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                {
-                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
-                                }
-                            }
-
-                            if (nonNameDict)
-                            {
-                                string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                                if (primarySpellingInHiragana != readingInHiragana)
-                                {
-                                    if (DictUtils.AddRecordToDictionary(readingInHiragana, record, dict))
-                                    {
-                                        if (generateFusejiVariants)
-                                        {
-                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                            {
-                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
-                                            }
-                                        }
-
-                                        if (generateMazegaki)
-                                        {
-                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
-                                            {
-                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, dict))
-                                                {
-                                                    if (generateFusejiVariants)
-                                                    {
-                                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                                        {
-                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        bool primarySpellingWasAdded = AddSearchKey(primarySpellingInHiragana, record, dict, searchKeys, out _);
+                        bool readingWasAdded = primarySpellingWasAdded && nonKanjiDict && nonNameDict
+                            && primarySpellingInHiragana != readingInHiragana
+                            && AddSearchKey(readingInHiragana, record, dict, searchKeys, out _);
 
                         ReadOnlySpan<string> spellingListSpan = spellingList.AsReadOnlySpan();
                         for (int j = 1; j < spellingListSpan.Length; j++)
@@ -182,26 +144,95 @@ internal static class EpwingNazekaLoader
 
                             string alternativeSpellingInHiragana = nonKanjiDict
                                 ? JapaneseUtils.NormalizeText(alternativeSpelling).GetPooledString()
-                                : alternativeSpelling.GetPooledString();
+                                : alternativeSpelling;
 
-                            if (primarySpellingInHiragana != alternativeSpellingInHiragana)
+                            if (nonKanjiDict && nonNameDict && alternativeSpellingInHiragana == readingInHiragana)
                             {
-                                _ = DictUtils.AddRecordToDictionary(alternativeSpellingInHiragana, new EpwingNazekaRecord(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imageInfo), dict);
+                                continue;
+                            }
+
+                            if (primarySpellingInHiragana == alternativeSpellingInHiragana
+                                || !searchKeys.Add(alternativeSpellingInHiragana))
+                            {
+                                continue;
+                            }
+
+                            EpwingNazekaRecord alternativeRecord = new(alternativeSpelling, reading, spellingList.RemoveAtToArray(j), definitions, imageInfo);
+                            if (DictUtils.AddRecordToDictionary(alternativeSpellingInHiragana, alternativeRecord, dict) && nonKanjiDict)
+                            {
+                                alternativeRecords.Add((alternativeSpellingInHiragana, alternativeRecord));
                             }
                         }
+
+                        if (primarySpellingWasAdded && nonKanjiDict)
+                        {
+                            if (generateFusejiVariants)
+                            {
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    _ = AddSearchKey(fusejiVariant, record, dict, searchKeys, out _);
+                                }
+                            }
+
+                            if (readingWasAdded)
+                            {
+                                if (generateFusejiVariants)
+                                {
+                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                    {
+                                        _ = AddSearchKey(fusejiVariant, record, dict, searchKeys, out _);
+                                    }
+                                }
+
+                                if (generateMazegaki)
+                                {
+                                    foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
+                                    {
+                                        if (AddSearchKey(mazegaki, record, dict, searchKeys, out _) && generateFusejiVariants)
+                                        {
+                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                            {
+                                                _ = AddSearchKey(fusejiVariant, record, dict, searchKeys, out _);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach ((string alternativeSpellingInHiragana, EpwingNazekaRecord alternativeRecord) in alternativeRecords)
+                        {
+                            if (generateFusejiVariants)
+                            {
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(alternativeSpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    _ = AddSearchKey(fusejiVariant, alternativeRecord, dict, searchKeys, out _);
+                                }
+                            }
+
+                            if (nonNameDict && generateMazegaki)
+                            {
+                                foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(alternativeSpellingInHiragana, readingInHiragana))
+                                {
+                                    _ = AddSearchKey(mazegaki, alternativeRecord, dict, searchKeys, out bool mazegakiWasNew);
+                                    if (mazegakiWasNew && generateFusejiVariants)
+                                    {
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        {
+                                            _ = AddSearchKey(fusejiVariant, alternativeRecord, dict, searchKeys, out _);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        searchKeys.Clear();
+                        alternativeRecords.Clear();
                     }
 
                     else if (!reading.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
                     {
-                        ImageInfo? imageInfo = null;
-                        if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
-                        {
-                            string? imagePath = imagePathProperty.GetString();
-                            if (imagePath is not null)
-                            {
-                                imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
-                            }
-                        }
+                        ImageInfo? imageInfo = GetImageInfo(jsonObj, imageInfoCache);
 
                         EpwingNazekaRecord record = new(reading, null, null, definitions, imageInfo);
                         _ = DictUtils.AddRecordToDictionary(nonKanjiDict ? JapaneseUtils.NormalizeText(reading).GetPooledString() : reading, record, dict);
@@ -211,5 +242,34 @@ internal static class EpwingNazekaLoader
         }
 
         dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+    }
+
+    private static ImageInfo? GetImageInfo(JsonElement jsonObj, Dictionary<string, ImageInfo?> imageInfoCache)
+    {
+        if (!jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
+        {
+            return null;
+        }
+
+        string? imagePath = imagePathProperty.GetString();
+        if (imagePath is null)
+        {
+            return null;
+        }
+
+        if (!imageInfoCache.TryGetValue(imagePath, out ImageInfo? imageInfo))
+        {
+            imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
+            imageInfoCache.Add(imagePath, imageInfo);
+        }
+
+        return imageInfo;
+    }
+
+    private static bool AddSearchKey(string searchKey, IDictRecord record, Dict dict, HashSet<string> searchKeys,
+        out bool searchKeyWasNew)
+    {
+        searchKeyWasNew = searchKeys.Add(searchKey);
+        return searchKeyWasNew && DictUtils.AddRecordToDictionary(searchKey, record, dict);
     }
 }

@@ -126,6 +126,9 @@ internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatabl
         return obj is EpwingNazekaRecord other
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
+               && (AlternativeSpellings is not null
+                   ? other.AlternativeSpellings is not null && AlternativeSpellings.SequenceEqual(other.AlternativeSpellings)
+                   : other.AlternativeSpellings is null)
                && ImageInfo == other.ImageInfo
                && other.Definitions.SequenceEqual(Definitions)));
     }
@@ -135,6 +138,9 @@ internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatabl
         return other is not null
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
+               && (AlternativeSpellings is not null
+                   ? other.AlternativeSpellings is not null && AlternativeSpellings.SequenceEqual(other.AlternativeSpellings)
+                   : other.AlternativeSpellings is null)
                && ImageInfo == other.ImageInfo
                && other.Definitions.SequenceEqual(Definitions)));
     }
@@ -150,6 +156,20 @@ internal sealed class EpwingNazekaRecord : IDictRecord, IGetFrequency, IEquatabl
         {
             int hash = (17 * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = ((hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal)) ?? 37;
+
+            string[]? alternativeSpellings = AlternativeSpellings;
+            if (alternativeSpellings is not null)
+            {
+                foreach (string alternativeSpelling in alternativeSpellings)
+                {
+                    hash = (hash * 37) + alternativeSpelling.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
             hash = ((hash * 37) + ImageInfo?.GetHashCode()) ?? 37;
 
             foreach (string definition in Definitions)

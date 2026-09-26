@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
@@ -5,6 +6,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Frontend;
@@ -21,19 +23,27 @@ namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaDBManager
 {
-    public const int Version = 22;
+    public const int Version = 23;
 
-    private const string Record = "record";
-    private const string RowId = "rowid";
-    private const string PrimarySpelling = "primary_spelling";
-    private const string Reading = "reading";
-    private const string Glossary = "glossary";
-    private const string AlternativeSpellings = "alternative_spellings";
-    private const string ImageInfo = "image_info";
+    private const int ImportRecordBatchSize = 64;
+    private const int VariantSearchKeyRecordBatchSize = 8192;
+    private const int VariantSearchKeyTransactionBatchSize = 20_000_000;
+    private const long WholeFileParsingThreshold = 32 * 1024 * 1024;
+    private static readonly int s_workerCount = Environment.ProcessorCount;
+    private static readonly int s_importRecordBatchChannelCapacity = Math.Max(1, s_workerCount * 16 / ImportRecordBatchSize);
+    private static readonly JsonReaderState s_initialJsonReaderState = CreateJsonReaderState();
 
-    private const string RecordSearchKey = "record_search_key";
-    private const string RecordId = "record_id";
-    private const string SearchKey = "search_key";
+    internal const string Record = "record";
+    internal const string RowId = "rowid";
+    internal const string PrimarySpelling = "primary_spelling";
+    internal const string Reading = "reading";
+    internal const string Glossary = "glossary";
+    internal const string AlternativeSpellings = "alternative_spellings";
+    internal const string ImageInfo = "image_info";
+
+    internal const string RecordSearchKey = "record_search_key";
+    internal const string RecordId = "record_id";
+    internal const string SearchKey = "search_key";
 
     private const string Term = "term";
     private const string SingleTermQuery =
@@ -131,20 +141,40 @@ internal static class EpwingNazekaDBManager
             return;
         }
 
+        byte[]? json = null;
+        FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            if (fileStream.Length <= WholeFileParsingThreshold)
+            {
+                json = GC.AllocateUninitializedArray<byte>(checked((int)fileStream.Length));
+                await fileStream.ReadExactlyAsync(json).ConfigureAwait(false);
+            }
+
+            await ImportFromJson(dict, json, fileStream).ConfigureAwait(false);
+        }
+    }
+
+    private static async Task ImportFromJson(Dict dict, byte[]? json, FileStream fileStream)
+    {
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
 
         GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
-        Debug.Assert(!nonNameDict || nonKanjiDict || generateMazegakiOption is not null);
-        bool generateMazegaki = nonKanjiDict && nonNameDict
-                                             // ReSharper disable once NullableWarningSuppressionIsUsed
-                                             && generateMazegakiOption!.Value;
+        bool generateMazegaki = false;
+        if (nonKanjiDict && nonNameDict)
+        {
+            Debug.Assert(generateMazegakiOption is not null);
+            generateMazegaki = generateMazegakiOption.Value;
+        }
 
         GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
-        Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
-        bool generateFusejiVariants = nonKanjiDict
-                                // ReSharper disable once NullableWarningSuppressionIsUsed
-                                && generateFusejiVariantsOption!.Value;
+        bool generateFusejiVariants = false;
+        if (nonKanjiDict)
+        {
+            Debug.Assert(generateFusejiVariantsOption is not null);
+            generateFusejiVariants = generateFusejiVariantsOption.Value;
+        }
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
@@ -162,343 +192,146 @@ internal static class EpwingNazekaDBManager
             maxTotalFuseji = 0;
         }
 
-        ulong rowId = 1;
-
         // ReSharper disable once UseAwaitUsing
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
         DBUtils.ConfigureForBulkWrite(connection);
 
-        // ReSharper disable once UseAwaitUsing
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-        $"""
-            INSERT INTO {Record} ({RowId}, {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo})
-            VALUES (@{RowId}, @{PrimarySpelling}, @{Reading}, @{AlternativeSpellings}, @{Glossary}, @{ImageInfo});
-            """;
+        using EpwingNazekaRecordInserter recordInserter = new(connection);
+        using EpwingNazekaSearchKeyInserter searchKeyInserter = new(connection);
 
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
-        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
-        SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter imageInfoParam = new($"@{ImageInfo}", SqliteType.Blob);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            primarySpellingParam,
-            readingParam,
-            alternativeSpellingsParam,
-            glossaryParam,
-            imageInfoParam
-        ]);
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-        insertRecordCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-        // ReSharper disable once UseAwaitUsing
-        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-        insertSearchKeyCommand.CommandText =
-            $"""
-            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
-            VALUES (@{RecordId}, @{SearchKey});
-            """;
-
-        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
-        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
-#pragma warning disable CA1849 // Call async methods when in an async method
-        insertSearchKeyCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-        HashSet<string> keys = new(StringComparer.Ordinal);
+        ConcurrentDictionary<string, byte[]> imageInfoCache = new(StringComparer.Ordinal);
         int transactionRecordCount = 0;
+        long rowId = 1;
+        List<long>? entryRowIds = generateMazegaki || generateFusejiVariants
+            ? []
+            : null;
 
 #pragma warning disable CA1849 // Call async methods when in an async method
         SqliteTransaction transaction = connection.BeginTransaction();
 #pragma warning restore CA1849 // Call async methods when in an async method
-
-        insertRecordCommand.Transaction = transaction;
-        insertSearchKeyCommand.Transaction = transaction;
-
-        FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-        await using (fileStream.ConfigureAwait(false))
+        try
         {
-            IAsyncEnumerator<JsonElement> enumerator = JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(fileStream, JsonOptions.DefaultJso).GetAsyncEnumerator();
-            await using (enumerator.ConfigureAwait(false))
-            {
-                _ = await enumerator.MoveNextAsync().ConfigureAwait(false);
-                while (await enumerator.MoveNextAsync().ConfigureAwait(false))
+            Channel<EpwingNazekaImportEntryBatch> inputChannel = Channel.CreateBounded<EpwingNazekaImportEntryBatch>(
+                new BoundedChannelOptions(s_importRecordBatchChannelCapacity)
                 {
-                    JsonElement jsonObj = enumerator.Current;
-                    string reading = jsonObj.GetProperty("r")
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        .GetString()!.GetPooledString();
+                    FullMode = BoundedChannelFullMode.Wait,
+                    SingleWriter = true
+                });
+            Channel<EpwingNazekaPreparedRecordBatch> outputChannel = Channel.CreateBounded<EpwingNazekaPreparedRecordBatch>(
+                new BoundedChannelOptions(s_importRecordBatchChannelCapacity)
+                {
+                    FullMode = BoundedChannelFullMode.Wait,
+                    SingleReader = true
+                });
 
-                    JsonElement spellingJsonArray = jsonObj.GetProperty("s");
-                    List<string>? spellingList = new(spellingJsonArray.GetArrayLength());
-                    foreach (JsonElement spellingJsonElement in spellingJsonArray.EnumerateArray())
+            Task producer = Task.Run(() => CreateImportBatches(json, fileStream, inputChannel.Writer));
+
+            Task[] workers = new Task[s_workerCount];
+            for (int i = 0; i < workers.Length; i++)
+            {
+                workers[i] = Task.Run(() => CreatePreparedRecords(inputChannel.Reader, inputChannel.Writer, outputChannel.Writer, nonKanjiDict, nonNameDict, imageInfoCache));
+            }
+
+            Task completeOutputChannel = CompleteOutputChannel(producer, workers, outputChannel.Writer);
+            try
+            {
+                await foreach (EpwingNazekaPreparedRecordBatch batch in outputChannel.Reader.ReadAllAsync(CancellationToken.None).ConfigureAwait(false))
+                {
+                    try
                     {
-                        string? spelling = spellingJsonElement.GetString();
-                        if (!string.IsNullOrWhiteSpace(spelling))
+                        for (int i = 0; i < batch.RecordCount; i++)
                         {
-                            spellingList.Add(spelling.GetPooledString());
+                            ref readonly EpwingNazekaPreparedRecord record = ref batch.Records[i];
+                            if (entryRowIds is not null && record.IsFirstInEntry)
+                            {
+                                entryRowIds.Add(rowId);
+                            }
+
+                            recordInserter.Insert(rowId, record.PrimarySpelling, record.Reading, record.AlternativeSpellings, record.Definitions, record.ImageInfo);
+                            searchKeyInserter.Insert(rowId, batch.SearchKeys.AsSpan(record.SearchKeyOffset, record.SearchKeyCount));
+                            transactionRecordCount += record.SearchKeyCount;
+                            ++rowId;
+
+                            if (transactionRecordCount > DBUtils.TransactionBatchSize)
+                            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                transaction.Commit();
+
+                                // ReSharper disable once MethodHasAsyncOverload
+                                transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                                dict.Ready = true;
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+                                transactionRecordCount = 0;
+                            }
                         }
                     }
-
-                    if (spellingList.Count is 0)
+                    finally
                     {
-                        spellingList = null;
-                    }
-
-                    JsonElement definitionJsonArray = jsonObj.GetProperty("l");
-                    List<string> definitionList = new(definitionJsonArray.GetArrayLength());
-                    foreach (JsonElement definitionJsonElement in definitionJsonArray.EnumerateArray())
-                    {
-                        string? definition = definitionJsonElement.GetString();
-                        if (!string.IsNullOrWhiteSpace(definition))
-                        {
-                            definitionList.Add(definition.GetPooledString());
-                        }
-                    }
-
-                    if (definitionList.Count is 0)
-                    {
-                        continue;
-                    }
-
-                    string[] definitions = definitionList.ToArray();
-                    definitions.DeduplicateStringsInArray();
-
-                    if (spellingList is not null)
-                    {
-                        string primarySpelling = spellingList[0];
-                        if (primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
-                        {
-                            continue;
-                        }
-
-                        string primarySpellingInHiragana = nonKanjiDict
-                            ? JapaneseUtils.NormalizeText(primarySpelling).GetPooledString()
-                            : primarySpelling.GetPooledString();
-
-                        ImageInfo? imageInfo = null;
-                        if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
-                        {
-                            string? imagePath = imagePathProperty.GetString();
-                            if (imagePath is not null)
-                            {
-                                imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
-                            }
-                        }
-
-                        string[]? alternativeSpellings = spellingList.RemoveAtToArray(0);
-                        rowidParam.Value = rowId;
-                        primarySpellingParam.Value = primarySpelling;
-                        readingParam.Value = reading;
-                        alternativeSpellingsParam.Value = alternativeSpellings is not null ? MessagePackSerializer.Serialize(alternativeSpellings) : DBNull.Value;
-                        glossaryParam.Value = MessagePackSerializer.Serialize(definitions);
-                        imageInfoParam.Value = imageInfo is not null ? MessagePackSerializer.Serialize(imageInfo) : DBNull.Value;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        _ = insertRecordCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                        recordIdParam.Value = rowId;
-                        _ = keys.Add(primarySpellingInHiragana);
-                        if (nonKanjiDict)
-                        {
-                            if (generateFusejiVariants)
-                            {
-                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                {
-                                    _ = keys.Add(fusejiVariant);
-                                }
-                            }
-
-                            if (nonNameDict)
-                            {
-                                string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                                if (primarySpellingInHiragana != readingInHiragana)
-                                {
-                                    if (keys.Add(readingInHiragana))
-                                    {
-                                        if (generateFusejiVariants)
-                                        {
-                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                            {
-                                                _ = keys.Add(fusejiVariant);
-                                            }
-                                        }
-
-                                        if (generateMazegaki)
-                                        {
-                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
-                                            {
-                                                if (keys.Add(mazegaki) && generateFusejiVariants)
-                                                {
-                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                                    {
-                                                        _ = keys.Add(fusejiVariant);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        recordIdParam.Value = rowId;
-                        foreach (string key in keys)
-                        {
-                            searchKeyParam.Value = key;
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            _ = insertSearchKeyCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-                        }
-
-                        transactionRecordCount += keys.Count;
-                        keys.Clear();
-                        ++rowId;
-
-                        ReadOnlySpan<string> spellingListSpan = spellingList.AsReadOnlySpan();
-                        for (int j = 1; j < spellingListSpan.Length; j++)
-                        {
-                            ref readonly string alternativeSpelling = ref spellingListSpan[j];
-                            if (alternativeSpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
-                            {
-                                continue;
-                            }
-
-                            string alternativeSpellingInHiragana = nonKanjiDict
-                                ? JapaneseUtils.NormalizeText(alternativeSpelling).GetPooledString()
-                                : alternativeSpelling.GetPooledString();
-
-                            if (primarySpellingInHiragana != alternativeSpellingInHiragana)
-                            {
-                                string[]? altSpellings = spellingList.RemoveAtToArray(j);
-                                rowidParam.Value = rowId;
-                                primarySpellingParam.Value = alternativeSpelling;
-                                readingParam.Value = reading;
-                                alternativeSpellingsParam.Value = altSpellings is not null ? MessagePackSerializer.Serialize(altSpellings) : DBNull.Value;
-                                glossaryParam.Value = MessagePackSerializer.Serialize(definitions);
-                                imageInfoParam.Value = imageInfo is not null ? MessagePackSerializer.Serialize(imageInfo) : DBNull.Value;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                                _ = insertRecordCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                                recordIdParam.Value = rowId;
-                                searchKeyParam.Value = alternativeSpellingInHiragana;
-#pragma warning disable CA1849 // Call async methods when in an async method
-                                _ = insertSearchKeyCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                                ++rowId;
-                                ++transactionRecordCount;
-                            }
-                        }
-
-                        if (transactionRecordCount > DBUtils.TransactionBatchSize)
-                        {
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            transaction.Commit();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            // ReSharper disable once MethodHasAsyncOverload
-                            transaction.Dispose();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                            dict.Ready = true;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            transaction = connection.BeginTransaction();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                            transactionRecordCount = 0;
-                            insertRecordCommand.Transaction = transaction;
-                            insertSearchKeyCommand.Transaction = transaction;
-                        }
-                    }
-
-                    else if (!reading.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
-                    {
-                        ImageInfo? imageInfo = null;
-                        if (jsonObj.TryGetProperty("i", out JsonElement imagePathProperty))
-                        {
-                            string? imagePath = imagePathProperty.GetString();
-                            if (imagePath is not null)
-                            {
-                                imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
-                            }
-                        }
-
-                        rowidParam.Value = rowId;
-                        primarySpellingParam.Value = reading;
-                        readingParam.Value = DBNull.Value;
-                        alternativeSpellingsParam.Value = DBNull.Value;
-                        glossaryParam.Value = MessagePackSerializer.Serialize(definitions);
-                        imageInfoParam.Value = imageInfo is not null ? MessagePackSerializer.Serialize(imageInfo) : DBNull.Value;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        _ = insertRecordCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                        recordIdParam.Value = rowId;
-                        searchKeyParam.Value = nonKanjiDict ? JapaneseUtils.NormalizeText(reading).GetPooledString() : reading;
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        _ = insertSearchKeyCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                        ++rowId;
-                        ++transactionRecordCount;
-
-                        if (transactionRecordCount > DBUtils.TransactionBatchSize)
-                        {
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            transaction.Commit();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            // ReSharper disable once MethodHasAsyncOverload
-                            transaction.Dispose();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                            dict.Ready = true;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            transaction = connection.BeginTransaction();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                            transactionRecordCount = 0;
-                            insertRecordCommand.Transaction = transaction;
-                            insertSearchKeyCommand.Transaction = transaction;
-                        }
+                        ReturnPreparedRecordBatch(batch);
                     }
                 }
             }
-        }
+            catch (Exception exception)
+            {
+                _ = inputChannel.Writer.TryComplete(exception);
+                _ = outputChannel.Writer.TryComplete(exception);
+                throw;
+            }
+            finally
+            {
+                await completeOutputChannel.ConfigureAwait(false);
 
-        if (transactionRecordCount > 0)
+                while (inputChannel.Reader.TryRead(out EpwingNazekaImportEntryBatch remainingBatch))
+                {
+                    remainingBatch.Entries.AsSpan(0, remainingBatch.Count).Clear();
+                    ArrayPool<EpwingNazekaImportEntry>.Shared.Return(remainingBatch.Entries);
+                }
+
+                while (outputChannel.Reader.TryRead(out EpwingNazekaPreparedRecordBatch remainingBatch))
+                {
+                    ReturnPreparedRecordBatch(remainingBatch);
+                }
+            }
+
+            if (transactionRecordCount > 0)
+            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                dict.Ready = true;
+            }
+        }
+        finally
         {
 #pragma warning disable CA1849 // Call async methods when in an async method
-            transaction.Commit();
+            // ReSharper disable once MethodHasAsyncOverload
+            transaction.Dispose();
 #pragma warning restore CA1849 // Call async methods when in an async method
-
-            dict.Ready = true;
         }
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-        // ReSharper disable once MethodHasAsyncOverload
-        transaction.Dispose();
-#pragma warning restore CA1849 // Call async methods when in an async method
 
         if (rowId > 1)
         {
             RemoveDuplicateRecords(connection);
+        }
+
+        if (rowId > 1 && (generateMazegaki || generateFusejiVariants))
+        {
+            DBUtils.FlushWalLog(connection);
+
+            Debug.Assert(entryRowIds is not null);
+            InsertVariantSearchKeys(connection, searchKeyInserter, entryRowIds, nonKanjiDict, nonNameDict, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration);
+        }
+
+        if (rowId > 1)
+        {
             DBUtils.ConfigureForRead(connection);
 
             // ReSharper disable once UseAwaitUsing
@@ -523,6 +356,737 @@ internal static class EpwingNazekaDBManager
             DBUtils.DeleteDB(dict.DBPath);
             dict.Size = 0;
             dict.MaxSearchKeyLength = 0;
+        }
+    }
+
+    private static async Task CreateImportBatches(byte[]? json, FileStream fileStream, ChannelWriter<EpwingNazekaImportEntryBatch> writer)
+    {
+        try
+        {
+            if (json is not null)
+            {
+                int offset = json.AsSpan().StartsWith(Encoding.UTF8.Preamble) ? Encoding.UTF8.Preamble.Length : 0;
+                JsonReaderState readerState = s_initialJsonReaderState;
+                bool started = false;
+                bool completed = false;
+
+                while (!completed)
+                {
+                    EpwingNazekaImportEntry[]? entries = ArrayPool<EpwingNazekaImportEntry>.Shared.Rent(ImportRecordBatchSize);
+                    int entriesToClear = entries.Length;
+                    try
+                    {
+                        int entryCount = ReadImportBatch(json, ref offset, ref readerState, ref started, entries, out completed);
+                        entriesToClear = entryCount;
+                        if (entryCount is 0)
+                        {
+                            ArrayPool<EpwingNazekaImportEntry>.Shared.Return(entries);
+                            entries = null;
+                            continue;
+                        }
+
+                        await writer.WriteAsync(new EpwingNazekaImportEntryBatch(entries, entryCount)).ConfigureAwait(false);
+                        entries = null;
+                    }
+                    finally
+                    {
+                        if (entries is not null)
+                        {
+                            entries.AsSpan(0, entriesToClear).Clear();
+                            ArrayPool<EpwingNazekaImportEntry>.Shared.Return(entries);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                await CreateImportBatchesFromStream(fileStream, writer).ConfigureAwait(false);
+            }
+        }
+        catch (Exception exception)
+        {
+            _ = writer.TryComplete(exception);
+            throw;
+        }
+
+        _ = writer.TryComplete();
+    }
+
+    private static async Task CreateImportBatchesFromStream(FileStream fileStream, ChannelWriter<EpwingNazekaImportEntryBatch> writer)
+    {
+        EpwingNazekaImportEntry[] entries = ArrayPool<EpwingNazekaImportEntry>.Shared.Rent(ImportRecordBatchSize);
+        int entryCount = 0;
+        try
+        {
+            IAsyncEnumerator<JsonElement> enumerator = JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(fileStream, JsonOptions.DefaultJso).GetAsyncEnumerator();
+            await using (enumerator.ConfigureAwait(false))
+            {
+                _ = await enumerator.MoveNextAsync().ConfigureAwait(false);
+                while (await enumerator.MoveNextAsync().ConfigureAwait(false))
+                {
+                    JsonElement jsonObject = enumerator.Current;
+                    string? reading = jsonObject.GetProperty("r").GetString();
+                    Debug.Assert(reading is not null);
+
+                    JsonElement spellingArray = jsonObject.GetProperty("s");
+                    List<string> spellings = new(spellingArray.GetArrayLength());
+                    foreach (JsonElement spellingElement in spellingArray.EnumerateArray())
+                    {
+                        string? spelling = spellingElement.GetString();
+                        if (!string.IsNullOrWhiteSpace(spelling))
+                        {
+                            spellings.Add(spelling);
+                        }
+                    }
+
+                    JsonElement definitionArray = jsonObject.GetProperty("l");
+                    List<string> definitions = new(definitionArray.GetArrayLength());
+                    foreach (JsonElement definitionElement in definitionArray.EnumerateArray())
+                    {
+                        string? definition = definitionElement.GetString();
+                        if (!string.IsNullOrWhiteSpace(definition))
+                        {
+                            definitions.Add(definition);
+                        }
+                    }
+
+                    string? imagePath = jsonObject.TryGetProperty("i", out JsonElement imageElement)
+                        ? imageElement.GetString()
+                        : null;
+
+                    entries[entryCount] = new EpwingNazekaImportEntry(reading,
+                        spellings.Count > 0 ? spellings : null,
+                        definitions,
+                        imagePath);
+
+                    ++entryCount;
+
+                    if (entryCount is ImportRecordBatchSize)
+                    {
+                        await writer.WriteAsync(new EpwingNazekaImportEntryBatch(entries, entryCount)).ConfigureAwait(false);
+                        entries = [];
+                        entryCount = 0;
+                        entries = ArrayPool<EpwingNazekaImportEntry>.Shared.Rent(ImportRecordBatchSize);
+                    }
+                }
+            }
+
+            if (entryCount > 0)
+            {
+                await writer.WriteAsync(new EpwingNazekaImportEntryBatch(entries, entryCount)).ConfigureAwait(false);
+                entries = [];
+                entryCount = 0;
+            }
+        }
+        finally
+        {
+            if (entries.Length > 0)
+            {
+                entries.AsSpan(0, entryCount).Clear();
+                ArrayPool<EpwingNazekaImportEntry>.Shared.Return(entries);
+            }
+        }
+    }
+
+    private static int ReadImportBatch(byte[] json, ref int offset, ref JsonReaderState readerState, ref bool started, EpwingNazekaImportEntry[] entries, out bool completed)
+    {
+        ReadOnlySpan<byte> jsonBytes = json;
+        Utf8JsonReader reader = new(jsonBytes[offset..], true, readerState);
+        if (!started)
+        {
+            if (!reader.Read() || reader.TokenType is not JsonTokenType.StartArray || !reader.Read())
+            {
+                throw new JsonException("The Nazeka dictionary JSON root must be an array with a header.");
+            }
+
+            if (reader.TokenType is JsonTokenType.EndArray)
+            {
+                if (reader.Read())
+                {
+                    throw new JsonException("Unexpected JSON content after the Nazeka dictionary array.");
+                }
+
+                offset += (int)reader.BytesConsumed;
+                readerState = reader.CurrentState;
+                completed = true;
+                return 0;
+            }
+
+            reader.Skip();
+            started = true;
+        }
+
+        int entryCount = 0;
+        completed = false;
+        while (entryCount < entries.Length)
+        {
+            if (!reader.Read())
+            {
+                throw new JsonException("Unexpected end of Nazeka dictionary JSON.");
+            }
+
+            if (reader.TokenType is JsonTokenType.EndArray)
+            {
+                completed = true;
+                if (reader.Read())
+                {
+                    throw new JsonException("Unexpected JSON content after the Nazeka dictionary array.");
+                }
+
+                break;
+            }
+
+            string? reading = null;
+            List<string>? spellings = null;
+            List<string>? definitions = null;
+            string? imagePath = null;
+
+            while (reader.Read() && reader.TokenType is not JsonTokenType.EndObject)
+            {
+                if (reader.TokenType is not JsonTokenType.PropertyName)
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("r"u8))
+                {
+                    _ = reader.Read();
+                    reading = reader.GetString();
+                }
+                else if (reader.ValueTextEquals("s"u8))
+                {
+                    _ = reader.Read();
+                    spellings = ReadStringArray(ref reader);
+                }
+                else if (reader.ValueTextEquals("l"u8))
+                {
+                    _ = reader.Read();
+                    definitions = ReadStringArray(ref reader);
+                }
+                else if (reader.ValueTextEquals("i"u8))
+                {
+                    _ = reader.Read();
+                    imagePath = reader.GetString();
+                }
+                else
+                {
+                    _ = reader.Read();
+                    reader.Skip();
+                }
+            }
+
+            Debug.Assert(reading is not null);
+            Debug.Assert(definitions is not null);
+            entries[entryCount] = new EpwingNazekaImportEntry(reading,
+                spellings is { Count: > 0 } ? spellings : null,
+                definitions,
+                imagePath);
+
+            ++entryCount;
+        }
+
+        offset += (int)reader.BytesConsumed;
+        readerState = reader.CurrentState;
+        return entryCount;
+    }
+
+    private static async Task CreatePreparedRecords(ChannelReader<EpwingNazekaImportEntryBatch> inputReader, ChannelWriter<EpwingNazekaImportEntryBatch> inputWriter, ChannelWriter<EpwingNazekaPreparedRecordBatch> outputWriter, bool nonKanjiDict, bool nonNameDict, ConcurrentDictionary<string, byte[]> imageInfoCache)
+    {
+        HashSet<string> alternativeSpellingsInHiragana = [];
+        EpwingNazekaPreparedRecord[]? records = null;
+        string[]? searchKeyBuffer = null;
+        int searchKeyCount = 0;
+        int recordCount = 0;
+
+        try
+        {
+            await foreach (EpwingNazekaImportEntryBatch batch in inputReader
+                               .ReadAllAsync(CancellationToken.None).ConfigureAwait(false))
+            {
+                try
+                {
+                    for (int i = 0; i < batch.Count; i++)
+                    {
+                        if (batch.Entries[i].Definitions.Count is 0)
+                        {
+                            continue;
+                        }
+
+                        int maximumEntryRecordCount = batch.Entries[i].Spellings?.Count ?? 1;
+                        if (records is not null && maximumEntryRecordCount > records.Length - recordCount)
+                        {
+                            if (recordCount > 0)
+                            {
+                                Debug.Assert(searchKeyBuffer is not null);
+                                await outputWriter.WriteAsync(new EpwingNazekaPreparedRecordBatch(
+                                    records, recordCount, searchKeyBuffer, searchKeyCount)).ConfigureAwait(false);
+                            }
+                            else
+                            {
+                                ReturnPreparedRecords(records, recordCount, searchKeyBuffer, searchKeyCount);
+                            }
+
+                            records = null;
+                            searchKeyBuffer = null;
+                            recordCount = 0;
+                            searchKeyCount = 0;
+                        }
+
+                        records ??= ArrayPool<EpwingNazekaPreparedRecord>.Shared.Rent(Math.Max(64, maximumEntryRecordCount));
+
+                        ref readonly EpwingNazekaImportEntry entry = ref batch.Entries[i];
+                        PrepareEntry(in entry, records, ref recordCount, ref searchKeyBuffer, ref searchKeyCount, alternativeSpellingsInHiragana, nonKanjiDict, nonNameDict, imageInfoCache);
+
+                        if (recordCount == records.Length)
+                        {
+                            Debug.Assert(searchKeyBuffer is not null);
+                            await outputWriter.WriteAsync(new EpwingNazekaPreparedRecordBatch(records, recordCount, searchKeyBuffer, searchKeyCount)).ConfigureAwait(false);
+                            records = null;
+                            searchKeyBuffer = null;
+                            recordCount = 0;
+                            searchKeyCount = 0;
+                        }
+                    }
+                }
+                finally
+                {
+                    batch.Entries.AsSpan(0, batch.Count).Clear();
+                    ArrayPool<EpwingNazekaImportEntry>.Shared.Return(batch.Entries);
+                }
+            }
+
+            if (recordCount > 0)
+            {
+                Debug.Assert(records is not null);
+                Debug.Assert(searchKeyBuffer is not null);
+                await outputWriter.WriteAsync(new EpwingNazekaPreparedRecordBatch(records, recordCount, searchKeyBuffer, searchKeyCount)).ConfigureAwait(false);
+                records = null;
+                searchKeyBuffer = null;
+                recordCount = 0;
+                searchKeyCount = 0;
+            }
+        }
+        catch (Exception exception)
+        {
+            _ = inputWriter.TryComplete(exception);
+            _ = outputWriter.TryComplete(exception);
+            throw;
+        }
+        finally
+        {
+            if (records is not null)
+            {
+                ReturnPreparedRecords(records, recordCount, searchKeyBuffer, searchKeyCount);
+            }
+            else if (searchKeyBuffer is not null)
+            {
+                searchKeyBuffer.AsSpan(0, searchKeyCount).Clear();
+                ArrayPool<string>.Shared.Return(searchKeyBuffer);
+            }
+        }
+    }
+
+    private static void PrepareEntry(in EpwingNazekaImportEntry entry, EpwingNazekaPreparedRecord[] records, ref int recordCount, ref string[]? searchKeyBuffer, ref int searchKeyCount, HashSet<string> alternativeSpellingsInHiragana, bool nonKanjiDict, bool nonNameDict, ConcurrentDictionary<string, byte[]> imageInfoCache)
+    {
+        if (entry.Spellings is not { Count: > 0 } spellingList)
+        {
+            string reading = entry.Reading;
+            if (!reading.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
+            {
+                byte[] definitionBytes = MessagePackSerializer.Serialize(entry.Definitions);
+                byte[]? imageInfoBytes = GetSerializedImageInfo(entry.ImagePath, imageInfoCache);
+                string searchKey = nonKanjiDict ? JapaneseUtils.NormalizeText(reading) : reading;
+                records[recordCount] = CreatePreparedRecord(reading, null, null, definitionBytes, imageInfoBytes, true, searchKey, null, ref searchKeyBuffer, ref searchKeyCount);
+                ++recordCount;
+            }
+
+            return;
+        }
+
+        string primarySpelling = spellingList[0];
+        if (primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
+        {
+            return;
+        }
+
+        byte[] serializedDefinitions = MessagePackSerializer.Serialize(entry.Definitions);
+        byte[]? serializedImageInfo = GetSerializedImageInfo(entry.ImagePath, imageInfoCache);
+
+        string readingText = entry.Reading;
+        string readingInHiragana = nonKanjiDict && nonNameDict
+            ? JapaneseUtils.NormalizeText(readingText)
+            : "";
+
+        string primarySpellingInHiragana = nonKanjiDict
+            ? JapaneseUtils.NormalizeText(primarySpelling)
+            : primarySpelling;
+
+        string[]? alternativeSpellings = spellingList.RemoveAtToArray(0);
+        byte[]? alternativeSpellingBytes = alternativeSpellings is not null
+            ? MessagePackSerializer.Serialize(alternativeSpellings)
+            : null;
+
+        records[recordCount] = CreatePreparedRecord(primarySpelling,
+            readingText,
+            alternativeSpellingBytes,
+            serializedDefinitions,
+            serializedImageInfo,
+            true,
+            primarySpellingInHiragana,
+            nonKanjiDict && nonNameDict && primarySpellingInHiragana != readingInHiragana
+                ? readingInHiragana
+                : null,
+            ref searchKeyBuffer,
+            ref searchKeyCount);
+
+        ++recordCount;
+
+        ReadOnlySpan<string> spellingListSpan = spellingList.AsReadOnlySpan();
+        for (int j = 1; j < spellingListSpan.Length; j++)
+        {
+            ref readonly string alternativeSpelling = ref spellingListSpan[j];
+            if (alternativeSpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
+            {
+                continue;
+            }
+
+            string alternativeSpellingInHiragana = nonKanjiDict
+                ? JapaneseUtils.NormalizeText(alternativeSpelling)
+                : alternativeSpelling;
+
+            if (nonKanjiDict && nonNameDict && alternativeSpellingInHiragana == readingInHiragana)
+            {
+                continue;
+            }
+
+            if (primarySpellingInHiragana == alternativeSpellingInHiragana || !alternativeSpellingsInHiragana.Add(alternativeSpellingInHiragana))
+            {
+                continue;
+            }
+
+            string[]? altSpellings = spellingList.RemoveAtToArray(j);
+            byte[]? altSpellingBytes = altSpellings is not null ? MessagePackSerializer.Serialize(altSpellings) : null;
+            records[recordCount] = CreatePreparedRecord(alternativeSpelling, readingText, altSpellingBytes, serializedDefinitions, serializedImageInfo, false, alternativeSpellingInHiragana, null, ref searchKeyBuffer, ref searchKeyCount);
+            ++recordCount;
+        }
+
+        alternativeSpellingsInHiragana.Clear();
+    }
+
+    private static EpwingNazekaPreparedRecord CreatePreparedRecord(string primarySpelling, string? reading, byte[]? alternativeSpellings, byte[] definitions, byte[]? imageInfo, bool isFirstInEntry, string searchKey, string? additionalSearchKey, ref string[]? searchKeyBuffer, ref int searchKeyCount)
+    {
+        int searchKeyOffset = searchKeyCount;
+        int recordSearchKeyCount = additionalSearchKey is null ? 1 : 2;
+        int requiredSearchKeyCount = searchKeyCount + recordSearchKeyCount;
+        if (searchKeyBuffer is null || requiredSearchKeyCount > searchKeyBuffer.Length)
+        {
+            int minimumLength = searchKeyBuffer is null ? 64 : Math.Max(searchKeyBuffer.Length * 2, requiredSearchKeyCount);
+            string[] largerSearchKeyBuffer = ArrayPool<string>.Shared.Rent(minimumLength);
+            if (searchKeyBuffer is not null)
+            {
+                searchKeyBuffer.AsSpan(0, searchKeyCount).CopyTo(largerSearchKeyBuffer);
+                searchKeyBuffer.AsSpan(0, searchKeyCount).Clear();
+                ArrayPool<string>.Shared.Return(searchKeyBuffer);
+            }
+
+            searchKeyBuffer = largerSearchKeyBuffer;
+        }
+
+        searchKeyBuffer[searchKeyCount] = searchKey;
+        ++searchKeyCount;
+        if (additionalSearchKey is not null)
+        {
+            searchKeyBuffer[searchKeyCount] = additionalSearchKey;
+            ++searchKeyCount;
+        }
+
+        return new EpwingNazekaPreparedRecord(primarySpelling, reading, alternativeSpellings, definitions, imageInfo, isFirstInEntry, searchKeyOffset, recordSearchKeyCount);
+    }
+
+    private static byte[]? GetSerializedImageInfo(string? imagePath, ConcurrentDictionary<string, byte[]> imageInfoCache)
+    {
+        if (imagePath is null)
+        {
+            return null;
+        }
+
+        if (imageInfoCache.TryGetValue(imagePath, out byte[]? imageInfoBytes))
+        {
+            return imageInfoBytes.Length is 0 ? null : imageInfoBytes;
+        }
+
+        ImageInfo? imageInfo = FrontendManager.Frontend.GetImageInfo(imagePath);
+        imageInfoBytes = imageInfo is not null ? MessagePackSerializer.Serialize(imageInfo) : [];
+        if (!imageInfoCache.TryAdd(imagePath, imageInfoBytes) && imageInfoCache.TryGetValue(imagePath, out byte[]? cachedImageInfoBytes))
+        {
+            imageInfoBytes = cachedImageInfoBytes;
+        }
+
+        return imageInfoBytes.Length is 0
+            ? null
+            : imageInfoBytes;
+    }
+
+    private static JsonReaderState CreateJsonReaderState()
+    {
+        JsonSerializerOptions serializerOptions = JsonOptions.DefaultJso;
+
+        return new JsonReaderState(new JsonReaderOptions
+        {
+            AllowTrailingCommas = serializerOptions.AllowTrailingCommas,
+
+            CommentHandling = serializerOptions.ReadCommentHandling is JsonCommentHandling.Allow
+                ? JsonCommentHandling.Skip
+                : serializerOptions.ReadCommentHandling,
+
+            MaxDepth = serializerOptions.MaxDepth
+        });
+    }
+
+    private static async Task CompleteOutputChannel(Task producer, Task[] workers,
+        ChannelWriter<EpwingNazekaPreparedRecordBatch> outputWriter)
+    {
+        Exception? completionException = null;
+        try
+        {
+            await producer.ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            completionException = exception;
+        }
+
+        try
+        {
+            await Task.WhenAll(workers).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            completionException ??= exception;
+        }
+
+        _ = outputWriter.TryComplete(completionException);
+    }
+
+    private static void ReturnPreparedRecords(EpwingNazekaPreparedRecord[] records, int recordCount, string[]? searchKeys, int searchKeyCount)
+    {
+        if (searchKeys is not null)
+        {
+            searchKeys.AsSpan(0, searchKeyCount).Clear();
+            ArrayPool<string>.Shared.Return(searchKeys);
+        }
+
+        records.AsSpan(0, recordCount).Clear();
+        ArrayPool<EpwingNazekaPreparedRecord>.Shared.Return(records);
+    }
+
+    private static void ReturnPreparedRecordBatch(EpwingNazekaPreparedRecordBatch batch)
+    {
+        ReturnPreparedRecords(batch.Records, batch.RecordCount, batch.SearchKeys, batch.SearchKeyCount);
+    }
+
+    private static List<string> ReadStringArray(ref Utf8JsonReader reader)
+    {
+        List<string> values = [];
+        while (reader.Read() && reader.TokenType is not JsonTokenType.EndArray)
+        {
+            string? value = reader.GetString();
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                values.Add(value);
+            }
+        }
+
+        return values;
+    }
+
+    private static void InsertVariantSearchKeys(SqliteConnection connection, EpwingNazekaSearchKeyInserter searchKeyInserter, List<long> entryRowIds, bool nonKanjiDict, bool nonNameDict, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration)
+    {
+        const string query = $"SELECT {RowId}, {PrimarySpelling}, {Reading} FROM {Record} ORDER BY {RowId};";
+        using SqliteRecordReader reader = new(connection, query);
+        EpwingNazekaVariantSource[] sources = new EpwingNazekaVariantSource[VariantSearchKeyRecordBatchSize];
+        int sourceCount = 0;
+        int entryIndex = 0;
+        long lastEntryRowId = 0;
+        int transactionRecordCount = 0;
+
+        SqliteTransaction transaction = connection.BeginTransaction();
+        try
+        {
+            while (reader.Read())
+            {
+                long rowId = reader.GetInt64(0);
+                while (entryIndex + 1 < entryRowIds.Count && rowId >= entryRowIds[entryIndex + 1])
+                {
+                    ++entryIndex;
+                }
+
+                long entryRowId = entryRowIds[entryIndex];
+                if (sourceCount == sources.Length && entryRowId != lastEntryRowId)
+                {
+                    InsertVariantSearchKeyBatch(sources, sourceCount, searchKeyInserter, nonKanjiDict, nonNameDict, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration, ref transactionRecordCount, ref transaction, connection);
+                    sourceCount = 0;
+                }
+                else if (sourceCount == sources.Length)
+                {
+                    Array.Resize(ref sources, sources.Length * 2);
+                }
+
+                string? reading = null;
+                if (!reader.IsNull(2))
+                {
+                    reading = nonNameDict ? reader.GetString(2) : "";
+                }
+
+                sources[sourceCount] = new EpwingNazekaVariantSource(rowId, entryRowId, reader.GetString(1), reading);
+                ++sourceCount;
+                lastEntryRowId = entryRowId;
+            }
+
+            if (sourceCount > 0)
+            {
+                InsertVariantSearchKeyBatch(sources, sourceCount, searchKeyInserter, nonKanjiDict, nonNameDict, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration, ref transactionRecordCount, ref transaction, connection);
+            }
+
+            if (transactionRecordCount > 0)
+            {
+                transaction.Commit();
+            }
+        }
+        finally
+        {
+            transaction.Dispose();
+        }
+    }
+
+    private static void InsertVariantSearchKeyBatch(EpwingNazekaVariantSource[] sources, int sourceCount, EpwingNazekaSearchKeyInserter searchKeyInserter, bool nonKanjiDict, bool nonNameDict, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration, ref int transactionRecordCount, ref SqliteTransaction transaction, SqliteConnection connection)
+    {
+        List<int> entryOffsets = [0];
+        for (int i = 1; i < sourceCount; i++)
+        {
+            if (sources[i].EntryRowId != sources[i - 1].EntryRowId)
+            {
+                entryOffsets.Add(i);
+            }
+        }
+
+        entryOffsets.Add(sourceCount);
+        string[]?[] variantSearchKeys = new string[]?[sourceCount];
+        string[] normalizedSpellings = new string[sourceCount];
+        int workerCount = Math.Min(s_workerCount, entryOffsets.Count - 1);
+        _ = Parallel.For(0, workerCount, workerIndex =>
+        {
+            HashSet<string> keys = new(StringComparer.Ordinal);
+            List<string> variants = [];
+            for (int entryIndex = workerIndex; entryIndex < entryOffsets.Count - 1; entryIndex += workerCount)
+            {
+                int start = entryOffsets[entryIndex];
+                int end = entryOffsets[entryIndex + 1];
+                string? readingText = sources[start].Reading;
+                if (readingText is null)
+                {
+                    continue;
+                }
+
+                string? reading = nonKanjiDict && nonNameDict
+                    ? JapaneseUtils.NormalizeText(readingText)
+                    : null;
+                if (reading is not null)
+                {
+                    _ = keys.Add(reading);
+                }
+
+                for (int i = start; i < end; i++)
+                {
+                    ref readonly EpwingNazekaVariantSource source = ref sources[i];
+
+                    string searchKey = nonKanjiDict
+                        ? JapaneseUtils.NormalizeText(source.PrimarySpelling)
+                        : source.PrimarySpelling;
+
+                    normalizedSpellings[i] = searchKey;
+                    _ = keys.Add(searchKey);
+                }
+
+                for (int i = start; i < end; i++)
+                {
+                    ref readonly EpwingNazekaVariantSource source = ref sources[i];
+                    string spelling = normalizedSpellings[i];
+
+                    if (generateFusejiVariants)
+                    {
+                        foreach (string variant in FusejiUtils.CreateFusejiVariants(spelling, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                        {
+                            if (keys.Add(variant))
+                            {
+                                variants.Add(variant);
+                            }
+                        }
+                    }
+
+                    if (reading is not null && spelling != reading)
+                    {
+                        if (source.RowId == source.EntryRowId && generateFusejiVariants)
+                        {
+                            foreach (string variant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            {
+                                if (keys.Add(variant))
+                                {
+                                    variants.Add(variant);
+                                }
+                            }
+                        }
+
+                        if (generateMazegaki)
+                        {
+                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(spelling, reading))
+                            {
+                                if (keys.Add(mazegaki))
+                                {
+                                    variants.Add(mazegaki);
+                                    if (generateFusejiVariants)
+                                    {
+                                        foreach (string variant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        {
+                                            if (keys.Add(variant))
+                                            {
+                                                variants.Add(variant);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (variants.Count > 0)
+                    {
+                        variantSearchKeys[i] = variants.ToArray();
+                        variants.Clear();
+                    }
+                }
+
+                keys.Clear();
+            }
+        });
+
+        for (int i = 0; i < sourceCount; i++)
+        {
+            if (variantSearchKeys[i] is not { Length: > 0 } searchKeys)
+            {
+                continue;
+            }
+
+            searchKeyInserter.Insert(sources[i].RowId, searchKeys);
+            transactionRecordCount += searchKeys.Length;
+            if (transactionRecordCount > VariantSearchKeyTransactionBatchSize)
+            {
+                transaction.Commit();
+                transaction.Dispose();
+                transaction = connection.BeginTransaction();
+                transactionRecordCount = 0;
+            }
         }
     }
 
@@ -610,66 +1174,29 @@ internal static class EpwingNazekaDBManager
             }
         }
 
-        ulong rowId = 1;
-
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
         DBUtils.ConfigureForBulkWrite(connection);
+        using EpwingNazekaRecordInserter recordInserter = new(connection);
+        using EpwingNazekaSearchKeyInserter searchKeyInserter = new(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo})
-            VALUES (@{RowId}, @{PrimarySpelling}, @{Reading}, @{AlternativeSpellings}, @{Glossary}, @{ImageInfo});
-            """;
-
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
-        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
-        SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter imageInfoParam = new($"@{ImageInfo}", SqliteType.Blob);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            primarySpellingParam,
-            readingParam,
-            alternativeSpellingsParam,
-            glossaryParam,
-            imageInfoParam
-        ]);
-
-        insertRecordCommand.Prepare();
-
-        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-        insertSearchKeyCommand.CommandText =
-            $"""
-            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
-            VALUES (@{RecordId}, @{SearchKey});
-            """;
-
-        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
-        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
-        insertSearchKeyCommand.Prepare();
-
+        long rowId = 1;
         foreach ((EpwingNazekaRecord record, List<string> keys) in recordToKeysDict)
         {
-            rowidParam.Value = rowId;
-            primarySpellingParam.Value = record.PrimarySpelling;
-            readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            alternativeSpellingsParam.Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
-            glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
-            imageInfoParam.Value = record.ImageInfo is not null ? MessagePackSerializer.Serialize(record.ImageInfo) : DBNull.Value;
-            _ = insertRecordCommand.ExecuteNonQuery();
+            byte[]? alternativeSpellings = record.AlternativeSpellings is not null
+                ? MessagePackSerializer.Serialize(record.AlternativeSpellings)
+                : null;
 
-            recordIdParam.Value = rowId;
-            foreach (ref readonly string key in keys.AsReadOnlySpan())
-            {
-                searchKeyParam.Value = key;
-                _ = insertSearchKeyCommand.ExecuteNonQuery();
-            }
+            byte[] definitions = MessagePackSerializer.Serialize(record.Definitions);
+
+            byte[]? imageInfo = record.ImageInfo is not null
+                ? MessagePackSerializer.Serialize(record.ImageInfo)
+                : null;
+
+            recordInserter.Insert(rowId, record.PrimarySpelling, record.Reading, alternativeSpellings, definitions, imageInfo);
+            searchKeyInserter.Insert(rowId, keys.AsReadOnlySpan());
 
             ++rowId;
         }
