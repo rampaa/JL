@@ -37,7 +37,7 @@ internal static class MazegakiVariantGenerator
                 : rentedRuns = ArrayPool<ExpressionRun>.Shared.Rent(expression.Length);
 
             int runCount = ParseRuns(expression, runs, out int kanjiRunCount);
-            if (kanjiRunCount < MinKanjiRunCount || kanjiRunCount > MaxKanjiRunCount)
+            if (kanjiRunCount is < MinKanjiRunCount or > MaxKanjiRunCount)
             {
                 return false;
             }
