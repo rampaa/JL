@@ -436,7 +436,9 @@ public static partial class JapaneseUtils
         for (int i = normalizationStartOffset; i < normalizedText.Length; i++)
         {
             char character = normalizedText[i];
-            if (character is >= VariationSelectorRangeStart and <= VariationSelectorRangeEnd)
+
+            bool nonFirstChar = i > 0;
+            if (nonFirstChar && character is >= VariationSelectorRangeStart and <= VariationSelectorRangeEnd)
             {
                 continue;
             }
@@ -446,7 +448,7 @@ public static partial class JapaneseUtils
             {
                 if (char.IsHighSurrogate(character))
                 {
-                    if (character is VariationSelectorSupplementHighSurrogate
+                    if (nonFirstChar && character is VariationSelectorSupplementHighSurrogate
                         && normalizedText[i + 1] is >= VariationSelectorSupplementLowSurrogateRangeStart and <= VariationSelectorSupplementLowSurrogateRangeEnd)
                     {
                         ++i;
@@ -487,7 +489,7 @@ public static partial class JapaneseUtils
                     continue;
                 }
 
-                if (i > 0 && s_charsToStrip.Contains(character))
+                if (nonFirstChar && s_charsToStrip.Contains(character))
                 {
                     continue;
                 }
@@ -1261,6 +1263,32 @@ public static partial class JapaneseUtils
                 or (>= 0x2F800 and <= 0x2FA1F) // CJK Compatibility Ideographs Supplement (2F800–2FA1F)or (>= 0x1D360 and <= 0x1D37F) // Counting Rod Numerals (1D360-1D37F)
                 or (>= 0x30000 and <= 0x3347F) // CJK Unified Ideographs Extension G (30000–3134F), CJK Unified Ideographs Extension H (31350–323AF), CJK Unified Ideographs Extension J (323B0-3347F)
                 or (>= 0x1D360 and <= 0x1D37F); // Counting Rod Numerals (1D360-1D37F)
+    }
+
+    public static int GetLookupStartPosition(ReadOnlySpan<char> text, int charPosition)
+    {
+        if (char.IsLowSurrogate(text[charPosition]))
+        {
+            --charPosition;
+        }
+
+        if (charPosition > 0)
+        {
+            char character = text[charPosition];
+            if (character is >= VariationSelectorRangeStart and <= VariationSelectorRangeEnd
+                || (character is VariationSelectorSupplementHighSurrogate
+                    && charPosition + 1 < text.Length
+                    && text[charPosition + 1] is >= VariationSelectorSupplementLowSurrogateRangeStart and <= VariationSelectorSupplementLowSurrogateRangeEnd))
+            {
+                --charPosition;
+                if (char.IsLowSurrogate(text[charPosition]))
+                {
+                    --charPosition;
+                }
+            }
+        }
+
+        return charPosition;
     }
 
     internal static string? GetFirstCharacterIfKanji(ReadOnlySpan<char> text, out string? kanjiWithVariationSelector)

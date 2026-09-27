@@ -339,10 +339,7 @@ internal sealed partial class PopupWindow : IDisposable
     public async Task LookupOnCharPosition(TextBox textBox, int charPosition, bool enableMiningMode, bool mayNeedCoordinateConversion, bool verticalText)
     {
         string textBoxText = textBox.Text;
-        if (char.IsLowSurrogate(textBoxText[charPosition]))
-        {
-            --charPosition;
-        }
+        charPosition = JapaneseUtils.GetLookupStartPosition(textBoxText, charPosition);
 
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager is { AlwaysShowBacklog: true, MaxBacklogCapacity: not 0 }
@@ -393,7 +390,7 @@ internal sealed partial class PopupWindow : IDisposable
         if (textBoxText.Length - charPosition > maxSearchLength)
         {
             int newLength = charPosition + maxSearchLength;
-            if (char.IsLowSurrogate(textBoxText[newLength - 1]))
+            if (char.IsHighSurrogate(textBoxText[newLength - 1]))
             {
                 --newLength;
             }
@@ -1135,11 +1132,7 @@ internal sealed partial class PopupWindow : IDisposable
             return;
         }
 
-        if (char.IsLowSurrogate(textBox.Text[charPosition]))
-        {
-            --charPosition;
-        }
-
+        charPosition = JapaneseUtils.GetLookupStartPosition(textBox.Text, charPosition);
         if (charPosition != _lastCharPosition)
         {
             _lookupDelayTimer.IsEnabled = false;
@@ -1189,11 +1182,7 @@ internal sealed partial class PopupWindow : IDisposable
             return;
         }
 
-        if (char.IsLowSurrogate(_lastInteractedTextBox.Text[charPosition]))
-        {
-            --charPosition;
-        }
-
+        charPosition = JapaneseUtils.GetLookupStartPosition(_lastInteractedTextBox.Text, charPosition);
         if (charPosition == _lastCharPosition)
         {
             PopupWindow? childPopupWindow = PopupWindowUtils.PopupWindows[PopupIndex + 1];

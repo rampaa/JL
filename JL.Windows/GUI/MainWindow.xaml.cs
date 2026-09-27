@@ -607,11 +607,7 @@ internal sealed partial class MainWindow : IDisposable
 
     private void InitDelayedLookup(int charPosition)
     {
-        if (char.IsLowSurrogate(MainTextBox.Text[charPosition]))
-        {
-            --charPosition;
-        }
-
+        charPosition = JapaneseUtils.GetLookupStartPosition(MainTextBox.Text, charPosition);
         if (charPosition != _lastCharPosition)
         {
             _tsukikageLookupDelayTimer.IsEnabled = false;
@@ -637,11 +633,7 @@ internal sealed partial class MainWindow : IDisposable
             return;
         }
 
-        if (char.IsLowSurrogate(MainTextBox.Text[charPosition]))
-        {
-            --charPosition;
-        }
-
+        charPosition = JapaneseUtils.GetLookupStartPosition(MainTextBox.Text, charPosition);
         if (charPosition != _lastCharPosition)
         {
             _lookupDelayTimer.IsEnabled = false;
@@ -685,11 +677,7 @@ internal sealed partial class MainWindow : IDisposable
             return;
         }
 
-        if (char.IsLowSurrogate(MainTextBox.Text[charPosition]))
-        {
-            --charPosition;
-        }
-
+        charPosition = JapaneseUtils.GetLookupStartPosition(MainTextBox.Text, charPosition);
         if (charPosition == _lastCharPosition)
         {
             MoveWindowToScreen();
@@ -721,11 +709,7 @@ internal sealed partial class MainWindow : IDisposable
             return;
         }
 
-        if (char.IsLowSurrogate(MainTextBox.Text[charPosition]))
-        {
-            --charPosition;
-        }
-
+        charPosition = JapaneseUtils.GetLookupStartPosition(MainTextBox.Text, charPosition);
         await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charPosition, ConfigManager.Instance.EnableMiningModeForDelayedLookups, true, WindowsUtils.LastWebSocketTextWasVertical).ConfigureAwait(true);
     }
 
@@ -2729,8 +2713,14 @@ internal sealed partial class MainWindow : IDisposable
             {
                 TextBox textBox = MainTextBox;
                 PopupWindow? childPopup = PopupWindowUtils.PopupWindows[FirstPopupWindow.PopupIndex + 1];
+                int charPosition = textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false);
+                if (charPosition >= 0)
+                {
+                    charPosition = JapaneseUtils.GetLookupStartPosition(textBox.Text, charPosition);
+                }
+
                 if ((childPopup is not null && childPopup.Opacity is not 0)
-                    || FirstPopupWindow.CurrentSourceTextCharPosition != textBox.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false))
+                    || FirstPopupWindow.CurrentSourceTextCharPosition != charPosition)
                 {
                     PopupWindowUtils.HidePopups(FirstPopupWindow.PopupIndex);
                     hidPopup = true;
@@ -2747,8 +2737,15 @@ internal sealed partial class MainWindow : IDisposable
                 {
                     PopupWindow? childPopup = PopupWindowUtils.PopupWindows[popupWindow.PopupIndex + 1];
                     TextBox? textBox = popupWindow.PreviousTextBox;
+                    int charPosition = textBox?.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false) ?? -1;
+                    if (charPosition >= 0)
+                    {
+                        Debug.Assert(textBox is not null);
+                        charPosition = JapaneseUtils.GetLookupStartPosition(textBox.Text, charPosition);
+                    }
+
                     if ((childPopup is not null && childPopup.Opacity is not 0)
-                        || popupWindow.CurrentSourceTextCharPosition != (textBox?.GetCharacterIndexFromPoint(Mouse.GetPosition(textBox), false) ?? -1))
+                        || popupWindow.CurrentSourceTextCharPosition != charPosition)
                     {
                         PopupWindowUtils.HidePopups(popupWindow.PopupIndex);
                         hidPopup = true;
