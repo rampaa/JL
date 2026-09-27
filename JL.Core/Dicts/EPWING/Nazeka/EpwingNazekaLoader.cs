@@ -73,7 +73,6 @@ internal static class EpwingNazekaLoader
                     JsonElement jsonObj = enumerator.Current;
                     string? reading = jsonObj.GetProperty("r").GetString();
                     Debug.Assert(reading is not null);
-                    reading = reading.GetPooledString();
 
                     JsonElement spellingJsonArray = jsonObj.GetProperty("s");
                     List<string>? spellingList = new(spellingJsonArray.GetArrayLength());
@@ -89,6 +88,18 @@ internal static class EpwingNazekaLoader
                     if (spellingList.Count is 0)
                     {
                         spellingList = null;
+                    }
+
+                    if (spellingList is not null)
+                    {
+                        if (spellingList[0].ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
+                        {
+                            continue;
+                        }
+                    }
+                    else if (reading.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
+                    {
+                        continue;
                     }
 
                     JsonElement definitionJsonArray = jsonObj.GetProperty("l");
@@ -107,16 +118,12 @@ internal static class EpwingNazekaLoader
                         continue;
                     }
 
+                    reading = reading.GetPooledString();
                     string[] definitions = definitionList.ToArray();
 
                     if (spellingList is not null)
                     {
                         string primarySpelling = spellingList[0];
-                        if (primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
-                        {
-                            continue;
-                        }
-
                         string readingInHiragana = nonKanjiDict && nonNameDict
                             ? JapaneseUtils.NormalizeText(reading).GetPooledString()
                             : "";
@@ -230,7 +237,7 @@ internal static class EpwingNazekaLoader
                         alternativeRecords.Clear();
                     }
 
-                    else if (!reading.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
+                    else
                     {
                         ImageInfo? imageInfo = GetImageInfo(jsonObj, imageInfoCache);
 

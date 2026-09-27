@@ -136,11 +136,11 @@ internal static class EpwingYomichanLoader
     private static EpwingYomichanRecord? GetEpwingYomichanRecord(JsonElement jsonElement, Dict dict, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
     {
         if (!TryGetPrimarySpellingAndReading(jsonElement, out string primarySpelling, out string? reading)
+            || primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings)
             || !TryGetDefinitionTags(jsonElement, out string[]? definitionTags)
             || (definitionTags?.Length is 1 && definitionTags[0] is "子" or "句")
             || !TryGetDefinitions(jsonElement, dict, imageInfoCache, out string[]? definitions, out List<ImageInfo>? imageInfos)
             || (definitions is null && imageInfos is null)
-            || primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings)
             || !TryGetWordClasses(jsonElement, out string[]? wordClasses))
         {
             return null;
@@ -373,11 +373,11 @@ internal static class EpwingYomichanLoader
     internal static bool TryGetImportRecord(JsonElement jsonElement, Dict dict, bool nonKanjiDict, bool nonNameDict, ConcurrentDictionary<string, ImageInfo> imageInfoCache, out EpwingYomichanImportRecord record)
     {
         if (!TryGetPrimarySpellingAndReading(jsonElement, out string primarySpelling, out string? reading)
+            || primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings)
             || !TryGetDefinitionTags(jsonElement, out string[]? definitionTags)
             || (definitionTags?.Length is 1 && definitionTags[0] is "子" or "句")
             || !TryGetDefinitions(jsonElement, dict, imageInfoCache, out string[]? definitions, out List<ImageInfo>? imageInfos)
             || (definitions is null && imageInfos is null)
-            || primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings)
             || !TryGetWordClasses(jsonElement, out string[]? wordClasses))
         {
             record = default;
@@ -463,6 +463,11 @@ internal static class EpwingYomichanLoader
             reading = null;
         }
 
+        if (primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
+        {
+            return false;
+        }
+
         if (!reader.Read())
         {
             return false;
@@ -530,8 +535,7 @@ internal static class EpwingYomichanLoader
                 imageInfoCache,
                 out string[]? definitions,
                 out List<ImageInfo>? imageInfos)
-            || (definitions is null && imageInfos is null)
-            || primarySpelling.ContainsAny(DictUtils.s_invalidCharactersForPrimarySpellings))
+            || (definitions is null && imageInfos is null))
         {
             return false;
         }

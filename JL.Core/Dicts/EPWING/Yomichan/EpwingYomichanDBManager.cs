@@ -140,7 +140,7 @@ internal static class EpwingYomichanDBManager
 
     public static void ImportFromMemory(Dict dict)
     {
-        Dictionary<EpwingYomichanRecord, List<string>> recordToKeysDict = [];
+        Dictionary<EpwingYomichanRecord, List<string>> recordToKeysDict = new(ReferenceEqualityComparer.Instance);
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
             int recordsCount = records.Count;
