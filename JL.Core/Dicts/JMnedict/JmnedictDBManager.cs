@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Channels;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
@@ -19,15 +20,15 @@ internal static class JmnedictDBManager
 {
     public const int Version = 11;
 
-    private const string Record = "record";
-    private const string RowId = "rowid";
-    private const string JmnedictId = "jmnedict_id";
-    private const string PrimarySpelling = "primary_spelling";
-    private const string Readings = "readings";
-    private const string AlternativeSpellings = "alternative_spellings";
-    private const string Glossary = "glossary";
-    private const string NameTypes = "name_types";
-    private const string PrimarySpellingInHiragana = "primary_spelling_in_hiragana";
+    internal const string Record = "record";
+    internal const string RowId = "rowid";
+    internal const string JmnedictId = "jmnedict_id";
+    internal const string PrimarySpelling = "primary_spelling";
+    internal const string Readings = "readings";
+    internal const string AlternativeSpellings = "alternative_spellings";
+    internal const string Glossary = "glossary";
+    internal const string NameTypes = "name_types";
+    internal const string PrimarySpellingInHiragana = "primary_spelling_in_hiragana";
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
@@ -134,103 +135,84 @@ internal static class JmnedictDBManager
             SqliteTransaction transaction = connection.BeginTransaction();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-            // ReSharper disable once UseAwaitUsing
-            using SqliteCommand insertRecordCommand = connection.CreateCommand();
-            insertRecordCommand.CommandText =
-                $"""
-                INSERT INTO {Record} ({RowId}, {JmnedictId}, {PrimarySpelling}, {PrimarySpellingInHiragana}, {Readings}, {AlternativeSpellings}, {Glossary}, {NameTypes})
-                VALUES (@{RowId}, @{JmnedictId}, @{PrimarySpelling}, @{PrimarySpellingInHiragana}, @{Readings}, @{AlternativeSpellings}, @{Glossary}, @{NameTypes});
-                """;
-
-            SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-            SqliteParameter jmnedictIdParam = new($"@{JmnedictId}", SqliteType.Integer);
-            SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
-            SqliteParameter primarySpellingInHiraganaParam = new($"@{PrimarySpellingInHiragana}", SqliteType.Text);
-            SqliteParameter readingsParam = new($"@{Readings}", SqliteType.Blob);
-            SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
-            SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-            SqliteParameter nameTypesParam = new($"@{NameTypes}", SqliteType.Blob);
-            insertRecordCommand.Parameters.AddRange([
-                rowidParam,
-                jmnedictIdParam,
-                primarySpellingParam,
-                primarySpellingInHiraganaParam,
-                readingsParam,
-                alternativeSpellingsParam,
-                glossaryParam,
-                nameTypesParam
-                ]);
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-            insertRecordCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
+            using JmnedictRecordInserter recordInserter = new(connection);
 
             int transactionRecordCount = 0;
-            HashSet<JmnedictRecord> jmnedictRecords = [];
-            while (xmlTextReader.ReadToFollowing("entry"))
+            HashSet<string> searchKeys = new(StringComparer.Ordinal);
+            Channel<JmnedictImportEntryBatch> availableBatches = Channel.CreateUnbounded<JmnedictImportEntryBatch>(
+                new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
+            Channel<JmnedictImportEntryBatch> readyBatches = Channel.CreateUnbounded<JmnedictImportEntryBatch>(
+                new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
+            _ = availableBatches.Writer.TryWrite(new JmnedictImportEntryBatch());
+            _ = availableBatches.Writer.TryWrite(new JmnedictImportEntryBatch());
+            Task producer = Task.Run(() => CreateImportEntryBatches(xmlTextReader, availableBatches.Reader,
+                readyBatches.Writer));
+            try
             {
-                Dictionary<string, JmnedictRecord> recordDictionary = JmnedictLoader.GetRecordsFromEntry(JmnedictLoader.ReadEntry(xmlTextReader));
-                foreach (JmnedictRecord jmnedictRecord in recordDictionary.Values)
+                await foreach (JmnedictImportEntryBatch batch in readyBatches.Reader.ReadAllAsync().ConfigureAwait(false))
                 {
-                    _ = jmnedictRecords.Add(jmnedictRecord);
-                }
+                    try
+                    {
+                        for (int i = 0; i < batch.EntryCount; i++)
+                        {
+                            JmnedictEntry entry = new(batch.EntryIds[i], batch.SpellingLists[i], batch.ReadingArrays[i],
+                                batch.TranslationLists[i]);
+                            int recordsInserted = InsertRecordsFromEntry(in entry, recordInserter, rowId, searchKeys);
+                            rowId += recordsInserted;
+                            transactionRecordCount += recordsInserted;
 
-                foreach (JmnedictRecord jmnedictRecord in jmnedictRecords)
-                {
-                    rowidParam.Value = rowId;
-                    jmnedictIdParam.Value = jmnedictRecord.Id;
-                    primarySpellingParam.Value = jmnedictRecord.PrimarySpelling;
-                    primarySpellingInHiraganaParam.Value = JapaneseUtils.NormalizeText(jmnedictRecord.PrimarySpelling);
-                    readingsParam.Value = jmnedictRecord.Readings is not null ? MessagePackSerializer.Serialize(jmnedictRecord.Readings) : DBNull.Value;
-                    alternativeSpellingsParam.Value = jmnedictRecord.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(jmnedictRecord.AlternativeSpellings) : DBNull.Value;
-                    glossaryParam.Value = MessagePackSerializer.Serialize(jmnedictRecord.Definitions);
-                    nameTypesParam.Value = MessagePackSerializer.Serialize(jmnedictRecord.NameTypes);
-
+                            if (transactionRecordCount > DBUtils.TransactionBatchSize)
+                            {
 #pragma warning disable CA1849 // Call async methods when in an async method
-                    _ = insertRecordCommand.ExecuteNonQuery();
+                                transaction.Commit();
 #pragma warning restore CA1849 // Call async methods when in an async method
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+                                dict.Ready = true;
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+                                transactionRecordCount = 0;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        for (int i = 0; i < batch.EntryCount; i++)
+                        {
+                            batch.SpellingLists[i].Clear();
+                            batch.TranslationLists[i].Clear();
+                        }
 
-                    ++rowId;
-                    ++transactionRecordCount;
+                        batch.EntryCount = 0;
+                        _ = availableBatches.Writer.TryWrite(batch);
+                    }
                 }
 
-                if (transactionRecordCount > DBUtils.TransactionBatchSize)
+                if (transactionRecordCount > 0)
                 {
 #pragma warning disable CA1849 // Call async methods when in an async method
                     transaction.Commit();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-#pragma warning disable CA1849 // Call async methods when in an async method
-                    // ReSharper disable once MethodHasAsyncOverload
-                    transaction.Dispose();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
                     dict.Ready = true;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                    transaction = connection.BeginTransaction();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                    transactionRecordCount = 0;
-                    insertRecordCommand.Transaction = transaction;
                 }
-
-                jmnedictRecords.Clear();
             }
-
-            if (transactionRecordCount > 0)
+            catch (Exception exception)
             {
-#pragma warning disable CA1849 // Call async methods when in an async method
-                transaction.Commit();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                dict.Ready = true;
+                _ = availableBatches.Writer.TryComplete(exception);
+                throw;
             }
+            finally
+            {
+                await producer.ConfigureAwait(false);
 
 #pragma warning disable CA1849 // Call async methods when in an async method
-            // ReSharper disable once MethodHasAsyncOverload
-            transaction.Dispose();
+                // ReSharper disable once MethodHasAsyncOverload
+                transaction.Dispose();
 #pragma warning restore CA1849 // Call async methods when in an async method
+            }
 
             if (rowId > 1)
             {
@@ -303,6 +285,104 @@ internal static class JmnedictDBManager
         }
     }
 
+    private static int InsertRecordsFromEntry(in JmnedictEntry entry, JmnedictRecordInserter recordInserter,
+        int firstRowId, HashSet<string> searchKeys)
+    {
+        ReadOnlySpan<Translation> translations = entry.TranslationList.AsReadOnlySpan();
+        Debug.Assert(translations.Length > 0);
+
+        ReadOnlySpan<string> spellings = entry.KebList.AsReadOnlySpan();
+        bool hasSpellings = spellings.Length > 0;
+        if (!hasSpellings)
+        {
+            spellings = entry.RebArray;
+        }
+
+        if (spellings.IsEmpty)
+        {
+            return 0;
+        }
+
+        string[][] definitionsArray = new string[translations.Length][];
+        string[]?[] nameTypesArray = new string[translations.Length][];
+        for (int i = 0; i < translations.Length; i++)
+        {
+            definitionsArray[i] = translations[i].TransDetArray;
+            nameTypesArray[i] = translations[i].NameTypeArray;
+        }
+        byte[] definitionBytes = MessagePackSerializer.Serialize(definitionsArray);
+        byte[] nameTypeBytes = MessagePackSerializer.Serialize(nameTypesArray.TrimNullableArray());
+
+        byte[]? readingBytes = hasSpellings ? MessagePackSerializer.Serialize(entry.RebArray) : null;
+        int recordsInserted = 0;
+        for (int i = 0; i < spellings.Length; i++)
+        {
+            string spelling = spellings[i];
+            string searchKey = JapaneseUtils.NormalizeText(spelling);
+            if (spellings.Length > 1 && !searchKeys.Add(searchKey))
+            {
+                continue;
+            }
+
+            string[]? alternativeSpellings = hasSpellings
+                ? entry.KebList.RemoveAtToArray(i)
+                : entry.RebArray.RemoveAt(i);
+            byte[]? alternativeSpellingBytes = alternativeSpellings is not null
+                ? MessagePackSerializer.Serialize(alternativeSpellings)
+                : null;
+
+            recordInserter.Insert(firstRowId + recordsInserted, entry.Id, spelling, searchKey, readingBytes,
+                alternativeSpellingBytes, definitionBytes, nameTypeBytes);
+            ++recordsInserted;
+        }
+
+        if (spellings.Length > 1)
+        {
+            searchKeys.Clear();
+        }
+
+        return recordsInserted;
+    }
+
+    private static async Task CreateImportEntryBatches(XmlTextReader xmlTextReader,
+        ChannelReader<JmnedictImportEntryBatch> availableBatches, ChannelWriter<JmnedictImportEntryBatch> readyBatches)
+    {
+        List<string> rebList = [];
+        List<string> nameTypeList = [];
+        List<string> transDetList = [];
+        try
+        {
+            JmnedictImportEntryBatch batch = await availableBatches.ReadAsync().ConfigureAwait(false);
+            while (xmlTextReader.ReadToFollowing("entry"))
+            {
+                int i = batch.EntryCount;
+                JmnedictEntry entry = JmnedictLoader.ReadEntry(xmlTextReader, batch.SpellingLists[i], rebList,
+                    batch.TranslationLists[i], nameTypeList, transDetList);
+                batch.EntryIds[i] = entry.Id;
+                batch.ReadingArrays[i] = entry.RebArray;
+                ++batch.EntryCount;
+                rebList.Clear();
+
+                if (batch.EntryCount == JmnedictImportEntryBatch.MaxEntriesPerBatch)
+                {
+                    _ = readyBatches.TryWrite(batch);
+                    batch = await availableBatches.ReadAsync().ConfigureAwait(false);
+                }
+            }
+
+            if (batch.EntryCount > 0)
+            {
+                _ = readyBatches.TryWrite(batch);
+            }
+
+            _ = readyBatches.TryComplete();
+        }
+        catch (Exception exception)
+        {
+            _ = readyBatches.TryComplete(exception);
+        }
+    }
+
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
         const string query =
@@ -342,46 +422,19 @@ internal static class JmnedictDBManager
 
         DBUtils.ConfigureForBulkWrite(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
-
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {JmnedictId}, {PrimarySpelling}, {PrimarySpellingInHiragana}, {Readings}, {AlternativeSpellings}, {Glossary}, {NameTypes})
-            VALUES (@{RowId}, @{JmnedictId}, @{PrimarySpelling}, @{PrimarySpellingInHiragana}, @{Readings}, @{AlternativeSpellings}, @{Glossary}, @{NameTypes});
-            """;
-
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter jmnedictIdParam = new($"@{JmnedictId}", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
-        SqliteParameter primarySpellingInHiraganaParam = new($"@{PrimarySpellingInHiragana}", SqliteType.Text);
-        SqliteParameter readingsParam = new($"@{Readings}", SqliteType.Blob);
-        SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter nameTypesParam = new($"@{NameTypes}", SqliteType.Blob);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            jmnedictIdParam,
-            primarySpellingParam,
-            primarySpellingInHiraganaParam,
-            readingsParam,
-            alternativeSpellingsParam,
-            glossaryParam,
-            nameTypesParam
-        ]);
-
-        insertRecordCommand.Prepare();
+        using JmnedictRecordInserter recordInserter = new(connection);
 
         foreach (JmnedictRecord record in jmnedictRecords)
         {
-            rowidParam.Value = rowId;
-            jmnedictIdParam.Value = record.Id;
-            primarySpellingParam.Value = record.PrimarySpelling;
-            primarySpellingInHiraganaParam.Value = JapaneseUtils.NormalizeText(record.PrimarySpelling);
-            readingsParam.Value = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : DBNull.Value;
-            alternativeSpellingsParam.Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
-            glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
-            nameTypesParam.Value = MessagePackSerializer.Serialize(record.NameTypes);
-            _ = insertRecordCommand.ExecuteNonQuery();
+            byte[]? readings = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : null;
+            byte[]? alternativeSpellings = record.AlternativeSpellings is not null
+                ? MessagePackSerializer.Serialize(record.AlternativeSpellings)
+                : null;
+            byte[] definitions = MessagePackSerializer.Serialize(record.Definitions);
+            byte[] nameTypes = MessagePackSerializer.Serialize(record.NameTypes);
+
+            recordInserter.Insert((long)rowId, record.Id, record.PrimarySpelling,
+                JapaneseUtils.NormalizeText(record.PrimarySpelling), readings, alternativeSpellings, definitions, nameTypes);
 
             ++rowId;
         }

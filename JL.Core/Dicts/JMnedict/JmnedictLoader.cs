@@ -35,9 +35,17 @@ internal static class JmnedictLoader
 
                 Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
                 Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
+
+                List<string> kebList = [];
+                List<string> rebList = [];
+                List<Translation> translationList = [];
+                List<string> nameTypeList = [];
+                List<string> transDetList = [];
+
                 while (xmlTextReader.ReadToFollowing("entry"))
                 {
-                    Dictionary<string, JmnedictRecord> recordDictionary = GetRecordsFromEntry(ReadEntry(xmlTextReader));
+                    JmnedictEntry entry = ReadEntry(xmlTextReader, kebList, rebList, translationList, nameTypeList, transDetList);
+                    Dictionary<string, JmnedictRecord> recordDictionary = GetRecordsFromEntry(in entry);
                     foreach ((string key, JmnedictRecord jmnedictRecord) in recordDictionary)
                     {
                         ref IList<IDictRecord>? tempRecordList = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
@@ -56,6 +64,10 @@ internal static class JmnedictLoader
                             dict.MaxSearchKeyLength = key.Length;
                         }
                     }
+
+                    kebList.Clear();
+                    rebList.Clear();
+                    translationList.Clear();
                 }
             }
 
@@ -103,12 +115,9 @@ internal static class JmnedictLoader
         }
     }
 
-    public static JmnedictEntry ReadEntry(XmlTextReader xmlReader)
+    internal static JmnedictEntry ReadEntry(XmlTextReader xmlReader, List<string> kebList, List<string> rebList, List<Translation> translationList, List<string> nameTypeList, List<string> transDetList)
     {
         int id = 0;
-        List<string> kebList = [];
-        List<string> rebList = [];
-        List<Translation> translationList = [];
 
         while (!xmlReader.EOF)
         {
@@ -126,15 +135,15 @@ internal static class JmnedictLoader
                         break;
 
                     case "k_ele":
-                        kebList.Add(ReadKEle(xmlReader).GetPooledString());
+                        kebList.Add(ReadKEle(xmlReader));
                         break;
 
                     case "r_ele":
-                        rebList.Add(ReadREle(xmlReader).GetPooledString());
+                        rebList.Add(ReadREle(xmlReader));
                         break;
 
                     case "trans":
-                        translationList.Add(ReadTrans(xmlReader));
+                        translationList.Add(ReadTrans(xmlReader, nameTypeList, transDetList));
                         break;
 
                     default:
@@ -164,11 +173,8 @@ internal static class JmnedictLoader
         return xmlReader.ReadElementContentAsString();
     }
 
-    private static Translation ReadTrans(XmlTextReader xmlReader)
+    private static Translation ReadTrans(XmlTextReader xmlReader, List<string> nameTypeList, List<string> transDetList)
     {
-        List<string> nameTypeList = [];
-        List<string> transDetList = [];
-
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "trans", NodeType: XmlNodeType.EndElement })
@@ -185,7 +191,7 @@ internal static class JmnedictLoader
                         break;
 
                     case "trans_det":
-                        transDetList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
+                        transDetList.Add(xmlReader.ReadElementContentAsString());
                         break;
 
                     //case "xref":
@@ -204,20 +210,23 @@ internal static class JmnedictLoader
             }
         }
 
-        return new Translation(transDetList.ToArray(), nameTypeList.TrimToArray());
+        Translation translation = new(transDetList.ToArray(), nameTypeList.TrimToArray());
+        nameTypeList.Clear();
+        transDetList.Clear();
+        return translation;
     }
 
     private static string ReadEntity(XmlTextReader xmlReader)
     {
         _ = xmlReader.Read();
-        string entityName = xmlReader.Name.GetPooledString();
+        string entityName = xmlReader.Name;
 
         if (!DictUtils.JmnedictEntities.ContainsKey(entityName))
         {
             xmlReader.ResolveEntity();
             _ = xmlReader.Read();
 
-            DictUtils.JmnedictEntities.Add(entityName, xmlReader.Value.GetPooledString());
+            DictUtils.JmnedictEntities.Add(entityName, xmlReader.Value);
         }
 
         _ = xmlReader.Read();
@@ -227,7 +236,36 @@ internal static class JmnedictLoader
 
     public static Dictionary<string, JmnedictRecord> GetRecordsFromEntry(in JmnedictEntry entry)
     {
-        ReadOnlySpan<string> kebListSpan = entry.KebList.AsReadOnlySpan();
+        Span<string> kebListSpan = CollectionsMarshal.AsSpan(entry.KebList);
+        for (int i = 0; i < kebListSpan.Length; i++)
+        {
+            kebListSpan[i] = kebListSpan[i].GetPooledString();
+        }
+
+        string[] rebArray = entry.RebArray;
+        for (int i = 0; i < rebArray.Length; i++)
+        {
+            rebArray[i] = rebArray[i].GetPooledString();
+        }
+
+        foreach (Translation translation in entry.TranslationList)
+        {
+            string[] transDetArray = translation.TransDetArray;
+            for (int i = 0; i < transDetArray.Length; i++)
+            {
+                transDetArray[i] = transDetArray[i].GetPooledString();
+            }
+
+            string[]? nameTypeArray = translation.NameTypeArray;
+            if (nameTypeArray is not null)
+            {
+                for (int i = 0; i < nameTypeArray.Length; i++)
+                {
+                    nameTypeArray[i] = nameTypeArray[i].GetPooledString();
+                }
+            }
+        }
+
         ReadOnlySpan<Translation> translationListSpan = entry.TranslationList.AsReadOnlySpan();
 
         int kebListSpanLength = kebListSpan.Length;
@@ -248,6 +286,7 @@ internal static class JmnedictLoader
             // relatedTermsArray[j] = translation.XRefList.TrimListToArray();
         }
 
+        string[]?[]? nameTypes = nameTypesArray.TrimNullableArray();
         Dictionary<string, JmnedictRecord> recordDictionary;
         if (kebListSpanLength > 0)
         {
@@ -262,7 +301,7 @@ internal static class JmnedictLoader
                     continue;
                 }
 
-                JmnedictRecord record = new(entry.Id, keb, entry.KebList.RemoveAtToArray(i), entry.RebArray, definitionsArray, nameTypesArray.TrimNullableArray());
+                JmnedictRecord record = new(entry.Id, keb, entry.KebList.RemoveAtToArray(i), entry.RebArray, definitionsArray, nameTypes);
                 // record.RelatedTerms = relatedTermsArray;
 
                 recordDictionary.Add(key, record);
@@ -281,7 +320,7 @@ internal static class JmnedictLoader
                     continue;
                 }
 
-                JmnedictRecord record = new(entry.Id, reb, entry.RebArray.RemoveAt(i), null, definitionsArray, nameTypesArray.TrimNullableArray());
+                JmnedictRecord record = new(entry.Id, reb, entry.RebArray.RemoveAt(i), null, definitionsArray, nameTypes);
                 // record.RelatedTerms = relatedTermsArray;
 
                 recordDictionary.Add(key, record);
