@@ -146,6 +146,10 @@ internal static class JmnedictLoader
                         translationList.Add(ReadTrans(xmlReader, nameTypeList, transDetList));
                         break;
 
+                    case "re_pri":
+                        xmlReader.Skip();
+                        break;
+
                     default:
                         _ = xmlReader.Read();
                         break;
