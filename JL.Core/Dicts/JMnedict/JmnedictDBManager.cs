@@ -18,7 +18,7 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictDBManager
 {
-    public const int Version = 11;
+    public const int Version = 12;
 
     internal const string Record = "record";
     internal const string RowId = "rowid";
@@ -389,7 +389,7 @@ internal static class JmnedictDBManager
     {
         const string query =
             $"""
-            SELECT MAX(LENGTH({PrimarySpellingInHiragana}))
+            SELECT MAX(LENGTH(CAST({PrimarySpellingInHiragana} AS BLOB)) / 2)
             FROM {Record};
             """;
 

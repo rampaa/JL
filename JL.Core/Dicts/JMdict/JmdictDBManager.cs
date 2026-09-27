@@ -23,7 +23,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 25;
+    public const int Version = 26;
     private const int ImportRecordBatchSize = 128;
     private const int VariantSearchKeyTransactionBatchSize = 20_000_000;
 
@@ -700,7 +700,7 @@ internal static class JmdictDBManager
     {
         const string query =
             $"""
-            SELECT MAX(LENGTH({SearchKey}))
+            SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
             FROM {RecordSearchKey};
             """;
 

@@ -14,7 +14,7 @@ namespace JL.Core.Dicts.KANJIDIC;
 
 internal static class KanjidicDBManager
 {
-    public const int Version = 7;
+    public const int Version = 8;
 
     private const int ImportRecordBatchSize = 128;
 
@@ -168,8 +168,9 @@ internal static class KanjidicDBManager
             _ = vacuumCommand.ExecuteNonQuery();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-            dict.Ready = true;
             dict.Size = kanjiCount;
+            dict.MaxSearchKeyLength = 2;
+            dict.Ready = true;
         }
         else
         {
