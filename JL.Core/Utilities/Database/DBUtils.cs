@@ -242,9 +242,17 @@ public static class DBUtils
             );
             """;
 
-        using SqliteDataReader reader = command.ExecuteReader();
-        _ = reader.Read();
-        return reader.GetBoolean(0);
+        try
+        {
+            using SqliteDataReader reader = command.ExecuteReader();
+            _ = reader.Read();
+            return reader.GetBoolean(0);
+        }
+        catch (SqliteException e)
+        {
+            LoggerManager.Logger.Error(e, "Failed to check if record exists in DB with connection string: {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return false;
+        }
     }
 
     internal static void ConfigureForBulkWrite(SqliteConnection connection)
