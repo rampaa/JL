@@ -160,9 +160,18 @@ internal static class JmdictLoader
 
                 Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
                 Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
+
+                List<KanjiElement> kanjiElements = [];
+                List<ReadingElement> readingElements = [];
+                List<Sense> senseList = [];
+                List<string> glossList = [];
+                List<string> posList = [];
                 while (xmlReader.ReadToFollowing("entry"))
                 {
-                    Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(ReadEntry(xmlReader), includeProperNames);
+                    Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(ReadEntry(xmlReader, includeProperNames, kanjiElements, readingElements, senseList, glossList, posList), includeProperNames);
+                    kanjiElements.Clear();
+                    readingElements.Clear();
+                    senseList.Clear();
                     if (recordDictionary is not null)
                     {
                         foreach ((string key, JmdictRecord record) in recordDictionary)
@@ -272,12 +281,9 @@ internal static class JmdictLoader
         }
     }
 
-    public static JmdictEntry ReadEntry(XmlTextReader xmlReader)
+    public static JmdictEntry ReadEntry(XmlTextReader xmlReader, bool includeProperNames, List<KanjiElement> kanjiElements, List<ReadingElement> readingElements, List<Sense> senseList, List<string> glossList, List<string> posList)
     {
         int id = 0;
-        List<KanjiElement> kanjiElements = [];
-        List<ReadingElement> readingElements = [];
-        List<Sense> senseList = [];
         List<LoanwordSource>? lSourceList = null;
         List<string>? infoList = null;
 
@@ -297,6 +303,14 @@ internal static class JmdictLoader
                     case "ent_seq":
                     {
                         id = xmlReader.ReadElementContentAsInt();
+                        if (!includeProperNames && id is >= 5000000 and <= 5999999)
+                        {
+                            while (!xmlReader.EOF && (xmlReader.NodeType is not XmlNodeType.EndElement || xmlReader.Name is not "entry"))
+                            {
+                                xmlReader.Skip();
+                            }
+                        }
+
                         break;
                     }
 
@@ -314,7 +328,7 @@ internal static class JmdictLoader
 
                     case "sense":
                     {
-                        senseList.Add(ReadSense(xmlReader));
+                        senseList.Add(ReadSense(xmlReader, glossList, posList));
                         break;
                     }
 
@@ -386,7 +400,7 @@ internal static class JmdictLoader
                     }
 
                     default:
-                        _ = xmlReader.Read();
+                        xmlReader.Skip();
                         break;
                 }
             }
@@ -426,12 +440,12 @@ internal static class JmdictLoader
                         keInfList.Add(ReadEntity(xmlReader));
                         break;
 
-                    //case "ke_pri":
-                    //    kanjiElement.KePriList.Add(xmlReader.ReadElementContentAsString());
-                    //    break;
+                    case "ke_pri":
+                        xmlReader.Skip();
+                        break;
 
                     default:
-                        _ = xmlReader.Read();
+                        xmlReader.Skip();
                         break;
                 }
             }
@@ -478,12 +492,13 @@ internal static class JmdictLoader
                         reInfList.Add(ReadEntity(xmlReader));
                         break;
 
-                    //case "re_pri":
-                    //    readingElement.RePriList.Add(xmlReader.ReadElementContentAsString());
-                    //    break;
+                    case "re_nokanji":
+                    case "re_pri":
+                        xmlReader.Skip();
+                        break;
 
                     default:
-                        _ = xmlReader.Read();
+                        xmlReader.Skip();
                         break;
                 }
             }
@@ -497,10 +512,8 @@ internal static class JmdictLoader
         return new ReadingElement(reb, reRestrList, reInfList?.ToArray());
     }
 
-    private static Sense ReadSense(XmlTextReader xmlReader)
+    private static Sense ReadSense(XmlTextReader xmlReader, List<string> glossList, List<string> posList)
     {
-        List<string> glossList = [];
-        List<string> posList = [];
         string? sInf = null;
         List<string>? stagKList = null;
         List<string>? stagRList = null;
@@ -571,17 +584,12 @@ internal static class JmdictLoader
 
                     case "gloss":
                     {
-                        string gloss = "";
-                        if (xmlReader.HasAttributes)
+                        string? glossType = xmlReader.HasAttributes ? xmlReader.GetAttribute("g_type") : null;
+                        string gloss = xmlReader.ReadElementContentAsString();
+                        if (glossType is not null)
                         {
-                            string? glossType = xmlReader.GetAttribute("g_type");
-                            if (glossType is not null)
-                            {
-                                gloss = $"({glossType}.) ";
-                            }
+                            gloss = $"({glossType}.) {gloss}";
                         }
-
-                        gloss += xmlReader.ReadElementContentAsString();
 
                         glossList.Add(gloss);
                         break;
@@ -590,32 +598,32 @@ internal static class JmdictLoader
                     case "xref":
                     {
                         xRefList ??= [];
-
-                        string crossReference = "";
-                        if (xmlReader.HasAttributes)
+                        string? crossReferenceType = xmlReader.HasAttributes ? xmlReader.GetAttribute("type") : null;
+                        string crossReference = xmlReader.ReadElementContentAsString();
+                        if (crossReferenceType is not null)
                         {
-                            string? crossReferenceType = xmlReader.GetAttribute("type");
-                            if (crossReferenceType is not null)
+                            string crossReferenceTypeName = crossReferenceType switch
                             {
-                                crossReference = crossReferenceType switch
-                                {
-                                    "see" => "see: ",
-                                    "ant" => "antonym: ",
-                                    "syn" => "synonym: ",
-                                    _ => $"{crossReferenceType}: "
-                                };
-                            }
-                        }
+                                "see" => "see",
+                                "ant" => "antonym",
+                                "syn" => "synonym",
+                                _ => crossReferenceType
+                            };
 
-                        crossReference += xmlReader.ReadElementContentAsString();
+                            crossReference = $"{crossReferenceTypeName}: {crossReference}";
+                        }
 
                         xRefList.Add(crossReference);
                         break;
                     }
 
+                    case "example":
+                        xmlReader.Skip();
+                        break;
+
                     default:
                     {
-                        _ = xmlReader.Read();
+                        xmlReader.Skip();
                         break;
                     }
                 }
@@ -627,7 +635,10 @@ internal static class JmdictLoader
             }
         }
 
-        return new Sense(glossList.ToArray(), posList.TrimToArray(), sInf, stagKList?.ToArray(), stagRList?.ToArray(), fieldList?.ToArray(), miscList?.ToArray(), dialList?.ToArray(), xRefList?.ToArray());
+        Sense sense = new(glossList.ToArray(), posList.TrimToArray(), sInf, stagKList?.ToArray(), stagRList?.ToArray(), fieldList?.ToArray(), miscList?.ToArray(), dialList?.ToArray(), xRefList?.ToArray());
+        glossList.Clear();
+        posList.Clear();
+        return sense;
     }
 
     private static string ReadEntity(XmlTextReader xmlReader)

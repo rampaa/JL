@@ -179,7 +179,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (multipleDefinitions && newlines)
             {
-                _ = defBuilder.Replace(" ", "\n", defBuilder.Length - 1, 1);
+                defBuilder[^1] = '\n';
             }
         }
 
@@ -240,7 +240,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
                 string? definitionInfoElement = definitionInfo[i];
                 if (definitionInfoElement is not null)
                 {
-                    _ = defBuilder.Append(CultureInfo.InvariantCulture, $"({definitionInfoElement}) ");
+                    _ = defBuilder.Append('(').Append(definitionInfoElement).Append(") ");
                 }
             }
 
@@ -257,7 +257,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (i + 1 != definitions.Length)
             {
-                _ = defBuilder.Replace(' ', separator, defBuilder.Length - 1, 1);
+                defBuilder[^1] = separator;
             }
         }
 
@@ -329,7 +329,7 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
 
             if (lSource.OriginalWord is not null)
             {
-                _ = defBuilder.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
+                _ = defBuilder.Append(": ").Append(lSource.OriginalWord);
             }
 
             if (j + 1 < lSources.Length)

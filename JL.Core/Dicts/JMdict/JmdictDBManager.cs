@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
@@ -16,7 +17,6 @@ using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Core.Utilities.ObjectPool;
 using JL.Core.WordClass;
-using MessagePack;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.JMdict;
@@ -24,33 +24,35 @@ namespace JL.Core.Dicts.JMdict;
 internal static class JmdictDBManager
 {
     public const int Version = 25;
+    private const int ImportRecordBatchSize = 128;
+    private const int VariantSearchKeyTransactionBatchSize = 20_000_000;
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
     public const string Record = "record";
     public const string RowId = "rowid";
-    private const string EdictId = "edict_id";
+    internal const string EdictId = "edict_id";
     public const string PrimarySpelling = "primary_spelling";
-    private const string PrimarySpellingOrthographyInfo = "primary_spelling_orthography_info";
-    private const string SpellingRestrictions = "spelling_restrictions";
-    private const string AlternativeSpellings = "alternative_spellings";
-    private const string AlternativeSpellingsOrthographyInfo = "alternative_spellings_orthography_info";
+    internal const string PrimarySpellingOrthographyInfo = "primary_spelling_orthography_info";
+    internal const string SpellingRestrictions = "spelling_restrictions";
+    internal const string AlternativeSpellings = "alternative_spellings";
+    internal const string AlternativeSpellingsOrthographyInfo = "alternative_spellings_orthography_info";
     public const string Readings = "readings";
-    private const string ReadingsOrthographyInfo = "readings_orthography_info";
-    private const string ReadingRestrictions = "reading_restrictions";
-    private const string Glossary = "glossary";
-    private const string GlossaryInfo = "glossary_info";
+    internal const string ReadingsOrthographyInfo = "readings_orthography_info";
+    internal const string ReadingRestrictions = "reading_restrictions";
+    internal const string Glossary = "glossary";
+    internal const string GlossaryInfo = "glossary_info";
     public const string PartOfSpeechSharedByAllSenses = "part_of_speech_shared_by_all_senses";
     public const string PartOfSpeech = "part_of_speech";
-    private const string FieldsSharedByAllSenses = "fields_shared_by_all_senses";
-    private const string Fields = "fields";
-    private const string MiscSharedByAllSenses = "misc_shared_by_all_senses";
-    private const string Misc = "misc";
-    private const string DialectsSharedByAllSenses = "dialects_shared_by_all_senses";
-    private const string Dialects = "dialects";
-    private const string LoanwordEtymology = "loanword_etymology";
-    private const string CrossReferences = "cross_references";
-    private const string Info = "info";
+    internal const string FieldsSharedByAllSenses = "fields_shared_by_all_senses";
+    internal const string Fields = "fields";
+    internal const string MiscSharedByAllSenses = "misc_shared_by_all_senses";
+    internal const string Misc = "misc";
+    internal const string DialectsSharedByAllSenses = "dialects_shared_by_all_senses";
+    internal const string Dialects = "dialects";
+    internal const string LoanwordEtymology = "loanword_etymology";
+    internal const string CrossReferences = "cross_references";
+    internal const string Info = "info";
 
     public const string RecordSearchKey = "record_search_key";
     public const string SearchKey = "search_key";
@@ -197,18 +199,6 @@ internal static class JmdictDBManager
         {
             DictUtils.JmdictEntities.Clear();
 
-            // ReSharper disable once UseAwaitUsing
-            using FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso);
-
-            // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
-            // And we do need EntityHandling property because we want to get unexpanded entity names
-            // The downside of using XmlTextReader is that it does not support async methods
-            // And we cannot set some settings (e.g. MaxCharactersFromEntities)
-            using XmlTextReader xmlReader = new(fileStream);
-            xmlReader.DtdProcessing = DtdProcessing.Parse;
-            xmlReader.WhitespaceHandling = WhitespaceHandling.None;
-            xmlReader.EntityHandling = EntityHandling.ExpandCharEntities;
-
             ProperNameEntriesOption? properNamesEntriesOption = dict.Options.ProperNameEntries;
             Debug.Assert(properNamesEntriesOption is not null);
             bool includeProperNames = properNamesEntriesOption.Value;
@@ -237,6 +227,11 @@ internal static class JmdictDBManager
                 maxTotalFuseji = 0;
             }
 
+            // ReSharper disable once UseAwaitUsing
+            using FileStream? sourceFileLock = generateFusejiVariants || generateMazegaki
+                ? new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read)
+                : null;
+
             long rowId = 1;
 
             // ReSharper disable once UseAwaitUsing
@@ -249,212 +244,90 @@ internal static class JmdictDBManager
             SqliteTransaction transaction = connection.BeginTransaction();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-            // ReSharper disable once UseAwaitUsing
-            using SqliteCommand insertRecordCommand = connection.CreateCommand();
-            insertRecordCommand.CommandText =
-                $"""
-                INSERT INTO {Record} ({RowId}, {EdictId}, {PrimarySpelling}, {PrimarySpellingOrthographyInfo}, {AlternativeSpellings}, {AlternativeSpellingsOrthographyInfo}, {Readings}, {ReadingsOrthographyInfo}, {ReadingRestrictions}, {Glossary}, {GlossaryInfo}, {PartOfSpeechSharedByAllSenses}, {PartOfSpeech}, {SpellingRestrictions}, {FieldsSharedByAllSenses}, {Fields}, {MiscSharedByAllSenses}, {Misc}, {DialectsSharedByAllSenses}, {Dialects}, {LoanwordEtymology}, {CrossReferences}, {Info})
-                VALUES (@{RowId}, @{EdictId}, @{PrimarySpelling}, @{PrimarySpellingOrthographyInfo}, @{AlternativeSpellings}, @{AlternativeSpellingsOrthographyInfo}, @{Readings}, @{ReadingsOrthographyInfo}, @{ReadingRestrictions}, @{Glossary}, @{GlossaryInfo}, @{PartOfSpeechSharedByAllSenses}, @{PartOfSpeech}, @{SpellingRestrictions}, @{FieldsSharedByAllSenses}, @{Fields}, @{MiscSharedByAllSenses}, @{Misc}, @{DialectsSharedByAllSenses}, @{Dialects}, @{LoanwordEtymology}, @{CrossReferences}, @{Info});
-                """;
-
-            SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-            SqliteParameter edictIdParam = new($"@{EdictId}", SqliteType.Integer);
-            SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
-            SqliteParameter primarySpellingOrthographyInfoParam = new($"@{PrimarySpellingOrthographyInfo}", SqliteType.Blob);
-            SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
-            SqliteParameter alternativeSpellingsOrthographyInfoParam = new($"@{AlternativeSpellingsOrthographyInfo}", SqliteType.Blob);
-            SqliteParameter readingsParam = new($"@{Readings}", SqliteType.Blob);
-            SqliteParameter readingsOrthographyInfoParam = new($"@{ReadingsOrthographyInfo}", SqliteType.Blob);
-            SqliteParameter readingRestrictionsParam = new($"@{ReadingRestrictions}", SqliteType.Blob);
-            SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-            SqliteParameter glossaryInfoParam = new($"@{GlossaryInfo}", SqliteType.Blob);
-            SqliteParameter partOfSpeechSharedByAllSensesParam = new($"@{PartOfSpeechSharedByAllSenses}", SqliteType.Blob);
-            SqliteParameter partOfSpeechParam = new($"@{PartOfSpeech}", SqliteType.Blob);
-            SqliteParameter spellingRestrictionsParam = new($"@{SpellingRestrictions}", SqliteType.Blob);
-            SqliteParameter fieldsSharedByAllSensesParam = new($"@{FieldsSharedByAllSenses}", SqliteType.Blob);
-            SqliteParameter fieldsParam = new($"@{Fields}", SqliteType.Blob);
-            SqliteParameter miscSharedByAllSensesParam = new($"@{MiscSharedByAllSenses}", SqliteType.Blob);
-            SqliteParameter miscParam = new($"@{Misc}", SqliteType.Blob);
-            SqliteParameter dialectsSharedByAllSensesParam = new($"@{DialectsSharedByAllSenses}", SqliteType.Blob);
-            SqliteParameter dialectsParam = new($"@{Dialects}", SqliteType.Blob);
-            SqliteParameter loanwordEtymologyParam = new($"@{LoanwordEtymology}", SqliteType.Blob);
-            SqliteParameter crossReferencesParam = new($"@{CrossReferences}", SqliteType.Blob);
-            SqliteParameter infoParam = new($"@{Info}", SqliteType.Blob);
-            insertRecordCommand.Parameters.AddRange([
-                rowidParam,
-                    edictIdParam,
-                    primarySpellingParam,
-                    primarySpellingOrthographyInfoParam,
-                    alternativeSpellingsParam,
-                    alternativeSpellingsOrthographyInfoParam,
-                    readingsParam,
-                    readingsOrthographyInfoParam,
-                    readingRestrictionsParam,
-                    glossaryParam,
-                    glossaryInfoParam,
-                    partOfSpeechSharedByAllSensesParam,
-                    partOfSpeechParam,
-                    spellingRestrictionsParam,
-                    fieldsSharedByAllSensesParam,
-                    fieldsParam,
-                    miscSharedByAllSensesParam,
-                    miscParam,
-                    dialectsSharedByAllSensesParam,
-                    dialectsParam,
-                    loanwordEtymologyParam,
-                    crossReferencesParam,
-                    infoParam
-                ]);
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-            insertRecordCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-            // ReSharper disable once UseAwaitUsing
-            using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-            insertSearchKeyCommand.CommandText =
-                $"""
-                INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
-                VALUES (@{RecordId}, @{SearchKey});
-                """;
-
-            SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
-            SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
-            insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
-#pragma warning disable CA1849 // Call async methods when in an async method
-            insertSearchKeyCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
+            using JmdictRecordInserter recordInserter = new(connection);
 
             Dictionary<JmdictRecord, List<string>> recordsToKeys = [];
             int transactionRecordCount = 0;
-            while (xmlReader.ReadToFollowing("entry"))
+            Channel<Dictionary<string, JmdictRecord>[]> availableBatches = Channel.CreateUnbounded<Dictionary<string, JmdictRecord>[]>(new UnboundedChannelOptions
             {
-                Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(JmdictLoader.ReadEntry(xmlReader), includeProperNames);
-                if (recordDictionary is not null)
+                SingleReader = true,
+                SingleWriter = true
+            });
+            Channel<(Dictionary<string, JmdictRecord>[] Records, int Count)> readyBatches = Channel.CreateUnbounded<(Dictionary<string, JmdictRecord>[] Records, int Count)>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = true
+            });
+
+            _ = availableBatches.Writer.TryWrite(new Dictionary<string, JmdictRecord>[ImportRecordBatchSize]);
+            _ = availableBatches.Writer.TryWrite(new Dictionary<string, JmdictRecord>[ImportRecordBatchSize]);
+
+            Task producer = Task.Run(() => CreateImportRecordBatches(fullPath, includeProperNames, availableBatches.Reader, readyBatches.Writer));
+            try
+            {
+                await foreach ((Dictionary<string, JmdictRecord>[] batch, int count) in readyBatches.Reader.ReadAllAsync().ConfigureAwait(false))
                 {
-                    foreach ((string key, JmdictRecord record) in recordDictionary)
+                    for (int i = 0; i < count; i++)
                     {
-                        ref List<string>? keys = ref CollectionsMarshal.GetValueRefOrAddDefault(recordsToKeys, record, out bool exists);
-                        if (exists)
+                        Dictionary<string, JmdictRecord> recordDictionary = batch[i];
+                        foreach ((string key, JmdictRecord record) in recordDictionary)
                         {
-                            Debug.Assert(keys is not null);
-                            keys.Add(key);
-                        }
-                        else
-                        {
-                            keys = [key];
-                        }
-                    }
-
-                    foreach ((JmdictRecord record, List<string> keys) in recordsToKeys)
-                    {
-                        rowidParam.Value = rowId;
-                        edictIdParam.Value = record.Id;
-                        primarySpellingParam.Value = record.PrimarySpelling;
-                        primarySpellingOrthographyInfoParam.Value = record.PrimarySpellingOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.PrimarySpellingOrthographyInfo) : DBNull.Value;
-                        alternativeSpellingsParam.Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
-                        alternativeSpellingsOrthographyInfoParam.Value = record.AlternativeSpellingsOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo) : DBNull.Value;
-                        readingsParam.Value = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : DBNull.Value;
-                        readingsOrthographyInfoParam.Value = record.ReadingsOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.ReadingsOrthographyInfo) : DBNull.Value;
-                        readingRestrictionsParam.Value = record.ReadingRestrictions is not null ? MessagePackSerializer.Serialize(record.ReadingRestrictions) : DBNull.Value;
-                        glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
-                        glossaryInfoParam.Value = record.DefinitionInfo is not null ? MessagePackSerializer.Serialize(record.DefinitionInfo) : DBNull.Value;
-                        partOfSpeechSharedByAllSensesParam.Value = record.WordClassesSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.WordClassesSharedByAllSenses) : DBNull.Value;
-                        partOfSpeechParam.Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
-                        spellingRestrictionsParam.Value = record.SpellingRestrictions is not null ? MessagePackSerializer.Serialize(record.SpellingRestrictions) : DBNull.Value;
-                        fieldsSharedByAllSensesParam.Value = record.FieldsSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.FieldsSharedByAllSenses) : DBNull.Value;
-                        fieldsParam.Value = record.Fields is not null ? MessagePackSerializer.Serialize(record.Fields) : DBNull.Value;
-                        miscSharedByAllSensesParam.Value = record.MiscSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.MiscSharedByAllSenses) : DBNull.Value;
-                        miscParam.Value = record.Misc is not null ? MessagePackSerializer.Serialize(record.Misc) : DBNull.Value;
-                        dialectsSharedByAllSensesParam.Value = record.DialectsSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.DialectsSharedByAllSenses) : DBNull.Value;
-                        dialectsParam.Value = record.Dialects is not null ? MessagePackSerializer.Serialize(record.Dialects) : DBNull.Value;
-                        loanwordEtymologyParam.Value = record.LoanwordEtymology is not null ? MessagePackSerializer.Serialize(record.LoanwordEtymology) : DBNull.Value;
-                        crossReferencesParam.Value = record.CrossReferences is not null ? MessagePackSerializer.Serialize(record.CrossReferences) : DBNull.Value;
-                        infoParam.Value = record.Info is not null ? MessagePackSerializer.Serialize(record.Info) : DBNull.Value;
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        _ = insertRecordCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                        HashSet<string> uniqueKeys = [.. keys];
-                        if (generateFusejiVariants || generateMazegaki)
-                        {
-                            foreach (string key in keys)
+                            ref List<string>? keys = ref CollectionsMarshal.GetValueRefOrAddDefault(recordsToKeys, record, out bool exists);
+                            if (exists)
                             {
-                                if (generateFusejiVariants)
-                                {
-                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(key, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                    {
-                                        _ = uniqueKeys.Add(fusejiVariant);
-                                    }
-                                }
-
-                                if (generateMazegaki && record.Readings is not null)
-                                {
-                                    foreach (string reading in record.Readings)
-                                    {
-                                        string readingInHiragana = JapaneseUtils.NormalizeText(reading);
-                                        if (readingInHiragana != key)
-                                        {
-                                            foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(key, readingInHiragana))
-                                            {
-                                                if (!recordDictionary.ContainsKey(mazegaki))
-                                                {
-                                                    if (uniqueKeys.Add(mazegaki) && generateFusejiVariants)
-                                                    {
-                                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                                        {
-                                                            if (!recordDictionary.ContainsKey(fusejiVariant))
-                                                            {
-                                                                _ = uniqueKeys.Add(fusejiVariant);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                Debug.Assert(keys is not null);
+                                keys.Add(key);
+                            }
+                            else
+                            {
+                                keys = [key];
                             }
                         }
 
-                        recordIdParam.Value = rowId;
-                        foreach (string key in uniqueKeys)
+                        foreach ((JmdictRecord record, List<string> keys) in recordsToKeys)
                         {
-                            searchKeyParam.Value = key;
+                            recordInserter.InsertRecord(rowId, record);
+                            recordInserter.InsertSearchKeys(rowId, CollectionsMarshal.AsSpan(keys));
+
+                            transactionRecordCount += keys.Count;
+                            if (transactionRecordCount > DBUtils.TransactionBatchSize)
+                            {
 #pragma warning disable CA1849 // Call async methods when in an async method
-                            _ = insertSearchKeyCommand.ExecuteNonQuery();
+                                transaction.Commit();
 #pragma warning restore CA1849 // Call async methods when in an async method
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                // ReSharper disable once MethodHasAsyncOverload
+                                transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                                dict.Ready = true;
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                                transactionRecordCount = 0;
+                            }
+
+                            ++rowId;
                         }
 
-                        transactionRecordCount += uniqueKeys.Count;
-                        uniqueKeys.Clear();
-                        if (transactionRecordCount > DBUtils.TransactionBatchSize)
-                        {
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            transaction.Commit();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            // ReSharper disable once MethodHasAsyncOverload
-                            transaction.Dispose();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                            dict.Ready = true;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                            transaction = connection.BeginTransaction();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                            transactionRecordCount = 0;
-                            insertRecordCommand.Transaction = transaction;
-                            insertSearchKeyCommand.Transaction = transaction;
-                        }
-
-                        ++rowId;
+                        recordsToKeys.Clear();
                     }
 
-                    recordsToKeys.Clear();
+                    Array.Clear(batch, 0, count);
+                    _ = availableBatches.Writer.TryWrite(batch);
                 }
+            }
+            catch (Exception exception)
+            {
+                _ = availableBatches.Writer.TryComplete(exception);
+                throw;
+            }
+            finally
+            {
+                await producer.ConfigureAwait(false);
             }
 
             if (transactionRecordCount > 0)
@@ -470,6 +343,12 @@ internal static class JmdictDBManager
             // ReSharper disable once MethodHasAsyncOverload
             transaction.Dispose();
 #pragma warning restore CA1849 // Call async methods when in an async method
+
+            if (rowId > 1 && (generateFusejiVariants || generateMazegaki))
+            {
+                DBUtils.FlushWalLog(connection);
+                await InsertVariantSearchKeys(fullPath, connection, recordInserter, rowId, includeProperNames, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration).ConfigureAwait(false);
+            }
 
             if (rowId > 1)
             {
@@ -543,6 +422,267 @@ internal static class JmdictDBManager
         }
     }
 
+    private static async Task CreateImportRecordBatches(string fullPath, bool includeProperNames, ChannelReader<Dictionary<string, JmdictRecord>[]> availableBatches, ChannelWriter<(Dictionary<string, JmdictRecord>[] Records, int Count)> readyBatches)
+    {
+        List<KanjiElement> kanjiElements = [];
+        List<ReadingElement> readingElements = [];
+        List<Sense> senseList = [];
+        List<string> glossList = [];
+        List<string> posList = [];
+        try
+        {
+            // ReSharper disable once UseAwaitUsing
+            using FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso);
+
+            // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
+            // And we do need EntityHandling property because we want to get unexpanded entity names
+            // The downside of using XmlTextReader is that it does not support async methods
+            // And we cannot set some settings (e.g. MaxCharactersFromEntities)
+            using XmlTextReader xmlReader = new(fileStream);
+            xmlReader.DtdProcessing = DtdProcessing.Parse;
+            xmlReader.WhitespaceHandling = WhitespaceHandling.None;
+            xmlReader.EntityHandling = EntityHandling.ExpandCharEntities;
+
+            Dictionary<string, JmdictRecord>[] batch = await availableBatches.ReadAsync().ConfigureAwait(false);
+            int count = 0;
+            while (xmlReader.ReadToFollowing("entry"))
+            {
+                Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(JmdictLoader.ReadEntry(xmlReader, includeProperNames, kanjiElements, readingElements, senseList, glossList, posList), includeProperNames);
+                kanjiElements.Clear();
+                readingElements.Clear();
+                senseList.Clear();
+                if (recordDictionary is not null && recordDictionary.Count > 0)
+                {
+                    batch[count] = recordDictionary;
+                    ++count;
+                    if (count == batch.Length)
+                    {
+                        _ = readyBatches.TryWrite((batch, count));
+                        batch = await availableBatches.ReadAsync().ConfigureAwait(false);
+                        count = 0;
+                    }
+                }
+            }
+
+            if (count > 0)
+            {
+                _ = readyBatches.TryWrite((batch, count));
+            }
+
+            _ = readyBatches.TryComplete();
+        }
+        catch (Exception exception)
+        {
+            _ = readyBatches.TryComplete(exception);
+        }
+    }
+
+    private static async Task InsertVariantSearchKeys(string fullPath, SqliteConnection connection, JmdictRecordInserter recordInserter, long expectedNextRowId, bool includeProperNames, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration)
+    {
+        int transactionRecordCount = 0;
+        long rowId = 1;
+
+        Channel<Dictionary<string, JmdictRecord>[]> availableBatches = Channel.CreateUnbounded<Dictionary<string, JmdictRecord>[]>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = true
+        });
+        Channel<(Dictionary<string, JmdictRecord>[] Records, int Count)> readyBatches = Channel.CreateUnbounded<(Dictionary<string, JmdictRecord>[] Records, int Count)>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = true
+        });
+        _ = availableBatches.Writer.TryWrite(new Dictionary<string, JmdictRecord>[ImportRecordBatchSize]);
+        _ = availableBatches.Writer.TryWrite(new Dictionary<string, JmdictRecord>[ImportRecordBatchSize]);
+
+        Channel<(List<string> Keys, List<int> EndOffsets)> availableKeyBatches = Channel.CreateUnbounded<(List<string> Keys, List<int> EndOffsets)>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = true
+        });
+        Channel<(List<string> Keys, List<int> EndOffsets)> readyKeyBatches = Channel.CreateUnbounded<(List<string> Keys, List<int> EndOffsets)>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = true
+        });
+        _ = availableKeyBatches.Writer.TryWrite(([], []));
+        _ = availableKeyBatches.Writer.TryWrite(([], []));
+
+        Task producer = Task.Run(() => CreateImportRecordBatches(fullPath, includeProperNames, availableBatches.Reader, readyBatches.Writer));
+        Task keyProducer = Task.Run(() => CreateVariantSearchKeyBatches(readyBatches.Reader, availableBatches.Writer, availableKeyBatches.Reader, readyKeyBatches.Writer, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration));
+#pragma warning disable CA1849 // Call async methods when in an async method
+        SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+        try
+        {
+            try
+            {
+                await foreach ((List<string> keys, List<int> endOffsets) in readyKeyBatches.Reader.ReadAllAsync().ConfigureAwait(false))
+                {
+                    int startOffset = 0;
+                    ReadOnlySpan<string> searchKeys = CollectionsMarshal.AsSpan(keys);
+                    foreach (int endOffset in endOffsets)
+                    {
+                        int keyCount = endOffset - startOffset;
+                        if (keyCount > 0)
+                        {
+                            recordInserter.InsertSearchKeys(rowId, searchKeys.Slice(startOffset, keyCount));
+                            transactionRecordCount += keyCount;
+
+                            if (transactionRecordCount > VariantSearchKeyTransactionBatchSize)
+                            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                transaction.Commit();
+
+                                // ReSharper disable once MethodHasAsyncOverload
+                                transaction.Dispose();
+
+                                transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+                                transactionRecordCount = 0;
+                            }
+                        }
+
+                        ++rowId;
+                        startOffset = endOffset;
+                    }
+
+                    keys.Clear();
+                    endOffsets.Clear();
+                    _ = availableKeyBatches.Writer.TryWrite((keys, endOffsets));
+                }
+            }
+            catch (Exception exception)
+            {
+                _ = availableBatches.Writer.TryComplete(exception);
+                _ = availableKeyBatches.Writer.TryComplete(exception);
+                throw;
+            }
+            finally
+            {
+                await keyProducer.ConfigureAwait(false);
+                await producer.ConfigureAwait(false);
+            }
+
+            if (rowId != expectedNextRowId)
+            {
+                throw new InvalidOperationException("JMdict changed while generating variant search keys.");
+            }
+
+            if (transactionRecordCount > 0)
+            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+            }
+        }
+        finally
+        {
+#pragma warning disable CA1849 // Call async methods when in an async method
+            // ReSharper disable once MethodHasAsyncOverload
+            transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+        }
+    }
+
+    private static async Task CreateVariantSearchKeyBatches(ChannelReader<(Dictionary<string, JmdictRecord>[] Records, int Count)> recordBatches, ChannelWriter<Dictionary<string, JmdictRecord>[]> availableRecordBatches, ChannelReader<(List<string> Keys, List<int> EndOffsets)> availableKeyBatches, ChannelWriter<(List<string> Keys, List<int> EndOffsets)> readyKeyBatches, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration)
+    {
+        Dictionary<JmdictRecord, List<string>> recordsToKeys = [];
+        HashSet<string> uniqueKeys = new(StringComparer.Ordinal);
+        try
+        {
+            await foreach ((Dictionary<string, JmdictRecord>[] batch, int count) in recordBatches.ReadAllAsync().ConfigureAwait(false))
+            {
+                (List<string> keys, List<int> endOffsets) = await availableKeyBatches.ReadAsync().ConfigureAwait(false);
+                for (int i = 0; i < count; i++)
+                {
+                    Dictionary<string, JmdictRecord> recordDictionary = batch[i];
+                    foreach ((string key, JmdictRecord record) in recordDictionary)
+                    {
+                        ref List<string>? recordKeys = ref CollectionsMarshal.GetValueRefOrAddDefault(recordsToKeys, record, out bool exists);
+                        if (exists)
+                        {
+                            Debug.Assert(recordKeys is not null);
+                            recordKeys.Add(key);
+                        }
+                        else
+                        {
+                            recordKeys = [key];
+                        }
+                    }
+
+                    foreach ((JmdictRecord record, List<string> recordKeys) in recordsToKeys)
+                    {
+                        foreach (string key in recordKeys)
+                        {
+                            _ = uniqueKeys.Add(key);
+                        }
+
+                        foreach (string key in recordKeys)
+                        {
+                            if (generateFusejiVariants)
+                            {
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(key, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    _ = uniqueKeys.Add(fusejiVariant);
+                                }
+                            }
+
+                            if (generateMazegaki && record.Readings is not null)
+                            {
+                                foreach (string reading in record.Readings)
+                                {
+                                    string readingInHiragana = JapaneseUtils.NormalizeText(reading);
+                                    if (readingInHiragana != key)
+                                    {
+                                        foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(key, readingInHiragana))
+                                        {
+                                            if (!recordDictionary.ContainsKey(mazegaki))
+                                            {
+                                                if (uniqueKeys.Add(mazegaki) && generateFusejiVariants)
+                                                {
+                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                                    {
+                                                        if (!recordDictionary.ContainsKey(fusejiVariant))
+                                                        {
+                                                            _ = uniqueKeys.Add(fusejiVariant);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach (string key in recordKeys)
+                        {
+                            _ = uniqueKeys.Remove(key);
+                        }
+
+                        keys.AddRange(uniqueKeys);
+                        endOffsets.Add(keys.Count);
+                        uniqueKeys.Clear();
+                    }
+
+                    recordsToKeys.Clear();
+                }
+
+                Array.Clear(batch, 0, count);
+                _ = availableRecordBatches.TryWrite(batch);
+                _ = readyKeyBatches.TryWrite((keys, endOffsets));
+            }
+
+            _ = readyKeyBatches.TryComplete();
+        }
+        catch (Exception exception)
+        {
+            _ = availableRecordBatches.TryComplete(exception);
+            _ = readyKeyBatches.TryComplete(exception);
+        }
+    }
+
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
         const string query =
@@ -599,109 +739,12 @@ internal static class JmdictDBManager
         DBUtils.ConfigureForBulkWrite(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {EdictId}, {PrimarySpelling}, {PrimarySpellingOrthographyInfo}, {AlternativeSpellings}, {AlternativeSpellingsOrthographyInfo}, {Readings}, {ReadingsOrthographyInfo}, {ReadingRestrictions}, {Glossary}, {GlossaryInfo}, {PartOfSpeechSharedByAllSenses}, {PartOfSpeech}, {SpellingRestrictions}, {FieldsSharedByAllSenses}, {Fields}, {MiscSharedByAllSenses}, {Misc}, {DialectsSharedByAllSenses}, {Dialects}, {LoanwordEtymology}, {CrossReferences}, {Info})
-            VALUES (@{RowId}, @{EdictId}, @{PrimarySpelling}, @{PrimarySpellingOrthographyInfo}, @{AlternativeSpellings}, @{AlternativeSpellingsOrthographyInfo}, @{Readings}, @{ReadingsOrthographyInfo}, @{ReadingRestrictions}, @{Glossary}, @{GlossaryInfo}, @{PartOfSpeechSharedByAllSenses}, @{PartOfSpeech}, @{SpellingRestrictions}, @{FieldsSharedByAllSenses}, @{Fields}, @{MiscSharedByAllSenses}, @{Misc}, @{DialectsSharedByAllSenses}, @{Dialects}, @{LoanwordEtymology}, @{CrossReferences}, @{Info});
-            """;
-
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter edictIdParam = new($"@{EdictId}", SqliteType.Integer);
-        SqliteParameter primarySpellingParam = new($"@{PrimarySpelling}", SqliteType.Text);
-        SqliteParameter primarySpellingOrthographyInfoParam = new($"@{PrimarySpellingOrthographyInfo}", SqliteType.Blob);
-        SqliteParameter alternativeSpellingsParam = new($"@{AlternativeSpellings}", SqliteType.Blob);
-        SqliteParameter alternativeSpellingsOrthographyInfoParam = new($"@{AlternativeSpellingsOrthographyInfo}", SqliteType.Blob);
-        SqliteParameter readingsParam = new($"@{Readings}", SqliteType.Blob);
-        SqliteParameter readingsOrthographyInfoParam = new($"@{ReadingsOrthographyInfo}", SqliteType.Blob);
-        SqliteParameter readingRestrictionsParam = new($"@{ReadingRestrictions}", SqliteType.Blob);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter glossaryInfoParam = new($"@{GlossaryInfo}", SqliteType.Blob);
-        SqliteParameter partOfSpeechSharedByAllSensesParam = new($"@{PartOfSpeechSharedByAllSenses}", SqliteType.Blob);
-        SqliteParameter partOfSpeechParam = new($"@{PartOfSpeech}", SqliteType.Blob);
-        SqliteParameter spellingRestrictionsParam = new($"@{SpellingRestrictions}", SqliteType.Blob);
-        SqliteParameter fieldsSharedByAllSensesParam = new($"@{FieldsSharedByAllSenses}", SqliteType.Blob);
-        SqliteParameter fieldsParam = new($"@{Fields}", SqliteType.Blob);
-        SqliteParameter miscSharedByAllSensesParam = new($"@{MiscSharedByAllSenses}", SqliteType.Blob);
-        SqliteParameter miscParam = new($"@{Misc}", SqliteType.Blob);
-        SqliteParameter dialectsSharedByAllSensesParam = new($"@{DialectsSharedByAllSenses}", SqliteType.Blob);
-        SqliteParameter dialectsParam = new($"@{Dialects}", SqliteType.Blob);
-        SqliteParameter loanwordEtymologyParam = new($"@{LoanwordEtymology}", SqliteType.Blob);
-        SqliteParameter crossReferencesParam = new($"@{CrossReferences}", SqliteType.Blob);
-        SqliteParameter infoParam = new($"@{Info}", SqliteType.Blob);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            edictIdParam,
-            primarySpellingParam,
-            primarySpellingOrthographyInfoParam,
-            alternativeSpellingsParam,
-            alternativeSpellingsOrthographyInfoParam,
-            readingsParam,
-            readingsOrthographyInfoParam,
-            readingRestrictionsParam,
-            glossaryParam,
-            glossaryInfoParam,
-            partOfSpeechSharedByAllSensesParam,
-            partOfSpeechParam,
-            spellingRestrictionsParam,
-            fieldsSharedByAllSensesParam,
-            fieldsParam,
-            miscSharedByAllSensesParam,
-            miscParam,
-            dialectsSharedByAllSensesParam,
-            dialectsParam,
-            loanwordEtymologyParam,
-            crossReferencesParam,
-            infoParam
-        ]);
-
-        insertRecordCommand.Prepare();
-
-        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-        insertSearchKeyCommand.CommandText =
-            $"""
-            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
-            VALUES (@{RecordId}, @{SearchKey});
-            """;
-
-        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
-        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
-        insertSearchKeyCommand.Prepare();
+        using JmdictRecordInserter recordInserter = new(connection);
 
         foreach ((JmdictRecord record, List<string> keys) in recordToKeysDict)
         {
-            rowidParam.Value = rowId;
-            edictIdParam.Value = record.Id;
-            primarySpellingParam.Value = record.PrimarySpelling;
-            primarySpellingOrthographyInfoParam.Value = record.PrimarySpellingOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.PrimarySpellingOrthographyInfo) : DBNull.Value;
-            alternativeSpellingsParam.Value = record.AlternativeSpellings is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellings) : DBNull.Value;
-            alternativeSpellingsOrthographyInfoParam.Value = record.AlternativeSpellingsOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo) : DBNull.Value;
-            readingsParam.Value = record.Readings is not null ? MessagePackSerializer.Serialize(record.Readings) : DBNull.Value;
-            readingsOrthographyInfoParam.Value = record.ReadingsOrthographyInfo is not null ? MessagePackSerializer.Serialize(record.ReadingsOrthographyInfo) : DBNull.Value;
-            readingRestrictionsParam.Value = record.ReadingRestrictions is not null ? MessagePackSerializer.Serialize(record.ReadingRestrictions) : DBNull.Value;
-            glossaryParam.Value = MessagePackSerializer.Serialize(record.Definitions);
-            glossaryInfoParam.Value = record.DefinitionInfo is not null ? MessagePackSerializer.Serialize(record.DefinitionInfo) : DBNull.Value;
-            partOfSpeechSharedByAllSensesParam.Value = record.WordClassesSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.WordClassesSharedByAllSenses) : DBNull.Value;
-            partOfSpeechParam.Value = record.WordClasses is not null ? MessagePackSerializer.Serialize(record.WordClasses) : DBNull.Value;
-            spellingRestrictionsParam.Value = record.SpellingRestrictions is not null ? MessagePackSerializer.Serialize(record.SpellingRestrictions) : DBNull.Value;
-            fieldsSharedByAllSensesParam.Value = record.FieldsSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.FieldsSharedByAllSenses) : DBNull.Value;
-            fieldsParam.Value = record.Fields is not null ? MessagePackSerializer.Serialize(record.Fields) : DBNull.Value;
-            miscSharedByAllSensesParam.Value = record.MiscSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.MiscSharedByAllSenses) : DBNull.Value;
-            miscParam.Value = record.Misc is not null ? MessagePackSerializer.Serialize(record.Misc) : DBNull.Value;
-            dialectsSharedByAllSensesParam.Value = record.DialectsSharedByAllSenses is not null ? MessagePackSerializer.Serialize(record.DialectsSharedByAllSenses) : DBNull.Value;
-            dialectsParam.Value = record.Dialects is not null ? MessagePackSerializer.Serialize(record.Dialects) : DBNull.Value;
-            loanwordEtymologyParam.Value = record.LoanwordEtymology is not null ? MessagePackSerializer.Serialize(record.LoanwordEtymology) : DBNull.Value;
-            crossReferencesParam.Value = record.CrossReferences is not null ? MessagePackSerializer.Serialize(record.CrossReferences) : DBNull.Value;
-            infoParam.Value = record.Info is not null ? MessagePackSerializer.Serialize(record.Info) : DBNull.Value;
-            _ = insertRecordCommand.ExecuteNonQuery();
-
-            recordIdParam.Value = rowId;
-            foreach (ref readonly string key in keys.AsReadOnlySpan())
-            {
-                searchKeyParam.Value = key;
-                _ = insertSearchKeyCommand.ExecuteNonQuery();
-            }
+            recordInserter.InsertRecord(rowId, record);
+            recordInserter.InsertSearchKeys(rowId, CollectionsMarshal.AsSpan(keys));
 
             ++rowId;
         }
@@ -804,6 +847,9 @@ internal static class JmdictDBManager
             GROUP BY r.{RowId};
             """;
 
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
+
         using SqliteRecordReader reader = new(connection, query);
         while (reader.Read())
         {
@@ -811,8 +857,6 @@ internal static class JmdictDBManager
             string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
             Debug.Assert(searchKeys is not null);
 
-            Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
-            Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
             foreach (string searchKey in searchKeys)
             {
                 ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
