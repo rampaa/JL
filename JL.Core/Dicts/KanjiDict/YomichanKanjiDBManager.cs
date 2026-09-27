@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Threading.Channels;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
@@ -13,17 +14,19 @@ namespace JL.Core.Dicts.KanjiDict;
 
 internal static class YomichanKanjiDBManager
 {
-    public const int Version = 7;
+    public const int Version = 8;
 
     public const int Size = 20000;
+    private const int ImportRecordBatchSize = 128;
+    private const int ImportBatchChannelCapacity = 256;
 
-    private const string Record = "record";
-    private const string RowId = "rowid";
-    private const string Kanji = "kanji";
-    private const string OnReadings = "on_readings";
-    private const string KunReadings = "kun_readings";
-    private const string Glossary = "glossary";
-    private const string Stats = "stats";
+    internal const string Record = "record";
+    internal const string RowId = "rowid";
+    internal const string Kanji = "kanji";
+    internal const string OnReadings = "on_readings";
+    internal const string KunReadings = "kun_readings";
+    internal const string Glossary = "glossary";
+    internal const string Stats = "stats";
 
     private const string Term = "term";
     private const string SingleTermQuery =
@@ -31,6 +34,13 @@ internal static class YomichanKanjiDBManager
         SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}
         FROM {Record} r
         WHERE r.{Kanji} = @{Term};
+        """;
+
+    private const string KanjiWithVariationSelectorQuery =
+        $"""
+        SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}, r.{Kanji}
+        FROM {Record} r
+        WHERE r.{Kanji} IN (@1, @2);
         """;
 
     private enum ColumnIndex
@@ -93,32 +103,7 @@ internal static class YomichanKanjiDBManager
 
         DBUtils.ConfigureForBulkWrite(connection);
 
-        // ReSharper disable once UseAwaitUsing
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats})
-            VALUES (@{RowId}, @{Kanji}, @{OnReadings}, @{KunReadings}, @{Glossary}, @{Stats});
-            """;
-
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter kanjiParam = new($"@{Kanji}", SqliteType.Text);
-        SqliteParameter onReadingsParam = new($"@{OnReadings}", SqliteType.Blob);
-        SqliteParameter kunReadingsParam = new($"@{KunReadings}", SqliteType.Blob);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter statsParam = new($"@{Stats}", SqliteType.Blob);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            kanjiParam,
-            onReadingsParam,
-            kunReadingsParam,
-            glossaryParam,
-            statsParam
-        ]);
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-        insertRecordCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
+        using YomichanKanjiRecordInserter recordInserter = new(connection);
 
         int transactionRecordCount = 0;
         foreach (string jsonFile in jsonFiles)
@@ -127,61 +112,51 @@ internal static class YomichanKanjiDBManager
             SqliteTransaction transaction = connection.BeginTransaction();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-            insertRecordCommand.Transaction = transaction;
-
-            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-            await using (fileStream.ConfigureAwait(false))
+            if (new FileInfo(jsonFile).Length <= YomichanKanjiLoader.WholeFileParsingThreshold)
             {
-                await foreach (JsonElement[]? jsonObj in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                byte[] jsonBytes = await File.ReadAllBytesAsync(jsonFile).ConfigureAwait(false);
+                Channel<YomichanKanjiSerializedRecord[]> batches = Channel.CreateBounded<YomichanKanjiSerializedRecord[]>(new BoundedChannelOptions(ImportBatchChannelCapacity)
                 {
-                    Debug.Assert(jsonObj is not null);
-                    string? kanji = jsonObj[0].GetString();
-                    Debug.Assert(kanji is not null);
-                    if (string.IsNullOrWhiteSpace(kanji))
+                    SingleReader = true,
+                    SingleWriter = true,
+                    FullMode = BoundedChannelFullMode.Wait
+                });
+                Task producer = Task.Run(() => CreateSerializedRecordBatches(jsonBytes, batches.Writer));
+                try
+                {
+                    await foreach (YomichanKanjiSerializedRecord[] batch in batches.Reader.ReadAllAsync().ConfigureAwait(false))
                     {
-                        continue;
+                        for (int i = 0; i < batch.Length; i++)
+                        {
+                            ref readonly YomichanKanjiSerializedRecord record = ref batch[i];
+                            InsertSerializedRecord(connection, recordInserter, dict, record.Kanji, record.OnReadings, record.KunReadings, record.Definitions, record.Stats, ref rowId, ref transactionRecordCount, ref transaction);
+                        }
                     }
-
-                    YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
-                    Debug.Assert(yomichanKanjiRecord is not { Definitions: null, KunReadings: null, OnReadings: null, Stats: null });
-                    //if (yomichanKanjiRecord is { Definitions: null, KunReadings: null, OnReadings: null, Stats: null })
-                    //{
-                    //    continue;
-                    //}
-
-                    rowidParam.Value = rowId;
-                    kanjiParam.Value = kanji;
-                    onReadingsParam.Value = yomichanKanjiRecord.OnReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.OnReadings) : DBNull.Value;
-                    kunReadingsParam.Value = yomichanKanjiRecord.KunReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.KunReadings) : DBNull.Value;
-                    glossaryParam.Value = yomichanKanjiRecord.Definitions is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Definitions) : DBNull.Value;
-                    statsParam.Value = yomichanKanjiRecord.Stats is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Stats) : DBNull.Value;
-#pragma warning disable CA1849 // Call async methods when in an async method
-                    _ = insertRecordCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                    ++transactionRecordCount;
-                    if (transactionRecordCount > DBUtils.TransactionBatchSize)
+                }
+                finally
+                {
+                    _ = batches.Writer.TryComplete();
+                    await producer.ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+                await using (fileStream.ConfigureAwait(false))
+                {
+                    await foreach (JsonElement[]? jsonObj in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
                     {
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        transaction.Commit();
-#pragma warning restore CA1849 // Call async methods when in an async method
+                        Debug.Assert(jsonObj is not null);
+                        string? kanji = jsonObj[0].GetString();
+                        Debug.Assert(kanji is not null);
+                        if (string.IsNullOrWhiteSpace(kanji))
+                        {
+                            continue;
+                        }
 
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        // ReSharper disable once MethodHasAsyncOverload
-                        transaction.Dispose();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                        dict.Ready = true;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        transaction = connection.BeginTransaction();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                        transactionRecordCount = 0;
-                        insertRecordCommand.Transaction = transaction;
+                        YomichanKanjiRecord.ReadFields(jsonObj, out string[]? onReadings, out string[]? kunReadings, out string[]? definitions, out string[]? stats);
+                        InsertRecord(connection, recordInserter, dict, kanji, onReadings, kunReadings, definitions, stats, ref rowId, ref transactionRecordCount, ref transaction);
                     }
-
-                    ++rowId;
                 }
             }
 
@@ -229,13 +204,107 @@ internal static class YomichanKanjiDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
             dict.Size = GetDistinctKanjiCount(connection);
-            dict.MaxSearchKeyLength = 1;
         }
         else
         {
             dict.Size = 0;
             dict.MaxSearchKeyLength = 0;
         }
+    }
+
+    private static void CreateSerializedRecordBatches(byte[] jsonBytes, ChannelWriter<YomichanKanjiSerializedRecord[]> writer)
+    {
+        try
+        {
+            Utf8JsonReader reader = YomichanKanjiLoader.CreateJsonReader(jsonBytes);
+            if (!reader.Read() || reader.TokenType is not JsonTokenType.StartArray)
+            {
+                throw new JsonException("The Yomichan kanji bank root must be an array.");
+            }
+
+            YomichanKanjiSerializedRecord[] batch = new YomichanKanjiSerializedRecord[ImportRecordBatchSize];
+            int recordCount = 0;
+            while (reader.Read() && reader.TokenType is not JsonTokenType.EndArray)
+            {
+                YomichanKanjiLoader.ReadRecord(ref reader, out string kanji, out string[]? onReadings, out string[]? kunReadings, out string[]? definitions, out string[]? stats);
+                if (string.IsNullOrWhiteSpace(kanji))
+                {
+                    continue;
+                }
+
+                batch[recordCount] = new YomichanKanjiSerializedRecord(kanji,
+                    onReadings is not null ? MessagePackSerializer.Serialize(onReadings) : null,
+                    kunReadings is not null ? MessagePackSerializer.Serialize(kunReadings) : null,
+                    definitions is not null ? MessagePackSerializer.Serialize(definitions) : null,
+                    stats is not null ? MessagePackSerializer.Serialize(stats) : null);
+                ++recordCount;
+                if (recordCount == batch.Length)
+                {
+                    if (!writer.TryWrite(batch))
+                    {
+                        writer.WriteAsync(batch).AsTask().GetAwaiter().GetResult();
+                    }
+                    batch = new YomichanKanjiSerializedRecord[ImportRecordBatchSize];
+                    recordCount = 0;
+                }
+            }
+
+            if (reader.TokenType is not JsonTokenType.EndArray || reader.Read())
+            {
+                throw new JsonException("Unexpected content after the Yomichan kanji bank array.");
+            }
+
+            if (recordCount > 0)
+            {
+                Array.Resize(ref batch, recordCount);
+                if (!writer.TryWrite(batch))
+                {
+                    writer.WriteAsync(batch).AsTask().GetAwaiter().GetResult();
+                }
+            }
+
+            _ = writer.TryComplete();
+        }
+        catch (Exception exception)
+        {
+            _ = writer.TryComplete(exception);
+        }
+    }
+
+    private static void InsertRecord(SqliteConnection connection, YomichanKanjiRecordInserter recordInserter, Dict dict, string kanji, string[]? onReadings, string[]? kunReadings, string[]? definitions, string[]? stats, ref int rowId, ref int transactionRecordCount, ref SqliteTransaction transaction)
+    {
+        //if (definitions is null && kunReadings is null && onReadings is null && stats is null)
+        //{
+        //    return;
+        //}
+
+        byte[]? onReadingsBytes = onReadings is not null ? MessagePackSerializer.Serialize(onReadings) : null;
+        byte[]? kunReadingsBytes = kunReadings is not null ? MessagePackSerializer.Serialize(kunReadings) : null;
+        byte[]? definitionsBytes = definitions is not null ? MessagePackSerializer.Serialize(definitions) : null;
+        byte[]? statsBytes = stats is not null ? MessagePackSerializer.Serialize(stats) : null;
+        InsertSerializedRecord(connection, recordInserter, dict, kanji, onReadingsBytes, kunReadingsBytes, definitionsBytes, statsBytes, ref rowId, ref transactionRecordCount, ref transaction);
+    }
+
+    private static void InsertSerializedRecord(SqliteConnection connection, YomichanKanjiRecordInserter recordInserter, Dict dict, string kanji, byte[]? onReadings, byte[]? kunReadings, byte[]? definitions, byte[]? stats, ref int rowId, ref int transactionRecordCount, ref SqliteTransaction transaction)
+    {
+        if (kanji.Length > dict.MaxSearchKeyLength)
+        {
+            dict.MaxSearchKeyLength = kanji.Length;
+        }
+
+        recordInserter.Insert(rowId, kanji, onReadings, kunReadings, definitions, stats);
+
+        ++transactionRecordCount;
+        if (transactionRecordCount > DBUtils.TransactionBatchSize)
+        {
+            transaction.Commit();
+            transaction.Dispose();
+            dict.Ready = true;
+            transaction = connection.BeginTransaction();
+            transactionRecordCount = 0;
+        }
+
+        ++rowId;
     }
 
     private static void RemoveDuplicateRecords(SqliteConnection connection)
@@ -257,7 +326,7 @@ internal static class YomichanKanjiDBManager
                 ) d ON d.{Kanji} = r.{Kanji}
                     AND d.{OnReadings} IS r.{OnReadings}
                     AND d.{KunReadings} IS r.{KunReadings}
-                    AND d.{Glossary} = r.{Glossary}
+                    AND d.{Glossary} IS r.{Glossary}
                     AND d.{Stats} IS r.{Stats}
                 WHERE r.{RowId} != d.{RowId}_to_keep
             );
@@ -281,7 +350,7 @@ internal static class YomichanKanjiDBManager
 
     public static void ImportFromMemory(Dict dict)
     {
-        ulong rowId = 1;
+        long rowId = 1;
 
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
@@ -289,29 +358,7 @@ internal static class YomichanKanjiDBManager
         DBUtils.ConfigureForBulkWrite(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {Kanji}, {OnReadings}, {KunReadings}, {Glossary}, {Stats})
-            VALUES (@{RowId}, @{Kanji}, @{OnReadings}, @{KunReadings}, @{Glossary}, @{Stats});
-            """;
-
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter kanjiParam = new($"@{Kanji}", SqliteType.Text);
-        SqliteParameter onReadingsParam = new($"@{OnReadings}", SqliteType.Blob);
-        SqliteParameter kunReadingsParam = new($"@{KunReadings}", SqliteType.Blob);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter statsParam = new($"@{Stats}", SqliteType.Blob);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            kanjiParam,
-            onReadingsParam,
-            kunReadingsParam,
-            glossaryParam,
-            statsParam
-        ]);
-
-        insertRecordCommand.Prepare();
+        using YomichanKanjiRecordInserter recordInserter = new(connection);
 
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
         {
@@ -319,13 +366,11 @@ internal static class YomichanKanjiDBManager
             for (int i = 0; i < recordsCount; i++)
             {
                 YomichanKanjiRecord yomichanKanjiRecord = (YomichanKanjiRecord)records[i];
-                rowidParam.Value = rowId;
-                kanjiParam.Value = kanji;
-                onReadingsParam.Value = yomichanKanjiRecord.OnReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.OnReadings) : DBNull.Value;
-                kunReadingsParam.Value = yomichanKanjiRecord.KunReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.KunReadings) : DBNull.Value;
-                glossaryParam.Value = yomichanKanjiRecord.Definitions is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Definitions) : DBNull.Value;
-                statsParam.Value = yomichanKanjiRecord.Stats is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Stats) : DBNull.Value;
-                _ = insertRecordCommand.ExecuteNonQuery();
+                byte[]? onReadings = yomichanKanjiRecord.OnReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.OnReadings) : null;
+                byte[]? kunReadings = yomichanKanjiRecord.KunReadings is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.KunReadings) : null;
+                byte[]? definitions = yomichanKanjiRecord.Definitions is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Definitions) : null;
+                byte[]? stats = yomichanKanjiRecord.Stats is not null ? MessagePackSerializer.Serialize(yomichanKanjiRecord.Stats) : null;
+                recordInserter.Insert(rowId, kanji, onReadings, kunReadings, definitions, stats);
 
                 ++rowId;
             }
@@ -370,6 +415,40 @@ internal static class YomichanKanjiDBManager
             results.Add(GetRecord(reader));
         }
         while (reader.Read());
+
+        return results;
+    }
+
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, string kanjiWithVariationSelector, string kanji)
+    {
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
+        if (connection is null)
+        {
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
+
+        using SqliteRecordReader reader = new(connection, KanjiWithVariationSelectorQuery);
+        reader.Bind(1, kanjiWithVariationSelector);
+        reader.Bind(2, kanji);
+
+        Dictionary<string, IList<IDictRecord>>? results = null;
+        while (reader.Read())
+        {
+            results ??= new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
+            YomichanKanjiRecord record = GetRecord(reader);
+            string searchKey = reader.GetString((int)ColumnIndex.Kanji);
+            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+            if (exists)
+            {
+                Debug.Assert(result is not null);
+                result.Add(record);
+            }
+            else
+            {
+                result = [record];
+            }
+        }
 
         return results;
     }
