@@ -119,6 +119,7 @@ internal static class JmnedictLoader
     {
         int id = 0;
 
+        _ = xmlReader.Read();
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "entry", NodeType: XmlNodeType.EndElement })
@@ -151,7 +152,7 @@ internal static class JmnedictLoader
                         break;
 
                     default:
-                        _ = xmlReader.Read();
+                        xmlReader.Skip();
                         break;
                 }
             }
@@ -179,6 +180,7 @@ internal static class JmnedictLoader
 
     private static Translation ReadTrans(XmlTextReader xmlReader, List<string> nameTypeList, List<string> transDetList)
     {
+        _ = xmlReader.Read();
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "trans", NodeType: XmlNodeType.EndElement })
@@ -203,7 +205,7 @@ internal static class JmnedictLoader
                     //    break;
 
                     default:
-                        _ = xmlReader.Read();
+                        xmlReader.Skip();
                         break;
                 }
             }
