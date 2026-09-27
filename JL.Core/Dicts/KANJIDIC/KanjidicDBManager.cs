@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Threading.Channels;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
@@ -13,18 +14,20 @@ namespace JL.Core.Dicts.KANJIDIC;
 
 internal static class KanjidicDBManager
 {
-    public const int Version = 6;
+    public const int Version = 7;
 
-    private const string Record = "record";
-    private const string Kanji = "kanji";
-    private const string OnReadings = "on_readings";
-    private const string KunReadings = "kun_readings";
-    private const string NanoriReadings = "nanori_readings";
-    private const string RadicalNames = "radical_names";
-    private const string Glossary = "glossary";
-    private const string StrokeCount = "stroke_count";
-    private const string Grade = "grade";
-    private const string Frequency = "frequency";
+    private const int ImportRecordBatchSize = 128;
+
+    internal const string Record = "record";
+    internal const string Kanji = "kanji";
+    internal const string OnReadings = "on_readings";
+    internal const string KunReadings = "kun_readings";
+    internal const string NanoriReadings = "nanori_readings";
+    internal const string RadicalNames = "radical_names";
+    internal const string Glossary = "glossary";
+    internal const string StrokeCount = "stroke_count";
+    internal const string Grade = "grade";
+    internal const string Frequency = "frequency";
 
     private const string Term = "term";
     private const string SingleTermQuery =
@@ -85,106 +88,81 @@ internal static class KanjidicDBManager
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-            await using (fileStream.ConfigureAwait(false))
+            // ReSharper disable once UseAwaitUsing
+            using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+            Debug.Assert(connection is not null);
+
+            DBUtils.ConfigureForBulkWrite(connection);
+#pragma warning disable CA1849 // Call async methods when in an async method
+            // ReSharper disable once UseAwaitUsing
+            using SqliteTransaction transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            using KanjidicRecordInserter recordInserter = new(connection);
+
+            int kanjiCount = 0;
+            Channel<(string Kanji, KanjidicRecord Record)[]> availableBatches = Channel.CreateUnbounded<(string Kanji, KanjidicRecord Record)[]>(
+                new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
+            Channel<((string Kanji, KanjidicRecord Record)[] Records, int Count)> readyBatches =
+                Channel.CreateUnbounded<((string Kanji, KanjidicRecord Record)[] Records, int Count)>(
+                    new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
+            _ = availableBatches.Writer.TryWrite(new (string Kanji, KanjidicRecord Record)[ImportRecordBatchSize]);
+            _ = availableBatches.Writer.TryWrite(new (string Kanji, KanjidicRecord Record)[ImportRecordBatchSize]);
+            Task producer = Task.Run(() => CreateImportRecordBatches(fullPath, availableBatches.Reader, readyBatches.Writer));
+            try
             {
-                XmlReaderSettings xmlReaderSettings = new()
+                await foreach (((string Kanji, KanjidicRecord Record)[] batch, int count) in readyBatches.Reader.ReadAllAsync().ConfigureAwait(false))
                 {
-                    Async = true,
-                    DtdProcessing = DtdProcessing.Parse,
-                    IgnoreWhitespace = true
-                };
+                    for (int i = 0; i < count; i++)
+                    {
+                        (string kanji, KanjidicRecord kanjidicRecord) = batch[i];
+                        byte[]? onReadings = kanjidicRecord.OnReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.OnReadings) : null;
+                        byte[]? kunReadings = kanjidicRecord.KunReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.KunReadings) : null;
+                        byte[]? nanoriReadings = kanjidicRecord.NanoriReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.NanoriReadings) : null;
+                        byte[]? radicalNames = kanjidicRecord.RadicalNames is not null ? MessagePackSerializer.Serialize(kanjidicRecord.RadicalNames) : null;
+                        byte[]? definitions = kanjidicRecord.Definitions is not null ? MessagePackSerializer.Serialize(kanjidicRecord.Definitions) : null;
 
-                // ReSharper disable once UseAwaitUsing
-                using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
-                Debug.Assert(connection is not null);
+                        recordInserter.Insert(kanji, onReadings, kunReadings, nanoriReadings, radicalNames, definitions,
+                            kanjidicRecord.StrokeCount, kanjidicRecord.Grade, kanjidicRecord.Frequency);
 
-                DBUtils.ConfigureForBulkWrite(connection);
-#pragma warning disable CA1849 // Call async methods when in an async method
-                // ReSharper disable once UseAwaitUsing
-                using SqliteTransaction transaction = connection.BeginTransaction();
-#pragma warning restore CA1849 // Call async methods when in an async method
+                        ++kanjiCount;
+                    }
 
-                // ReSharper disable once UseAwaitUsing
-                using SqliteCommand insertRecordCommand = connection.CreateCommand();
-                insertRecordCommand.CommandText =
-                    $"""
-                    INSERT INTO {Record} ({Kanji}, {OnReadings}, {KunReadings}, {NanoriReadings}, {RadicalNames}, {Glossary}, {StrokeCount}, {Grade}, {Frequency})
-                    VALUES (@{Kanji}, @{OnReadings}, @{KunReadings}, @{NanoriReadings}, @{RadicalNames}, @{Glossary}, @{StrokeCount}, @{Grade}, @{Frequency});
-                    """;
-
-                SqliteParameter kanjiParam = new($"@{Kanji}", SqliteType.Text);
-                SqliteParameter onReadingsParam = new($"@{OnReadings}", SqliteType.Blob);
-                SqliteParameter kunReadingsParam = new($"@{KunReadings}", SqliteType.Blob);
-                SqliteParameter nanoriReadingsParam = new($"@{NanoriReadings}", SqliteType.Blob);
-                SqliteParameter radicalNamesParam = new($"@{RadicalNames}", SqliteType.Blob);
-                SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-                SqliteParameter strokeCountParam = new($"@{StrokeCount}", SqliteType.Integer);
-                SqliteParameter gradeParam = new($"@{Grade}", SqliteType.Integer);
-                SqliteParameter frequencyParam = new($"@{Frequency}", SqliteType.Integer);
-                insertRecordCommand.Parameters.AddRange(
-                 [
-                    kanjiParam,
-                    onReadingsParam,
-                    kunReadingsParam,
-                    nanoriReadingsParam,
-                    radicalNamesParam,
-                    glossaryParam,
-                    strokeCountParam,
-                    gradeParam,
-                    frequencyParam
-                 ]);
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                insertRecordCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                int kanjiCount = 0;
-                using XmlReader xmlReader = XmlReader.Create(fileStream, xmlReaderSettings);
-                while (xmlReader.ReadToFollowing("literal"))
-                {
-                    (string kanji, KanjidicRecord kanjidicRecord) = await KanjidicLoader.ReadCharacter(xmlReader).ConfigureAwait(false);
-
-                    kanjiParam.Value = kanji;
-                    onReadingsParam.Value = kanjidicRecord.OnReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.OnReadings) : DBNull.Value;
-                    kunReadingsParam.Value = kanjidicRecord.KunReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.KunReadings) : DBNull.Value;
-                    nanoriReadingsParam.Value = kanjidicRecord.NanoriReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.NanoriReadings) : DBNull.Value;
-                    radicalNamesParam.Value = kanjidicRecord.RadicalNames is not null ? MessagePackSerializer.Serialize(kanjidicRecord.RadicalNames) : DBNull.Value;
-                    glossaryParam.Value = kanjidicRecord.Definitions is not null ? MessagePackSerializer.Serialize(kanjidicRecord.Definitions) : DBNull.Value;
-                    strokeCountParam.Value = kanjidicRecord.StrokeCount;
-                    gradeParam.Value = kanjidicRecord.Grade;
-                    frequencyParam.Value = kanjidicRecord.Frequency;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                    _ = insertRecordCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                    ++kanjiCount;
+                    _ = availableBatches.Writer.TryWrite(batch);
                 }
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                transaction.Commit();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                DBUtils.ConfigureForRead(connection);
-
-                // ReSharper disable once UseAwaitUsing
-                using SqliteCommand analyzeCommand = connection.CreateCommand();
-                analyzeCommand.CommandText = "ANALYZE;";
-#pragma warning disable CA1849 // Call async methods when in an async method
-                _ = analyzeCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                // ReSharper disable once UseAwaitUsing
-                using SqliteCommand vacuumCommand = connection.CreateCommand();
-                vacuumCommand.CommandText = "VACUUM;";
-#pragma warning disable CA1849 // Call async methods when in an async method
-                _ = vacuumCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                dict.Ready = true;
-                dict.Size = kanjiCount;
             }
+            catch (Exception exception)
+            {
+                _ = availableBatches.Writer.TryComplete(exception);
+                throw;
+            }
+            finally
+            {
+                await producer.ConfigureAwait(false);
+            }
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+            transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            DBUtils.ConfigureForRead(connection);
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand analyzeCommand = connection.CreateCommand();
+            analyzeCommand.CommandText = "ANALYZE;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = analyzeCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            // ReSharper disable once UseAwaitUsing
+            using SqliteCommand vacuumCommand = connection.CreateCommand();
+            vacuumCommand.CommandText = "VACUUM;";
+#pragma warning disable CA1849 // Call async methods when in an async method
+            _ = vacuumCommand.ExecuteNonQuery();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+            dict.Ready = true;
+            dict.Size = kanjiCount;
         }
         else
         {
@@ -229,6 +207,48 @@ internal static class KanjidicDBManager
         }
     }
 
+    private static async Task CreateImportRecordBatches(string fullPath, ChannelReader<(string Kanji, KanjidicRecord Record)[]> availableBatches,
+        ChannelWriter<((string Kanji, KanjidicRecord Record)[] Records, int Count)> readyBatches)
+    {
+        try
+        {
+            // ReSharper disable once UseAwaitUsing
+            using FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso);
+            XmlReaderSettings xmlReaderSettings = new()
+            {
+                DtdProcessing = DtdProcessing.Parse,
+                IgnoreWhitespace = true
+            };
+
+            using XmlReader xmlReader = XmlReader.Create(fileStream, xmlReaderSettings);
+            (string Kanji, KanjidicRecord Record)[] batch = await availableBatches.ReadAsync().ConfigureAwait(false);
+            int count = 0;
+            while (xmlReader.ReadToFollowing("literal"))
+            {
+                (string kanji, KanjidicRecord record) = KanjidicLoader.ReadCharacter(xmlReader);
+                batch[count] = (kanji, record);
+                ++count;
+                if (count == batch.Length)
+                {
+                    _ = readyBatches.TryWrite((batch, count));
+                    batch = await availableBatches.ReadAsync().ConfigureAwait(false);
+                    count = 0;
+                }
+            }
+
+            if (count > 0)
+            {
+                _ = readyBatches.TryWrite((batch, count));
+            }
+
+            _ = readyBatches.TryComplete();
+        }
+        catch (Exception exception)
+        {
+            _ = readyBatches.TryComplete(exception);
+        }
+    }
+
     public static void ImportFromMemory(Dict dict)
     {
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
@@ -237,35 +257,7 @@ internal static class KanjidicDBManager
         DBUtils.ConfigureForBulkWrite(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({Kanji}, {OnReadings}, {KunReadings}, {NanoriReadings}, {RadicalNames}, {Glossary}, {StrokeCount}, {Grade}, {Frequency})
-            VALUES (@{Kanji}, @{OnReadings}, @{KunReadings}, @{NanoriReadings}, @{RadicalNames}, @{Glossary}, @{StrokeCount}, @{Grade}, @{Frequency});
-            """;
-
-        SqliteParameter kanjiParam = new($"@{Kanji}", SqliteType.Text);
-        SqliteParameter onReadingsParam = new($"@{OnReadings}", SqliteType.Blob);
-        SqliteParameter kunReadingsParam = new($"@{KunReadings}", SqliteType.Blob);
-        SqliteParameter nanoriReadingsParam = new($"@{NanoriReadings}", SqliteType.Blob);
-        SqliteParameter radicalNamesParam = new($"@{RadicalNames}", SqliteType.Blob);
-        SqliteParameter glossaryParam = new($"@{Glossary}", SqliteType.Blob);
-        SqliteParameter strokeCountParam = new($"@{StrokeCount}", SqliteType.Integer);
-        SqliteParameter gradeParam = new($"@{Grade}", SqliteType.Integer);
-        SqliteParameter frequencyParam = new($"@{Frequency}", SqliteType.Integer);
-        insertRecordCommand.Parameters.AddRange([
-            kanjiParam,
-            onReadingsParam,
-            kunReadingsParam,
-            nanoriReadingsParam,
-            radicalNamesParam,
-            glossaryParam,
-            strokeCountParam,
-            gradeParam,
-            frequencyParam
-        ]);
-
-        insertRecordCommand.Prepare();
+        using KanjidicRecordInserter recordInserter = new(connection);
 
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
         {
@@ -273,16 +265,14 @@ internal static class KanjidicDBManager
             for (int i = 0; i < recordsCount; i++)
             {
                 KanjidicRecord kanjidicRecord = (KanjidicRecord)records[i];
-                kanjiParam.Value = kanji;
-                onReadingsParam.Value = kanjidicRecord.OnReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.OnReadings) : DBNull.Value;
-                kunReadingsParam.Value = kanjidicRecord.KunReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.KunReadings) : DBNull.Value;
-                nanoriReadingsParam.Value = kanjidicRecord.NanoriReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.NanoriReadings) : DBNull.Value;
-                radicalNamesParam.Value = kanjidicRecord.RadicalNames is not null ? MessagePackSerializer.Serialize(kanjidicRecord.RadicalNames) : DBNull.Value;
-                glossaryParam.Value = kanjidicRecord.Definitions is not null ? MessagePackSerializer.Serialize(kanjidicRecord.Definitions) : DBNull.Value;
-                strokeCountParam.Value = kanjidicRecord.StrokeCount;
-                gradeParam.Value = kanjidicRecord.Grade;
-                frequencyParam.Value = kanjidicRecord.Frequency;
-                _ = insertRecordCommand.ExecuteNonQuery();
+                byte[]? onReadings = kanjidicRecord.OnReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.OnReadings) : null;
+                byte[]? kunReadings = kanjidicRecord.KunReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.KunReadings) : null;
+                byte[]? nanoriReadings = kanjidicRecord.NanoriReadings is not null ? MessagePackSerializer.Serialize(kanjidicRecord.NanoriReadings) : null;
+                byte[]? radicalNames = kanjidicRecord.RadicalNames is not null ? MessagePackSerializer.Serialize(kanjidicRecord.RadicalNames) : null;
+                byte[]? definitions = kanjidicRecord.Definitions is not null ? MessagePackSerializer.Serialize(kanjidicRecord.Definitions) : null;
+
+                recordInserter.Insert(kanji, onReadings, kunReadings, nanoriReadings, radicalNames, definitions,
+                    kanjidicRecord.StrokeCount, kanjidicRecord.Grade, kanjidicRecord.Frequency);
             }
         }
 

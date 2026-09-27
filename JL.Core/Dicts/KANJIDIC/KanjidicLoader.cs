@@ -16,12 +16,11 @@ internal static class KanjidicLoader
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-            await using (fileStream.ConfigureAwait(false))
+            // ReSharper disable once UseAwaitUsing
+            using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))
             {
                 XmlReaderSettings xmlReaderSettings = new()
                 {
-                    Async = true,
                     DtdProcessing = DtdProcessing.Parse,
                     IgnoreWhitespace = true
                 };
@@ -29,7 +28,7 @@ internal static class KanjidicLoader
                 using XmlReader xmlReader = XmlReader.Create(fileStream, xmlReaderSettings);
                 while (xmlReader.ReadToFollowing("literal"))
                 {
-                    (string key, KanjidicRecord record) = await ReadCharacter(xmlReader).ConfigureAwait(false);
+                    (string key, KanjidicRecord record) = ReadCharacter(xmlReader);
                     dict.Contents[key] = [record];
                 }
             }
@@ -79,12 +78,13 @@ internal static class KanjidicLoader
         }
     }
 
-    public static async Task<(string key, KanjidicRecord record)> ReadCharacter(XmlReader xmlReader)
+    public static (string key, KanjidicRecord record) ReadCharacter(XmlReader xmlReader)
     {
-        string key = (await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString();
+        string key = xmlReader.ReadElementContentAsString().GetPooledString();
 
         byte grade = 0;
         byte strokeCount = 0;
+        bool strokeCountRead = false;
         int frequency = 0;
         List<string> definitionList = [];
         List<string> onReadingList = [];
@@ -108,7 +108,16 @@ internal static class KanjidicLoader
                         break;
 
                     case "stroke_count":
-                        strokeCount = (byte)xmlReader.ReadElementContentAsInt();
+                        if (!strokeCountRead)
+                        {
+                            strokeCount = (byte)xmlReader.ReadElementContentAsInt();
+                            strokeCountRead = true;
+                        }
+                        else
+                        {
+                            xmlReader.Skip();
+                        }
+
                         break;
 
                     case "freq":
@@ -117,35 +126,35 @@ internal static class KanjidicLoader
 
                     case "meaning":
                         // English definition
-                        if (!xmlReader.HasAttributes)
+                        if (!xmlReader.HasAttributes || xmlReader.GetAttribute("m_lang") is "en")
                         {
-                            definitionList.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                            definitionList.Add(xmlReader.ReadElementContentAsString());
                         }
                         else
                         {
-                            _ = await xmlReader.ReadAsync().ConfigureAwait(false);
+                            xmlReader.Skip();
                         }
 
                         break;
 
                     case "nanori":
                         nanoriReadingList ??= [];
-                        nanoriReadingList.Add((await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString());
+                        nanoriReadingList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
                     case "reading":
                         switch (xmlReader.GetAttribute("r_type"))
                         {
                             case "ja_on":
-                                onReadingList.Add((await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString());
+                                onReadingList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                                 break;
 
                             case "ja_kun":
-                                kunReadingList.Add((await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString());
+                                kunReadingList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                                 break;
 
                             default:
-                                _ = await xmlReader.ReadAsync().ConfigureAwait(false);
+                                xmlReader.Skip();
                                 break;
                         }
 
@@ -153,7 +162,7 @@ internal static class KanjidicLoader
 
                     case "rad_name":
                         radicalNameList ??= [];
-                        radicalNameList.Add((await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString());
+                        radicalNameList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
                     // Old JLPT, has 4 levels instead of 5
@@ -161,15 +170,21 @@ internal static class KanjidicLoader
                     //    jlpt = xmlReader.ReadElementContentAsInt();
                     //    break;
 
+                    case "misc":
+                    case "reading_meaning":
+                    case "rmgroup":
+                        _ = xmlReader.Read();
+                        break;
+
                     default:
-                        _ = await xmlReader.ReadAsync().ConfigureAwait(false);
+                        xmlReader.Skip();
                         break;
                 }
             }
 
             else
             {
-                _ = await xmlReader.ReadAsync().ConfigureAwait(false);
+                _ = xmlReader.Read();
             }
         }
 
