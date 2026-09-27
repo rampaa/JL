@@ -101,11 +101,18 @@ internal static class KanjidicDBManager
             using KanjidicRecordInserter recordInserter = new(connection);
 
             int kanjiCount = 0;
-            Channel<(string Kanji, KanjidicRecord Record)[]> availableBatches = Channel.CreateUnbounded<(string Kanji, KanjidicRecord Record)[]>(
-                new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
-            Channel<((string Kanji, KanjidicRecord Record)[] Records, int Count)> readyBatches =
-                Channel.CreateUnbounded<((string Kanji, KanjidicRecord Record)[] Records, int Count)>(
-                    new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
+            Channel<(string Kanji, KanjidicRecord Record)[]> availableBatches = Channel.CreateUnbounded<(string Kanji, KanjidicRecord Record)[]>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = true
+            });
+
+            Channel<((string Kanji, KanjidicRecord Record)[] Records, int Count)> readyBatches = Channel.CreateUnbounded<((string Kanji, KanjidicRecord Record)[] Records, int Count)>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = true
+            });
+
             _ = availableBatches.Writer.TryWrite(new (string Kanji, KanjidicRecord Record)[ImportRecordBatchSize]);
             _ = availableBatches.Writer.TryWrite(new (string Kanji, KanjidicRecord Record)[ImportRecordBatchSize]);
             Task producer = Task.Run(() => CreateImportRecordBatches(fullPath, availableBatches.Reader, readyBatches.Writer));
@@ -221,11 +228,18 @@ internal static class KanjidicDBManager
             };
 
             using XmlReader xmlReader = XmlReader.Create(fileStream, xmlReaderSettings);
+            List<string> definitionList = [];
+            List<string> onReadingList = [];
+            List<string> kunReadingList = [];
+            List<string> nanoriReadingList = [];
+            List<string> radicalNameList = [];
+
             (string Kanji, KanjidicRecord Record)[] batch = await availableBatches.ReadAsync().ConfigureAwait(false);
+
             int count = 0;
             while (xmlReader.ReadToFollowing("literal"))
             {
-                (string kanji, KanjidicRecord record) = KanjidicLoader.ReadCharacter(xmlReader);
+                (string kanji, KanjidicRecord record) = KanjidicLoader.ReadCharacter(xmlReader, definitionList, onReadingList, kunReadingList, nanoriReadingList, radicalNameList);
                 batch[count] = (kanji, record);
                 ++count;
                 if (count == batch.Length)

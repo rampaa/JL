@@ -26,9 +26,15 @@ internal static class KanjidicLoader
                 };
 
                 using XmlReader xmlReader = XmlReader.Create(fileStream, xmlReaderSettings);
+
+                List<string> definitionList = [];
+                List<string> onReadingList = [];
+                List<string> kunReadingList = [];
+                List<string> nanoriReadingList = [];
+                List<string> radicalNameList = [];
                 while (xmlReader.ReadToFollowing("literal"))
                 {
-                    (string key, KanjidicRecord record) = ReadCharacter(xmlReader);
+                    (string key, KanjidicRecord record) = ReadCharacter(xmlReader, definitionList, onReadingList, kunReadingList, nanoriReadingList, radicalNameList);
                     dict.Contents[key] = [record];
                 }
             }
@@ -78,7 +84,7 @@ internal static class KanjidicLoader
         }
     }
 
-    public static (string key, KanjidicRecord record) ReadCharacter(XmlReader xmlReader)
+    public static (string key, KanjidicRecord record) ReadCharacter(XmlReader xmlReader, List<string> definitionList, List<string> onReadingList, List<string> kunReadingList, List<string> nanoriReadingList, List<string> radicalNameList)
     {
         string key = xmlReader.ReadElementContentAsString().GetPooledString();
 
@@ -86,12 +92,6 @@ internal static class KanjidicLoader
         byte strokeCount = 0;
         bool strokeCountRead = false;
         int frequency = 0;
-        List<string> definitionList = [];
-        List<string> onReadingList = [];
-        List<string> kunReadingList = [];
-        List<string>? nanoriReadingList = null;
-        List<string>? radicalNameList = null;
-
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "character", NodeType: XmlNodeType.EndElement })
@@ -138,7 +138,6 @@ internal static class KanjidicLoader
                         break;
 
                     case "nanori":
-                        nanoriReadingList ??= [];
                         nanoriReadingList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
@@ -161,7 +160,6 @@ internal static class KanjidicLoader
                         break;
 
                     case "rad_name":
-                        radicalNameList ??= [];
                         radicalNameList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
@@ -191,10 +189,15 @@ internal static class KanjidicLoader
         string[]? definitions = definitionList.TrimToArray();
         string[]? onReadings = onReadingList.TrimToArray();
         string[]? kunReadings = kunReadingList.TrimToArray();
-        string[]? nanoriReadings = nanoriReadingList?.ToArray();
-        string[]? radicalNames = radicalNameList?.ToArray();
+        string[]? nanoriReadings = nanoriReadingList.TrimToArray();
+        string[]? radicalNames = radicalNameList.TrimToArray();
 
         KanjidicRecord record = new(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
+        definitionList.Clear();
+        onReadingList.Clear();
+        kunReadingList.Clear();
+        nanoriReadingList.Clear();
+        radicalNameList.Clear();
 
         return (key, record);
     }
