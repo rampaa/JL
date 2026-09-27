@@ -440,10 +440,7 @@ internal static class JmdictLoader
                         keInfList.Add(ReadEntity(xmlReader));
                         break;
 
-                    case "ke_pri":
-                        xmlReader.Skip();
-                        break;
-
+                    // case "ke_pri":
                     default:
                         xmlReader.Skip();
                         break;
@@ -492,11 +489,8 @@ internal static class JmdictLoader
                         reInfList.Add(ReadEntity(xmlReader));
                         break;
 
-                    case "re_nokanji":
-                    case "re_pri":
-                        xmlReader.Skip();
-                        break;
-
+                    // case "re_nokanji":
+                    // case "re_pri":
                     default:
                         xmlReader.Skip();
                         break;
@@ -617,10 +611,7 @@ internal static class JmdictLoader
                         break;
                     }
 
-                    case "example":
-                        xmlReader.Skip();
-                        break;
-
+                    // case "example":
                     default:
                     {
                         xmlReader.Skip();
