@@ -234,7 +234,7 @@ internal static class JmnedictLoader
         return entityName;
     }
 
-    public static Dictionary<string, JmnedictRecord> GetRecordsFromEntry(in JmnedictEntry entry)
+    private static Dictionary<string, JmnedictRecord> GetRecordsFromEntry(in JmnedictEntry entry)
     {
         Span<string> kebListSpan = CollectionsMarshal.AsSpan(entry.KebList);
         for (int i = 0; i < kebListSpan.Length; i++)

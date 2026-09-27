@@ -111,18 +111,6 @@ internal static class JmnedictDBManager
         {
             DictUtils.JmnedictEntities.Clear();
 
-            // ReSharper disable once UseAwaitUsing
-            using FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso);
-
-            // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
-            // And we do need EntityHandling property because we want to get unexpanded entity names
-            // The downside of using XmlTextReader is that it does not support async methods
-            // And we cannot set some settings (e.g. MaxCharactersFromEntities)
-            using XmlTextReader xmlTextReader = new(fileStream);
-            xmlTextReader.DtdProcessing = DtdProcessing.Parse;
-            xmlTextReader.WhitespaceHandling = WhitespaceHandling.None;
-            xmlTextReader.EntityHandling = EntityHandling.ExpandCharEntities;
-
             int rowId = 1;
 
             // ReSharper disable once UseAwaitUsing
@@ -145,8 +133,7 @@ internal static class JmnedictDBManager
                 new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
             _ = availableBatches.Writer.TryWrite(new JmnedictImportEntryBatch());
             _ = availableBatches.Writer.TryWrite(new JmnedictImportEntryBatch());
-            Task producer = Task.Run(() => CreateImportEntryBatches(xmlTextReader, availableBatches.Reader,
-                readyBatches.Writer));
+            Task producer = Task.Run(() => CreateImportEntryBatches(fullPath, availableBatches.Reader, readyBatches.Writer));
             try
             {
                 await foreach (JmnedictImportEntryBatch batch in readyBatches.Reader.ReadAllAsync().ConfigureAwait(false))
@@ -166,10 +153,14 @@ internal static class JmnedictDBManager
 #pragma warning disable CA1849 // Call async methods when in an async method
                                 transaction.Commit();
 #pragma warning restore CA1849 // Call async methods when in an async method
+
 #pragma warning disable CA1849 // Call async methods when in an async method
+                                // ReSharper disable once MethodHasAsyncOverload
                                 transaction.Dispose();
 #pragma warning restore CA1849 // Call async methods when in an async method
+
                                 dict.Ready = true;
+
 #pragma warning disable CA1849 // Call async methods when in an async method
                                 transaction = connection.BeginTransaction();
 #pragma warning restore CA1849 // Call async methods when in an async method
@@ -344,14 +335,25 @@ internal static class JmnedictDBManager
         return recordsInserted;
     }
 
-    private static async Task CreateImportEntryBatches(XmlTextReader xmlTextReader,
-        ChannelReader<JmnedictImportEntryBatch> availableBatches, ChannelWriter<JmnedictImportEntryBatch> readyBatches)
+    private static async Task CreateImportEntryBatches(string fullPath, ChannelReader<JmnedictImportEntryBatch> availableBatches, ChannelWriter<JmnedictImportEntryBatch> readyBatches)
     {
         List<string> rebList = [];
         List<string> nameTypeList = [];
         List<string> transDetList = [];
         try
         {
+            // ReSharper disable once UseAwaitUsing
+            using FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso);
+
+            // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
+            // And we do need EntityHandling property because we want to get unexpanded entity names
+            // The downside of using XmlTextReader is that it does not support async methods
+            // And we cannot set some settings (e.g. MaxCharactersFromEntities)
+            using XmlTextReader xmlTextReader = new(fileStream);
+            xmlTextReader.DtdProcessing = DtdProcessing.Parse;
+            xmlTextReader.WhitespaceHandling = WhitespaceHandling.None;
+            xmlTextReader.EntityHandling = EntityHandling.ExpandCharEntities;
+
             JmnedictImportEntryBatch batch = await availableBatches.ReadAsync().ConfigureAwait(false);
             while (xmlTextReader.ReadToFollowing("entry"))
             {

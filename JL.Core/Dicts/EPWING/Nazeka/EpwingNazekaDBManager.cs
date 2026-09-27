@@ -1154,7 +1154,7 @@ internal static class EpwingNazekaDBManager
 
     public static void ImportFromMemory(Dict dict)
     {
-        Dictionary<EpwingNazekaRecord, List<string>> recordToKeysDict = [];
+        Dictionary<EpwingNazekaRecord, List<string>> recordToKeysDict = new(ReferenceEqualityComparer.Instance);
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
             int recordsCount = records.Count;
