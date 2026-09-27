@@ -19,7 +19,7 @@ namespace JL.Core.Dicts.PitchAccent;
 
 internal static class YomichanPitchAccentDBManager
 {
-    public const int Version = 14;
+    public const int Version = 15;
 
     public const int Size = 250000;
 
@@ -394,7 +394,7 @@ internal static class YomichanPitchAccentDBManager
     {
         const string query =
             $"""
-            SELECT MAX(LENGTH({SearchKey}))
+            SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
             FROM {RecordSearchKey};
             """;
 

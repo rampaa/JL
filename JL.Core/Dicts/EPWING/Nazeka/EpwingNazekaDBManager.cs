@@ -23,7 +23,7 @@ namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaDBManager
 {
-    public const int Version = 23;
+    public const int Version = 24;
 
     private const int ImportRecordBatchSize = 64;
     private const int VariantSearchKeyRecordBatchSize = 8192;
@@ -1143,7 +1143,7 @@ internal static class EpwingNazekaDBManager
     {
         const string query =
             $"""
-            SELECT MAX(LENGTH({SearchKey}))
+            SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
             FROM {RecordSearchKey};
             """;
 

@@ -22,7 +22,7 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 39;
+    public const int Version = 40;
 
     public const int Size = 250000;
 
@@ -485,7 +485,7 @@ internal static class EpwingYomichanDBManager
     {
         const string query =
             $"""
-            SELECT MAX(LENGTH({SearchKey}))
+            SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
             FROM {RecordSearchKey};
             """;
 
