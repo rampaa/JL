@@ -32,10 +32,20 @@ internal static class FreqDBManager
     private const string Term = "term";
     private const string SingleTermQuery =
         $"""
-        SELECT r.{Spelling}, r.{Frequency}
+        SELECT r.{Frequency}
         FROM {Record} r
         JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
         WHERE rsk.{SearchKey} = @{Term};
+        """;
+
+    private const string KanjiWithVariationSelectorQuery =
+        $"""
+        SELECT r.{Frequency}
+        FROM {Record} r
+        JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
+        WHERE rsk.{SearchKey} IN (@1, @2)
+        ORDER BY rsk.{SearchKey} DESC
+        LIMIT 1;
         """;
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
@@ -231,7 +241,7 @@ internal static class FreqDBManager
         return GetRecordsFromDB(connection, terms);
     }
 
-    public static List<FrequencyRecord>? GetRecordsFromDB(string readOnlyConnectionString, string term)
+    public static int? GetKanjiFrequencyFromDB(string readOnlyConnectionString, string kanji)
     {
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
@@ -241,20 +251,27 @@ internal static class FreqDBManager
         }
 
         using SqliteRecordReader reader = new(connection, SingleTermQuery);
-        reader.Bind(1, term);
-        if (!reader.Read())
+        reader.Bind(1, kanji);
+        return reader.Read()
+            ? reader.GetInt32(0)
+            : null;
+    }
+
+    public static int? GetKanjiFrequencyFromDB(string readOnlyConnectionString, string kanjiWithVariationSelector, string kanji)
+    {
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
+        if (connection is null)
         {
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}", readOnlyConnectionString);
             return null;
         }
 
-        List<FrequencyRecord> records = [];
-        do
-        {
-            records.Add(GetRecord(reader));
-        }
-        while (reader.Read());
-
-        return records;
+        using SqliteRecordReader reader = new(connection, KanjiWithVariationSelectorQuery);
+        reader.Bind(1, kanjiWithVariationSelector);
+        reader.Bind(2, kanji);
+        return reader.Read()
+            ? reader.GetInt32(0)
+            : null;
     }
 
     public static void SetMaxFrequencyValue(Freq freq)

@@ -1263,6 +1263,45 @@ internal static class EpwingNazekaDBManager
         return results;
     }
 
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, string kanjiWithVariationSelector, string kanji)
+    {
+        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
+        if (connection is null)
+        {
+            LoggerManager.Logger.Error("Failed to create connection for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
+
+        using SqliteRecordReader reader = new(connection, GetQuery(2));
+        reader.Bind(1, kanjiWithVariationSelector);
+        reader.Bind(2, kanji);
+
+        if (!reader.Read())
+        {
+            return null;
+        }
+
+        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+        do
+        {
+            EpwingNazekaRecord record = GetRecord(reader);
+            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
+            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+            if (exists)
+            {
+                Debug.Assert(result is not null);
+                result.Add(record);
+            }
+            else
+            {
+                result = [record];
+            }
+        }
+        while (reader.Read());
+
+        return results;
+    }
+
     public static List<IDictRecord>? GetRecordsFromDB(string readOnlyConnectionString, string term)
     {
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);

@@ -1263,25 +1263,48 @@ public static partial class JapaneseUtils
                 or (>= 0x1D360 and <= 0x1D37F); // Counting Rod Numerals (1D360-1D37F)
     }
 
-    internal static string? GetFirstCharacterIfKanji(ReadOnlySpan<char> text)
+    internal static string? GetFirstCharacterIfKanji(ReadOnlySpan<char> text, out string? kanjiWithVariationSelector)
     {
+        kanjiWithVariationSelector = null;
         char firstChar = text[0];
+        int kanjiLength;
         if (!char.IsHighSurrogate(firstChar))
         {
-            return IsKanji(firstChar)
-                ? firstChar.ToString()
-                : null;
+            if (!IsKanji(firstChar))
+            {
+                return null;
+            }
+
+            kanjiLength = 1;
+        }
+        else
+        {
+            Debug.Assert(text.Length > 1);
+            char secondChar = text[1];
+            Debug.Assert(char.IsLowSurrogate(secondChar));
+            if (!IsKanji(char.ConvertToUtf32(firstChar, secondChar)))
+            {
+                return null;
+            }
+
+            kanjiLength = 2;
         }
 
-        Debug.Assert(text.Length > 1);
-        char secondChar = text[1];
+        if (text.Length > kanjiLength)
+        {
+            char nextChar = text[kanjiLength];
+            if (nextChar is >= VariationSelectorRangeStart and <= VariationSelectorRangeEnd)
+            {
+                kanjiWithVariationSelector = text[..(kanjiLength + 1)].ToString();
+            }
+            else if (nextChar is VariationSelectorSupplementHighSurrogate
+                     && text.Length > kanjiLength + 1
+                     && text[kanjiLength + 1] is >= VariationSelectorSupplementLowSurrogateRangeStart and <= VariationSelectorSupplementLowSurrogateRangeEnd)
+            {
+                kanjiWithVariationSelector = text[..(kanjiLength + 2)].ToString();
+            }
+        }
 
-        Debug.Assert(char.IsHighSurrogate(firstChar));
-        Debug.Assert(char.IsLowSurrogate(secondChar));
-        int codePoint = char.ConvertToUtf32(firstChar, secondChar);
-
-        return IsKanji(codePoint)
-            ? char.ConvertFromUtf32(codePoint)
-            : null;
+        return text[..kanjiLength].ToString();
     }
 }
