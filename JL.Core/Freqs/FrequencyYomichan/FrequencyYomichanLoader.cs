@@ -1,6 +1,5 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
-using System.Text.Json;
 using JL.Core.Freqs.Options;
 using JL.Core.Japanese;
 using JL.Core.Japanese.Fuseji;
@@ -21,17 +20,18 @@ internal static class FrequencyYomichanLoader
 
         bool nonKanjiDict = freq.Type is not FreqType.YomichanKanji;
 
-        GenerateMazegakiVariantsOption? generateMazegakiOption = freq.Options.GenerateMazegakiVariants;
-        Debug.Assert(nonKanjiDict || generateMazegakiOption is not null);
-        bool generateMazegaki = nonKanjiDict
-            // ReSharper disable once NullableWarningSuppressionIsUsed
-            && generateMazegakiOption!.Value;
+        bool generateMazegaki = false;
+        bool generateFusejiVariants = false;
+        if (nonKanjiDict)
+        {
+            GenerateMazegakiVariantsOption? generateMazegakiOption = freq.Options.GenerateMazegakiVariants;
+            Debug.Assert(generateMazegakiOption is not null);
+            generateMazegaki = generateMazegakiOption.Value;
 
-        GenerateFusejiVariantsOption? generateFusejiVariantsOption = freq.Options.GenerateFusejiVariants;
-        Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
-        bool generateFusejiVariants = nonKanjiDict
-                                // ReSharper disable once NullableWarningSuppressionIsUsed
-                                && generateFusejiVariantsOption!.Value;
+            GenerateFusejiVariantsOption? generateFusejiVariantsOption = freq.Options.GenerateFusejiVariants;
+            Debug.Assert(generateFusejiVariantsOption is not null);
+            generateFusejiVariants = generateFusejiVariantsOption.Value;
+        }
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
@@ -49,121 +49,62 @@ internal static class FrequencyYomichanLoader
             maxTotalFuseji = 0;
         }
 
-        Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
-        Dictionary<string, IList<FrequencyRecord>> dictionary = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
+        bool higherValueMeansHigherFrequency = freq.Options.HigherValueMeansHigherFrequency.Value;
+        Dictionary<string, FrequencyRecords> dictionary = new(freq.Size > 0 ? freq.Size : 0, StringComparer.Ordinal);
 
         // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, freq.Type is FreqType.Yomichan ? "term_meta_bank_*.json" : "kanji_meta_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-            await using (fileStream.ConfigureAwait(false))
+            await foreach (FrequencyYomichanRecordBatch batch in FrequencyYomichanReader.ReadRecordBatches(jsonFile, nonKanjiDict).ConfigureAwait(false))
             {
-                await foreach (JsonElement[]? jsonElements in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                for (int recordIndex = 0; recordIndex < batch.Count; recordIndex++)
                 {
-                    Debug.Assert(jsonElements is not null);
-
-                    string primarySpelling = jsonElements[0]
-                        // ReSharper disable once NullableWarningSuppressionIsUsed
-                        .GetString()!.GetPooledString();
-
+                    ref readonly FrequencyYomichanRecord record = ref batch.Records[recordIndex];
+                    string? reading = record.Reading;
+                    string primarySpelling = record.Spelling.GetPooledString();
                     string primarySpellingInHiragana = JapaneseUtils.NormalizeText(primarySpelling).GetPooledString();
-                    string? reading = null;
-                    int frequency = -1;
-                    ref readonly JsonElement thirdElement = ref jsonElements[2];
-
-                    if (thirdElement.ValueKind is JsonValueKind.Number)
-                    {
-                        frequency = thirdElement.GetInt32();
-                    }
-                    else if (thirdElement.ValueKind is JsonValueKind.Object)
-                    {
-                        if (thirdElement.TryGetProperty("value", out JsonElement freqValue))
-                        {
-                            frequency = freqValue.GetInt32();
-                            if (frequency <= 0 && thirdElement.TryGetProperty("displayValue", out JsonElement displayValue))
-                            {
-                                frequency = TextUtils.ExtractFirstInt(displayValue.GetString());
-                            }
-                        }
-                        else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
-                        {
-                            reading = readingValue
-                                // ReSharper disable once NullableWarningSuppressionIsUsed
-                                .GetString()!.GetPooledString();
-                            JsonElement frequencyElement = thirdElement.GetProperty("frequency");
-
-                            if (frequencyElement.ValueKind is JsonValueKind.Number)
-                            {
-                                frequency = frequencyElement.GetInt32();
-                            }
-                            else if (frequencyElement.ValueKind is JsonValueKind.Object)
-                            {
-                                frequency = frequencyElement.GetProperty("value").GetInt32();
-                                if (frequency <= 0 && frequencyElement.TryGetProperty("displayValue", out JsonElement displayValue))
-                                {
-                                    frequency = TextUtils.ExtractFirstInt(displayValue.GetString());
-                                }
-                            }
-                            else // if (frequencyElement.ValueKind is JsonValueKind.String)
-                            {
-                                frequency = TextUtils.ExtractFirstInt(frequencyElement.GetString());
-                            }
-                        }
-                    }
-                    else // if (thirdElement.ValueKind is JsonValueKind.String)
-                    {
-                        string? freqStr = thirdElement.GetString();
-                        Debug.Assert(freqStr is not null);
-
-                        frequency = TextUtils.ExtractFirstInt(freqStr);
-                    }
-
-                    if (frequency <= 0)
-                    {
-                        continue;
-                    }
+                    int frequency = record.Frequency;
 
                     if (frequency > freq.MaxValue)
                     {
                         freq.MaxValue = frequency;
                     }
 
-                    if (primarySpelling == reading)
-                    {
-                        reading = null;
-                    }
+                    reading = primarySpelling == reading
+                        ? null
+                        : reading?.GetPooledString();
 
                     FrequencyRecord frequencyRecordWithPrimarySpelling = new(primarySpelling, frequency);
                     if (reading is null)
                     {
-                        if (FreqUtils.AddOrUpdate(dictionary, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling) && generateFusejiVariants)
+                        if (FreqUtils.AddOrUpdate(dictionary, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithPrimarySpelling);
+                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency);
                             }
                         }
                     }
                     else
                     {
                         string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                        if (FreqUtils.AddOrUpdate(dictionary, readingInHiragana, frequencyRecordWithPrimarySpelling) && generateFusejiVariants)
+                        if (FreqUtils.AddOrUpdate(dictionary, readingInHiragana, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithPrimarySpelling);
+                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency);
                             }
                         }
 
                         FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
-                        if (FreqUtils.AddOrUpdate(dictionary, primarySpellingInHiragana, frequencyRecordWithReading))
+                        if (FreqUtils.AddOrUpdate(dictionary, primarySpellingInHiragana, frequencyRecordWithReading, higherValueMeansHigherFrequency))
                         {
                             if (generateFusejiVariants)
                             {
                                 foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
-                                    _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading);
+                                    _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
                                 }
                             }
 
@@ -171,11 +112,11 @@ internal static class FrequencyYomichanLoader
                             {
                                 foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, reading))
                                 {
-                                    if (FreqUtils.AddOrUpdate(dictionary, mazegakiVariant, frequencyRecordWithReading) && generateFusejiVariants)
+                                    if (FreqUtils.AddOrUpdate(dictionary, mazegakiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency) && generateFusejiVariants)
                                     {
                                         foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                         {
-                                            _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading);
+                                            _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
                                         }
                                     }
                                 }
@@ -186,6 +127,6 @@ internal static class FrequencyYomichanLoader
             }
         }
 
-        freq.Contents = freq.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        freq.Contents = dictionary.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 }

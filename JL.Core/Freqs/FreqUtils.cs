@@ -559,30 +559,16 @@ public static class FreqUtils
         }
     }
 
-    internal static bool AddOrUpdate(Dictionary<string, IList<FrequencyRecord>> dictionary, string key, FrequencyRecord record)
+    internal static bool AddOrUpdate(Dictionary<string, FrequencyRecords> dictionary, string key, FrequencyRecord record, bool higherValueMeansHigherFrequency)
     {
-        ref IList<FrequencyRecord>? freqResult = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        ref FrequencyRecords records = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
         if (!exists)
         {
-            freqResult = [record];
+            records = new FrequencyRecords(record);
             return true;
         }
 
-        Debug.Assert(freqResult is not null);
-        int index = freqResult.IndexOf(record);
-        if (index < 0)
-        {
-            freqResult.Add(record);
-            return true;
-        }
-
-        if (freqResult[index].Frequency > record.Frequency)
-        {
-            freqResult[index] = record;
-            return true;
-        }
-
-        return false;
+        return records.AddOrUpdate(record, higherValueMeansHigherFrequency);
     }
 
     private static async Task UpdateRevisionInfo(Freq freq)

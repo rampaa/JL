@@ -1,6 +1,5 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
-using System.Text.Json;
 using JL.Core.Freqs.Options;
 using JL.Core.Japanese;
 using JL.Core.Japanese.Fuseji;
@@ -43,24 +42,16 @@ internal static class FrequencyNazekaLoader
             maxTotalFuseji = 0;
         }
 
-        Dictionary<string, JsonElement[][]>? frequencyJson;
-        FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-        await using (fileStream.ConfigureAwait(false))
+        bool higherValueMeansHigherFrequency = freq.Options.HigherValueMeansHigherFrequency.Value;
+        Dictionary<string, FrequencyRecords> dictionary = new(freq.Size > 0 ? freq.Size : 0, StringComparer.Ordinal);
+        await foreach (FrequencyNazekaRecordBatch batch in FrequencyNazekaReader.ReadRecordBatches(fullPath, parseInParallel: true).ConfigureAwait(false))
         {
-            frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, JsonElement[][]>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
-            Debug.Assert(frequencyJson is not null);
-        }
-
-        Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
-        Dictionary<string, IList<FrequencyRecord>> dictionary = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
-        foreach ((string reading, JsonElement[][] value) in frequencyJson)
-        {
-            foreach (JsonElement[] elementList in value)
+            for (int recordIndex = 0; recordIndex < batch.Count; recordIndex++)
             {
-                int frequencyRank = elementList[1].GetInt32();
-                string exactSpelling = elementList[0]
-                    // ReSharper disable once NullableWarningSuppressionIsUsed
-                    .GetString()!.GetPooledString();
+                ref readonly FrequencyNazekaRecord record = ref batch.Records[recordIndex];
+                string reading = record.Reading;
+                int frequencyRank = record.Frequency;
+                string exactSpelling = record.Spelling.GetPooledString();
 
                 if (frequencyRank > freq.MaxValue)
                 {
@@ -68,25 +59,26 @@ internal static class FrequencyNazekaLoader
                 }
 
                 FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
-                if (FreqUtils.AddOrUpdate(dictionary, reading, frequencyRecordWithExactSpelling) && generateFusejiVariants)
+                if (FreqUtils.AddOrUpdate(dictionary, reading, frequencyRecordWithExactSpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
                 {
                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                     {
-                        _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithExactSpelling);
+                        _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithExactSpelling, higherValueMeansHigherFrequency);
                     }
                 }
 
-                string exactSpellingInHiragana = JapaneseUtils.NormalizeText(exactSpelling).GetPooledString();
+                string exactSpellingInHiragana = JapaneseUtils.NormalizeText(exactSpelling);
                 if (exactSpellingInHiragana != reading)
                 {
+                    exactSpellingInHiragana = exactSpellingInHiragana.GetPooledString();
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
-                    if (FreqUtils.AddOrUpdate(dictionary, exactSpellingInHiragana, frequencyRecordWithReading))
+                    if (FreqUtils.AddOrUpdate(dictionary, exactSpellingInHiragana, frequencyRecordWithReading, higherValueMeansHigherFrequency))
                     {
                         if (generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading);
+                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
                             }
                         }
 
@@ -94,11 +86,11 @@ internal static class FrequencyNazekaLoader
                         {
                             foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(exactSpellingInHiragana, reading))
                             {
-                                if (FreqUtils.AddOrUpdate(dictionary, mazegakiVariant, frequencyRecordWithReading) && generateFusejiVariants)
+                                if (FreqUtils.AddOrUpdate(dictionary, mazegakiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency) && generateFusejiVariants)
                                 {
                                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                     {
-                                        _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading);
+                                        _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
                                     }
                                 }
                             }
@@ -108,6 +100,6 @@ internal static class FrequencyNazekaLoader
             }
         }
 
-        freq.Contents = freq.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        freq.Contents = dictionary.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 }
