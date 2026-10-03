@@ -461,25 +461,13 @@ internal sealed class PopupContentGenerator : Decorator
         }
 
         ReadOnlySpan<LookupFrequencyResult> allFrequencies = result.Frequencies.AsReadOnlySpan();
-        LookupFrequencyResult[] filteredFrequencies = ArrayPool<LookupFrequencyResult>.Shared.Rent(allFrequencies.Length);
-
-        int count = 0;
-        foreach (ref readonly LookupFrequencyResult frequency in allFrequencies)
+        string? frequencyText = LookupResultUtils.ValidFrequenciesToText(allFrequencies, result.Frequencies.Count is 1);
+        if (frequencyText is not null)
         {
-            if (frequency.Freq is > 0 and < int.MaxValue)
-            {
-                filteredFrequencies[count] = frequency;
-                ++count;
-            }
-        }
-
-        if (count > 0)
-        {
-            ReadOnlySpan<LookupFrequencyResult> validFrequencies = filteredFrequencies.AsSpan(0, count);
             ConfigManager configManager = ConfigManager.Instance;
             TextBlock frequencyTextBlock = PopupWindowUtils.CreateTextBlock(
                 nameof(result.Frequencies),
-                LookupResultUtils.FrequenciesToText(validFrequencies, false, result.Frequencies.Count is 1),
+                frequencyText,
                 configManager.FrequencyColor,
                 BoxedFrequencyFontSize,
                 PopupWindowUtils.BoxedVerticalAlignmentTop,
@@ -487,8 +475,6 @@ internal sealed class PopupContentGenerator : Decorator
 
             _ = top.Children.Add(frequencyTextBlock);
         }
-
-        ArrayPool<LookupFrequencyResult>.Shared.Return(filteredFrequencies);
     }
 
     private static void CreateDictName(LookupResult result, WrapPanel top)

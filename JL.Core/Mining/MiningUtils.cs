@@ -197,22 +197,9 @@ public static class MiningUtils
 
     private static string? GetFrequencyHarmonicMean(LookupResult lookupResult)
     {
-        if (lookupResult.Frequencies is null)
-        {
-            return null;
-        }
-
-        ReadOnlySpan<LookupFrequencyResult> allFrequencies = lookupResult.Frequencies.AsReadOnlySpan();
-        List<LookupFrequencyResult> filteredFrequencies = new(allFrequencies.Length);
-        foreach (ref readonly LookupFrequencyResult frequency in allFrequencies)
-        {
-            if (frequency.Freq is > 0 and < int.MaxValue)
-            {
-                filteredFrequencies.Add(frequency);
-            }
-        }
-
-        return CalculateHarmonicMean(filteredFrequencies.AsReadOnlySpan()).ToString(CultureInfo.InvariantCulture);
+        return lookupResult.Frequencies is null
+            ? null
+            : CalculateHarmonicMean(lookupResult.Frequencies.AsReadOnlySpan()).ToString(CultureInfo.InvariantCulture);
     }
 
     private static string? GetPitchAccents(LookupResult lookupResult)
@@ -475,7 +462,7 @@ public static class MiningUtils
     private static string? GetFrequency(LookupResult lookupResult)
     {
         return lookupResult.Frequencies is not null
-            ? LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsReadOnlySpan(), true, lookupResult.Frequencies.Count is 1)
+            ? LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsReadOnlySpan())
             : null;
     }
 
@@ -871,18 +858,17 @@ public static class MiningUtils
             return;
         }
 
-        List<LookupFrequencyResult> validFrequencies = new(lookupResult.Frequencies.Count);
-        List<int> validFrequencyValues = new(lookupResult.Frequencies.Count);
-        foreach (LookupFrequencyResult lookupFrequencyResult in lookupResult.Frequencies.AsReadOnlySpan())
+        bool validFrequencyExists = false;
+        foreach (ref readonly LookupFrequencyResult lookupFrequencyResult in lookupResult.Frequencies.AsReadOnlySpan())
         {
             if (lookupFrequencyResult.Freq is > 0 and < int.MaxValue)
             {
-                validFrequencies.Add(lookupFrequencyResult);
-                validFrequencyValues.Add(lookupFrequencyResult.Freq);
+                validFrequencyExists = true;
+                break;
             }
         }
 
-        if (validFrequencies.Count is 0)
+        if (!validFrequencyExists)
         {
             return;
         }
@@ -891,21 +877,23 @@ public static class MiningUtils
             // ReSharper disable once NullableWarningSuppressionIsUsed
             || jlFields!.Contains(JLField.Frequencies))
         {
-            miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsReadOnlySpan(), true, lookupResult.Frequencies.Count is 1);
+            miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies.AsReadOnlySpan());
         }
 
         if (mineAllFields
             // ReSharper disable once NullableWarningSuppressionIsUsed
             || jlFields!.Contains(JLField.RawFrequencies))
         {
-            miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencyValues);
+            string? rawFrequencies = GetRawFrequencies(lookupResult);
+            Debug.Assert(rawFrequencies is not null);
+            miningParams[JLField.RawFrequencies] = rawFrequencies;
         }
 
         if (mineAllFields
             // ReSharper disable once NullableWarningSuppressionIsUsed
             || jlFields!.Contains(JLField.FrequencyHarmonicMean))
         {
-            miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies.AsReadOnlySpan()).ToString(CultureInfo.InvariantCulture);
+            miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(lookupResult.Frequencies.AsReadOnlySpan()).ToString(CultureInfo.InvariantCulture);
         }
 
         int firstFrequency = lookupResult.Frequencies[0].Freq;
@@ -1446,16 +1434,23 @@ public static class MiningUtils
     private static int CalculateHarmonicMean(ReadOnlySpan<LookupFrequencyResult> lookupFrequencyResults)
     {
         double sumOfReciprocalOfFreqs = 0;
+        int frequencyCount = 0;
         foreach (ref readonly LookupFrequencyResult lookupFrequencyResult in lookupFrequencyResults)
         {
+            if (lookupFrequencyResult.Freq is <= 0 or int.MaxValue)
+            {
+                continue;
+            }
+
             int freq = lookupFrequencyResult.HigherValueMeansHigherFrequency
                 ? FreqUtils.FreqDicts[lookupFrequencyResult.Name].MaxValue - lookupFrequencyResult.Freq + 1
                 : lookupFrequencyResult.Freq;
 
             sumOfReciprocalOfFreqs += 1d / freq;
+            ++frequencyCount;
         }
 
-        return double.ConvertToIntegerNative<int>(Math.Round(lookupFrequencyResults.Length / sumOfReciprocalOfFreqs));
+        return double.ConvertToIntegerNative<int>(Math.Round(frequencyCount / sumOfReciprocalOfFreqs));
     }
 
     private static string GetPitchAccentCategory(string expression, byte pitchPosition)

@@ -976,53 +976,93 @@ public static class LookupUtils
 
     private static Dictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, RentedArrayBuffer<SqliteConnection?> connections, HashSet<string> searchKeys)
     {
-        Dictionary<string, List<FrequencyRecord>>?[] resultsArray = ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Rent(dbFreqs.Length);
-        _ = Parallel.For(0, dbFreqs.Length, i =>
+        if (dbFreqs.Length is 1)
         {
-            SqliteConnection? connection = connections[i];
+            Dictionary<string, Dictionary<string, List<FrequencyRecord>>> singleResult = new(1, StringComparer.Ordinal);
+            SqliteConnection? connection = connections[0];
             if (connection is not null)
             {
-                resultsArray[i] = FreqDBManager.GetRecordsFromDB(connection, searchKeys);
+                Dictionary<string, List<FrequencyRecord>>? records = FreqDBManager.GetRecordsFromDB(connection, searchKeys);
+                if (records is not null)
+                {
+                    singleResult.Add(dbFreqs[0].Name, records);
+                }
             }
-        });
 
-        Dictionary<string, Dictionary<string, List<FrequencyRecord>>> result = new(dbFreqs.Length, StringComparer.Ordinal);
-        for (int i = 0; i < dbFreqs.Length; i++)
-        {
-            Dictionary<string, List<FrequencyRecord>>? resultArrayItem = resultsArray[i];
-            if (resultArrayItem is not null)
-            {
-                result[dbFreqs[i].Name] = resultArrayItem;
-            }
+            return singleResult;
         }
 
-        ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Return(resultsArray);
+        Dictionary<string, List<FrequencyRecord>>?[] resultsArray = ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Rent(dbFreqs.Length);
+        try
+        {
+            _ = Parallel.For(0, dbFreqs.Length, i =>
+            {
+                SqliteConnection? connection = connections[i];
+                resultsArray[i] = connection is not null
+                    ? FreqDBManager.GetRecordsFromDB(connection, searchKeys)
+                    : null;
+            });
 
-        return result;
+            Dictionary<string, Dictionary<string, List<FrequencyRecord>>> result = new(dbFreqs.Length, StringComparer.Ordinal);
+            for (int i = 0; i < dbFreqs.Length; i++)
+            {
+                Dictionary<string, List<FrequencyRecord>>? resultArrayItem = resultsArray[i];
+                if (resultArrayItem is not null)
+                {
+                    result[dbFreqs[i].Name] = resultArrayItem;
+                }
+            }
+
+            return result;
+        }
+        finally
+        {
+            resultsArray.AsSpan(0, dbFreqs.Length).Clear();
+            ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Return(resultsArray);
+        }
     }
 
     private static Dictionary<string, Dictionary<string, List<FrequencyRecord>>> GetFrequencyDictsFromDB(Freq[] dbFreqs, HashSet<string> searchKeys)
     {
-        Dictionary<string, List<FrequencyRecord>>?[] resultsArray = ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Rent(dbFreqs.Length);
-
-        _ = Parallel.For(0, dbFreqs.Length, i =>
+        if (dbFreqs.Length is 1)
         {
-            Freq freq = dbFreqs[i];
-            resultsArray[i] = FreqDBManager.GetRecordsFromDB(freq.ReadOnlyConnectionString, searchKeys);
-        });
-
-        Dictionary<string, Dictionary<string, List<FrequencyRecord>>> result = new(dbFreqs.Length, StringComparer.Ordinal);
-        for (int i = 0; i < dbFreqs.Length; i++)
-        {
-            Dictionary<string, List<FrequencyRecord>>? resultArrayItem = resultsArray[i];
-            if (resultArrayItem is not null)
+            Dictionary<string, Dictionary<string, List<FrequencyRecord>>> singleResult = new(1, StringComparer.Ordinal);
+            Freq freq = dbFreqs[0];
+            Dictionary<string, List<FrequencyRecord>>? records = FreqDBManager.GetRecordsFromDB(freq.ReadOnlyConnectionString, searchKeys);
+            if (records is not null)
             {
-                result[dbFreqs[i].Name] = resultArrayItem;
+                singleResult.Add(freq.Name, records);
             }
+
+            return singleResult;
         }
 
-        ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Return(resultsArray);
-        return result;
+        Dictionary<string, List<FrequencyRecord>>?[] resultsArray = ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Rent(dbFreqs.Length);
+        try
+        {
+            _ = Parallel.For(0, dbFreqs.Length, i =>
+            {
+                Freq freq = dbFreqs[i];
+                resultsArray[i] = FreqDBManager.GetRecordsFromDB(freq.ReadOnlyConnectionString, searchKeys);
+            });
+
+            Dictionary<string, Dictionary<string, List<FrequencyRecord>>> result = new(dbFreqs.Length, StringComparer.Ordinal);
+            for (int i = 0; i < dbFreqs.Length; i++)
+            {
+                Dictionary<string, List<FrequencyRecord>>? resultArrayItem = resultsArray[i];
+                if (resultArrayItem is not null)
+                {
+                    result[dbFreqs[i].Name] = resultArrayItem;
+                }
+            }
+
+            return result;
+        }
+        finally
+        {
+            resultsArray.AsSpan(0, dbFreqs.Length).Clear();
+            ArrayPool<Dictionary<string, List<FrequencyRecord>>?>.Shared.Return(resultsArray);
+        }
     }
 
     private static void BuildJmdictResult(Dictionary<string, IntermediaryResult> jmdictResults, List<LookupResult> results, Freq[]? wordFreqs, Freq[]? dbWordFreqs, RentedArrayBuffer<SqliteConnection?>? dbWordFreqConnections, bool dbIsUsedForPitchDict, SqliteConnection? pitchDictConnection, Dict? pitchDict)

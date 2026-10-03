@@ -63,13 +63,8 @@ public static class LookupResultUtils
         };
     }
 
-    public static string FrequenciesToText(ReadOnlySpan<LookupFrequencyResult> frequencies, bool forMining, bool singleDict)
+    public static string FrequenciesToText(ReadOnlySpan<LookupFrequencyResult> frequencies)
     {
-        if (!forMining && singleDict)
-        {
-            return string.Create(CultureInfo.InvariantCulture, $"#{frequencies[0].Freq}");
-        }
-
         StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 0; i < frequencies.Length; i++)
         {
@@ -78,6 +73,40 @@ public static class LookupResultUtils
             if (i + 1 != frequencies.Length)
             {
                 _ = sb.Append(", ");
+            }
+        }
+
+        string text = sb.ToString();
+        ObjectPoolManager.StringBuilderPool.Return(sb);
+        return text;
+    }
+
+    public static string? ValidFrequenciesToText(ReadOnlySpan<LookupFrequencyResult> frequencies, bool singleDict)
+    {
+        int firstValidIndex = 0;
+        while (firstValidIndex < frequencies.Length && (frequencies[firstValidIndex].Freq is <= 0 or int.MaxValue))
+        {
+            ++firstValidIndex;
+        }
+
+        if (firstValidIndex == frequencies.Length)
+        {
+            return null;
+        }
+
+        if (singleDict)
+        {
+            return string.Create(CultureInfo.InvariantCulture, $"#{frequencies[firstValidIndex].Freq}");
+        }
+
+        ref readonly LookupFrequencyResult firstFrequency = ref frequencies[firstValidIndex];
+        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get().Append(CultureInfo.InvariantCulture, $"{firstFrequency.Name}: {firstFrequency.Freq}");
+        for (int i = firstValidIndex + 1; i < frequencies.Length; i++)
+        {
+            ref readonly LookupFrequencyResult frequency = ref frequencies[i];
+            if (frequency.Freq is > 0 and < int.MaxValue)
+            {
+                _ = sb.Append(", ").Append(CultureInfo.InvariantCulture, $"{frequency.Name}: {frequency.Freq}");
             }
         }
 
