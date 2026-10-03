@@ -68,7 +68,7 @@ internal readonly ref struct SqliteRecordReader
 
     public int GetInt32(int index)
     {
-        return checked((int)raw.sqlite3_column_int64(_statement, index));
+        return raw.sqlite3_column_int(_statement, index);
     }
 
     public long GetInt64(int index)
