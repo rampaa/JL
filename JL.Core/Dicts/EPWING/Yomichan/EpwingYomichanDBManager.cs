@@ -733,7 +733,7 @@ internal static class EpwingYomichanDBManager
                 {
                     if (fileStream.Length <= WholeFileParsingThreshold)
                     {
-                        byte[] jsonBytes = GC.AllocateUninitializedArray<byte>(checked((int)fileStream.Length));
+                        byte[] jsonBytes = GC.AllocateUninitializedArray<byte>((int)fileStream.Length);
                         await fileStream.ReadExactlyAsync(jsonBytes, cancellationToken).ConfigureAwait(false);
 
                         int offset = jsonBytes.AsSpan().StartsWith(Encoding.UTF8.Preamble)

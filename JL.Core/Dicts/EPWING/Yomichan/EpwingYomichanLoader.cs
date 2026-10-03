@@ -365,7 +365,7 @@ internal static class EpwingYomichanLoader
             }
         }
 
-        offset += checked((int)reader.BytesConsumed);
+        offset += (int)reader.BytesConsumed;
         readerState = reader.CurrentState;
         return recordCount;
     }
@@ -1089,7 +1089,7 @@ internal static class EpwingYomichanLoader
                         Utf8JsonReader nextReader = reader;
                         emptyContentArray = nextReader.Read() && nextReader.TokenType is JsonTokenType.EndArray;
                     }
-                    int contentStart = checked((int)reader.TokenStartIndex);
+                    int contentStart = (int)reader.TokenStartIndex;
                     int contentDepth = reader.CurrentDepth;
 
                     if (!tagPresent)
@@ -1137,13 +1137,13 @@ internal static class EpwingYomichanLoader
                         }
 
                         contentOffset = contentStart;
-                        contentLength = checked((int)reader.BytesConsumed) - contentStart;
+                        contentLength = (int)reader.BytesConsumed - contentStart;
                         invalidContent = true;
                         continue;
                     }
 
                     contentOffset = contentStart;
-                    contentLength = checked((int)reader.BytesConsumed) - contentStart;
+                    contentLength = (int)reader.BytesConsumed - contentStart;
 
                     if (tag is ContentTag.TR && childTableRowSpans is not null)
                     {
@@ -1162,7 +1162,7 @@ internal static class EpwingYomichanLoader
                 if (reader.TokenType is JsonTokenType.StartObject)
                 {
                     contentKind = ContentValueKind.ObjectValue;
-                    int contentStart = checked((int)reader.TokenStartIndex);
+                    int contentStart = (int)reader.TokenStartIndex;
                     int contentDepth = reader.CurrentDepth;
 
                     if (!tagPresent)
@@ -1200,13 +1200,13 @@ internal static class EpwingYomichanLoader
                         }
 
                         contentOffset = contentStart;
-                        contentLength = checked((int)reader.BytesConsumed) - contentStart;
+                        contentLength = (int)reader.BytesConsumed - contentStart;
                         invalidContent = true;
                         continue;
                     }
 
                     contentOffset = contentStart;
-                    contentLength = checked((int)reader.BytesConsumed) - contentStart;
+                    contentLength = (int)reader.BytesConsumed - contentStart;
 
                     continue;
                 }
@@ -1820,9 +1820,9 @@ internal static class EpwingYomichanLoader
 
     private static void SkipNestedContentForLater(ref Utf8JsonReader reader, out int contentOffset, out int contentLength)
     {
-        contentOffset = checked((int)reader.TokenStartIndex);
+        contentOffset = (int)reader.TokenStartIndex;
         reader.Skip();
-        contentLength = checked((int)reader.BytesConsumed) - contentOffset;
+        contentLength = (int)reader.BytesConsumed - contentOffset;
     }
 
     private static void RemoveImagesFromReplacedContent(ref List<ImageInfo>? imageInfos, int previousCount)

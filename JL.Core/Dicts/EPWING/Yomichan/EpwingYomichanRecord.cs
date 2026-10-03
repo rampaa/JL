@@ -150,6 +150,8 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
                && other.Definitions.SequenceEqual(Definitions)
+               && other.WordClasses.SequenceEqual(WordClasses)
+               && other.DefinitionTags.SequenceEqual(DefinitionTags)
                && other.ImageInfos.SequenceEqual(ImageInfos)));
     }
 
@@ -159,6 +161,8 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
                && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
                && Reading == other.Reading
                && other.Definitions.SequenceEqual(Definitions)
+               && other.WordClasses.SequenceEqual(WordClasses)
+               && other.DefinitionTags.SequenceEqual(DefinitionTags)
                && other.ImageInfos.SequenceEqual(ImageInfos)));
     }
 
@@ -179,6 +183,30 @@ internal sealed class EpwingYomichanRecord : IDictRecord, IGetFrequency, IEquata
                 foreach (string definition in Definitions)
                 {
                     hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            if (WordClasses is not null)
+            {
+                foreach (string wordClass in WordClasses)
+                {
+                    hash = (hash * 37) + wordClass.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            if (DefinitionTags is not null)
+            {
+                foreach (string definitionTag in DefinitionTags)
+                {
+                    hash = (hash * 37) + definitionTag.GetHashCode(StringComparison.Ordinal);
                 }
             }
             else
