@@ -377,8 +377,8 @@ internal static class KanjidicDBManager
             ? reader.Deserialize<string[]>(glossaryIndex)
             : null;
 
-        byte strokeCount = checked((byte)reader.GetInt64((int)ColumnIndex.StrokeCount));
-        byte grade = checked((byte)reader.GetInt64((int)ColumnIndex.Grade));
+        byte strokeCount = (byte)reader.GetInt32((int)ColumnIndex.StrokeCount);
+        byte grade = (byte)reader.GetInt32((int)ColumnIndex.Grade);
         int frequency = reader.GetInt32((int)ColumnIndex.Frequency);
         return new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
     }
