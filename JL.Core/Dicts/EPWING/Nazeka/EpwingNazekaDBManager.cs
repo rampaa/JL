@@ -147,7 +147,7 @@ internal static class EpwingNazekaDBManager
         {
             if (fileStream.Length <= WholeFileParsingThreshold)
             {
-                json = GC.AllocateUninitializedArray<byte>(checked((int)fileStream.Length));
+                json = GC.AllocateUninitializedArray<byte>((int)fileStream.Length);
                 await fileStream.ReadExactlyAsync(json).ConfigureAwait(false);
             }
 
