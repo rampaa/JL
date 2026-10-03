@@ -275,11 +275,11 @@ public static class DBUtils
     {
         SqliteConnection.ClearAllPools();
 
+        ValidateForeignKeys(connection);
+
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1; PRAGMA foreign_keys = ON; PRAGMA cache_size = -2000";
         _ = command.ExecuteNonQuery();
-
-        ValidateForeignKeys(connection);
     }
 
     internal static void SetEncodingToUtf16LE(SqliteConnection connection)
