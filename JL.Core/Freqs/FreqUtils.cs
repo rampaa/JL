@@ -229,11 +229,6 @@ public static class FreqUtils
         {
             tasks.Add(Task.Run(async () =>
             {
-                int size = freq.Size > 0
-                    ? freq.Size
-                    : 114348;
-
-                freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
                 try
                 {
                     if (!dbExists)
@@ -242,6 +237,11 @@ public static class FreqUtils
                     }
                     else
                     {
+                        int size = freq.Size > 0
+                            ? freq.Size
+                            : 114348;
+
+                        freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
                         FreqDBManager.LoadFromDB(freq);
                     }
 
@@ -320,7 +320,7 @@ public static class FreqUtils
             freq.Ready = true;
         }
 
-        if (freq is { Active: true, MaxValue: 0 } && useDB)
+        if (freq is { Active: true, MaxValue: 0 } && useDB && dbExists)
         {
             FreqDBManager.SetMaxFrequencyValue(freq);
         }
@@ -345,13 +345,6 @@ public static class FreqUtils
         {
             tasks.Add(Task.Run(async () =>
             {
-                int size = freq.Size > 0
-                        ? freq.Size
-                        : freq.Type is FreqType.Yomichan
-                            ? 1504512
-                            : 169623;
-
-                freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
                 try
                 {
                     if (!dbExists)
@@ -360,6 +353,13 @@ public static class FreqUtils
                     }
                     else
                     {
+                        int size = freq.Size > 0
+                                ? freq.Size
+                                : freq.Type is FreqType.Yomichan
+                                    ? 1504512
+                                    : 169623;
+
+                        freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
                         FreqDBManager.LoadFromDB(freq);
                     }
 
@@ -438,7 +438,7 @@ public static class FreqUtils
             freq.Ready = true;
         }
 
-        if (freq is { Active: true, MaxValue: 0 } && useDB)
+        if (freq is { Active: true, MaxValue: 0 } && useDB && dbExists)
         {
             FreqDBManager.SetMaxFrequencyValue(freq);
         }

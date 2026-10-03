@@ -617,7 +617,6 @@ public static class ResourceUpdater
                     freq.Ready = false;
                     await Task.Run(async () =>
                     {
-                        freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(13108, StringComparer.Ordinal);
                         await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
                     }).ConfigureAwait(false);
 
@@ -668,7 +667,6 @@ public static class ResourceUpdater
                     {
                         await Task.Run(async () =>
                         {
-                            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(13108, StringComparer.Ordinal);
                             await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
                         }).ConfigureAwait(false);
                     }
