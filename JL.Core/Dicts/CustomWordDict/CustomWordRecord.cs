@@ -172,13 +172,15 @@ internal sealed class CustomWordRecord : IDictRecordWithMultipleReadings, IGetFr
     public bool Equals([NotNullWhen(true)] CustomWordRecord? other)
     {
         return other is not null
-               && (ReferenceEquals(this, other) || (PrimarySpelling == other.PrimarySpelling
+               && PrimarySpelling == other.PrimarySpelling
                && other.Definitions.SequenceEqual(Definitions)
-               && ((AlternativeSpellings is not null && other.AlternativeSpellings is not null && other.AlternativeSpellings.SequenceEqual(AlternativeSpellings))
-                   || (AlternativeSpellings is null && other.AlternativeSpellings is null))
-               && ((Readings is not null && other.Readings is not null && other.Readings.SequenceEqual(Readings))
-                   || (Readings is null && other.Readings is null))
-               && other.WordClasses.SequenceEqual(WordClasses)));
+               && (AlternativeSpellings is not null
+                   ? other.AlternativeSpellings is not null && other.AlternativeSpellings.SequenceEqual(AlternativeSpellings)
+                   : other.AlternativeSpellings is null)
+               && (Readings is not null
+                   ? other.Readings is not null && other.Readings.SequenceEqual(Readings)
+                   : other.Readings is null)
+               && other.WordClasses.SequenceEqual(WordClasses);
     }
 
     public bool Equals([NotNullWhen(true)] IDictRecord? other)
