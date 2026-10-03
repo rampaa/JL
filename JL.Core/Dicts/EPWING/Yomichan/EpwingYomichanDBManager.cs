@@ -91,6 +91,7 @@ internal static class EpwingYomichanDBManager
         PrimarySpelling,
         Reading,
         PopularityScore,
+        // ReSharper disable once UnusedMember.Local
         Glossary,
         PartOfSpeech,
         GlossaryTags,
@@ -699,7 +700,7 @@ internal static class EpwingYomichanDBManager
             {
                 await outputCompletionTask.ConfigureAwait(false);
             }
-            catch (OperationCanceledException) when (stopOnConsumerExit.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 LoggerManager.Logger.Debug("Output channel completion task was canceled due to consumer exit");
             }
@@ -848,7 +849,7 @@ internal static class EpwingYomichanDBManager
             {
                 await outputCompletionTask.ConfigureAwait(false);
             }
-            catch (OperationCanceledException) when (stopOnConsumerExit.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 LoggerManager.Logger.Debug("Output channel completion task was canceled due to consumer exit");
             }

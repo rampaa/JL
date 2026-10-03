@@ -23,8 +23,7 @@ internal ref struct MazegakiVariantEnumerator
         _segments = ArrayPool<MazegakiSegment>.Shared.Rent(expression.Length * 2);
 
         if (!MazegakiVariantGenerator.TryGetUniqueSegmentation(_expression, _reading, _segments, out _segmentCount, out int kanjiCount)
-            || kanjiCount < MazegakiVariantGenerator.MinKanjiRunCount
-            || kanjiCount > MazegakiVariantGenerator.MaxKanjiRunCount)
+            || kanjiCount is < MazegakiVariantGenerator.MinKanjiRunCount or > MazegakiVariantGenerator.MaxKanjiRunCount)
         {
             Dispose();
             return;
