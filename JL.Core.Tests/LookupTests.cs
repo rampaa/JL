@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
@@ -32,13 +31,13 @@ internal sealed class LookupTests
         DictUtils.Dicts.Add(nameof(DictType.JMdict), jmdict);
         DictUtils.PopulateDictTypeArrays(DictUtils.Dicts.Values.ToArray());
         Dict dict = DictUtils.Dicts[nameof(DictType.JMdict)];
-        dict.Contents = new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
+        DictUtils.InitializeContents(dict, JmdictLoader.Size);
         DictUtils.SingleDictTypeDicts[DictType.JMdict] = dict;
         JmdictLoader.Load(dict).Wait();
 
         foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
         {
-            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(StringComparer.Ordinal);
             freq.Options = new Freqs.Options.FreqOptions(new Freqs.Options.UseDBOption(false), new Freqs.Options.HigherValueMeansHigherFrequencyOption(false), generateMazegakiVariants: new Freqs.Options.GenerateMazegakiVariantsOption(false), generateFusejiVariants: new Freqs.Options.GenerateFusejiVariantsOption(false));
             FreqUtils.FreqDicts[key] = freq;
         }
