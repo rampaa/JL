@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -17,6 +18,8 @@ namespace JL.Core.WordClass;
 public static class JmdictWordClassUtils
 {
     private static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
+
+    private static readonly byte[] s_searchKeysQuery = TextUtils.s_utf8NoBom.GetBytes($"SELECT {JmdictDBManager.RecordId}, {JmdictDBManager.SearchKey} FROM {JmdictDBManager.RecordSearchKey}\0");
 
     public static async Task Load()
     {
@@ -306,11 +309,10 @@ public static class JmdictWordClassUtils
 
         _ = jmdictWordClassDictionary.EnsureCapacity(rowIdToWordClassCandidate.Count);
 
-        const string searchKeyQuery = $"SELECT {JmdictDBManager.RecordId}, {JmdictDBManager.SearchKey} FROM {JmdictDBManager.RecordSearchKey}";
         const int recordIdColumnIndex = 0;
         const int searchKeyColumnIndex = 1;
 
-        using SqliteRecordReader searchKeyReader = new(connection, searchKeyQuery);
+        using SqliteRecordReader searchKeyReader = new(connection, s_searchKeysQuery);
         while (searchKeyReader.Read())
         {
             long recordId = searchKeyReader.GetInt64(recordIdColumnIndex);

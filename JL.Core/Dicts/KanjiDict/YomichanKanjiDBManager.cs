@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
 using JL.Core.Dicts.Interfaces;
@@ -28,19 +29,19 @@ internal static class YomichanKanjiDBManager
     internal const string Stats = "stats";
 
     private const string Term = "term";
-    private const string SingleTermQuery =
+    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
         $"""
         SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}
         FROM {Record} r
-        WHERE r.{Kanji} = @{Term};
-        """;
+        WHERE r.{Kanji} = @{Term};{"\0"}
+        """);
 
-    private const string KanjiWithVariationSelectorQuery =
+    private static readonly byte[] s_kanjiWithVariationSelectorQuery = TextUtils.s_utf8NoBom.GetBytes(
         $"""
         SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}, r.{Kanji}
         FROM {Record} r
-        WHERE r.{Kanji} IN (@1, @2);
-        """;
+        WHERE r.{Kanji} IN (@1, @2);{"\0"}
+        """);
 
     private enum ColumnIndex
     {
@@ -52,6 +53,12 @@ internal static class YomichanKanjiDBManager
         Stats,
         Kanji
     }
+
+    private static readonly byte[] s_distinctKanjiCountQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT COUNT(DISTINCT {Kanji})
+        FROM {Record};{"\0"}
+        """);
 
     public static void CreateDB(string dbPath)
     {
@@ -334,13 +341,7 @@ internal static class YomichanKanjiDBManager
 
     private static int GetDistinctKanjiCount(SqliteConnection connection)
     {
-        const string query =
-            $"""
-            SELECT COUNT(DISTINCT {Kanji})
-            FROM {Record};
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_distinctKanjiCountQuery);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -399,7 +400,7 @@ internal static class YomichanKanjiDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
         reader.Bind(1, term);
         if (!reader.Read())
         {
@@ -425,7 +426,7 @@ internal static class YomichanKanjiDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, KanjiWithVariationSelectorQuery);
+        using SqliteRecordReader reader = new(connection, s_kanjiWithVariationSelectorQuery);
         reader.Bind(1, kanjiWithVariationSelector);
         reader.Bind(2, kanji);
 

@@ -36,29 +36,54 @@ internal static class FreqDBManager
     internal const string RecordId = "record_id";
 
     private const string Term = "term";
-    private const string SingleTermQuery =
+    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
         $"""
         SELECT r.{Frequency}
         FROM {Record} r
         JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
-        WHERE rsk.{SearchKey} = @{Term};
-        """;
+        WHERE rsk.{SearchKey} = @{Term};{"\0"}
+        """);
 
-    private const string KanjiWithVariationSelectorQuery =
+    private static readonly byte[] s_kanjiWithVariationSelectorQuery = TextUtils.s_utf8NoBom.GetBytes(
         $"""
         SELECT r.{Frequency}
         FROM {Record} r
         JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
         WHERE rsk.{SearchKey} IN (@1, @2)
         ORDER BY rsk.{SearchKey} DESC
-        LIMIT 1;
-        """;
+        LIMIT 1;{"\0"}
+        """);
 
-    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
+    private static readonly ConcurrentDictionary<int, byte[]> s_queryCache = [];
 
-    private static string GetQuery(int termCount)
+    private static readonly byte[] s_maxFrequencyQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT MAX({Frequency})
+        FROM {Record}{"\0"}
+        """);
+
+    private static readonly byte[] s_recordsQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT {Spelling}, {Frequency}, {RowId}
+        FROM {Record};{"\0"}
+        """);
+
+    private static readonly byte[] s_searchKeysQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT {SearchKey}, {RecordId}
+        FROM {RecordSearchKey}
+        ORDER BY {SearchKey}, {RecordId};{"\0"}
+        """);
+
+    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT COUNT(DISTINCT {SearchKey})
+        FROM {RecordSearchKey};{"\0"}
+        """);
+
+    private static byte[] GetQuery(int termCount)
     {
-        if (s_queryCache.TryGetValue(termCount, out string? query))
+        if (s_queryCache.TryGetValue(termCount, out byte[]? query))
         {
             return query;
         }
@@ -76,8 +101,11 @@ internal static class FreqDBManager
             _ = queryBuilder.Append(',').Append(DBUtils.GetParameterName(i + 1));
         }
 
-        query = queryBuilder.Append(");").ToString();
+        string queryText = queryBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
+        query = GC.AllocateUninitializedArray<byte>(TextUtils.s_utf8NoBom.GetByteCount(queryText) + 1);
+        _ = TextUtils.s_utf8NoBom.GetBytes(queryText, query);
+        query[^1] = 0;
         _ = s_queryCache.TryAdd(termCount, query);
         return query;
     }
@@ -232,7 +260,7 @@ internal static class FreqDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
         reader.Bind(1, kanji);
         return reader.Read()
             ? reader.GetInt32(0)
@@ -248,7 +276,7 @@ internal static class FreqDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, KanjiWithVariationSelectorQuery);
+        using SqliteRecordReader reader = new(connection, s_kanjiWithVariationSelectorQuery);
         reader.Bind(1, kanjiWithVariationSelector);
         reader.Bind(2, kanji);
         return reader.Read()
@@ -266,13 +294,7 @@ internal static class FreqDBManager
 
     private static void SetMaxFrequencyValue(Freq freq, SqliteConnection connection)
     {
-        const string query =
-            $"""
-            SELECT MAX({Frequency})
-            FROM {Record}
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_maxFrequencyQuery);
         _ = reader.Read();
         freq.MaxValue = !reader.IsNull(0)
             ? reader.GetInt32(0)
@@ -287,14 +309,8 @@ internal static class FreqDBManager
 
         SetMaxFrequencyValue(freq, connection);
 
-        const string recordQuery =
-            $"""
-            SELECT {Spelling}, {Frequency}, {RowId}
-            FROM {Record};
-            """;
-
         Dictionary<long, FrequencyRecord> records = [];
-        using (SqliteRecordReader reader = new(connection, recordQuery))
+        using (SqliteRecordReader reader = new(connection, s_recordsQuery))
         {
             while (reader.Read())
             {
@@ -302,18 +318,11 @@ internal static class FreqDBManager
             }
         }
 
-        const string searchKeyQuery =
-            $"""
-            SELECT {SearchKey}, {RecordId}
-            FROM {RecordSearchKey}
-            ORDER BY {SearchKey}, {RecordId};
-            """;
-
         Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
         Dictionary<string, IList<FrequencyRecord>> contents = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
         string? currentSearchKey = null;
         List<FrequencyRecord>? currentRecords = null;
-        using (SqliteRecordReader reader = new(connection, searchKeyQuery))
+        using (SqliteRecordReader reader = new(connection, s_searchKeysQuery))
         {
             while (reader.Read())
             {
@@ -1195,13 +1204,7 @@ internal static class FreqDBManager
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
-        const string query =
-            $"""
-            SELECT COUNT(DISTINCT {SearchKey})
-            FROM {RecordSearchKey};
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_distinctSearchKeyCountQuery);
         _ = reader.Read();
         return reader.GetInt32(0);
     }

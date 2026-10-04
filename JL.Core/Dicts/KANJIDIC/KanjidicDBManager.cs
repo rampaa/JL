@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Threading.Channels;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
@@ -30,12 +31,12 @@ internal static class KanjidicDBManager
     internal const string Frequency = "frequency";
 
     private const string Term = "term";
-    private const string SingleTermQuery =
+    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
         $"""
         SELECT r.{OnReadings}, r.{KunReadings}, r.{NanoriReadings}, r.{RadicalNames}, r.{Glossary}, r.{StrokeCount}, r.{Grade}, r.{Frequency}
         FROM {Record} r
-        WHERE r.{Kanji} = @{Term};
-        """;
+        WHERE r.{Kanji} = @{Term};{"\0"}
+        """);
 
     private enum ColumnIndex
     {
@@ -49,6 +50,12 @@ internal static class KanjidicDBManager
         Frequency,
         Kanji
     }
+
+    private static readonly byte[] s_recordsQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT r.{OnReadings}, r.{KunReadings}, r.{NanoriReadings}, r.{RadicalNames}, r.{Glossary}, r.{StrokeCount}, r.{Grade}, r.{Frequency}, r.{Kanji}
+        FROM {Record} r;{"\0"}
+        """);
 
     public static void CreateDB(string dbPath)
     {
@@ -313,7 +320,7 @@ internal static class KanjidicDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
         reader.Bind(1, term);
         return reader.Read()
             ? [GetRecord(reader)]
@@ -328,13 +335,7 @@ internal static class KanjidicDBManager
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
-        const string query =
-            $"""
-            SELECT r.{OnReadings}, r.{KunReadings}, r.{NanoriReadings}, r.{RadicalNames}, r.{Glossary}, r.{StrokeCount}, r.{Grade}, r.{Frequency}, r.{Kanji}
-            FROM {Record} r;
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_recordsQuery);
         while (reader.Read())
         {
             IDictRecord[] record = [GetRecord(reader)];

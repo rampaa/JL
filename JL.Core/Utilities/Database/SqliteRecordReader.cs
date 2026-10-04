@@ -10,7 +10,7 @@ internal readonly ref struct SqliteRecordReader
     private readonly SqliteConnection _connection;
     private readonly sqlite3_stmt _statement;
 
-    public SqliteRecordReader(SqliteConnection connection, string query)
+    public SqliteRecordReader(SqliteConnection connection, ReadOnlySpan<byte> query)
     {
         _connection = connection;
         sqlite3? connectionHandle = connection.Handle;
@@ -31,9 +31,9 @@ internal readonly ref struct SqliteRecordReader
         _statement = statement;
     }
 
-    public void Bind(int index, string value)
+    public void Bind(int index, ReadOnlySpan<char> value)
     {
-        int result = raw.sqlite3_bind_text16(_statement, index, value.AsSpan());
+        int result = raw.sqlite3_bind_text16(_statement, index, value);
         if (result is not raw.SQLITE_OK)
         {
             sqlite3? connectionHandle = _connection.Handle;

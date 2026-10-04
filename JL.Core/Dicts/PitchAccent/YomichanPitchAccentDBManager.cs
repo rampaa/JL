@@ -35,11 +35,32 @@ internal static class YomichanPitchAccentDBManager
     internal const string RecordId = "record_id";
     internal const string SearchKey = "search_key";
 
-    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
+    private static readonly ConcurrentDictionary<int, byte[]> s_queryCache = [];
 
-    private static string GetQuery(int termCount)
+    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT COUNT(DISTINCT {SearchKey})
+        FROM {RecordSearchKey};{"\0"}
+        """);
+
+    private static readonly byte[] s_maxSearchKeyLengthQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
+        FROM {RecordSearchKey};{"\0"}
+        """);
+
+    private static readonly byte[] s_recordsQuery = TextUtils.s_utf8NoBom.GetBytes($"SELECT {Spelling}, {Reading}, {Position}, {RowId} FROM {Record};\0");
+
+    private static readonly byte[] s_searchKeysQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT {SearchKey}, {RecordId}
+        FROM {RecordSearchKey}
+        ORDER BY {SearchKey}, {RecordId};{"\0"}
+        """);
+
+    private static byte[] GetQuery(int termCount)
     {
-        if (s_queryCache.TryGetValue(termCount, out string? query))
+        if (s_queryCache.TryGetValue(termCount, out byte[]? query))
         {
             return query;
         }
@@ -57,8 +78,11 @@ internal static class YomichanPitchAccentDBManager
             _ = queryBuilder.Append(',').Append(DBUtils.GetParameterName(i + 1));
         }
 
-        query = queryBuilder.Append(");").ToString();
+        string queryText = queryBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
+        query = GC.AllocateUninitializedArray<byte>(TextUtils.s_utf8NoBom.GetByteCount(queryText) + 1);
+        _ = TextUtils.s_utf8NoBom.GetBytes(queryText, query);
+        query[^1] = 0;
         _ = s_queryCache.TryAdd(termCount, query);
         return query;
     }
@@ -395,26 +419,14 @@ internal static class YomichanPitchAccentDBManager
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
-        const string query =
-            $"""
-            SELECT COUNT(DISTINCT {SearchKey})
-            FROM {RecordSearchKey};
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_distinctSearchKeyCountQuery);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
 
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
-        const string query =
-            $"""
-            SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
-            FROM {RecordSearchKey};
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_maxSearchKeyLengthQuery);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -543,9 +555,8 @@ internal static class YomichanPitchAccentDBManager
         Debug.Assert(connection is not null);
         using SqliteTransaction transaction = connection.BeginTransaction(deferred: true);
 
-        const string recordQuery = $"SELECT {Spelling}, {Reading}, {Position}, {RowId} FROM {Record};";
         Dictionary<long, PitchAccentRecord> records = [];
-        using (SqliteRecordReader reader = new(connection, recordQuery))
+        using (SqliteRecordReader reader = new(connection, s_recordsQuery))
         {
             while (reader.Read())
             {
@@ -553,19 +564,12 @@ internal static class YomichanPitchAccentDBManager
             }
         }
 
-        const string searchKeyQuery =
-            $"""
-            SELECT {SearchKey}, {RecordId}
-            FROM {RecordSearchKey}
-            ORDER BY {SearchKey}, {RecordId};
-            """;
-
         Debug.Assert(dict.Contents.Count is 0);
         Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
         Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
         string? currentSearchKey = null;
         List<IDictRecord>? currentRecords = null;
-        using (SqliteRecordReader reader = new(connection, searchKeyQuery))
+        using (SqliteRecordReader reader = new(connection, s_searchKeysQuery))
         {
             while (reader.Read())
             {

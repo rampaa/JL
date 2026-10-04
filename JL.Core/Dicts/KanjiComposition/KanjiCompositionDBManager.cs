@@ -1,3 +1,4 @@
+using System.Text;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using Microsoft.Data.Sqlite;
@@ -10,12 +11,12 @@ internal static class KanjiCompositionDBManager
     private static readonly string s_dbPath = Path.Join(AppInfo.ResourcesPath, DBName);
     private static readonly string s_readOnlyDBConnectionString = DBUtils.GetReadOnlyConnectionString(s_dbPath);
 
-    private const string SingleTermQuery =
-        """
+    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
         SELECT compositions
         FROM record
-        WHERE kanji = @kanji;
-        """;
+        WHERE kanji = @kanji;{"\0"}
+        """);
 
     //public static void AnalyzeAndVacuum()
     //{
@@ -38,7 +39,7 @@ internal static class KanjiCompositionDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
         reader.Bind(1, kanji);
 
         // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.

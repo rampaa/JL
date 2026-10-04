@@ -44,19 +44,46 @@ internal static class EpwingNazekaDBManager
     internal const string SearchKey = "search_key";
 
     private const string Term = "term";
-    private const string SingleTermQuery =
+    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
         $"""
         SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}
         FROM {Record} r
         JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
-        WHERE rsk.{SearchKey} = @{Term};
-        """;
+        WHERE rsk.{SearchKey} = @{Term};{"\0"}
+        """);
 
-    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
+    private static readonly ConcurrentDictionary<int, byte[]> s_queryCache = [];
 
-    private static string GetQuery(int termCount)
+    private static readonly byte[] s_variantSourcesQuery = TextUtils.s_utf8NoBom.GetBytes($"SELECT {RowId}, {PrimarySpelling}, {Reading} FROM {Record} ORDER BY {RowId};\0");
+
+    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT COUNT(DISTINCT {SearchKey})
+        FROM {RecordSearchKey};{"\0"}
+        """);
+
+    private static readonly byte[] s_maxSearchKeyLengthQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
+        FROM {RecordSearchKey};{"\0"}
+        """);
+
+    private static readonly byte[] s_recordsQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT {RowId}, {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo}
+        FROM {Record};{"\0"}
+        """);
+
+    private static readonly byte[] s_searchKeysQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT {SearchKey}, {RecordId}
+        FROM {RecordSearchKey}
+        ORDER BY {SearchKey}, {RecordId};{"\0"}
+        """);
+
+    private static byte[] GetQuery(int termCount)
     {
-        if (s_queryCache.TryGetValue(termCount, out string? query))
+        if (s_queryCache.TryGetValue(termCount, out byte[]? query))
         {
             return query;
         }
@@ -74,8 +101,11 @@ internal static class EpwingNazekaDBManager
             _ = queryBuilder.Append(',').Append(DBUtils.GetParameterName(i + 1));
         }
 
-        query = queryBuilder.Append(");").ToString();
+        string queryText = queryBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
+        query = GC.AllocateUninitializedArray<byte>(TextUtils.s_utf8NoBom.GetByteCount(queryText) + 1);
+        _ = TextUtils.s_utf8NoBom.GetBytes(queryText, query);
+        query[^1] = 0;
         _ = s_queryCache.TryAdd(termCount, query);
         return query;
     }
@@ -768,8 +798,7 @@ internal static class EpwingNazekaDBManager
 
     private static void InsertVariantSearchKeys(SqliteConnection connection, EpwingNazekaSearchKeyInserter searchKeyInserter, List<long> entryRowIds, bool nonKanjiDict, bool nonNameDict, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration)
     {
-        const string query = $"SELECT {RowId}, {PrimarySpelling}, {Reading} FROM {Record} ORDER BY {RowId};";
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_variantSourcesQuery);
         EpwingNazekaVariantSource[] sources = new EpwingNazekaVariantSource[VariantSearchKeyRecordBatchSize];
         int sourceCount = 0;
         int entryIndex = 0;
@@ -993,26 +1022,14 @@ internal static class EpwingNazekaDBManager
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
     {
-        const string query =
-            $"""
-            SELECT COUNT(DISTINCT {SearchKey})
-            FROM {RecordSearchKey};
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_distinctSearchKeyCountQuery);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
 
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
-        const string query =
-            $"""
-            SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
-            FROM {RecordSearchKey};
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_maxSearchKeyLengthQuery);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
@@ -1176,7 +1193,7 @@ internal static class EpwingNazekaDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, SingleTermQuery);
+        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
         reader.Bind(1, term);
         if (!reader.Read())
         {
@@ -1202,14 +1219,8 @@ internal static class EpwingNazekaDBManager
         Debug.Assert(connection is not null);
         using SqliteTransaction transaction = connection.BeginTransaction(deferred: true);
 
-        const string recordQuery =
-            $"""
-            SELECT {RowId}, {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo}
-            FROM {Record};
-            """;
-
         Dictionary<long, EpwingNazekaRecord> records = [];
-        using (SqliteRecordReader reader = new(connection, recordQuery))
+        using (SqliteRecordReader reader = new(connection, s_recordsQuery))
         {
             while (reader.Read())
             {
@@ -1217,16 +1228,9 @@ internal static class EpwingNazekaDBManager
             }
         }
 
-        const string searchKeyQuery =
-            $"""
-            SELECT {SearchKey}, {RecordId}
-            FROM {RecordSearchKey}
-            ORDER BY {SearchKey}, {RecordId};
-            """;
-
         string? currentSearchKey = null;
         List<IDictRecord>? currentRecords = null;
-        using (SqliteRecordReader reader = new(connection, searchKeyQuery))
+        using (SqliteRecordReader reader = new(connection, s_searchKeysQuery))
         {
             while (reader.Read())
             {

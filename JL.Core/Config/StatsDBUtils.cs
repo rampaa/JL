@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -9,6 +10,13 @@ namespace JL.Core.Config;
 
 public static class StatsDBUtils
 {
+    private static readonly byte[] s_statsQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT {ConfigDBManager.Value}
+        FROM {ConfigDBManager.Stats}
+        WHERE {ConfigDBManager.ProfileId} = @{ConfigDBManager.ProfileId};{"\0"}
+        """);
+
     public static void InsertStats(SqliteConnection connection, Stats stats, int profileId)
     {
         InsertStats(connection, JsonSerializer.Serialize(stats, JsonOptions.s_jsoWithEnumConverterAndIndentation), profileId);
@@ -80,14 +88,7 @@ public static class StatsDBUtils
 
     public static Stats GetStatsFromDB(SqliteConnection connection, int profileId)
     {
-        const string query =
-            $"""
-            SELECT {ConfigDBManager.Value}
-            FROM {ConfigDBManager.Stats}
-            WHERE {ConfigDBManager.ProfileId} = @{ConfigDBManager.ProfileId};
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_statsQuery);
         reader.Bind(1, profileId);
         bool hasRow = reader.Read();
         Debug.Assert(hasRow);

@@ -30,11 +30,17 @@ internal static class JmnedictDBManager
     internal const string NameTypes = "name_types";
     internal const string PrimarySpellingInHiragana = "primary_spelling_in_hiragana";
 
-    private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
+    private static readonly ConcurrentDictionary<int, byte[]> s_queryCache = [];
 
-    private static string GetQuery(int termCount)
+    private static readonly byte[] s_maxSearchKeyLengthQuery = TextUtils.s_utf8NoBom.GetBytes(
+        $"""
+        SELECT MAX(LENGTH(CAST({PrimarySpellingInHiragana} AS BLOB)) / 2)
+        FROM {Record};{"\0"}
+        """);
+
+    private static byte[] GetQuery(int termCount)
     {
-        if (s_queryCache.TryGetValue(termCount, out string? query))
+        if (s_queryCache.TryGetValue(termCount, out byte[]? query))
         {
             return query;
         }
@@ -51,8 +57,11 @@ internal static class JmnedictDBManager
             _ = queryBuilder.Append(',').Append(DBUtils.GetParameterName(i + 1));
         }
 
-        query = queryBuilder.Append(");").ToString();
+        string queryText = queryBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
+        query = GC.AllocateUninitializedArray<byte>(TextUtils.s_utf8NoBom.GetByteCount(queryText) + 1);
+        _ = TextUtils.s_utf8NoBom.GetBytes(queryText, query);
+        query[^1] = 0;
         _ = s_queryCache.TryAdd(termCount, query);
         return query;
     }
@@ -387,13 +396,7 @@ internal static class JmnedictDBManager
 
     public static int GetMaxSearchKeyLength(SqliteConnection connection)
     {
-        const string query =
-            $"""
-            SELECT MAX(LENGTH(CAST({PrimarySpellingInHiragana} AS BLOB)) / 2)
-            FROM {Record};
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
+        using SqliteRecordReader reader = new(connection, s_maxSearchKeyLengthQuery);
         _ = reader.Read();
         return reader.GetInt32(0);
     }
