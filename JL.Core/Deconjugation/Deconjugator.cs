@@ -41,12 +41,6 @@ internal static class Deconjugator
             return;
         }
 
-        // Too many proper deconjugation steps
-        if ((form.Process?.ProperStepCount ?? 0) > 7)
-        {
-            return;
-        }
-
         // ending doesn't match
         if (!textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
         {
@@ -120,13 +114,17 @@ internal static class Deconjugator
         {
             foreach (ref readonly Form form in formsToProcess.AsReadOnlySpan())
             {
-                ReadOnlySpan<char> textSpan = form.Text.AsSpan();
-                if (textSpan.Length is not 0 && ruleBucketsByLastDecEndChar.TryGetValue(textSpan[^1], out RuleBucket bucket))
+                // Too many proper deconjugation steps
+                if ((form.Process?.ProperStepCount ?? 0) <= 7)
                 {
-                    ApplyBucket(form, bucket, newFormsToProcess, textSpan);
-                }
+                    ReadOnlySpan<char> textSpan = form.Text.AsSpan();
+                    if (textSpan.Length is not 0 && ruleBucketsByLastDecEndChar.TryGetValue(textSpan[^1], out RuleBucket bucket))
+                    {
+                        ApplyBucket(form, bucket, newFormsToProcess, textSpan);
+                    }
 
-                ApplyBucket(form, RulesWithEmptyConEnd, newFormsToProcess, textSpan);
+                    ApplyBucket(form, RulesWithEmptyConEnd, newFormsToProcess, textSpan);
+                }
 
                 string formTag = form.LastTag;
                 if (validWordClasses.Contains(formTag))

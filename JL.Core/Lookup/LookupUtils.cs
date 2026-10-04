@@ -527,7 +527,7 @@ public static class LookupUtils
                         textWithoutLongVowelMarksCount += textsWithoutLongVowelMarks.Count;
                         textWithoutLongVowelMarksList.Add(textsWithoutLongVowelMarks);
 
-                        List<List<Form>> deconjugatedTextWithoutLongVowelMarks = [];
+                        List<List<Form>> deconjugatedTextWithoutLongVowelMarks = new(textsWithoutLongVowelMarks.Count);
                         foreach (string textWithoutLongVowelMarks in textsWithoutLongVowelMarks.AsReadOnlySpan())
                         {
                             List<Form> deconjugationResultsForTextWithoutLongVowelMarks = Deconjugator.Deconjugate(textWithoutLongVowelMarks);
@@ -613,25 +613,36 @@ public static class LookupUtils
         IDictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
         if (allSearchKeys is not null)
         {
-            Parallel.Invoke(
-            () =>
+            bool queryWordFrequencies = dbWordFreqs is not null && dbIsUsedForAtLeastOneYomichanOrNazekaWordDict;
+            if (queryWordFrequencies && dbIsUsedForPitchDict)
             {
-                frequencyDicts = dbWordFreqs is not null && dbIsUsedForAtLeastOneYomichanOrNazekaWordDict
-                    ? GetFrequencyDictsFromDB(dbWordFreqs, allSearchKeys)
-                    : null;
-            },
-            () =>
-            {
-                if (dbIsUsedForPitchDict)
+                Parallel.Invoke(
+                () =>
+                {
+                    Debug.Assert(dbWordFreqs is not null);
+                    frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, allSearchKeys);
+                },
+                () =>
                 {
                     Debug.Assert(pitchDict is not null);
                     pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.ReadOnlyConnectionString, allSearchKeys);
-                }
-                else
-                {
-                    pitchAccentDict = pitchDict?.Contents;
-                }
-            });
+                });
+            }
+            else if (queryWordFrequencies)
+            {
+                Debug.Assert(dbWordFreqs is not null);
+                frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, allSearchKeys);
+                pitchAccentDict = pitchDict?.Contents;
+            }
+            else if (dbIsUsedForPitchDict)
+            {
+                Debug.Assert(pitchDict is not null);
+                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.ReadOnlyConnectionString, allSearchKeys);
+            }
+            else
+            {
+                pitchAccentDict = pitchDict?.Contents;
+            }
         }
         else
         {
@@ -654,7 +665,11 @@ public static class LookupUtils
 
         if (wordDict.TryGetValue(textInHiragana, out IList<IDictRecord>? tempResult))
         {
-            _ = results.TryAdd(textInHiragana, new IntermediaryResult(matchedText, dict, tempResult));
+            ref IntermediaryResult? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, textInHiragana, out bool exists);
+            if (!exists)
+            {
+                result = new IntermediaryResult(matchedText, dict, tempResult);
+            }
         }
 
         if (deconjugationResults is not null)
@@ -915,7 +930,11 @@ public static class LookupUtils
             string textInHiragana = textInHiraganaList[i];
             if (nameDict.TryGetValue(textInHiragana, out IList<IDictRecord>? result))
             {
-                _ = results.TryAdd(textInHiragana, new IntermediaryResult(textList[i], dict, result));
+                ref IntermediaryResult? nameResult = ref CollectionsMarshal.GetValueRefOrAddDefault(results, textInHiragana, out bool exists);
+                if (!exists)
+                {
+                    nameResult = new IntermediaryResult(textList[i], dict, result);
+                }
             }
         }
     }
@@ -1630,12 +1649,12 @@ public static class LookupUtils
             byte[]? positions = null;
             if (pitchDictionary.TryGetValue(JapaneseUtils.NormalizeText(primarySpelling), out IList<IDictRecord>? records))
             {
+                int recordsCount = records.Count;
                 for (int i = 0; i < readings.Length; i++)
                 {
                     byte position = byte.MaxValue;
                     string reading = readings[i];
                     string readingInHiragana = JapaneseUtils.NormalizeText(reading);
-                    int recordsCount = records.Count;
                     for (int j = 0; j < recordsCount; j++)
                     {
                         PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)records[j];
@@ -1727,7 +1746,7 @@ public static class LookupUtils
             return (null, 0);
         }
 
-        if (processListSpan.Length is 1)
+        if (processSpan.Length is 1)
         {
             return (process, processSpan[0].ProperStepCount);
         }

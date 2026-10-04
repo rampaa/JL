@@ -23,6 +23,8 @@ namespace JL.Windows.GUI.Popup;
 internal sealed class PopupContentGenerator : Decorator
 #pragma warning restore CA1812 // Internal class that is apparently never instantiated
 {
+    private static readonly object s_boxedMiningButtonContent = '➕';
+
     public static object BoxedPrimarySpellingFontSize { get; set; } = 1d;
     public static object BoxedReadingsFontSize { get; set; } = 1d;
     public static object BoxedAlternativeSpellingsFontSize { get; set; } = 1d;
@@ -115,7 +117,6 @@ internal sealed class PopupContentGenerator : Decorator
         StackPanel stackPanel = new()
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            Margin = new Thickness(2),
             Background = Brushes.Transparent,
             Tag = result.Dict,
             Children =
@@ -124,6 +125,7 @@ internal sealed class PopupContentGenerator : Decorator
             }
         };
 
+        stackPanel.SetValue(MarginProperty, PopupWindowUtils.BoxedThickness2222);
         stackPanel.MouseEnter += ownerWindow.ListViewItem_MouseEnter;
 
         return stackPanel;
@@ -160,9 +162,8 @@ internal sealed class PopupContentGenerator : Decorator
 
         if (result.Readings is null && result.PitchPositions is not null)
         {
-            PitchAccentDecorator pitchAccentDecorator = new(primarySpellingFrameworkElement, [result.PrimarySpelling],
-                        [result.PrimarySpelling],
-                        result.PitchPositions);
+            string[] spellings = [result.PrimarySpelling];
+            PitchAccentDecorator pitchAccentDecorator = new(primarySpellingFrameworkElement, spellings, spellings, result.PitchPositions);
 
             _ = top.Children.Add(pitchAccentDecorator);
         }
@@ -528,7 +529,7 @@ internal sealed class PopupContentGenerator : Decorator
         Button miningButton = new()
         {
             Name = "MiningButton",
-            Content = '➕',
+            Content = s_boxedMiningButtonContent,
             Background = Brushes.Transparent,
             Cursor = Cursors.Arrow,
             Focusable = false,
@@ -593,22 +594,22 @@ internal sealed class PopupContentGenerator : Decorator
 
         if (kanjiLookupResult.OnReadings is not null)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{(hasFormattedDefinition ? "\n" : "")}On: {string.Join('、', kanjiLookupResult.OnReadings)}");
+            _ = sb.Append(hasFormattedDefinition ? "\nOn: " : "On: ").AppendJoin('、', kanjiLookupResult.OnReadings);
         }
 
         if (kanjiLookupResult.KunReadings is not null)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Kun: {string.Join('、', kanjiLookupResult.KunReadings)}");
+            _ = sb.Append(sb.Length > 0 ? "\nKun: " : "Kun: ").AppendJoin('、', kanjiLookupResult.KunReadings);
         }
 
         if (kanjiLookupResult.NanoriReadings is not null)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Nanori: {string.Join('、', kanjiLookupResult.NanoriReadings)}");
+            _ = sb.Append(sb.Length > 0 ? "\nNanori: " : "Nanori: ").AppendJoin('、', kanjiLookupResult.NanoriReadings);
         }
 
         if (kanjiLookupResult.RadicalNames is not null)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Radical names: {string.Join('、', kanjiLookupResult.RadicalNames)}");
+            _ = sb.Append(sb.Length > 0 ? "\nRadical names: " : "Radical names: ").AppendJoin('、', kanjiLookupResult.RadicalNames);
         }
 
         if (kanjiLookupResult.KanjiGrade is not byte.MaxValue)
@@ -623,7 +624,7 @@ internal sealed class PopupContentGenerator : Decorator
 
         if (kanjiLookupResult.KanjiComposition is not null)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Composition: {string.Join('、', kanjiLookupResult.KanjiComposition)}");
+            _ = sb.Append(sb.Length > 0 ? "\nComposition: " : "Composition: ").AppendJoin('、', kanjiLookupResult.KanjiComposition);
         }
 
         if (kanjiLookupResult.KanjiStats is not null)
@@ -704,10 +705,10 @@ internal sealed class PopupContentGenerator : Decorator
                 Height = imageHeight,
                 Stretch = Stretch.None,
                 VerticalAlignment = VerticalAlignment.Top,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(2, 2, 2, 4)
+                HorizontalAlignment = HorizontalAlignment.Left
             };
 
+            image.SetValue(MarginProperty, PopupWindowUtils.BoxedThickness2224);
             _ = bottom.Children.Add(image);
             LoadImageSource(image, Path.GetFullPath(imageInfo.Path, AppInfo.ApplicationPath), decodePixelWidth, decodePixelHeight, result.Dict.Name).SafeFireAndForget("Unexpected error while loading image source");
         }

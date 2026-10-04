@@ -38,6 +38,7 @@ internal static class PopupWindowUtils
     public static readonly object BoxedThickness0222 = new Thickness(0, 2, 2, 2);
     public static readonly object BoxedThickness2000 = new Thickness(2, 0, 0, 0);
     public static readonly object BoxedThickness2222 = new Thickness(2, 2, 2, 2);
+    public static readonly object BoxedThickness2224 = new Thickness(2, 2, 2, 4);
     public static readonly object BoxedThickness3000 = new Thickness(3, 0, 0, 0);
     public static readonly object BoxedThickness5000 = new Thickness(5, 0, 0, 0);
     public static readonly object BoxedThickness5353 = new Thickness(5, 3, 5, 3);

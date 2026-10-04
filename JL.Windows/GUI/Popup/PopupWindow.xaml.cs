@@ -605,7 +605,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         _lastLookedUpText = selectedText;
 
-        LookupResult[]? lookupResults = LookupUtils.LookupText(textBox.SelectedText);
+        LookupResult[]? lookupResults = LookupUtils.LookupText(selectedText);
 
         if (lookupResults is not null && lookupResults.Length > 0)
         {
@@ -906,10 +906,7 @@ internal sealed partial class PopupWindow : IDisposable
         {
             LookupResult lookupResult = lastLookupResultsSpan[i];
 
-            if (!_dictsWithResults.Contains(lookupResult.Dict))
-            {
-                _ = _dictsWithResults.Add(lookupResult.Dict);
-            }
+            _ = _dictsWithResults.Add(lookupResult.Dict);
 
             popupItemSource[i] = new LookupDisplayResult(this, lookupResult, i, resultCount - 1 > i);
         }
@@ -1000,8 +997,9 @@ internal sealed partial class PopupWindow : IDisposable
     {
         ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
         ReadOnlyCollection<object> items = generator.Items;
-        foreach (LookupDisplayResult item in items.Cast<LookupDisplayResult>())
+        for (int i = 0; i < items.Count; i++)
         {
+            LookupDisplayResult item = (LookupDisplayResult)items[i];
             if (generator.ContainerFromItem(item) is ListViewItem)
             {
                 return item.Index;
@@ -2708,8 +2706,9 @@ internal sealed partial class PopupWindow : IDisposable
     {
         ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
         ReadOnlyCollection<object> items = generator.Items;
-        foreach (LookupDisplayResult lookupDisplayResult in items.Cast<LookupDisplayResult>())
+        for (int i = 0; i < items.Count; i++)
         {
+            LookupDisplayResult lookupDisplayResult = (LookupDisplayResult)items[i];
             if (lookupDisplayResult.Index == listViewIndex)
             {
                 ListViewItem container = (ListViewItem)generator.ContainerFromItem(lookupDisplayResult);
