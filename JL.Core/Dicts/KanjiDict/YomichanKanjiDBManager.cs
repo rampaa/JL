@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -92,7 +91,6 @@ internal static class YomichanKanjiDBManager
             return;
         }
 
-        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly);
 
         int rowId = 1;
@@ -126,9 +124,8 @@ internal static class YomichanKanjiDBManager
                 {
                     await foreach (YomichanKanjiSerializedRecord[] batch in batches.Reader.ReadAllAsync().ConfigureAwait(false))
                     {
-                        for (int i = 0; i < batch.Length; i++)
+                        foreach (ref readonly YomichanKanjiSerializedRecord record in batch.AsSpan())
                         {
-                            ref readonly YomichanKanjiSerializedRecord record = ref batch[i];
                             InsertSerializedRecord(connection, recordInserter, dict, record.Kanji, record.OnReadings, record.KunReadings, record.Definitions, record.Stats, ref rowId, ref transactionRecordCount, ref transaction);
                         }
                     }
@@ -451,44 +448,6 @@ internal static class YomichanKanjiDBManager
         }
 
         return results;
-    }
-
-    public static void LoadFromDB(Dict dict)
-    {
-        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
-        Debug.Assert(connection is not null);
-
-        const string query =
-            $"""
-            SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}, r.{Kanji}
-            FROM {Record} r;
-            """;
-
-        using SqliteRecordReader reader = new(connection, query);
-        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
-        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
-        while (reader.Read())
-        {
-            YomichanKanjiRecord record = GetRecord(reader);
-            string kanji = reader.GetString((int)ColumnIndex.Kanji);
-            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, kanji, out bool exists);
-            if (exists)
-            {
-                Debug.Assert(result is not null);
-                result.Add(record);
-            }
-            else
-            {
-                result = [record];
-            }
-
-            if (kanji.Length > dict.MaxSearchKeyLength)
-            {
-                dict.MaxSearchKeyLength = kanji.Length;
-            }
-        }
-
-        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static YomichanKanjiRecord GetRecord(SqliteRecordReader reader)

@@ -28,10 +28,8 @@ internal static class EpwingNazekaDBManager
     private const int ImportRecordBatchSize = 64;
     private const int VariantSearchKeyRecordBatchSize = 8192;
     private const int VariantSearchKeyTransactionBatchSize = 20_000_000;
-    private const long WholeFileParsingThreshold = 32 * 1024 * 1024;
     private static readonly int s_workerCount = Environment.ProcessorCount;
     private static readonly int s_importRecordBatchChannelCapacity = Math.Max(1, s_workerCount * 16 / ImportRecordBatchSize);
-    private static readonly JsonReaderState s_initialJsonReaderState = CreateJsonReaderState();
 
     internal const string Record = "record";
     internal const string RowId = "rowid";
@@ -145,9 +143,10 @@ internal static class EpwingNazekaDBManager
         FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            if (fileStream.Length <= WholeFileParsingThreshold)
+            long fileLength = fileStream.Length;
+            if (fileLength <= EpwingNazekaLoader.WholeFileParsingThreshold)
             {
-                json = GC.AllocateUninitializedArray<byte>((int)fileStream.Length);
+                json = GC.AllocateUninitializedArray<byte>((int)fileLength);
                 await fileStream.ReadExactlyAsync(json).ConfigureAwait(false);
             }
 
@@ -366,7 +365,7 @@ internal static class EpwingNazekaDBManager
             if (json is not null)
             {
                 int offset = json.AsSpan().StartsWith(Encoding.UTF8.Preamble) ? Encoding.UTF8.Preamble.Length : 0;
-                JsonReaderState readerState = s_initialJsonReaderState;
+                JsonReaderState readerState = EpwingNazekaLoader.InitialJsonReaderState;
                 bool started = false;
                 bool completed = false;
 
@@ -376,7 +375,7 @@ internal static class EpwingNazekaDBManager
                     int entriesToClear = entries.Length;
                     try
                     {
-                        int entryCount = ReadImportBatch(json, ref offset, ref readerState, ref started, entries, out completed);
+                        int entryCount = EpwingNazekaLoader.ReadImportBatch(json, ref offset, ref readerState, ref started, entries, out completed);
                         entriesToClear = entryCount;
                         if (entryCount is 0)
                         {
@@ -488,112 +487,9 @@ internal static class EpwingNazekaDBManager
         }
     }
 
-    private static int ReadImportBatch(byte[] json, ref int offset, ref JsonReaderState readerState, ref bool started, EpwingNazekaImportEntry[] entries, out bool completed)
-    {
-        ReadOnlySpan<byte> jsonBytes = json;
-        Utf8JsonReader reader = new(jsonBytes[offset..], true, readerState);
-        if (!started)
-        {
-            if (!reader.Read() || reader.TokenType is not JsonTokenType.StartArray || !reader.Read())
-            {
-                throw new JsonException("The Nazeka dictionary JSON root must be an array with a header.");
-            }
-
-            if (reader.TokenType is JsonTokenType.EndArray)
-            {
-                if (reader.Read())
-                {
-                    throw new JsonException("Unexpected JSON content after the Nazeka dictionary array.");
-                }
-
-                offset += (int)reader.BytesConsumed;
-                readerState = reader.CurrentState;
-                completed = true;
-                return 0;
-            }
-
-            reader.Skip();
-            started = true;
-        }
-
-        int entryCount = 0;
-        completed = false;
-        while (entryCount < entries.Length)
-        {
-            if (!reader.Read())
-            {
-                throw new JsonException("Unexpected end of Nazeka dictionary JSON.");
-            }
-
-            if (reader.TokenType is JsonTokenType.EndArray)
-            {
-                completed = true;
-                if (reader.Read())
-                {
-                    throw new JsonException("Unexpected JSON content after the Nazeka dictionary array.");
-                }
-
-                break;
-            }
-
-            string? reading = null;
-            List<string>? spellings = null;
-            List<string>? definitions = null;
-            string? imagePath = null;
-
-            while (reader.Read() && reader.TokenType is not JsonTokenType.EndObject)
-            {
-                if (reader.TokenType is not JsonTokenType.PropertyName)
-                {
-                    reader.Skip();
-                    continue;
-                }
-
-                if (reader.ValueTextEquals("r"u8))
-                {
-                    _ = reader.Read();
-                    reading = reader.GetString();
-                }
-                else if (reader.ValueTextEquals("s"u8))
-                {
-                    _ = reader.Read();
-                    spellings = ReadStringArray(ref reader);
-                }
-                else if (reader.ValueTextEquals("l"u8))
-                {
-                    _ = reader.Read();
-                    definitions = ReadStringArray(ref reader);
-                }
-                else if (reader.ValueTextEquals("i"u8))
-                {
-                    _ = reader.Read();
-                    imagePath = reader.GetString();
-                }
-                else
-                {
-                    _ = reader.Read();
-                    reader.Skip();
-                }
-            }
-
-            Debug.Assert(reading is not null);
-            Debug.Assert(definitions is not null);
-            entries[entryCount] = new EpwingNazekaImportEntry(reading,
-                spellings is { Count: > 0 } ? spellings : null,
-                definitions,
-                imagePath);
-
-            ++entryCount;
-        }
-
-        offset += (int)reader.BytesConsumed;
-        readerState = reader.CurrentState;
-        return entryCount;
-    }
-
     private static async Task CreatePreparedRecords(ChannelReader<EpwingNazekaImportEntryBatch> inputReader, ChannelWriter<EpwingNazekaImportEntryBatch> inputWriter, ChannelWriter<EpwingNazekaPreparedRecordBatch> outputWriter, bool nonKanjiDict, bool nonNameDict, ConcurrentDictionary<string, byte[]> imageInfoCache)
     {
-        HashSet<string> alternativeSpellingsInHiragana = [];
+        HashSet<string> alternativeSpellingsInHiragana = new(StringComparer.Ordinal);
         EpwingNazekaPreparedRecord[]? records = null;
         string[]? searchKeyBuffer = null;
         int searchKeyCount = 0;
@@ -828,22 +724,6 @@ internal static class EpwingNazekaDBManager
             : imageInfoBytes;
     }
 
-    private static JsonReaderState CreateJsonReaderState()
-    {
-        JsonSerializerOptions serializerOptions = JsonOptions.DefaultJso;
-
-        return new JsonReaderState(new JsonReaderOptions
-        {
-            AllowTrailingCommas = serializerOptions.AllowTrailingCommas,
-
-            CommentHandling = serializerOptions.ReadCommentHandling is JsonCommentHandling.Allow
-                ? JsonCommentHandling.Skip
-                : serializerOptions.ReadCommentHandling,
-
-            MaxDepth = serializerOptions.MaxDepth
-        });
-    }
-
     private static async Task CompleteOutputChannel(Task producer, Task[] workers,
         ChannelWriter<EpwingNazekaPreparedRecordBatch> outputWriter)
     {
@@ -884,21 +764,6 @@ internal static class EpwingNazekaDBManager
     private static void ReturnPreparedRecordBatch(EpwingNazekaPreparedRecordBatch batch)
     {
         ReturnPreparedRecords(batch.Records, batch.RecordCount, batch.SearchKeys, batch.SearchKeyCount);
-    }
-
-    private static List<string> ReadStringArray(ref Utf8JsonReader reader)
-    {
-        List<string> values = [];
-        while (reader.Read() && reader.TokenType is not JsonTokenType.EndArray)
-        {
-            string? value = reader.GetString();
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                values.Add(value);
-            }
-        }
-
-        return values;
     }
 
     private static void InsertVariantSearchKeys(SqliteConnection connection, EpwingNazekaSearchKeyInserter searchKeyInserter, List<long> entryRowIds, bool nonKanjiDict, bool nonNameDict, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration)
@@ -1330,47 +1195,74 @@ internal static class EpwingNazekaDBManager
 
     public static void LoadFromDB(Dict dict)
     {
+        Dictionary<string, DictRecords<EpwingNazekaRecord>> contents = new(dict.Size > 0 ? dict.Size : EpwingNazekaLoader.Size, StringComparer.Ordinal);
+
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
+        using SqliteTransaction transaction = connection.BeginTransaction(deferred: true);
 
-        const string query =
+        const string recordQuery =
             $"""
-            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}, json_group_array(rsk.{SearchKey})
-            FROM {Record} r
-            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
-            GROUP BY r.{RowId};
+            SELECT {RowId}, {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo}
+            FROM {Record};
             """;
 
-        using SqliteRecordReader reader = new(connection, query);
-        while (reader.Read())
+        Dictionary<long, EpwingNazekaRecord> records = [];
+        using (SqliteRecordReader reader = new(connection, recordQuery))
         {
-            EpwingNazekaRecord record = GetRecord(reader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
-            Debug.Assert(searchKeys is not null);
-
-            Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
-            Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
-            foreach (string searchKey in searchKeys)
+            while (reader.Read())
             {
-                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
-                if (exists)
+                records.Add(reader.GetInt64((int)ColumnIndex.RowId), GetRecord(reader));
+            }
+        }
+
+        const string searchKeyQuery =
+            $"""
+            SELECT {SearchKey}, {RecordId}
+            FROM {RecordSearchKey}
+            ORDER BY {SearchKey}, {RecordId};
+            """;
+
+        string? currentSearchKey = null;
+        DictRecords<EpwingNazekaRecord> currentRecords = default;
+        using (SqliteRecordReader reader = new(connection, searchKeyQuery))
+        {
+            while (reader.Read())
+            {
+                if (!records.TryGetValue(reader.GetInt64(1), out EpwingNazekaRecord? record))
                 {
-                    Debug.Assert(result is not null);
-                    result.Add(record);
+                    continue;
+                }
+
+                ReadOnlySpan<char> searchKey = reader.GetStringSpan(0);
+                if (currentSearchKey is not null && searchKey.SequenceEqual(currentSearchKey))
+                {
+                    currentRecords.Add(record);
                 }
                 else
                 {
-                    result = [record];
-                }
+                    if (currentSearchKey is not null)
+                    {
+                        contents.Add(currentSearchKey, currentRecords);
+                    }
 
-                if (searchKey.Length > dict.MaxSearchKeyLength)
-                {
-                    dict.MaxSearchKeyLength = searchKey.Length;
+                    currentSearchKey = searchKey.ToString();
+                    currentRecords = new DictRecords<EpwingNazekaRecord>(record);
+                    if (searchKey.Length > dict.MaxSearchKeyLength)
+                    {
+                        dict.MaxSearchKeyLength = searchKey.Length;
+                    }
                 }
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        if (currentSearchKey is not null)
+        {
+            contents.Add(currentSearchKey, currentRecords);
+        }
+
+        transaction.Commit();
+        dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static EpwingNazekaRecord GetRecord(SqliteRecordReader reader)

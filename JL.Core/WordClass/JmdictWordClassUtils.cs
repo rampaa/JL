@@ -306,12 +306,11 @@ public static class JmdictWordClassUtils
 
         _ = jmdictWordClassDictionary.EnsureCapacity(rowIdToWordClassCandidate.Count);
 
-        using SqliteCommand searchKeyCommand = connection.CreateCommand();
-        searchKeyCommand.CommandText = $"SELECT {JmdictDBManager.RecordId}, {JmdictDBManager.SearchKey} FROM {JmdictDBManager.RecordSearchKey}";
+        const string searchKeyQuery = $"SELECT {JmdictDBManager.RecordId}, {JmdictDBManager.SearchKey} FROM {JmdictDBManager.RecordSearchKey}";
         const int recordIdColumnIndex = 0;
         const int searchKeyColumnIndex = 1;
 
-        using SqliteDataReader searchKeyReader = searchKeyCommand.ExecuteReader();
+        using SqliteRecordReader searchKeyReader = new(connection, searchKeyQuery);
         while (searchKeyReader.Read())
         {
             long recordId = searchKeyReader.GetInt64(recordIdColumnIndex);
@@ -320,50 +319,48 @@ public static class JmdictWordClassUtils
                 continue;
             }
 
-            string key = searchKeyReader.GetString(searchKeyColumnIndex);
-            if (key.ContainsAny(JapaneseUtils.s_fuseji))
+            ReadOnlySpan<char> keySpan = searchKeyReader.GetStringSpan(searchKeyColumnIndex);
+            if (keySpan.ContainsAny(JapaneseUtils.s_fuseji))
             {
                 continue;
             }
 
+            bool keyFromReading = false;
             if (data.NormalizedReadings is not null)
             {
-                bool keyFromReading = false;
                 foreach (string normalizedReading in data.NormalizedReadings)
                 {
-                    if (normalizedReading == key)
+                    if (keySpan.SequenceEqual(normalizedReading))
                     {
                         keyFromReading = true;
                         break;
                     }
                 }
 
-                if (keyFromReading)
+                if (keyFromReading && !keySpan.SequenceEqual(data.NormalizedPrimarySpelling))
                 {
-                    if (data.NormalizedPrimarySpelling != key)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
+            }
 
-                    if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? prevResults))
+            string key = keySpan.ToString();
+            if (keyFromReading && jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? prevResults))
+            {
+                bool alreadyAdded = false;
+                foreach (JmdictWordClass wordClass in prevResults.AsReadOnlySpan())
+                {
+                    if (wordClass.Spelling == data.PrimarySpelling
+                        && wordClass.Readings.SequenceEqual(data.Readings)
+                        && wordClass.WordClasses.SequenceEqual(data.WordClasses))
                     {
-                        bool alreadyAdded = false;
-                        foreach (JmdictWordClass wordClass in prevResults.AsReadOnlySpan())
-                        {
-                            if (wordClass.Spelling == data.PrimarySpelling
-                                && wordClass.Readings.SequenceEqual(data.Readings)
-                                && wordClass.WordClasses.SequenceEqual(data.WordClasses))
-                            {
-                                alreadyAdded = true;
-                                break;
-                            }
-                        }
-
-                        if (alreadyAdded)
-                        {
-                            continue;
-                        }
+                        alreadyAdded = true;
+                        break;
                     }
+                }
+
+                if (alreadyAdded)
+                {
+                    continue;
                 }
             }
 

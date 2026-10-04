@@ -622,38 +622,44 @@ public static class DictUtils
                     case DictType.JMdict:
                         LoadDict(dict, JmdictLoader.Load, JmdictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             JmdictDBManager.CreateDB, JmdictDBManager.ImportFromDisk, JmdictDBManager.ImportFromMemory,
-                            JmdictDBManager.LoadFromDB, JmdictDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, JmdictLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
+                            null, JmdictDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, false, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
                     case DictType.JMnedict:
                         LoadDict(dict, JmnedictLoader.Load, JmnedictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             JmnedictDBManager.CreateDB, JmnedictDBManager.ImportFromDisk, JmnedictDBManager.ImportFromMemory,
-                            null, JmnedictDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, JmnedictLoader.Size, false, true, ref rebuildingAnyDB, ref dictCleared);
+                            null, JmnedictDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, false, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
                     case DictType.Kanjidic:
                         LoadDict(dict, KanjidicLoader.Load, KanjidicDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             KanjidicDBManager.CreateDB, KanjidicDBManager.ImportFromDisk, KanjidicDBManager.ImportFromMemory,
-                            KanjidicDBManager.LoadFromDB, null, tasks, dictsToBeRemoved, KanjidicLoader.Size, true, true, ref rebuildingAnyDB, ref dictCleared);
+                            KanjidicDBManager.LoadFromDB, null, tasks, dictsToBeRemoved, true, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
                     case DictType.NonspecificWordYomichan:
-                    case DictType.NonspecificKanjiWithWordSchemaYomichan:
                     case DictType.NonspecificNameYomichan:
                     case DictType.NonspecificYomichan:
                         LoadDict(dict, EpwingYomichanLoader.Load, EpwingYomichanDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
                             EpwingYomichanDBManager.CreateDB, EpwingYomichanDBManager.ImportFromDisk, EpwingYomichanDBManager.ImportFromMemory,
-                            EpwingYomichanDBManager.LoadFromDB, EpwingYomichanDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, EpwingYomichanLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+                            EpwingYomichanDBManager.LoadFromDB, EpwingYomichanDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, true, false, ref rebuildingAnyDB, ref dictCleared);
+
+                        break;
+
+                    case DictType.NonspecificKanjiWithWordSchemaYomichan:
+                        LoadDict(dict, EpwingYomichanLoader.Load, EpwingYomichanDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
+                            EpwingYomichanDBManager.CreateDB, EpwingYomichanDBManager.ImportFromDisk, EpwingYomichanDBManager.ImportFromMemory,
+                            null, EpwingYomichanDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, false, false, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
                         LoadDict(dict, YomichanKanjiLoader.Load, YomichanKanjiDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
                             YomichanKanjiDBManager.CreateDB, YomichanKanjiDBManager.ImportFromDisk, YomichanKanjiDBManager.ImportFromMemory,
-                            YomichanKanjiDBManager.LoadFromDB, null, tasks, dictsToBeRemoved, YomichanKanjiLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+                            null, null, tasks, dictsToBeRemoved, false, false, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.CustomWordDictionary:
@@ -672,13 +678,13 @@ public static class DictUtils
                     case DictType.NonspecificNazeka:
                         LoadDict(dict, EpwingNazekaLoader.Load, EpwingNazekaDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
                             EpwingNazekaDBManager.CreateDB, EpwingNazekaDBManager.ImportFromDisk, EpwingNazekaDBManager.ImportFromMemory,
-                            EpwingNazekaDBManager.LoadFromDB, EpwingNazekaDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, EpwingNazekaLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+                            EpwingNazekaDBManager.LoadFromDB, EpwingNazekaDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, true, false, ref rebuildingAnyDB, ref dictCleared);
                         break;
 
                     case DictType.PitchAccentYomichan:
                         LoadDict(dict, YomichanPitchAccentLoader.Load, YomichanPitchAccentDBManager.Version, ResourceUpdater.HandleLeftOverFolders,
                             YomichanPitchAccentDBManager.CreateDB, YomichanPitchAccentDBManager.ImportFromDisk, YomichanPitchAccentDBManager.ImportFromMemory,
-                            YomichanPitchAccentDBManager.LoadFromDB, YomichanPitchAccentDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, YomichanPitchAccentLoader.Size, true, false, ref rebuildingAnyDB, ref dictCleared);
+                            YomichanPitchAccentDBManager.LoadFromDB, YomichanPitchAccentDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, true, false, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
@@ -811,7 +817,7 @@ public static class DictUtils
         return new DBState(useDB, dbExists);
     }
 
-    private static void LoadDict(Dict dict, Load load, int version, HandleLeftOvers handleLeftOvers, CreateDB createDB, ImportFromDisk importFromDisk, ImportFromMemory importFromMemory, LoadFromDB? loadFromDB, GetMaxSearchKeyLength? getMaxSearchKeyLength, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, int initialDictSize, bool preferLoadingFromDB, bool deleteDictFileOnError, ref bool rebuildingAnyDB, ref bool dictCleared)
+    private static void LoadDict(Dict dict, Load load, int version, HandleLeftOvers handleLeftOvers, CreateDB createDB, ImportFromDisk importFromDisk, ImportFromMemory importFromMemory, LoadFromDB? loadFromDB, GetMaxSearchKeyLength? getMaxSearchKeyLength, List<Task> tasks, ConcurrentBag<Dict> dictsToBeRemoved, bool preferLoadingFromDB, bool deleteDictFileOnError, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         if (dict.Updating)
         {
@@ -830,7 +836,7 @@ public static class DictUtils
         {
             tasks.Add(Task.Run(async () =>
             {
-                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : initialDictSize, StringComparer.Ordinal);
+                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                 try
                 {
                     if (!dbExists || !preferLoadingFromDB)
@@ -1356,6 +1362,23 @@ public static class DictUtils
         DBIsUsedForAtLeastOneYomichanOrNazekaWordDict = dbIsUsedForAtLeastOneYomichanOrNazekaWordDict;
         AtLeastOneKanjiDictIsActive = atLeastOneKanjiDictIsActive;
         DBIsUsedForJmdict = dbIsUsedForJmdict;
+    }
+
+    internal static bool AddRecordToDictionary<TRecord>(string normalizedKey, TRecord record, Dictionary<string, DictRecords<TRecord>> contents, Dict dict) where TRecord : class, IDictRecord, IEquatable<TRecord>
+    {
+        ref DictRecords<TRecord> records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, normalizedKey, out bool exists);
+        if (exists)
+        {
+            return records.AddIfNotExists(record);
+        }
+
+        records = new DictRecords<TRecord>(record);
+        if (normalizedKey.Length > dict.MaxSearchKeyLength)
+        {
+            dict.MaxSearchKeyLength = normalizedKey.Length;
+        }
+
+        return true;
     }
 
     public static bool AddRecordToDictionary(string normalizedKey, IDictRecord record, Dict dict)

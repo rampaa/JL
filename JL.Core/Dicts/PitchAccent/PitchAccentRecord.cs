@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
-using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.PitchAccent;
 
@@ -19,68 +17,28 @@ internal sealed class PitchAccentRecord : IDictRecord, IEquatable<PitchAccentRec
         Position = position;
     }
 
-    public PitchAccentRecord(JsonElement[] jsonElements)
+    internal static byte GetPositionFromPitchString(string positionStr)
     {
-        Position = byte.MaxValue;
-        Spelling = jsonElements[0]
-            // ReSharper disable once NullableWarningSuppressionIsUsed
-            .GetString()!.GetPooledString();
+        Debug.Assert(positionStr.Length <= byte.MaxValue);
 
-        JsonElement thirdJsonElement = jsonElements[2];
-        Reading = thirdJsonElement.GetProperty("reading").GetString();
-
-        JsonElement pitchesArray = thirdJsonElement.GetProperty("pitches");
-        foreach (JsonElement pitchElement in pitchesArray.EnumerateArray())
+        bool foundHighPitch = false;
+        byte pitchStringLength = (byte)positionStr.Length;
+        for (byte i = 0; i < pitchStringLength; i++)
         {
-            JsonElement positionProperty = pitchElement.GetProperty("position");
-            if (positionProperty.ValueKind is JsonValueKind.Number)
+            if (foundHighPitch)
             {
-                if (positionProperty.TryGetByte(out byte position))
+                if (positionStr[i] is 'L')
                 {
-                    Position = position;
-                    break;
+                    return i;
                 }
             }
-            else if (positionProperty.ValueKind is JsonValueKind.String)
+            else if (positionStr[i] is 'H')
             {
-                Position = 0;
-
-                string? positionStr = positionProperty.GetString();
-                Debug.Assert(positionStr is not null);
-                Debug.Assert(positionStr.Length <= byte.MaxValue);
-
-                bool foundHighPitch = false;
-                byte pitchStringLength = (byte)positionStr.Length;
-                for (byte i = 0; i < pitchStringLength; i++)
-                {
-                    if (foundHighPitch)
-                    {
-                        if (positionStr[i] is 'L')
-                        {
-                            Position = i;
-                            break;
-                        }
-                    }
-                    else if (positionStr[i] is 'H')
-                    {
-                        foundHighPitch = true;
-                    }
-                }
-
-                break;
+                foundHighPitch = true;
             }
         }
 
-        Reading = Spelling == Reading
-            ? null
-            // ReSharper disable once NullableWarningSuppressionIsUsed
-            : Reading!.GetPooledString();
-
-        if (string.IsNullOrWhiteSpace(Spelling) && !string.IsNullOrWhiteSpace(Reading))
-        {
-            Spelling = Reading;
-            Reading = null;
-        }
+        return 0;
     }
 
     public override int GetHashCode()

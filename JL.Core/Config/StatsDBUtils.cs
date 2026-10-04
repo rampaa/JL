@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Core.Utilities.Database;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;
@@ -79,23 +80,18 @@ public static class StatsDBUtils
 
     public static Stats GetStatsFromDB(SqliteConnection connection, int profileId)
     {
-        using SqliteCommand command = connection.CreateCommand();
-
-        command.CommandText =
+        const string query =
             $"""
             SELECT {ConfigDBManager.Value}
             FROM {ConfigDBManager.Stats}
             WHERE {ConfigDBManager.ProfileId} = @{ConfigDBManager.ProfileId};
             """;
 
-        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.ProfileId}", profileId);
-
-        using SqliteDataReader reader = command.ExecuteReader();
-
-        Debug.Assert(reader.HasRows);
-
-        _ = reader.Read();
-        Stats? stats = JsonSerializer.Deserialize<Stats>(reader.GetString(0), JsonOptions.s_jsoWithEnumConverter);
+        using SqliteRecordReader reader = new(connection, query);
+        reader.Bind(1, profileId);
+        bool hasRow = reader.Read();
+        Debug.Assert(hasRow);
+        Stats? stats = JsonSerializer.Deserialize<Stats>(reader.GetStringSpan(0), JsonOptions.s_jsoWithEnumConverter);
         Debug.Assert(stats is not null);
         return stats;
     }

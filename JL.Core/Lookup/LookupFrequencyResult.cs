@@ -5,7 +5,7 @@ namespace JL.Core.Lookup;
 public readonly record struct LookupFrequencyResult
 {
     internal string Name { get; }
-    public int Freq { get; }
+    internal int Freq { get; }
 
     internal bool HigherValueMeansHigherFrequency { get; }
 

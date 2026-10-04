@@ -11,6 +11,18 @@ internal record struct FrequencyRecords
         _additionalRecords = null;
     }
 
+    internal void Add(FrequencyRecord record)
+    {
+        if (_additionalRecords is null)
+        {
+            _additionalRecords = [record];
+        }
+        else
+        {
+            _additionalRecords.Add(record);
+        }
+    }
+
     internal bool AddOrUpdate(FrequencyRecord record, bool higherValueMeansHigherFrequency)
     {
         if (_firstRecord == record)

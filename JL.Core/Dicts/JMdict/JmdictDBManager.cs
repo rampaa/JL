@@ -1,10 +1,8 @@
 using System.Collections.Concurrent;
-using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Channels;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
@@ -809,75 +807,6 @@ internal static class JmdictDBManager
         while (reader.Read());
 
         return results;
-    }
-
-    public static void LoadFromDB(Dict dict)
-    {
-        using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
-        Debug.Assert(connection is not null);
-
-        const string query =
-            $"""
-            SELECT r.{RowId},
-                   r.{EdictId},
-                   r.{PrimarySpelling},
-                   r.{PrimarySpellingOrthographyInfo},
-                   r.{SpellingRestrictions},
-                   r.{AlternativeSpellings},
-                   r.{AlternativeSpellingsOrthographyInfo},
-                   r.{Readings},
-                   r.{ReadingsOrthographyInfo},
-                   r.{ReadingRestrictions},
-                   r.{Glossary},
-                   r.{GlossaryInfo},
-                   r.{PartOfSpeechSharedByAllSenses},
-                   r.{PartOfSpeech},
-                   r.{FieldsSharedByAllSenses},
-                   r.{Fields},
-                   r.{MiscSharedByAllSenses},
-                   r.{Misc},
-                   r.{DialectsSharedByAllSenses},
-                   r.{Dialects},
-                   r.{LoanwordEtymology},
-                   r.{CrossReferences},
-                   r.{Info},
-                   json_group_array(rsk.{SearchKey})
-            FROM {Record} r
-            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
-            GROUP BY r.{RowId};
-            """;
-
-        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
-        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
-
-        using SqliteRecordReader reader = new(connection, query);
-        while (reader.Read())
-        {
-            JmdictRecord record = GetRecord(reader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
-            Debug.Assert(searchKeys is not null);
-
-            foreach (string searchKey in searchKeys)
-            {
-                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
-                if (exists)
-                {
-                    Debug.Assert(result is not null);
-                    result.Add(record);
-                }
-                else
-                {
-                    result = [record];
-                }
-
-                if (searchKey.Length > dict.MaxSearchKeyLength)
-                {
-                    dict.MaxSearchKeyLength = searchKey.Length;
-                }
-            }
-        }
-
-        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static JmdictRecord GetRecord(SqliteRecordReader reader)

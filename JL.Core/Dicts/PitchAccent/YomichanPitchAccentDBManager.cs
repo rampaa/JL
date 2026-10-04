@@ -1,10 +1,10 @@
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Dicts.Options;
 using JL.Core.Japanese;
@@ -20,18 +20,20 @@ namespace JL.Core.Dicts.PitchAccent;
 internal static class YomichanPitchAccentDBManager
 {
     public const int Version = 15;
+    private const int VariantSearchKeyTransactionBatchSize = 20_000_000;
+    private const int VariantSourceBatchSize = 4096;
 
     public const int Size = 250000;
 
-    private const string Record = "Record";
-    private const string RowId = "rowid";
-    private const string Spelling = "spelling";
-    private const string Reading = "reading";
-    private const string Position = "position";
+    internal const string Record = "Record";
+    internal const string RowId = "rowid";
+    internal const string Spelling = "spelling";
+    internal const string Reading = "reading";
+    internal const string Position = "position";
 
-    private const string RecordSearchKey = "record_search_key";
-    private const string RecordId = "record_id";
-    private const string SearchKey = "search_key";
+    internal const string RecordSearchKey = "record_search_key";
+    internal const string RecordId = "record_id";
+    internal const string SearchKey = "search_key";
 
     private static readonly ConcurrentDictionary<int, string> s_queryCache = [];
 
@@ -137,7 +139,7 @@ internal static class YomichanPitchAccentDBManager
             maxTotalFuseji = 0;
         }
 
-        ulong rowId = 1;
+        long rowId = 1;
 
         // ReSharper disable once UseAwaitUsing
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
@@ -145,48 +147,10 @@ internal static class YomichanPitchAccentDBManager
 
         DBUtils.ConfigureForBulkWrite(connection);
 
-        // ReSharper disable once UseAwaitUsing
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {Spelling}, {Reading}, {Position})
-            VALUES (@{RowId}, @{Spelling}, @{Reading}, @{Position});
-            """;
+        using PitchAccentRecordWriter recordWriter = new(connection);
 
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter spellingParam = new($"@{Spelling}", SqliteType.Text);
-        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
-        SqliteParameter positionParam = new($"@{Position}", SqliteType.Integer);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            spellingParam,
-            readingParam,
-            positionParam
-        ]);
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-        insertRecordCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-        // ReSharper disable once UseAwaitUsing
-        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-        insertSearchKeyCommand.CommandText =
-            $"""
-            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
-            VALUES (@{RecordId}, @{SearchKey});
-            """;
-
-        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
-        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
-#pragma warning disable CA1849 // Call async methods when in an async method
-        insertSearchKeyCommand.Prepare();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-        HashSet<string> keys = new(StringComparer.Ordinal);
         int transactionRecordCount = 0;
 
-        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term_meta_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
@@ -194,129 +158,86 @@ internal static class YomichanPitchAccentDBManager
             SqliteTransaction transaction = connection.BeginTransaction();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-            insertRecordCommand.Transaction = transaction;
-            insertSearchKeyCommand.Transaction = transaction;
-
-            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-            await using (fileStream.ConfigureAwait(false))
+            try
             {
-                await foreach (JsonElement[]? jsonObject in JsonSerializer.DeserializeAsyncEnumerable<JsonElement[]>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+                await using (fileStream.ConfigureAwait(false))
                 {
-                    Debug.Assert(jsonObject is not null);
-
-                    PitchAccentRecord record = new(jsonObject);
-                    if (record.Position is byte.MaxValue || string.IsNullOrWhiteSpace(record.Spelling))
+                    await foreach (PitchAccentRecordBatch batch in YomichanPitchAccentLoader.ReadRecordBatches(fileStream).ConfigureAwait(false))
                     {
-                        continue;
-                    }
-
-                    rowidParam.Value = rowId;
-                    spellingParam.Value = record.Spelling;
-                    readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
-                    positionParam.Value = record.Position;
-#pragma warning disable CA1849 // Call async methods when in an async method
-                    _ = insertRecordCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                    string spellingInHiragana = JapaneseUtils.NormalizeText(record.Spelling);
-                    _ = keys.Add(spellingInHiragana);
-
-                    if (generateFusejiVariants)
-                    {
-                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(spellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                        for (int recordIndex = 0; recordIndex < batch.Count; recordIndex++)
                         {
-                            _ = keys.Add(fusejiVariant);
-                        }
-                    }
+                            PitchAccentRecord record = batch.Records[recordIndex];
+                            recordWriter.InsertRecord(rowId, record.Spelling, record.Reading, record.Position);
 
-                    if (record.Reading is not null)
-                    {
-                        string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading);
-                        if (spellingInHiragana != readingInHiragana)
-                        {
-                            if (keys.Add(readingInHiragana))
+                            string spellingInHiragana = JapaneseUtils.NormalizeText(record.Spelling);
+                            recordWriter.InsertSearchKey(rowId, spellingInHiragana);
+                            ++transactionRecordCount;
+
+                            if (record.Reading is not null)
                             {
-                                if (generateFusejiVariants)
+                                string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading);
+                                if (spellingInHiragana != readingInHiragana)
                                 {
-                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                    {
-                                        _ = keys.Add(fusejiVariant);
-                                    }
-                                }
-
-                                if (generateMazegaki)
-                                {
-                                    foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(spellingInHiragana, readingInHiragana))
-                                    {
-                                        if (keys.Add(mazegaki) && generateFusejiVariants)
-                                        {
-                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                            {
-                                                _ = keys.Add(fusejiVariant);
-                                            }
-                                        }
-                                    }
+                                    recordWriter.InsertSearchKey(rowId, readingInHiragana);
+                                    ++transactionRecordCount;
                                 }
                             }
+
+                            if (transactionRecordCount > DBUtils.TransactionBatchSize)
+                            {
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                transaction.Commit();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                // ReSharper disable once MethodHasAsyncOverload
+                                transaction.Dispose();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                                dict.Ready = true;
+
+#pragma warning disable CA1849 // Call async methods when in an async method
+                                transaction = connection.BeginTransaction();
+#pragma warning restore CA1849 // Call async methods when in an async method
+
+                                transactionRecordCount = 0;
+                            }
+
+                            ++rowId;
                         }
                     }
+                }
 
-                    recordIdParam.Value = rowId;
-                    foreach (string key in keys)
-                    {
-                        searchKeyParam.Value = key;
+                if (transactionRecordCount > 0)
+                {
 #pragma warning disable CA1849 // Call async methods when in an async method
-                        _ = insertSearchKeyCommand.ExecuteNonQuery();
-#pragma warning restore CA1849 // Call async methods when in an async method
-                    }
-
-                    transactionRecordCount += keys.Count;
-                    keys.Clear();
-                    if (transactionRecordCount > DBUtils.TransactionBatchSize)
-                    {
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        transaction.Commit();
+                    transaction.Commit();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        // ReSharper disable once MethodHasAsyncOverload
-                        transaction.Dispose();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                        dict.Ready = true;
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-                        transaction = connection.BeginTransaction();
-#pragma warning restore CA1849 // Call async methods when in an async method
-
-                        transactionRecordCount = 0;
-                        insertRecordCommand.Transaction = transaction;
-                        insertSearchKeyCommand.Transaction = transaction;
-                    }
-
-                    ++rowId;
+                    transactionRecordCount = 0;
+                    dict.Ready = true;
                 }
             }
-
-            if (transactionRecordCount > 0)
+            finally
             {
 #pragma warning disable CA1849 // Call async methods when in an async method
-                transaction.Commit();
+                // ReSharper disable once MethodHasAsyncOverload
+                transaction.Dispose();
 #pragma warning restore CA1849 // Call async methods when in an async method
-
-                transactionRecordCount = 0;
-                dict.Ready = true;
             }
-
-#pragma warning disable CA1849 // Call async methods when in an async method
-            // ReSharper disable once MethodHasAsyncOverload
-            transaction.Dispose();
-#pragma warning restore CA1849 // Call async methods when in an async method
         }
 
         if (rowId > 1)
         {
             RemoveDuplicateRecords(connection);
+
+            if (generateMazegaki || generateFusejiVariants)
+            {
+                DBUtils.FlushWalLog(connection);
+                InsertVariantSearchKeys(connection, recordWriter, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration);
+            }
+
             DBUtils.ConfigureForRead(connection);
 
             // ReSharper disable once UseAwaitUsing
@@ -355,13 +276,11 @@ internal static class YomichanPitchAccentDBManager
                 FROM {Record} r
                 JOIN
                 (
-                    SELECT MIN({RowId}) AS {RowId}_to_keep, {Spelling}, {Reading}, {Position}
+                    SELECT MIN({RowId}) AS {RowId}_to_keep, {Spelling}, {Reading}
                     FROM {Record}
-                    GROUP BY {Spelling}, {Reading}, {Position}
+                    GROUP BY {Spelling}, {Reading}
                     HAVING COUNT(*) > 1
-                ) d ON d.{Spelling} = r.{Spelling}
-                    AND d.{Reading} IS r.{Reading}
-                    AND d.{Position} IS r.{Position}
+                ) d ON d.{Spelling} = r.{Spelling} AND d.{Reading} IS r.{Reading}
                 WHERE r.{RowId} != d.{RowId}_to_keep
             );
 
@@ -375,6 +294,103 @@ internal static class YomichanPitchAccentDBManager
             """;
 
         _ = command.ExecuteNonQuery();
+    }
+
+    private static void InsertVariantSearchKeys(SqliteConnection connection, PitchAccentRecordWriter recordWriter, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration)
+    {
+        using PitchAccentVariantSourceReader reader = new(connection);
+        PitchAccentVariantSource[] sources = ArrayPool<PitchAccentVariantSource>.Shared.Rent(VariantSourceBatchSize);
+        HashSet<string> keys = new(StringComparer.Ordinal);
+        try
+        {
+            int transactionRecordCount = 0;
+            SqliteTransaction transaction = connection.BeginTransaction();
+            try
+            {
+                int sourceCount = reader.Read(sources, VariantSourceBatchSize);
+                while (sourceCount > 0)
+                {
+                    for (int i = 0; i < sourceCount; i++)
+                    {
+                        ref readonly PitchAccentVariantSource source = ref sources[i];
+                        string spellingInHiragana = JapaneseUtils.NormalizeText(source.Spelling);
+                        string? readingInHiragana = source.Reading is not null ? JapaneseUtils.NormalizeText(source.Reading) : null;
+
+                        _ = keys.Add(spellingInHiragana);
+                        if (generateFusejiVariants)
+                        {
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(spellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                            {
+                                _ = keys.Add(fusejiVariant);
+                            }
+                        }
+
+                        if (readingInHiragana is not null && spellingInHiragana != readingInHiragana)
+                        {
+                            _ = keys.Add(readingInHiragana);
+                            if (generateFusejiVariants)
+                            {
+                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                {
+                                    _ = keys.Add(fusejiVariant);
+                                }
+                            }
+
+                            if (generateMazegaki)
+                            {
+                                foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(spellingInHiragana, readingInHiragana))
+                                {
+                                    if (keys.Add(mazegaki) && generateFusejiVariants)
+                                    {
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
+                                        {
+                                            _ = keys.Add(fusejiVariant);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach (string key in keys)
+                        {
+                            if (key == spellingInHiragana || key == readingInHiragana)
+                            {
+                                continue;
+                            }
+
+                            recordWriter.InsertSearchKey(source.RecordId, key);
+                            ++transactionRecordCount;
+                        }
+
+                        keys.Clear();
+                        if (transactionRecordCount > VariantSearchKeyTransactionBatchSize)
+                        {
+                            transaction.Commit();
+                            transaction.Dispose();
+                            transaction = connection.BeginTransaction();
+                            transactionRecordCount = 0;
+                        }
+                    }
+
+                    sources.AsSpan(0, sourceCount).Clear();
+                    sourceCount = reader.Read(sources, VariantSourceBatchSize);
+                }
+
+                if (transactionRecordCount > 0)
+                {
+                    transaction.Commit();
+                }
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
+        }
+        finally
+        {
+            sources.AsSpan(0, VariantSourceBatchSize).Clear();
+            ArrayPool<PitchAccentVariantSource>.Shared.Return(sources);
+        }
     }
 
     private static int GetDistinctSearchKeyCount(SqliteConnection connection)
@@ -425,7 +441,7 @@ internal static class YomichanPitchAccentDBManager
             }
         }
 
-        ulong rowId = 1;
+        long rowId = 1;
 
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
@@ -433,51 +449,14 @@ internal static class YomichanPitchAccentDBManager
         DBUtils.ConfigureForBulkWrite(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
-        using SqliteCommand insertRecordCommand = connection.CreateCommand();
-        insertRecordCommand.CommandText =
-            $"""
-            INSERT INTO {Record} ({RowId}, {Spelling}, {Reading}, {Position})
-            VALUES (@{RowId}, @{Spelling}, @{Reading}, @{Position})
-            """;
-
-        SqliteParameter rowidParam = new($"@{RowId}", SqliteType.Integer);
-        SqliteParameter spellingParam = new($"@{Spelling}", SqliteType.Text);
-        SqliteParameter readingParam = new($"@{Reading}", SqliteType.Text);
-        SqliteParameter positionParam = new($"@{Position}", SqliteType.Integer);
-        insertRecordCommand.Parameters.AddRange([
-            rowidParam,
-            spellingParam,
-            readingParam,
-            positionParam
-        ]);
-
-        insertRecordCommand.Prepare();
-
-        using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-        insertSearchKeyCommand.CommandText =
-            $"""
-            INSERT INTO {RecordSearchKey}({RecordId}, {SearchKey})
-            VALUES (@{RecordId}, @{SearchKey})
-            """;
-
-        SqliteParameter recordIdParam = new($"@{RecordId}", SqliteType.Integer);
-        SqliteParameter searchKeyParam = new($"@{SearchKey}", SqliteType.Text);
-        insertSearchKeyCommand.Parameters.AddRange([recordIdParam, searchKeyParam]);
-        insertSearchKeyCommand.Prepare();
+        using PitchAccentRecordWriter recordWriter = new(connection);
 
         foreach ((PitchAccentRecord record, List<string> keys) in recordToKeysDict)
         {
-            rowidParam.Value = rowId;
-            spellingParam.Value = record.Spelling;
-            readingParam.Value = record.Reading is not null ? record.Reading : DBNull.Value;
-            positionParam.Value = record.Position;
-            _ = insertRecordCommand.ExecuteNonQuery();
-
-            recordIdParam.Value = rowId;
+            recordWriter.InsertRecord(rowId, record.Spelling, record.Reading, record.Position);
             foreach (ref readonly string key in keys.AsReadOnlySpan())
             {
-                searchKeyParam.Value = key;
-                _ = insertSearchKeyCommand.ExecuteNonQuery();
+                recordWriter.InsertSearchKey(rowId, key);
             }
 
             ++rowId;
@@ -498,6 +477,11 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(SqliteConnection connection, HashSet<string> terms)
     {
+        if (terms.Count is 0)
+        {
+            return null;
+        }
+
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         using SqliteRecordReader reader = new(connection, GetQuery(terms.Count));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
@@ -537,6 +521,11 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectingString, HashSet<string> terms)
     {
+        if (terms.Count is 0)
+        {
+            return null;
+        }
+
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectingString);
         if (connection is null)
         {
@@ -552,45 +541,70 @@ internal static class YomichanPitchAccentDBManager
     {
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
+        using SqliteTransaction transaction = connection.BeginTransaction(deferred: true);
 
-        const string query =
+        const string recordQuery = $"SELECT {Spelling}, {Reading}, {Position}, {RowId} FROM {Record};";
+        Dictionary<long, PitchAccentRecord> records = [];
+        using (SqliteRecordReader reader = new(connection, recordQuery))
+        {
+            while (reader.Read())
+            {
+                records.Add(reader.GetInt64(3), GetRecord(reader));
+            }
+        }
+
+        const string searchKeyQuery =
             $"""
-            SELECT r.{Spelling}, r.{Reading}, r.{Position}, json_group_array(rsk.{SearchKey})
-            FROM {Record} r
-            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
-            GROUP BY r.{RowId};
+            SELECT {SearchKey}, {RecordId}
+            FROM {RecordSearchKey}
+            ORDER BY {SearchKey}, {RecordId};
             """;
 
-        using SqliteRecordReader reader = new(connection, query);
-        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
-        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
-        while (reader.Read())
+        Debug.Assert(dict.Contents.Count is 0);
+        Dictionary<string, PitchAccentRecords> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        string? currentSearchKey = null;
+        PitchAccentRecords currentRecords = default;
+        using (SqliteRecordReader reader = new(connection, searchKeyQuery))
         {
-            PitchAccentRecord record = GetRecord(reader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
-            Debug.Assert(searchKeys is not null);
-
-            foreach (string searchKey in searchKeys)
+            while (reader.Read())
             {
-                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
-                if (exists)
+                long recordId = reader.GetInt64(1);
+                Debug.Assert(recordId > 0);
+                if (!records.TryGetValue(recordId, out PitchAccentRecord? record))
                 {
-                    Debug.Assert(result is not null);
-                    result.Add(record);
+                    continue;
+                }
+
+                ReadOnlySpan<char> searchKey = reader.GetStringSpan(0);
+                if (currentSearchKey is not null && searchKey.SequenceEqual(currentSearchKey))
+                {
+                    currentRecords.Add(record);
                 }
                 else
                 {
-                    result = [record];
-                }
+                    if (currentSearchKey is not null)
+                    {
+                        contents.Add(currentSearchKey, currentRecords);
+                    }
 
-                if (searchKey.Length > dict.MaxSearchKeyLength)
-                {
-                    dict.MaxSearchKeyLength = searchKey.Length;
+                    currentSearchKey = searchKey.ToString();
+                    currentRecords = new PitchAccentRecords(record);
+                    if (searchKey.Length > dict.MaxSearchKeyLength)
+                    {
+                        dict.MaxSearchKeyLength = searchKey.Length;
+                    }
                 }
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        if (currentSearchKey is not null)
+        {
+            contents.Add(currentSearchKey, currentRecords);
+        }
+
+        transaction.Commit();
+        dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static PitchAccentRecord GetRecord(SqliteRecordReader reader)
@@ -602,7 +616,7 @@ internal static class YomichanPitchAccentDBManager
             ? reader.GetString(readingIndex)
             : null;
 
-        byte position = checked((byte)reader.GetInt64((int)ColumnIndex.Position));
+        byte position = (byte)reader.GetInt32((int)ColumnIndex.Position);
 
         return new PitchAccentRecord(spelling, reading, position);
     }

@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Xml;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
 
@@ -16,6 +17,8 @@ internal static class KanjidicLoader
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
+            Dictionary<string, IList<IDictRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+
             // ReSharper disable once UseAwaitUsing
             using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))
             {
@@ -35,11 +38,11 @@ internal static class KanjidicLoader
                 while (xmlReader.ReadToFollowing("literal"))
                 {
                     (string key, KanjidicRecord record) = ReadCharacter(xmlReader, definitionList, onReadingList, kunReadingList, nanoriReadingList, radicalNameList);
-                    dict.Contents[key] = [record];
+                    contents[key] = [record];
                 }
             }
 
-            dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
+            dict.Contents = contents.ToFrozenDictionary(StringComparer.Ordinal);
         }
         else
         {

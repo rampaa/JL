@@ -52,11 +52,10 @@ internal static class FrequencyYomichanLoader
         bool higherValueMeansHigherFrequency = freq.Options.HigherValueMeansHigherFrequency.Value;
         Dictionary<string, FrequencyRecords> dictionary = new(freq.Size > 0 ? freq.Size : 0, StringComparer.Ordinal);
 
-        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, freq.Type is FreqType.Yomichan ? "term_meta_bank_*.json" : "kanji_meta_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
-            await foreach (FrequencyYomichanRecordBatch batch in FrequencyYomichanReader.ReadRecordBatches(jsonFile, nonKanjiDict).ConfigureAwait(false))
+            await foreach (FrequencyYomichanRecordBatch batch in FrequencyYomichanReader.ReadRecordBatches(jsonFile).ConfigureAwait(false))
             {
                 for (int recordIndex = 0; recordIndex < batch.Count; recordIndex++)
                 {

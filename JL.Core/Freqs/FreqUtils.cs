@@ -237,11 +237,6 @@ public static class FreqUtils
                     }
                     else
                     {
-                        int size = freq.Size > 0
-                            ? freq.Size
-                            : 114348;
-
-                        freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
                         FreqDBManager.LoadFromDB(freq);
                     }
 
@@ -353,13 +348,6 @@ public static class FreqUtils
                     }
                     else
                     {
-                        int size = freq.Size > 0
-                                ? freq.Size
-                                : freq.Type is FreqType.Yomichan
-                                    ? 1504512
-                                    : 169623;
-
-                        freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
                         FreqDBManager.LoadFromDB(freq);
                     }
 

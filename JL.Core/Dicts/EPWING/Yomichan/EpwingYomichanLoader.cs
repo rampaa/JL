@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Diagnostics;
@@ -17,6 +18,9 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 internal static class EpwingYomichanLoader
 {
     public const int Size = 250000;
+    internal const long WholeFileParsingThreshold = 32 * 1024 * 1024;
+    internal const int PooledFileThreshold = 4 * 1024 * 1024;
+    private const int LoadRecordBatchSize = 64;
 
     internal static JsonReaderState InitialJsonReaderState { get; } = CreateJsonReaderState();
 
@@ -28,7 +32,8 @@ internal static class EpwingYomichanLoader
             return;
         }
 
-        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
+        Dictionary<string, DictRecords<EpwingYomichanRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term_bank_*.json", SearchOption.TopDirectoryOnly);
         ConcurrentDictionary<string, ImageInfo> imageInfoCache = new();
 
@@ -38,14 +43,14 @@ internal static class EpwingYomichanLoader
         GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
         Debug.Assert(!nonKanjiDict || !nonNameDict || generateMazegakiOption is not null);
         bool generateMazegaki = nonKanjiDict && nonNameDict
-                                             // ReSharper disable once NullableWarningSuppressionIsUsed
-                                             && generateMazegakiOption!.Value;
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && generateMazegakiOption!.Value;
 
         GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
         Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
         bool generateFusejiVariants = nonKanjiDict
-                                      // ReSharper disable once NullableWarningSuppressionIsUsed
-                                      && generateFusejiVariantsOption!.Value;
+            // ReSharper disable once NullableWarningSuppressionIsUsed
+            && generateFusejiVariantsOption!.Value;
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
@@ -63,60 +68,53 @@ internal static class EpwingYomichanLoader
             maxTotalFuseji = 0;
         }
 
-        foreach (string jsonFile in jsonFiles)
+        await foreach (EpwingYomichanRecordBatch batch in ReadRecordBatches(jsonFiles, dict, imageInfoCache).ConfigureAwait(false))
         {
-            FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-            await using (fileStream.ConfigureAwait(false))
+            for (int recordIndex = 0; recordIndex < batch.Count; recordIndex++)
             {
-                await foreach (JsonElement jsonElement in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                EpwingYomichanRecord record = batch.Records[recordIndex];
+                string primarySpellingInHiragana = nonKanjiDict
+                    ? JapaneseUtils.NormalizeText(record.PrimarySpelling).GetPooledString()
+                    : record.PrimarySpelling.GetPooledString();
+
+                if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, contents, dict))
                 {
-                    EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElement, dict, imageInfoCache);
-                    if (record is not null)
+                    if (nonKanjiDict)
                     {
-                        string primarySpellingInHiragana = nonKanjiDict
-                            ? JapaneseUtils.NormalizeText(record.PrimarySpelling).GetPooledString()
-                            : record.PrimarySpelling.GetPooledString();
-
-                        if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, dict))
+                        if (generateFusejiVariants)
                         {
-                            if (nonKanjiDict)
+                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                if (generateFusejiVariants)
-                                {
-                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                    {
-                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
-                                    }
-                                }
+                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
+                            }
+                        }
 
-                                if (nonNameDict && record.Reading is not null)
+                        if (nonNameDict && record.Reading is not null)
+                        {
+                            string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
+                            if (primarySpellingInHiragana != readingInHiragana)
+                            {
+                                if (DictUtils.AddRecordToDictionary(readingInHiragana, record, contents, dict))
                                 {
-                                    string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
-                                    if (primarySpellingInHiragana != readingInHiragana)
+                                    if (generateFusejiVariants)
                                     {
-                                        if (DictUtils.AddRecordToDictionary(readingInHiragana, record, dict))
+                                        foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                         {
-                                            if (generateFusejiVariants)
-                                            {
-                                                foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                                {
-                                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
-                                                }
-                                            }
+                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
+                                        }
+                                    }
 
-                                            if (generateMazegaki)
+                                    if (generateMazegaki)
+                                    {
+                                        foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
+                                        {
+                                            if (DictUtils.AddRecordToDictionary(mazegaki, record, contents, dict))
                                             {
-                                                foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
+                                                if (generateFusejiVariants)
                                                 {
-                                                    if (DictUtils.AddRecordToDictionary(mazegaki, record, dict))
+                                                    foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                     {
-                                                        if (generateFusejiVariants)
-                                                        {
-                                                            foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
-                                                            {
-                                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
-                                                            }
-                                                        }
+                                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                                                     }
                                                 }
                                             }
@@ -130,7 +128,196 @@ internal static class EpwingYomichanLoader
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+    }
+
+    private static async IAsyncEnumerable<EpwingYomichanRecordBatch> ReadRecordBatches(IEnumerable<string> jsonFiles, Dict dict, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+    {
+        byte[]? pooledJsonBytes = null;
+        try
+        {
+            foreach (string jsonFile in jsonFiles)
+            {
+                FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
+                await using (fileStream.ConfigureAwait(false))
+                {
+                    EpwingYomichanRecord[] records = ArrayPool<EpwingYomichanRecord>.Shared.Rent(LoadRecordBatchSize);
+                    int recordCount = 0;
+                    try
+                    {
+                        long fileLength = fileStream.Length;
+                        if (fileLength <= WholeFileParsingThreshold)
+                        {
+                            int jsonLength = (int)fileLength;
+                            byte[] jsonBytes;
+                            if (jsonLength <= PooledFileThreshold)
+                            {
+                                if (pooledJsonBytes is null || pooledJsonBytes.Length < jsonLength)
+                                {
+                                    if (pooledJsonBytes is not null)
+                                    {
+                                        ArrayPool<byte>.Shared.Return(pooledJsonBytes);
+                                    }
+
+                                    pooledJsonBytes = null;
+                                    pooledJsonBytes = ArrayPool<byte>.Shared.Rent(jsonLength);
+                                }
+
+                                jsonBytes = pooledJsonBytes;
+                            }
+                            else
+                            {
+                                jsonBytes = GC.AllocateUninitializedArray<byte>(jsonLength);
+                            }
+
+                            await fileStream.ReadExactlyAsync(jsonBytes.AsMemory(0, jsonLength)).ConfigureAwait(false);
+                            int offset = jsonBytes.AsSpan(0, jsonLength).StartsWith(Encoding.UTF8.Preamble) ? Encoding.UTF8.Preamble.Length : 0;
+                            bool started = false;
+                            bool completed = false;
+                            JsonReaderState readerState = InitialJsonReaderState;
+                            while (!completed)
+                            {
+                                ReadRecordBatch(jsonBytes.AsSpan(0, jsonLength), ref offset, ref readerState, ref started, dict, imageInfoCache, records, out recordCount, out completed);
+                                if (recordCount > 0)
+                                {
+                                    yield return new EpwingYomichanRecordBatch(records, recordCount);
+
+                                    records.AsSpan(0, recordCount).Clear();
+                                    recordCount = 0;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            await foreach (JsonElement jsonElement in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false))
+                            {
+                                EpwingYomichanRecord? record = GetEpwingYomichanRecord(jsonElement, dict, imageInfoCache);
+                                if (record is null)
+                                {
+                                    continue;
+                                }
+
+                                records[recordCount] = record;
+                                ++recordCount;
+                                if (recordCount is LoadRecordBatchSize)
+                                {
+                                    yield return new EpwingYomichanRecordBatch(records, recordCount);
+
+                                    records.AsSpan(0, recordCount).Clear();
+                                    recordCount = 0;
+                                }
+                            }
+
+                            if (recordCount > 0)
+                            {
+                                yield return new EpwingYomichanRecordBatch(records, recordCount);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        records.AsSpan(0, recordCount).Clear();
+                        ArrayPool<EpwingYomichanRecord>.Shared.Return(records);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            if (pooledJsonBytes is not null)
+            {
+                ArrayPool<byte>.Shared.Return(pooledJsonBytes);
+            }
+        }
+    }
+
+    private static void ReadRecordBatch(ReadOnlySpan<byte> jsonBytes, ref int offset, ref JsonReaderState readerState, ref bool started, Dict dict,
+        ConcurrentDictionary<string, ImageInfo> imageInfoCache, EpwingYomichanRecord[] records, out int recordCount, out bool completed)
+    {
+        ReadOnlySpan<byte> json = jsonBytes[offset..];
+        Utf8JsonReader reader = new(json, true, readerState);
+        completed = false;
+        recordCount = 0;
+        if (!started)
+        {
+            if (!reader.Read() || reader.TokenType is not JsonTokenType.StartArray)
+            {
+                throw new JsonException("The Yomichan term bank JSON root must be an array.");
+            }
+
+            started = true;
+        }
+
+        while (recordCount < LoadRecordBatchSize)
+        {
+            if (!reader.Read())
+            {
+                throw new JsonException("Unexpected end of Yomichan term bank JSON.");
+            }
+
+            if (reader.TokenType is JsonTokenType.EndArray)
+            {
+                completed = true;
+                if (reader.Read())
+                {
+                    throw new JsonException("Unexpected JSON content after the Yomichan term bank array.");
+                }
+
+                break;
+            }
+
+            if (reader.TokenType is not JsonTokenType.StartArray)
+            {
+                throw new JsonException("A Yomichan term-bank record must be an array.");
+            }
+
+            int recordDepth = reader.CurrentDepth;
+            EpwingYomichanRecord? record;
+            try
+            {
+                record = GetEpwingYomichanRecord(ref reader, json, dict, imageInfoCache);
+            }
+            catch (InvalidOperationException ex)
+            {
+                LoggerManager.Logger.Error(ex, "Failed to read EPWING Yomichan record near byte offset {ByteOffset}", offset + reader.TokenStartIndex);
+                record = null;
+            }
+
+            if (!MoveReaderToArrayEnd(ref reader, recordDepth))
+            {
+                throw new JsonException("Unexpected end of Yomichan term-bank record.");
+            }
+
+            if (record is not null)
+            {
+                records[recordCount] = record;
+                ++recordCount;
+            }
+        }
+
+        offset += (int)reader.BytesConsumed;
+        readerState = reader.CurrentState;
+    }
+
+    private static EpwingYomichanRecord? GetEpwingYomichanRecord(ref Utf8JsonReader reader, ReadOnlySpan<byte> json, Dict dict, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
+    {
+        if (!TryReadRecord(ref reader, json, dict, imageInfoCache, out string primarySpelling, out string? reading, out double popularityScore,
+            out string[]? definitions, out string[]? wordClasses, out string[]? definitionTags, out List<ImageInfo>? imageInfos))
+        {
+            return null;
+        }
+
+        primarySpelling = primarySpelling.GetPooledString();
+        reading = reading?.GetPooledString();
+        if (definitions is not null)
+        {
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                definitions[i] = definitions[i].GetPooledString();
+            }
+        }
+
+        return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos?.ToArray());
     }
 
     private static EpwingYomichanRecord? GetEpwingYomichanRecord(JsonElement jsonElement, Dict dict, ConcurrentDictionary<string, ImageInfo> imageInfoCache)
@@ -291,7 +478,7 @@ internal static class EpwingYomichanLoader
         });
     }
 
-    internal static int ReadImportRecords(byte[] jsonBytes, ref int offset, ref JsonReaderState readerState, ref bool started,
+    internal static int ReadImportRecords(ReadOnlySpan<byte> jsonBytes, ref int offset, ref JsonReaderState readerState, ref bool started,
         Dict dict, bool nonKanjiDict, bool nonNameDict, ConcurrentDictionary<string, ImageInfo> imageInfoCache,
         EpwingYomichanImportRecord[] records, int recordOffset, int maxRecordCount, out bool completed)
     {
@@ -299,7 +486,7 @@ internal static class EpwingYomichanLoader
         Debug.Assert(maxRecordCount > 0);
         Debug.Assert(recordOffset + maxRecordCount <= records.Length);
 
-        ReadOnlySpan<byte> json = jsonBytes.AsSpan(offset);
+        ReadOnlySpan<byte> json = jsonBytes[offset..];
         Utf8JsonReader reader = new(json, true, readerState);
 
         int recordCount = 0;
@@ -400,16 +587,11 @@ internal static class EpwingYomichanLoader
             }
         }
 
-        record = new EpwingYomichanImportRecord(
-            primarySpelling,
-            reading,
-            popularityScore,
-            MessagePackSerializer.Serialize(definitions),
+        record = new EpwingYomichanImportRecord(primarySpelling, reading, popularityScore, MessagePackSerializer.Serialize(definitions),
             wordClasses is not null ? MessagePackSerializer.Serialize(wordClasses) : null,
             definitionTags is not null ? MessagePackSerializer.Serialize(definitionTags) : null,
             imageInfos is not null ? MessagePackSerializer.Serialize(imageInfos) : null,
-            searchKey,
-            additionalSearchKey);
+            searchKey, additionalSearchKey);
 
         return true;
     }
@@ -418,6 +600,45 @@ internal static class EpwingYomichanLoader
         bool nonKanjiDict, bool nonNameDict, ConcurrentDictionary<string, ImageInfo> imageInfoCache, out EpwingYomichanImportRecord record)
     {
         record = default;
+        if (!TryReadRecord(ref reader, json, dict, imageInfoCache, out string primarySpelling, out string? reading, out double popularityScore,
+            out string[]? definitions, out string[]? wordClasses, out string[]? definitionTags, out List<ImageInfo>? imageInfos))
+        {
+            return false;
+        }
+
+        string searchKey = nonKanjiDict
+            ? JapaneseUtils.NormalizeText(primarySpelling)
+            : primarySpelling;
+
+        string? additionalSearchKey = null;
+        if (nonKanjiDict && nonNameDict && reading is not null)
+        {
+            string readingInHiragana = JapaneseUtils.NormalizeText(reading);
+            if (searchKey != readingInHiragana)
+            {
+                additionalSearchKey = readingInHiragana;
+            }
+        }
+
+        record = new EpwingYomichanImportRecord(primarySpelling, reading, popularityScore, MessagePackSerializer.Serialize(definitions),
+            wordClasses is not null ? MessagePackSerializer.Serialize(wordClasses) : null,
+            definitionTags is not null ? MessagePackSerializer.Serialize(definitionTags) : null,
+            imageInfos is not null ? MessagePackSerializer.Serialize(imageInfos) : null,
+            searchKey, additionalSearchKey);
+
+        return true;
+    }
+
+    private static bool TryReadRecord(ref Utf8JsonReader reader, ReadOnlySpan<byte> json, Dict dict, ConcurrentDictionary<string, ImageInfo> imageInfoCache,
+        out string primarySpelling, out string? reading, out double popularityScore, out string[]? definitions, out string[]? wordClasses, out string[]? definitionTags, out List<ImageInfo>? imageInfos)
+    {
+        primarySpelling = "";
+        reading = null;
+        popularityScore = 0D;
+        definitions = null;
+        wordClasses = null;
+        definitionTags = null;
+        imageInfos = null;
 
         if (!reader.Read() || reader.TokenType is not JsonTokenType.String)
         {
@@ -426,14 +647,13 @@ internal static class EpwingYomichanLoader
 
         string? primarySpellingValue = reader.GetString();
         Debug.Assert(primarySpellingValue is not null);
-        string primarySpelling = primarySpellingValue;
+        primarySpelling = primarySpellingValue;
 
         if (!reader.Read())
         {
             return false;
         }
 
-        string? reading;
         if (reader.TokenType is JsonTokenType.String)
         {
             reading = reader.GetString();
@@ -473,7 +693,6 @@ internal static class EpwingYomichanLoader
             return false;
         }
 
-        string[]? definitionTags = null;
         if (reader.TokenType is JsonTokenType.String)
         {
             string? definitionTagsStr = reader.GetString();
@@ -514,7 +733,7 @@ internal static class EpwingYomichanLoader
             return false;
         }
 
-        double popularityScore = reader.TokenType is JsonTokenType.Number && reader.TryGetDouble(out double score)
+        popularityScore = reader.TokenType is JsonTokenType.Number && reader.TryGetDouble(out double score)
             ? score
             : 0D;
 
@@ -528,44 +747,13 @@ internal static class EpwingYomichanLoader
             return false;
         }
 
-        if (!TryReadDefinitions(
-                ref reader,
-                json,
-                dict,
-                imageInfoCache,
-                out string[]? definitions,
-                out List<ImageInfo>? imageInfos)
+        if (!TryReadDefinitions(ref reader, json, dict, imageInfoCache, out definitions, out imageInfos)
             || (definitions is null && imageInfos is null))
         {
             return false;
         }
 
-        string[]? wordClasses = SplitSpaceSeparatedTags(wordClassesStr);
-
-        string searchKey = nonKanjiDict
-            ? JapaneseUtils.NormalizeText(primarySpelling)
-            : primarySpelling;
-
-        string? additionalSearchKey = null;
-        if (nonKanjiDict && nonNameDict && reading is not null)
-        {
-            string readingInHiragana = JapaneseUtils.NormalizeText(reading);
-            if (searchKey != readingInHiragana)
-            {
-                additionalSearchKey = readingInHiragana;
-            }
-        }
-
-        record = new EpwingYomichanImportRecord(
-            primarySpelling,
-            reading,
-            popularityScore,
-            MessagePackSerializer.Serialize(definitions),
-            wordClasses is not null ? MessagePackSerializer.Serialize(wordClasses) : null,
-            definitionTags is not null ? MessagePackSerializer.Serialize(definitionTags) : null,
-            imageInfos is not null ? MessagePackSerializer.Serialize(imageInfos) : null,
-            searchKey,
-            additionalSearchKey);
+        wordClasses = SplitSpaceSeparatedTags(wordClassesStr);
 
         return true;
     }

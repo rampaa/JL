@@ -89,7 +89,7 @@ public static class AnkiConnectUtils
         return fieldNames;
     }
 
-    internal static async Task<bool?> CanAddNote(Note note)
+    private static async Task<bool?> CanAddNote(Note note)
     {
         Response? response = await AnkiConnectClient.GetCanAddNotesResponse([note], CancellationToken.None).ConfigureAwait(false);
         if (response is null)

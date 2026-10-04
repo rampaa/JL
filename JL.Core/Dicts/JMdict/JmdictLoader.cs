@@ -118,6 +118,8 @@ internal static class JmdictLoader
         {
             DictUtils.JmdictEntities.Clear();
 
+            Dictionary<string, DictRecords<JmdictRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+
             // ReSharper disable once UseAwaitUsing
             using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))
             {
@@ -158,9 +160,6 @@ internal static class JmdictLoader
                     maxTotalFuseji = 0;
                 }
 
-                Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
-                Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
-
                 List<KanjiElement> kanjiElements = [];
                 List<ReadingElement> readingElements = [];
                 List<Sense> senseList = [];
@@ -176,20 +175,18 @@ internal static class JmdictLoader
                     {
                         foreach ((string key, JmdictRecord record) in recordDictionary)
                         {
-                            ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
+                            ref DictRecords<JmdictRecord> records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
                             if (exists)
                             {
-                                Debug.Assert(records is not null);
                                 records.Add(record);
                             }
                             else
                             {
-                                records = [record];
-                            }
-
-                            if (key.Length > dict.MaxSearchKeyLength)
-                            {
-                                dict.MaxSearchKeyLength = key.Length;
+                                records = new DictRecords<JmdictRecord>(record);
+                                if (key.Length > dict.MaxSearchKeyLength)
+                                {
+                                    dict.MaxSearchKeyLength = key.Length;
+                                }
                             }
 
                             if (generateFusejiVariants)
@@ -198,7 +195,7 @@ internal static class JmdictLoader
                                 {
                                     if (!recordDictionary.ContainsKey(fusejiVariant))
                                     {
-                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
+                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                                     }
                                 }
                             }
@@ -214,13 +211,13 @@ internal static class JmdictLoader
                                         {
                                             if (!recordDictionary.ContainsKey(mazegaki))
                                             {
-                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, dict) && generateFusejiVariants)
+                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, contents, dict) && generateFusejiVariants)
                                                 {
                                                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                     {
                                                         if (!recordDictionary.ContainsKey(fusejiVariant))
                                                         {
-                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, dict);
+                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                                                         }
                                                     }
                                                 }
@@ -234,7 +231,7 @@ internal static class JmdictLoader
                 }
             }
 
-            dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+            dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
         }
         else
         {

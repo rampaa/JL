@@ -42,6 +42,17 @@ internal readonly ref struct SqliteRecordReader
         }
     }
 
+    public void Bind(int index, int value)
+    {
+        int result = raw.sqlite3_bind_int(_statement, index, value);
+        if (result is not raw.SQLITE_OK)
+        {
+            sqlite3? connectionHandle = _connection.Handle;
+            Debug.Assert(connectionHandle is not null);
+            SqliteException.ThrowExceptionForRC(result, connectionHandle);
+        }
+    }
+
     public bool Read()
     {
         int result = raw.sqlite3_step(_statement);
@@ -91,7 +102,18 @@ internal readonly ref struct SqliteRecordReader
         return value;
     }
 
-    public byte[] GetBytes(int index)
+    // The span belongs to SQLite. Use it before Read/Dispose or converting this column to another format.
+    public unsafe ReadOnlySpan<char> GetStringSpan(int index)
+    {
+        nint statement = _statement.DangerousGetHandle();
+        nint text = SqliteNativeMethods.GetColumnText16(statement, index);
+        int byteCount = SqliteNativeMethods.GetColumnBytes16(statement, index);
+        ReadOnlySpan<char> value = new((char*)text, byteCount / sizeof(char));
+        GC.KeepAlive(_statement);
+        return value;
+    }
+
+    private byte[] GetBytes(int index)
     {
         return raw.sqlite3_column_blob(_statement, index).ToArray();
     }

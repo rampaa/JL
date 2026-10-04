@@ -13,31 +13,33 @@ internal static class FrequencyYomichanReader
     private const int RecordBatchSize = 16384;
     private const int PipelineParsingThreshold = 4 * 1024 * 1024;
     private const int WholeFileParsingThreshold = 32 * 1024 * 1024;
+    private const int PooledFileThreshold = 4 * 1024 * 1024;
     private const int StreamingBufferSize = 1024 * 1024;
 
-    internal static async IAsyncEnumerable<FrequencyYomichanRecordBatch> ReadRecordBatches(string jsonFile, bool nonKanjiDict)
+    internal static async IAsyncEnumerable<FrequencyYomichanRecordBatch> ReadRecordBatches(string jsonFile)
     {
         FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            if (fileStream.Length <= WholeFileParsingThreshold)
+            long fileLength = fileStream.Length;
+            if (fileLength <= WholeFileParsingThreshold)
             {
-                int jsonLength = (int)fileStream.Length;
-                bool pooled = jsonLength <= YomichanBankReader.PooledFileThreshold;
-                byte[] jsonBytes = pooled ? ArrayPool<byte>.Shared.Rent(jsonLength) : new byte[jsonLength];
+                int jsonLength = (int)fileLength;
+                bool pooled = jsonLength <= PooledFileThreshold;
+                byte[] jsonBytes = pooled ? ArrayPool<byte>.Shared.Rent(jsonLength) : GC.AllocateUninitializedArray<byte>(jsonLength);
                 try
                 {
                     await fileStream.ReadExactlyAsync(jsonBytes.AsMemory(0, jsonLength)).ConfigureAwait(false);
                     if (jsonLength >= PipelineParsingThreshold)
                     {
-                        await foreach (FrequencyYomichanRecordBatch batch in ReadRecordBatches(fileStream, jsonBytes, jsonLength, nonKanjiDict).ConfigureAwait(false))
+                        await foreach (FrequencyYomichanRecordBatch batch in ReadRecordBatches(fileStream, jsonBytes, jsonLength).ConfigureAwait(false))
                         {
                             yield return batch;
                         }
                     }
                     else
                     {
-                        FrequencyYomichanRecord[] records = ReadWholeFile(jsonBytes.AsSpan(0, jsonLength), nonKanjiDict, out int recordCount);
+                        FrequencyYomichanRecord[] records = ReadWholeFile(jsonBytes.AsSpan(0, jsonLength), out int recordCount);
                         yield return new FrequencyYomichanRecordBatch(records, recordCount);
                     }
                 }
@@ -51,7 +53,7 @@ internal static class FrequencyYomichanReader
             }
             else
             {
-                await foreach (FrequencyYomichanRecordBatch batch in ReadRecordBatches(fileStream, null, 0, nonKanjiDict).ConfigureAwait(false))
+                await foreach (FrequencyYomichanRecordBatch batch in ReadRecordBatches(fileStream, null, 0).ConfigureAwait(false))
                 {
                     yield return batch;
                 }
@@ -59,7 +61,7 @@ internal static class FrequencyYomichanReader
         }
     }
 
-    private static async IAsyncEnumerable<FrequencyYomichanRecordBatch> ReadRecordBatches(FileStream fileStream, byte[]? jsonBytes, int jsonLength, bool nonKanjiDict)
+    private static async IAsyncEnumerable<FrequencyYomichanRecordBatch> ReadRecordBatches(FileStream fileStream, byte[]? jsonBytes, int jsonLength)
     {
         Channel<FrequencyYomichanRecordBatch> batches = Channel.CreateBounded<FrequencyYomichanRecordBatch>(new BoundedChannelOptions(4)
         {
@@ -70,8 +72,8 @@ internal static class FrequencyYomichanReader
         using CancellationTokenSource stopProducer = new();
         CancellationToken stopProducerToken = stopProducer.Token;
         Task producer = jsonBytes is not null
-            ? Task.Run(() => CreateRecordBatches(jsonBytes, jsonLength, nonKanjiDict, batches.Writer, stopProducerToken), CancellationToken.None)
-            : Task.Run(() => CreateStreamedRecordBatches(fileStream, nonKanjiDict, batches.Writer, stopProducerToken), CancellationToken.None);
+            ? Task.Run(() => CreateRecordBatches(jsonBytes, jsonLength, batches.Writer, stopProducerToken), CancellationToken.None)
+            : Task.Run(() => CreateStreamedRecordBatches(fileStream, batches.Writer, stopProducerToken), CancellationToken.None);
         try
         {
             await foreach (FrequencyYomichanRecordBatch batch in batches.Reader.ReadAllAsync(CancellationToken.None).ConfigureAwait(false))
@@ -107,7 +109,7 @@ internal static class FrequencyYomichanReader
         }
     }
 
-    private static async Task CreateStreamedRecordBatches(FileStream fileStream, bool nonKanjiDict, ChannelWriter<FrequencyYomichanRecordBatch> writer, CancellationToken stopProducerToken)
+    private static async Task CreateStreamedRecordBatches(FileStream fileStream, ChannelWriter<FrequencyYomichanRecordBatch> writer, CancellationToken stopProducerToken)
     {
         byte[] jsonBytes = ArrayPool<byte>.Shared.Rent(StreamingBufferSize);
         FrequencyYomichanRecord[]? records = ArrayPool<FrequencyYomichanRecord>.Shared.Rent(RecordBatchSize);
@@ -135,7 +137,7 @@ internal static class FrequencyYomichanReader
                 }
 
                 Debug.Assert(records is not null);
-                ReadStreamedRecordBatch(jsonBytes.AsSpan(offset, bufferedBytes), finalBlock, nonKanjiDict, records, ref recordCount,
+                ReadStreamedRecordBatch(jsonBytes.AsSpan(offset, bufferedBytes), finalBlock, records, ref recordCount,
                     ref readerState, ref started, ref completed, out int consumedBytes);
                 offset += consumedBytes;
                 bufferedBytes -= consumedBytes;
@@ -206,7 +208,7 @@ internal static class FrequencyYomichanReader
         }
     }
 
-    private static void ReadStreamedRecordBatch(ReadOnlySpan<byte> json, bool finalBlock, bool nonKanjiDict, FrequencyYomichanRecord[] records, ref int recordCount,
+    private static void ReadStreamedRecordBatch(ReadOnlySpan<byte> json, bool finalBlock, FrequencyYomichanRecord[] records, ref int recordCount,
         ref JsonReaderState readerState, ref bool started, ref bool completed, out int consumedBytes)
     {
         Utf8JsonReader reader = new(json, finalBlock, readerState);
@@ -249,34 +251,17 @@ internal static class FrequencyYomichanReader
                 }
 
                 Utf8JsonReader spellingReader = reader;
-                if (!reader.Read())
+                if (!reader.Read() || !reader.Read())
                 {
                     reader = entryReader;
                     break;
                 }
 
-                bool frequencyEntry = !nonKanjiDict || reader.ValueTextEquals("freq");
-                if (!reader.Read())
-                {
-                    reader = entryReader;
-                    break;
-                }
-
-                int frequency = -1;
-                string? reading = null;
-                if (frequencyEntry)
-                {
-                    JsonTokenType frequencyTokenType = reader.TokenType;
-                    int frequencyDepth = reader.CurrentDepth;
-                    frequency = ReadFrequency(ref reader, out reading);
-                    if (frequencyTokenType is JsonTokenType.StartObject
-                        && (reader.TokenType is not JsonTokenType.EndObject || reader.CurrentDepth != frequencyDepth))
-                    {
-                        reader = entryReader;
-                        break;
-                    }
-                }
-                else if (!reader.TrySkip())
+                JsonTokenType frequencyTokenType = reader.TokenType;
+                int frequencyDepth = reader.CurrentDepth;
+                int frequency = ReadFrequency(ref reader, out string? reading);
+                if (frequencyTokenType is JsonTokenType.StartObject
+                    && (reader.TokenType is not JsonTokenType.EndObject || reader.CurrentDepth != frequencyDepth))
                 {
                     reader = entryReader;
                     break;
@@ -317,11 +302,11 @@ internal static class FrequencyYomichanReader
         readerState = reader.CurrentState;
     }
 
-    private static void CreateRecordBatches(byte[] jsonBytes, int jsonLength, bool nonKanjiDict, ChannelWriter<FrequencyYomichanRecordBatch> writer, CancellationToken stopProducerToken)
+    private static void CreateRecordBatches(byte[] jsonBytes, int jsonLength, ChannelWriter<FrequencyYomichanRecordBatch> writer, CancellationToken stopProducerToken)
     {
         try
         {
-            _ = ReadWholeFile(jsonBytes.AsSpan(0, jsonLength), nonKanjiDict, out _, writer, stopProducerToken);
+            _ = ReadWholeFile(jsonBytes.AsSpan(0, jsonLength), out _, writer, stopProducerToken);
             _ = writer.TryComplete();
         }
         catch (OperationCanceledException)
@@ -335,7 +320,7 @@ internal static class FrequencyYomichanReader
         }
     }
 
-    private static FrequencyYomichanRecord[] ReadWholeFile(ReadOnlySpan<byte> json, bool nonKanjiDict, out int recordCount, ChannelWriter<FrequencyYomichanRecordBatch>? writer = null, CancellationToken stopProducerToken = default)
+    private static FrequencyYomichanRecord[] ReadWholeFile(ReadOnlySpan<byte> json, out int recordCount, ChannelWriter<FrequencyYomichanRecordBatch>? writer = null, CancellationToken stopProducerToken = default)
     {
         ReadOnlySpan<byte> utf8Preamble = Encoding.UTF8.Preamble;
         if (json.StartsWith(utf8Preamble))
@@ -362,42 +347,34 @@ internal static class FrequencyYomichanReader
                 _ = reader.Read();
                 Utf8JsonReader spellingReader = reader;
                 _ = reader.Read();
-                bool frequencyEntry = !nonKanjiDict || reader.ValueTextEquals("freq");
                 _ = reader.Read();
-                if (!frequencyEntry)
+                int frequency = ReadFrequency(ref reader, out string? reading);
+                if (frequency > 0)
                 {
-                    reader.Skip();
-                }
-                else
-                {
-                    int frequency = ReadFrequency(ref reader, out string? reading);
-                    if (frequency > 0)
+                    string? spelling = spellingReader.GetString();
+                    Debug.Assert(spelling is not null);
+                    if (recordCount == records.Length)
                     {
-                        string? spelling = spellingReader.GetString();
-                        Debug.Assert(spelling is not null);
-                        if (recordCount == records.Length)
+                        if (writer is null)
                         {
-                            if (writer is null)
-                            {
-                                Array.Resize(ref records, records.Length * 2);
-                            }
-                            else
-                            {
-                                if (!writer.TryWrite(new FrequencyYomichanRecordBatch(records, recordCount)))
-                                {
-                                    writer.WriteAsync(new FrequencyYomichanRecordBatch(records, recordCount), stopProducerToken).AsTask().GetAwaiter().GetResult();
-                                }
-
-                                ownsRecordBatch = false;
-                                records = ArrayPool<FrequencyYomichanRecord>.Shared.Rent(RecordBatchSize);
-                                ownsRecordBatch = true;
-                                recordCount = 0;
-                            }
+                            Array.Resize(ref records, records.Length * 2);
                         }
+                        else
+                        {
+                            if (!writer.TryWrite(new FrequencyYomichanRecordBatch(records, recordCount)))
+                            {
+                                writer.WriteAsync(new FrequencyYomichanRecordBatch(records, recordCount), stopProducerToken).AsTask().GetAwaiter().GetResult();
+                            }
 
-                        records[recordCount] = new FrequencyYomichanRecord(spelling, reading, frequency);
-                        ++recordCount;
+                            ownsRecordBatch = false;
+                            records = ArrayPool<FrequencyYomichanRecord>.Shared.Rent(RecordBatchSize);
+                            ownsRecordBatch = true;
+                            recordCount = 0;
+                        }
                     }
+
+                    records[recordCount] = new FrequencyYomichanRecord(spelling, reading, frequency);
+                    ++recordCount;
                 }
 
                 _ = reader.Read();
@@ -472,10 +449,10 @@ internal static class FrequencyYomichanReader
         bool hasDisplayValue = false;
         while (reader.Read() && reader.TokenType is not JsonTokenType.EndObject)
         {
-            bool valueProperty = reader.ValueTextEquals("value");
-            bool readingProperty = !valueProperty && reader.ValueTextEquals("reading");
-            bool frequencyProperty = !valueProperty && !readingProperty && reader.ValueTextEquals("frequency");
-            bool displayValueProperty = !valueProperty && !readingProperty && !frequencyProperty && reader.ValueTextEquals("displayValue");
+            bool valueProperty = reader.ValueTextEquals("value"u8);
+            bool readingProperty = !valueProperty && reader.ValueTextEquals("reading"u8);
+            bool frequencyProperty = !valueProperty && !readingProperty && reader.ValueTextEquals("frequency"u8);
+            bool displayValueProperty = !valueProperty && !readingProperty && !frequencyProperty && reader.ValueTextEquals("displayValue"u8);
             if (!reader.Read())
             {
                 return -1;
@@ -557,7 +534,7 @@ internal static class FrequencyYomichanReader
         int value = -1;
         while (reader.Read() && reader.TokenType is not JsonTokenType.EndObject)
         {
-            bool valueProperty = reader.ValueTextEquals("value");
+            bool valueProperty = reader.ValueTextEquals("value"u8);
             if (!reader.Read())
             {
                 return -1;
@@ -584,7 +561,7 @@ internal static class FrequencyYomichanReader
         {
             while (displayValueReader.Read() && displayValueReader.TokenType is not JsonTokenType.EndObject)
             {
-                bool displayValueProperty = displayValueReader.ValueTextEquals("displayValue");
+                bool displayValueProperty = displayValueReader.ValueTextEquals("displayValue"u8);
                 _ = displayValueReader.Read();
                 if (displayValueProperty)
                 {

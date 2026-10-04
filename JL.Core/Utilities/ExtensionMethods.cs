@@ -198,14 +198,6 @@ public static class ExtensionMethods
         }
     }
 
-    internal static int IndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
-    {
-        int index = text[startIndex..].IndexOf(value);
-        return index < 0
-            ? -1
-            : index + startIndex;
-    }
-
     internal static int IndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
     {
         int index = text[startIndex..].IndexOf(value, StringComparison.Ordinal);
@@ -213,16 +205,6 @@ public static class ExtensionMethods
             ? -1
             : index + startIndex;
     }
-
-    internal static int LastIndexOf(this ReadOnlySpan<char> text, char value, int startIndex)
-    {
-        return text[..startIndex].LastIndexOf(value);
-    }
-
-    //public static int LastIndexOf(this ReadOnlySpan<char> text, ReadOnlySpan<char> value, int startIndex)
-    //{
-    //    return text[..startIndex].LastIndexOf(value);
-    //}
 
     internal static ReadOnlySpan<int> FindAllIndexes(this ReadOnlySpan<char> text, int startIndex, int length, ReadOnlySpan<char> value)
     {

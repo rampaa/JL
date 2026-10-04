@@ -86,8 +86,7 @@ internal static class FreqDBManager
     {
         Spelling = 0,
         Frequency,
-        SearchKey,
-        RowId
+        SearchKey
     }
 
     public static void CreateDB(string dbPath)
@@ -284,46 +283,77 @@ internal static class FreqDBManager
     {
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(freq.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
+        using SqliteTransaction transaction = connection.BeginTransaction(deferred: true);
 
         SetMaxFrequencyValue(freq, connection);
 
-        const string query =
+        const string recordQuery =
             $"""
-            SELECT r.{Spelling}, r.{Frequency}, rsk.{SearchKey}, r.{RowId}
-            FROM {Record} r
-            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
-            ORDER BY r.{RowId};
+            SELECT {Spelling}, {Frequency}, {RowId}
+            FROM {Record};
             """;
 
-        using SqliteRecordReader reader = new(connection, query);
-        Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
-        Dictionary<string, IList<FrequencyRecord>> contents = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
-        long previousRowId = 0;
-        FrequencyRecord record = default;
-        while (reader.Read())
+        Dictionary<long, FrequencyRecord> records = [];
+        using (SqliteRecordReader reader = new(connection, recordQuery))
         {
-            long rowId = reader.GetInt64((int)ColumnIndex.RowId);
-            Debug.Assert(rowId > 0);
-            if (rowId != previousRowId)
+            while (reader.Read())
             {
-                record = GetRecord(reader);
-                previousRowId = rowId;
-            }
-
-            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
-            ref IList<FrequencyRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
-            if (exists)
-            {
-                Debug.Assert(result is not null);
-                result.Add(record);
-            }
-            else
-            {
-                result = [record];
+                records.Add(reader.GetInt64(2), GetRecord(reader));
             }
         }
 
-        freq.Contents = freq.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        const string searchKeyQuery =
+            $"""
+            SELECT {SearchKey}, {RecordId}
+            FROM {RecordSearchKey}
+            ORDER BY {SearchKey}, {RecordId};
+            """;
+
+        int initialSearchKeyCount = freq.Size > 0
+            ? freq.Size
+            : freq.Type is FreqType.Nazeka
+                ? 114348
+                : freq.Type is FreqType.Yomichan
+                    ? 1504512
+                    : 169623;
+
+        Dictionary<string, FrequencyRecords> contents = new(initialSearchKeyCount, StringComparer.Ordinal);
+        string? currentSearchKey = null;
+        FrequencyRecords currentRecords = default;
+        using (SqliteRecordReader reader = new(connection, searchKeyQuery))
+        {
+            while (reader.Read())
+            {
+                if (!records.TryGetValue(reader.GetInt64(1), out FrequencyRecord record))
+                {
+                    continue;
+                }
+
+                ReadOnlySpan<char> searchKey = reader.GetStringSpan(0);
+                if (currentSearchKey is not null && searchKey.SequenceEqual(currentSearchKey))
+                {
+                    currentRecords.Add(record);
+                }
+                else
+                {
+                    if (currentSearchKey is not null)
+                    {
+                        contents.Add(currentSearchKey, currentRecords);
+                    }
+
+                    currentSearchKey = searchKey.ToString();
+                    currentRecords = new FrequencyRecords(record);
+                }
+            }
+        }
+
+        if (currentSearchKey is not null)
+        {
+            contents.Add(currentSearchKey, currentRecords);
+        }
+
+        transaction.Commit();
+        freq.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     public static async Task ImportYomichanFreqFromDisk(Freq freq)
@@ -377,7 +407,6 @@ internal static class FreqDBManager
 
         int transactionRecordCount = 0;
 
-        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
         string[] jsonFiles = Directory.GetFiles(fullPath, freq.Type is FreqType.Yomichan ? "term_meta_bank_*.json" : "kanji_meta_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
@@ -386,7 +415,7 @@ internal static class FreqDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
             try
             {
-                await foreach (FrequencyYomichanRecordBatch batch in FrequencyYomichanReader.ReadRecordBatches(jsonFile, nonKanjiDict).ConfigureAwait(false))
+                await foreach (FrequencyYomichanRecordBatch batch in FrequencyYomichanReader.ReadRecordBatches(jsonFile).ConfigureAwait(false))
                 {
                     for (int recordIndex = 0; recordIndex < batch.Count; recordIndex++)
                     {
@@ -470,7 +499,7 @@ internal static class FreqDBManager
         if (rowId > 1 && (generateFusejiVariants || generateMazegaki))
         {
             DBUtils.FlushWalLog(connection);
-            await InsertVariantSearchKeysInParallel(jsonFiles, null, nonKanjiDict, generateFusejiVariants, generateMazegaki,
+            await InsertVariantSearchKeysInParallel(jsonFiles, null, generateFusejiVariants, generateMazegaki,
                 maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration, recordWriter, connection).ConfigureAwait(false);
         }
 
@@ -501,7 +530,7 @@ internal static class FreqDBManager
         }
     }
 
-    private static async Task InsertVariantSearchKeysInParallel(string[]? jsonFiles, string? nazekaFilePath, bool nonKanjiDict, bool generateFusejiVariants, bool generateMazegaki,
+    private static async Task InsertVariantSearchKeysInParallel(string[]? jsonFiles, string? nazekaFilePath, bool generateFusejiVariants, bool generateMazegaki,
         int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration, FrequencyRecordWriter recordWriter, SqliteConnection connection)
     {
         Debug.Assert(generateFusejiVariants || generateMazegaki);
@@ -532,7 +561,7 @@ internal static class FreqDBManager
         else
         {
             Debug.Assert(jsonFiles is not null);
-            sourceProducer = Task.Run(() => CreateVariantSourceBatches(jsonFiles, nonKanjiDict, generateFusejiVariants, sourceChannel.Writer, stopOnConsumerExitToken), CancellationToken.None);
+            sourceProducer = Task.Run(() => CreateVariantSourceBatches(jsonFiles, generateFusejiVariants, sourceChannel.Writer, stopOnConsumerExitToken), CancellationToken.None);
         }
         Task[] workers = new Task[workerCount];
         for (int workerIndex = 0; workerIndex < workerCount; workerIndex++)
@@ -755,7 +784,7 @@ internal static class FreqDBManager
         }
     }
 
-    private static async Task CreateVariantSourceBatches(string[] jsonFiles, bool nonKanjiDict, bool generateFusejiVariants,
+    private static async Task CreateVariantSourceBatches(string[] jsonFiles, bool generateFusejiVariants,
         ChannelWriter<(FrequencyVariantSource[] Sources, int Count)> writer, CancellationToken cancellationToken)
     {
         FrequencyVariantSource[]? sources = ArrayPool<FrequencyVariantSource>.Shared.Rent(VariantSearchKeyBatchSize);
@@ -766,7 +795,7 @@ internal static class FreqDBManager
             foreach (string jsonFile in jsonFiles)
             {
                 // ReSharper disable once UseCancellationTokenForIAsyncEnumerable
-                await foreach (FrequencyYomichanRecordBatch batch in FrequencyYomichanReader.ReadRecordBatches(jsonFile, nonKanjiDict).ConfigureAwait(false))
+                await foreach (FrequencyYomichanRecordBatch batch in FrequencyYomichanReader.ReadRecordBatches(jsonFile).ConfigureAwait(false))
                 {
                     for (int recordIndex = 0; recordIndex < batch.Count; recordIndex++)
                     {
@@ -1050,7 +1079,7 @@ internal static class FreqDBManager
         if (rowId > 1 && (generateFusejiVariants || generateMazegaki))
         {
             DBUtils.FlushWalLog(connection);
-            await InsertVariantSearchKeysInParallel(null, fullPath, true, generateFusejiVariants, generateMazegaki,
+            await InsertVariantSearchKeysInParallel(null, fullPath, generateFusejiVariants, generateMazegaki,
                 maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration, recordWriter, connection).ConfigureAwait(false);
         }
 

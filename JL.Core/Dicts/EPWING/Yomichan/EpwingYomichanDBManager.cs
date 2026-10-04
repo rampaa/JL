@@ -79,7 +79,6 @@ internal static class EpwingYomichanDBManager
     private const int ImportRecordBatchSize = 64;
     internal const int VariantSearchKeyRecordBatchSize = 8192;
     private const int VariantSearchKeyTransactionBatchSize = 20_000_000;
-    private const long WholeFileParsingThreshold = 32 * 1024 * 1024;
 
     private static readonly int s_workerCount = Environment.ProcessorCount;
     private static readonly int s_outputChannelCapacity = s_workerCount * 16;
@@ -262,7 +261,6 @@ internal static class EpwingYomichanDBManager
 
         int transactionRecordCount = 0;
 
-        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
         string[] jsonFiles = [.. Directory.EnumerateFiles(fullPath, "term_bank_*.json", SearchOption.TopDirectoryOnly)];
 
 #pragma warning disable CA1849 // Call async methods when in an async method
@@ -434,6 +432,7 @@ internal static class EpwingYomichanDBManager
 
     private static void RemoveDuplicateRecords(SqliteConnection connection)
     {
+        // SQLite takes the row ID from the row with the highest score when MAX is the only MIN/MAX aggregate.
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             $"""
@@ -444,7 +443,7 @@ internal static class EpwingYomichanDBManager
                 FROM {Record} r
                 JOIN
                 (
-                    SELECT MIN({RowId}) AS {RowId}_to_keep, {PrimarySpelling}, {Reading}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
+                    SELECT {RowId} AS {RowId}_to_keep, MAX({PopularityScore}), {PrimarySpelling}, {Reading}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
                     FROM {Record}
                     GROUP BY {PrimarySpelling}, {Reading}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
                     HAVING COUNT(*) > 1
@@ -597,47 +596,74 @@ internal static class EpwingYomichanDBManager
 
     public static void LoadFromDB(Dict dict)
     {
+        Dictionary<string, DictRecords<EpwingYomichanRecord>> contents = new(dict.Size > 0 ? dict.Size : EpwingYomichanLoader.Size, StringComparer.Ordinal);
+
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
+        using SqliteTransaction transaction = connection.BeginTransaction(deferred: true);
 
-        const string query =
+        const string recordQuery =
             $"""
-            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}, json_group_array(rsk.{SearchKey})
-            FROM {Record} r
-            JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
-            GROUP BY r.{RowId};
+            SELECT {RowId}, {PrimarySpelling}, {Reading}, {PopularityScore}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
+            FROM {Record};
             """;
 
-        using SqliteRecordReader reader = new(connection, query);
-        while (reader.Read())
+        Dictionary<long, EpwingYomichanRecord> records = [];
+        using (SqliteRecordReader reader = new(connection, recordQuery))
         {
-            EpwingYomichanRecord record = GetRecord(reader);
-            string[]? searchKeys = JsonSerializer.Deserialize<string[]>(reader.GetString((int)ColumnIndex.SearchKey), JsonOptions.DefaultJso);
-            Debug.Assert(searchKeys is not null);
-
-            Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
-            Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
-            foreach (string searchKey in searchKeys)
+            while (reader.Read())
             {
-                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, searchKey, out bool exists);
-                if (exists)
+                records.Add(reader.GetInt64((int)ColumnIndex.RowId), GetRecord(reader));
+            }
+        }
+
+        const string searchKeyQuery =
+            $"""
+            SELECT {SearchKey}, {RecordId}
+            FROM {RecordSearchKey}
+            ORDER BY {SearchKey}, {RecordId};
+            """;
+
+        string? currentSearchKey = null;
+        DictRecords<EpwingYomichanRecord> currentRecords = default;
+        using (SqliteRecordReader reader = new(connection, searchKeyQuery))
+        {
+            while (reader.Read())
+            {
+                if (!records.TryGetValue(reader.GetInt64(1), out EpwingYomichanRecord? record))
                 {
-                    Debug.Assert(result is not null);
-                    result.Add(record);
+                    continue;
+                }
+
+                ReadOnlySpan<char> searchKey = reader.GetStringSpan(0);
+                if (currentSearchKey is not null && searchKey.SequenceEqual(currentSearchKey))
+                {
+                    currentRecords.Add(record);
                 }
                 else
                 {
-                    result = [record];
-                }
+                    if (currentSearchKey is not null)
+                    {
+                        contents.Add(currentSearchKey, currentRecords);
+                    }
 
-                if (searchKey.Length > dict.MaxSearchKeyLength)
-                {
-                    dict.MaxSearchKeyLength = searchKey.Length;
+                    currentSearchKey = searchKey.ToString();
+                    currentRecords = new DictRecords<EpwingYomichanRecord>(record);
+                    if (searchKey.Length > dict.MaxSearchKeyLength)
+                    {
+                        dict.MaxSearchKeyLength = searchKey.Length;
+                    }
                 }
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        if (currentSearchKey is not null)
+        {
+            contents.Add(currentSearchKey, currentRecords);
+        }
+
+        transaction.Commit();
+        dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
     private static EpwingYomichanRecord GetRecord(SqliteRecordReader reader)
@@ -719,6 +745,7 @@ internal static class EpwingYomichanDBManager
     {
         EpwingYomichanImportRecord[] records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
         int recordCount = 0;
+        byte[]? pooledJsonBytes = null;
 
         try
         {
@@ -732,12 +759,34 @@ internal static class EpwingYomichanDBManager
                 FileStream fileStream = new(jsonFile, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
                 await using (fileStream.ConfigureAwait(false))
                 {
-                    if (fileStream.Length <= WholeFileParsingThreshold)
+                    long fileLength = fileStream.Length;
+                    if (fileLength <= EpwingYomichanLoader.WholeFileParsingThreshold)
                     {
-                        byte[] jsonBytes = GC.AllocateUninitializedArray<byte>((int)fileStream.Length);
-                        await fileStream.ReadExactlyAsync(jsonBytes, cancellationToken).ConfigureAwait(false);
+                        int jsonLength = (int)fileLength;
+                        bool pooled = jsonLength <= EpwingYomichanLoader.PooledFileThreshold;
+                        byte[] jsonBytes;
+                        if (pooled)
+                        {
+                            if (pooledJsonBytes is null || pooledJsonBytes.Length < jsonLength)
+                            {
+                                if (pooledJsonBytes is not null)
+                                {
+                                    ArrayPool<byte>.Shared.Return(pooledJsonBytes);
+                                }
+                                pooledJsonBytes = null;
+                                pooledJsonBytes = ArrayPool<byte>.Shared.Rent(jsonLength);
+                            }
 
-                        int offset = jsonBytes.AsSpan().StartsWith(Encoding.UTF8.Preamble)
+                            jsonBytes = pooledJsonBytes;
+                        }
+                        else
+                        {
+                            jsonBytes = GC.AllocateUninitializedArray<byte>(jsonLength);
+                        }
+
+                        await fileStream.ReadExactlyAsync(jsonBytes.AsMemory(0, jsonLength), cancellationToken).ConfigureAwait(false);
+
+                        int offset = jsonBytes.AsSpan(0, jsonLength).StartsWith(Encoding.UTF8.Preamble)
                             ? Encoding.UTF8.Preamble.Length
                             : 0;
 
@@ -752,13 +801,14 @@ internal static class EpwingYomichanDBManager
                                 return;
                             }
 
-                            recordCount += EpwingYomichanLoader.ReadImportRecords(jsonBytes, ref offset, ref readerState, ref started, dict, importOptions.NonKanjiDict, importOptions.NonNameDict, imageInfoCache, records, recordCount, ImportRecordBatchSize - recordCount, out completed);
+                            recordCount += EpwingYomichanLoader.ReadImportRecords(jsonBytes.AsSpan(0, jsonLength), ref offset, ref readerState, ref started, dict, importOptions.NonKanjiDict, importOptions.NonNameDict, imageInfoCache, records, recordCount, ImportRecordBatchSize - recordCount, out completed);
                             if (recordCount is ImportRecordBatchSize)
                             {
                                 await writer.WriteAsync(new ImportRecordBatch(records, recordCount), cancellationToken).ConfigureAwait(false);
 
-                                records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
+                                records = [];
                                 recordCount = 0;
+                                records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
                             }
                         }
                     }
@@ -783,8 +833,9 @@ internal static class EpwingYomichanDBManager
                             {
                                 await writer.WriteAsync(new ImportRecordBatch(records, recordCount), cancellationToken).ConfigureAwait(false);
 
-                                records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
+                                records = [];
                                 recordCount = 0;
+                                records = ArrayPool<EpwingYomichanImportRecord>.Shared.Rent(ImportRecordBatchSize);
                             }
                         }
                     }
@@ -794,21 +845,25 @@ internal static class EpwingYomichanDBManager
             if (recordCount > 0)
             {
                 await writer.WriteAsync(new ImportRecordBatch(records, recordCount), cancellationToken).ConfigureAwait(false);
-
-                records = [];
-                recordCount = 0;
             }
             else
             {
                 ArrayPool<EpwingYomichanImportRecord>.Shared.Return(records);
-                records = [];
             }
+
+            records = [];
         }
         finally
         {
+            if (pooledJsonBytes is not null)
+            {
+                ArrayPool<byte>.Shared.Return(pooledJsonBytes);
+            }
+
             if (records.Length > 0)
             {
-                records.AsSpan(0, recordCount).Clear();
+                // Parsing can fail after writing records that are not included in recordCount yet.
+                records.AsSpan(0, ImportRecordBatchSize).Clear();
                 ArrayPool<EpwingYomichanImportRecord>.Shared.Return(records);
             }
         }

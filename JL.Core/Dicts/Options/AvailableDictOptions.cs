@@ -139,7 +139,7 @@ public sealed class AutoUpdateAfterNDaysOption(int value)
 
 public sealed class ShowImagesOption(bool value)
 {
-    public bool Value { get; set; } = value;
+    public bool Value { get; } = value;
 
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =

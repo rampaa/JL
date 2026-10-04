@@ -322,6 +322,8 @@ internal static class KanjidicDBManager
 
     public static void LoadFromDB(Dict dict)
     {
+        Dictionary<string, IList<IDictRecord>> contents = new(dict.Size > 0 ? dict.Size : KanjidicLoader.Size, StringComparer.Ordinal);
+
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);
 
@@ -336,7 +338,7 @@ internal static class KanjidicDBManager
         {
             IDictRecord[] record = [GetRecord(reader)];
             string kanji = reader.GetString((int)ColumnIndex.Kanji);
-            dict.Contents[kanji] = record;
+            contents[kanji] = record;
 
             if (kanji.Length > dict.MaxSearchKeyLength)
             {
@@ -344,7 +346,7 @@ internal static class KanjidicDBManager
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
+        dict.Contents = contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
     private static KanjidicRecord GetRecord(SqliteRecordReader reader)

@@ -10,7 +10,7 @@ namespace JL.Core.Dicts.KanjiDict;
 
 internal static class YomichanKanjiLoader
 {
-    public const int Size = 50000;
+    private const int Size = 50000;
     internal const long WholeFileParsingThreshold = 32 * 1024 * 1024;
     private const int InitialDefinitionCapacity = 4;
     private const int InitialStatCapacity = 5;
@@ -174,14 +174,15 @@ internal static class YomichanKanjiLoader
             return;
         }
 
-        // TODO: When migrating to .NET 10 again, use CompareOptions.NumericOrdering to order JSON files
+        Dictionary<string, DictRecords<YomichanKanjiRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
         {
             if (new FileInfo(jsonFile).Length <= WholeFileParsingThreshold)
             {
                 byte[] jsonBytes = await File.ReadAllBytesAsync(jsonFile).ConfigureAwait(false);
-                LoadWholeFile(jsonBytes, dict);
+                LoadWholeFile(jsonBytes, contents, dict);
             }
             else
             {
@@ -199,16 +200,16 @@ internal static class YomichanKanjiLoader
                         }
 
                         YomichanKanjiRecord record = new(jsonObj);
-                        AddRecord(dict, kanji, record);
+                        AddRecord(contents, dict, kanji, record);
                     }
                 }
             }
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static void LoadWholeFile(byte[] jsonBytes, Dict dict)
+    private static void LoadWholeFile(byte[] jsonBytes, Dictionary<string, DictRecords<YomichanKanjiRecord>> contents, Dict dict)
     {
         Utf8JsonReader reader = CreateJsonReader(jsonBytes);
         if (!reader.Read() || reader.TokenType is not JsonTokenType.StartArray)
@@ -222,7 +223,7 @@ internal static class YomichanKanjiLoader
             if (!string.IsNullOrWhiteSpace(kanji))
             {
                 YomichanKanjiRecord record = new(onReadings, kunReadings, definitions, stats);
-                AddRecord(dict, kanji, record);
+                AddRecord(contents, dict, kanji, record);
             }
         }
 
@@ -232,7 +233,7 @@ internal static class YomichanKanjiLoader
         }
     }
 
-    private static void AddRecord(Dict dict, string kanji, YomichanKanjiRecord record)
+    private static void AddRecord(Dictionary<string, DictRecords<YomichanKanjiRecord>> contents, Dict dict, string kanji, YomichanKanjiRecord record)
     {
         kanji = kanji.GetPooledString();
         record.OnReadings?.DeduplicateStringsInArray();
@@ -242,6 +243,6 @@ internal static class YomichanKanjiLoader
         //    return;
         //}
 
-        _ = DictUtils.AddRecordToDictionary(kanji, record, dict);
+        _ = DictUtils.AddRecordToDictionary(kanji, record, contents, dict);
     }
 }

@@ -21,6 +21,8 @@ internal static class JmnedictLoader
         {
             DictUtils.JmnedictEntities.Clear();
 
+            Dictionary<string, DictRecords<JmnedictRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+
             // ReSharper disable once UseAwaitUsing
             using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))
             {
@@ -32,9 +34,6 @@ internal static class JmnedictLoader
                 xmlTextReader.DtdProcessing = DtdProcessing.Parse;
                 xmlTextReader.WhitespaceHandling = WhitespaceHandling.None;
                 xmlTextReader.EntityHandling = EntityHandling.ExpandCharEntities;
-
-                Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
-                Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
                 List<string> kebList = [];
                 List<string> rebList = [];
@@ -48,20 +47,18 @@ internal static class JmnedictLoader
                     Dictionary<string, JmnedictRecord> recordDictionary = GetRecordsFromEntry(in entry);
                     foreach ((string key, JmnedictRecord jmnedictRecord) in recordDictionary)
                     {
-                        ref IList<IDictRecord>? tempRecordList = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
+                        ref DictRecords<JmnedictRecord> records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
                         if (exists)
                         {
-                            Debug.Assert(tempRecordList is not null);
-                            tempRecordList.Add(jmnedictRecord);
+                            records.Add(jmnedictRecord);
                         }
                         else
                         {
-                            tempRecordList = [jmnedictRecord];
-                        }
-
-                        if (key.Length > dict.MaxSearchKeyLength)
-                        {
-                            dict.MaxSearchKeyLength = key.Length;
+                            records = new DictRecords<JmnedictRecord>(jmnedictRecord);
+                            if (key.Length > dict.MaxSearchKeyLength)
+                            {
+                                dict.MaxSearchKeyLength = key.Length;
+                            }
                         }
                     }
 
@@ -71,7 +68,7 @@ internal static class JmnedictLoader
                 }
             }
 
-            dict.Contents = dict.Contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+            dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
         }
         else
         {
