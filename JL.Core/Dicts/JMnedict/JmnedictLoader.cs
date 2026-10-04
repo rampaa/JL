@@ -21,7 +21,8 @@ internal static class JmnedictLoader
         {
             DictUtils.JmnedictEntities.Clear();
 
-            Dictionary<string, DictRecords<JmnedictRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+            Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+            Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
             // ReSharper disable once UseAwaitUsing
             using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))
@@ -47,14 +48,15 @@ internal static class JmnedictLoader
                     Dictionary<string, JmnedictRecord> recordDictionary = GetRecordsFromEntry(in entry);
                     foreach ((string key, JmnedictRecord jmnedictRecord) in recordDictionary)
                     {
-                        ref DictRecords<JmnedictRecord> records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
+                        ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
                         if (exists)
                         {
+                            Debug.Assert(records is not null);
                             records.Add(jmnedictRecord);
                         }
                         else
                         {
-                            records = new DictRecords<JmnedictRecord>(jmnedictRecord);
+                            records = [jmnedictRecord];
                             if (key.Length > dict.MaxSearchKeyLength)
                             {
                                 dict.MaxSearchKeyLength = key.Length;

@@ -32,7 +32,8 @@ internal static class EpwingYomichanLoader
             return;
         }
 
-        Dictionary<string, DictRecords<EpwingYomichanRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term_bank_*.json", SearchOption.TopDirectoryOnly);
         ConcurrentDictionary<string, ImageInfo> imageInfoCache = new();

@@ -277,7 +277,7 @@ public static class ResourceUpdater
                     dict.Ready = false;
                     await Task.Run(async () =>
                     {
-                        dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                        DictUtils.InitializeContents(dict, size);
                         await load(dict).ConfigureAwait(false);
                     }).ConfigureAwait(false);
 
@@ -333,7 +333,7 @@ public static class ResourceUpdater
                     {
                         await Task.Run(async () =>
                         {
-                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                            DictUtils.InitializeContents(dict, size);
                             await load(dict).ConfigureAwait(false);
                         }).ConfigureAwait(false);
                     }
@@ -449,7 +449,7 @@ public static class ResourceUpdater
                     dict.Ready = false;
                     await Task.Run(async () =>
                     {
-                        dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                        DictUtils.InitializeContents(dict, size);
                         await load(dict).ConfigureAwait(false);
                     }).ConfigureAwait(false);
 
@@ -505,7 +505,7 @@ public static class ResourceUpdater
                     {
                         await Task.Run(async () =>
                         {
-                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
+                            DictUtils.InitializeContents(dict, size);
                             await load(dict).ConfigureAwait(false);
                         }).ConfigureAwait(false);
                     }
@@ -617,6 +617,7 @@ public static class ResourceUpdater
                     freq.Ready = false;
                     await Task.Run(async () =>
                     {
+                        FreqUtils.InitializeContents(freq, 0);
                         await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
                     }).ConfigureAwait(false);
 
@@ -667,6 +668,7 @@ public static class ResourceUpdater
                     {
                         await Task.Run(async () =>
                         {
+                            FreqUtils.InitializeContents(freq, 0);
                             await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
                         }).ConfigureAwait(false);
                     }

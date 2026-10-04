@@ -50,7 +50,8 @@ internal static class FrequencyYomichanLoader
         }
 
         bool higherValueMeansHigherFrequency = freq.Options.HigherValueMeansHigherFrequency.Value;
-        Dictionary<string, FrequencyRecords> dictionary = new(freq.Size > 0 ? freq.Size : 0, StringComparer.Ordinal);
+        Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
+        Dictionary<string, IList<FrequencyRecord>> contents = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
 
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, freq.Type is FreqType.Yomichan ? "term_meta_bank_*.json" : "kanji_meta_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
@@ -77,33 +78,33 @@ internal static class FrequencyYomichanLoader
                     FrequencyRecord frequencyRecordWithPrimarySpelling = new(primarySpelling, frequency);
                     if (reading is null)
                     {
-                        if (FreqUtils.AddOrUpdate(dictionary, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
+                        if (FreqUtils.AddOrUpdate(contents, primarySpellingInHiragana, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency);
+                                _ = FreqUtils.AddOrUpdate(contents, fusejiVariant, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency);
                             }
                         }
                     }
                     else
                     {
                         string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                        if (FreqUtils.AddOrUpdate(dictionary, readingInHiragana, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
+                        if (FreqUtils.AddOrUpdate(contents, readingInHiragana, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency);
+                                _ = FreqUtils.AddOrUpdate(contents, fusejiVariant, frequencyRecordWithPrimarySpelling, higherValueMeansHigherFrequency);
                             }
                         }
 
                         FrequencyRecord frequencyRecordWithReading = new(reading, frequency);
-                        if (FreqUtils.AddOrUpdate(dictionary, primarySpellingInHiragana, frequencyRecordWithReading, higherValueMeansHigherFrequency))
+                        if (FreqUtils.AddOrUpdate(contents, primarySpellingInHiragana, frequencyRecordWithReading, higherValueMeansHigherFrequency))
                         {
                             if (generateFusejiVariants)
                             {
                                 foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
-                                    _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
+                                    _ = FreqUtils.AddOrUpdate(contents, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
                                 }
                             }
 
@@ -111,11 +112,11 @@ internal static class FrequencyYomichanLoader
                             {
                                 foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, reading))
                                 {
-                                    if (FreqUtils.AddOrUpdate(dictionary, mazegakiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency) && generateFusejiVariants)
+                                    if (FreqUtils.AddOrUpdate(contents, mazegakiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency) && generateFusejiVariants)
                                     {
                                         foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                         {
-                                            _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
+                                            _ = FreqUtils.AddOrUpdate(contents, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
                                         }
                                     }
                                 }
@@ -126,6 +127,6 @@ internal static class FrequencyYomichanLoader
             }
         }
 
-        freq.Contents = dictionary.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        freq.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 }

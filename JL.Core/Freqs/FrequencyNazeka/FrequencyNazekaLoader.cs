@@ -43,7 +43,8 @@ internal static class FrequencyNazekaLoader
         }
 
         bool higherValueMeansHigherFrequency = freq.Options.HigherValueMeansHigherFrequency.Value;
-        Dictionary<string, FrequencyRecords> dictionary = new(freq.Size > 0 ? freq.Size : 0, StringComparer.Ordinal);
+        Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
+        Dictionary<string, IList<FrequencyRecord>> contents = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
         await foreach (FrequencyNazekaRecordBatch batch in FrequencyNazekaReader.ReadRecordBatches(fullPath, parseInParallel: true).ConfigureAwait(false))
         {
             for (int recordIndex = 0; recordIndex < batch.Count; recordIndex++)
@@ -59,11 +60,11 @@ internal static class FrequencyNazekaLoader
                 }
 
                 FrequencyRecord frequencyRecordWithExactSpelling = new(exactSpelling, frequencyRank);
-                if (FreqUtils.AddOrUpdate(dictionary, reading, frequencyRecordWithExactSpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
+                if (FreqUtils.AddOrUpdate(contents, reading, frequencyRecordWithExactSpelling, higherValueMeansHigherFrequency) && generateFusejiVariants)
                 {
                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(reading, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                     {
-                        _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithExactSpelling, higherValueMeansHigherFrequency);
+                        _ = FreqUtils.AddOrUpdate(contents, fusejiVariant, frequencyRecordWithExactSpelling, higherValueMeansHigherFrequency);
                     }
                 }
 
@@ -72,13 +73,13 @@ internal static class FrequencyNazekaLoader
                 {
                     exactSpellingInHiragana = exactSpellingInHiragana.GetPooledString();
                     FrequencyRecord frequencyRecordWithReading = new(reading, frequencyRank);
-                    if (FreqUtils.AddOrUpdate(dictionary, exactSpellingInHiragana, frequencyRecordWithReading, higherValueMeansHigherFrequency))
+                    if (FreqUtils.AddOrUpdate(contents, exactSpellingInHiragana, frequencyRecordWithReading, higherValueMeansHigherFrequency))
                     {
                         if (generateFusejiVariants)
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(exactSpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
+                                _ = FreqUtils.AddOrUpdate(contents, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
                             }
                         }
 
@@ -86,11 +87,11 @@ internal static class FrequencyNazekaLoader
                         {
                             foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(exactSpellingInHiragana, reading))
                             {
-                                if (FreqUtils.AddOrUpdate(dictionary, mazegakiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency) && generateFusejiVariants)
+                                if (FreqUtils.AddOrUpdate(contents, mazegakiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency) && generateFusejiVariants)
                                 {
                                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegakiVariant, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                     {
-                                        _ = FreqUtils.AddOrUpdate(dictionary, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
+                                        _ = FreqUtils.AddOrUpdate(contents, fusejiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency);
                                     }
                                 }
                             }
@@ -100,6 +101,6 @@ internal static class FrequencyNazekaLoader
             }
         }
 
-        freq.Contents = dictionary.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
+        freq.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 }

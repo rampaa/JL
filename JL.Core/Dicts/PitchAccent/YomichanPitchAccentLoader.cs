@@ -1,7 +1,6 @@
 using System.Buffers;
 using System.Collections.Frozen;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Interfaces;
@@ -402,8 +401,8 @@ internal static class YomichanPitchAccentLoader
         }
 
         Debug.Assert(dict.Contents.Count is 0);
-        Dictionary<string, PitchAccentRecords> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
-        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "term_meta_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
@@ -417,13 +416,13 @@ internal static class YomichanPitchAccentLoader
                     {
                         PitchAccentRecord record = batch.Records[recordIndex];
                         string spellingInHiragana = JapaneseUtils.NormalizeText(record.Spelling).GetPooledString();
-                        if (AddRecordToDictionary(spellingInHiragana, record, contents, dict))
+                        if (DictUtils.AddRecordToDictionary(spellingInHiragana, record, contents, dict))
                         {
                             if (generateFusejiVariants)
                             {
                                 foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(spellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                 {
-                                    _ = AddRecordToDictionary(fusejiVariant, record, contents, dict);
+                                    _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                                 }
                             }
 
@@ -432,13 +431,13 @@ internal static class YomichanPitchAccentLoader
                                 string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
                                 if (spellingInHiragana != readingInHiragana)
                                 {
-                                    if (AddRecordToDictionary(readingInHiragana, record, contents, dict))
+                                    if (DictUtils.AddRecordToDictionary(readingInHiragana, record, contents, dict))
                                     {
                                         if (generateFusejiVariants)
                                         {
                                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                             {
-                                                _ = AddRecordToDictionary(fusejiVariant, record, contents, dict);
+                                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                                             }
                                         }
 
@@ -446,13 +445,13 @@ internal static class YomichanPitchAccentLoader
                                         {
                                             foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(spellingInHiragana, readingInHiragana))
                                             {
-                                                if (AddRecordToDictionary(mazegaki, record, contents, dict))
+                                                if (DictUtils.AddRecordToDictionary(mazegaki, record, contents, dict))
                                                 {
                                                     if (generateFusejiVariants)
                                                     {
                                                         foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                         {
-                                                            _ = AddRecordToDictionary(fusejiVariant, record, contents, dict);
+                                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                                                         }
                                                     }
                                                 }
@@ -468,22 +467,5 @@ internal static class YomichanPitchAccentLoader
         }
 
         dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
-    }
-
-    private static bool AddRecordToDictionary(string normalizedKey, PitchAccentRecord record, Dictionary<string, PitchAccentRecords> contents, Dict dict)
-    {
-        ref PitchAccentRecords records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, normalizedKey, out bool exists);
-        if (exists)
-        {
-            return records.AddIfNotExists(record);
-        }
-
-        records = new PitchAccentRecords(record);
-        if (normalizedKey.Length > dict.MaxSearchKeyLength)
-        {
-            dict.MaxSearchKeyLength = normalizedKey.Length;
-        }
-
-        return true;
     }
 }

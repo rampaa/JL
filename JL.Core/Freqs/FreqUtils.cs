@@ -229,6 +229,7 @@ public static class FreqUtils
         {
             tasks.Add(Task.Run(async () =>
             {
+                InitializeContents(freq, dbExists ? 114348 : 0);
                 try
                 {
                     if (!dbExists)
@@ -340,6 +341,7 @@ public static class FreqUtils
         {
             tasks.Add(Task.Run(async () =>
             {
+                InitializeContents(freq, !dbExists ? 0 : freq.Type is FreqType.Yomichan ? 1504512 : 169623);
                 try
                 {
                     if (!dbExists)
@@ -547,16 +549,37 @@ public static class FreqUtils
         }
     }
 
-    internal static bool AddOrUpdate(Dictionary<string, FrequencyRecords> dictionary, string key, FrequencyRecord record, bool higherValueMeansHigherFrequency)
+    internal static void InitializeContents(Freq freq, int initialSearchKeyCount)
     {
-        ref FrequencyRecords records = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(freq.Size > 0 ? freq.Size : initialSearchKeyCount, StringComparer.Ordinal);
+    }
+
+    internal static bool AddOrUpdate(Dictionary<string, IList<FrequencyRecord>> contents, string key, FrequencyRecord record, bool higherValueMeansHigherFrequency)
+    {
+        ref IList<FrequencyRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
         if (!exists)
         {
-            records = new FrequencyRecords(record);
+            records = [record];
             return true;
         }
 
-        return records.AddOrUpdate(record, higherValueMeansHigherFrequency);
+        Debug.Assert(records is not null);
+        List<FrequencyRecord> list = (List<FrequencyRecord>)records;
+        int index = list.AsReadOnlySpan().IndexOf(record);
+        if (index < 0)
+        {
+            list.Add(record);
+            return true;
+        }
+
+        ref FrequencyRecord previousRecord = ref CollectionsMarshal.AsSpan(list)[index];
+        if (higherValueMeansHigherFrequency ? previousRecord.Frequency < record.Frequency : previousRecord.Frequency > record.Frequency)
+        {
+            previousRecord = record;
+            return true;
+        }
+
+        return false;
     }
 
     private static async Task UpdateRevisionInfo(Freq freq)

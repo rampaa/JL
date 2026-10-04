@@ -28,7 +28,8 @@ internal static class EpwingNazekaLoader
             return;
         }
 
-        Dictionary<string, DictRecords<EpwingNazekaRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
@@ -483,7 +484,7 @@ internal static class EpwingNazekaLoader
         return imageInfo;
     }
 
-    private static bool AddSearchKey(string searchKey, EpwingNazekaRecord record, Dict dict, Dictionary<string, DictRecords<EpwingNazekaRecord>> contents, HashSet<string> searchKeys, out bool searchKeyWasNew)
+    private static bool AddSearchKey(string searchKey, EpwingNazekaRecord record, Dict dict, Dictionary<string, IList<IDictRecord>> contents, HashSet<string> searchKeys, out bool searchKeyWasNew)
     {
         searchKeyWasNew = searchKeys.Add(searchKey);
         return searchKeyWasNew && DictUtils.AddRecordToDictionary(searchKey, record, contents, dict);

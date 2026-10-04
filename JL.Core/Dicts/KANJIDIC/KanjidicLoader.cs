@@ -17,7 +17,8 @@ internal static class KanjidicLoader
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            Dictionary<string, IList<IDictRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+            Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+            Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
             // ReSharper disable once UseAwaitUsing
             using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))

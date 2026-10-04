@@ -10,7 +10,7 @@ namespace JL.Core.Dicts.KanjiDict;
 
 internal static class YomichanKanjiLoader
 {
-    private const int Size = 50000;
+    internal const int Size = 50000;
     internal const long WholeFileParsingThreshold = 32 * 1024 * 1024;
     private const int InitialDefinitionCapacity = 4;
     private const int InitialStatCapacity = 5;
@@ -174,7 +174,8 @@ internal static class YomichanKanjiLoader
             return;
         }
 
-        Dictionary<string, DictRecords<YomichanKanjiRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
         IEnumerable<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly);
         foreach (string jsonFile in jsonFiles)
@@ -209,7 +210,7 @@ internal static class YomichanKanjiLoader
         dict.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<IDictRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    private static void LoadWholeFile(byte[] jsonBytes, Dictionary<string, DictRecords<YomichanKanjiRecord>> contents, Dict dict)
+    private static void LoadWholeFile(byte[] jsonBytes, Dictionary<string, IList<IDictRecord>> contents, Dict dict)
     {
         Utf8JsonReader reader = CreateJsonReader(jsonBytes);
         if (!reader.Read() || reader.TokenType is not JsonTokenType.StartArray)
@@ -233,7 +234,7 @@ internal static class YomichanKanjiLoader
         }
     }
 
-    private static void AddRecord(Dictionary<string, DictRecords<YomichanKanjiRecord>> contents, Dict dict, string kanji, YomichanKanjiRecord record)
+    private static void AddRecord(Dictionary<string, IList<IDictRecord>> contents, Dict dict, string kanji, YomichanKanjiRecord record)
     {
         kanji = kanji.GetPooledString();
         record.OnReadings?.DeduplicateStringsInArray();

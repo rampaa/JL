@@ -95,6 +95,8 @@ public static class CustomWordLoader
 
     public static void AddToDictionary(Dict dict, string[] spellings, string[]? readings, string[] definitions, ReadOnlySpan<char> rawPartOfSpeech, string[]? wordClasses)
     {
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
         bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
 
         string[] wordClassArray;
@@ -126,7 +128,7 @@ public static class CustomWordLoader
                 dict.MaxSearchKeyLength = normalizedSpelling.Length;
             }
 
-            if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, dict) && i is 0 && readings is not null)
+            if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, contents, dict) && i is 0 && readings is not null)
             {
                 foreach (string reading in readings)
                 {
@@ -136,7 +138,7 @@ public static class CustomWordLoader
                         dict.MaxSearchKeyLength = normalizedReading.Length;
                     }
 
-                    _ = DictUtils.AddRecordToDictionary(normalizedReading, record, dict);
+                    _ = DictUtils.AddRecordToDictionary(normalizedReading, record, contents, dict);
                 }
             }
         }

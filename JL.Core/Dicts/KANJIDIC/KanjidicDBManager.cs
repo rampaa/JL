@@ -322,7 +322,8 @@ internal static class KanjidicDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        Dictionary<string, IList<IDictRecord>> contents = new(dict.Size > 0 ? dict.Size : KanjidicLoader.Size, StringComparer.Ordinal);
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
         Debug.Assert(connection is not null);

@@ -118,7 +118,8 @@ internal static class JmdictLoader
         {
             DictUtils.JmdictEntities.Clear();
 
-            Dictionary<string, DictRecords<JmdictRecord>> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
+            Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+            Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
 
             // ReSharper disable once UseAwaitUsing
             using (FileStream fileStream = new(fullPath, FileStreamOptionsPresets.s_syncRead64KBufferFso))
@@ -175,14 +176,15 @@ internal static class JmdictLoader
                     {
                         foreach ((string key, JmdictRecord record) in recordDictionary)
                         {
-                            ref DictRecords<JmdictRecord> records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
+                            ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, key, out bool exists);
                             if (exists)
                             {
+                                Debug.Assert(records is not null);
                                 records.Add(record);
                             }
                             else
                             {
-                                records = new DictRecords<JmdictRecord>(record);
+                                records = [record];
                                 if (key.Length > dict.MaxSearchKeyLength)
                                 {
                                     dict.MaxSearchKeyLength = key.Length;

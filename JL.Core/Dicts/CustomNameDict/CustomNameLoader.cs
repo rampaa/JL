@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
 using JL.Core.Japanese;
@@ -65,9 +66,11 @@ public static class CustomNameLoader
 
     public static void AddToDictionary(Dict dict, string spelling, string? reading, string nameType, string? extraInfo, ImageInfo? imageInfo)
     {
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
         CustomNameRecord record = new(spelling, reading, nameType, extraInfo, imageInfo);
         string normalizedSpelling = JapaneseUtils.NormalizeText(spelling);
-        if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, dict))
+        if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, contents, dict))
         {
             if (normalizedSpelling.Length > dict.MaxSearchKeyLength)
             {

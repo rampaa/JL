@@ -561,10 +561,10 @@ internal static class YomichanPitchAccentDBManager
             """;
 
         Debug.Assert(dict.Contents.Count is 0);
-        Dictionary<string, PitchAccentRecords> contents = new(dict.Size > 0 ? dict.Size : Size, StringComparer.Ordinal);
-        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
+        Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
         string? currentSearchKey = null;
-        PitchAccentRecords currentRecords = default;
+        List<IDictRecord>? currentRecords = null;
         using (SqliteRecordReader reader = new(connection, searchKeyQuery))
         {
             while (reader.Read())
@@ -579,28 +579,20 @@ internal static class YomichanPitchAccentDBManager
                 ReadOnlySpan<char> searchKey = reader.GetStringSpan(0);
                 if (currentSearchKey is not null && searchKey.SequenceEqual(currentSearchKey))
                 {
+                    Debug.Assert(currentRecords is not null);
                     currentRecords.Add(record);
                 }
                 else
                 {
-                    if (currentSearchKey is not null)
-                    {
-                        contents.Add(currentSearchKey, currentRecords);
-                    }
-
                     currentSearchKey = searchKey.ToString();
-                    currentRecords = new PitchAccentRecords(record);
+                    currentRecords = [record];
+                    contents.Add(currentSearchKey, currentRecords);
                     if (searchKey.Length > dict.MaxSearchKeyLength)
                     {
                         dict.MaxSearchKeyLength = searchKey.Length;
                     }
                 }
             }
-        }
-
-        if (currentSearchKey is not null)
-        {
-            contents.Add(currentSearchKey, currentRecords);
         }
 
         transaction.Commit();

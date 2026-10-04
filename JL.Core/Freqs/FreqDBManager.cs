@@ -309,17 +309,10 @@ internal static class FreqDBManager
             ORDER BY {SearchKey}, {RecordId};
             """;
 
-        int initialSearchKeyCount = freq.Size > 0
-            ? freq.Size
-            : freq.Type is FreqType.Nazeka
-                ? 114348
-                : freq.Type is FreqType.Yomichan
-                    ? 1504512
-                    : 169623;
-
-        Dictionary<string, FrequencyRecords> contents = new(initialSearchKeyCount, StringComparer.Ordinal);
+        Debug.Assert(freq.Contents is Dictionary<string, IList<FrequencyRecord>>);
+        Dictionary<string, IList<FrequencyRecord>> contents = (Dictionary<string, IList<FrequencyRecord>>)freq.Contents;
         string? currentSearchKey = null;
-        FrequencyRecords currentRecords = default;
+        List<FrequencyRecord>? currentRecords = null;
         using (SqliteRecordReader reader = new(connection, searchKeyQuery))
         {
             while (reader.Read())
@@ -332,24 +325,16 @@ internal static class FreqDBManager
                 ReadOnlySpan<char> searchKey = reader.GetStringSpan(0);
                 if (currentSearchKey is not null && searchKey.SequenceEqual(currentSearchKey))
                 {
+                    Debug.Assert(currentRecords is not null);
                     currentRecords.Add(record);
                 }
                 else
                 {
-                    if (currentSearchKey is not null)
-                    {
-                        contents.Add(currentSearchKey, currentRecords);
-                    }
-
                     currentSearchKey = searchKey.ToString();
-                    currentRecords = new FrequencyRecords(record);
+                    currentRecords = [record];
+                    contents.Add(currentSearchKey, currentRecords);
                 }
             }
-        }
-
-        if (currentSearchKey is not null)
-        {
-            contents.Add(currentSearchKey, currentRecords);
         }
 
         transaction.Commit();
