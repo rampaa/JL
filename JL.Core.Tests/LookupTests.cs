@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
@@ -37,7 +38,7 @@ internal sealed class LookupTests
 
         foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
         {
-            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(StringComparer.Ordinal);
+            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
             freq.Options = new Freqs.Options.FreqOptions(new Freqs.Options.UseDBOption(false), new Freqs.Options.HigherValueMeansHigherFrequencyOption(false), generateMazegakiVariants: new Freqs.Options.GenerateMazegakiVariantsOption(false), generateFusejiVariants: new Freqs.Options.GenerateFusejiVariantsOption(false));
             FreqUtils.FreqDicts[key] = freq;
         }
