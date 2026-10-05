@@ -228,15 +228,20 @@ internal sealed class PopupContentGenerator : Decorator
         {
             DictOptions jmdictOptions = result.Dict.Options;
             Debug.Assert(jmdictOptions.ROrthographyInfo is not null);
-            showROrthographyInfo = jmdictOptions.ROrthographyInfo.Value;
+            showROrthographyInfo = jmdictOptions.ROrthographyInfo.Value && jmdictLookupResult.ReadingsOrthographyInfoList is not null;
         }
 
-        string readingsText = showROrthographyInfo
-                              // ReSharper disable once NullableWarningSuppressionIsUsed
-                              && jmdictLookupResult!.ReadingsOrthographyInfoList is not null
-
-            ? LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, jmdictLookupResult.ReadingsOrthographyInfoList)
-            : string.Join('、', result.Readings);
+        string readingsText;
+        if (showROrthographyInfo)
+        {
+            Debug.Assert(jmdictLookupResult is not null);
+            Debug.Assert(jmdictLookupResult.ReadingsOrthographyInfoList is not null);
+            readingsText = LookupResultUtils.ElementWithOrthographyInfoToText(result.Readings, jmdictLookupResult.ReadingsOrthographyInfoList);
+        }
+        else
+        {
+            readingsText = string.Join('、', result.Readings);
+        }
 
         PopupWindow ownerWindow = lookupDisplayResult.OwnerWindow;
         if (ownerWindow.MiningMode)
@@ -253,7 +258,7 @@ internal sealed class PopupContentGenerator : Decorator
                 Debug.Assert(result.PitchPositions is not null);
 
                 PitchAccentDecorator pitchAccentDecorator = new(readingTextBox, result.Readings,
-                    readingTextBox.Text.Split('、'),
+                    showROrthographyInfo ? readingsText.Split('、') : result.Readings,
                     result.PitchPositions);
 
                 _ = top.Children.Add(pitchAccentDecorator);
@@ -281,7 +286,7 @@ internal sealed class PopupContentGenerator : Decorator
                 Debug.Assert(result.PitchPositions is not null);
 
                 PitchAccentDecorator pitchAccentDecorator = new(readingTextBlock, result.Readings,
-                    readingTextBlock.Text.Split('、'),
+                    showROrthographyInfo ? readingsText.Split('、') : result.Readings,
                     result.PitchPositions);
 
                 _ = top.Children.Add(pitchAccentDecorator);
@@ -614,10 +619,10 @@ internal sealed class PopupContentGenerator : Decorator
 
         if (kanjiLookupResult.KanjiGrade is not byte.MaxValue)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Grade: {LookupResultUtils.GradeToText(kanjiLookupResult.KanjiGrade)}");
+            _ = sb.Append(sb.Length > 0 ? "\nGrade: " : "Grade: ").Append(LookupResultUtils.GradeToText(kanjiLookupResult.KanjiGrade));
         }
 
-        if (kanjiLookupResult.KanjiGrade is not 0)
+        if (kanjiLookupResult.StrokeCount is not 0)
         {
             _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Stroke count: {kanjiLookupResult.StrokeCount}");
         }
@@ -629,7 +634,7 @@ internal sealed class PopupContentGenerator : Decorator
 
         if (kanjiLookupResult.KanjiStats is not null)
         {
-            _ = sb.Append(CultureInfo.InvariantCulture, $"{(sb.Length > 0 ? "\n" : "")}Statistics:\n{kanjiLookupResult.KanjiStats}");
+            _ = sb.Append(sb.Length > 0 ? "\nStatistics:\n" : "Statistics:\n").Append(kanjiLookupResult.KanjiStats);
         }
 
         string? result = sb.Length > 0 ? sb.ToString() : null;
