@@ -22,7 +22,9 @@ internal sealed class CustomNameRecord : IDictRecord, IEquatable<CustomNameRecor
 
     public string BuildFormattedDefinition()
     {
-        return $"[{NameType}] {Reading ?? PrimarySpelling}{(ExtraInfo is not null ? $"\n{ExtraInfo}" : "")}";
+        return ExtraInfo is not null
+            ? $"[{NameType}] {Reading ?? PrimarySpelling}\n{ExtraInfo}"
+            : $"[{NameType}] {Reading ?? PrimarySpelling}";
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
