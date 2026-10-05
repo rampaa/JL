@@ -473,8 +473,7 @@ internal sealed partial class PreferencesWindow
 
     private static AnkiConfig? GetAnkiConfigFromPreferences(Selector deckNamesSelector, Selector modelNamesSelector, Panel miningPanel, TextBox tagsTextBox, JLField[] jlFieldList, MineType mineType)
     {
-        if (deckNamesSelector.SelectedItem is null ||
-            modelNamesSelector.SelectedItem is null)
+        if (deckNamesSelector.SelectedItem is null || modelNamesSelector.SelectedItem is null)
         {
             LoggerManager.Logger.Error("Save failed: Incomplete Anki config for {MineType} dictionaries", mineType);
             NotificationManager.Notify(NotificationLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed for {mineType} Anki config: Please complete the Anki configuration for {mineType} dictionaries first."));

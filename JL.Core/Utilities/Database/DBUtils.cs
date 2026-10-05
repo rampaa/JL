@@ -248,9 +248,9 @@ public static class DBUtils
             _ = reader.Read();
             return reader.GetBoolean(0);
         }
-        catch (SqliteException e)
+        catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(e, "Failed to check if record exists in DB with connection string: {ReadOnlyConnectionString}", readOnlyConnectionString);
+            LoggerManager.Logger.Error(ex, "Failed to check if record exists in DB with connection string: {ReadOnlyConnectionString}", readOnlyConnectionString);
             return false;
         }
     }

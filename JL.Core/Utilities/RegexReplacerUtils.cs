@@ -75,9 +75,9 @@ public static partial class RegexReplacerUtils
                         Regex regex = new(regexPattern, regexOptions);
                         RegexReplacements.Add(KeyValuePair.Create(regex, match.Groups["replacement"].Value));
                     }
-                    catch (ArgumentException e)
+                    catch (ArgumentException ex)
                     {
-                        LoggerManager.Logger.Error(e, "Invalid RegEx: {RegexPattern}", regexPattern);
+                        LoggerManager.Logger.Error(ex, "Invalid RegEx: {RegexPattern}", regexPattern);
                         FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Invalid RegEx: {regexPattern}. Check the logs for more details.");
                     }
                 }
