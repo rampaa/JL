@@ -41,14 +41,18 @@ public static class AudioUtils
             using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
-                string audioFormat = response.Content.Headers.ContentType?.MediaType?.Split('/').LastOrDefault("mp3") ?? "mp3";
+                string? mediaType = response.Content.Headers.ContentType?.MediaType;
+                string audioFormat = mediaType is not null
+                    ? mediaType[(mediaType.LastIndexOf('/') + 1)..]
+                    : "mp3";
+
                 if (s_mediaTypeToExtensionDict.TryGetValue(audioFormat, out string? fileSuffix))
                 {
                     audioFormat = fileSuffix;
                 }
 
                 byte[] audioData = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                return HashUtils.GetMd5String(audioData) is NetworkUtils.Jpod101NoAudioMd5Hash
+                return HashUtils.HasMd5Hash(audioData, NetworkUtils.s_jpod101NoAudioMd5HashBytes)
                     ? null
                     : new AudioResponse(AudioSourceType.Url, audioFormat, audioData);
             }

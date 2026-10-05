@@ -19,6 +19,7 @@ public static class NetworkUtils
     });
 
     internal const string Jpod101NoAudioMd5Hash = "7E2C2F954EF6051373BA916F000168DC";
+    internal static readonly byte[] s_jpod101NoAudioMd5HashBytes = Convert.FromHexString(Jpod101NoAudioMd5Hash);
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
     private static readonly Timer s_updaterTimer = new();
     private static readonly AtomicBool s_updatingJL = new(false);
