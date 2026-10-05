@@ -51,6 +51,11 @@ public static class TextUtils
     private static string RemoveInvalidUnicodeSequences(ReadOnlySpan<char> text, int index, bool keepLength)
     {
         StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get().Append(text[..index]);
+        if (keepLength)
+        {
+            _ = sb.Append(ReplacementCharacter);
+        }
+
         for (int i = index + 1; i < text.Length; i++)
         {
             char c = text[i];
