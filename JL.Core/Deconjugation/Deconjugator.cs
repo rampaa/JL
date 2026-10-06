@@ -16,7 +16,7 @@ internal static class Deconjugator
     {
         if (rule.Type is RuleType.OnlyFinal)
         {
-            if (form.LastTag.Length is not 0)
+            if (form.LastTag.Length is not 0 || !textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
             {
                 return;
             }
@@ -30,19 +30,21 @@ internal static class Deconjugator
         }
         else if (rule.Type is RuleType.NeverFinal)
         {
-            if (form.LastTag.Length is 0)
+            if (form.LastTag.Length is 0 || !textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
+            {
+                return;
+            }
+        }
+        else // if (rule.Type is RuleType.Standard)
+        {
+            // ending doesn't match
+            if (!textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
             {
                 return;
             }
         }
 
         if (textSpan.Length == rule.ConEnd.Length && rule.DecEnd.Length is 0)
-        {
-            return;
-        }
-
-        // ending doesn't match
-        if (!textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
         {
             return;
         }
@@ -80,7 +82,6 @@ internal static class Deconjugator
     private static bool DiscoveredFormsContain(ReadOnlySpan<Form> discoveredForms, ReadOnlySpan<char> stem, string decEnd, string tag, ProcessNode? parentProcessNode, string newDetail)
     {
         int targetTextLength = stem.Length + decEnd.Length;
-        int targetProperStepCount = parentProcessNode?.ProperStepCount ?? 0;
 
         foreach (ref readonly Form form in discoveredForms)
         {
@@ -90,7 +91,7 @@ internal static class Deconjugator
                 if (formText.StartsWith(stem) && formText[stem.Length..].Equals(decEnd, StringComparison.Ordinal))
                 {
                     ProcessNode? currentProcess = form.Process;
-                    if (currentProcess is not null && currentProcess.ProperStepCount == targetProperStepCount && currentProcess.Detail == newDetail && ReferenceEquals(currentProcess.Parent, parentProcessNode))
+                    if (currentProcess is not null && ReferenceEquals(currentProcess.Parent, parentProcessNode) && currentProcess.Detail == newDetail)
                     {
                         return true;
                     }
