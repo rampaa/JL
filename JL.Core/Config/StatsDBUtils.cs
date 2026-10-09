@@ -9,6 +9,8 @@ namespace JL.Core.Config;
 
 public static class StatsDBUtils
 {
+    internal static readonly Lock s_statsDBLock = new();
+
     private static readonly byte[] s_statsQuery = TextUtils.s_utf8NoBom.GetBytes(
         $"""
         SELECT {ConfigDBManager.Value}
@@ -35,11 +37,6 @@ public static class StatsDBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    private static void UpdateStats(SqliteConnection connection, Stats stats, int profileId)
-    {
-        UpdateStats(connection, JsonSerializer.Serialize(stats, JsonOptions.s_jsoWithEnumConverterAndIndentation), profileId);
-    }
-
     private static void UpdateStats(SqliteConnection connection, string stats, int profileId)
     {
         using SqliteCommand command = connection.CreateCommand();
@@ -57,6 +54,11 @@ public static class StatsDBUtils
 
     private static void UpsertTermLookupCounts(SqliteConnection connection, Dictionary<string, int> lookupStats, int profileId)
     {
+        if (lookupStats.Count is 0)
+        {
+            return;
+        }
+
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         using SqliteCommand insertOrUpdateLookupStatsCommand = connection.CreateCommand();
@@ -130,34 +132,66 @@ public static class StatsDBUtils
 
     public static void UpdateLifetimeStats(SqliteConnection connection)
     {
-        UpdateStats(connection, StatsUtils.LifetimeStats, ProfileUtils.GlobalProfileId);
-        if (CoreConfigManager.Instance.TrackTermLookupCounts)
+        lock (s_statsDBLock)
         {
-            lock (StatsUtils.TermLookupCountsLock)
+            Stats stats;
+            string statsJson;
+            lock (StatsUtils.TimeStatsLock)
             {
-                UpsertTermLookupCounts(connection, StatsUtils.LifetimeStats.TermLookupCountDict, ProfileUtils.GlobalProfileId);
-                StatsUtils.LifetimeStats.TermLookupCountDict.Clear();
+                stats = StatsUtils.LifetimeStats;
+                statsJson = JsonSerializer.Serialize(stats, JsonOptions.s_jsoWithEnumConverterAndIndentation);
+            }
+
+            UpdateStats(connection, statsJson, ProfileUtils.GlobalProfileId);
+            if (CoreConfigManager.Instance.TrackTermLookupCounts)
+            {
+                lock (StatsUtils.TermLookupCountsLock)
+                {
+                    UpsertTermLookupCounts(connection, stats.TermLookupCountDict, ProfileUtils.GlobalProfileId);
+                    stats.TermLookupCountDict.Clear();
+                }
             }
         }
     }
 
     public static void UpdateProfileLifetimeStats(SqliteConnection connection)
     {
-        UpdateStats(connection, StatsUtils.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
-        if (CoreConfigManager.Instance.TrackTermLookupCounts)
+        lock (s_statsDBLock)
         {
-            lock (StatsUtils.TermLookupCountsLock)
+            Stats stats;
+            string statsJson;
+            int profileId;
+            lock (StatsUtils.TimeStatsLock)
             {
-                UpsertTermLookupCounts(connection, StatsUtils.ProfileLifetimeStats.TermLookupCountDict, ProfileUtils.CurrentProfileId);
-                StatsUtils.ProfileLifetimeStats.TermLookupCountDict.Clear();
+                stats = StatsUtils.ProfileLifetimeStats;
+                profileId = ProfileUtils.CurrentProfileId;
+                statsJson = JsonSerializer.Serialize(stats, JsonOptions.s_jsoWithEnumConverterAndIndentation);
+            }
+
+            UpdateStats(connection, statsJson, profileId);
+            if (CoreConfigManager.Instance.TrackTermLookupCounts)
+            {
+                lock (StatsUtils.TermLookupCountsLock)
+                {
+                    UpsertTermLookupCounts(connection, stats.TermLookupCountDict, profileId);
+                    stats.TermLookupCountDict.Clear();
+                }
             }
         }
     }
 
     public static void SetStatsFromDB(SqliteConnection connection)
     {
-        StatsUtils.LifetimeStats = GetStatsFromDB(connection, ProfileUtils.GlobalProfileId);
-        StatsUtils.ProfileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId);
+        Stats lifetimeStats = GetStatsFromDB(connection, ProfileUtils.GlobalProfileId);
+        Stats profileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId);
+        lock (StatsUtils.TimeStatsLock)
+        {
+            lock (StatsUtils.TermLookupCountsLock)
+            {
+                StatsUtils.LifetimeStats = lifetimeStats;
+                StatsUtils.ProfileLifetimeStats = profileLifetimeStats;
+            }
+        }
     }
 
     internal static void ResetAllTermLookupCounts(SqliteConnection connection, int profileId)
