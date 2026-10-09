@@ -122,8 +122,8 @@ public static class MiningUtils
 
     private static string GetSourceText(LookupResult lookupResult, ReadOnlySpan<char> currentText, int currentCharPosition)
     {
-        string leadingSourcePart = currentText[..currentCharPosition].ToString().ReplaceLineEndings(HtmlLineBreak);
-        string trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..].ToString().ReplaceLineEndings(HtmlLineBreak);
+        ReadOnlySpan<char> leadingSourcePart = currentText[..currentCharPosition];
+        ReadOnlySpan<char> trailingSourcePart = currentText[(currentCharPosition + lookupResult.MatchedText.Length)..];
         return $"{leadingSourcePart}<b>{lookupResult.MatchedText}</b>{trailingSourcePart}".ReplaceLineEndings(HtmlLineBreak);
     }
 
@@ -1098,9 +1098,7 @@ public static class MiningUtils
                             _ = expressionsWithPitchAccentBuilder.Append('、');
                         }
 
-                        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
-                        _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expression, sb, pitchPosition));
-                        ObjectPoolManager.StringBuilderPool.Return(sb);
+                        _ = GetExpressionWithPitchAccent(expression, expressionsWithPitchAccentBuilder, pitchPosition);
                     }
 
                     if (addPitchAccentCategories)
