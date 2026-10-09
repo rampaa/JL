@@ -39,7 +39,7 @@ internal static class KeyGestureUtils
         Key.NumPad0, Key.NumPad1, Key.NumPad2, Key.NumPad3,Key.NumPad4,
         Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9,
 
-        Key.Multiply, Key.Add, Key.Separator, Key.Subtract, Key.Multiply,
+        Key.Multiply, Key.Add, Key.Separator, Key.Subtract,
         Key.Decimal, Key.Divide,
 
         // Media keys
@@ -69,7 +69,6 @@ internal static class KeyGestureUtils
         nameof(ConfigManager.NextDictKeyGesture),
         nameof(ConfigManager.PreviousDictKeyGesture),
         nameof(ConfigManager.ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture),
-        nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
         nameof(ConfigManager.SelectNextItemKeyGesture),
         nameof(ConfigManager.SelectPreviousItemKeyGesture),
         nameof(ConfigManager.CaptureTextFromClipboardKeyGesture),

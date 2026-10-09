@@ -46,7 +46,7 @@ public static class ExtensionMethods
                 char lowSurrogateCandidate = text[i + 1];
                 if (char.IsLowSurrogate(lowSurrogateCandidate))
                 {
-                    textBlocks.Add(char.ConvertFromUtf32(char.ConvertToUtf32(highSurrogateCandidate, lowSurrogateCandidate)));
+                    textBlocks.Add(new string(text.Slice(i, 2)));
                     ++i;
                 }
                 else

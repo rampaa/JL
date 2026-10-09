@@ -95,7 +95,7 @@ public sealed class CoreConfigManager
             if (CaptureTextFromTsukikageWebsocket)
             {
                 WebSocketUtils.TsukikageWebSocketConnection = new WebSocketConnection(TsukikageWebSocketUri);
-                WebSocketUtils.TsukikageWebSocketConnection.Connect(false);
+                WebSocketUtils.TsukikageWebSocketConnection.Connect(true);
             }
         }
         else
@@ -243,7 +243,6 @@ public sealed class CoreConfigManager
         }
         else
         {
-            AnkiConnectUtils.AnkiOptions.Clear();
             AnkiConnectUtils.AnkiOptions.Clear();
         }
 

@@ -167,7 +167,7 @@ public static class DBUtils
         _ = parameterBuilder.Append("(@1");
         for (int i = 1; i < parameterCount; i++)
         {
-            _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", {GetParameterName(i + 1)}");
+            _ = parameterBuilder.Append(", ").Append(GetParameterName(i + 1));
         }
 
         string parameter = parameterBuilder.Append(");").ToString();
