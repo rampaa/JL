@@ -116,11 +116,18 @@ internal static class SpeechSynthesisUtils
 
     public static void SetInstalledVoiceWithHighestPriority()
     {
-        List<KeyValuePair<string, AudioSource>> textToSpeechAudioSources = AudioUtils.AudioSources
-            .Where(static a => a.Value is { Active: true, Type: AudioSourceType.TextToSpeech }).ToList();
+        string? installedVoiceWithHighestPriority = null;
+        int highestPriority = int.MaxValue;
+        foreach ((string voiceName, AudioSource audioSource) in AudioUtils.AudioSources)
+        {
+            if (audioSource is { Active: true, Type: AudioSourceType.TextToSpeech }
+                && audioSource.Priority <= highestPriority)
+            {
+                installedVoiceWithHighestPriority = voiceName;
+                highestPriority = audioSource.Priority;
+            }
+        }
 
-        InstalledVoiceWithHighestPriority = textToSpeechAudioSources.Count > 0
-            ? textToSpeechAudioSources.Aggregate(static (a1, a2) => a1.Value.Priority < a2.Value.Priority ? a1 : a2).Key
-            : null;
+        InstalledVoiceWithHighestPriority = installedVoiceWithHighestPriority;
     }
 }
