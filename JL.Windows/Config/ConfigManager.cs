@@ -729,7 +729,6 @@ internal sealed class ConfigManager
             && MainWindow.Instance.MainTextBox.Text.Length > 0)
         {
             StatsUtils.StartTimeStatStopWatch();
-            StatsUtils.InitializeIdleTimeTimer();
         }
         else
         {
