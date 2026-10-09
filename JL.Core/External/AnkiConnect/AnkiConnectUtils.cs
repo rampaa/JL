@@ -225,18 +225,27 @@ public static class AnkiConnectUtils
         List<string> imageClipboardOverMonitorScreenshotFields = FindFields(JLField.ImageClipboardOverMonitorScreenshot, userFields);
         bool imageClipboardOverMonitorScreenshotFieldsExist = imageClipboardOverMonitorScreenshotFields.Count > 0;
 
+        List<string> clipboardImageFields = FindFields(JLField.Image, userFields);
+        bool clipboardImageFieldsExist = clipboardImageFields.Count > 0;
+
+        byte[]? clipboardImageBytes = clipboardImageFieldsExist || imageClipboardOverMonitorScreenshotFieldsExist
+            ? await FrontendManager.Frontend.GetImageFromClipboardAsByteArray().ConfigureAwait(false)
+            : null;
+
+        bool fallbackToScreenshot = imageClipboardOverMonitorScreenshotFieldsExist && clipboardImageBytes is null;
+
         List<string> screenshotFields = FindFields(JLField.MonitorScreenshot, userFields);
         bool screenshotFieldsExist = screenshotFields.Count > 0;
 
-        byte[]? screenshotBytes = screenshotFieldsExist || imageClipboardOverMonitorScreenshotFieldsExist
+        byte[]? screenshotBytes = screenshotFieldsExist || fallbackToScreenshot
             ? FrontendManager.Frontend.GetMonitorScreenshotAsByteArray()
             : null;
 
         if (screenshotBytes is not null)
         {
-            List<string> imageFields = screenshotFieldsExist && imageClipboardOverMonitorScreenshotFieldsExist
+            List<string> imageFields = screenshotFieldsExist && fallbackToScreenshot
                 ? [.. screenshotFields, .. imageClipboardOverMonitorScreenshotFields]
-                : imageClipboardOverMonitorScreenshotFieldsExist
+                : fallbackToScreenshot
                     ? imageClipboardOverMonitorScreenshotFields
                     : screenshotFields;
 
@@ -291,17 +300,9 @@ public static class AnkiConnectUtils
             }
         }
 
-        List<string> clipboardImageFields = FindFields(JLField.Image, userFields);
-        bool clipboardImageFieldsExist = clipboardImageFields.Count > 0;
-        bool fallbackToClipboardImage = imageClipboardOverMonitorScreenshotFieldsExist && screenshotBytes is null;
-
-        byte[]? clipboardImageBytes = clipboardImageFieldsExist || fallbackToClipboardImage
-            ? await FrontendManager.Frontend.GetImageFromClipboardAsByteArray().ConfigureAwait(false)
-            : null;
-
         if (clipboardImageBytes is not null)
         {
-            List<string> imageFields = clipboardImageFieldsExist && fallbackToClipboardImage
+            List<string> imageFields = clipboardImageFieldsExist && imageClipboardOverMonitorScreenshotFieldsExist
                 ? [.. clipboardImageFields, .. imageClipboardOverMonitorScreenshotFields]
                 : clipboardImageFieldsExist
                     ? clipboardImageFields
