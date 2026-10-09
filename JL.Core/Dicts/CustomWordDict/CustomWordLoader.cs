@@ -123,27 +123,17 @@ public static class CustomWordLoader
 
             CustomWordRecord record = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
             string normalizedSpelling = JapaneseUtils.NormalizeText(spelling);
-            if (normalizedSpelling.Length > dict.MaxSearchKeyLength)
-            {
-                dict.MaxSearchKeyLength = normalizedSpelling.Length;
-            }
-
             if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, contents, dict) && i is 0 && readings is not null)
             {
                 foreach (string reading in readings)
                 {
                     string normalizedReading = JapaneseUtils.NormalizeText(reading);
-                    if (normalizedReading.Length > dict.MaxSearchKeyLength)
-                    {
-                        dict.MaxSearchKeyLength = normalizedReading.Length;
-                    }
-
                     _ = DictUtils.AddRecordToDictionary(normalizedReading, record, contents, dict);
                 }
             }
         }
 
-        if (DictUtils.MaxSearchKeyLength > dict.MaxSearchKeyLength)
+        if (dict.MaxSearchKeyLength > DictUtils.MaxSearchKeyLength)
         {
             DictUtils.MaxSearchKeyLength = dict.MaxSearchKeyLength;
         }

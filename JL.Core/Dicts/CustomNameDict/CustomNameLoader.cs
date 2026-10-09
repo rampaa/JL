@@ -70,16 +70,10 @@ public static class CustomNameLoader
         Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
         CustomNameRecord record = new(spelling, reading, nameType, extraInfo, imageInfo);
         string normalizedSpelling = JapaneseUtils.NormalizeText(spelling);
-        if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, contents, dict))
+        _ = DictUtils.AddRecordToDictionary(normalizedSpelling, record, contents, dict);
+        if (dict.MaxSearchKeyLength > DictUtils.MaxSearchKeyLength)
         {
-            if (normalizedSpelling.Length > dict.MaxSearchKeyLength)
-            {
-                dict.MaxSearchKeyLength = normalizedSpelling.Length;
-                if (DictUtils.MaxSearchKeyLength > normalizedSpelling.Length)
-                {
-                    DictUtils.MaxSearchKeyLength = normalizedSpelling.Length;
-                }
-            }
+            DictUtils.MaxSearchKeyLength = dict.MaxSearchKeyLength;
         }
     }
 }
