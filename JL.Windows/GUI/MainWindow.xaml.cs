@@ -873,7 +873,7 @@ internal sealed partial class MainWindow : IDisposable
         using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
             ConfigManager.Instance.SaveBeforeClosing(connection);
-            StatsUtils.IncrementStat(StatType.Time, StatsUtils.TimeStatStopWatch.ElapsedTicks);
+            StatsUtils.UpdateTimeStats(restartStopWatch: false);
             StatsDBUtils.UpdateLifetimeStats(connection);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
         }
@@ -1295,10 +1295,7 @@ internal sealed partial class MainWindow : IDisposable
         WebSocketUtils.ConnectToAllWebSockets();
         if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
         {
-            if (!StatsUtils.TimeStatStopWatch.IsRunning)
-            {
-                StatsUtils.StartTimeStatStopWatch();
-            }
+            StatsUtils.StartTimeStatStopWatch(true);
         }
     }
 
@@ -1310,10 +1307,7 @@ internal sealed partial class MainWindow : IDisposable
         WebSocketUtils.ConnectToTsukikageWebSocket();
         if (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || WindowState is not WindowState.Minimized)
         {
-            if (!StatsUtils.TimeStatStopWatch.IsRunning)
-            {
-                StatsUtils.StartTimeStatStopWatch();
-            }
+            StatsUtils.StartTimeStatStopWatch(true);
         }
     }
 

@@ -256,9 +256,7 @@ internal static class WindowsUtils
 
     public static void ShowStatsWindow()
     {
-        StatsUtils.IncrementStat(StatType.Time, StatsUtils.TimeStatStopWatch.ElapsedTicks);
-        StatsUtils.TimeStatStopWatch.Reset();
-        StatsUtils.StopIdleItemTimer();
+        StatsUtils.UpdateTimeStats(restartStopWatch: false);
 
         StatsWindow statsWindow = StatsWindow.Instance;
         statsWindow.Owner = MainWindow.Instance;

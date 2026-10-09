@@ -707,18 +707,27 @@ internal sealed partial class PreferencesWindow
         // ReSharper disable once UseAwaitUsing
         using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
+            StatsUtils.UpdateTimeStats(restartStopWatch: false);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
 
             BacklogUtils.StopBacklogTimer();
             await BacklogUtils.WriteBacklog().ConfigureAwait(true);
             BacklogUtils.ClearBacklog();
 
-            ProfileUtils.CurrentProfileName = selectedProfileName;
-            ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
-            ProfileUtils.CurrentProfileSessionStartTime = DateTime.Now;
+            int selectedProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
+            Stats selectedProfileStats = StatsDBUtils.GetStatsFromDB(connection, selectedProfileId);
+            lock (StatsUtils.TimeStatsLock)
+            {
+                lock (StatsUtils.TermLookupCountsLock)
+                {
+                    ProfileUtils.CurrentProfileName = selectedProfileName;
+                    ProfileUtils.CurrentProfileId = selectedProfileId;
+                    ProfileUtils.CurrentProfileSessionStartTime = DateTime.Now;
+                    StatsUtils.ProfileLifetimeStats = selectedProfileStats;
+                }
+            }
+
             ProfileDBUtils.UpdateCurrentProfile(connection);
-            StatsUtils.ProfileLifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.CurrentProfileId);
-            StatsDBUtils.UpdateProfileLifetimeStats(connection);
         }
 
         ConfigManager configManager = ConfigManager.Instance;
