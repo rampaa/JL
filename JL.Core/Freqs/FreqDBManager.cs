@@ -374,7 +374,7 @@ internal static class FreqDBManager
         freq.Contents = contents.ToFrozenDictionary(static entry => entry.Key, static IList<FrequencyRecord> (entry) => entry.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    public static async Task ImportYomichanFreqFromDisk(Freq freq)
+    public static async Task ImportYomichanFreqFromDisk(Freq freq, string dbPath)
     {
         string fullPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
         if (!Directory.Exists(fullPath))
@@ -416,7 +416,7 @@ internal static class FreqDBManager
         long rowId = 1;
 
         // ReSharper disable once UseAwaitUsing
-        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
         DBUtils.ConfigureForBulkWrite(connection);

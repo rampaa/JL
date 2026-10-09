@@ -205,12 +205,12 @@ internal static class JmdictDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static async Task ImportFromDisk(Dict dict)
+    public static async Task ImportFromDisk(Dict dict, string dbPath, Dictionary<string, string> entities)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            DictUtils.JmdictEntities.Clear();
+            entities.Clear();
 
             ProperNameEntriesOption? properNamesEntriesOption = dict.Options.ProperNameEntries;
             Debug.Assert(properNamesEntriesOption is not null);
@@ -248,7 +248,7 @@ internal static class JmdictDBManager
             long rowId = 1;
 
             // ReSharper disable once UseAwaitUsing
-            using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+            using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
             Debug.Assert(connection is not null);
 
             DBUtils.ConfigureForBulkWrite(connection);
@@ -275,7 +275,7 @@ internal static class JmdictDBManager
             _ = availableBatches.Writer.TryWrite(new Dictionary<string, JmdictRecord>[ImportRecordBatchSize]);
             _ = availableBatches.Writer.TryWrite(new Dictionary<string, JmdictRecord>[ImportRecordBatchSize]);
 
-            Task producer = Task.Run(() => CreateImportRecordBatches(fullPath, includeProperNames, availableBatches.Reader, readyBatches.Writer));
+            Task producer = Task.Run(() => CreateImportRecordBatches(fullPath, includeProperNames, availableBatches.Reader, readyBatches.Writer, entities));
             try
             {
                 await foreach ((Dictionary<string, JmdictRecord>[] batch, int count) in readyBatches.Reader.ReadAllAsync().ConfigureAwait(false))
@@ -360,7 +360,7 @@ internal static class JmdictDBManager
             if (rowId > 1 && (generateFusejiVariants || generateMazegaki))
             {
                 DBUtils.FlushWalLog(connection);
-                await InsertVariantSearchKeys(fullPath, connection, recordInserter, rowId, includeProperNames, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration).ConfigureAwait(false);
+                await InsertVariantSearchKeys(fullPath, connection, recordInserter, rowId, includeProperNames, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration, entities).ConfigureAwait(false);
             }
 
             if (rowId > 1)
@@ -413,7 +413,7 @@ internal static class JmdictDBManager
                 {
                     try
                     {
-                        await ImportFromDisk(dict).ConfigureAwait(false);
+                        await ImportFromDisk(dict, dict.DBPath, entities).ConfigureAwait(false);
                         await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
                         await JmdictWordClassUtils.Load().ConfigureAwait(false);
                     }
@@ -435,7 +435,7 @@ internal static class JmdictDBManager
         }
     }
 
-    private static async Task CreateImportRecordBatches(string fullPath, bool includeProperNames, ChannelReader<Dictionary<string, JmdictRecord>[]> availableBatches, ChannelWriter<(Dictionary<string, JmdictRecord>[] Records, int Count)> readyBatches)
+    private static async Task CreateImportRecordBatches(string fullPath, bool includeProperNames, ChannelReader<Dictionary<string, JmdictRecord>[]> availableBatches, ChannelWriter<(Dictionary<string, JmdictRecord>[] Records, int Count)> readyBatches, Dictionary<string, string> entities)
     {
         List<KanjiElement> kanjiElements = [];
         List<ReadingElement> readingElements = [];
@@ -460,7 +460,7 @@ internal static class JmdictDBManager
             int count = 0;
             while (xmlReader.ReadToFollowing("entry"))
             {
-                Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(JmdictLoader.ReadEntry(xmlReader, includeProperNames, kanjiElements, readingElements, senseList, glossList, posList), includeProperNames);
+                Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(JmdictLoader.ReadEntry(xmlReader, includeProperNames, kanjiElements, readingElements, senseList, glossList, posList, entities), includeProperNames);
                 kanjiElements.Clear();
                 readingElements.Clear();
                 senseList.Clear();
@@ -490,7 +490,7 @@ internal static class JmdictDBManager
         }
     }
 
-    private static async Task InsertVariantSearchKeys(string fullPath, SqliteConnection connection, JmdictRecordInserter recordInserter, long expectedNextRowId, bool includeProperNames, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration)
+    private static async Task InsertVariantSearchKeys(string fullPath, SqliteConnection connection, JmdictRecordInserter recordInserter, long expectedNextRowId, bool includeProperNames, bool generateMazegaki, bool generateFusejiVariants, int maxTotalFuseji, int maxSearchKeyLengthForFusejiGeneration, Dictionary<string, string> entities)
     {
         int transactionRecordCount = 0;
         long rowId = 1;
@@ -521,7 +521,7 @@ internal static class JmdictDBManager
         _ = availableKeyBatches.Writer.TryWrite(([], []));
         _ = availableKeyBatches.Writer.TryWrite(([], []));
 
-        Task producer = Task.Run(() => CreateImportRecordBatches(fullPath, includeProperNames, availableBatches.Reader, readyBatches.Writer));
+        Task producer = Task.Run(() => CreateImportRecordBatches(fullPath, includeProperNames, availableBatches.Reader, readyBatches.Writer, entities));
         Task keyProducer = Task.Run(() => CreateVariantSearchKeyBatches(readyBatches.Reader, availableBatches.Writer, availableKeyBatches.Reader, readyKeyBatches.Writer, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration));
 #pragma warning disable CA1849 // Call async methods when in an async method
         SqliteTransaction transaction = connection.BeginTransaction();

@@ -113,17 +113,17 @@ internal static class JmnedictDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static async Task ImportFromDisk(Dict dict)
+    public static async Task ImportFromDisk(Dict dict, string dbPath, Dictionary<string, string> entities)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            DictUtils.JmnedictEntities.Clear();
+            entities.Clear();
 
             int rowId = 1;
 
             // ReSharper disable once UseAwaitUsing
-            using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+            using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
             Debug.Assert(connection is not null);
 
             DBUtils.ConfigureForBulkWrite(connection);
@@ -142,7 +142,7 @@ internal static class JmnedictDBManager
                 new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
             _ = availableBatches.Writer.TryWrite(new JmnedictImportEntryBatch());
             _ = availableBatches.Writer.TryWrite(new JmnedictImportEntryBatch());
-            Task producer = Task.Run(() => CreateImportEntryBatches(fullPath, availableBatches.Reader, readyBatches.Writer));
+            Task producer = Task.Run(() => CreateImportEntryBatches(fullPath, availableBatches.Reader, readyBatches.Writer, entities));
             try
             {
                 await foreach (JmnedictImportEntryBatch batch in readyBatches.Reader.ReadAllAsync().ConfigureAwait(false))
@@ -265,7 +265,7 @@ internal static class JmnedictDBManager
                 {
                     try
                     {
-                        await ImportFromDisk(dict).ConfigureAwait(false);
+                        await ImportFromDisk(dict, dict.DBPath, entities).ConfigureAwait(false);
                     }
                     finally
                     {
@@ -344,7 +344,7 @@ internal static class JmnedictDBManager
         return recordsInserted;
     }
 
-    private static async Task CreateImportEntryBatches(string fullPath, ChannelReader<JmnedictImportEntryBatch> availableBatches, ChannelWriter<JmnedictImportEntryBatch> readyBatches)
+    private static async Task CreateImportEntryBatches(string fullPath, ChannelReader<JmnedictImportEntryBatch> availableBatches, ChannelWriter<JmnedictImportEntryBatch> readyBatches, Dictionary<string, string> entities)
     {
         List<string> rebList = [];
         List<string> nameTypeList = [];
@@ -368,7 +368,7 @@ internal static class JmnedictDBManager
             {
                 int i = batch.EntryCount;
                 JmnedictEntry entry = JmnedictLoader.ReadEntry(xmlTextReader, batch.SpellingLists[i], rebList,
-                    batch.TranslationLists[i], nameTypeList, transDetList);
+                    batch.TranslationLists[i], nameTypeList, transDetList, entities);
                 batch.EntryIds[i] = entry.Id;
                 batch.ReadingArrays[i] = entry.RebArray;
                 ++batch.EntryCount;

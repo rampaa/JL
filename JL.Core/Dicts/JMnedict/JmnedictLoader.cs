@@ -14,12 +14,12 @@ internal static class JmnedictLoader
     // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055, 2023/12/16: 609238, 2024/02/22: 609265
     public const int Size = 620000;
 
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict dict, Dictionary<string, string> entities)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            DictUtils.JmnedictEntities.Clear();
+            entities.Clear();
 
             Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
             Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
@@ -44,7 +44,7 @@ internal static class JmnedictLoader
 
                 while (xmlTextReader.ReadToFollowing("entry"))
                 {
-                    JmnedictEntry entry = ReadEntry(xmlTextReader, kebList, rebList, translationList, nameTypeList, transDetList);
+                    JmnedictEntry entry = ReadEntry(xmlTextReader, kebList, rebList, translationList, nameTypeList, transDetList, entities);
                     Dictionary<string, JmnedictRecord> recordDictionary = GetRecordsFromEntry(in entry);
                     foreach ((string key, JmnedictRecord jmnedictRecord) in recordDictionary)
                     {
@@ -94,7 +94,7 @@ internal static class JmnedictLoader
                 {
                     try
                     {
-                        await Load(dict).ConfigureAwait(false);
+                        await Load(dict, entities).ConfigureAwait(false);
                     }
                     finally
                     {
@@ -114,7 +114,7 @@ internal static class JmnedictLoader
         }
     }
 
-    internal static JmnedictEntry ReadEntry(XmlTextReader xmlReader, List<string> kebList, List<string> rebList, List<Translation> translationList, List<string> nameTypeList, List<string> transDetList)
+    internal static JmnedictEntry ReadEntry(XmlTextReader xmlReader, List<string> kebList, List<string> rebList, List<Translation> translationList, List<string> nameTypeList, List<string> transDetList, Dictionary<string, string> entities)
     {
         int id = 0;
 
@@ -143,7 +143,7 @@ internal static class JmnedictLoader
                         break;
 
                     case "trans":
-                        translationList.Add(ReadTrans(xmlReader, nameTypeList, transDetList));
+                        translationList.Add(ReadTrans(xmlReader, nameTypeList, transDetList, entities));
                         break;
 
                     // case "re_pri":
@@ -174,7 +174,7 @@ internal static class JmnedictLoader
         return xmlReader.ReadElementContentAsString();
     }
 
-    private static Translation ReadTrans(XmlTextReader xmlReader, List<string> nameTypeList, List<string> transDetList)
+    private static Translation ReadTrans(XmlTextReader xmlReader, List<string> nameTypeList, List<string> transDetList, Dictionary<string, string> entities)
     {
         _ = xmlReader.Read();
         while (!xmlReader.EOF)
@@ -189,7 +189,7 @@ internal static class JmnedictLoader
                 switch (xmlReader.Name)
                 {
                     case "name_type":
-                        nameTypeList.Add(ReadEntity(xmlReader));
+                        nameTypeList.Add(ReadEntity(xmlReader, entities));
                         break;
 
                     case "trans_det":
@@ -218,17 +218,18 @@ internal static class JmnedictLoader
         return translation;
     }
 
-    private static string ReadEntity(XmlTextReader xmlReader)
+    private static string ReadEntity(XmlTextReader xmlReader, Dictionary<string, string> entities)
     {
         _ = xmlReader.Read();
         string entityName = xmlReader.Name;
 
-        if (!DictUtils.JmnedictEntities.ContainsKey(entityName))
+        ref string? description = ref CollectionsMarshal.GetValueRefOrAddDefault(entities, entityName, out bool exists);
+        if (!exists)
         {
             xmlReader.ResolveEntity();
             _ = xmlReader.Read();
 
-            DictUtils.JmnedictEntities.Add(entityName, xmlReader.Value);
+            description = xmlReader.Value;
         }
 
         _ = xmlReader.Read();

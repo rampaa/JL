@@ -89,7 +89,7 @@ internal static class YomichanKanjiDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static async Task ImportFromDisk(Dict dict)
+    public static async Task ImportFromDisk(Dict dict, string dbPath)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (!Directory.Exists(fullPath))
@@ -102,7 +102,7 @@ internal static class YomichanKanjiDBManager
         int rowId = 1;
 
         // ReSharper disable once UseAwaitUsing
-        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
         DBUtils.ConfigureForBulkWrite(connection);

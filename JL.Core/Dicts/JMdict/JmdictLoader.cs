@@ -111,12 +111,12 @@ internal static class JmdictLoader
         new("yid", "Yiddish")
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    public static async Task Load(Dict dict)
+    public static async Task Load(Dict dict, Dictionary<string, string> entities)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            DictUtils.JmdictEntities.Clear();
+            entities.Clear();
 
             Debug.Assert(dict.Contents is Dictionary<string, IList<IDictRecord>>);
             Dictionary<string, IList<IDictRecord>> contents = (Dictionary<string, IList<IDictRecord>>)dict.Contents;
@@ -168,7 +168,7 @@ internal static class JmdictLoader
                 List<string> posList = [];
                 while (xmlReader.ReadToFollowing("entry"))
                 {
-                    Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(ReadEntry(xmlReader, includeProperNames, kanjiElements, readingElements, senseList, glossList, posList), includeProperNames);
+                    Dictionary<string, JmdictRecord>? recordDictionary = JmdictRecordBuilder.GetRecordsFromEntry(ReadEntry(xmlReader, includeProperNames, kanjiElements, readingElements, senseList, glossList, posList, entities), includeProperNames);
                     kanjiElements.Clear();
                     readingElements.Clear();
                     senseList.Clear();
@@ -258,7 +258,7 @@ internal static class JmdictLoader
                 {
                     try
                     {
-                        await Load(dict).ConfigureAwait(false);
+                        await Load(dict, entities).ConfigureAwait(false);
                         await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
                         await JmdictWordClassUtils.Load().ConfigureAwait(false);
                     }
@@ -280,7 +280,7 @@ internal static class JmdictLoader
         }
     }
 
-    public static JmdictEntry ReadEntry(XmlTextReader xmlReader, bool includeProperNames, List<KanjiElement> kanjiElements, List<ReadingElement> readingElements, List<Sense> senseList, List<string> glossList, List<string> posList)
+    public static JmdictEntry ReadEntry(XmlTextReader xmlReader, bool includeProperNames, List<KanjiElement> kanjiElements, List<ReadingElement> readingElements, List<Sense> senseList, List<string> glossList, List<string> posList, Dictionary<string, string> entities)
     {
         int id = 0;
         List<LoanwordSource>? lSourceList = null;
@@ -315,19 +315,19 @@ internal static class JmdictLoader
 
                     case "k_ele":
                     {
-                        kanjiElements.Add(ReadKanjiElement(xmlReader));
+                        kanjiElements.Add(ReadKanjiElement(xmlReader, entities));
                         break;
                     }
 
                     case "r_ele":
                     {
-                        readingElements.Add(ReadReadingElement(xmlReader));
+                        readingElements.Add(ReadReadingElement(xmlReader, entities));
                         break;
                     }
 
                     case "sense":
                     {
-                        senseList.Add(ReadSense(xmlReader, glossList, posList));
+                        senseList.Add(ReadSense(xmlReader, glossList, posList, entities));
                         break;
                     }
 
@@ -412,7 +412,7 @@ internal static class JmdictLoader
         return new JmdictEntry(id, kanjiElements, readingElements, senseList, lSourceList?.ToArray(), infoList?.ToArray());
     }
 
-    private static KanjiElement ReadKanjiElement(XmlTextReader xmlReader)
+    private static KanjiElement ReadKanjiElement(XmlTextReader xmlReader, Dictionary<string, string> entities)
     {
         string keb = "";
         List<string>? keInfList = null;
@@ -436,7 +436,7 @@ internal static class JmdictLoader
 
                     case "ke_inf":
                         keInfList ??= [];
-                        keInfList.Add(ReadEntity(xmlReader));
+                        keInfList.Add(ReadEntity(xmlReader, entities));
                         break;
 
                     // case "ke_pri":
@@ -455,7 +455,7 @@ internal static class JmdictLoader
         return new KanjiElement(keb, keInfList?.ToArray());
     }
 
-    private static ReadingElement ReadReadingElement(XmlTextReader xmlReader)
+    private static ReadingElement ReadReadingElement(XmlTextReader xmlReader, Dictionary<string, string> entities)
     {
         string reb = "";
         List<string>? reRestrList = null;
@@ -485,7 +485,7 @@ internal static class JmdictLoader
 
                     case "re_inf":
                         reInfList ??= [];
-                        reInfList.Add(ReadEntity(xmlReader));
+                        reInfList.Add(ReadEntity(xmlReader, entities));
                         break;
 
                     // case "re_nokanji":
@@ -505,7 +505,7 @@ internal static class JmdictLoader
         return new ReadingElement(reb, reRestrList, reInfList?.ToArray());
     }
 
-    private static Sense ReadSense(XmlTextReader xmlReader, List<string> glossList, List<string> posList)
+    private static Sense ReadSense(XmlTextReader xmlReader, List<string> glossList, List<string> posList, Dictionary<string, string> entities)
     {
         string? sInf = null;
         List<string>? stagKList = null;
@@ -544,21 +544,21 @@ internal static class JmdictLoader
 
                     case "pos":
                     {
-                        posList.Add(ReadEntity(xmlReader));
+                        posList.Add(ReadEntity(xmlReader, entities));
                         break;
                     }
 
                     case "field":
                     {
                         fieldList ??= [];
-                        fieldList.Add(ReadEntity(xmlReader));
+                        fieldList.Add(ReadEntity(xmlReader, entities));
                         break;
                     }
 
                     case "misc":
                     {
                         miscList ??= [];
-                        miscList.Add(ReadEntity(xmlReader));
+                        miscList.Add(ReadEntity(xmlReader, entities));
                         break;
                     }
 
@@ -571,7 +571,7 @@ internal static class JmdictLoader
                     case "dial":
                     {
                         dialList ??= [];
-                        dialList.Add(ReadEntity(xmlReader));
+                        dialList.Add(ReadEntity(xmlReader, entities));
                         break;
                     }
 
@@ -631,18 +631,19 @@ internal static class JmdictLoader
         return sense;
     }
 
-    private static string ReadEntity(XmlTextReader xmlReader)
+    private static string ReadEntity(XmlTextReader xmlReader, Dictionary<string, string> entities)
     {
         _ = xmlReader.Read();
 
         string entityName = xmlReader.Name.GetPooledString();
 
-        if (!DictUtils.JmdictEntities.ContainsKey(entityName))
+        ref string? description = ref CollectionsMarshal.GetValueRefOrAddDefault(entities, entityName, out bool exists);
+        if (!exists)
         {
             xmlReader.ResolveEntity();
             _ = xmlReader.Read();
 
-            DictUtils.JmdictEntities.Add(entityName, xmlReader.Value.GetPooledString());
+            description = xmlReader.Value.GetPooledString();
         }
 
         _ = xmlReader.Read();

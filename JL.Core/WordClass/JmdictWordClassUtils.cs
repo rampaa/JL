@@ -417,12 +417,12 @@ public static class JmdictWordClassUtils
                 {
                     if (useDB)
                     {
-                        await JmdictDBManager.ImportFromDisk(jmdictDict).ConfigureAwait(false);
+                        await JmdictDBManager.ImportFromDisk(jmdictDict, jmdictDict.DBPath, DictUtils.JmdictEntities).ConfigureAwait(false);
                     }
                     else
                     {
                         jmdictDict.Contents = new Dictionary<string, IList<IDictRecord>>(jmdictDict.Size > 0 ? jmdictDict.Size : JmdictLoader.Size, StringComparer.Ordinal);
-                        await JmdictLoader.Load(jmdictDict).ConfigureAwait(false);
+                        await JmdictLoader.Load(jmdictDict, DictUtils.JmdictEntities).ConfigureAwait(false);
                     }
 
                     await Serialize().ConfigureAwait(false);

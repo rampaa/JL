@@ -161,7 +161,7 @@ internal static class EpwingNazekaDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static async Task ImportFromDisk(Dict dict)
+    public static async Task ImportFromDisk(Dict dict, string dbPath)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (!File.Exists(fullPath))
@@ -180,11 +180,11 @@ internal static class EpwingNazekaDBManager
                 await fileStream.ReadExactlyAsync(json).ConfigureAwait(false);
             }
 
-            await ImportFromJson(dict, json, fileStream).ConfigureAwait(false);
+            await ImportFromJson(dict, dbPath, json, fileStream).ConfigureAwait(false);
         }
     }
 
-    private static async Task ImportFromJson(Dict dict, byte[]? json, FileStream fileStream)
+    private static async Task ImportFromJson(Dict dict, string dbPath, byte[]? json, FileStream fileStream)
     {
         bool nonKanjiDict = dict.Type is not DictType.NonspecificKanjiNazeka;
         bool nonNameDict = dict.Type is not DictType.NonspecificNameNazeka;
@@ -222,7 +222,7 @@ internal static class EpwingNazekaDBManager
         }
 
         // ReSharper disable once UseAwaitUsing
-        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+        using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
         DBUtils.ConfigureForBulkWrite(connection);
@@ -382,7 +382,7 @@ internal static class EpwingNazekaDBManager
         }
         else
         {
-            DBUtils.DeleteDB(dict.DBPath);
+            DBUtils.DeleteDB(dbPath);
             dict.Size = 0;
             dict.MaxSearchKeyLength = 0;
         }

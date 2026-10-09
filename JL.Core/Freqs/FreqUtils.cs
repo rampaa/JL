@@ -386,7 +386,7 @@ public static class FreqUtils
                     FreqDBManager.CreateDB(freq.DBPath);
                     if (!hasContent)
                     {
-                        await FreqDBManager.ImportYomichanFreqFromDisk(freq).ConfigureAwait(false);
+                        await FreqDBManager.ImportYomichanFreqFromDisk(freq, freq.DBPath).ConfigureAwait(false);
                     }
                     else
                     {

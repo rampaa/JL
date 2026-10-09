@@ -89,13 +89,13 @@ internal static class KanjidicDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static async Task ImportFromDisk(Dict dict)
+    public static async Task ImportFromDisk(Dict dict, string dbPath)
     {
         string fullPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         if (File.Exists(fullPath))
         {
             // ReSharper disable once UseAwaitUsing
-            using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
+            using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
             Debug.Assert(connection is not null);
 
             DBUtils.ConfigureForBulkWrite(connection);
@@ -201,7 +201,7 @@ internal static class KanjidicDBManager
                 {
                     try
                     {
-                        await ImportFromDisk(dict).ConfigureAwait(false);
+                        await ImportFromDisk(dict, dict.DBPath).ConfigureAwait(false);
                     }
                     finally
                     {

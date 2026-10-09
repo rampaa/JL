@@ -31,7 +31,7 @@ public static class DictUtils
 {
     internal delegate Task Load(Dict dict);
 
-    internal delegate Task ImportFromDisk(Dict dict);
+    internal delegate Task ImportFromDisk(Dict dict, string dbPath);
     private delegate void ImportFromMemory(Dict dict);
     private delegate void LoadFromDB(Dict dict);
     private delegate void HandleLeftOvers(string fullPath);
@@ -231,7 +231,7 @@ public static class DictUtils
 
     public static readonly Dictionary<DictType, Dict> SingleDictTypeDicts = new(8);
 
-    public static readonly Dictionary<string, string> JmdictEntities = new(254, StringComparer.Ordinal)
+    public static Dictionary<string, string> JmdictEntities { get; internal set; } = new(254, StringComparer.Ordinal)
     {
         // ReSharper disable BadExpressionBracesLineBreaks
         { "bra", "Brazilian" },
@@ -508,7 +508,7 @@ public static class DictUtils
         // ReSharper restore BadExpressionBracesLineBreaks
     };
 
-    public static readonly Dictionary<string, string> JmnedictEntities = new(25, StringComparer.Ordinal)
+    public static Dictionary<string, string> JmnedictEntities { get; internal set; } = new(25, StringComparer.Ordinal)
     {
         #pragma warning disable format
         // ReSharper disable BadExpressionBracesLineBreaks
@@ -629,15 +629,15 @@ public static class DictUtils
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        LoadDict(dict, JmdictLoader.Load, JmdictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
-                            JmdictDBManager.CreateDB, JmdictDBManager.ImportFromDisk, JmdictDBManager.ImportFromMemory,
+                        LoadDict(dict, static dict => JmdictLoader.Load(dict, JmdictEntities), JmdictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
+                            JmdictDBManager.CreateDB, static (dict, dbPath) => JmdictDBManager.ImportFromDisk(dict, dbPath, JmdictEntities), JmdictDBManager.ImportFromMemory,
                             null, JmdictDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, JmdictLoader.Size, false, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
 
                     case DictType.JMnedict:
-                        LoadDict(dict, JmnedictLoader.Load, JmnedictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
-                            JmnedictDBManager.CreateDB, JmnedictDBManager.ImportFromDisk, JmnedictDBManager.ImportFromMemory,
+                        LoadDict(dict, static dict => JmnedictLoader.Load(dict, JmnedictEntities), JmnedictDBManager.Version, ResourceUpdater.HandleLeftOverFiles,
+                            JmnedictDBManager.CreateDB, static (dict, dbPath) => JmnedictDBManager.ImportFromDisk(dict, dbPath, JmnedictEntities), JmnedictDBManager.ImportFromMemory,
                             null, JmnedictDBManager.GetMaxSearchKeyLength, tasks, dictsToBeRemoved, JmnedictLoader.Size, false, true, ref rebuildingAnyDB, ref dictCleared);
 
                         break;
@@ -899,7 +899,7 @@ public static class DictUtils
                     createDB(dict.DBPath);
                     if (!hasContent)
                     {
-                        await importFromDisk(dict).ConfigureAwait(false);
+                        await importFromDisk(dict, dict.DBPath).ConfigureAwait(false);
                     }
                     else
                     {
