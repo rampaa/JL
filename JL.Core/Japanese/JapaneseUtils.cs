@@ -893,13 +893,18 @@ public static partial class JapaneseUtils
             return text[..^1];
         }
 
-        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get().Append(text[..index]);
-        foreach (Rune rune in text.AsSpan(index + 1).EnumerateRunes())
+        StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get().Append(text.AsSpan(0, index));
+        ReadOnlySpan<char> remainingText = text.AsSpan(index + 1);
+        int currentIndex = 0;
+        foreach (Rune rune in remainingText.EnumerateRunes())
         {
+            int runeLength = rune.Utf16SequenceLength;
             if (Rune.IsLetterOrDigit(rune))
             {
-                _ = sb.Append(rune);
+                _ = sb.Append(remainingText.Slice(currentIndex, runeLength));
             }
+
+            currentIndex += runeLength;
         }
 
         string textWithoutPunctuation = sb.ToString();
@@ -1022,7 +1027,9 @@ public static partial class JapaneseUtils
                 }
             }
 
-            if (index < 0)
+            if (index < 0
+                || (i is 0 && index is not 0)
+                || (i + 1 == primarySpellingSegments.Length && index + segment.Length != reading.Length))
             {
                 ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
                 return null;
@@ -1140,6 +1147,11 @@ public static partial class JapaneseUtils
                 }
             }
 
+            if (index < 0 || (i + 1 == primarySpellingSegments.Length && index + segment.Length != reading.Length))
+            {
+                return false;
+            }
+
             currentReadingPosition = index + segment.Length + 1;
         }
 
@@ -1212,7 +1224,8 @@ public static partial class JapaneseUtils
             or (>= 0x25A0 and <= 0x25FF) // Geometric Shapes (25A0-U+25FF): ◦, ◎, ○, △, ◉
             or (>= 0x2E80 and <= 0x2FDF) // CJK Radicals Supplement (2E80–2EFF), Kangxi Radicals (2F00–2FDF)
             or (>= 0x3190 and <= 0x319F) // Kanbun (3190–319F)
-            or (>= 0x31C0 and <= 0x325F) // CJK Strokes (31C0–31EF), Katakana Phonetic Extensions (31F0–31FF), Enclosed CJK Letters and Months 3220-325F
+            or (>= 0x31C0 and <= 0x31FF) // CJK Strokes (31C0–31EF), Katakana Phonetic Extensions (31F0–31FF)
+            or (>= 0x3220 and <= 0x325F) // Enclosed CJK Letters and Months 3220-325F
             or (>= 0x3280 and <= 0x4DBF) // Enclosed CJK Letters and Months 3280-32FF, CJK Compatibility (3300–33FF), CJK Unified Ideographs Extension A (3400–4DBF)
             or (>= 0xF900 and <= 0xFAFF) // CJK Compatibility Ideographs (F900–FAFF)
             or (>= 0xFE10 and <= 0xFE1F) // Vertical Forms (FE10–FE1F)
