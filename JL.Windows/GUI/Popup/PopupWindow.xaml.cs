@@ -262,8 +262,7 @@ internal sealed partial class PopupWindow : IDisposable
     {
         Debug.Assert(_lastInteractedTextBox is not null);
 
-        PresentationSource? lastInteractedTextBoxSource = PresentationSource.FromVisual(_lastInteractedTextBox);
-        Debug.Assert(lastInteractedTextBoxSource is not null);
+        Debug.Assert(PresentationSource.FromVisual(_lastInteractedTextBox) is not null);
 
         EditingCommands.Backspace.Execute(null, _lastInteractedTextBox);
     }
@@ -999,10 +998,9 @@ internal sealed partial class PopupWindow : IDisposable
         ReadOnlyCollection<object> items = generator.Items;
         for (int i = 0; i < items.Count; i++)
         {
-            LookupDisplayResult item = (LookupDisplayResult)items[i];
-            if (generator.ContainerFromItem(item) is ListViewItem)
+            if (generator.ContainerFromIndex(i) is ListViewItem)
             {
-                return item.Index;
+                return ((LookupDisplayResult)items[i]).Index;
             }
         }
         return 0;
@@ -1229,30 +1227,10 @@ internal sealed partial class PopupWindow : IDisposable
             return Task.CompletedTask;
         }
 
-        ListViewItem? popupListViewItem = null;
-        int listViewItemIndex;
-        if (useSelectedListViewItemIfItExists && PopupListView.SelectedItem is not null)
-        {
-            popupListViewItem = (ListViewItem?)PopupListView.ItemContainerGenerator.ContainerFromItem(PopupListView.SelectedItem);
-            Debug.Assert(popupListViewItem is not null);
-
-            listViewItemIndex = ((LookupDisplayResult)PopupListView.SelectedItem).Index;
-        }
-        else
-        {
-            listViewItemIndex = _listViewItemIndex;
-
-            ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
-            ReadOnlyCollection<object> items = generator.Items;
-            foreach (LookupDisplayResult item in items.Cast<LookupDisplayResult>())
-            {
-                if (item.Index == listViewItemIndex)
-                {
-                    popupListViewItem = (ListViewItem)generator.ContainerFromItem(item);
-                    break;
-                }
-            }
-        }
+        LookupDisplayResult? selectedItem = useSelectedListViewItemIfItExists
+            ? (LookupDisplayResult?)PopupListView.SelectedItem
+            : null;
+        int listViewItemIndex = selectedItem is not null ? selectedItem.Index : _listViewItemIndex;
 
         LookupResult lookupResult = LastLookupResults[listViewItemIndex];
         if (lookupResult.Readings is null || lookupResult.Readings.Length is 1)
@@ -1263,6 +1241,10 @@ internal sealed partial class PopupWindow : IDisposable
         Point position;
         if (useSelectedListViewItemIfItExists)
         {
+            ListViewItem? popupListViewItem = selectedItem is not null
+                ? (ListViewItem?)PopupListView.ItemContainerGenerator.ContainerFromItem(selectedItem)
+                : GetListViewItem(listViewItemIndex);
+
             Debug.Assert(popupListViewItem is not null);
             Button? audioButton = popupListViewItem.GetChildByName<Button>("AudioButton");
             if (audioButton is not null)
@@ -1292,28 +1274,11 @@ internal sealed partial class PopupWindow : IDisposable
             return Task.CompletedTask;
         }
 
-        ListViewItem? popupListViewItem = null;
-        int listViewItemIndex;
-        if (useSelectedListViewItemIfItExists && PopupListView.SelectedItem is not null)
-        {
-            popupListViewItem = (ListViewItem)PopupListView.ItemContainerGenerator.ContainerFromItem(PopupListView.SelectedItem);
-            listViewItemIndex = ((LookupDisplayResult)PopupListView.SelectedItem).Index;
-        }
-        else
-        {
-            listViewItemIndex = _listViewItemIndex;
+        LookupDisplayResult? selectedItem = useSelectedListViewItemIfItExists
+            ? (LookupDisplayResult?)PopupListView.SelectedItem
+            : null;
 
-            ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
-            ReadOnlyCollection<object> items = generator.Items;
-            foreach (LookupDisplayResult item in items.Cast<LookupDisplayResult>())
-            {
-                if (item.Index == listViewItemIndex)
-                {
-                    popupListViewItem = (ListViewItem)generator.ContainerFromItem(item);
-                    break;
-                }
-            }
-        }
+        int listViewItemIndex = selectedItem is not null ? selectedItem.Index : _listViewItemIndex;
 
         LookupResult[] lookupResults = LastLookupResults;
         LookupResult lookupResult = lookupResults[listViewItemIndex];
@@ -1357,6 +1322,10 @@ internal sealed partial class PopupWindow : IDisposable
         Point position;
         if (useSelectedListViewItemIfItExists)
         {
+            ListViewItem? popupListViewItem = selectedItem is not null
+                ? (ListViewItem?)PopupListView.ItemContainerGenerator.ContainerFromItem(selectedItem)
+                : GetListViewItem(listViewItemIndex);
+
             Debug.Assert(popupListViewItem is not null);
             Button? miningButton = popupListViewItem.GetChildByName<Button>("MiningButton");
             if (miningButton is not null)
@@ -2702,6 +2671,22 @@ internal sealed partial class PopupWindow : IDisposable
         }
     }
 
+    private ListViewItem? GetListViewItem(int resultIndex)
+    {
+        ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
+        ReadOnlyCollection<object> items = generator.Items;
+        for (int i = 0; i < items.Count; i++)
+        {
+            LookupDisplayResult lookupDisplayResult = (LookupDisplayResult)items[i];
+            if (lookupDisplayResult.Index == resultIndex)
+            {
+                return (ListViewItem?)generator.ContainerFromIndex(i);
+            }
+        }
+
+        return null;
+    }
+
     public TextBox? GetDefinitionTextBox(int listViewIndex)
     {
         ItemContainerGenerator generator = PopupListView.ItemContainerGenerator;
@@ -2840,7 +2825,6 @@ internal sealed partial class PopupWindow : IDisposable
         _popupListViewScrollViewer = null;
         DictTabButtonsItemsControl.ItemsSource = null;
         PopupListView.ItemsSource = null;
-        _lastInteractedTextBox = null;
         _dictTypeButtons.Clear();
         LastLookupResults = [];
         _dictsWithResults.Clear();
