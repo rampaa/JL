@@ -59,7 +59,7 @@ public static class AnkiConfigUtils
             }
 
             Debug.Assert(s_ankiConfigDict is not null);
-            AtomicBool firstFieldChanged = new(false);
+            AtomicBool fieldsChanged = new(false);
             await Parallel.ForEachAsync(s_ankiConfigDict.Values, CancellationToken.None, async (ankiConfig, _) =>
             {
                 if (ankiConfig.Fields.Count > 0)
@@ -67,26 +67,15 @@ public static class AnkiConfigUtils
                     string[]? fields = await AnkiConnectUtils.GetFieldNames(ankiConfig.ModelName, cancellationToken).ConfigureAwait(false);
                     if (fields?.Length > 0)
                     {
-                        ReadOnlySpan<string> fieldsSpan = fields;
-                        if (ankiConfig.Fields.GetAt(0).Key != fieldsSpan[0])
+                        if (UpdateFields(ankiConfig, fields))
                         {
-                            firstFieldChanged.SetTrue();
-
-                            OrderedDictionary<string, JLField> upToDateFields = new(fieldsSpan.Length, StringComparer.Ordinal);
-                            for (int i = 0; i < fieldsSpan.Length; i++)
-                            {
-                                string fieldName = fieldsSpan[i];
-                                upToDateFields.Add(fieldName, ankiConfig.Fields.GetValueOrDefault(fieldName, JLField.Nothing));
-                            }
-
-                            ankiConfig.Fields = upToDateFields;
-                            ankiConfig.UsedJLFields = upToDateFields.Values.Where(static f => f is not JLField.Nothing).ToFrozenSet();
+                            fieldsChanged.SetTrue();
                         }
                     }
                 }
             }).ConfigureAwait(false);
 
-            if (firstFieldChanged.Read())
+            if (fieldsChanged.Read())
             {
                 await WriteAnkiConfig(s_ankiConfigDict).ConfigureAwait(false);
             }
@@ -99,5 +88,36 @@ public static class AnkiConfigUtils
             FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't read AnkiConfig. Check the logs for more details.");
             return null;
         }
+    }
+
+    internal static bool UpdateFields(AnkiConfig ankiConfig, ReadOnlySpan<string> fieldNames)
+    {
+        bool fieldsMatch = ankiConfig.Fields.Count == fieldNames.Length;
+        if (fieldsMatch)
+        {
+            for (int i = 0; i < fieldNames.Length; i++)
+            {
+                if (ankiConfig.Fields.GetAt(i).Key != fieldNames[i])
+                {
+                    fieldsMatch = false;
+                    break;
+                }
+            }
+        }
+
+        if (fieldsMatch)
+        {
+            return false;
+        }
+
+        OrderedDictionary<string, JLField> fields = new(fieldNames.Length, StringComparer.Ordinal);
+        foreach (string fieldName in fieldNames)
+        {
+            fields.Add(fieldName, ankiConfig.Fields.GetValueOrDefault(fieldName, JLField.Nothing));
+        }
+
+        ankiConfig.Fields = fields;
+        ankiConfig.UsedJLFields = fields.Values.Where(static field => field is not JLField.Nothing).ToFrozenSet();
+        return true;
     }
 }
