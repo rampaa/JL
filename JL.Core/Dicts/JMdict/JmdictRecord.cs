@@ -123,9 +123,10 @@ internal sealed class JmdictRecord : IDictRecordWithMultipleReadings, IGetFreque
         bool showExtraDefinitionInfo = options.ExtraDefinitionInfo.Value && definitionInfo is not null;
 
         Debug.Assert(options.SpellingRestrictionInfo is not null);
-        bool showSpellingRestrictionInfo = options.SpellingRestrictionInfo.Value;
-        bool showSpellingRestrictions = showSpellingRestrictionInfo && SpellingRestrictions is not null;
-        bool showReadingRestrictionss = showSpellingRestrictionInfo && ReadingRestrictions is not null;
+        bool showSpellingRestrictionInfoOptionValue = options.SpellingRestrictionInfo.Value;
+        bool showSpellingRestrictions = showSpellingRestrictionInfoOptionValue && SpellingRestrictions is not null;
+        bool showReadingRestrictionss = showSpellingRestrictionInfoOptionValue && ReadingRestrictions is not null;
+        bool showSpellingRestrictionInfo = showSpellingRestrictions || showReadingRestrictionss;
 
         Debug.Assert(options.LoanwordEtymology is not null);
         LoanwordSource[]? loanwordEtymology = LoanwordEtymology;

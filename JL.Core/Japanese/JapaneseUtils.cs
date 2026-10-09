@@ -711,14 +711,9 @@ public static partial class JapaneseUtils
                     int stringBuildersCount = stringBuilders.Count;
                     for (int j = 0; j < stringBuildersCount; j++)
                     {
-                        stringBuilders.Add(ObjectPoolManager.StringBuilderPool.Get().Append(stringBuilders[j]));
-                    }
-
-                    stringBuildersCount = stringBuilders.Count;
-                    ReadOnlySpan<StringBuilder> stringBuildersSpan = stringBuilders.AsReadOnlySpan();
-                    for (int j = 0; j < stringBuildersSpan.Length; j++)
-                    {
-                        _ = stringBuildersSpan[j].Append(j < stringBuildersCount / 2 ? vowel : alternativeVowel);
+                        StringBuilder stringBuilder = stringBuilders[j];
+                        stringBuilders.Add(ObjectPoolManager.StringBuilderPool.Get().Append(stringBuilder).Append(alternativeVowel));
+                        _ = stringBuilder.Append(vowel);
                     }
                 }
             }
@@ -945,6 +940,7 @@ public static partial class JapaneseUtils
 
         bool firstSegmentIsKana = ContainsKana(primarySpellingSegments[0]);
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
+        string? readingInHiragana = null;
         for (int i = currentReadingPosition; i < primarySpellingSegments.Length; i += 2)
         {
             ref readonly string segment = ref primarySpellingSegments[i];
@@ -959,7 +955,7 @@ public static partial class JapaneseUtils
             int index = -1;
             if (indexes.Length is 0)
             {
-                string readingInHiragana = NormalizeText(reading);
+                readingInHiragana ??= NormalizeText(reading);
                 if (readingInHiragana.Length != reading.Length)
                 {
                     ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
@@ -1006,7 +1002,7 @@ public static partial class JapaneseUtils
                     }
                     else if (i + 2 < primarySpellingSegments.Length)
                     {
-                        bool unambiguous = IsPrimarySpellingAndReadingMappingUnambiguous(primarySpellingSegments[(i + 2)..], reading[(currentIndex + segment.Length + 1)..]);
+                        bool unambiguous = IsPrimarySpellingAndReadingMappingUnambiguous(primarySpellingSegments[(i + 2)..], reading.AsSpan(currentIndex + segment.Length + 1));
                         if (unambiguous)
                         {
                             if (index >= 0)
@@ -1065,10 +1061,11 @@ public static partial class JapaneseUtils
         return primarySpellingAndReadingMapping;
     }
 
-    private static bool IsPrimarySpellingAndReadingMappingUnambiguous(ReadOnlySpan<string> primarySpellingSegments, string reading)
+    private static bool IsPrimarySpellingAndReadingMappingUnambiguous(ReadOnlySpan<string> primarySpellingSegments, ReadOnlySpan<char> reading)
     {
         bool firstSegmentIsKana = ContainsKana(primarySpellingSegments[0]);
         int currentReadingPosition = firstSegmentIsKana ? 0 : 1;
+        string? readingInHiragana = null;
         for (int i = currentReadingPosition; i < primarySpellingSegments.Length; i += 2)
         {
             ref readonly string segment = ref primarySpellingSegments[i];
@@ -1078,11 +1075,11 @@ public static partial class JapaneseUtils
                 searchLength = reading.Length - currentReadingPosition;
             }
 
-            ReadOnlySpan<int> indexes = reading.AsSpan().FindAllIndexes(currentReadingPosition, searchLength, segment);
+            ReadOnlySpan<int> indexes = reading.FindAllIndexes(currentReadingPosition, searchLength, segment);
             int index = -1;
             if (indexes.Length is 0)
             {
-                string readingInHiragana = NormalizeText(reading);
+                readingInHiragana ??= NormalizeText(reading.ToString());
                 if (readingInHiragana.Length != reading.Length)
                 {
                     return false;

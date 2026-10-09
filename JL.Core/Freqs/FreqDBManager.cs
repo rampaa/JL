@@ -197,41 +197,49 @@ internal static class FreqDBManager
             return null;
         }
 
+        try
+        {
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        using SqliteRecordReader reader = new(connection, GetQuery(terms.Count));
+            using SqliteRecordReader reader = new(connection, GetQuery(terms.Count));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        int index = 1;
-        foreach (string term in terms)
-        {
-            reader.Bind(index, term);
-            ++index;
-        }
+            int index = 1;
+            foreach (string term in terms)
+            {
+                reader.Bind(index, term);
+                ++index;
+            }
 
-        if (!reader.Read())
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            Dictionary<string, List<FrequencyRecord>> results = new(StringComparer.Ordinal);
+            do
+            {
+                FrequencyRecord record = GetRecord(reader);
+                string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
+                ref List<FrequencyRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+                if (exists)
+                {
+                    Debug.Assert(result is not null);
+                    result.Add(record);
+                }
+                else
+                {
+                    result = [record];
+                }
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
         {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ConnectionString}", connection.ConnectionString);
             return null;
         }
-
-        Dictionary<string, List<FrequencyRecord>> results = new(StringComparer.Ordinal);
-        do
-        {
-            FrequencyRecord record = GetRecord(reader);
-            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
-            ref List<FrequencyRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
-            if (exists)
-            {
-                Debug.Assert(result is not null);
-                result.Add(record);
-            }
-            else
-            {
-                result = [record];
-            }
-        }
-        while (reader.Read());
-
-        return results;
     }
 
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string readOnlyConnectionString, HashSet<string> terms)
@@ -260,11 +268,19 @@ internal static class FreqDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
-        reader.Bind(1, kanji);
-        return reader.Read()
-            ? reader.GetInt32(0)
-            : null;
+        try
+        {
+            using SqliteRecordReader reader = new(connection, s_singleTermQuery);
+            reader.Bind(1, kanji);
+            return reader.Read()
+                ? reader.GetInt32(0)
+                : null;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
     }
 
     public static int? GetKanjiFrequencyFromDB(string readOnlyConnectionString, string kanjiWithVariationSelector, string kanji)
@@ -276,12 +292,20 @@ internal static class FreqDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, s_kanjiWithVariationSelectorQuery);
-        reader.Bind(1, kanjiWithVariationSelector);
-        reader.Bind(2, kanji);
-        return reader.Read()
-            ? reader.GetInt32(0)
-            : null;
+        try
+        {
+            using SqliteRecordReader reader = new(connection, s_kanjiWithVariationSelectorQuery);
+            reader.Bind(1, kanjiWithVariationSelector);
+            reader.Bind(2, kanji);
+            return reader.Read()
+                ? reader.GetInt32(0)
+                : null;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
     }
 
     public static void SetMaxFrequencyValue(Freq freq)

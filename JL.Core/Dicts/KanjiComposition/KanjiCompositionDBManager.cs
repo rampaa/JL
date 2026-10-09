@@ -33,13 +33,21 @@ internal static class KanjiCompositionDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, SingleTermQuery);
-        reader.Bind(1, kanji);
+        try
+        {
+            using SqliteRecordReader reader = new(connection, SingleTermQuery);
+            reader.Bind(1, kanji);
 
-        // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
-        // As a result, SqliteBlob cannot be used to read its BLOBs.
-        return reader.Read()
-            ? reader.Deserialize<string[]>(0)
-            : null;
+            // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
+            // As a result, SqliteBlob cannot be used to read its BLOBs.
+            return reader.Read()
+                ? reader.Deserialize<string[]>(0)
+                : null;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", s_readOnlyDBConnectionString);
+            return null;
+        }
     }
 }

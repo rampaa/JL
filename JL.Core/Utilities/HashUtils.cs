@@ -5,9 +5,11 @@ namespace JL.Core.Utilities;
 internal static class HashUtils
 {
 #pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms
-    internal static string GetMd5String(ReadOnlySpan<byte> bytes)
+    internal static bool HasMd5Hash(ReadOnlySpan<byte> bytes, ReadOnlySpan<byte> expectedHash)
     {
-        return Convert.ToHexString(MD5.HashData(bytes));
+        Span<byte> hash = stackalloc byte[MD5.HashSizeInBytes];
+        _ = MD5.HashData(bytes, hash);
+        return hash.SequenceEqual(expectedHash);
     }
 #pragma warning restore CA5351 // Do Not Use Broken Cryptographic Algorithms
 }

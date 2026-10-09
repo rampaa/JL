@@ -224,9 +224,7 @@ public static class MiningUtils
                     _ = expressionsWithPitchAccentBuilder.Append('、');
                 }
 
-                StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
-                _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(expressions[i], sb, pitchPosition));
-                ObjectPoolManager.StringBuilderPool.Return(sb);
+                _ = GetExpressionWithPitchAccent(expressions[i], expressionsWithPitchAccentBuilder, pitchPosition);
 
                 addSeparator = true;
             }
@@ -610,9 +608,9 @@ public static class MiningUtils
 
         if (mineAllFields
             // ReSharper disable once NullableWarningSuppressionIsUsed
-            || jlFields!.Contains(JLField.SourceTextNoBolding))
+            || jlFields!.Contains(JLField.SentenceNoBolding))
         {
-            miningParams[JLField.SourceTextNoBolding] = sentence;
+            miningParams[JLField.SentenceNoBolding] = sentence;
         }
         AddSentenceFields(miningParams, jlFields, lookupResult, sentence, currentText, currentCharPosition, useHtmlTags);
 
@@ -1220,7 +1218,7 @@ public static class MiningUtils
                 && ((readingIsSelected && otherLookupResult.Readings is not null && otherLookupResult.Readings.Contains(selectedSpelling))
                     || (!readingIsSelected
                         && ((selectedLookupResult.Readings is null && otherLookupResult.Readings is null)
-                            || (selectedLookupResult.Readings is not null && otherLookupResult.Readings is not null && selectedLookupResult.Readings.Any(otherLookupResult.Readings.Contains))))))
+                            || (selectedLookupResult.Readings is not null && otherLookupResult.Readings is not null && selectedLookupResult.Readings.ContainsAny(otherLookupResult.Readings))))))
             {
                 if (validLookupResults.TryGetValue(otherLookupResult.Dict.Name, out List<LookupResult>? results))
                 {
@@ -1517,7 +1515,7 @@ public static class MiningUtils
 
     private static string[]? GetWordClassesFromWordClassDictionary(string primarySpelling, string? reading)
     {
-        if (DictUtils.WordClassDictionary.TryGetValue(primarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
+        if (DictUtils.WordClassDictionary.TryGetValue(JapaneseUtils.NormalizeText(primarySpelling), out IList<JmdictWordClass>? jmdictWcResults))
         {
             JmdictWordClass? foundRecord = null;
             int jmdictWcResultsCount = jmdictWcResults.Count;
@@ -1639,7 +1637,6 @@ public static class MiningUtils
 
         List<Note> notes = new(displayedLookupResultLength);
         List<int> positions = new(displayedLookupResultLength);
-        bool[] results = new bool[displayedLookupResultLength];
 
         ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults;
         for (int i = 0; i < displayedLookupResultLength; i++)
@@ -1698,6 +1695,7 @@ public static class MiningUtils
             return null;
         }
 
+        bool[] results = new bool[displayedLookupResultLength];
         ReadOnlySpan<bool> canAddNoteSpan = canAddNoteList;
         for (int i = 0; i < canAddNoteSpan.Length; i++)
         {

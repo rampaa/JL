@@ -494,41 +494,49 @@ internal static class YomichanPitchAccentDBManager
             return null;
         }
 
+        try
+        {
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        using SqliteRecordReader reader = new(connection, GetQuery(terms.Count));
+            using SqliteRecordReader reader = new(connection, GetQuery(terms.Count));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        int index = 1;
-        foreach (string term in terms)
-        {
-            reader.Bind(index, term);
-            ++index;
-        }
+            int index = 1;
+            foreach (string term in terms)
+            {
+                reader.Bind(index, term);
+                ++index;
+            }
 
-        if (!reader.Read())
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+            do
+            {
+                PitchAccentRecord record = GetRecord(reader);
+                string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
+                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+                if (exists)
+                {
+                    Debug.Assert(result is not null);
+                    result.Add(record);
+                }
+                else
+                {
+                    result = [record];
+                }
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
         {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ConnectionString}", connection.ConnectionString);
             return null;
         }
-
-        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-        do
-        {
-            PitchAccentRecord record = GetRecord(reader);
-            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
-            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
-            if (exists)
-            {
-                Debug.Assert(result is not null);
-                result.Add(record);
-            }
-            else
-            {
-                result = [record];
-            }
-        }
-        while (reader.Read());
-
-        return results;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectingString, HashSet<string> terms)

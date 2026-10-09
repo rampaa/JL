@@ -34,12 +34,29 @@ public static class LookupUtils
 
     public static LookupResult[]? LookupText(string text)
     {
+        LookupCategory lookupCategory = CoreConfigManager.Instance.LookupCategory;
+        Dict[] dicts = DictUtils.GetDictForLookupCategoryType(lookupCategory);
+        if (dicts.Length is 0)
+        {
+            return null;
+        }
+
+        bool includeWordCategory = lookupCategory is LookupCategory.All or LookupCategory.Word;
+        bool includeOtherCategory = lookupCategory is LookupCategory.All or LookupCategory.Other;
+        bool lookUpWordDicts = (includeWordCategory || includeOtherCategory) && DictUtils.LookupHasWordDicts;
+        bool lookUpJmdict = includeWordCategory && DictUtils.LookupHasJmdict;
+        bool lookUpCustomWordDicts = includeWordCategory && DictUtils.LookupHasCustomWordDicts;
+        bool queryWordDictsFromDB = (includeWordCategory && DictUtils.LookupWordDictsUseDB)
+            || (includeOtherCategory && DictUtils.LookupOtherDictsUseDB);
+        bool lookUpEpwingWordDicts = (includeWordCategory && DictUtils.LookupHasEpwingWordDicts)
+            || (includeOtherCategory && DictUtils.LookupHasOtherDicts);
+
         string? kanji = null;
         string? kanjiWithVariationSelector = null;
         string[]? kanjiCompositions = null;
         List<LookupFrequencyResult>? kanjiFrequencyResults = null;
         bool kanjiExists = false;
-        if (DictUtils.AtLeastOneKanjiDictIsActive)
+        if ((lookupCategory is LookupCategory.Kanji or LookupCategory.All) && DictUtils.LookupHasKanjiDicts)
         {
             kanji = JapaneseUtils.GetFirstCharacterIfKanji(text, out kanjiWithVariationSelector);
             if (kanji is not null)
@@ -54,14 +71,14 @@ public static class LookupUtils
             }
         }
 
-        Freq[]? wordFreqs = FreqUtils.WordFreqs;
-        Freq[]? dbWordFreqs = FreqUtils.DBWordFreqs;
+        Freq[]? wordFreqs = lookUpWordDicts ? FreqUtils.WordFreqs : null;
+        Freq[]? dbWordFreqs = lookUpWordDicts ? FreqUtils.DBWordFreqs : null;
 
-        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForJmdict = dbWordFreqs is not null && DictUtils.JmdictIsActive
+        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForJmdict = dbWordFreqs is not null && lookUpJmdict
             ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
             : default;
 
-        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForCustomWordDict = dbWordFreqs is not null && DictUtils.AnyCustomWordDictIsActive
+        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForCustomWordDict = dbWordFreqs is not null && lookUpCustomWordDicts
             ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
             : default;
 
@@ -74,9 +91,16 @@ public static class LookupUtils
             // ReSharper disable once NullableWarningSuppressionIsUsed
             && pitchDict!.Ready;
 
-        TextInfo textInfo = GetTextInfo(text, wordFreqs is not null, dbIsUsedForPitchDict, dbWordFreqs, pitchDict);
+        bool querySharedPitch = dbIsUsedForPitchDict
+            && ((lookupCategory is LookupCategory.All && DictUtils.LookupNeedsSharedPitch)
+                || lookUpEpwingWordDicts
+                || lookupCategory is LookupCategory.Kanji or LookupCategory.Name);
+        Freq[]? sharedDBWordFreqs = lookUpEpwingWordDicts ? dbWordFreqs : null;
+        bool collectDeconjugatedTexts = queryWordDictsFromDB
+            || (lookUpEpwingWordDicts && querySharedPitch) || sharedDBWordFreqs is not null;
+        TextInfo textInfo = GetTextInfo(text, lookUpWordDicts, collectDeconjugatedTexts, querySharedPitch, sharedDBWordFreqs, pitchDict);
         List<string>? allTextWithoutLongVowelMark = null;
-        if (DictUtils.DBIsUsedForAtLeastOneDict && textInfo.TextWithoutLongVowelMarksList is not null)
+        if (queryWordDictsFromDB && textInfo.TextWithoutLongVowelMarksList is not null)
         {
             allTextWithoutLongVowelMark = new List<string>(textInfo.TextWithoutLongVowelMarksCount);
             foreach (ref readonly List<string>? textWithoutLongVowelMark in textInfo.TextWithoutLongVowelMarksList.AsReadOnlySpan())
@@ -99,28 +123,25 @@ public static class LookupUtils
             readOnlyConnectionStringForPitchDict = null;
         }
 
-        using SqliteConnection? sqliteConnectionForJmdictPitch = readOnlyConnectionStringForPitchDict is not null && DictUtils.JmdictIsActive
+        using SqliteConnection? sqliteConnectionForJmdictPitch = readOnlyConnectionStringForPitchDict is not null && lookUpJmdict
             ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForPitchDict)
             : null;
 
-        using SqliteConnection? sqliteConnectionForCustomWordPitch = readOnlyConnectionStringForPitchDict is not null && DictUtils.AnyCustomWordDictIsActive
+        using SqliteConnection? sqliteConnectionForCustomWordPitch = readOnlyConnectionStringForPitchDict is not null && lookUpCustomWordDicts
             ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForPitchDict)
             : null;
-
-        Dict[] dicts = DictUtils.GetDictForLookupCategoryType(CoreConfigManager.Instance.LookupCategory);
-        bool dbIsUsedAtLeastForOneDict = DictUtils.DBIsUsedForAtLeastOneDict;
 
         List<LookupResult>?[] resultSlots = ArrayPool<List<LookupResult>?>.Shared.Rent(dicts.Length);
         _ = Parallel.For(0, dicts.Length, i =>
         {
             Dict dict = dicts[i];
-            bool useDB = dbIsUsedAtLeastForOneDict && dict is { Options.UseDB.Value: true, Ready: true, Active: true };
+            bool useDB = dict is { Options.UseDB.Value: true, Ready: true, Active: true };
             switch (dict.Type)
             {
                 case DictType.JMdict:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetWordResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), textInfo.DeconjugationResultsList.AsReadOnlySpan(), textInfo.DeconjugatedTexts, textInfo.DeconjugatedTextWithoutLongVowelMarksList.AsReadOnlySpan(), textInfo.TextWithoutLongVowelMarksList.AsReadOnlySpan(), allTextWithoutLongVowelMark.AsReadOnlySpan(), dict, useDB, results, JmdictDBManager.GetRecordsFromDB);
+                    GetWordResults(textInfo, allTextWithoutLongVowelMark.AsReadOnlySpan(), dict, useDB, results, JmdictDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -136,7 +157,7 @@ public static class LookupUtils
                 case DictType.JMnedict:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetNameResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), dict, useDB, results, JmnedictDBManager.GetRecordsFromDB);
+                    GetNameResults(textInfo, dict, useDB, results, JmnedictDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -212,7 +233,7 @@ public static class LookupUtils
                 case DictType.ProfileCustomWordDictionary:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetWordResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), textInfo.DeconjugationResultsList.AsReadOnlySpan(), textInfo.DeconjugatedTexts, textInfo.DeconjugatedTextWithoutLongVowelMarksList.AsReadOnlySpan(), textInfo.TextWithoutLongVowelMarksList.AsReadOnlySpan(), allTextWithoutLongVowelMark.AsReadOnlySpan(), dict, false, results, null);
+                    GetWordResults(textInfo, allTextWithoutLongVowelMark.AsReadOnlySpan(), dict, false, results, null);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -230,7 +251,7 @@ public static class LookupUtils
                 case DictType.ProfileCustomNameDictionary:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetNameResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), dict, false, results, null);
+                    GetNameResults(textInfo, dict, false, results, null);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -287,7 +308,7 @@ public static class LookupUtils
                 case DictType.NonspecificNameYomichan:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetNameResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), dict, useDB, results, EpwingYomichanDBManager.GetRecordsFromDB);
+                    GetNameResults(textInfo, dict, useDB, results, EpwingYomichanDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -304,7 +325,7 @@ public static class LookupUtils
                 case DictType.NonspecificYomichan:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetWordResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), textInfo.DeconjugationResultsList.AsReadOnlySpan(), textInfo.DeconjugatedTexts, textInfo.DeconjugatedTextWithoutLongVowelMarksList.AsReadOnlySpan(), textInfo.TextWithoutLongVowelMarksList.AsReadOnlySpan(), allTextWithoutLongVowelMark.AsReadOnlySpan(), dict, useDB, results, EpwingYomichanDBManager.GetRecordsFromDB);
+                    GetWordResults(textInfo, allTextWithoutLongVowelMark.AsReadOnlySpan(), dict, useDB, results, EpwingYomichanDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -362,7 +383,7 @@ public static class LookupUtils
                 case DictType.NonspecificNameNazeka:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetNameResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), dict, useDB, results, EpwingNazekaDBManager.GetRecordsFromDB);
+                    GetNameResults(textInfo, dict, useDB, results, EpwingNazekaDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -379,7 +400,7 @@ public static class LookupUtils
                 case DictType.NonspecificNazeka:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetWordResults(textInfo.TextList.AsReadOnlySpan(), textInfo.TextInHiraganaList.AsReadOnlySpan(), textInfo.DeconjugationResultsList.AsReadOnlySpan(), textInfo.DeconjugatedTexts, textInfo.DeconjugatedTextWithoutLongVowelMarksList.AsReadOnlySpan(), textInfo.TextWithoutLongVowelMarksList.AsReadOnlySpan(), allTextWithoutLongVowelMark.AsReadOnlySpan(), dict, useDB, results, EpwingNazekaDBManager.GetRecordsFromDB);
+                    GetWordResults(textInfo, allTextWithoutLongVowelMark.AsReadOnlySpan(), dict, useDB, results, EpwingNazekaDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -435,7 +456,8 @@ public static class LookupUtils
             }
         }
 
-        ArrayPool<List<LookupResult>?>.Shared.Return(resultSlots, true);
+        resultSlots.AsSpan(0, dicts.Length).Clear();
+        ArrayPool<List<LookupResult>?>.Shared.Return(resultSlots);
 
         Array.Sort(lookupResults);
         return lookupResults;
@@ -471,19 +493,22 @@ public static class LookupUtils
         }
     }
 
-    private static TextInfo GetTextInfo(string text, bool dbIsUsedForAtLeastOneWordFreqDict, bool dbIsUsedForPitchDict, Freq[]? dbWordFreqs, Dict? pitchDict)
+    private static TextInfo GetTextInfo(string text, bool prepareDeconjugation, bool collectDeconjugatedTexts, bool queryPitchFromDB, Freq[]? dbWordFreqs, Dict? pitchDict)
     {
         int textLength = text.Length;
         List<string> textList = new(textLength);
         List<string> textInHiraganaList = new(textLength);
-        List<List<Form>?> deconjugationResultsList = new(textLength);
+        List<List<Form>?>? deconjugationResultsList = prepareDeconjugation ? new List<List<Form>?>(textLength) : null;
         List<List<string>?>? textWithoutLongVowelMarksList = null;
         List<List<List<Form>>?>? deconjugatedTextWithoutLongVowelMarksList = null;
         int estimatedDeconjugatedTextCapacity = 0;
         int textWithoutLongVowelMarksCount = 0;
         int estimatedDeconjugatedTextWithoutLongVowelMarksListCount = 0;
+        int maxTextInHiraganaLength = 0;
+        int maxDeconjugatedTextLength = 0;
+        int maxTextWithoutLongVowelMarksLength = 0;
 
-        bool doesNotStartWithLongVowelMark = !JapaneseUtils.s_longVowelMarkCharsNotNormalized.Contains(text[0]);
+        bool doesNotStartWithLongVowelMark = prepareDeconjugation && !JapaneseUtils.s_longVowelMarkCharsNotNormalized.Contains(text[0]);
         bool countLongVowelMark = doesNotStartWithLongVowelMark;
 
         for (int i = 0; i < textLength; i++)
@@ -499,7 +524,17 @@ public static class LookupUtils
 
             string textInHiragana = JapaneseUtils.NormalizeText(currentText);
             textInHiraganaList.Add(textInHiragana);
+            if (textInHiragana.Length > maxTextInHiraganaLength)
+            {
+                maxTextInHiraganaLength = textInHiragana.Length;
+            }
 
+            if (!prepareDeconjugation)
+            {
+                continue;
+            }
+
+            Debug.Assert(deconjugationResultsList is not null);
             if (textInHiragana.Length <= 35 && (i != textLength - 1 || textInHiragana[0] is not JapaneseUtils.NormalizedFuseji))
             {
                 List<Form> deconjugationResults = Deconjugator.Deconjugate(textInHiragana);
@@ -519,8 +554,18 @@ public static class LookupUtils
 
                 if (nonConsecutiveLongVowelMarkCount > 0)
                 {
-                    textWithoutLongVowelMarksList ??= new List<List<string>?>(textLength);
-                    deconjugatedTextWithoutLongVowelMarksList ??= new List<List<List<Form>>?>(textLength);
+                    if (textWithoutLongVowelMarksList is null)
+                    {
+                        textWithoutLongVowelMarksList = new List<List<string>?>(textLength);
+                        deconjugatedTextWithoutLongVowelMarksList = new List<List<List<Form>>?>(textLength);
+                        for (int j = 0; j < textList.Count - 1; j++)
+                        {
+                            textWithoutLongVowelMarksList.Add(null);
+                            deconjugatedTextWithoutLongVowelMarksList.Add(null);
+                        }
+                    }
+
+                    Debug.Assert(deconjugatedTextWithoutLongVowelMarksList is not null);
                     if (nonConsecutiveLongVowelMarkCount < 4)
                     {
                         List<string> textsWithoutLongVowelMarks = JapaneseUtils.NormalizeLongVowelMark(textInHiragana);
@@ -530,6 +575,11 @@ public static class LookupUtils
                         List<List<Form>> deconjugatedTextWithoutLongVowelMarks = new(textsWithoutLongVowelMarks.Count);
                         foreach (string textWithoutLongVowelMarks in textsWithoutLongVowelMarks.AsReadOnlySpan())
                         {
+                            if (textWithoutLongVowelMarks.Length > maxTextWithoutLongVowelMarksLength)
+                            {
+                                maxTextWithoutLongVowelMarksLength = textWithoutLongVowelMarks.Length;
+                            }
+
                             List<Form> deconjugationResultsForTextWithoutLongVowelMarks = Deconjugator.Deconjugate(textWithoutLongVowelMarks);
                             estimatedDeconjugatedTextWithoutLongVowelMarksListCount += deconjugationResultsForTextWithoutLongVowelMarks.Count;
                             deconjugatedTextWithoutLongVowelMarks.Add(deconjugationResultsForTextWithoutLongVowelMarks);
@@ -550,10 +600,15 @@ public static class LookupUtils
                     countLongVowelMark = false;
                 }
             }
+            else
+            {
+                textWithoutLongVowelMarksList?.Add(null);
+                deconjugatedTextWithoutLongVowelMarksList?.Add(null);
+            }
         }
 
         string[]? deconjugatedTexts = null;
-        if (DictUtils.DBIsUsedForAtLeastOneWordDict || dbIsUsedForPitchDict || dbIsUsedForAtLeastOneWordFreqDict)
+        if (collectDeconjugatedTexts)
         {
             HashSet<string> deconjugatedTextsHashSet = new(Math.Min(estimatedDeconjugatedTextCapacity + estimatedDeconjugatedTextWithoutLongVowelMarksListCount, 256), StringComparer.Ordinal);
             foreach (ref readonly List<Form>? deconjugationResults in deconjugationResultsList.AsReadOnlySpan())
@@ -561,6 +616,10 @@ public static class LookupUtils
                 foreach (ref readonly Form form in deconjugationResults.AsReadOnlySpan())
                 {
                     _ = deconjugatedTextsHashSet.Add(form.Text);
+                    if (form.Text.Length > maxDeconjugatedTextLength)
+                    {
+                        maxDeconjugatedTextLength = form.Text.Length;
+                    }
                 }
             }
 
@@ -570,7 +629,7 @@ public static class LookupUtils
                 {
                     if (deconjugatedTextWithoutLongVowelMarks is null)
                     {
-                        break;
+                        continue;
                     }
 
                     foreach (ref readonly List<Form> forms in deconjugatedTextWithoutLongVowelMarks.AsReadOnlySpan())
@@ -578,6 +637,10 @@ public static class LookupUtils
                         foreach (ref readonly Form form in forms.AsReadOnlySpan())
                         {
                             _ = deconjugatedTextsHashSet.Add(form.Text);
+                            if (form.Text.Length > maxDeconjugatedTextLength)
+                            {
+                                maxDeconjugatedTextLength = form.Text.Length;
+                            }
                         }
                     }
                 }
@@ -587,8 +650,8 @@ public static class LookupUtils
         }
 
         HashSet<string>? allSearchKeys = null;
-        bool dbIsUsedForAtLeastOneYomichanOrNazekaWordDict = DictUtils.DBIsUsedForAtLeastOneYomichanOrNazekaWordDict;
-        if (dbIsUsedForPitchDict || dbIsUsedForAtLeastOneYomichanOrNazekaWordDict)
+        bool queryWordFrequencies = dbWordFreqs is not null;
+        if (queryPitchFromDB || queryWordFrequencies)
         {
             allSearchKeys = new HashSet<string>(textInHiraganaList.Count + (deconjugatedTexts?.Length ?? 0) + textWithoutLongVowelMarksCount, StringComparer.Ordinal);
             allSearchKeys.UnionWith(textInHiraganaList);
@@ -613,8 +676,7 @@ public static class LookupUtils
         IDictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
         if (allSearchKeys is not null)
         {
-            bool queryWordFrequencies = dbWordFreqs is not null && dbIsUsedForAtLeastOneYomichanOrNazekaWordDict;
-            if (queryWordFrequencies && dbIsUsedForPitchDict)
+            if (queryWordFrequencies && queryPitchFromDB)
             {
                 Parallel.Invoke(
                 () =>
@@ -634,14 +696,10 @@ public static class LookupUtils
                 frequencyDicts = GetFrequencyDictsFromDB(dbWordFreqs, allSearchKeys);
                 pitchAccentDict = pitchDict?.Contents;
             }
-            else if (dbIsUsedForPitchDict)
+            else // queryPitchFromDB
             {
                 Debug.Assert(pitchDict is not null);
                 pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict.ReadOnlyConnectionString, allSearchKeys);
-            }
-            else
-            {
-                pitchAccentDict = pitchDict?.Contents;
             }
         }
         else
@@ -649,7 +707,7 @@ public static class LookupUtils
             pitchAccentDict = pitchDict?.Contents;
         }
 
-        return new TextInfo(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTextWithoutLongVowelMarksList, textWithoutLongVowelMarksList, textWithoutLongVowelMarksCount, deconjugatedTexts, frequencyDicts, pitchAccentDict);
+        return new TextInfo(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTextWithoutLongVowelMarksList, textWithoutLongVowelMarksList, textWithoutLongVowelMarksCount, deconjugatedTexts, frequencyDicts, pitchAccentDict, maxTextInHiraganaLength, maxDeconjugatedTextLength, maxTextWithoutLongVowelMarksLength);
     }
 
     private static void GetWordResultsHelper(Dict dict,
@@ -686,14 +744,13 @@ public static class LookupUtils
                         if (exists)
                         {
                             Debug.Assert(result is not null);
-                            if (result.MatchedText == deconjugationResult.OriginalText)
+                            if (result.Processes is not null && result.MatchedText == matchedText)
                             {
                                 foreach (IDictRecord record in resultsList)
                                 {
                                     int index = result.Results.FastReferenceIndexOf(record);
                                     if (index >= 0)
                                     {
-                                        Debug.Assert(result.Processes is not null);
                                         List<ProcessNode> processes = result.Processes[index];
 
                                         bool addProcess = true;
@@ -715,7 +772,6 @@ public static class LookupUtils
                                     {
                                         result.Results.Add(record);
 
-                                        Debug.Assert(result.Processes is not null);
                                         result.Processes.Add([deconjugationResult.Process]);
                                     }
                                 }
@@ -741,9 +797,14 @@ public static class LookupUtils
         }
     }
 
-    private static void GetWordResults(ReadOnlySpan<string> textList, ReadOnlySpan<string> textInHiraganaList,
-        ReadOnlySpan<List<Form>?> deconjugationResultsList, string[]? deconjugatedTexts, ReadOnlySpan<List<List<Form>>?> deconjugationResultListForTextWithoutLongVowelMarkList, ReadOnlySpan<List<string>?> textWithoutLongVowelMarkList, ReadOnlySpan<string> allTextWithoutLongVowelMark, Dict dict, bool useDB, Dictionary<string, IntermediaryResult> results, GetRecordsFromDB? getRecordsFromDB)
+    private static void GetWordResults(TextInfo textInfo, ReadOnlySpan<string> allTextWithoutLongVowelMark, Dict dict, bool useDB, Dictionary<string, IntermediaryResult> results, GetRecordsFromDB? getRecordsFromDB)
     {
+        ReadOnlySpan<string> textList = textInfo.TextList.AsReadOnlySpan();
+        ReadOnlySpan<string> textInHiraganaList = textInfo.TextInHiraganaList.AsReadOnlySpan();
+        ReadOnlySpan<List<Form>?> deconjugationResultsList = textInfo.DeconjugationResultsList.AsReadOnlySpan();
+        string[]? deconjugatedTexts = textInfo.DeconjugatedTexts;
+        ReadOnlySpan<List<List<Form>>?> deconjugationResultListForTextWithoutLongVowelMarkList = textInfo.DeconjugatedTextWithoutLongVowelMarksList.AsReadOnlySpan();
+        ReadOnlySpan<List<string>?> textWithoutLongVowelMarkList = textInfo.TextWithoutLongVowelMarksList.AsReadOnlySpan();
         Dictionary<string, IList<IDictRecord>>? dbWordDict = null;
         Dictionary<string, IList<IDictRecord>>? dbVerbDict = null;
         Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = null;
@@ -751,20 +812,21 @@ public static class LookupUtils
         if (useDB)
         {
             Debug.Assert(getRecordsFromDB is not null);
-            dbWordDict = getRecordsFromDB(dict.ReadOnlyConnectionString, textInHiraganaList, dict.MaxSearchKeyLength);
+            int maxSearchKeyLength = dict.MaxSearchKeyLength;
+            // Use 0 to skip filtering when all candidates fit.
+            dbWordDict = getRecordsFromDB(dict.ReadOnlyConnectionString, textInHiraganaList, textInfo.MaxTextInHiraganaLength <= maxSearchKeyLength ? 0 : maxSearchKeyLength);
 
             if (deconjugatedTexts is not null)
             {
-                dbVerbDict = getRecordsFromDB(dict.ReadOnlyConnectionString, deconjugatedTexts, dict.MaxSearchKeyLength);
+                dbVerbDict = getRecordsFromDB(dict.ReadOnlyConnectionString, deconjugatedTexts, textInfo.MaxDeconjugatedTextLength <= maxSearchKeyLength ? 0 : maxSearchKeyLength);
             }
 
             if (!allTextWithoutLongVowelMark.IsEmpty)
             {
-                dbWordDictForLongVowelConversion = getRecordsFromDB(dict.ReadOnlyConnectionString, allTextWithoutLongVowelMark, dict.MaxSearchKeyLength);
+                dbWordDictForLongVowelConversion = getRecordsFromDB(dict.ReadOnlyConnectionString, allTextWithoutLongVowelMark, textInfo.MaxTextWithoutLongVowelMarksLength <= maxSearchKeyLength ? 0 : maxSearchKeyLength);
             }
         }
 
-        bool textWithoutLongVowelMarkListExist = !textWithoutLongVowelMarkList.IsEmpty;
         for (int i = 0; i < textList.Length; i++)
         {
             ref readonly string text = ref textList[i];
@@ -772,7 +834,7 @@ public static class LookupUtils
 
             ReadOnlySpan<string> textsWithoutLongVowelMark = [];
             ReadOnlySpan<List<Form>> deconjugationResultListForTextWithoutLongVowelMark = [];
-            if (textWithoutLongVowelMarkListExist && textWithoutLongVowelMarkList.Length > i)
+            if (textWithoutLongVowelMarkList.Length > i)
             {
                 Debug.Assert(textWithoutLongVowelMarkList.Length > i);
                 textsWithoutLongVowelMark = textWithoutLongVowelMarkList[i].AsReadOnlySpan();
@@ -907,13 +969,16 @@ public static class LookupUtils
         return resultsList;
     }
 
-    private static void GetNameResults(ReadOnlySpan<string> textList, ReadOnlySpan<string> textInHiraganaList, Dict dict, bool useDB, Dictionary<string, IntermediaryResult> results, GetRecordsFromDB? getRecordsFromDB)
+    private static void GetNameResults(TextInfo textInfo, Dict dict, bool useDB, Dictionary<string, IntermediaryResult> results, GetRecordsFromDB? getRecordsFromDB)
     {
+        ReadOnlySpan<string> textList = textInfo.TextList.AsReadOnlySpan();
+        ReadOnlySpan<string> textInHiraganaList = textInfo.TextInHiraganaList.AsReadOnlySpan();
         IDictionary<string, IList<IDictRecord>>? nameDict;
         if (useDB)
         {
             Debug.Assert(getRecordsFromDB is not null);
-            nameDict = getRecordsFromDB(dict.ReadOnlyConnectionString, textInHiraganaList, dict.MaxSearchKeyLength);
+            int maxSearchKeyLength = dict.MaxSearchKeyLength;
+            nameDict = getRecordsFromDB(dict.ReadOnlyConnectionString, textInHiraganaList, textInfo.MaxTextInHiraganaLength <= maxSearchKeyLength ? 0 : maxSearchKeyLength);
         }
         else
         {
@@ -981,8 +1046,11 @@ public static class LookupUtils
             && dict.Type is DictType.NonspecificKanjiWithWordSchemaYomichan or DictType.NonspecificKanjiNazeka)
         {
             List<IDictRecord> baseRecords = [];
-            foreach (IDictRecord record in kanjiResult.Results)
+            IList<IDictRecord> records = kanjiResult.Results;
+            int recordCount = records.Count;
+            for (int i = 0; i < recordCount; i++)
             {
+                IDictRecord record = records[i];
                 if (!kanjiVariationResult.Results.Contains(record))
                 {
                     baseRecords.Add(record);
@@ -1147,7 +1215,7 @@ public static class LookupUtils
             IList<IDictRecord> resultsList = wordResult.Results;
             for (int i = 0; i < resultsList.Count; i++)
             {
-                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = GetDeconjugationInfo(deconjugatedWord, processesSpan, i);
+                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : (null, 0);
                 JmdictRecord jmdictResult = (JmdictRecord)resultsList[i];
                 LookupResult result = new
                 (
@@ -1183,9 +1251,11 @@ public static class LookupUtils
         HashSet<string> searchKeys = new(StringComparer.Ordinal);
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
-            foreach (IDictRecord dictRecord in intermediaryResult.Results)
+            IList<IDictRecord> records = intermediaryResult.Results;
+            int recordCount = records.Count;
+            for (int i = 0; i < recordCount; i++)
             {
-                IDictRecordWithMultipleReadings record = (IDictRecordWithMultipleReadings)dictRecord;
+                IDictRecordWithMultipleReadings record = (IDictRecordWithMultipleReadings)records[i];
                 _ = searchKeys.Add(JapaneseUtils.NormalizeText(record.PrimarySpelling));
                 if (record.Readings is not null)
                 {
@@ -1206,9 +1276,11 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         foreach (IntermediaryResult nameResult in jmnedictResults.Values)
         {
-            foreach (IDictRecord dictRecord in nameResult.Results)
+            IList<IDictRecord> records = nameResult.Results;
+            int recordCount = records.Count;
+            for (int i = 0; i < recordCount; i++)
             {
-                JmnedictRecord jmnedictRecord = (JmnedictRecord)dictRecord;
+                JmnedictRecord jmnedictRecord = (JmnedictRecord)records[i];
                 LookupResult result = new
                 (
                     primarySpelling: jmnedictRecord.PrimarySpelling,
@@ -1253,9 +1325,11 @@ public static class LookupUtils
         string kanji, List<LookupResult> results, string[]? kanjiCompositions, IntermediaryResult intermediaryResult, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
-        foreach (IDictRecord dictRecord in intermediaryResult.Results)
+        IList<IDictRecord> records = intermediaryResult.Results;
+        int recordCount = records.Count;
+        for (int i = 0; i < recordCount; i++)
         {
-            YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)dictRecord;
+            YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)records[i];
 
             string[]? allReadings = ArrayUtils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
             LookupResult result = new
@@ -1276,7 +1350,7 @@ public static class LookupUtils
     }
 
     private static void BuildEpwingYomichanResult(
-        IDictionary<string, IntermediaryResult> epwingResults, List<LookupResult> results, Freq[]? freqs, Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        Dictionary<string, IntermediaryResult> epwingResults, List<LookupResult> results, Freq[]? freqs, Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool freqsExist = freqs is not null;
         bool pitchAccentDictExists = pitchAccentDict is not null;
@@ -1287,7 +1361,7 @@ public static class LookupUtils
             IList<IDictRecord> resultsList = wordResult.Results;
             for (int i = 0; i < resultsList.Count; i++)
             {
-                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = GetDeconjugationInfo(deconjugatedWord, processesSpan, i);
+                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : (null, 0);
                 EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)resultsList[i];
                 string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
                 LookupResult result = new
@@ -1317,9 +1391,11 @@ public static class LookupUtils
     private static void BuildEpwingYomichanResultForKanjiWithWordSchema(IntermediaryResult intermediaryResult, List<LookupResult> results, string[]? kanjiCompositions, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
-        foreach (IDictRecord dictRecords in intermediaryResult.Results)
+        IList<IDictRecord> records = intermediaryResult.Results;
+        int recordCount = records.Count;
+        for (int i = 0; i < recordCount; i++)
         {
-            EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)dictRecords;
+            EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)records[i];
             string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
             LookupResult result = new
             (
@@ -1341,7 +1417,7 @@ public static class LookupUtils
     }
 
     private static void BuildEpwingNazekaResult(
-        IDictionary<string, IntermediaryResult> epwingNazekaResults, List<LookupResult> results, Freq[]? freqs, Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
+        Dictionary<string, IntermediaryResult> epwingNazekaResults, List<LookupResult> results, Freq[]? freqs, Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
         bool freqsExist = freqs is not null;
@@ -1352,7 +1428,7 @@ public static class LookupUtils
             IList<IDictRecord> resultsList = wordResult.Results;
             for (int i = 0; i < resultsList.Count; i++)
             {
-                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = GetDeconjugationInfo(deconjugatedWord, processesSpan, i);
+                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : (null, 0);
                 EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)resultsList[i];
                 string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
                 LookupResult result = new
@@ -1380,7 +1456,7 @@ public static class LookupUtils
 
     private static bool WordClassDictionaryContainsTag(string primarySpelling, string? reading, string tag)
     {
-        if (DictUtils.WordClassDictionary.TryGetValue(primarySpelling, out IList<JmdictWordClass>? jmdictWcResults))
+        if (DictUtils.WordClassDictionary.TryGetValue(JapaneseUtils.NormalizeText(primarySpelling), out IList<JmdictWordClass>? jmdictWcResults))
         {
             bool hasReading = reading is not null;
             int jmdictWcResultsCount = jmdictWcResults.Count;
@@ -1402,9 +1478,11 @@ public static class LookupUtils
     private static void BuildEpwingNazekaResultForKanji(IntermediaryResult intermediaryResult, List<LookupResult> results, string[]? kanjiCompositions, List<LookupFrequencyResult>? kanjiFrequencyResults, IDictionary<string, IList<IDictRecord>>? pitchAccentDict)
     {
         bool pitchAccentDictExists = pitchAccentDict is not null;
-        foreach (IDictRecord dictRecords in intermediaryResult.Results)
+        IList<IDictRecord> records = intermediaryResult.Results;
+        int recordCount = records.Count;
+        for (int i = 0; i < recordCount; i++)
         {
-            EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)dictRecords;
+            EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)records[i];
             string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
             LookupResult result = new
             (
@@ -1487,8 +1565,21 @@ public static class LookupUtils
             IList<IDictRecord> resultsList = wordResult.Results;
             for (int i = 0; i < resultsList.Count; i++)
             {
-                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = GetDeconjugationInfo(deconjugatedWord, processesSpan, i);
                 CustomWordRecord customWordDictResult = (CustomWordRecord)resultsList[i];
+                string? deconjugationProcess = null;
+                int minDeconjugationProcessStepCount = 0;
+                if (deconjugatedWord)
+                {
+                    if (customWordDictResult.HasUserDefinedWordClass)
+                    {
+                        (deconjugationProcess, minDeconjugationProcessStepCount) = GetDeconjugationInfo(processesSpan, i);
+                    }
+                    else
+                    {
+                        minDeconjugationProcessStepCount = GetMinDeconjugationProcessStepCount(processesSpan[i].AsReadOnlySpan());
+                    }
+                }
+
                 LookupResult result = new
                 (
                     primarySpelling: customWordDictResult.PrimarySpelling,
@@ -1500,7 +1591,7 @@ public static class LookupUtils
                     frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
                     alternativeSpellings: customWordDictResult.AlternativeSpellings,
                     deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                    deconjugationProcess: customWordDictResult.HasUserDefinedWordClass ? deconjugationProcess : null,
+                    deconjugationProcess: deconjugationProcess,
                     minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
@@ -1518,10 +1609,11 @@ public static class LookupUtils
         bool pitchAccentDictExists = pitchAccentDict is not null;
         foreach (IntermediaryResult customNameResult in customNameResults.Values)
         {
-            int freq = 0;
-            foreach (IDictRecord dictRecord in customNameResult.Results)
+            IList<IDictRecord> records = customNameResult.Results;
+            int recordCount = records.Count;
+            for (int i = 0; i < recordCount; i++)
             {
-                CustomNameRecord customNameDictResult = (CustomNameRecord)dictRecord;
+                CustomNameRecord customNameDictResult = (CustomNameRecord)records[i];
                 string[]? readings = customNameDictResult.Reading is not null ? [customNameDictResult.Reading] : null;
                 LookupResult result = new
                 (
@@ -1530,13 +1622,12 @@ public static class LookupUtils
                     dict: customNameResult.Dict,
                     readings: readings,
                     formattedDefinitions: customNameDictResult.BuildFormattedDefinition(),
-                    frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
+                    frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -i, false)],
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(customNameDictResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                     imageInfos: customNameDictResult.ImageInfo is not null ? [customNameDictResult.ImageInfo] : null
                 );
 
-                ++freq;
                 results.Add(result);
             }
         }
@@ -1587,7 +1678,7 @@ public static class LookupUtils
                     : FreqDBManager.GetKanjiFrequencyFromDB(kanjiFreq.ReadOnlyConnectionString, kanji);
                 if (frequency is not null)
                 {
-                    freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency.Value, false));
+                    freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency.Value, kanjiFreq.Options.HigherValueMeansHigherFrequency.Value));
                 }
 
                 continue;
@@ -1601,7 +1692,7 @@ public static class LookupUtils
             if (freqResultList is not null)
             {
                 int frequency = freqResultList[0].Frequency;
-                freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency, false));
+                freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency, kanjiFreq.Options.HigherValueMeansHigherFrequency.Value));
             }
         }
 
@@ -1612,17 +1703,11 @@ public static class LookupUtils
 
     private static List<LookupFrequencyResult>? GetKanjidicFrequencies(int frequency, List<LookupFrequencyResult>? frequencyResults)
     {
-        bool kanjidicFreqExists = frequency is not 0;
-        bool freqsExist = frequencyResults is not null;
-
-        return !kanjidicFreqExists && !freqsExist
-            ? null
-            : !kanjidicFreqExists && freqsExist
-                ? frequencyResults
-                : kanjidicFreqExists && !freqsExist
-                    ? [new LookupFrequencyResult("KANJIDIC2", frequency, false)]
-                    // ReSharper disable once NullableWarningSuppressionIsUsed
-                    : [new LookupFrequencyResult("KANJIDIC2", frequency, false), .. frequencyResults!];
+        return frequency is 0
+            ? frequencyResults
+            : frequencyResults is null
+                ? [new LookupFrequencyResult("KANJIDIC2", frequency, false)]
+                : [new LookupFrequencyResult("KANJIDIC2", frequency, false), .. frequencyResults];
     }
 
     private static byte[]? GetPitchPosition(string primarySpelling, string[]? readings, IDictionary<string, IList<IDictRecord>> pitchDictionary)
@@ -1682,9 +1767,9 @@ public static class LookupUtils
                 for (int i = 0; i < readings.Length; i++)
                 {
                     string reading = readings[i];
+                    byte position = byte.MaxValue;
                     if (pitchDictionary.TryGetValue(JapaneseUtils.NormalizeText(reading), out records))
                     {
-                        byte position = byte.MaxValue;
                         int recordsCount = records.Count;
                         for (int j = 0; j < recordsCount; j++)
                         {
@@ -1705,9 +1790,9 @@ public static class LookupUtils
                                 break;
                             }
                         }
-
-                        _ = positions?[i] = position;
                     }
+
+                    _ = positions?[i] = position;
                 }
             }
 
@@ -1732,13 +1817,33 @@ public static class LookupUtils
         return -1;
     }
 
-    private static (string? process, int minStepCount) GetDeconjugationInfo(bool deconjugated, ReadOnlySpan<List<ProcessNode>> processListSpan, int index)
+    private static int GetMinDeconjugationProcessStepCount(ReadOnlySpan<ProcessNode> processes)
     {
-        if (!deconjugated)
+        Debug.Assert(!processes.IsEmpty);
+        int min = processes[0].ProperStepCount;
+        if (min is 1)
         {
-            return (null, 0);
+            return 1;
         }
 
+        foreach (ref readonly ProcessNode node in processes[1..])
+        {
+            int properStepCount = node.ProperStepCount;
+            if (properStepCount < min)
+            {
+                min = properStepCount;
+                if (min is 1)
+                {
+                    return 1;
+                }
+            }
+        }
+
+        return min;
+    }
+
+    private static (string? process, int minStepCount) GetDeconjugationInfo(ReadOnlySpan<List<ProcessNode>> processListSpan, int index)
+    {
         ReadOnlySpan<ProcessNode> processSpan = processListSpan[index].AsReadOnlySpan();
         string? process = LookupResultUtils.DeconjugationProcessesToText(processSpan);
         if (process is null)
@@ -1746,20 +1851,6 @@ public static class LookupUtils
             return (null, 0);
         }
 
-        if (processSpan.Length is 1)
-        {
-            return (process, processSpan[0].ProperStepCount);
-        }
-
-        int min = int.MaxValue;
-        foreach (ref readonly ProcessNode node in processSpan)
-        {
-            if (node.ProperStepCount < min)
-            {
-                min = node.ProperStepCount;
-            }
-        }
-
-        return (process, min);
+        return (process, GetMinDeconjugationProcessStepCount(processSpan));
     }
 }

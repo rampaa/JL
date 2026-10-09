@@ -1098,6 +1098,24 @@ internal static class EpwingNazekaDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, int maxSearchKeyLengthForDict)
     {
+        int validTermCount = terms.Length;
+        if (maxSearchKeyLengthForDict > 0)
+        {
+            validTermCount = 0;
+            foreach (string term in terms)
+            {
+                if (term.Length <= maxSearchKeyLengthForDict)
+                {
+                    ++validTermCount;
+                }
+            }
+        }
+
+        if (validTermCount is 0)
+        {
+            return null;
+        }
+
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
@@ -1105,44 +1123,62 @@ internal static class EpwingNazekaDBManager
             return null;
         }
 
-        int validTermCount = terms.Length > maxSearchKeyLengthForDict && maxSearchKeyLengthForDict > 0
-            ? maxSearchKeyLengthForDict
-            : terms.Length;
-
+        try
+        {
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
+            using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        int offset = terms.Length - validTermCount;
-        for (int i = 0; i < validTermCount; i++)
-        {
-            reader.Bind(i + 1, terms[offset + i]);
-        }
-
-        if (!reader.Read())
-        {
-            return null;
-        }
-
-        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-        do
-        {
-            EpwingNazekaRecord epwingNazekaRecord = GetRecord(reader);
-            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
-            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
-            if (exists)
+            if (validTermCount == terms.Length)
             {
-                Debug.Assert(result is not null);
-                result.Add(epwingNazekaRecord);
+                for (int i = 0; i < terms.Length; i++)
+                {
+                    reader.Bind(i + 1, terms[i]);
+                }
             }
             else
             {
-                result = [epwingNazekaRecord];
+                int parameterIndex = 1;
+                foreach (string term in terms)
+                {
+                    if (term.Length <= maxSearchKeyLengthForDict)
+                    {
+                        reader.Bind(parameterIndex, term);
+                        ++parameterIndex;
+                    }
+                }
             }
-        }
-        while (reader.Read());
 
-        return results;
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+            do
+            {
+                EpwingNazekaRecord epwingNazekaRecord = GetRecord(reader);
+                string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
+                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+                if (exists)
+                {
+                    Debug.Assert(result is not null);
+                    result.Add(epwingNazekaRecord);
+                }
+                else
+                {
+                    result = [epwingNazekaRecord];
+                }
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, string kanjiWithVariationSelector, string kanji)
@@ -1154,34 +1190,42 @@ internal static class EpwingNazekaDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, GetQuery(2));
-        reader.Bind(1, kanjiWithVariationSelector);
-        reader.Bind(2, kanji);
-
-        if (!reader.Read())
+        try
         {
+            using SqliteRecordReader reader = new(connection, GetQuery(2));
+            reader.Bind(1, kanjiWithVariationSelector);
+            reader.Bind(2, kanji);
+
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+            do
+            {
+                EpwingNazekaRecord record = GetRecord(reader);
+                string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
+                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+                if (exists)
+                {
+                    Debug.Assert(result is not null);
+                    result.Add(record);
+                }
+                else
+                {
+                    result = [record];
+                }
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
             return null;
         }
-
-        Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
-        do
-        {
-            EpwingNazekaRecord record = GetRecord(reader);
-            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
-            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
-            if (exists)
-            {
-                Debug.Assert(result is not null);
-                result.Add(record);
-            }
-            else
-            {
-                result = [record];
-            }
-        }
-        while (reader.Read());
-
-        return results;
     }
 
     public static List<IDictRecord>? GetRecordsFromDB(string readOnlyConnectionString, string term)
@@ -1193,21 +1237,29 @@ internal static class EpwingNazekaDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
-        reader.Bind(1, term);
-        if (!reader.Read())
+        try
         {
+            using SqliteRecordReader reader = new(connection, s_singleTermQuery);
+            reader.Bind(1, term);
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            List<IDictRecord> results = [];
+            do
+            {
+                results.Add(GetRecord(reader));
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
             return null;
         }
-
-        List<IDictRecord> results = [];
-        do
-        {
-            results.Add(GetRecord(reader));
-        }
-        while (reader.Read());
-
-        return results;
     }
 
     public static void LoadFromDB(Dict dict)

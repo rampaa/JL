@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
 using JL.Core.Dicts.Interfaces;
@@ -400,21 +399,29 @@ internal static class YomichanKanjiDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
-        reader.Bind(1, term);
-        if (!reader.Read())
+        try
         {
+            using SqliteRecordReader reader = new(connection, s_singleTermQuery);
+            reader.Bind(1, term);
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            List<IDictRecord> results = [];
+            do
+            {
+                results.Add(GetRecord(reader));
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
             return null;
         }
-
-        List<IDictRecord> results = [];
-        do
-        {
-            results.Add(GetRecord(reader));
-        }
-        while (reader.Read());
-
-        return results;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, string kanjiWithVariationSelector, string kanji)
@@ -426,29 +433,42 @@ internal static class YomichanKanjiDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, s_kanjiWithVariationSelectorQuery);
-        reader.Bind(1, kanjiWithVariationSelector);
-        reader.Bind(2, kanji);
-
-        Dictionary<string, IList<IDictRecord>>? results = null;
-        while (reader.Read())
+        try
         {
-            results ??= new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
-            YomichanKanjiRecord record = GetRecord(reader);
-            string searchKey = reader.GetString((int)ColumnIndex.Kanji);
-            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
-            if (exists)
-            {
-                Debug.Assert(result is not null);
-                result.Add(record);
-            }
-            else
-            {
-                result = [record];
-            }
-        }
+            using SqliteRecordReader reader = new(connection, s_kanjiWithVariationSelectorQuery);
+            reader.Bind(1, kanjiWithVariationSelector);
+            reader.Bind(2, kanji);
 
-        return results;
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+            do
+            {
+                YomichanKanjiRecord record = GetRecord(reader);
+                string searchKey = reader.GetString((int)ColumnIndex.Kanji);
+                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+                if (exists)
+                {
+                    Debug.Assert(result is not null);
+                    result.Add(record);
+                }
+                else
+                {
+                    result = [record];
+                }
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
     }
 
     private static YomichanKanjiRecord GetRecord(SqliteRecordReader reader)

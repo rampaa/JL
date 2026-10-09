@@ -597,7 +597,7 @@ internal sealed partial class PopupWindow : IDisposable
             return Task.CompletedTask;
         }
 
-        if (selectedText == _lastLookedUpText && Opacity is not 0)
+        if (selectedText == _lastLookedUpText && Opacity is not 0 && MiningMode)
         {
             UpdatePositionAndBringToFront(false, false);
             return Task.CompletedTask;
@@ -836,7 +836,7 @@ internal sealed partial class PopupWindow : IDisposable
                 x = activeScreen.Bounds.Right;
             }
 
-            x = Math.Max(x is -1 ? activeScreen.WorkingArea.Left : activeScreen.Bounds.Left, x - currentWidth);
+            x = Math.Max(fixedPosition.X is -1 ? activeScreen.WorkingArea.Left : activeScreen.Bounds.Left, x - currentWidth);
         }
 
         double y = fixedPosition.Y;
@@ -856,7 +856,7 @@ internal sealed partial class PopupWindow : IDisposable
                 y = (activeScreen.Bounds.Top + activeScreen.Bounds.Bottom + currentHeight) / 2;
             }
 
-            y = Math.Max(y is -1 ? activeScreen.WorkingArea.Top : activeScreen.Bounds.Top, y - currentHeight);
+            y = Math.Max(fixedPosition.Y is -1 ? activeScreen.WorkingArea.Top : activeScreen.Bounds.Top, y - currentHeight);
         }
 
         return new Point(x, y);
@@ -896,7 +896,7 @@ internal sealed partial class PopupWindow : IDisposable
         }
         else
         {
-            resultCount = Math.Min(lastLookupResultsSpan.Length, ConfigManager.Instance.MaxNumResultsNotInMiningMode);
+            resultCount = Math.Min(lastLookupResultsSpan.Length, configManager.MaxNumResultsNotInMiningMode);
             checkForDuplicateCards = coreConfigManager is { DuplicateCheckIndependentOfMiningMode: true, CheckForDuplicateCards: true, AnkiIntegration: true } && !configManager.MineToFileInsteadOfAnki;
         }
 
@@ -971,7 +971,7 @@ internal sealed partial class PopupWindow : IDisposable
             : LastLookupResults.Length >= lookupDisplayResults.Length);
 
         bool[]? duplicateCard = await MiningUtils.CheckDuplicates(lastLookupResults, lookupDisplayResults.Length, _currentSourceText, CurrentSourceTextCharPosition, cancellationToken).ConfigureAwait(true);
-        if (duplicateCard is not null)
+        if (duplicateCard is not null && !cancellationToken.IsCancellationRequested)
         {
             Debug.Assert(lookupDisplayResults.Length == duplicateCard.Length);
             for (int i = 0; i < duplicateCard.Length; i++)
@@ -2444,9 +2444,9 @@ internal sealed partial class PopupWindow : IDisposable
 
     private void ClickDictTypeButton(Button button)
     {
-        foreach (Button btn in DictTabButtonsItemsControl.Items.Cast<Button>())
+        for (int i = 0; i < _dictTypeButtons.Count; i++)
         {
-            btn.ClearValue(BackgroundProperty);
+            _dictTypeButtons[i].ClearValue(BackgroundProperty);
         }
 
         button.Background = Brushes.DodgerBlue;

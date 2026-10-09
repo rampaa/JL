@@ -210,8 +210,14 @@ public static class ExtensionMethods
     {
         ReadOnlySpan<char> textToSearch = text.Slice(startIndex, length);
 
+        int index = textToSearch.IndexOf(value, StringComparison.Ordinal);
+        if (index < 0)
+        {
+            return [];
+        }
+
         List<int> indexes = new(textToSearch.Length);
-        for (int i = textToSearch.IndexOf(value, StringComparison.Ordinal); i > -1; i = textToSearch.IndexOf(value, i + 1))
+        for (int i = index; i > -1; i = textToSearch.IndexOf(value, i + 1))
         {
             indexes.Add(i + startIndex);
         }

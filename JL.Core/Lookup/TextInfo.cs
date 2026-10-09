@@ -8,23 +8,30 @@ namespace JL.Core.Lookup;
 
 internal sealed class TextInfo(List<string> textList,
     List<string> textInHiraganaList,
-    List<List<Form>?> deconjugationResultsList,
+    List<List<Form>?>? deconjugationResultsList,
     List<List<List<Form>>?>? deconjugatedTextWithoutLongVowelMarksList,
     List<List<string>?>? textWithoutLongVowelMarksList,
     int textWithoutLongVowelMarksCount,
     string[]? deconjugatedTexts,
     Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts,
-    IDictionary<string, IList<IDictRecord>>? pitchAccentDict) : IEquatable<TextInfo>
+    IDictionary<string, IList<IDictRecord>>? pitchAccentDict,
+    int maxTextInHiraganaLength,
+    int maxDeconjugatedTextLength,
+    int maxTextWithoutLongVowelMarksLength
+    ) : IEquatable<TextInfo>
 {
     public List<string> TextList { get; } = textList;
     public List<string> TextInHiraganaList { get; } = textInHiraganaList;
-    public List<List<Form>?> DeconjugationResultsList { get; } = deconjugationResultsList;
+    public List<List<Form>?>? DeconjugationResultsList { get; } = deconjugationResultsList;
     public List<List<List<Form>>?>? DeconjugatedTextWithoutLongVowelMarksList { get; } = deconjugatedTextWithoutLongVowelMarksList;
     public List<List<string>?>? TextWithoutLongVowelMarksList { get; } = textWithoutLongVowelMarksList;
     public int TextWithoutLongVowelMarksCount { get; } = textWithoutLongVowelMarksCount;
     public string[]? DeconjugatedTexts { get; } = deconjugatedTexts;
     public Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? FrequencyDicts { get; } = frequencyDicts;
     public IDictionary<string, IList<IDictRecord>>? PitchAccentDict { get; } = pitchAccentDict;
+    public int MaxTextInHiraganaLength { get; } = maxTextInHiraganaLength;
+    public int MaxDeconjugatedTextLength { get; } = maxDeconjugatedTextLength;
+    public int MaxTextWithoutLongVowelMarksLength { get; } = maxTextWithoutLongVowelMarksLength;
 
     public bool Equals([NotNullWhen(true)] TextInfo? other)
     {

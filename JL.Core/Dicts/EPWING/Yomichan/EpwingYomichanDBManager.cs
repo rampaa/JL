@@ -512,6 +512,24 @@ internal static class EpwingYomichanDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, int maxSearchKeyLengthForDict)
     {
+        int validTermCount = terms.Length;
+        if (maxSearchKeyLengthForDict > 0)
+        {
+            validTermCount = 0;
+            foreach (string term in terms)
+            {
+                if (term.Length <= maxSearchKeyLengthForDict)
+                {
+                    ++validTermCount;
+                }
+            }
+        }
+
+        if (validTermCount is 0)
+        {
+            return null;
+        }
+
         using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
         if (connection is null)
         {
@@ -519,38 +537,60 @@ internal static class EpwingYomichanDBManager
             return null;
         }
 
-        int validTermCount = terms.Length > maxSearchKeyLengthForDict && maxSearchKeyLengthForDict > 0
-            ? maxSearchKeyLengthForDict
-            : terms.Length;
-
-        using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
-
-        int offset = terms.Length - validTermCount;
-        for (int i = 0; i < validTermCount; i++)
+        try
         {
-            reader.Bind(i + 1, terms[offset + i]);
-        }
+            using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
 
-        Dictionary<string, IList<IDictRecord>>? results = null;
-        while (reader.Read())
-        {
-            results ??= new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
-
-            EpwingYomichanRecord record = GetRecord(reader);
-            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
-            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
-            if (exists)
+            if (validTermCount == terms.Length)
             {
-                Debug.Assert(result is not null);
-                result.Add(record);
+                for (int i = 0; i < terms.Length; i++)
+                {
+                    reader.Bind(i + 1, terms[i]);
+                }
             }
             else
             {
-                result = [record];
+                int parameterIndex = 1;
+                foreach (string term in terms)
+                {
+                    if (term.Length <= maxSearchKeyLengthForDict)
+                    {
+                        reader.Bind(parameterIndex, term);
+                        ++parameterIndex;
+                    }
+                }
             }
-        }
 
-        return results;
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+            do
+            {
+                EpwingYomichanRecord record = GetRecord(reader);
+                string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
+                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+                if (exists)
+                {
+                    Debug.Assert(result is not null);
+                    result.Add(record);
+                }
+                else
+                {
+                    result = [record];
+                }
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, string kanjiWithVariationSelector, string kanji)
@@ -562,30 +602,42 @@ internal static class EpwingYomichanDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, GetQuery(2));
-        reader.Bind(1, kanjiWithVariationSelector);
-        reader.Bind(2, kanji);
-
-        Dictionary<string, IList<IDictRecord>>? results = null;
-        while (reader.Read())
+        try
         {
-            results ??= new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
+            using SqliteRecordReader reader = new(connection, GetQuery(2));
+            reader.Bind(1, kanjiWithVariationSelector);
+            reader.Bind(2, kanji);
 
-            EpwingYomichanRecord record = GetRecord(reader);
-            string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
-            ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
-            if (exists)
+            if (!reader.Read())
             {
-                Debug.Assert(result is not null);
-                result.Add(record);
+                return null;
             }
-            else
+
+            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+            do
             {
-                result = [record];
+                EpwingYomichanRecord record = GetRecord(reader);
+                string searchKey = reader.GetString((int)ColumnIndex.SearchKey);
+                ref IList<IDictRecord>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(results, searchKey, out bool exists);
+                if (exists)
+                {
+                    Debug.Assert(result is not null);
+                    result.Add(record);
+                }
+                else
+                {
+                    result = [record];
+                }
             }
+            while (reader.Read());
+
+            return results;
         }
-
-        return results;
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
     }
 
     public static List<IDictRecord>? GetRecordsFromDB(string readOnlyConnectionString, string term)
@@ -597,17 +649,30 @@ internal static class EpwingYomichanDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
-        reader.Bind(1, term);
-
-        List<IDictRecord>? results = null;
-        while (reader.Read())
+        try
         {
-            results ??= [];
-            results.Add(GetRecord(reader));
-        }
+            using SqliteRecordReader reader = new(connection, s_singleTermQuery);
+            reader.Bind(1, term);
 
-        return results;
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            List<IDictRecord> results = [];
+            do
+            {
+                results.Add(GetRecord(reader));
+            }
+            while (reader.Read());
+
+            return results;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
     }
 
     public static void LoadFromDB(Dict dict)

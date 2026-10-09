@@ -1,7 +1,6 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using System.Threading.Channels;
 using System.Xml;
 using JL.Core.Dicts.Interfaces;
@@ -320,11 +319,19 @@ internal static class KanjidicDBManager
             return null;
         }
 
-        using SqliteRecordReader reader = new(connection, s_singleTermQuery);
-        reader.Bind(1, term);
-        return reader.Read()
-            ? [GetRecord(reader)]
-            : null;
+        try
+        {
+            using SqliteRecordReader reader = new(connection, s_singleTermQuery);
+            reader.Bind(1, term);
+            return reader.Read()
+                ? [GetRecord(reader)]
+                : null;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return null;
+        }
     }
 
     public static void LoadFromDB(Dict dict)

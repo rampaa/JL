@@ -73,6 +73,15 @@ public static class DictUtils
     private static Dict[] s_wordDicts = [];
     private static Dict[] s_kanjiDicts = [];
     private static Dict[] s_otherDicts = [];
+    internal static bool LookupHasWordDicts { get; private set; }
+    internal static bool LookupHasJmdict { get; private set; }
+    internal static bool LookupHasCustomWordDicts { get; private set; }
+    internal static bool LookupHasKanjiDicts { get; private set; }
+    internal static bool LookupHasOtherDicts { get; private set; }
+    internal static bool LookupWordDictsUseDB { get; private set; }
+    internal static bool LookupOtherDictsUseDB { get; private set; }
+    internal static bool LookupHasEpwingWordDicts { get; private set; }
+    internal static bool LookupNeedsSharedPitch { get; private set; }
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
@@ -1320,7 +1329,7 @@ public static class DictUtils
                         dbIsUsedForJmnedict = true;
                     }
 
-                    if (dict.Type is DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificWordNazeka)
+                    if (dict.Type is DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificYomichan or DictType.NonspecificWordNazeka or DictType.NonspecificNazeka)
                     {
                         dbIsUsedForAtLeastOneWordDict = true;
                     }
@@ -1401,6 +1410,11 @@ public static class DictUtils
         List<Dict> nameDicts = [];
         List<Dict> kanjiDicts = [];
         List<Dict> otherDicts = [];
+        bool hasJmdict = false;
+        bool hasCustomWordDicts = false;
+        bool wordDictsUseDB = false;
+        bool otherDictsUseDB = false;
+        bool hasEpwingWordDicts = false;
 
         foreach (Dict dict in dicts)
         {
@@ -1410,6 +1424,20 @@ public static class DictUtils
                 if (s_wordDictTypes.Contains(dict.Type))
                 {
                     wordDicts.Add(dict);
+                    if (dict.Type is DictType.JMdict)
+                    {
+                        hasJmdict = true;
+                        wordDictsUseDB |= dict.Options.UseDB.Value;
+                    }
+                    else if (dict.Type is DictType.CustomWordDictionary or DictType.ProfileCustomWordDictionary)
+                    {
+                        hasCustomWordDicts = true;
+                    }
+                    else
+                    {
+                        hasEpwingWordDicts = true;
+                        wordDictsUseDB |= dict.Options.UseDB.Value;
+                    }
                 }
                 else if (KanjiDictTypes.Contains(dict.Type))
                 {
@@ -1422,6 +1450,7 @@ public static class DictUtils
                 else if (s_otherDictTypes.Contains(dict.Type))
                 {
                     otherDicts.Add(dict);
+                    otherDictsUseDB |= dict.Options.UseDB.Value;
                 }
             }
         }
@@ -1431,6 +1460,17 @@ public static class DictUtils
         s_nameDicts = nameDicts.ToArray();
         s_kanjiDicts = kanjiDicts.ToArray();
         s_otherDicts = otherDicts.ToArray();
+        LookupHasWordDicts = wordDicts.Count > 0 || otherDicts.Count > 0;
+        LookupHasJmdict = hasJmdict;
+        LookupHasCustomWordDicts = hasCustomWordDicts;
+        LookupHasKanjiDicts = kanjiDicts.Count > 0;
+        LookupHasOtherDicts = otherDicts.Count > 0;
+        // Cache configured DB usage; readiness is checked when querying each dictionary.
+        LookupWordDictsUseDB = wordDictsUseDB;
+        LookupOtherDictsUseDB = otherDictsUseDB;
+        // JMdict and custom words query frequency and pitch keys from their records separately.
+        LookupHasEpwingWordDicts = hasEpwingWordDicts;
+        LookupNeedsSharedPitch = hasEpwingWordDicts || otherDicts.Count > 0 || nameDicts.Count > 0 || kanjiDicts.Count > 0;
     }
 
     private static void CalculateMaxSearchKeyLength(Dict[] dicts)
