@@ -304,13 +304,13 @@ internal static class EpwingYomichanUtils
 
                 case "li":
                 {
-                    content = content.TrimStart();
+                    ReadOnlySpan<char> trimmedContent = content.AsSpan().TrimStart();
                     ++orderedListIndex;
 
                     string? marker = contentResult.Marker ?? inheritedMarker;
                     if (marker is "none")
                     {
-                        _ = stringBuilder.Append('\n').Append(content);
+                        _ = stringBuilder.Append('\n').Append(trimmedContent);
                         break;
                     }
 
@@ -322,17 +322,17 @@ internal static class EpwingYomichanUtils
                     marker ??= isOrderedList ? $"{orderedListIndex}." : "•";
                     if (marker.Length is 0)
                     {
-                        _ = stringBuilder.Append('\n').Append(content);
+                        _ = stringBuilder.Append('\n').Append(trimmedContent);
                         break;
                     }
 
-                    if (content.StartsWith('•') || content.StartsWith(marker, StringComparison.Ordinal))
+                    if ((!trimmedContent.IsEmpty && trimmedContent[0] is '•') || trimmedContent.StartsWith(marker, StringComparison.Ordinal))
                     {
-                        _ = stringBuilder.Append('\n').Append(marker).Append('\n').Append(content);
+                        _ = stringBuilder.Append('\n').Append(marker).Append('\n').Append(trimmedContent);
                     }
                     else
                     {
-                        _ = stringBuilder.Append('\n').Append(marker).Append(' ').Append(content);
+                        _ = stringBuilder.Append('\n').Append(marker).Append(' ').Append(trimmedContent);
                     }
                     break;
                 }
