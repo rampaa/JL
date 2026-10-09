@@ -13,7 +13,8 @@ public static class StatsUtils
     public static Stats ProfileLifetimeStats { get; set; } = new();
     public static Stats LifetimeStats { get; internal set; } = new();
 
-    public static readonly Stopwatch TimeStatStopWatch = new();
+    internal static readonly Stopwatch s_timeStatStopWatch = new();
+    public static readonly Lock TimeStatsLock = new();
     public static readonly Lock TermLookupCountsLock = new();
     private static readonly Timer s_statsTimer = new();
     private static readonly Timer s_idleTimeTimer = new()
@@ -21,6 +22,7 @@ public static class StatsUtils
         AutoReset = false
     };
 
+    private static long s_idleTimeDeadline; // = 0
     private static int s_textLength; // = 0
 
     static StatsUtils()
@@ -36,69 +38,117 @@ public static class StatsUtils
         s_statsTimer.Enabled = true;
     }
 
-    public static void InitializeIdleTimeTimer()
-    {
-        SetIdleTimeTimerInterval(s_textLength);
-    }
-
     public static void SetIdleTimeTimerInterval(int textLength)
     {
-        s_textLength = textLength;
-        double minReadingSpeedThreshold = CoreConfigManager.Instance.MinCharactersPerMinuteBeforeStoppingTimeTracking;
-        if (minReadingSpeedThreshold > 0 && textLength > 0 && TimeStatStopWatch.IsRunning)
+        lock (TimeStatsLock)
         {
-            s_idleTimeTimer.Interval = Math.Max(TimeSpan.FromMinutes(textLength / minReadingSpeedThreshold).TotalMilliseconds, 1500);
+            s_textLength = textLength;
+            UpdateIdleTimeTimer();
+        }
+    }
+
+    private static void UpdateIdleTimeTimer()
+    {
+        double minReadingSpeedThreshold = CoreConfigManager.Instance.MinCharactersPerMinuteBeforeStoppingTimeTracking;
+        if (minReadingSpeedThreshold > 0 && s_textLength > 0 && s_timeStatStopWatch.IsRunning)
+        {
+            double interval = Math.Max(TimeSpan.FromMinutes(s_textLength / minReadingSpeedThreshold).TotalMilliseconds, 1500);
+            s_idleTimeDeadline = Stopwatch.GetTimestamp() + (long)Math.Ceiling(interval * Stopwatch.Frequency / 1000);
+            s_idleTimeTimer.Interval = interval;
             s_idleTimeTimer.Enabled = true;
         }
         else
         {
             s_idleTimeTimer.Enabled = false;
+            s_idleTimeDeadline = 0;
         }
     }
 
-    public static void StartTimeStatStopWatch()
+    public static void StartTimeStatStopWatch(bool onlyIfStopped = false)
     {
-        TimeStatStopWatch.Start();
+        lock (TimeStatsLock)
+        {
+            if (onlyIfStopped && s_timeStatStopWatch.IsRunning)
+            {
+                return;
+            }
 
-        // Restarts the timer
-        // This is faster than setting the Enabled property to false and then true
-        s_idleTimeTimer.Interval = s_idleTimeTimer.Interval;
-        s_idleTimeTimer.Enabled = true;
+            s_timeStatStopWatch.Start();
+            UpdateIdleTimeTimer();
+        }
     }
 
     public static void StopTimeStatStopWatch()
     {
-        TimeStatStopWatch.Stop();
-        s_idleTimeTimer.Enabled = false;
-    }
-
-    public static void StopIdleItemTimer()
-    {
-        s_idleTimeTimer.Enabled = false;
+        lock (TimeStatsLock)
+        {
+            s_timeStatStopWatch.Stop();
+            s_idleTimeTimer.Enabled = false;
+            s_idleTimeDeadline = 0;
+        }
     }
 
     private static void IdleTimeTimer_OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
-        if (TimeStatStopWatch.IsRunning)
+        lock (TimeStatsLock)
         {
-            IncrementStat(StatType.Time, TimeStatStopWatch.ElapsedTicks);
-            TimeStatStopWatch.Reset();
+            if (!s_timeStatStopWatch.IsRunning || s_idleTimeDeadline is 0)
+            {
+                return;
+            }
+
+            // A queued callback can belong to an earlier timeout, before new text arrived.
+            long remainingTicks = s_idleTimeDeadline - Stopwatch.GetTimestamp();
+            if (remainingTicks > 0)
+            {
+                s_idleTimeTimer.Interval = Math.Max((double)remainingTicks * 1000 / Stopwatch.Frequency, 1);
+                s_idleTimeTimer.Enabled = true;
+                return;
+            }
+
+            IncrementTimeStats(s_timeStatStopWatch.ElapsedTicks);
+            s_timeStatStopWatch.Reset();
+            s_idleTimeTimer.Enabled = false;
+            s_idleTimeDeadline = 0;
         }
+    }
+
+    public static void UpdateTimeStats(bool restartStopWatch)
+    {
+        lock (TimeStatsLock)
+        {
+            long elapsedTicks = s_timeStatStopWatch.ElapsedTicks;
+            if (restartStopWatch && s_timeStatStopWatch.IsRunning)
+            {
+                s_timeStatStopWatch.Restart();
+            }
+            else
+            {
+                s_timeStatStopWatch.Reset();
+                s_idleTimeTimer.Enabled = false;
+                s_idleTimeDeadline = 0;
+            }
+
+            IncrementTimeStats(elapsedTicks);
+        }
+    }
+
+    private static void IncrementTimeStats(long elapsedTicks)
+    {
+        if (elapsedTicks is 0)
+        {
+            return;
+        }
+
+        TimeSpan elapsed = TimeSpan.FromTicks((long)Math.Round((double)elapsedTicks * TimeSpan.TicksPerSecond / Stopwatch.Frequency));
+        SessionStats.Time = SessionStats.Time.Add(elapsed);
+        ProfileLifetimeStats.Time = ProfileLifetimeStats.Time.Add(elapsed);
+        LifetimeStats.Time = LifetimeStats.Time.Add(elapsed);
     }
 
     private static void StatsTimer_OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
-        IncrementStat(StatType.Time, TimeStatStopWatch.ElapsedTicks);
-
-        if (TimeStatStopWatch.IsRunning)
-        {
-            TimeStatStopWatch.Restart();
-        }
-
-        else
-        {
-            TimeStatStopWatch.Reset();
-        }
+        UpdateTimeStats(restartStopWatch: true);
 
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         StatsDBUtils.UpdateLifetimeStats(connection);
@@ -157,10 +207,10 @@ public static class StatsUtils
 
             case StatType.Time:
             {
-                TimeSpan elapsed = TimeSpan.FromTicks((long)Math.Round((double)amount * TimeSpan.TicksPerSecond / Stopwatch.Frequency));
-                SessionStats.Time = SessionStats.Time.Add(elapsed);
-                ProfileLifetimeStats.Time = ProfileLifetimeStats.Time.Add(elapsed);
-                LifetimeStats.Time = LifetimeStats.Time.Add(elapsed);
+                lock (TimeStatsLock)
+                {
+                    IncrementTimeStats(amount);
+                }
 
                 break;
             }
@@ -213,22 +263,30 @@ public static class StatsUtils
 
     public static void ResetStats(SqliteConnection connection, StatsMode statsMode)
     {
-        Stats stats = statsMode switch
+        lock (StatsDBUtils.s_statsDBLock)
         {
-            StatsMode.Lifetime => LifetimeStats,
-            StatsMode.Profile => ProfileLifetimeStats,
-            StatsMode.Session => SessionStats,
-            _ => SessionStats
-        };
+            int profileId;
+            lock (TimeStatsLock)
+            {
+                Stats stats = statsMode switch
+                {
+                    StatsMode.Lifetime => LifetimeStats,
+                    StatsMode.Profile => ProfileLifetimeStats,
+                    StatsMode.Session => SessionStats,
+                    _ => SessionStats
+                };
 
-        lock (TermLookupCountsLock)
-        {
-            stats.ResetStats();
-        }
+                profileId = statsMode is StatsMode.Profile ? ProfileUtils.CurrentProfileId : ProfileUtils.GlobalProfileId;
+                lock (TermLookupCountsLock)
+                {
+                    stats.ResetStats();
+                }
+            }
 
-        if (statsMode is StatsMode.Profile or StatsMode.Lifetime)
-        {
-            StatsDBUtils.ResetAllTermLookupCounts(connection, statsMode is StatsMode.Profile ? ProfileUtils.CurrentProfileId : ProfileUtils.GlobalProfileId);
+            if (statsMode is StatsMode.Profile or StatsMode.Lifetime)
+            {
+                StatsDBUtils.ResetAllTermLookupCounts(connection, profileId);
+            }
         }
     }
 
