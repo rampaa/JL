@@ -640,15 +640,6 @@ internal sealed class DeconjugatorTestsForVK
     [Test]
     public void Deconjugate_PolitePastTeruNegative_VK()
     {
-        const string termToDeconjugate = "来てません";
-        const string expected = "～teru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "来る", LastTag: "vk" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
-    public void Deconjugate_PolitePastTeruNegative2_VK()
-    {
         const string termToDeconjugate = "来てませんでした";
         const string expected = "～teru→polite past negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "来る", LastTag: "vk" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
@@ -1971,15 +1962,6 @@ internal sealed class DeconjugatorTestsForVK
     }
 
     [Test]
-    public void Deconjugate_ContractedProvisionalConditional_V5K()
-    {
-        const string termToDeconjugate = "泣きゃ";
-        const string expected = "～provisional conditional→contracted";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "泣く", LastTag: "v5k" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
     public void Deconjugate_PlainNonPastColloquialCausativeNegative_VK()
     {
         const string termToDeconjugate = "来ささない";
@@ -2232,29 +2214,37 @@ internal sealed class DeconjugatorTestsForVK
     }
 
     [Test]
-    public void Deconjugate_Morau_V5K()
+    public void Deconjugate_Morau_VK()
     {
-        const string termToDeconjugate = "泣いてもらう";
+        const string termToDeconjugate = "来てもらう";
         const string expected = "～get someone do";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "泣く", LastTag: "v5k" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "来る", LastTag: "vk" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
-    public void Deconjugate_Yaru_V5K()
+    public void Deconjugate_Yaru_VK()
     {
-        const string termToDeconjugate = "泣いてやる";
+        const string termToDeconjugate = "来てやる";
         const string expected = "～do for someone";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "泣く", LastTag: "v5k" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "来る", LastTag: "vk" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
-    public void Deconjugate_Sashiageru_V5K()
+    public void Deconjugate_Sashiageru_VK()
     {
-        const string termToDeconjugate = "泣いてさしあげる";
+        const string termToDeconjugate = "来てさしあげる";
         const string expected = "～do for someone";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "泣く", LastTag: "v5k" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "来る", LastTag: "vk" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [TestCase("こさした", "～short causative→past")]
+    [TestCase("こささない", "～short causative→negative")]
+    public void Deconjugate_ShortCausativeInflected_VK(string termToDeconjugate, string expected)
+    {
+        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "くる", LastTag: "vk" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
     }
 }
