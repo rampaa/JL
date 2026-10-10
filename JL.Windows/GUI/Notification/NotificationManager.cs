@@ -39,19 +39,11 @@ internal static class NotificationManager
         bool silent = notificationLevel is NotificationLevel.Information or NotificationLevel.Success;
         const bool suppressPopup = false;
 
-        string xml = /*lang=xml*/ $"""
-        <toast>
-            <visual>
-                <binding template="ToastText01">
-                    <text id="1">{GetNotificationLevelSymbol(notificationLevel)} {message}</text>
-                </binding>
-            </visual>
-            <audio silent="{(silent ? True : False)}"/> 
-        </toast>
-        """;
-
-        XmlDocument xmlDoc = new();
-        xmlDoc.LoadXml(xml);
+        XmlDocument xmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+        _ = xmlDoc.GetElementsByTagName("text")[0].AppendChild(xmlDoc.CreateTextNode($"{GetNotificationLevelSymbol(notificationLevel)} {message}"));
+        XmlElement audio = xmlDoc.CreateElement("audio");
+        audio.SetAttribute("silent", silent ? True : False);
+        _ = xmlDoc.DocumentElement.AppendChild(audio);
 
         ToastNotification toast = new(xmlDoc)
         {
