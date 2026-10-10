@@ -125,8 +125,8 @@ internal static class FrequencyYomichanReader
             ReadOnlySpan<byte> utf8Preamble = Encoding.UTF8.Preamble;
             if (jsonBytes.AsSpan(0, bufferedBytes).StartsWith(utf8Preamble))
             {
-                jsonBytes.AsSpan(utf8Preamble.Length, bufferedBytes - utf8Preamble.Length).CopyTo(jsonBytes);
-                bufferedBytes -= utf8Preamble.Length;
+                offset = utf8Preamble.Length;
+                bufferedBytes -= offset;
             }
 
             while (!finalBlock || bufferedBytes > 0 || !completed)
