@@ -254,11 +254,23 @@ internal static partial class WinApi
     public static void RegisterAllGlobalHotKeys(nint windowHandle)
     {
         OrderedDictionary<string, KeyGesture> globalKeyGestureNameToKeyGestureDict = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict;
-        int count = globalKeyGestureNameToKeyGestureDict.Count;
-        for (int id = 0; id < count; id++)
+        if (ConfigManager.Instance.DisableHotkeys)
         {
-            KeyGesture keyGesture = globalKeyGestureNameToKeyGestureDict.GetAt(id).Value;
-            _ = RegisterHotKey(windowHandle, id, (uint)keyGesture.Modifiers | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(keyGesture.Key));
+            int id = globalKeyGestureNameToKeyGestureDict.IndexOf(nameof(ConfigManager.DisableHotkeysKeyGesture));
+            if (id >= 0)
+            {
+                KeyGesture keyGesture = globalKeyGestureNameToKeyGestureDict.GetAt(id).Value;
+                _ = RegisterHotKey(windowHandle, id, (uint)keyGesture.Modifiers | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(keyGesture.Key));
+            }
+        }
+        else
+        {
+            int count = globalKeyGestureNameToKeyGestureDict.Count;
+            for (int id = 0; id < count; id++)
+            {
+                KeyGesture keyGesture = globalKeyGestureNameToKeyGestureDict.GetAt(id).Value;
+                _ = RegisterHotKey(windowHandle, id, (uint)keyGesture.Modifiers | MOD_NOREPEAT, (uint)KeyInterop.VirtualKeyFromKey(keyGesture.Key));
+            }
         }
     }
 
@@ -506,7 +518,11 @@ internal static partial class WinApi
 
                 _ = Application.Current?.Dispatcher.BeginInvoke(() =>
                 {
-                    KeyGestureUtils.HandleHotKey(keyGesture).SafeFireAndForget("HandleHotKey failed unexpectedly");
+                    ConfigManager configManager = ConfigManager.Instance;
+                    if (!configManager.DisableHotkeys || keyGesture.IsEqual(configManager.DisableHotkeysKeyGesture))
+                    {
+                        KeyGestureUtils.HandleHotKey(keyGesture).SafeFireAndForget("HandleHotKey failed unexpectedly");
+                    }
                 }, DispatcherPriority.Input);
 
                 handled = true;

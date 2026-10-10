@@ -664,7 +664,7 @@ internal static class WindowsUtils
                 StatsUtils.StartTimeStatStopWatch();
             }
 
-            if (configManager is { GlobalHotKeys: true, DisableHotkeys: false })
+            if (configManager.GlobalHotKeys)
             {
                 WinApi.RegisterAllGlobalHotKeys(MainWindow.Instance.WindowHandle);
             }
@@ -697,16 +697,16 @@ internal static class WindowsUtils
             return;
         }
 
-        //resources.MergedDictionaries.Clear();
-        resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("GUI/Styles/ResourceDictionary.xaml", UriKind.Relative) });
-        resources.MergedDictionaries.Add(new ResourceDictionary
+        resources.MergedDictionaries[1] = new ResourceDictionary
         {
             Source = new Uri(string.Create(CultureInfo.InvariantCulture, $"pack://application:,,,/HandyControl;component/Themes/Skin{skin}.xaml"))
-        });
-        resources.MergedDictionaries.Add(new ResourceDictionary
+        };
+
+        // Reload the theme as well because its brushes retain the previous skin's colors.
+        resources.MergedDictionaries[2] = new ResourceDictionary
         {
             Source = new Uri("pack://application:,,,/HandyControl;component/Themes/Theme.xaml")
-        });
+        };
     }
 
     public static async Task<byte[]?> GetImageFromClipboardAsByteArray()
@@ -963,7 +963,7 @@ internal static class WindowsUtils
             catch (ExternalException ex)
             {
                 LoggerManager.Logger.Warning(ex, "CopyTextToClipboard failed");
-                await Task.Delay(5).ConfigureAwait(false);
+                await Task.Delay(5).ConfigureAwait(true);
             }
         }
         while (!copied);
