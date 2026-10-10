@@ -18,8 +18,12 @@ internal static class WindowsAudioUtils
 {
     private static MediaPlayer? s_audioPlayer;
     private static MediaSource? s_mediaSource;
-    private static IRandomAccessStream? s_mediaStream;
-    private static MediaPlayer? AudioPlayer => Volatile.Read(ref s_audioPlayer);
+    private static InMemoryRandomAccessStream? s_mediaStream;
+    private static MediaPlayer? AudioPlayer
+    {
+        get => Volatile.Read(ref s_audioPlayer);
+        set => Volatile.Write(ref s_audioPlayer, value);
+    }
 
     private static readonly SemaphoreSlim s_audioPlayerSemaphoreSlim = new(1, 1);
 
@@ -54,7 +58,7 @@ internal static class WindowsAudioUtils
             }
 
             MediaPlayer mediaPlayer = new();
-            Volatile.Write(ref s_audioPlayer, mediaPlayer);
+            AudioPlayer = mediaPlayer;
             mediaPlayer.MediaFailed += static async (player, args) =>
             {
                 await DisposeMedia(player, args).ConfigureAwait(false);
@@ -115,9 +119,9 @@ internal static class WindowsAudioUtils
     private static void DisposeCurrentMedia()
     {
         MediaPlayer? player = s_audioPlayer;
-        Volatile.Write(ref s_audioPlayer, null);
+        AudioPlayer = null;
         MediaSource? source = s_mediaSource;
-        IRandomAccessStream? mediaStream = s_mediaStream;
+        InMemoryRandomAccessStream? mediaStream = s_mediaStream;
         s_mediaSource = null;
         s_mediaStream = null;
         try
