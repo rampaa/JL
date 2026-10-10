@@ -28,7 +28,9 @@ internal sealed class EffectWrapper : ContentControl
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
+        _templateInitialized = false;
         EnsureTemplateParts();
+        ApplyFrozenEffects();
     }
 
     public void RebuildEffects()
