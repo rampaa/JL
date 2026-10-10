@@ -880,6 +880,66 @@ public static partial class JapaneseUtils
         return -1;
     }
 
+    public static void GetGraphemeCounts(ReadOnlySpan<char> text, out int characterCount, out int characterCountWithoutPunctuation)
+    {
+        characterCount = text.GetGraphemeCount();
+        int index = FirstPunctuationIndex(text);
+        characterCountWithoutPunctuation = index < 0
+            ? characterCount
+            : GetGraphemeCountWithoutPunctuation(text, index);
+    }
+
+    public static int GetGraphemeCountWithoutPunctuation(ReadOnlySpan<char> text)
+    {
+        int index = FirstPunctuationIndex(text);
+        return index < 0
+            ? text.GetGraphemeCount()
+            : GetGraphemeCountWithoutPunctuation(text, index);
+    }
+
+    private static int GetGraphemeCountWithoutPunctuation(ReadOnlySpan<char> text, int index)
+    {
+        if (index == text.Length - 1)
+        {
+            return text[..index].GetGraphemeCount();
+        }
+
+        int bufferLength = text.Length - 1;
+        char[]? rentedBuffer = null;
+
+        Span<char> buffer = bufferLength <= 256
+            ? stackalloc char[bufferLength]
+            : rentedBuffer = ArrayPool<char>.Shared.Rent(bufferLength);
+
+        try
+        {
+            text[..index].CopyTo(buffer);
+            int length = index;
+            ReadOnlySpan<char> remainingText = text[(index + 1)..];
+            int currentIndex = 0;
+            foreach (Rune rune in remainingText.EnumerateRunes())
+            {
+                int runeLength = rune.Utf16SequenceLength;
+                if (Rune.IsLetterOrDigit(rune))
+                {
+                    remainingText.Slice(currentIndex, runeLength).CopyTo(buffer[length..]);
+                    length += runeLength;
+                }
+
+                currentIndex += runeLength;
+            }
+
+            return buffer[..length].GetGraphemeCount();
+        }
+        finally
+        {
+            if (rentedBuffer is not null)
+            {
+                ArrayPool<char>.Shared.Return(rentedBuffer);
+            }
+        }
+    }
+
     public static string RemovePunctuation(string text)
     {
         int index = FirstPunctuationIndex(text);
