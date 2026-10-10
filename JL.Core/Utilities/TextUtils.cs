@@ -9,7 +9,7 @@ namespace JL.Core.Utilities;
 
 public static class TextUtils
 {
-    internal static readonly Encoding s_utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
+    public static readonly Encoding Utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
 
     private const char HighSurrogateStart = '\uD800';
     private const char ReplacementCharacter = '\uFFFD';

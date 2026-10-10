@@ -40,7 +40,7 @@ internal static class EpwingYomichanDBManager
     internal const string SearchKey = "search_key";
 
     private const string Term = "term";
-    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_singleTermQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}
         FROM {Record} r
@@ -50,25 +50,25 @@ internal static class EpwingYomichanDBManager
 
     private static readonly ConcurrentDictionary<int, byte[]> s_queryCache = [];
 
-    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT COUNT(DISTINCT {SearchKey})
         FROM {RecordSearchKey};{"\0"}
         """);
 
-    private static readonly byte[] s_maxSearchKeyLengthQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_maxSearchKeyLengthQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
         FROM {RecordSearchKey};{"\0"}
         """);
 
-    private static readonly byte[] s_recordsQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_recordsQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT {RowId}, {PrimarySpelling}, {Reading}, {PopularityScore}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
         FROM {Record};{"\0"}
         """);
 
-    private static readonly byte[] s_searchKeysQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_searchKeysQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT {SearchKey}, {RecordId}
         FROM {RecordSearchKey}
@@ -97,8 +97,8 @@ internal static class EpwingYomichanDBManager
 
         string queryText = queryBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
-        query = GC.AllocateUninitializedArray<byte>(TextUtils.s_utf8NoBom.GetByteCount(queryText) + 1);
-        _ = TextUtils.s_utf8NoBom.GetBytes(queryText, query);
+        query = GC.AllocateUninitializedArray<byte>(TextUtils.Utf8NoBom.GetByteCount(queryText) + 1);
+        _ = TextUtils.Utf8NoBom.GetBytes(queryText, query);
         query[^1] = 0;
         _ = s_queryCache.TryAdd(termCount, query);
         return query;

@@ -56,13 +56,13 @@ internal static class JmdictDBManager
     public const string SearchKey = "search_key";
     public const string RecordId = "record_id";
 
-    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT COUNT(DISTINCT {SearchKey})
         FROM {RecordSearchKey};{"\0"}
         """);
 
-    private static readonly byte[] s_maxSearchKeyLengthQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_maxSearchKeyLengthQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT MAX(LENGTH(CAST({SearchKey} AS BLOB)) / 2)
         FROM {RecordSearchKey};{"\0"}
@@ -113,8 +113,8 @@ internal static class JmdictDBManager
 
         string queryText = queryBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
-        query = GC.AllocateUninitializedArray<byte>(TextUtils.s_utf8NoBom.GetByteCount(queryText) + 1);
-        _ = TextUtils.s_utf8NoBom.GetBytes(queryText, query);
+        query = GC.AllocateUninitializedArray<byte>(TextUtils.Utf8NoBom.GetByteCount(queryText) + 1);
+        _ = TextUtils.Utf8NoBom.GetBytes(queryText, query);
         query[^1] = 0;
         _ = s_queryCache.TryAdd(termCount, query);
         return query;

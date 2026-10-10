@@ -18,7 +18,7 @@ public static class JmdictWordClassUtils
 {
     private static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
 
-    private static readonly byte[] s_searchKeysQuery = TextUtils.s_utf8NoBom.GetBytes($"SELECT {JmdictDBManager.RecordId}, {JmdictDBManager.SearchKey} FROM {JmdictDBManager.RecordSearchKey}\0");
+    private static readonly byte[] s_searchKeysQuery = TextUtils.Utf8NoBom.GetBytes($"SELECT {JmdictDBManager.RecordId}, {JmdictDBManager.SearchKey} FROM {JmdictDBManager.RecordSearchKey}\0");
 
     public static async Task Load()
     {

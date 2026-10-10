@@ -36,7 +36,7 @@ internal static class FreqDBManager
     internal const string RecordId = "record_id";
 
     private const string Term = "term";
-    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_singleTermQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT r.{Frequency}
         FROM {Record} r
@@ -44,7 +44,7 @@ internal static class FreqDBManager
         WHERE rsk.{SearchKey} = @{Term};{"\0"}
         """);
 
-    private static readonly byte[] s_kanjiWithVariationSelectorQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_kanjiWithVariationSelectorQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT r.{Frequency}
         FROM {Record} r
@@ -56,26 +56,26 @@ internal static class FreqDBManager
 
     private static readonly ConcurrentDictionary<int, byte[]> s_queryCache = [];
 
-    private static readonly byte[] s_maxFrequencyQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_maxFrequencyQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT MAX({Frequency})
         FROM {Record}{"\0"}
         """);
 
-    private static readonly byte[] s_recordsQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_recordsQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT {Spelling}, {Frequency}, {RowId}
         FROM {Record};{"\0"}
         """);
 
-    private static readonly byte[] s_searchKeysQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_searchKeysQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT {SearchKey}, {RecordId}
         FROM {RecordSearchKey}
         ORDER BY {SearchKey}, {RecordId};{"\0"}
         """);
 
-    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT COUNT(DISTINCT {SearchKey})
         FROM {RecordSearchKey};{"\0"}
@@ -103,8 +103,8 @@ internal static class FreqDBManager
 
         string queryText = queryBuilder.Append(");").ToString();
         ObjectPoolManager.StringBuilderPool.Return(queryBuilder);
-        query = GC.AllocateUninitializedArray<byte>(TextUtils.s_utf8NoBom.GetByteCount(queryText) + 1);
-        _ = TextUtils.s_utf8NoBom.GetBytes(queryText, query);
+        query = GC.AllocateUninitializedArray<byte>(TextUtils.Utf8NoBom.GetByteCount(queryText) + 1);
+        _ = TextUtils.Utf8NoBom.GetBytes(queryText, query);
         query[^1] = 0;
         _ = s_queryCache.TryAdd(termCount, query);
         return query;
@@ -842,9 +842,9 @@ internal static class FreqDBManager
                         }
                         else
                         {
+                            string readingInHiragana = JapaneseUtils.NormalizeText(reading);
                             if (generateFusejiVariants)
                             {
-                                string readingInHiragana = JapaneseUtils.NormalizeText(reading);
                                 Debug.Assert(sources is not null);
                                 sources[count] = new FrequencyVariantSource(rowId, readingInHiragana, null);
                                 ++count;
@@ -853,7 +853,7 @@ internal static class FreqDBManager
                             ++rowId;
                             string primarySpellingInHiragana = JapaneseUtils.NormalizeText(primarySpelling);
                             Debug.Assert(sources is not null);
-                            sources[count] = new FrequencyVariantSource(rowId, primarySpellingInHiragana, reading);
+                            sources[count] = new FrequencyVariantSource(rowId, primarySpellingInHiragana, readingInHiragana);
                             ++count;
                         }
 

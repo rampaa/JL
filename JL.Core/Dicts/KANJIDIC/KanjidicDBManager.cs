@@ -30,7 +30,7 @@ internal static class KanjidicDBManager
     internal const string Frequency = "frequency";
 
     private const string Term = "term";
-    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_singleTermQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT r.{OnReadings}, r.{KunReadings}, r.{NanoriReadings}, r.{RadicalNames}, r.{Glossary}, r.{StrokeCount}, r.{Grade}, r.{Frequency}
         FROM {Record} r
@@ -50,7 +50,7 @@ internal static class KanjidicDBManager
         Kanji
     }
 
-    private static readonly byte[] s_recordsQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_recordsQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT r.{OnReadings}, r.{KunReadings}, r.{NanoriReadings}, r.{RadicalNames}, r.{Glossary}, r.{StrokeCount}, r.{Grade}, r.{Frequency}, r.{Kanji}
         FROM {Record} r;{"\0"}

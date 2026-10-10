@@ -11,7 +11,7 @@ public static class StatsDBUtils
 {
     internal static readonly Lock s_statsDBLock = new();
 
-    private static readonly byte[] s_statsQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_statsQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT {ConfigDBManager.Value}
         FROM {ConfigDBManager.Stats}

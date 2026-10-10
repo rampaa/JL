@@ -28,14 +28,14 @@ internal static class YomichanKanjiDBManager
     internal const string Stats = "stats";
 
     private const string Term = "term";
-    private static readonly byte[] s_singleTermQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_singleTermQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}
         FROM {Record} r
         WHERE r.{Kanji} = @{Term};{"\0"}
         """);
 
-    private static readonly byte[] s_kanjiWithVariationSelectorQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_kanjiWithVariationSelectorQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}, r.{Kanji}
         FROM {Record} r
@@ -53,7 +53,7 @@ internal static class YomichanKanjiDBManager
         Kanji
     }
 
-    private static readonly byte[] s_distinctKanjiCountQuery = TextUtils.s_utf8NoBom.GetBytes(
+    private static readonly byte[] s_distinctKanjiCountQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
         SELECT COUNT(DISTINCT {Kanji})
         FROM {Record};{"\0"}
