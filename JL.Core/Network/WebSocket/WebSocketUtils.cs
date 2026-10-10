@@ -65,7 +65,7 @@ public static class WebSocketUtils
     {
         if (TsukikageWebSocketConnection?.Connected ?? false)
         {
-            return true;
+            return false;
         }
 
         foreach (WebSocketConnection connection in s_webSocketConnectionsDict.Values)
