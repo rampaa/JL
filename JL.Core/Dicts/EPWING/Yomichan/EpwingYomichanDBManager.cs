@@ -42,7 +42,7 @@ internal static class EpwingYomichanDBManager
     private const string Term = "term";
     private static readonly byte[] s_singleTermQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
-        SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}
+        SELECT r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}
         FROM {Record} r
         JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
         WHERE rsk.{SearchKey} = @{Term};{"\0"}
@@ -64,7 +64,7 @@ internal static class EpwingYomichanDBManager
 
     private static readonly byte[] s_recordsQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
-        SELECT {RowId}, {PrimarySpelling}, {Reading}, {PopularityScore}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}
+        SELECT {PrimarySpelling}, {Reading}, {PopularityScore}, {Glossary}, {PartOfSpeech}, {GlossaryTags}, {ImageInfos}, {RowId}
         FROM {Record};{"\0"}
         """);
 
@@ -84,7 +84,7 @@ internal static class EpwingYomichanDBManager
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             $"""
-            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}, rsk.{SearchKey}
+            SELECT r.{PrimarySpelling}, r.{Reading}, r.{PopularityScore}, r.{Glossary}, r.{PartOfSpeech}, r.{GlossaryTags}, r.{ImageInfos}, rsk.{SearchKey}
             FROM {Record} r
             JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
             WHERE rsk.{SearchKey} IN (@1
@@ -114,16 +114,16 @@ internal static class EpwingYomichanDBManager
 
     private enum ColumnIndex
     {
-        RowId = 0,
-        PrimarySpelling,
+        PrimarySpelling = 0,
         Reading,
         PopularityScore,
-        // ReSharper disable once UnusedMember.Local
         Glossary,
         PartOfSpeech,
         GlossaryTags,
         ImageInfos,
-        SearchKey
+        SearchKey,
+        // Lookup and bulk-load queries append different columns at the same position.
+        RowId = SearchKey
     }
 
     public static void CreateDB(string dbPath)
@@ -729,7 +729,6 @@ internal static class EpwingYomichanDBManager
 
     private static EpwingYomichanRecord GetRecord(SqliteRecordReader reader)
     {
-        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
         string primarySpelling = reader.GetString((int)ColumnIndex.PrimarySpelling);
 
         const int readingIndex = (int)ColumnIndex.Reading;
@@ -738,10 +737,10 @@ internal static class EpwingYomichanDBManager
             : null;
 
         double popularityScore = reader.GetDouble((int)ColumnIndex.PopularityScore);
-        string[] definitions = reader.Deserialize<string[]>(Record, Glossary, rowId);
-        string[]? wordClasses = reader.DeserializeNullable<string[]>((int)ColumnIndex.PartOfSpeech, Record, PartOfSpeech, rowId);
-        string[]? definitionTags = reader.DeserializeNullable<string[]>((int)ColumnIndex.GlossaryTags, Record, GlossaryTags, rowId);
-        ImageInfo[]? imageInfos = reader.DeserializeNullable<ImageInfo[]>((int)ColumnIndex.ImageInfos, Record, ImageInfos, rowId);
+        string[] definitions = reader.Deserialize<string[]>((int)ColumnIndex.Glossary);
+        string[]? wordClasses = reader.DeserializeNullable<string[]>((int)ColumnIndex.PartOfSpeech);
+        string[]? definitionTags = reader.DeserializeNullable<string[]>((int)ColumnIndex.GlossaryTags);
+        ImageInfo[]? imageInfos = reader.DeserializeNullable<ImageInfo[]>((int)ColumnIndex.ImageInfos);
 
         return new EpwingYomichanRecord(primarySpelling, reading, popularityScore, definitions, wordClasses, definitionTags, imageInfos);
     }

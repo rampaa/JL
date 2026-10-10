@@ -38,8 +38,6 @@ internal static class KanjiCompositionDBManager
             using SqliteRecordReader reader = new(connection, SingleTermQuery);
             reader.Bind(1, kanji);
 
-            // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
-            // As a result, SqliteBlob cannot be used to read its BLOBs.
             return reader.Read()
                 ? reader.Deserialize<string[]>(0)
                 : null;

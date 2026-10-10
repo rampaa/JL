@@ -47,7 +47,7 @@ internal static class JmnedictDBManager
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             $"""
-            SELECT r.{RowId}, r.{JmnedictId}, r.{PrimarySpelling}, r.{Readings}, r.{AlternativeSpellings}, r.{Glossary}, r.{NameTypes}, r.{PrimarySpellingInHiragana}
+            SELECT r.{JmnedictId}, r.{PrimarySpelling}, r.{Readings}, r.{AlternativeSpellings}, r.{Glossary}, r.{NameTypes}, r.{PrimarySpellingInHiragana}
             FROM {Record} r
             WHERE r.{PrimarySpellingInHiragana} IN (@1
             """);
@@ -68,15 +68,11 @@ internal static class JmnedictDBManager
 
     private enum ColumnIndex
     {
-        // ReSharper disable once UnusedMember.Local
-        RowId = 0,
-        JmnedictId,
+        JmnedictId = 0,
         PrimarySpelling,
         Readings,
         AlternativeSpellings,
-        // ReSharper disable once UnusedMember.Local
         Glossary,
-        // ReSharper disable once UnusedMember.Local
         NameTypes,
         PrimarySpellingInHiragana
     }
@@ -555,7 +551,7 @@ internal static class JmnedictDBManager
     //
     //    command.CommandText =
     //        $"""
-    //        SELECT r.{RowId}, r.{JmnedictId}, r.{PrimarySpelling}, r.{Readings}, r.{AlternativeSpellings}, r.{Glossary}, r.{NameTypes}, r.{PrimarySpellingInHiragana}
+    //        SELECT r.{JmnedictId}, r.{PrimarySpelling}, r.{Readings}, r.{AlternativeSpellings}, r.{Glossary}, r.{NameTypes}, r.{PrimarySpellingInHiragana}
     //        FROM {Record} r;
     //        """;
     //
@@ -579,13 +575,12 @@ internal static class JmnedictDBManager
 
     private static JmnedictRecord GetRecord(SqliteRecordReader reader)
     {
-        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
         int jmnedictId = reader.GetInt32((int)ColumnIndex.JmnedictId);
         string primarySpelling = reader.GetString((int)ColumnIndex.PrimarySpelling);
-        string[]? readings = reader.DeserializeNullable<string[]>((int)ColumnIndex.Readings, Record, Readings, rowId);
-        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings, Record, AlternativeSpellings, rowId);
-        string[][] definitions = reader.Deserialize<string[][]>(Record, Glossary, rowId);
-        string[][] nameTypes = reader.Deserialize<string[][]>(Record, NameTypes, rowId);
+        string[]? readings = reader.DeserializeNullable<string[]>((int)ColumnIndex.Readings);
+        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings);
+        string[][] definitions = reader.Deserialize<string[][]>((int)ColumnIndex.Glossary);
+        string[][] nameTypes = reader.Deserialize<string[][]>((int)ColumnIndex.NameTypes);
 
         return new JmnedictRecord(jmnedictId, primarySpelling, alternativeSpellings, readings, definitions, nameTypes);
     }

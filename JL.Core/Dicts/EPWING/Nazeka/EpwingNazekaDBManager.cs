@@ -46,7 +46,7 @@ internal static class EpwingNazekaDBManager
     private const string Term = "term";
     private static readonly byte[] s_singleTermQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
-        SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}
+        SELECT r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}
         FROM {Record} r
         JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
         WHERE rsk.{SearchKey} = @{Term};{"\0"}
@@ -54,7 +54,7 @@ internal static class EpwingNazekaDBManager
 
     private static readonly ConcurrentDictionary<int, byte[]> s_queryCache = [];
 
-    private static readonly byte[] s_variantSourcesQuery = TextUtils.Utf8NoBom.GetBytes($"SELECT {RowId}, {PrimarySpelling}, {Reading} FROM {Record} ORDER BY {RowId};\0");
+    private static readonly byte[] s_variantSourcesQuery = TextUtils.Utf8NoBom.GetBytes($"SELECT {PrimarySpelling}, {Reading} FROM {Record} ORDER BY {RowId};\0");
 
     private static readonly byte[] s_distinctSearchKeyCountQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
@@ -70,7 +70,7 @@ internal static class EpwingNazekaDBManager
 
     private static readonly byte[] s_recordsQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
-        SELECT {RowId}, {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo}
+        SELECT {PrimarySpelling}, {Reading}, {AlternativeSpellings}, {Glossary}, {ImageInfo}, {RowId}
         FROM {Record};{"\0"}
         """);
 
@@ -90,7 +90,7 @@ internal static class EpwingNazekaDBManager
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             $"""
-            SELECT r.{RowId}, r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}, rsk.{SearchKey}
+            SELECT r.{PrimarySpelling}, r.{Reading}, r.{AlternativeSpellings}, r.{Glossary}, r.{ImageInfo}, rsk.{SearchKey}
             FROM {Record} r
             JOIN {RecordSearchKey} rsk ON r.{RowId} = rsk.{RecordId}
             WHERE rsk.{SearchKey} IN (@1
@@ -112,15 +112,14 @@ internal static class EpwingNazekaDBManager
 
     private enum ColumnIndex
     {
-        // ReSharper disable once UnusedMember.Local
-        RowId = 0,
-        PrimarySpelling,
+        PrimarySpelling = 0,
         Reading,
         AlternativeSpellings,
-        // ReSharper disable once UnusedMember.Local
         Glossary,
         ImageInfo,
-        SearchKey
+        SearchKey,
+        // Lookup and bulk-load queries append different columns at the same position.
+        RowId = SearchKey
     }
 
     public static void CreateDB(string dbPath)
@@ -1316,7 +1315,6 @@ internal static class EpwingNazekaDBManager
 
     private static EpwingNazekaRecord GetRecord(SqliteRecordReader reader)
     {
-        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
         string primarySpelling = reader.GetString((int)ColumnIndex.PrimarySpelling);
 
         const int readingIndex = (int)ColumnIndex.Reading;
@@ -1324,9 +1322,9 @@ internal static class EpwingNazekaDBManager
             ? reader.GetString(readingIndex)
             : null;
 
-        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings, Record, AlternativeSpellings, rowId);
-        string[] definitions = reader.Deserialize<string[]>(Record, Glossary, rowId);
-        ImageInfo? imageInfo = reader.DeserializeNullable<ImageInfo>((int)ColumnIndex.ImageInfo, Record, ImageInfo, rowId);
+        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings);
+        string[] definitions = reader.Deserialize<string[]>((int)ColumnIndex.Glossary);
+        ImageInfo? imageInfo = reader.DeserializeNullable<ImageInfo>((int)ColumnIndex.ImageInfo);
 
         return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions, imageInfo);
     }

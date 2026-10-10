@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Diagnostics;
 using MessagePack;
 using Microsoft.Data.Sqlite;
@@ -113,27 +114,26 @@ internal readonly ref struct SqliteRecordReader
         return value;
     }
 
-    private byte[] GetBytes(int index)
-    {
-        return raw.sqlite3_column_blob(_statement, index).ToArray();
-    }
-
     public T Deserialize<T>(int index)
     {
-        return MessagePackSerializer.Deserialize<T>(GetBytes(index));
+        ReadOnlySpan<byte> source = raw.sqlite3_column_blob(_statement, index);
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(source.Length);
+        try
+        {
+            source.CopyTo(buffer);
+            return MessagePackSerializer.Deserialize<T>(buffer.AsMemory(0, source.Length));
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
     }
 
-    public T Deserialize<T>(string tableName, string columnName, long rowId)
-    {
-        using SqliteBlob stream = new(_connection, tableName, columnName, rowId, true);
-        return MessagePackSerializer.Deserialize<T>(stream);
-    }
-
-    public T? DeserializeNullable<T>(int index, string tableName, string columnName, long rowId) where T : class
+    public T? DeserializeNullable<T>(int index) where T : class
     {
         return IsNull(index)
             ? null
-            : Deserialize<T>(tableName, columnName, rowId);
+            : Deserialize<T>(index);
     }
 
     public void Dispose()

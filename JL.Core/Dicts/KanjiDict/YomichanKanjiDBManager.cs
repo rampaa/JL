@@ -30,23 +30,21 @@ internal static class YomichanKanjiDBManager
     private const string Term = "term";
     private static readonly byte[] s_singleTermQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
-        SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}
+        SELECT r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}
         FROM {Record} r
         WHERE r.{Kanji} = @{Term};{"\0"}
         """);
 
     private static readonly byte[] s_kanjiWithVariationSelectorQuery = TextUtils.Utf8NoBom.GetBytes(
         $"""
-        SELECT r.{RowId}, r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}, r.{Kanji}
+        SELECT r.{OnReadings}, r.{KunReadings}, r.{Glossary}, r.{Stats}, r.{Kanji}
         FROM {Record} r
         WHERE r.{Kanji} IN (@1, @2);{"\0"}
         """);
 
     private enum ColumnIndex
     {
-        // ReSharper disable once UnusedMember.Local
-        RowId = 0,
-        OnReadings,
+        OnReadings = 0,
         KunReadings,
         Glossary,
         Stats,
@@ -473,11 +471,10 @@ internal static class YomichanKanjiDBManager
 
     private static YomichanKanjiRecord GetRecord(SqliteRecordReader reader)
     {
-        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
-        string[]? onReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.OnReadings, Record, OnReadings, rowId);
-        string[]? kunReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.KunReadings, Record, KunReadings, rowId);
-        string[]? definitions = reader.DeserializeNullable<string[]>((int)ColumnIndex.Glossary, Record, Glossary, rowId);
-        string[]? stats = reader.DeserializeNullable<string[]>((int)ColumnIndex.Stats, Record, Stats, rowId);
+        string[]? onReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.OnReadings);
+        string[]? kunReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.KunReadings);
+        string[]? definitions = reader.DeserializeNullable<string[]>((int)ColumnIndex.Glossary);
+        string[]? stats = reader.DeserializeNullable<string[]>((int)ColumnIndex.Stats);
 
         return new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats);
     }

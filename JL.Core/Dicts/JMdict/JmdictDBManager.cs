@@ -77,8 +77,7 @@ internal static class JmdictDBManager
 
         StringBuilder queryBuilder = ObjectPoolManager.StringBuilderPool.Get().Append(
             $"""
-            SELECT r.{RowId},
-                   r.{EdictId},
+            SELECT r.{EdictId},
                    r.{PrimarySpelling},
                    r.{PrimarySpellingOrthographyInfo},
                    r.{SpellingRestrictions},
@@ -122,9 +121,7 @@ internal static class JmdictDBManager
 
     private enum ColumnIndex
     {
-        // ReSharper disable once UnusedMember.Local
-        RowId = 0,
-        EdictId,
+        EdictId = 0,
         PrimarySpelling,
         PrimarySpellingOrthographyInfo,
         SpellingRestrictions,
@@ -133,7 +130,6 @@ internal static class JmdictDBManager
         Readings,
         ReadingsOrthographyInfo,
         ReadingRestrictions,
-        // ReSharper disable once UnusedMember.Local
         Glossary,
         GlossaryInfo,
         WordClassesSharedByAllSenses,
@@ -850,29 +846,28 @@ internal static class JmdictDBManager
 
     private static JmdictRecord GetRecord(SqliteRecordReader reader)
     {
-        long rowId = reader.GetInt64((int)ColumnIndex.RowId);
         int edictId = reader.GetInt32((int)ColumnIndex.EdictId);
         string primarySpelling = reader.GetString((int)ColumnIndex.PrimarySpelling);
-        string[]? primarySpellingOrthographyInfo = reader.DeserializeNullable<string[]>((int)ColumnIndex.PrimarySpellingOrthographyInfo, Record, PrimarySpellingOrthographyInfo, rowId);
-        string[]?[]? spellingRestrictions = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.SpellingRestrictions, Record, SpellingRestrictions, rowId);
-        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings, Record, AlternativeSpellings, rowId);
-        string[]?[]? alternativeSpellingsOrthographyInfo = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.AlternativeSpellingsOrthographyInfo, Record, AlternativeSpellingsOrthographyInfo, rowId);
-        string[]? readings = reader.DeserializeNullable<string[]>((int)ColumnIndex.Readings, Record, Readings, rowId);
-        string[]?[]? readingsOrthographyInfo = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.ReadingsOrthographyInfo, Record, ReadingsOrthographyInfo, rowId);
-        string[]?[]? readingRestrictions = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.ReadingRestrictions, Record, ReadingRestrictions, rowId);
-        string[][] definitions = reader.Deserialize<string[][]>(Record, Glossary, rowId);
-        string?[]? definitionInfo = reader.DeserializeNullable<string?[]>((int)ColumnIndex.GlossaryInfo, Record, GlossaryInfo, rowId);
-        string[]? wordClassesSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.WordClassesSharedByAllSenses, Record, PartOfSpeechSharedByAllSenses, rowId);
-        string[]?[]? wordClasses = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.WordClasses, Record, PartOfSpeech, rowId);
-        string[]? fieldsSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.FieldsSharedByAllSenses, Record, FieldsSharedByAllSenses, rowId);
-        string[]?[]? fields = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Fields, Record, Fields, rowId);
-        string[]? miscSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.MiscSharedByAllSenses, Record, MiscSharedByAllSenses, rowId);
-        string[]?[]? misc = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Misc, Record, Misc, rowId);
-        string[]? dialectsSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.DialectsSharedByAllSenses, Record, DialectsSharedByAllSenses, rowId);
-        string[]?[]? dialects = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Dialects, Record, Dialects, rowId);
-        LoanwordSource[]? loanwordEtymology = reader.DeserializeNullable<LoanwordSource[]>((int)ColumnIndex.LoanwordEtymology, Record, LoanwordEtymology, rowId);
-        string[]?[]? crossReferences = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.CrossReferences, Record, CrossReferences, rowId);
-        string[]? info = reader.DeserializeNullable<string[]>((int)ColumnIndex.Info, Record, Info, rowId);
+        string[]? primarySpellingOrthographyInfo = reader.DeserializeNullable<string[]>((int)ColumnIndex.PrimarySpellingOrthographyInfo);
+        string[]?[]? spellingRestrictions = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.SpellingRestrictions);
+        string[]? alternativeSpellings = reader.DeserializeNullable<string[]>((int)ColumnIndex.AlternativeSpellings);
+        string[]?[]? alternativeSpellingsOrthographyInfo = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.AlternativeSpellingsOrthographyInfo);
+        string[]? readings = reader.DeserializeNullable<string[]>((int)ColumnIndex.Readings);
+        string[]?[]? readingsOrthographyInfo = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.ReadingsOrthographyInfo);
+        string[]?[]? readingRestrictions = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.ReadingRestrictions);
+        string[][] definitions = reader.Deserialize<string[][]>((int)ColumnIndex.Glossary);
+        string?[]? definitionInfo = reader.DeserializeNullable<string?[]>((int)ColumnIndex.GlossaryInfo);
+        string[]? wordClassesSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.WordClassesSharedByAllSenses);
+        string[]?[]? wordClasses = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.WordClasses);
+        string[]? fieldsSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.FieldsSharedByAllSenses);
+        string[]?[]? fields = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Fields);
+        string[]? miscSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.MiscSharedByAllSenses);
+        string[]?[]? misc = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Misc);
+        string[]? dialectsSharedByAllSenses = reader.DeserializeNullable<string[]>((int)ColumnIndex.DialectsSharedByAllSenses);
+        string[]?[]? dialects = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.Dialects);
+        LoanwordSource[]? loanwordEtymology = reader.DeserializeNullable<LoanwordSource[]>((int)ColumnIndex.LoanwordEtymology);
+        string[]?[]? crossReferences = reader.DeserializeNullable<string[]?[]>((int)ColumnIndex.CrossReferences);
+        string[]? info = reader.DeserializeNullable<string[]>((int)ColumnIndex.Info);
 
         return new JmdictRecord(edictId, primarySpelling, definitions, wordClasses, wordClassesSharedByAllSenses, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, spellingRestrictions, readingRestrictions, fields, fieldsSharedByAllSenses, misc, miscSharedByAllSenses, definitionInfo, dialects, dialectsSharedByAllSenses, loanwordEtymology, crossReferences, info);
     }

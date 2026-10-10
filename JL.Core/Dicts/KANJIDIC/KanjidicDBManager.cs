@@ -360,33 +360,11 @@ internal static class KanjidicDBManager
 
     private static KanjidicRecord GetRecord(SqliteRecordReader reader)
     {
-        // The "record" table is created as WITHOUT ROWID because we don't need a numeric primary key.
-        // As a result, SqliteBlob cannot be used to read its BLOBs.
-
-        const int onReadingsIndex = (int)ColumnIndex.OnReadings;
-        string[]? onReadings = !reader.IsNull(onReadingsIndex)
-            ? reader.Deserialize<string[]>(onReadingsIndex)
-            : null;
-
-        const int kunReadingsIndex = (int)ColumnIndex.KunReadings;
-        string[]? kunReadings = !reader.IsNull(kunReadingsIndex)
-            ? reader.Deserialize<string[]>(kunReadingsIndex)
-            : null;
-
-        const int nanoriReadingsIndex = (int)ColumnIndex.NanoriReadings;
-        string[]? nanoriReadings = !reader.IsNull(nanoriReadingsIndex)
-            ? reader.Deserialize<string[]>(nanoriReadingsIndex)
-            : null;
-
-        const int radicalNamesIndex = (int)ColumnIndex.RadicalNames;
-        string[]? radicalNames = !reader.IsNull(radicalNamesIndex)
-            ? reader.Deserialize<string[]>(radicalNamesIndex)
-            : null;
-
-        const int glossaryIndex = (int)ColumnIndex.Glossary;
-        string[]? definitions = !reader.IsNull(glossaryIndex)
-            ? reader.Deserialize<string[]>(glossaryIndex)
-            : null;
+        string[]? onReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.OnReadings);
+        string[]? kunReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.KunReadings);
+        string[]? nanoriReadings = reader.DeserializeNullable<string[]>((int)ColumnIndex.NanoriReadings);
+        string[]? radicalNames = reader.DeserializeNullable<string[]>((int)ColumnIndex.RadicalNames);
+        string[]? definitions = reader.DeserializeNullable<string[]>((int)ColumnIndex.Glossary);
 
         byte strokeCount = (byte)reader.GetInt32((int)ColumnIndex.StrokeCount);
         byte grade = (byte)reader.GetInt32((int)ColumnIndex.Grade);
