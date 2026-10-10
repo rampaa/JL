@@ -118,7 +118,7 @@ internal sealed partial class ManageProfilesWindow
             File.Delete(profileCustomWordsPath);
         }
 
-        string profileRegexReplacementFilePath = RegexReplacerUtils.GetProfileSpecificFilePath();
+        string profileRegexReplacementFilePath = RegexReplacerUtils.GetProfileSpecificFilePath(profile);
         if (File.Exists(profileRegexReplacementFilePath))
         {
             File.Delete(profileRegexReplacementFilePath);

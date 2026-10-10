@@ -13,9 +13,9 @@ public static partial class RegexReplacerUtils
 
     private static readonly string s_filePath = Path.Join(ProfileUtils.ProfileFolderPath, "Regex_Replacements.txt");
 
-    public static string GetProfileSpecificFilePath()
+    public static string GetProfileSpecificFilePath(string profileName)
     {
-        return Path.Join(ProfileUtils.ProfileFolderPath, $"{ProfileUtils.CurrentProfileName}_Regex_Replacements.txt");
+        return Path.Join(ProfileUtils.ProfileFolderPath, $"{profileName}_Regex_Replacements.txt");
     }
 
     public static void PopulateRegexReplacements()
@@ -29,7 +29,7 @@ public static partial class RegexReplacerUtils
             filePaths.Add(s_filePath);
         }
 
-        string profilePath = GetProfileSpecificFilePath();
+        string profilePath = GetProfileSpecificFilePath(ProfileUtils.CurrentProfileName);
         if (File.Exists(profilePath))
         {
             filePaths.Add(profilePath);
