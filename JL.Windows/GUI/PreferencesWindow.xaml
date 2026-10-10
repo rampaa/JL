@@ -14,7 +14,7 @@
         <Button Content="Save" HorizontalAlignment="Right" Margin="0,0,20,20"
                 VerticalAlignment="Bottom" Width="85" Click="SaveButton_Click" FontSize="16" Height="35" />
 
-        <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65">
+        <TabControl SelectionChanged="PreferencesTabControl_SelectionChanged" TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65">
             <TabControl.Resources>
                 <Style x:Key="AlternatingWithTriggers" TargetType="{x:Type ListBoxItem}">
                     <Style.Triggers>
@@ -1617,44 +1617,46 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Anki" Height="33" MouseUp="AnkiTabItem_MouseUp">
+            <TabItem x:Name="AnkiTabItem" Header="Anki" Height="33">
                 <ScrollViewer PanningMode="Both">
                     <StackPanel>
                         <DockPanel Margin="18,0,18,0" Height="35">
                             <TextBlock HorizontalAlignment="Left" Text="Enable Anki integration" Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" TextWrapping="Wrap" />
-                            <CheckBox x:Name="AnkiIntegrationCheckBox"  HorizontalAlignment="Right" />
+                            <CheckBox x:Name="AnkiIntegrationCheckBox"  HorizontalAlignment="Right" Checked="AnkiIntegrationCheckBox_Checked" />
                         </DockPanel>
 
                         <StackPanel IsEnabled="{Binding ElementName=AnkiIntegrationCheckBox,Path=IsChecked}">
+                            <GroupBox Header="AnkiConnect connection" Margin="10,0,10,8" Padding="10">
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,8">
+                                        <TextBlock Text="Server address" Style="{StaticResource TextBlockDefault}"
+                                                   VerticalAlignment="Center" DockPanel.Dock="Left" />
+                                        <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right" Width="210"
+                                                 TextWrapping="NoWrap" TextChanged="AnkiConnectSettings_TextChanged" />
+                                    </DockPanel>
+                                    <DockPanel Margin="0,0,0,8">
+                                        <TextBlock Text="API key" Style="{StaticResource TextBlockDefault}"
+                                                   VerticalAlignment="Center" DockPanel.Dock="Left" />
+                                        <TextBox x:Name="AnkiConnectApiKeyTextBox" HorizontalAlignment="Right" Width="210"
+                                                 TextWrapping="NoWrap" TextChanged="AnkiConnectSettings_TextChanged" />
+                                    </DockPanel>
+                                    <TextBlock Text="Apply changes to the server address or API key to load decks and note types."
+                                               Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" Margin="0,0,0,8" />
+                                    <DockPanel>
+                                        <Button x:Name="ApplyAnkiConnectSettingsButton" Content="Apply AnkiConnect settings"
+                                                DockPanel.Dock="Right" IsEnabled="False" Click="ApplyAnkiConnectSettingsButton_Click" />
+                                        <TextBlock x:Name="AnkiConnectSettingsStatusTextBlock" VerticalAlignment="Center"
+                                                   Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" Margin="0,0,10,0" />
+                                    </DockPanel>
+                                </StackPanel>
+                            </GroupBox>
                             <ListBox AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}">
                                 <ListBox.Template>
                                     <ControlTemplate>
                                         <ItemsPresenter></ItemsPresenter>
                                     </ControlTemplate>
                                 </ListBox.Template>
-
-                                <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
-                                    <DockPanel Margin="10,0,10,0">
-                                        <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address" Style="{StaticResource TextBlockDefault}"
-                                           VerticalAlignment="Center" TextWrapping="Wrap" DockPanel.Dock="Left" />
-                                        <Button Content="Apply" Width="Auto" VerticalAlignment="Center" FontSize="9" Height="26"
-                                    Click="ApplyAnkiConnectUrlButton_Click" DockPanel.Dock="Right" />
-                                        <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"
-                                         TextWrapping="NoWrap" Width="210" DockPanel.Dock="Right" />
-                                    </DockPanel>
-                                </ListBoxItem>
-
-                                <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
-                                    <DockPanel Margin="10,0,10,0">
-                                        <TextBlock HorizontalAlignment="Left" Text="AnkiConnect API key" Style="{StaticResource TextBlockDefault}"
-                                           VerticalAlignment="Center" TextWrapping="Wrap" DockPanel.Dock="Left" />
-                                        <Button Content="Apply" Width="Auto" VerticalAlignment="Center" FontSize="9" Height="26"
-                                    Click="ApplyAnkiConnectUrlButton_Click" DockPanel.Dock="Right" />
-                                        <TextBox x:Name="AnkiConnectApiKeyTextBox" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"
-                                         TextWrapping="NoWrap" Width="210" DockPanel.Dock="Right" />
-                                    </DockPanel>
-                                </ListBoxItem>
 
                                 <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                     <DockPanel Margin="10,0,10,0">
@@ -1732,6 +1734,10 @@
 
                             </ListBox>
                             
+                            <TextBlock Margin="15,15,15,5" Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap"
+                                       Text="Configure each dictionary type you want to mine." />
+                            <TextBlock Margin="15,0,15,10" Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap"
+                                       Text="Word settings do not apply to Kanji, Name or Other. Select each tab to choose its deck, note type and field mappings." />
                             <TabControl Margin="0,10,0,0">
                                 <TabControl.Resources>
                                     <Style TargetType="{x:Type TabPanel}">
@@ -1739,8 +1745,15 @@
                                     </Style>
                                 </TabControl.Resources>
 
-                                <TabItem Header="Word">
-                                    <StackPanel>
+                                <TabItem>
+                                    <TabItem.Header>
+                                        <StackPanel>
+                                            <TextBlock Text="Word" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="WordMiningSetupStatusTextBlock" Text="Needs setup"
+                                                       HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource WarningBrush}" />
+                                        </StackPanel>
+                                    </TabItem.Header>
+                                    <StackPanel Selector.SelectionChanged="WordMiningSetup_SelectionChanged">
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
@@ -1777,8 +1790,15 @@
                                         </Grid>
                                     </StackPanel>
                                 </TabItem>
-                                <TabItem Header="Kanji">
-                                    <StackPanel>
+                                <TabItem>
+                                    <TabItem.Header>
+                                        <StackPanel>
+                                            <TextBlock Text="Kanji" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="KanjiMiningSetupStatusTextBlock" Text="Needs setup"
+                                                       HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource WarningBrush}" />
+                                        </StackPanel>
+                                    </TabItem.Header>
+                                    <StackPanel Selector.SelectionChanged="KanjiMiningSetup_SelectionChanged">
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
@@ -1815,8 +1835,15 @@
                                         </Grid>
                                     </StackPanel>
                                 </TabItem>
-                                <TabItem Header="Name">
-                                    <StackPanel>
+                                <TabItem>
+                                    <TabItem.Header>
+                                        <StackPanel>
+                                            <TextBlock Text="Name" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="NameMiningSetupStatusTextBlock" Text="Needs setup"
+                                                       HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource WarningBrush}" />
+                                        </StackPanel>
+                                    </TabItem.Header>
+                                    <StackPanel Selector.SelectionChanged="NameMiningSetup_SelectionChanged">
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
@@ -1853,8 +1880,15 @@
                                         </Grid>
                                     </StackPanel>
                                 </TabItem>
-                                <TabItem Header="Other">
-                                    <StackPanel>
+                                <TabItem>
+                                    <TabItem.Header>
+                                        <StackPanel>
+                                            <TextBlock Text="Other" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="OtherMiningSetupStatusTextBlock" Text="Needs setup"
+                                                       HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource WarningBrush}" />
+                                        </StackPanel>
+                                    </TabItem.Header>
+                                    <StackPanel Selector.SelectionChanged="OtherMiningSetup_SelectionChanged">
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
@@ -2770,7 +2804,7 @@
                                     <TextBlock HorizontalAlignment="Left" Text="Strip punctuation before calculating character count"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />
-                                    <CheckBox x:Name="StripPunctuationBeforeCalculatingCharacterCountCheckBox"  HorizontalAlignment="Right" />
+                                    <CheckBox x:Name="StripPunctuationBeforeCalculatingCharacterCountCheckBox" HorizontalAlignment="Right" />
                                 </DockPanel>
                             </ListBoxItem>
 
