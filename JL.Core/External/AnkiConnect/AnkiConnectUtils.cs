@@ -222,10 +222,46 @@ public static class AnkiConnectUtils
 
         List<Dictionary<string, object>>? imageDictionaries = null;
 
-        List<string> imageClipboardOverMonitorScreenshotFields = FindFields(JLField.ImageClipboardOverMonitorScreenshot, userFields);
-        bool imageClipboardOverMonitorScreenshotFieldsExist = imageClipboardOverMonitorScreenshotFields.Count > 0;
+        List<string> imageClipboardOverMonitorScreenshotFields = [];
+        List<string> clipboardImageFields = [];
+        List<string> screenshotFields = [];
+        List<string> audioFields = [];
+        List<string> sentenceAudioFields = [];
+        List<string> sourceTextAudioFields = [];
+        List<string>? definitionsImagesFields = lookupResult.ImageInfos is not null ? [] : null;
+        foreach ((string fieldName, JLField fieldValue) in userFields)
+        {
+            if (fieldValue is JLField.ImageClipboardOverMonitorScreenshot)
+            {
+                imageClipboardOverMonitorScreenshotFields.Add(fieldName);
+            }
+            else if (fieldValue is JLField.Image)
+            {
+                clipboardImageFields.Add(fieldName);
+            }
+            else if (fieldValue is JLField.MonitorScreenshot)
+            {
+                screenshotFields.Add(fieldName);
+            }
+            else if (fieldValue is JLField.DefinitionsImages)
+            {
+                definitionsImagesFields?.Add(fieldName);
+            }
+            else if (fieldValue is JLField.Audio)
+            {
+                audioFields.Add(fieldName);
+            }
+            else if (fieldValue is JLField.SentenceAudio)
+            {
+                sentenceAudioFields.Add(fieldName);
+            }
+            else if (fieldValue is JLField.SourceTextAudio)
+            {
+                sourceTextAudioFields.Add(fieldName);
+            }
+        }
 
-        List<string> clipboardImageFields = FindFields(JLField.Image, userFields);
+        bool imageClipboardOverMonitorScreenshotFieldsExist = imageClipboardOverMonitorScreenshotFields.Count > 0;
         bool clipboardImageFieldsExist = clipboardImageFields.Count > 0;
 
         byte[]? clipboardImageBytes = clipboardImageFieldsExist || imageClipboardOverMonitorScreenshotFieldsExist
@@ -234,7 +270,6 @@ public static class AnkiConnectUtils
 
         bool fallbackToScreenshot = imageClipboardOverMonitorScreenshotFieldsExist && clipboardImageBytes is null;
 
-        List<string> screenshotFields = FindFields(JLField.MonitorScreenshot, userFields);
         bool screenshotFieldsExist = screenshotFields.Count > 0;
 
         byte[]? screenshotBytes = screenshotFieldsExist || fallbackToScreenshot
@@ -267,7 +302,7 @@ public static class AnkiConnectUtils
 
         if (lookupResult.ImageInfos is not null)
         {
-            List<string> definitionsImagesFields = FindFields(JLField.DefinitionsImages, userFields);
+            Debug.Assert(definitionsImagesFields is not null);
             if (definitionsImagesFields.Count > 0)
             {
                 if (imageDictionaries is null)
@@ -336,7 +371,6 @@ public static class AnkiConnectUtils
             note.Pictures = imageDictionaries.ToArray();
         }
 
-        List<string> audioFields = FindFields(JLField.Audio, userFields);
         bool needsAudio = audioFields.Count > 0;
         AudioResponse? audioResponse = needsAudio
             ? await AudioUtils.GetPrioritizedAudio(lookupResult.PrimarySpelling, selectedReading).ConfigureAwait(false)
@@ -348,7 +382,6 @@ public static class AnkiConnectUtils
             audioData = FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(selectedReading);
         }
 
-        List<string> sentenceAudioFields = FindFields(JLField.SentenceAudio, userFields);
         bool needsSentenceAudio = sentenceAudioFields.Count > 0;
         bool sentenceAudioIsSameAsAudio = needsSentenceAudio && audioData is not null && sentence == lookupResult.PrimarySpelling;
         byte[]? sentenceAudioData = needsSentenceAudio
@@ -357,7 +390,6 @@ public static class AnkiConnectUtils
                 : FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(sentence)
             : null;
 
-        List<string> sourceTextAudioFields = FindFields(JLField.SourceTextAudio, userFields);
         bool needsSourceTextAudio = sourceTextAudioFields.Count > 0;
         bool sourceTextAudioIsSameAsSentenceAudio = needsSourceTextAudio && sentenceAudioData is not null && currentText == sentence;
         byte[]? sourceTextAudioData = needsSourceTextAudio
@@ -515,19 +547,5 @@ public static class AnkiConnectUtils
         }
 
         return dict;
-    }
-
-    private static List<string> FindFields(JLField jlField, OrderedDictionary<string, JLField> userFields)
-    {
-        List<string> matchingFieldNames = [];
-        foreach ((string fieldName, JLField fieldValue) in userFields)
-        {
-            if (fieldValue == jlField)
-            {
-                matchingFieldNames.Add(fieldName);
-            }
-        }
-
-        return matchingFieldNames;
     }
 }
