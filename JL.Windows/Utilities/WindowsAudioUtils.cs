@@ -17,6 +17,8 @@ namespace JL.Windows.Utilities;
 internal static class WindowsAudioUtils
 {
     private static MediaPlayer? s_audioPlayer;
+    private static MediaSource? s_mediaSource;
+    private static IRandomAccessStream? s_mediaStream;
     private static MediaPlayer? AudioPlayer => Volatile.Read(ref s_audioPlayer);
 
     private static readonly SemaphoreSlim s_audioPlayerSemaphoreSlim = new(1, 1);
@@ -28,50 +30,46 @@ internal static class WindowsAudioUtils
         await s_audioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
         try
         {
-            MediaPlayer? oldPlayer = Interlocked.Exchange(ref s_audioPlayer, null);
-            if (oldPlayer is not null)
-            {
-                oldPlayer.Pause();
-                oldPlayer.Source = null;
-                oldPlayer.Dispose();
-            }
+            DisposeCurrentMedia();
 
-            MediaSource mediaSource;
-            InMemoryRandomAccessStream? mediaStream = null;
             try
             {
-#pragma warning disable CA2000 // Dispose objects before losing scope
-                mediaStream = await ToRandomAccessStreamAsync(audio).ConfigureAwait(false);
-                mediaSource = MediaSource.CreateFromStream(mediaStream, MimeTypeFor(audioFormat));
-#pragma warning restore CA2000 // Dispose objects before losing scope
+                s_mediaStream = new InMemoryRandomAccessStream();
+                using (DataWriter writer = new(s_mediaStream.GetOutputStreamAt(0)))
+                {
+                    writer.WriteBytes(audio);
+                    _ = await writer.StoreAsync().AsTask().ConfigureAwait(false);
+                    using IOutputStream outputStream = writer.DetachStream();
+                }
+
+                s_mediaStream.Seek(0);
+                s_mediaSource = MediaSource.CreateFromStream(s_mediaStream, MimeTypeFor(audioFormat));
             }
             catch (Exception ex)
             {
-                mediaStream?.Dispose(); // avoid leaking the stream if CreateFromStream throws
+                DisposeCurrentMedia();
                 LoggerManager.Logger.Error(ex, "Error decoding audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
                 NotificationManager.Notify(NotificationLevel.Error, "Error playing audio. Check the logs for more details.");
                 return;
             }
 
-            MediaPlayer mediaPlayer = new() { AutoPlay = true, Source = mediaSource };
-            _ = Interlocked.Exchange(ref s_audioPlayer, mediaPlayer);
-
-            IRandomAccessStream capturedMediaStream = mediaStream;
-
-            mediaPlayer.MediaFailed += async (_, args) =>
+            MediaPlayer mediaPlayer = new();
+            Volatile.Write(ref s_audioPlayer, mediaPlayer);
+            mediaPlayer.MediaFailed += static async (player, args) =>
             {
-                LoggerManager.Logger.Error("MediaPlayer failed: {Error} - {Message}", args.Error, args.ErrorMessage);
-                NotificationManager.Notify(NotificationLevel.Error, "Error playing audio. Check the logs for more details.");
-                await DisposeMedia(mediaPlayer, mediaSource, capturedMediaStream).ConfigureAwait(false);
+                await DisposeMedia(player, args).ConfigureAwait(false);
+            };
+            mediaPlayer.MediaEnded += static async (player, _) =>
+            {
+                await DisposeMedia(player, null).ConfigureAwait(false);
             };
 
-            mediaPlayer.MediaEnded += async (_, _) =>
-            {
-                await DisposeMedia(mediaPlayer, mediaSource, capturedMediaStream).ConfigureAwait(false);
-            };
+            mediaPlayer.Source = s_mediaSource;
+            mediaPlayer.Play();
         }
         catch (Exception ex)
         {
+            DisposeCurrentMedia();
             LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
             NotificationManager.Notify(NotificationLevel.Error, "Error playing audio. Check the logs for more details.");
         }
@@ -81,19 +79,28 @@ internal static class WindowsAudioUtils
         }
     }
 
-    private static async Task DisposeMedia(MediaPlayer player, MediaSource source, IRandomAccessStream? mediaStream)
+    private static async Task DisposeMedia(MediaPlayer player, MediaPlayerFailedEventArgs? args)
     {
         await s_audioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (s_audioPlayer == player)
+            if (s_audioPlayer != player)
             {
-                _ = Interlocked.Exchange(ref s_audioPlayer, null);
+                return;
             }
 
-            player.Dispose();
-            source.Dispose();
-            mediaStream?.Dispose();
+            try
+            {
+                if (args is not null)
+                {
+                    LoggerManager.Logger.Error("MediaPlayer failed: {Error} - {Message}", args.Error, args.ErrorMessage);
+                    NotificationManager.Notify(NotificationLevel.Error, "Error playing audio. Check the logs for more details.");
+                }
+            }
+            finally
+            {
+                DisposeCurrentMedia();
+            }
         }
         catch (Exception ex)
         {
@@ -105,17 +112,29 @@ internal static class WindowsAudioUtils
         }
     }
 
-    private static async Task<InMemoryRandomAccessStream> ToRandomAccessStreamAsync(byte[] data)
+    private static void DisposeCurrentMedia()
     {
-        InMemoryRandomAccessStream stream = new();
-
-        using DataWriter writer = new(stream.GetOutputStreamAt(0));
-        writer.WriteBytes(data);
-        _ = await writer.StoreAsync();
-        _ = writer.DetachStream();
-
-        stream.Seek(0);
-        return stream;
+        MediaPlayer? player = s_audioPlayer;
+        Volatile.Write(ref s_audioPlayer, null);
+        MediaSource? source = s_mediaSource;
+        IRandomAccessStream? mediaStream = s_mediaStream;
+        s_mediaSource = null;
+        s_mediaStream = null;
+        try
+        {
+            player?.Dispose();
+        }
+        finally
+        {
+            try
+            {
+                source?.Dispose();
+            }
+            finally
+            {
+                mediaStream?.Dispose();
+            }
+        }
     }
 
 #pragma warning disable CA1308 // Normalize strings to uppercase
@@ -140,7 +159,7 @@ internal static class WindowsAudioUtils
 
     public static async Task Motivate()
     {
-        if (AudioPlayer?.CurrentState is MediaPlayerState.Playing && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
+        if (IsPlaying() && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
         {
             s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
             return;
@@ -201,7 +220,7 @@ internal static class WindowsAudioUtils
         await s_audioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
         try
         {
-            AudioPlayer?.Pause();
+            s_audioPlayer?.Pause();
         }
         catch (Exception ex)
         {
