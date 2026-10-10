@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Collections.Frozen;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using JL.Core.Utilities;
@@ -882,62 +883,136 @@ public static partial class JapaneseUtils
 
     public static void GetGraphemeCounts(ReadOnlySpan<char> text, out int characterCount, out int characterCountWithoutPunctuation)
     {
-        characterCount = text.GetGraphemeCount();
-        int index = FirstPunctuationIndex(text);
-        characterCountWithoutPunctuation = index < 0
-            ? characterCount
-            : GetGraphemeCountWithoutPunctuation(text, index);
+        characterCount = 0;
+        int charIndex = 0;
+        while (charIndex < text.Length)
+        {
+            int graphemeLength = StringInfo.GetNextTextElementLength(text[charIndex..]);
+            if (char.IsLetterOrDigit(text[charIndex]))
+            {
+                ++characterCount;
+                charIndex += graphemeLength;
+                continue;
+            }
+
+            if (graphemeLength is 1 && charIndex == text.Length - 1)
+            {
+                characterCountWithoutPunctuation = characterCount;
+                ++characterCount;
+                return;
+            }
+
+            foreach (Rune rune in text.Slice(charIndex, graphemeLength).EnumerateRunes())
+            {
+                if (!Rune.IsLetterOrDigit(rune))
+                {
+                    GetGraphemeCounts(text, charIndex, characterCount, out characterCount, out characterCountWithoutPunctuation);
+                    return;
+                }
+            }
+
+            ++characterCount;
+            charIndex += graphemeLength;
+        }
+
+        characterCountWithoutPunctuation = characterCount;
+    }
+
+    private static void GetGraphemeCounts(ReadOnlySpan<char> text, int charIndex, int precedingCharacterCount, out int characterCount, out int characterCountWithoutPunctuation)
+    {
+        characterCount = precedingCharacterCount;
+        characterCountWithoutPunctuation = precedingCharacterCount;
+        while (charIndex < text.Length)
+        {
+            int graphemeLength = StringInfo.GetNextTextElementLength(text[charIndex..]);
+            if (char.IsLetterOrDigit(text[charIndex]))
+            {
+                ++characterCountWithoutPunctuation;
+            }
+            else if (graphemeLength > 1)
+            {
+                foreach (Rune rune in text.Slice(charIndex, graphemeLength).EnumerateRunes())
+                {
+                    if (Rune.IsLetterOrDigit(rune))
+                    {
+                        ++characterCountWithoutPunctuation;
+                        break;
+                    }
+                }
+            }
+
+            ++characterCount;
+            charIndex += graphemeLength;
+        }
     }
 
     public static int GetGraphemeCountWithoutPunctuation(ReadOnlySpan<char> text)
     {
-        int index = FirstPunctuationIndex(text);
-        return index < 0
-            ? text.GetGraphemeCount()
-            : GetGraphemeCountWithoutPunctuation(text, index);
-    }
-
-    private static int GetGraphemeCountWithoutPunctuation(ReadOnlySpan<char> text, int index)
-    {
-        if (index == text.Length - 1)
+        // Lines such as "……" contain no letters or digits to count.
+        if (!text.IsEmpty && !char.IsLetterOrDigit(text[0]))
         {
-            return text[..index].GetGraphemeCount();
-        }
-
-        int bufferLength = text.Length - 1;
-        char[]? rentedBuffer = null;
-
-        Span<char> buffer = bufferLength <= 256
-            ? stackalloc char[bufferLength]
-            : rentedBuffer = ArrayPool<char>.Shared.Rent(bufferLength);
-
-        try
-        {
-            text[..index].CopyTo(buffer);
-            int length = index;
-            ReadOnlySpan<char> remainingText = text[(index + 1)..];
-            int currentIndex = 0;
-            foreach (Rune rune in remainingText.EnumerateRunes())
+            bool lettersOrDigitsExist = false;
+            foreach (Rune rune in text.EnumerateRunes())
             {
-                int runeLength = rune.Utf16SequenceLength;
                 if (Rune.IsLetterOrDigit(rune))
                 {
-                    remainingText.Slice(currentIndex, runeLength).CopyTo(buffer[length..]);
-                    length += runeLength;
+                    lettersOrDigitsExist = true;
+                    break;
+                }
+            }
+
+            if (!lettersOrDigitsExist)
+            {
+                return 0;
+            }
+        }
+
+        int characterCount = 0;
+        for (int charIndex = 0; charIndex < text.Length; charIndex++)
+        {
+            if (!CanCountCharacterDirectly(text[charIndex]))
+            {
+                // A combining character can belong to the preceding character, so recount it too.
+                if (charIndex > 0)
+                {
+                    --charIndex;
+                    if (char.IsLetterOrDigit(text[charIndex]))
+                    {
+                        --characterCount;
+                    }
                 }
 
-                currentIndex += runeLength;
+                GetGraphemeCounts(text, charIndex, characterCount, out _, out int characterCountWithoutPunctuation);
+                return characterCountWithoutPunctuation;
             }
 
-            return buffer[..length].GetGraphemeCount();
-        }
-        finally
-        {
-            if (rentedBuffer is not null)
+            if (char.IsLetterOrDigit(text[charIndex]))
             {
-                ArrayPool<char>.Shared.Return(rentedBuffer);
+                ++characterCount;
             }
         }
+
+        return characterCount;
+    }
+
+    private static bool CanCountCharacterDirectly(char character)
+    {
+        if (char.IsAscii(character))
+        {
+            return true;
+        }
+
+        if (char.IsSurrogate(character) || !IsJapaneseCharacter(character))
+        {
+            return false;
+        }
+
+        UnicodeCategory category = char.GetUnicodeCategory(character);
+        return category is not (UnicodeCategory.NonSpacingMark
+                or UnicodeCategory.SpacingCombiningMark
+                or UnicodeCategory.EnclosingMark
+                or UnicodeCategory.Format)
+            && character is not ('ﾞ' or 'ﾟ'); // Halfwidth dakuten and handakuten combine with the preceding kana.
     }
 
     public static string RemovePunctuation(string text)
