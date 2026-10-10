@@ -39,7 +39,8 @@ internal static class KanjidicLoader
                 while (xmlReader.ReadToFollowing("literal"))
                 {
                     (string key, KanjidicRecord record) = ReadCharacter(xmlReader, definitionList, onReadingList, kunReadingList, nanoriReadingList, radicalNameList);
-                    contents[key] = [record];
+                    IDictRecord[] records = [record];
+                    contents[key] = records;
                 }
             }
 

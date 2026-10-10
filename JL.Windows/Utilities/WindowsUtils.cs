@@ -401,17 +401,19 @@ internal static class WindowsUtils
             {
                 await application.Dispatcher.BeginInvoke(static () =>
                 {
-                    PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
+                    if (PreferencesWindow.IsItVisible())
+                    {
+                        PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
+                    }
                 }, DispatcherPriority.Render).Task.ConfigureAwait(false);
 
                 await Task.Run(static () => NetworkUtils.CheckForJLUpdates(true)).ConfigureAwait(false);
 
                 await application.Dispatcher.BeginInvoke(static () =>
                 {
-                    PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
-                    if (!PreferencesWindow.Instance.IsVisible)
+                    if (PreferencesWindow.IsItVisible())
                     {
-                        PreferencesWindow.Instance.Close();
+                        PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
                     }
                 }, DispatcherPriority.Render).Task.ConfigureAwait(false);
             }

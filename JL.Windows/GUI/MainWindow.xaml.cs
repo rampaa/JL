@@ -1886,13 +1886,14 @@ internal sealed partial class MainWindow : IDisposable
 
     private void Window_LocationChanged(object sender, EventArgs e)
     {
-        if (WindowsUtils.ActiveScreen.DeviceName == Screen.FromHandle(WindowHandle).DeviceName)
+        Screen currentScreen = Screen.FromHandle(WindowHandle);
+        if (WindowsUtils.ActiveScreen.DeviceName == currentScreen.DeviceName)
         {
             return;
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        WindowsUtils.ActiveScreen = Screen.FromHandle(WindowHandle);
+        WindowsUtils.ActiveScreen = currentScreen;
         DpiScale dpi = VisualTreeHelper.GetDpi(this);
         WindowsUtils.Dpi = dpi;
         WindowsUtils.DpiAwareXOffset = configManager.PopupXOffset * dpi.DpiScaleX;
