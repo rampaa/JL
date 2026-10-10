@@ -260,7 +260,7 @@ internal sealed partial class PreferencesWindow
     {
         if (IsInitialized && ReferenceEquals(e.OriginalSource, sender))
         {
-            await InitializeAnkiConfig(false).ConfigureAwait(true);
+            await InitializeAnkiConfig(false).ConfigureAwait(false);
         }
     }
 
@@ -269,7 +269,7 @@ internal sealed partial class PreferencesWindow
     {
         if (IsInitialized)
         {
-            await InitializeAnkiConfig(false).ConfigureAwait(true);
+            await InitializeAnkiConfig(false).ConfigureAwait(false);
         }
     }
 
@@ -283,7 +283,7 @@ internal sealed partial class PreferencesWindow
 
         if (_ankiConfigTask is not null)
         {
-            await _ankiConfigTask.ConfigureAwait(true);
+            await _ankiConfigTask.ConfigureAwait(false);
             return;
         }
 
@@ -300,7 +300,7 @@ internal sealed partial class PreferencesWindow
         _ankiConfigTask = LoadAnkiConfig();
         try
         {
-            await _ankiConfigTask.ConfigureAwait(true);
+            await _ankiConfigTask.ConfigureAwait(false);
         }
         finally
         {
@@ -531,7 +531,7 @@ internal sealed partial class PreferencesWindow
     // ReSharper disable once AsyncVoidMethod
     private async void MiningSetupButtonRefresh_Click(object sender, RoutedEventArgs e)
     {
-        await InitializeAnkiConfig(true).ConfigureAwait(true);
+        await InitializeAnkiConfig(true).ConfigureAwait(false);
     }
 
     private async Task GetFields(ComboBox modelNamesComboBox, Panel miningPanel, JLField[] fieldList)
@@ -897,7 +897,7 @@ internal sealed partial class PreferencesWindow
         ApplyAnkiConnectSettingsButton.IsEnabled = false;
         AnkiConnectSettingsStatusTextBlock.Text = "Settings applied.";
         _ankiNamesLoaded = false;
-        await InitializeAnkiConfig(false).ConfigureAwait(true);
+        await InitializeAnkiConfig(false).ConfigureAwait(false);
     }
 
     private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -991,7 +991,7 @@ internal sealed partial class PreferencesWindow
 
         configManager.LoadPreferenceWindow(this);
         RegexReplacerUtils.PopulateRegexReplacements();
-        await InitializeAnkiConfig(false).ConfigureAwait(true);
+        await InitializeAnkiConfig(false).ConfigureAwait(false);
     }
 
     private void ProfileConfigButton_Click(object sender, RoutedEventArgs e)

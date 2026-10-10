@@ -745,7 +745,7 @@ internal sealed partial class MainWindow : IDisposable
         }
 
         charPosition = JapaneseUtils.GetLookupStartPosition(MainTextBox.Text, charPosition);
-        await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charPosition, ConfigManager.Instance.EnableMiningModeForDelayedLookups, true, WindowsUtils.LastWebSocketTextWasVertical).ConfigureAwait(true);
+        await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charPosition, ConfigManager.Instance.EnableMiningModeForDelayedLookups, true, WindowsUtils.LastWebSocketTextWasVertical).ConfigureAwait(false);
     }
 
     // ReSharper disable once AsyncVoidMethod
