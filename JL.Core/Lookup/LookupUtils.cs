@@ -45,7 +45,8 @@ public static class LookupUtils
         bool includeOtherCategory = lookupCategory is LookupCategory.All or LookupCategory.Other;
         bool lookUpWordDicts = (includeWordCategory || includeOtherCategory) && DictUtils.LookupHasWordDicts;
         bool lookUpJmdict = includeWordCategory && DictUtils.LookupHasJmdict;
-        bool lookUpCustomWordDicts = includeWordCategory && DictUtils.LookupHasCustomWordDicts;
+        bool lookUpCustomWordDict = includeWordCategory && DictUtils.LookupHasCustomWordDict;
+        bool lookUpProfileCustomWordDict = includeWordCategory && DictUtils.LookupHasProfileCustomWordDict;
         bool queryWordDictsFromDB = (includeWordCategory && DictUtils.LookupWordDictsUseDB)
             || (includeOtherCategory && DictUtils.LookupOtherDictsUseDB);
         bool lookUpEpwingWordDicts = (includeWordCategory && DictUtils.LookupHasEpwingWordDicts)
@@ -78,13 +79,18 @@ public static class LookupUtils
             ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
             : default;
 
-        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForCustomWordDict = dbWordFreqs is not null && lookUpCustomWordDicts
+        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForCustomWordDict = dbWordFreqs is not null && lookUpCustomWordDict
             ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
             : default;
 
-        PopulateFreqSqliteConnections(sqliteFreqConnectionsForJmdict.Items, sqliteFreqConnectionsForCustomWordDict.Items, dbWordFreqs);
+        using DisposableItemArrayRefStruct<SqliteConnection> sqliteFreqConnectionsForProfileCustomWordDict = dbWordFreqs is not null && lookUpProfileCustomWordDict
+            ? new DisposableItemArrayRefStruct<SqliteConnection>(dbWordFreqs.Length)
+            : default;
+
+        PopulateFreqSqliteConnections(sqliteFreqConnectionsForJmdict.Items, sqliteFreqConnectionsForCustomWordDict.Items, sqliteFreqConnectionsForProfileCustomWordDict.Items, dbWordFreqs);
         RentedArrayBuffer<SqliteConnection?>? freqConnectionsForJmdict = sqliteFreqConnectionsForJmdict.Items;
         RentedArrayBuffer<SqliteConnection?>? freqConnectionsForCustomWordDict = sqliteFreqConnectionsForCustomWordDict.Items;
+        RentedArrayBuffer<SqliteConnection?>? freqConnectionsForProfileCustomWordDict = sqliteFreqConnectionsForProfileCustomWordDict.Items;
 
         Dict? pitchDict = DictUtils.PitchDict;
         bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict
@@ -127,7 +133,11 @@ public static class LookupUtils
             ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForPitchDict)
             : null;
 
-        using SqliteConnection? sqliteConnectionForCustomWordPitch = readOnlyConnectionStringForPitchDict is not null && lookUpCustomWordDicts
+        using SqliteConnection? sqliteConnectionForCustomWordPitch = readOnlyConnectionStringForPitchDict is not null && lookUpCustomWordDict
+            ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForPitchDict)
+            : null;
+
+        using SqliteConnection? sqliteConnectionForProfileCustomWordPitch = readOnlyConnectionStringForPitchDict is not null && lookUpProfileCustomWordDict
             ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForPitchDict)
             : null;
 
@@ -239,8 +249,11 @@ public static class LookupUtils
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
                         // ReSharper disable once AccessToDisposedClosure
                         resultSlots[i] = rentedLookupResults;
+                        bool profileCustomWordDict = dict.Type is DictType.ProfileCustomWordDictionary;
                         // ReSharper disable once AccessToDisposedClosure
-                        BuildCustomWordResult(results, rentedLookupResults, wordFreqs, dbWordFreqs, freqConnectionsForCustomWordDict, dbIsUsedForPitchDict, sqliteConnectionForCustomWordPitch, pitchDict);
+                        BuildCustomWordResult(results, rentedLookupResults, wordFreqs, dbWordFreqs,
+                            profileCustomWordDict ? freqConnectionsForProfileCustomWordDict : freqConnectionsForCustomWordDict,
+                            dbIsUsedForPitchDict, profileCustomWordDict ? sqliteConnectionForProfileCustomWordPitch : sqliteConnectionForCustomWordPitch, pitchDict);
                     }
 
                     ObjectPoolManager.s_intermediaryResultPool.Return(results);
@@ -463,12 +476,13 @@ public static class LookupUtils
         return lookupResults;
     }
 
-    private static void PopulateFreqSqliteConnections(RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForJmdict, RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForCustomWordDict, Freq[]? dbWordFreqs)
+    private static void PopulateFreqSqliteConnections(RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForJmdict, RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForCustomWordDict, RentedArrayBuffer<SqliteConnection?>? sqliteFreqConnectionsForProfileCustomWordDict, Freq[]? dbWordFreqs)
     {
         bool sqliteFreqConnectionsForJmdictExist = sqliteFreqConnectionsForJmdict is not null;
         bool sqliteFreqConnectionsForCustomWordDictExist = sqliteFreqConnectionsForCustomWordDict is not null;
+        bool sqliteFreqConnectionsForProfileCustomWordDictExist = sqliteFreqConnectionsForProfileCustomWordDict is not null;
 
-        if (sqliteFreqConnectionsForJmdictExist || sqliteFreqConnectionsForCustomWordDictExist)
+        if (sqliteFreqConnectionsForJmdictExist || sqliteFreqConnectionsForCustomWordDictExist || sqliteFreqConnectionsForProfileCustomWordDictExist)
         {
             Debug.Assert(dbWordFreqs is not null);
             foreach (Freq dbWordFreq in dbWordFreqs)
@@ -487,6 +501,14 @@ public static class LookupUtils
                     Debug.Assert(sqliteFreqConnectionsForCustomWordDict is not null);
 #pragma warning disable CA2000 // Dispose objects before losing scope
                     sqliteFreqConnectionsForCustomWordDict.Add(DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq));
+#pragma warning restore CA2000 // Dispose objects before losing scope
+                }
+
+                if (sqliteFreqConnectionsForProfileCustomWordDictExist)
+                {
+                    Debug.Assert(sqliteFreqConnectionsForProfileCustomWordDict is not null);
+#pragma warning disable CA2000 // Dispose objects before losing scope
+                    sqliteFreqConnectionsForProfileCustomWordDict.Add(DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq));
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 }
             }

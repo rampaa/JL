@@ -75,7 +75,8 @@ public static class DictUtils
     private static Dict[] s_otherDicts = [];
     internal static bool LookupHasWordDicts { get; private set; }
     internal static bool LookupHasJmdict { get; private set; }
-    internal static bool LookupHasCustomWordDicts { get; private set; }
+    internal static bool LookupHasCustomWordDict { get; private set; }
+    internal static bool LookupHasProfileCustomWordDict { get; private set; }
     internal static bool LookupHasKanjiDicts { get; private set; }
     internal static bool LookupHasOtherDicts { get; private set; }
     internal static bool LookupWordDictsUseDB { get; private set; }
@@ -1411,7 +1412,8 @@ public static class DictUtils
         List<Dict> kanjiDicts = [];
         List<Dict> otherDicts = [];
         bool hasJmdict = false;
-        bool hasCustomWordDicts = false;
+        bool hasCustomWordDict = false;
+        bool hasProfileCustomWordDict = false;
         bool wordDictsUseDB = false;
         bool otherDictsUseDB = false;
         bool hasEpwingWordDicts = false;
@@ -1429,9 +1431,13 @@ public static class DictUtils
                         hasJmdict = true;
                         wordDictsUseDB |= dict.Options.UseDB.Value;
                     }
-                    else if (dict.Type is DictType.CustomWordDictionary or DictType.ProfileCustomWordDictionary)
+                    else if (dict.Type is DictType.CustomWordDictionary)
                     {
-                        hasCustomWordDicts = true;
+                        hasCustomWordDict = true;
+                    }
+                    else if (dict.Type is DictType.ProfileCustomWordDictionary)
+                    {
+                        hasProfileCustomWordDict = true;
                     }
                     else
                     {
@@ -1462,7 +1468,8 @@ public static class DictUtils
         s_otherDicts = otherDicts.ToArray();
         LookupHasWordDicts = wordDicts.Count > 0 || otherDicts.Count > 0;
         LookupHasJmdict = hasJmdict;
-        LookupHasCustomWordDicts = hasCustomWordDicts;
+        LookupHasCustomWordDict = hasCustomWordDict;
+        LookupHasProfileCustomWordDict = hasProfileCustomWordDict;
         LookupHasKanjiDicts = kanjiDicts.Count > 0;
         LookupHasOtherDicts = otherDicts.Count > 0;
         // Cache configured DB usage; readiness is checked when querying each dictionary.
