@@ -43,7 +43,7 @@ public static class DictUtils
     private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "dicts.json");
     public static bool DictsReady { get; private set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
-    internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
+    internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = FrozenDictionary<string, IList<JmdictWordClass>>.Empty;
     private static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e_NG.gz");
     private static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
@@ -52,16 +52,6 @@ public static class DictUtils
 
     internal static readonly SearchValues<char> s_invalidCharactersForPrimarySpellings = SearchValues.Create('�', '\n');
 
-    internal static bool DBIsUsedForAtLeastOneDict { get; private set; } = true;
-    internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; } = true;
-    internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; } = true;
-    internal static bool DBIsUsedForJmdict { get; private set; } = true;
-    internal static bool DBIsUsedForJmnedict { get; private set; } = true;
-    internal static bool JmdictIsActive { get; private set; } = true;
-    internal static bool AnyCustomWordDictIsActive { get; private set; } = true;
-    internal static bool DBIsUsedForAtLeastOneWordDict { get; private set; } = true;
-    internal static bool AtLeastOneKanjiDictIsActive { get; private set; } = true;
-    internal static bool DBIsUsedForAtLeastOneYomichanOrNazekaWordDict { get; private set; } = true;
     internal static bool DBIsUsedForPitchDict { get; private set; } // false;
 
     public static int MaxSearchKeyLength { get; internal set; }
@@ -589,12 +579,6 @@ public static class DictUtils
         DictType.NonspecificNazeka
     ];
 
-    private static readonly FrozenSet<DictType> s_yomichanWordAndNameDictTypeSet = YomichanDictTypes
-        .Where(static dictType => dictType is not DictType.PitchAccentYomichan and not DictType.NonspecificKanjiYomichan and not DictType.NonspecificKanjiWithWordSchemaYomichan)
-        .ToFrozenSet();
-
-    private static readonly FrozenSet<DictType> s_nazekaWordAndNameDictTypeSet = NazekaDictTypes.Where(static d => d is not DictType.NonspecificKanjiNazeka).ToFrozenSet();
-
     public static async Task LoadDictionaries()
     {
         await s_loadDictionariesSemaphoreSlim.WaitAsync().ConfigureAwait(false);
@@ -618,7 +602,6 @@ public static class DictUtils
             List<Task> tasks = [];
 
             Dict[] dicts = Dicts.Values.ToArray();
-            CheckDBUsageForDicts(dicts);
             PopulateDictTypeArrays(dicts);
             CalculateMaxSearchKeyLength(dicts);
 
@@ -745,7 +728,6 @@ public static class DictUtils
 
                 Dict[] dictsSnapshot = Dicts.Values.ToArray();
                 CheckSingleDictActiveness();
-                CheckDBUsageForDicts(dictsSnapshot);
                 PopulateDictTypeArrays(dictsSnapshot);
                 CalculateMaxSearchKeyLength(dictsSnapshot);
 
@@ -1288,90 +1270,9 @@ public static class DictUtils
 
     private static void CheckSingleDictActiveness()
     {
-        JmdictIsActive = SingleDictTypeDicts.TryGetValue(DictType.JMdict, out Dict? jmdict) && jmdict.Active;
-        AnyCustomWordDictIsActive = (SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict) && customWordDict.Active)
-            || (SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict) && profileCustomWordDict.Active);
-
         DBIsUsedForPitchDict = SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict)
             && pitchDict is { Active: true, Options.UseDB.Value: true };
         PitchDict = pitchDict;
-    }
-
-    private static void CheckDBUsageForDicts(Dict[] dicts)
-    {
-        bool dbIsUsedForAtLeastOneDict = false;
-        bool dbIsUsedForAtLeastOneWordDict = false;
-        bool dbIsUsedForAtLeastOneYomichanDict = false;
-        bool dbIsUsedForAtLeastOneNazekaDict = false;
-        bool dbIsUsedForAtLeastOneYomichanOrNazekaWordDict = false;
-        bool atLeastOneKanjiDictIsActive = false;
-        bool dbIsUsedForJmdict = false;
-        bool dbIsUsedForJmnedict = false;
-
-        foreach (Dict dict in dicts)
-        {
-            if (dict.Active)
-            {
-                if (KanjiDictTypes.Contains(dict.Type))
-                {
-                    atLeastOneKanjiDictIsActive = true;
-                }
-
-                if (dict.Options.UseDB.Value)
-                {
-                    dbIsUsedForAtLeastOneDict = true;
-
-                    if (dict.Type is DictType.JMdict)
-                    {
-                        dbIsUsedForJmdict = true;
-                    }
-                    else if (dict.Type is DictType.JMnedict)
-                    {
-                        dbIsUsedForJmnedict = true;
-                    }
-
-                    if (dict.Type is DictType.JMdict or DictType.NonspecificWordYomichan or DictType.NonspecificYomichan or DictType.NonspecificWordNazeka or DictType.NonspecificNazeka)
-                    {
-                        dbIsUsedForAtLeastOneWordDict = true;
-                    }
-
-                    if (s_yomichanWordAndNameDictTypeSet.Contains(dict.Type))
-                    {
-                        dbIsUsedForAtLeastOneYomichanDict = true;
-                    }
-
-                    if (s_nazekaWordAndNameDictTypeSet.Contains(dict.Type))
-                    {
-                        dbIsUsedForAtLeastOneNazekaDict = true;
-                    }
-
-                    if (dict.Type is DictType.NonspecificWordYomichan or DictType.NonspecificYomichan or DictType.NonspecificWordNazeka or DictType.NonspecificNazeka)
-                    {
-                        dbIsUsedForAtLeastOneYomichanOrNazekaWordDict = true;
-                    }
-                }
-
-                if (dbIsUsedForAtLeastOneDict
-                    && dbIsUsedForAtLeastOneWordDict
-                    && dbIsUsedForAtLeastOneYomichanDict
-                    && dbIsUsedForAtLeastOneNazekaDict
-                    && dbIsUsedForAtLeastOneYomichanOrNazekaWordDict
-                    && atLeastOneKanjiDictIsActive
-                    && dbIsUsedForJmdict
-                    && dbIsUsedForJmnedict)
-                {
-                    break;
-                }
-            }
-        }
-
-        DBIsUsedForAtLeastOneDict = dbIsUsedForAtLeastOneDict;
-        DBIsUsedForAtLeastOneWordDict = dbIsUsedForAtLeastOneWordDict;
-        DBIsUsedForAtLeastOneYomichanDict = dbIsUsedForAtLeastOneYomichanDict;
-        DBIsUsedForAtLeastOneNazekaDict = dbIsUsedForAtLeastOneNazekaDict;
-        DBIsUsedForAtLeastOneYomichanOrNazekaWordDict = dbIsUsedForAtLeastOneYomichanOrNazekaWordDict;
-        AtLeastOneKanjiDictIsActive = atLeastOneKanjiDictIsActive;
-        DBIsUsedForJmdict = dbIsUsedForJmdict;
     }
 
     internal static void InitializeContents(Dict dict, int initialDictSize)
