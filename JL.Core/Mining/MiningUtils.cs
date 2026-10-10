@@ -1054,9 +1054,10 @@ public static class MiningUtils
 
         string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
 
+        // File mining excludes graphical pitch fields.
         bool addPitchAccents = mineAllFields
                                // ReSharper disable once NullableWarningSuppressionIsUsed
-                               || jlFields!.Contains(JLField.PitchAccents);
+                               && jlFields!.Contains(JLField.PitchAccents);
 
         bool addNumericPitchAccents = mineAllFields
                                       // ReSharper disable once NullableWarningSuppressionIsUsed
@@ -1145,13 +1146,15 @@ public static class MiningUtils
         }
 
         string firstExpression = expressions[selectedSpellingIndex];
-        if (mineAllFields
-            // ReSharper disable once NullableWarningSuppressionIsUsed
-            || jlFields!.Contains(JLField.PitchAccentForFirstReading))
+        if (mineAllFields)
         {
-            StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
-            miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstExpression, sb, firstPitchPosition)}");
-            ObjectPoolManager.StringBuilderPool.Return(sb);
+            Debug.Assert(jlFields is not null);
+            if (jlFields.Contains(JLField.PitchAccentForFirstReading))
+            {
+                StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
+                miningParams[JLField.PitchAccentForFirstReading] = string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n{GetExpressionWithPitchAccent(firstExpression, sb, firstPitchPosition)}");
+                ObjectPoolManager.StringBuilderPool.Return(sb);
+            }
         }
 
         if (mineAllFields

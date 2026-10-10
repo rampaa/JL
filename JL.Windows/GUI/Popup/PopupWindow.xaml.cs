@@ -2696,7 +2696,7 @@ internal sealed partial class PopupWindow : IDisposable
             LookupDisplayResult lookupDisplayResult = (LookupDisplayResult)items[i];
             if (lookupDisplayResult.Index == listViewIndex)
             {
-                ListViewItem container = (ListViewItem)generator.ContainerFromItem(lookupDisplayResult);
+                ListViewItem container = (ListViewItem)generator.ContainerFromIndex(i);
                 return container.GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));
             }
         }
