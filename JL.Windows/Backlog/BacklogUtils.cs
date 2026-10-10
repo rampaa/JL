@@ -428,7 +428,7 @@ internal static class BacklogUtils
         {
             if (File.Exists(s_backlogFilePathToRestore))
             {
-                FileStream incompleteFile = new(s_backlogFilePathToRestore, FileMode.Open, FileAccess.Write, FileShare.Read, 4096, FileOptions.Asynchronous);
+                FileStream incompleteFile = new(s_backlogFilePathToRestore, FileMode.Open, FileAccess.Write, FileShare.Read, bufferSize: 1, options: FileOptions.Asynchronous);
                 await using (incompleteFile.ConfigureAwait(false))
                 {
                     // Repair the failed append even if its pending entries have since been cleared.
@@ -449,12 +449,13 @@ internal static class BacklogUtils
         _ = Directory.CreateDirectory(s_backlogDirectory);
         string tempBacklogPath = GetBacklogFilePath(false, "");
         bool addTimestamps = ConfigManager.Instance.SaveBacklogTimestamps;
-        StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
+        char[]? headerBuffer = null;
         (LinkedListNode<LinkedListNode<BacklogItem>> Node, string Text)[]? pendingItems = null;
         int pendingItemCount = 0;
         try
         {
-            FileStream fileStream = new(tempBacklogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read, 4096, FileOptions.Asynchronous);
+            // StreamWriter buffers the output, so FileStream does not need another buffer.
+            FileStream fileStream = new(tempBacklogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read, bufferSize: 1, options: FileOptions.Asynchronous);
             await using (fileStream.ConfigureAwait(false))
             {
                 long originalLength = fileStream.Length;
@@ -470,32 +471,41 @@ internal static class BacklogUtils
                     }
                 }
 
-                bool appendRecordSeparator = originalLength > 0;
-                foreach ((LinkedListNode<LinkedListNode<BacklogItem>> node, string text) in pendingItems.AsSpan(0, pendingItemCount))
+                if (pendingItemCount > 0)
                 {
-                    if (appendRecordSeparator)
-                    {
-                        _ = stringBuilder.Append(RecordSeparator);
-                    }
-
                     if (addTimestamps)
                     {
-                        // Merging and recalculating statistics leave the timestamp unchanged.
-                        _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"[{node.Value.Value.Timestamp:yyyy.MM.dd HH:mm:ss}]\n");
+                        headerBuffer = ArrayPool<char>.Shared.Rent(RecordSeparator.Length + 22);
+                        RecordSeparator.AsSpan().CopyTo(headerBuffer);
+                        headerBuffer[RecordSeparator.Length] = '[';
+                        headerBuffer[RecordSeparator.Length + 20] = ']';
+                        headerBuffer[RecordSeparator.Length + 21] = '\n';
                     }
 
-                    _ = stringBuilder.Append(text);
-                    appendRecordSeparator = true;
-                }
-
-                if (stringBuilder.Length > 0)
-                {
                     s_backlogFilePathToRestore = tempBacklogPath;
                     s_backlogFileLengthToRestore = originalLength;
                     StreamWriter writer = new(fileStream, TextUtils.Utf8NoBom, 4096, leaveOpen: true);
                     await using (writer.ConfigureAwait(false))
                     {
-                        await writer.WriteAsync(stringBuilder).ConfigureAwait(false);
+                        bool appendRecordSeparator = originalLength > 0;
+                        for (int i = 0; i < pendingItemCount; i++)
+                        {
+                            (LinkedListNode<LinkedListNode<BacklogItem>> node, string text) = pendingItems[i];
+                            if (headerBuffer is not null)
+                            {
+                                // Merging and recalculating statistics leave the timestamp unchanged.
+                                _ = node.Value.Value.Timestamp.TryFormat(headerBuffer.AsSpan(RecordSeparator.Length + 1, 19), out _, "yyyy.MM.dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                int headerOffset = appendRecordSeparator ? 0 : RecordSeparator.Length;
+                                await writer.WriteAsync(headerBuffer.AsMemory(headerOffset, RecordSeparator.Length + 22 - headerOffset)).ConfigureAwait(false);
+                            }
+                            else if (appendRecordSeparator)
+                            {
+                                await writer.WriteAsync(RecordSeparator).ConfigureAwait(false);
+                            }
+
+                            await writer.WriteAsync(text).ConfigureAwait(false);
+                            appendRecordSeparator = true;
+                        }
                     }
                 }
             }
@@ -519,7 +529,10 @@ internal static class BacklogUtils
                 pendingItems.AsSpan(0, pendingItemCount).Clear();
                 ArrayPool<(LinkedListNode<LinkedListNode<BacklogItem>> Node, string Text)>.Shared.Return(pendingItems);
             }
-            ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
+            if (headerBuffer is not null)
+            {
+                ArrayPool<char>.Shared.Return(headerBuffer);
+            }
         }
     }
 
