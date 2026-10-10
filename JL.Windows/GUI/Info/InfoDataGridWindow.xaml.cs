@@ -13,6 +13,7 @@ namespace JL.Windows.GUI.Info;
 internal sealed partial class InfoDataGridWindow
 {
     private nint _windowHandle;
+    private string _searchTextInHiragana = "";
 
     public InfoDataGridWindow()
     {
@@ -46,16 +47,20 @@ internal sealed partial class InfoDataGridWindow
 
     private void InfoDataGridSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
+        _searchTextInHiragana = JapaneseUtils.NormalizeText(InfoDataGridSearchTextBox.Text);
         InfoDataGrid.Items.Filter = InfoDataGridFilter;
     }
 
     private bool InfoDataGridFilter(object item)
     {
+        if (_searchTextInHiragana.Length is 0)
+        {
+            return true;
+        }
+
         (string term, int count) = (KeyValuePair<string, int>)item;
         string termInHiragana = JapaneseUtils.NormalizeText(term);
-        string textInHiragana = JapaneseUtils.NormalizeText(InfoDataGridSearchTextBox.Text);
-
-        return termInHiragana.AsSpan().Contains(textInHiragana, StringComparison.Ordinal)
-            || count.ToString(CultureInfo.InvariantCulture).AsSpan().Contains(textInHiragana, StringComparison.Ordinal);
+        return termInHiragana.AsSpan().Contains(_searchTextInHiragana, StringComparison.Ordinal)
+            || count.ToString(CultureInfo.InvariantCulture).AsSpan().Contains(_searchTextInHiragana, StringComparison.Ordinal);
     }
 }
