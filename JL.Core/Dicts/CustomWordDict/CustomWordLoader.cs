@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using JL.Core.Dicts.Interfaces;
 using JL.Core.Japanese;
 using JL.Core.Utilities;
@@ -123,12 +124,12 @@ public static class CustomWordLoader
 
             CustomWordRecord record = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
             string normalizedSpelling = JapaneseUtils.NormalizeText(spelling);
-            if (DictUtils.AddRecordToDictionary(normalizedSpelling, record, contents, dict) && i is 0 && readings is not null)
+            if (AddRecordToDictionary(normalizedSpelling, record, contents, dict) && i is 0 && readings is not null)
             {
                 foreach (string reading in readings)
                 {
                     string normalizedReading = JapaneseUtils.NormalizeText(reading);
-                    _ = DictUtils.AddRecordToDictionary(normalizedReading, record, contents, dict);
+                    _ = AddRecordToDictionary(normalizedReading, record, contents, dict);
                 }
             }
         }
@@ -137,5 +138,37 @@ public static class CustomWordLoader
         {
             DictUtils.MaxSearchKeyLength = dict.MaxSearchKeyLength;
         }
+    }
+
+    private static bool AddRecordToDictionary(string normalizedKey, CustomWordRecord record, Dictionary<string, IList<IDictRecord>> contents, Dict dict)
+    {
+        ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, normalizedKey, out bool exists);
+        if (!exists)
+        {
+            records = [record];
+            if (normalizedKey.Length > dict.MaxSearchKeyLength)
+            {
+                dict.MaxSearchKeyLength = normalizedKey.Length;
+            }
+
+            return true;
+        }
+
+        Debug.Assert(records is not null);
+        List<IDictRecord> list = (List<IDictRecord>)records;
+        int duplicateIndex = list.AsReadOnlySpan().IndexOf(record);
+        if (duplicateIndex >= 0)
+        {
+            if (record.HasUserDefinedWordClass && !((CustomWordRecord)list[duplicateIndex]).HasUserDefinedWordClass)
+            {
+                list[duplicateIndex] = record;
+                return true;
+            }
+
+            return false;
+        }
+
+        list.Add(record);
+        return true;
     }
 }
