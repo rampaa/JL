@@ -81,6 +81,11 @@ internal sealed partial class EditFrequencyWindow
             return;
         }
 
+        bool autoUpdatable = _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
+        Uri? url = autoUpdatable
+            ? (Uri?)_freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag ?? _freq.Url
+            : null;
+
         string dbPath = _freq.DBPath;
         bool dbExists = File.Exists(dbPath);
 
@@ -112,8 +117,7 @@ internal sealed partial class EditFrequencyWindow
             }
         }
 
-        FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type, _freq.AutoUpdatable);
-
+        FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type, autoUpdatable);
         if (_freq.Options.UseDB.Value != options.UseDB.Value)
         {
             _freq.Ready = false;
@@ -164,19 +168,8 @@ internal sealed partial class EditFrequencyWindow
             }
         }
 
-        _freq.AutoUpdatable = _freqOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
-        if (!_freq.AutoUpdatable)
-        {
-            _freq.Url = null;
-        }
-        else
-        {
-            string? url = (string?)_freqOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag;
-            if (url is not null)
-            {
-                _freq.Url = new Uri(url);
-            }
-        }
+        _freq.AutoUpdatable = autoUpdatable;
+        _freq.Url = url;
 
         _freq.Options = options;
         if (_freq.Name != name)

@@ -85,6 +85,11 @@ internal sealed partial class EditDictionaryWindow
             return;
         }
 
+        bool autoUpdatable = _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
+        Uri? url = autoUpdatable
+            ? (Uri?)_dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag ?? _dict.Url
+            : null;
+
         string dbPath = _dict.DBPath;
         bool dbExists = File.Exists(dbPath);
 
@@ -123,21 +128,10 @@ internal sealed partial class EditDictionaryWindow
             }
         }
 
-        _dict.AutoUpdatable = _dictOptionsControl.AutoUpdateAfterNDaysDockPanel.IsVisible;
-        if (!_dict.AutoUpdatable)
-        {
-            _dict.Url = null;
-        }
-        else
-        {
-            string? url = (string?)_dictOptionsControl.AutoUpdateAfterNDaysDockPanel.Tag;
-            if (url is not null)
-            {
-                _dict.Url = new Uri(url);
-            }
-        }
+        _dict.AutoUpdatable = autoUpdatable;
+        _dict.Url = url;
 
-        DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type, _dict.AutoUpdatable);
+        DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type, autoUpdatable);
         if (_dict.Type is DictType.PitchAccentYomichan)
         {
             Debug.Assert(_dict.Options.ShowPitchAccentWithDottedLines is not null);
@@ -241,7 +235,16 @@ internal sealed partial class EditDictionaryWindow
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);
-            DictUtils.Dicts.Add(name, new Dict(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, options, _dict.MaxSearchKeyLength, _dict.AutoUpdatable, _dict.Url, _dict.Revision));
+            Dict renamedDict = new(_dict.Type, name, _dict.Path, _dict.Active, _dict.Priority, _dict.Size, options, _dict.MaxSearchKeyLength, _dict.AutoUpdatable, _dict.Url, _dict.Revision)
+            {
+                Ready = _dict.Ready,
+                Contents = _dict.Contents
+            };
+            DictUtils.Dicts.Add(name, renamedDict);
+            if (DictUtils.SingleDictTypeDicts.ContainsKey(_dict.Type))
+            {
+                DictUtils.SingleDictTypeDicts[_dict.Type] = renamedDict;
+            }
         }
 
         Close();
