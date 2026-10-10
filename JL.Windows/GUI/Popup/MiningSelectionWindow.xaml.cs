@@ -116,7 +116,7 @@ internal sealed partial class MiningSelectionWindow
 
     private static Task MineSelectedSpelling()
     {
-        if (s_instance is null)
+        if (s_instance is null || s_instance.MiningListView.SelectedItem is null)
         {
             return Task.CompletedTask;
         }
