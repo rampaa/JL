@@ -15,6 +15,8 @@ public sealed class Stats
     public ulong Imoutos { get; set; }
 
     [JsonIgnore] public Dictionary<string, int> TermLookupCountDict { get; } = new(StringComparer.Ordinal);
+    [JsonIgnore] public int ResetCount { get; private set; }
+
 
     internal void IncrementLookupStat(string deconjugatedMatchedText)
     {
@@ -32,6 +34,7 @@ public sealed class Stats
         Imoutos = 0;
         NumberOfLookups = 0;
         TermLookupCountDict.Clear();
+        ++ResetCount;
     }
 
     public override string ToString()
