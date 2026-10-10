@@ -522,7 +522,7 @@ internal sealed class ConfigManager
 
         bool alwaysShowBacklog = ConfigDBManager.GetValueFromConfig(connection, configs, AlwaysShowBacklog, nameof(AlwaysShowBacklog));
         TextBox mainTextBox = MainWindow.Instance.MainTextBox;
-        if (alwaysShowBacklog)
+        if (alwaysShowBacklog && MaxBacklogCapacity is not 0)
         {
             string allBacklogText = BacklogUtils.AllBacklogText;
             if (mainTextBox.Text != allBacklogText)
@@ -533,16 +533,9 @@ internal sealed class ConfigManager
                 MainWindow.Instance.UpdatePosition();
             }
         }
-        else if (!AlwaysShowBacklog)
+        else if (AlwaysShowBacklog && MaxBacklogCapacity is not 0)
         {
-            string lastText = BacklogUtils.LastItem ?? "";
-            if (mainTextBox.Text != lastText)
-            {
-                mainTextBox.Text = lastText;
-                mainTextBox.CaretIndex = mainTextBox.Text.Length;
-                mainTextBox.ScrollToEnd();
-                MainWindow.Instance.UpdatePosition();
-            }
+            BacklogUtils.ShowLastBacklogItem();
         }
 
         AlwaysShowBacklog = alwaysShowBacklog;

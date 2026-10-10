@@ -62,7 +62,9 @@ internal sealed partial class MainWindow : IDisposable
     private int _lastCharPosition = -1;
 
     private string? _webSocketTextToProcess;
-    private readonly AtomicBool _processingWebSocketText = new(false);
+    private bool _webSocketTextIsTsukikage; // = false;
+    private bool _processingWebSocketText; // = false;
+    private readonly Lock _webSocketTextLock = new();
 
     public nint WindowHandle { get; private set; }
     public PopupWindow FirstPopupWindow { get; }
@@ -182,29 +184,42 @@ internal sealed partial class MainWindow : IDisposable
 
     public async Task CopyFromWebSocket(string text, bool tsukikage)
     {
-        Volatile.Write(ref _webSocketTextToProcess, text);
-        if (!_processingWebSocketText.TrySetTrue())
+        lock (_webSocketTextLock)
         {
-            return;
+            _webSocketTextToProcess = text;
+            _webSocketTextIsTsukikage = tsukikage;
+            if (_processingWebSocketText)
+            {
+                return;
+            }
+
+            _processingWebSocketText = true;
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        bool copiedText = false;
-
-        try
+        while (true)
         {
-            while (true)
+            string? currentText;
+            bool currentTsukikage;
+            lock (_webSocketTextLock)
             {
-                string? currentText = Interlocked.Exchange(ref _webSocketTextToProcess, null);
+                currentText = _webSocketTextToProcess;
                 if (currentText is null)
                 {
-                    break;
+                    _processingWebSocketText = false;
+                    return;
                 }
 
+                currentTsukikage = _webSocketTextIsTsukikage;
+                _webSocketTextToProcess = null;
+            }
+
+            try
+            {
                 bool verticalText = false;
                 int charIndex = 0;
 
-                if (tsukikage && currentText.StartsWith('{'))
+                if (currentTsukikage && currentText.StartsWith('{'))
                 {
                     try
                     {
@@ -220,14 +235,14 @@ internal sealed partial class MainWindow : IDisposable
                     }
                 }
 
-                WindowsUtils.LastWebSocketTextWasVertical = verticalText;
-                await Dispatcher.BeginInvoke(async () =>
+                Task processingTask = await Dispatcher.InvokeAsync(async () =>
                 {
+                    WindowsUtils.LastWebSocketTextWasVertical = verticalText;
                     bool tsukikageTextNotHovered = charIndex is -1;
-                    bool keepStats = !tsukikage || tsukikageTextNotHovered || CoreConfigManager.Instance.IgnoreHoveredTsukikageTextForStats;
-                    copiedText = CopyText(currentText, tsukikage, keepStats)
+                    bool keepStats = !currentTsukikage || tsukikageTextNotHovered || !CoreConfigManager.Instance.IgnoreHoveredTsukikageTextForStats;
+                    bool copiedText = CopyText(currentText, currentTsukikage, keepStats)
                         && !FirstPopupWindow.MiningMode
-                        && (tsukikage || configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket)
+                        && (currentTsukikage || configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket)
                         && (!configManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized || WindowState is WindowState.Minimized);
 
                     if (!copiedText)
@@ -235,7 +250,7 @@ internal sealed partial class MainWindow : IDisposable
                         return;
                     }
 
-                    if (tsukikage)
+                    if (currentTsukikage)
                     {
                         if (tsukikageTextNotHovered)
                         {
@@ -259,10 +274,10 @@ internal sealed partial class MainWindow : IDisposable
                         PopupWindowUtils.TransparentDueToAutoLookup = true;
                     }
 
-                    bool enableMiningMode = tsukikage && configManager.MiningModeMouseButton.IsPressed();
+                    bool enableMiningMode = currentTsukikage && configManager.MiningModeMouseButton.IsPressed();
                     if (charIndex >= 0 && charIndex < MainTextBox.Text.Length)
                     {
-                        if (!tsukikage || configManager.MainWindowLookupDelay is 0)
+                        if (!currentTsukikage || configManager.MainWindowLookupDelay is 0)
                         {
                             MoveWindowToScreen();
                             await FirstPopupWindow.LookupOnCharPosition(MainTextBox, charIndex, enableMiningMode, true, verticalText).ConfigureAwait(true);
@@ -276,12 +291,13 @@ internal sealed partial class MainWindow : IDisposable
                             InitDelayedLookup(charIndex);
                         }
                     }
-                }, DispatcherPriority.Send).Task.ConfigureAwait(true);
+                }, DispatcherPriority.Send).Task.ConfigureAwait(false);
+                processingTask.SafeFireAndForget("Unexpected error while processing WebSocket text");
             }
-        }
-        finally
-        {
-            _processingWebSocketText.SetFalse();
+            catch (Exception ex)
+            {
+                LoggerManager.Logger.Error(ex, "Unexpected error while processing WebSocket text");
+            }
         }
     }
 
@@ -422,9 +438,33 @@ internal sealed partial class MainWindow : IDisposable
         _tsukikageLookupDelayTimer.IsEnabled = false;
         bool backlogActive = configManager.MaxBacklogCapacity is not 0;
         mergeTexts = mergeTexts && subsequentText is not null;
+        bool notMinimized = WindowState is not WindowState.Minimized;
+        bool countStats = keepStats && (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || notMinimized);
+        int characterCount = 0;
+        int characterCountWithPunctuation = 0;
+        int characterCountWithoutPunctuation = 0;
+        if (countStats)
+        {
+            string textForStats = subsequentText ?? sanitizedNewText;
+            if (backlogActive)
+            {
+                JapaneseUtils.GetGraphemeCounts(textForStats, out characterCountWithPunctuation, out characterCountWithoutPunctuation);
+                characterCount = configManager.StripPunctuationBeforeCalculatingCharacterCount
+                    ? characterCountWithoutPunctuation
+                    : characterCountWithPunctuation;
+            }
+            else
+            {
+                characterCount = configManager.StripPunctuationBeforeCalculatingCharacterCount
+                    ? JapaneseUtils.GetGraphemeCountWithoutPunctuation(textForStats)
+                    : textForStats.GetGraphemeCount();
+            }
+        }
+
         bool doNotShowAllBacklog = !backlogActive || !configManager.AlwaysShowBacklog;
         if (mergeTexts)
         {
+            Debug.Assert(subsequentText is not null);
             if (doNotShowAllBacklog && MainTextBox.Text != previousText)
             {
                 MainTextBox.Text = previousText;
@@ -436,7 +476,7 @@ internal sealed partial class MainWindow : IDisposable
             mergedText = previousText + subsequentText;
             if (backlogActive && keepStats)
             {
-                BacklogUtils.ReplaceLastBacklogText(mergedText);
+                BacklogUtils.ReplaceLastBacklogText(mergedText, characterCountWithPunctuation, characterCountWithoutPunctuation);
                 if (configManager.DiscardIdenticalTextAllBacklog)
                 {
                     BacklogUtils.UpdateUniqueBacklogItem(previousText, mergedText);
@@ -452,7 +492,7 @@ internal sealed partial class MainWindow : IDisposable
                 Debug.Assert(MainTextBox.Text.Length > 0);
                 if (backlogActive && keepStats)
                 {
-                    BacklogUtils.AddToBacklog(sanitizedNewText);
+                    BacklogUtils.AddToBacklog(sanitizedNewText, characterCountWithPunctuation, characterCountWithoutPunctuation, countStats);
                     if (configManager.DiscardIdenticalTextAllBacklog)
                     {
                         BacklogUtils.AddToUniqueBacklogItems(sanitizedNewText);
@@ -461,7 +501,7 @@ internal sealed partial class MainWindow : IDisposable
             }
             else if (keepStats)
             {
-                BacklogUtils.AddToBacklogShowAllBacklog(sanitizedNewText);
+                BacklogUtils.AddToBacklogShowAllBacklog(sanitizedNewText, characterCountWithPunctuation, characterCountWithoutPunctuation, countStats);
                 if (configManager.DiscardIdenticalTextAllBacklog)
                 {
                     BacklogUtils.AddToUniqueBacklogItems(sanitizedNewText);
@@ -471,7 +511,6 @@ internal sealed partial class MainWindow : IDisposable
 
         MainTextBox.Foreground = configManager.MainWindowTextColor;
 
-        bool notMinimized = WindowState is not WindowState.Minimized;
         if (!mergeTexts && SizeToContent is SizeToContent.Manual && notMinimized
                         && (configManager.MainWindowDynamicHeight || configManager.MainWindowDynamicWidth))
         {
@@ -497,18 +536,14 @@ internal sealed partial class MainWindow : IDisposable
             }
         }
 
-        if (keepStats && (!configManager.StopIncreasingTimeAndCharStatsWhenMinimized || notMinimized))
+        if (countStats)
         {
-            StatsUtils.StartTimeStatStopWatch();
             StatsUtils.SetIdleTimeTimerInterval(mergedText?.Length ?? sanitizedNewText.Length);
+            StatsUtils.StartTimeStatStopWatch(true);
 
-            string strippedText = configManager.StripPunctuationBeforeCalculatingCharacterCount
-                ? JapaneseUtils.RemovePunctuation(subsequentText ?? sanitizedNewText)
-                : subsequentText ?? sanitizedNewText;
-
-            if (strippedText.Length > 0)
+            if (characterCount > 0)
             {
-                StatsUtils.IncrementStat(StatType.Characters, strippedText.GetGraphemeCount());
+                StatsUtils.IncrementStat(StatType.Characters, characterCount);
 
                 if (!mergeTexts)
                 {
@@ -1177,7 +1212,7 @@ internal sealed partial class MainWindow : IDisposable
         {
             if (configManager.DisableHotkeys)
             {
-                int disableHotkeysKeyGestureId = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.IndexOf(nameof(configManager.DisableHotkeys));
+                int disableHotkeysKeyGestureId = KeyGestureUtils.GlobalKeyGestureNameToKeyGestureDict.IndexOf(nameof(configManager.DisableHotkeysKeyGesture));
                 if (disableHotkeysKeyGestureId >= 0)
                 {
                     WinApi.UnregisterAllGlobalHotKeys(WindowHandle, disableHotkeysKeyGestureId);

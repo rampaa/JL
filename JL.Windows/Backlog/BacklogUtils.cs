@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -6,7 +7,6 @@ using System.Windows.Controls;
 using JL.Core;
 using JL.Core.Config;
 using JL.Core.Frontend;
-using JL.Core.Japanese;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Core.Utilities.ObjectPool;
@@ -29,6 +29,8 @@ internal static class BacklogUtils
     private static readonly LinkedList<LinkedListNode<BacklogItem>> s_pendingBacklogItemsForBacklogFile = new();
 
     private static readonly SemaphoreSlim s_semaphoreSlimForBacklogFile = new(1, 1);
+    private static string? s_backlogFilePathToRestore;
+    private static long s_backlogFileLengthToRestore; // = 0
     private const string RecordSeparator = "\u001E\n";
 
     public static string? LastItem => s_backlog.Last?.Value.Text;
@@ -74,15 +76,15 @@ internal static class BacklogUtils
 
     private static readonly Lock s_pendingItemsLock = new();
 
-    public static void AddToBacklog(string text)
+    public static void AddToBacklog(string text, int characterCount, int characterCountWithoutPunctuation, bool countStats)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.MaxBacklogCapacity is not -1 && s_backlog.Count > configManager.MaxBacklogCapacity)
+        if (configManager.MaxBacklogCapacity > 0 && s_backlog.Count > configManager.MaxBacklogCapacity)
         {
             s_backlog.RemoveFirst();
         }
 
-        s_currentNode = s_backlog.AddLast(new BacklogItem(text, DateTime.Now));
+        s_currentNode = s_backlog.AddLast(CreateBacklogItem(text, characterCount, characterCountWithoutPunctuation, countStats));
         if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
         {
             lock (s_pendingItemsLock)
@@ -97,15 +99,15 @@ internal static class BacklogUtils
         _ = s_uniqueBacklogItems.Add(text);
     }
 
-    public static void AddToBacklogShowAllBacklog(string text)
+    public static void AddToBacklogShowAllBacklog(string text, int characterCount, int characterCountWithoutPunctuation, bool countStats)
     {
         ConfigManager configManager = ConfigManager.Instance;
         MainWindow mainWindow = MainWindow.Instance;
         TextBox mainTextBox = mainWindow.MainTextBox;
 
-        bool removeOldestItem = configManager.MaxBacklogCapacity is not -1 && s_backlog.Count > configManager.MaxBacklogCapacity;
+        bool removeOldestItem = configManager.MaxBacklogCapacity > 0 && s_backlog.Count > configManager.MaxBacklogCapacity;
 
-        BacklogItem item = new(text, DateTime.Now);
+        BacklogItem item = CreateBacklogItem(text, characterCount, characterCountWithoutPunctuation, countStats);
         s_currentNode = s_backlog.AddLast(item);
         if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
         {
@@ -155,20 +157,44 @@ internal static class BacklogUtils
         }
     }
 
-    public static void ReplaceLastBacklogText(string text)
+    private static BacklogItem CreateBacklogItem(string text, int characterCount, int characterCountWithoutPunctuation, bool countLine)
     {
+        bool lineCounted = countLine && (ConfigManager.Instance.StripPunctuationBeforeCalculatingCharacterCount
+            ? characterCountWithoutPunctuation
+            : characterCount) > 0;
+
+        BacklogStats stats = new(characterCount, characterCountWithoutPunctuation, 0, countLine, lineCounted);
+        return new BacklogItem(text, DateTime.Now,
+            stats with { ResetCount = StatsUtils.SessionStats.ResetCount },
+            stats with { ResetCount = StatsUtils.ProfileLifetimeStats.ResetCount },
+            stats with { ResetCount = StatsUtils.LifetimeStats.ResetCount });
+    }
+
+    public static void ReplaceLastBacklogText(string text, int characterCount, int characterCountWithoutPunctuation)
+    {
+        ConfigManager configManager = ConfigManager.Instance;
         LinkedListNode<BacklogItem>? lastNode = s_backlog.Last;
         if (lastNode is not null)
         {
             lock (s_pendingItemsLock)
             {
-                lastNode.Value = lastNode.Value with { Text = text };
+                BacklogItem lastItem = lastNode.Value;
+                lastNode.Value = new BacklogItem(text, lastItem.Timestamp,
+                    AddBacklogStats(lastItem.SessionStats, StatsUtils.SessionStats.ResetCount, characterCount, characterCountWithoutPunctuation),
+                    AddBacklogStats(lastItem.ProfileStats, StatsUtils.ProfileLifetimeStats.ResetCount, characterCount, characterCountWithoutPunctuation),
+                    AddBacklogStats(lastItem.LifetimeStats, StatsUtils.LifetimeStats.ResetCount, characterCount, characterCountWithoutPunctuation));
+                if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 }
+                    && s_pendingBacklogItemsForBacklogFile.Last?.Value != lastNode)
+                {
+                    // Autosave may already have written this entry before it was merged.
+                    _ = s_pendingBacklogItemsForBacklogFile.AddLast(lastNode);
+                }
             }
+            s_currentNode = lastNode;
         }
         else
         {
-            s_currentNode = s_backlog.AddLast(new BacklogItem(text, DateTime.Now));
-            ConfigManager configManager = ConfigManager.Instance;
+            s_currentNode = s_backlog.AddLast(CreateBacklogItem(text, characterCount, characterCountWithoutPunctuation, false));
             if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
             {
                 lock (s_pendingItemsLock)
@@ -176,6 +202,22 @@ internal static class BacklogUtils
                     _ = s_pendingBacklogItemsForBacklogFile.AddLast(s_currentNode);
                 }
             }
+        }
+    }
+
+    public static void ShowLastBacklogItem()
+    {
+        s_currentNode = s_backlog.Last;
+        MainWindow mainWindow = MainWindow.Instance;
+        TextBox mainTextBox = mainWindow.MainTextBox;
+        mainTextBox.Foreground = ConfigManager.Instance.MainWindowTextColor;
+        string lastText = s_currentNode?.Value.Text ?? "";
+        if (mainTextBox.Text != lastText)
+        {
+            mainTextBox.Text = lastText;
+            mainTextBox.CaretIndex = mainTextBox.Text.Length;
+            mainTextBox.ScrollToEnd();
+            mainWindow.UpdatePosition();
         }
     }
 
@@ -255,32 +297,31 @@ internal static class BacklogUtils
         MainWindow mainWindow = MainWindow.Instance;
         TextBox mainTextBox = mainWindow.MainTextBox;
 
-        string displayText = s_currentNode.Value.Text;
-        if (displayText != mainTextBox.Text)
+        BacklogItem backlogItem = s_currentNode.Value;
+        if (backlogItem.Text != mainTextBox.Text)
         {
             return;
         }
 
-        string text = s_currentNode.Value.Text;
-        if (configManager.StripPunctuationBeforeCalculatingCharacterCount)
-        {
-            text = JapaneseUtils.RemovePunctuation(text);
-        }
-
-        if (text.Length > 0)
-        {
-            StatsUtils.IncrementStat(StatType.Lines, -1);
-            int textLength = text.GetGraphemeCount();
-            StatsUtils.IncrementStat(StatType.Characters, -textLength);
-        }
+        bool stripPunctuation = configManager.StripPunctuationBeforeCalculatingCharacterCount;
+        SubtractBacklogStats(StatsUtils.SessionStats, backlogItem.SessionStats, stripPunctuation);
+        SubtractBacklogStats(StatsUtils.ProfileLifetimeStats, backlogItem.ProfileStats, stripPunctuation);
+        SubtractBacklogStats(StatsUtils.LifetimeStats, backlogItem.LifetimeStats, stripPunctuation);
 
         LinkedListNode<BacklogItem>? newCurrentNode = s_currentNode.Previous ?? s_currentNode.Next;
-        _ = s_uniqueBacklogItems.Remove(s_currentNode.Value.Text);
+        _ = s_uniqueBacklogItems.Remove(backlogItem.Text);
         s_backlog.Remove(s_currentNode);
 
         lock (s_pendingItemsLock)
         {
-            _ = s_pendingBacklogItemsForBacklogFile.Remove(s_currentNode);
+            if (s_pendingBacklogItemsForBacklogFile.Last?.Value == s_currentNode)
+            {
+                s_pendingBacklogItemsForBacklogFile.RemoveLast();
+            }
+            else
+            {
+                _ = s_pendingBacklogItemsForBacklogFile.Remove(s_currentNode);
+            }
         }
 
         s_currentNode = newCurrentNode;
@@ -383,42 +424,101 @@ internal static class BacklogUtils
 
     private static async Task WritePendingItemsToBacklogFile()
     {
-        string tempBacklogPath = GetBacklogFilePath(false, "");
-        bool appendRecordSeparator = File.Exists(tempBacklogPath);
-        bool addTimestamps = ConfigManager.Instance.SaveBacklogTimestamps;
+        if (s_backlogFilePathToRestore is not null)
+        {
+            if (File.Exists(s_backlogFilePathToRestore))
+            {
+                FileStream incompleteFile = new(s_backlogFilePathToRestore, FileMode.Open, FileAccess.Write, FileShare.Read, 4096, FileOptions.Asynchronous);
+                await using (incompleteFile.ConfigureAwait(false))
+                {
+                    // Repair the failed append even if its pending entries have since been cleared.
+                    incompleteFile.SetLength(Math.Min(s_backlogFileLengthToRestore, incompleteFile.Length));
+                }
+            }
+            s_backlogFilePathToRestore = null;
+        }
 
+        lock (s_pendingItemsLock)
+        {
+            if (s_pendingBacklogItemsForBacklogFile.Count is 0)
+            {
+                return;
+            }
+        }
+
+        _ = Directory.CreateDirectory(s_backlogDirectory);
+        string tempBacklogPath = GetBacklogFilePath(false, "");
+        bool addTimestamps = ConfigManager.Instance.SaveBacklogTimestamps;
         StringBuilder stringBuilder = ObjectPoolManager.StringBuilderPool.Get();
+        (LinkedListNode<LinkedListNode<BacklogItem>> Node, string Text)[]? pendingItems = null;
+        int pendingItemCount = 0;
         try
         {
-            lock (s_pendingItemsLock)
+            FileStream fileStream = new(tempBacklogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read, 4096, FileOptions.Asynchronous);
+            await using (fileStream.ConfigureAwait(false))
             {
-                LinkedListNode<LinkedListNode<BacklogItem>>? currentNode = s_pendingBacklogItemsForBacklogFile.First;
-                while (currentNode is not null)
+                long originalLength = fileStream.Length;
+                fileStream.Position = originalLength;
+                lock (s_pendingItemsLock)
+                {
+                    pendingItems = ArrayPool<(LinkedListNode<LinkedListNode<BacklogItem>> Node, string Text)>.Shared.Rent(s_pendingBacklogItemsForBacklogFile.Count);
+                    LinkedListNode<LinkedListNode<BacklogItem>>? currentNode = s_pendingBacklogItemsForBacklogFile.First;
+                    while (currentNode is not null)
+                    {
+                        pendingItems[pendingItemCount++] = (currentNode, currentNode.Value.Value.Text);
+                        currentNode = currentNode.Next;
+                    }
+                }
+
+                bool appendRecordSeparator = originalLength > 0;
+                foreach ((LinkedListNode<LinkedListNode<BacklogItem>> node, string text) in pendingItems.AsSpan(0, pendingItemCount))
                 {
                     if (appendRecordSeparator)
                     {
                         _ = stringBuilder.Append(RecordSeparator);
                     }
 
-                    BacklogItem backlogItem = currentNode.Value.Value;
-                    _ = stringBuilder.Append(addTimestamps
-                        ? string.Create(CultureInfo.InvariantCulture, $"[{backlogItem.Timestamp:yyyy.MM.dd HH:mm:ss}]\n{backlogItem.Text}")
-                        : backlogItem.Text);
+                    if (addTimestamps)
+                    {
+                        // Merging and recalculating statistics leave the timestamp unchanged.
+                        _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"[{node.Value.Value.Timestamp:yyyy.MM.dd HH:mm:ss}]\n");
+                    }
 
+                    _ = stringBuilder.Append(text);
                     appendRecordSeparator = true;
-                    LinkedListNode<LinkedListNode<BacklogItem>>? nextNode = currentNode.Next;
-                    s_pendingBacklogItemsForBacklogFile.Remove(currentNode);
-                    currentNode = nextNode;
+                }
+
+                if (stringBuilder.Length > 0)
+                {
+                    s_backlogFilePathToRestore = tempBacklogPath;
+                    s_backlogFileLengthToRestore = originalLength;
+                    StreamWriter writer = new(fileStream, TextUtils.Utf8NoBom, 4096, leaveOpen: true);
+                    await using (writer.ConfigureAwait(false))
+                    {
+                        await writer.WriteAsync(stringBuilder).ConfigureAwait(false);
+                    }
                 }
             }
 
-            if (stringBuilder.Length > 0)
+            s_backlogFilePathToRestore = null;
+            lock (s_pendingItemsLock)
             {
-                await File.AppendAllTextAsync(tempBacklogPath, stringBuilder.ToString()).ConfigureAwait(false);
+                foreach ((LinkedListNode<LinkedListNode<BacklogItem>> node, string text) in pendingItems.AsSpan(0, pendingItemCount))
+                {
+                    if (node.List == s_pendingBacklogItemsForBacklogFile && node.Value.Value.Text == text)
+                    {
+                        s_pendingBacklogItemsForBacklogFile.Remove(node);
+                    }
+                }
             }
         }
         finally
         {
+            if (pendingItems is not null)
+            {
+                pendingItems.AsSpan(0, pendingItemCount).Clear();
+                ArrayPool<(LinkedListNode<LinkedListNode<BacklogItem>> Node, string Text)>.Shared.Return(pendingItems);
+            }
             ObjectPoolManager.StringBuilderPool.Return(stringBuilder);
         }
     }
@@ -434,6 +534,7 @@ internal static class BacklogUtils
 
     private static async Task WriteSessionStats()
     {
+        _ = Directory.CreateDirectory(s_backlogDirectory);
         string tempStatsFilePath = GetBacklogFilePath(false, "_Stats");
 
         Stats sessionStats = StatsUtils.SessionStats;
@@ -483,7 +584,6 @@ internal static class BacklogUtils
         await s_semaphoreSlimForBacklogFile.WaitAsync().ConfigureAwait(false);
         try
         {
-            _ = Directory.CreateDirectory(s_backlogDirectory);
             if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
             {
                 await WritePendingItemsToBacklogFile().ConfigureAwait(false);
@@ -518,7 +618,7 @@ internal static class BacklogUtils
 
     public static void ClearBacklog()
     {
-        BacklogItem? lastItem = s_backlog.Last?.Value;
+        string? lastText = s_backlog.Last?.Value.Text;
         s_backlog.Clear();
         s_currentNode = null;
 
@@ -528,12 +628,12 @@ internal static class BacklogUtils
             s_pendingBacklogItemsForBacklogFile.Clear();
         }
 
-        if (lastItem is not null)
+        if (lastText is not null)
         {
             MainWindow mainWindow = MainWindow.Instance;
             TextBox mainTextBox = mainWindow.MainTextBox;
             mainTextBox.Foreground = ConfigManager.Instance.MainWindowTextColor;
-            mainTextBox.Text = lastItem.Value.Text;
+            mainTextBox.Text = lastText;
             mainWindow.UpdatePosition();
         }
     }
@@ -546,7 +646,7 @@ internal static class BacklogUtils
     public static void TrimBacklog()
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.MaxBacklogCapacity > 0 && s_backlog.Count > configManager.MaxBacklogCapacity)
+        if (configManager.MaxBacklogCapacity > 0 && s_backlog.Count - 1 > configManager.MaxBacklogCapacity)
         {
             bool changeCurrentNodeToLast = false;
             do
@@ -559,7 +659,7 @@ internal static class BacklogUtils
                 }
 
                 s_backlog.RemoveFirst();
-            } while (s_backlog.Count > configManager.MaxBacklogCapacity);
+            } while (s_backlog.Count - 1 > configManager.MaxBacklogCapacity);
 
             if (changeCurrentNodeToLast)
             {
@@ -575,44 +675,88 @@ internal static class BacklogUtils
         }
     }
 
+    private static BacklogStats AddBacklogStats(BacklogStats backlogStats, int resetCount, int characterCount, int characterCountWithoutPunctuation)
+    {
+        return backlogStats.ResetCount != resetCount
+            ? new BacklogStats(characterCount, characterCountWithoutPunctuation, resetCount, false, false)
+            : backlogStats with
+            {
+                CharacterCount = backlogStats.CharacterCount + characterCount,
+                CharacterCountWithoutPunctuation = backlogStats.CharacterCountWithoutPunctuation + characterCountWithoutPunctuation
+            };
+    }
+
     public static void RecalculateCharacterCountStats()
     {
-        if (s_backlog.Count is 0)
+        bool stripPunctuation = ConfigManager.Instance.StripPunctuationBeforeCalculatingCharacterCount;
+        lock (s_pendingItemsLock)
+        {
+            LinkedListNode<BacklogItem>? node = s_backlog.First;
+            while (node is not null)
+            {
+                BacklogItem item = node.Value;
+                node.Value = new BacklogItem(item.Text, item.Timestamp,
+                    RecalculateBacklogStats(StatsUtils.SessionStats, item.SessionStats, stripPunctuation),
+                    RecalculateBacklogStats(StatsUtils.ProfileLifetimeStats, item.ProfileStats, stripPunctuation),
+                    RecalculateBacklogStats(StatsUtils.LifetimeStats, item.LifetimeStats, stripPunctuation));
+                node = node.Next;
+            }
+        }
+    }
+
+    private static BacklogStats RecalculateBacklogStats(Stats stats, BacklogStats backlogStats, bool stripPunctuation)
+    {
+        if (backlogStats.ResetCount != stats.ResetCount)
+        {
+            return new BacklogStats(0, 0, stats.ResetCount, false, false);
+        }
+
+        long difference = stripPunctuation
+            ? (long)backlogStats.CharacterCountWithoutPunctuation - backlogStats.CharacterCount
+            : (long)backlogStats.CharacterCount - backlogStats.CharacterCountWithoutPunctuation;
+        if (difference > 0)
+        {
+            stats.Characters += (ulong)difference;
+        }
+        else if (difference < 0)
+        {
+            stats.Characters -= (ulong)-difference;
+        }
+
+        int characterCount = stripPunctuation ? backlogStats.CharacterCountWithoutPunctuation : backlogStats.CharacterCount;
+        bool lineCounted = backlogStats.CountLine && characterCount > 0;
+        if (lineCounted != backlogStats.LineCounted)
+        {
+            if (lineCounted)
+            {
+                ++stats.Lines;
+            }
+            else
+            {
+                --stats.Lines;
+            }
+        }
+
+        return backlogStats with { LineCounted = lineCounted };
+    }
+
+    private static void SubtractBacklogStats(Stats stats, BacklogStats backlogStats, bool stripPunctuation)
+    {
+        if (backlogStats.ResetCount != stats.ResetCount)
         {
             return;
         }
 
-        ulong characterCount = 0;
-        ulong lineCount = 0;
-
-        ConfigManager configManager = ConfigManager.Instance;
-        LinkedListNode<BacklogItem>? currentBacklogNode = s_backlog.First;
-        while (currentBacklogNode is not null)
+        int characterCount = stripPunctuation
+            ? backlogStats.CharacterCountWithoutPunctuation
+            : backlogStats.CharacterCount;
+        if (characterCount > 0)
         {
-            string text = currentBacklogNode.Value.Text;
-            if (configManager.StripPunctuationBeforeCalculatingCharacterCount)
-            {
-                text = JapaneseUtils.RemovePunctuation(text);
-            }
-
-            if (text.Length > 0)
-            {
-                ++lineCount;
-                characterCount += (ulong)text.GetGraphemeCount();
-            }
-
-            currentBacklogNode = currentBacklogNode.Next;
+            stats.Characters -= (ulong)characterCount;
         }
-
-        if (configManager.StripPunctuationBeforeCalculatingCharacterCount)
+        if (backlogStats.LineCounted)
         {
-            StatsUtils.IncrementStat(StatType.Characters, -(long)(StatsUtils.SessionStats.Characters - characterCount));
-            StatsUtils.IncrementStat(StatType.Lines, -(long)(StatsUtils.SessionStats.Lines - lineCount));
-        }
-        else
-        {
-            StatsUtils.IncrementStat(StatType.Characters, (long)(characterCount - StatsUtils.SessionStats.Characters));
-            StatsUtils.IncrementStat(StatType.Lines, (long)(lineCount - StatsUtils.SessionStats.Lines));
+            --stats.Lines;
         }
     }
 
