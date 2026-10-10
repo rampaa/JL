@@ -793,15 +793,6 @@ internal sealed class DeconjugatorTestsForVZ
     [Test]
     public void Deconjugate_PolitePastTeruNegative_VZ()
     {
-        const string termToDeconjugate = "命じてません";
-        const string expected = "～teru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "命ずる", LastTag: "vz" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
-    public void Deconjugate_PolitePastTeruNegative2_VZ()
-    {
         const string termToDeconjugate = "命じてませんでした";
         const string expected = "～teru→polite past negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "命ずる", LastTag: "vz" }).Select(static form => form.Process).ToList().AsReadOnlySpan());

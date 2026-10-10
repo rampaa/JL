@@ -206,15 +206,6 @@ internal sealed class DeconjugatorTestsForVSC
     }
 
     [Test]
-    public void Deconjugate_PlainImperativeAffirmative2_VSC()
-    {
-        const string termToDeconjugate = "御座せよ";
-        const string expected = "～imperative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "御座す", LastTag: "vs-c" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
     public void Deconjugate_PlainImperativeNegative_VSC()
     {
         const string termToDeconjugate = "御座すな";

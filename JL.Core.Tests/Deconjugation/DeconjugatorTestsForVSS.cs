@@ -739,15 +739,6 @@ internal sealed class DeconjugatorTestsForVSS
     [Test]
     public void Deconjugate_PolitePastTeruNegative_VSS()
     {
-        const string termToDeconjugate = "愛してません";
-        const string expected = "～teru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "愛する", LastTag: "vs-s" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
-    public void Deconjugate_PolitePastTeruNegative2_VSS()
-    {
         const string termToDeconjugate = "愛してませんでした";
         const string expected = "～teru→polite past negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "愛する", LastTag: "vs-s" }).Select(static form => form.Process).ToList().AsReadOnlySpan());

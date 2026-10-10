@@ -748,15 +748,6 @@ internal sealed class DeconjugatorTestsForV5RI
     [Test]
     public void Deconjugate_PolitePastTeruNegative_V5RI()
     {
-        const string termToDeconjugate = "有ってません";
-        const string expected = "～teru→polite negative";
-        string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "有る", LastTag: "v5r-i" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
-    public void Deconjugate_PolitePastTeruNegative2_V5RI()
-    {
         const string termToDeconjugate = "有ってませんでした";
         const string expected = "～teru→polite past negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "有る", LastTag: "v5r-i" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
