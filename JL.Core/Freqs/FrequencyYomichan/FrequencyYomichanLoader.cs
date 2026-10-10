@@ -110,7 +110,7 @@ internal static class FrequencyYomichanLoader
 
                             if (generateMazegaki)
                             {
-                                foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, reading))
+                                foreach (string mazegakiVariant in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
                                 {
                                     if (FreqUtils.AddOrUpdate(contents, mazegakiVariant, frequencyRecordWithReading, higherValueMeansHigherFrequency) && generateFusejiVariants)
                                     {
