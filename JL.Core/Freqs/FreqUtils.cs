@@ -11,6 +11,7 @@ using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using Microsoft.Data.Sqlite;
+using SQLitePCL;
 
 namespace JL.Core.Freqs;
 
@@ -134,7 +135,15 @@ public static class FreqUtils
                         string dbPath = freq.DBPath;
                         if (File.Exists(dbPath))
                         {
-                            DBUtils.DeleteDB(dbPath);
+                            try
+                            {
+                                DBUtils.DeleteDB(dbPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                LoggerManager.Logger.Error(ex, "Couldn't remove the failed database for '{DictName}' at '{DBPath}'", freq.Name, dbPath);
+                                FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't remove the failed database for {freq.Name}. The dictionary remains disabled. {ex.Message}");
+                            }
                         }
                     }
 
@@ -161,21 +170,55 @@ public static class FreqUtils
         FreqsReady = true;
     }
 
-    private static DBState PrepareFreqDB(Freq freq, int dbVersion, ref bool rebuildingAnyDB)
+    private static DBState PrepareFreqDB(Freq freq, int dbVersion, ref bool rebuildingAnyDB, ref bool freqCleared)
     {
+        freq.Ready = false;
+
         bool useDB = freq.Options.UseDB.Value;
         string dbPath = freq.DBPath;
-        string dbJournalPath = $"{dbPath}-journal";
-        string dbWalPath = $"{dbPath}-wal";
-        string dbShmPath = $"{dbPath}-shm";
         bool dbExists = File.Exists(dbPath);
-        bool dbJournalExists = File.Exists(dbJournalPath);
-        bool dbWalExists = File.Exists(dbWalPath);
-        bool dbShmExists = File.Exists(dbShmPath);
-
-        if (!freq.Updating)
+        try
         {
-            if (dbJournalExists || dbWalExists || dbShmExists)
+            string dbJournalPath = $"{dbPath}-journal";
+            string dbWalPath = $"{dbPath}-wal";
+            string dbShmPath = $"{dbPath}-shm";
+            bool dbJournalExists = File.Exists(dbJournalPath);
+            bool dbWalExists = File.Exists(dbWalPath);
+            bool dbShmExists = File.Exists(dbShmPath);
+
+            if (dbExists)
+            {
+                if (DBUtils.TryInspectDB(freq.ReadOnlyConnectionString, out bool recordsExist, out int version, out SqliteException? error))
+                {
+                    if ((!freq.Updating && !recordsExist) || version != dbVersion)
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB |= version != dbVersion;
+                    }
+                }
+                else
+                {
+                    Debug.Assert(error is not null);
+                    if (error.SqliteErrorCode is raw.SQLITE_BUSY or raw.SQLITE_LOCKED)
+                    {
+                        LoggerManager.Logger.Error(error, "Database inspection timed out for '{DictName}' at '{DBPath}'. The frequency dictionary has been deactivated", freq.Name, dbPath);
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"{freq.Name} has been deactivated because its database is still busy. The database has been preserved. You can enable the frequency dictionary again in Manage Frequencies window.");
+                        freq.Active = false;
+                        freqCleared = true;
+                        return new DBState(useDB, dbExists);
+                    }
+                    else
+                    {
+                        LoggerManager.Logger.Warning(error, "Couldn't inspect the database for '{DictName}' at '{DBPath}'. Rebuilding it", freq.Name, dbPath);
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Couldn't read the database for {freq.Name}.");
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                    }
+                }
+            }
+
+            if (!freq.Updating && (dbJournalExists || dbWalExists || dbShmExists))
             {
                 if (dbExists)
                 {
@@ -198,19 +241,13 @@ public static class FreqUtils
                     File.Delete(dbShmPath);
                 }
             }
-            else if (dbExists && !DBUtils.RecordExists(freq.ReadOnlyConnectionString))
-            {
-                DBUtils.DeleteDB(dbPath);
-                dbExists = false;
-            }
         }
-
-        freq.Ready = false;
-        if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(dbVersion, freq.ReadOnlyConnectionString))
+        catch (Exception ex)
         {
-            DBUtils.DeleteDB(dbPath);
-            dbExists = false;
-            rebuildingAnyDB = true;
+            LoggerManager.Logger.Error(ex, "Couldn't prepare the database for '{DictName}' at '{DBPath}'. The frequency dictionary has been deactivated", freq.Name, dbPath);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't prepare the database for {freq.Name}. The frequency dictionary has been deactivated. {ex.Message}");
+            freq.Active = false;
+            freqCleared = true;
         }
 
         return new DBState(useDB, dbExists);
@@ -219,7 +256,7 @@ public static class FreqUtils
     private static void LoadNazekaFreq(Freq freq, List<Task> tasks, ConcurrentBag<Freq> freqsToBeRemoved, ref bool rebuildingAnyDB, ref bool freqCleared)
     {
         string fullDictPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
-        DBState dBContext = PrepareFreqDB(freq, FreqDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareFreqDB(freq, FreqDBManager.Version, ref rebuildingAnyDB, ref freqCleared);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -254,7 +291,7 @@ public static class FreqUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. The frequency dictionary has been deactivated. Check the logs for more details.");
 
                     freq.Active = false;
                     freqsToBeRemoved.Add(freq);
@@ -274,6 +311,7 @@ public static class FreqUtils
                     FreqDBManager.CreateDB(freq.DBPath);
                     if (!hasContent)
                     {
+                        freq.Size = 0;
                         await FreqDBManager.ImportNazekaFreqFromDisk(freq).ConfigureAwait(false);
                     }
                     else
@@ -285,7 +323,7 @@ public static class FreqUtils
                     if (freq.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
 
                         freq.Active = false;
                         freqsToBeRemoved.Add(freq);
@@ -294,7 +332,7 @@ public static class FreqUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. The frequency dictionary has been deactivated. Check the logs for more details.");
 
                     freq.Active = false;
                     freqsToBeRemoved.Add(freq);
@@ -331,7 +369,7 @@ public static class FreqUtils
 
         string fullDictPath = Path.GetFullPath(freq.Path, AppInfo.ApplicationPath);
         ResourceUpdater.HandleLeftOverFolders(fullDictPath);
-        DBState dBContext = PrepareFreqDB(freq, FreqDBManager.Version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareFreqDB(freq, FreqDBManager.Version, ref rebuildingAnyDB, ref freqCleared);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -357,7 +395,7 @@ public static class FreqUtils
                     if (freq.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
 
                         freq.Active = false;
                         freqsToBeRemoved.Add(freq);
@@ -366,7 +404,7 @@ public static class FreqUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. The frequency dictionary has been deactivated. Check the logs for more details.");
 
                     freq.Active = false;
                     freqsToBeRemoved.Add(freq);
@@ -386,6 +424,7 @@ public static class FreqUtils
                     FreqDBManager.CreateDB(freq.DBPath);
                     if (!hasContent)
                     {
+                        freq.Size = 0;
                         await FreqDBManager.ImportYomichanFreqFromDisk(freq, freq.DBPath).ConfigureAwait(false);
                     }
                     else
@@ -397,7 +436,7 @@ public static class FreqUtils
                     if (freq.Size is 0)
                     {
                         LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
 
                         freq.Active = false;
                         freqsToBeRemoved.Add(freq);
@@ -406,7 +445,7 @@ public static class FreqUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. Check the logs for more details.");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {freq.Name}. The frequency dictionary has been deactivated. Check the logs for more details.");
 
                     freq.Active = false;
                     freqsToBeRemoved.Add(freq);

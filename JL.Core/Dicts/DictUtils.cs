@@ -781,7 +781,7 @@ public static class DictUtils
                     if (error.SqliteErrorCode is raw.SQLITE_BUSY or raw.SQLITE_LOCKED)
                     {
                         LoggerManager.Logger.Error(error, "Database inspection timed out for '{DictName}' at '{DBPath}'. The dictionary has been deactivated", dict.Name, dbPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"{dict.Name} has been deactivated because its database is still busy. The database has been preserved. You can enable the dictionary again in preferences.");
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"{dict.Name} has been deactivated because its database is still busy. The database has been preserved. You can enable the dictionary again in Manage Dictionaries window.");
                         dict.Active = false;
                         dictCleared = true;
                         return new DBState(useDB, dbExists);
