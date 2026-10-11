@@ -24,6 +24,7 @@ using JL.Core.Utilities.Bool;
 using JL.Core.Utilities.Database;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
+using SQLitePCL;
 
 namespace JL.Core.Dicts;
 
@@ -697,7 +698,15 @@ public static class DictUtils
                             string dbPath = dict.DBPath;
                             if (File.Exists(dbPath))
                             {
-                                DBUtils.DeleteDB(dbPath);
+                                try
+                                {
+                                    DBUtils.DeleteDB(dbPath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    LoggerManager.Logger.Error(ex, "Couldn't remove the failed database for '{DictName}' at '{DBPath}'", dict.Name, dbPath);
+                                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't remove the failed database for {dict.Name}. The dictionary remains disabled. {ex.Message}");
+                                }
                             }
                         }
 
@@ -739,23 +748,55 @@ public static class DictUtils
         }
     }
 
-    private static DBState PrepareDictDB(Dict dict, int dbVersion, ref bool rebuildingAnyDB)
+    private static DBState PrepareDictDB(Dict dict, int dbVersion, ref bool rebuildingAnyDB, ref bool dictCleared)
     {
         dict.Ready = false;
 
         bool useDB = dict.Options.UseDB.Value;
         string dbPath = dict.DBPath;
-        string dbJournalPath = $"{dbPath}-journal";
-        string dbWalPath = $"{dbPath}-wal";
-        string dbShmPath = $"{dbPath}-shm";
         bool dbExists = File.Exists(dbPath);
-        bool dbJournalExists = File.Exists(dbJournalPath);
-        bool dbWalExists = File.Exists(dbWalPath);
-        bool dbShmExists = File.Exists(dbShmPath);
-
-        if (!dict.Updating)
+        try
         {
-            if (dbJournalExists || dbWalExists || dbShmExists)
+            string dbJournalPath = $"{dbPath}-journal";
+            string dbWalPath = $"{dbPath}-wal";
+            string dbShmPath = $"{dbPath}-shm";
+            bool dbJournalExists = File.Exists(dbJournalPath);
+            bool dbWalExists = File.Exists(dbWalPath);
+            bool dbShmExists = File.Exists(dbShmPath);
+
+            if (dbExists)
+            {
+                if (DBUtils.TryInspectDB(dict.ReadOnlyConnectionString, out bool recordsExist, out int version, out SqliteException? error))
+                {
+                    if ((!dict.Updating && !recordsExist) || version != dbVersion)
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB |= version != dbVersion;
+                    }
+                }
+                else
+                {
+                    Debug.Assert(error is not null);
+                    if (error.SqliteErrorCode is raw.SQLITE_BUSY or raw.SQLITE_LOCKED)
+                    {
+                        LoggerManager.Logger.Error(error, "Database inspection timed out for '{DictName}' at '{DBPath}'. The dictionary has been deactivated", dict.Name, dbPath);
+                        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"{dict.Name} has been deactivated because its database is still busy. The database has been preserved. You can enable the dictionary again in preferences.");
+                        dict.Active = false;
+                        dictCleared = true;
+                        return new DBState(useDB, dbExists);
+                    }
+                    else
+                    {
+                        LoggerManager.Logger.Warning(error, "Couldn't inspect the database for '{DictName}' at '{DBPath}'. Rebuilding it", dict.Name, dbPath);
+                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Couldn't read the database for {dict.Name}.");
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                    }
+                }
+            }
+
+            if (!dict.Updating && (dbJournalExists || dbWalExists || dbShmExists))
             {
                 if (dbExists)
                 {
@@ -778,18 +819,13 @@ public static class DictUtils
                     File.Delete(dbShmPath);
                 }
             }
-            else if (dbExists && !DBUtils.RecordExists(dict.ReadOnlyConnectionString))
-            {
-                DBUtils.DeleteDB(dbPath);
-                dbExists = false;
-            }
         }
-
-        if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(dbVersion, dict.ReadOnlyConnectionString))
+        catch (Exception ex)
         {
-            DBUtils.DeleteDB(dbPath);
-            dbExists = false;
-            rebuildingAnyDB = true;
+            LoggerManager.Logger.Error(ex, "Couldn't prepare the database for '{DictName}' at '{DBPath}'. The dictionary has been deactivated", dict.Name, dbPath);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't prepare the database for {dict.Name}. The dictionary has been deactivated. {ex.Message}");
+            dict.Active = false;
+            dictCleared = true;
         }
 
         return new DBState(useDB, dbExists);
@@ -804,7 +840,7 @@ public static class DictUtils
 
         string fullDictPath = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
         handleLeftOvers(fullDictPath);
-        DBState dBContext = PrepareDictDB(dict, version, ref rebuildingAnyDB);
+        DBState dBContext = PrepareDictDB(dict, version, ref rebuildingAnyDB, ref dictCleared);
 
         bool useDB = dBContext.UseDB;
         bool dbExists = dBContext.DBExists;
@@ -844,7 +880,7 @@ public static class DictUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {dict.Name}. Check the logs for more details.");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {dict.Name}. The dictionary has been deactivated. Check the logs for more details.");
 
                     dict.Active = false;
                     dictsToBeRemoved.Add(dict);
@@ -868,6 +904,7 @@ public static class DictUtils
                     createDB(dict.DBPath);
                     if (!hasContent)
                     {
+                        dict.Size = 0;
                         await importFromDisk(dict, dict.DBPath).ConfigureAwait(false);
                     }
                     else
@@ -892,7 +929,7 @@ public static class DictUtils
                 catch (Exception ex)
                 {
                     LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", dict.Type.GetDescription(), dict.Name, fullDictPath);
-                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {dict.Name}. Check the logs for more details.");
+                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {dict.Name}. The dictionary has been deactivated. Check the logs for more details.");
 
                     dict.Active = false;
                     dictsToBeRemoved.Add(dict);
@@ -918,7 +955,7 @@ public static class DictUtils
             dict.Ready = true;
         }
 
-        if (dict is { MaxSearchKeyLength: 0, Active: true, Options.UseDB.Value: true })
+        if (dbExists && dict is { MaxSearchKeyLength: 0, Active: true, Options.UseDB.Value: true })
         {
             if (getMaxSearchKeyLength is not null)
             {
