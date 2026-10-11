@@ -17,6 +17,8 @@ public static class AudioUtils
 
     public static readonly OrderedDictionary<string, AudioSource> AudioSources = new(StringComparer.Ordinal);
 
+    private static KeyValuePair<string, AudioSourceType>[] s_activeAudioSources = [];
+
     private static readonly OrderedDictionary<string, AudioSource> s_builtInAudioSources = new(1, StringComparer.Ordinal)
     {
         {
@@ -129,55 +131,52 @@ public static class AudioUtils
     internal static async ValueTask<AudioResponse?> GetPrioritizedAudio(string spelling, string reading)
     {
         AudioResponse? audioResponse = null;
-        foreach ((string uri, AudioSource audioSource) in AudioSources)
+        foreach ((string uri, AudioSourceType audioSourceType) in Volatile.Read(ref s_activeAudioSources))
         {
-            if (audioSource.Active)
+            switch (audioSourceType)
             {
-                switch (audioSource.Type)
+                case AudioSourceType.Url:
+                case AudioSourceType.UrlJson:
                 {
-                    case AudioSourceType.Url:
-                    case AudioSourceType.UrlJson:
-                    {
-                        string normalizedUriStr = uri
-                            .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase)
-                            .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
-                            .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
+                    string normalizedUriStr = uri
+                        .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase)
+                        .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
+                        .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
 
-                        Uri normalizedUri = new(normalizedUriStr);
-                        audioResponse = audioSource.Type is AudioSourceType.Url
-                            ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
-                            : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
+                    Uri normalizedUri = new(normalizedUriStr);
+                    audioResponse = audioSourceType is AudioSourceType.Url
+                        ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
+                        : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
 
-                        break;
-                    }
-
-                    case AudioSourceType.LocalPath:
-                    {
-                        string normalizedUriStr = uri
-                            .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
-                            .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
-
-                        normalizedUriStr = Path.GetFullPath(normalizedUriStr, AppInfo.ApplicationPath);
-
-                        Uri normalizedUri = new(normalizedUriStr);
-                        audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
-
-                        break;
-                    }
-
-                    case AudioSourceType.TextToSpeech:
-                        await FrontendManager.Frontend.TextToSpeech(uri, reading).ConfigureAwait(false);
-                        return s_textToSpeechAudioResponse;
-
-                    default:
-                        LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AudioUtils), nameof(GetPrioritizedAudio), audioSource.Type);
-                        break;
-                }
-
-                if (audioResponse is not null)
-                {
                     break;
                 }
+
+                case AudioSourceType.LocalPath:
+                {
+                    string normalizedUriStr = uri
+                        .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
+                        .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
+
+                    normalizedUriStr = Path.GetFullPath(normalizedUriStr, AppInfo.ApplicationPath);
+
+                    Uri normalizedUri = new(normalizedUriStr);
+                    audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
+
+                    break;
+                }
+
+                case AudioSourceType.TextToSpeech:
+                    await FrontendManager.Frontend.TextToSpeech(uri, reading).ConfigureAwait(false);
+                    return s_textToSpeechAudioResponse;
+
+                default:
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AudioUtils), nameof(GetPrioritizedAudio), audioSourceType);
+                    break;
+            }
+
+            if (audioResponse is not null)
+            {
+                break;
             }
         }
 
@@ -195,6 +194,37 @@ public static class AudioUtils
             await FrontendManager.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat).ConfigureAwait(false);
             StatsUtils.IncrementStat(StatType.TimesPlayedAudio);
         }
+    }
+
+    public static void UpdateActiveAudioSources()
+    {
+        int activeSourceCount = 0;
+        foreach (AudioSource audioSource in AudioSources.Values)
+        {
+            if (audioSource.Active)
+            {
+                ++activeSourceCount;
+            }
+        }
+
+        if (activeSourceCount is 0)
+        {
+            Volatile.Write(ref s_activeAudioSources, []);
+            return;
+        }
+
+        KeyValuePair<string, AudioSourceType>[] activeAudioSources = new KeyValuePair<string, AudioSourceType>[activeSourceCount];
+        int index = 0;
+        foreach ((string uri, AudioSource audioSource) in AudioSources)
+        {
+            if (audioSource.Active)
+            {
+                activeAudioSources[index] = new KeyValuePair<string, AudioSourceType>(uri, audioSource.Type);
+                ++index;
+            }
+        }
+
+        Volatile.Write(ref s_activeAudioSources, activeAudioSources);
     }
 
     public static async Task SerializeAudioSources()
@@ -250,6 +280,8 @@ public static class AudioUtils
 
                 ++priority;
             }
+
+            UpdateActiveAudioSources();
         }
         else
         {

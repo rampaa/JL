@@ -182,6 +182,7 @@ internal sealed partial class EditAudioSourceWindow
                 _ = AudioUtils.AudioSources.Remove(_uri);
             }
 
+            AudioUtils.UpdateActiveAudioSources();
             Close();
         }
     }

@@ -132,6 +132,7 @@ internal sealed partial class AddAudioSourceWindow
         if (!string.IsNullOrEmpty(uri))
         {
             AudioUtils.AudioSources.Add(uri, new AudioSource(type, true, AudioUtils.AudioSources.Count + 1));
+            AudioUtils.UpdateActiveAudioSources();
             Close();
         }
     }

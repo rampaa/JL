@@ -80,8 +80,9 @@ internal sealed partial class ManageAudioSourcesWindow
             AudioUtils.AudioSources.Add(audioSource.Key, audioSource.Value);
         }
 
-        await AudioUtils.SerializeAudioSources().ConfigureAwait(false);
+        AudioUtils.UpdateActiveAudioSources();
         SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
+        await AudioUtils.SerializeAudioSources().ConfigureAwait(false);
     }
 
     private void UpdateAudioSourcesDisplay()
@@ -199,12 +200,14 @@ internal sealed partial class ManageAudioSourcesWindow
     {
         AudioSource audioSource = (AudioSource)((CheckBox)sender).Tag;
         audioSource.Active = true;
+        AudioUtils.UpdateActiveAudioSources();
     }
 
     private static void CheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         AudioSource audioSource = (AudioSource)((CheckBox)sender).Tag;
         audioSource.Active = false;
+        AudioUtils.UpdateActiveAudioSources();
     }
 
     private void IncreasePriorityButton_Click(object sender, RoutedEventArgs e)
@@ -251,6 +254,7 @@ internal sealed partial class ManageAudioSourcesWindow
 
         string uri = audioSourceUriTextBlock.Text;
         _ = AudioUtils.AudioSources.Remove(uri);
+        AudioUtils.UpdateActiveAudioSources();
 
         AudioSource audioSource = (AudioSource)removeButton.Tag;
         int priorityOfDeletedAudioSource = audioSource.Priority;
