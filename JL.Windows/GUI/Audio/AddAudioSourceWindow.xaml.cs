@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core;
@@ -140,10 +141,6 @@ internal sealed partial class AddAudioSourceWindow
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         AudioSourceTypeComboBox.ItemsSource = s_audioSourceTypes;
-        if (SpeechSynthesisUtils.InstalledVoices is not null)
-        {
-            TextToSpeechVoicesComboBox.ItemsSource = WindowsUtils.CloneComboBoxItems(SpeechSynthesisUtils.InstalledVoices);
-        }
     }
 
     private void InfoButton_Click(object sender, RoutedEventArgs e)
@@ -195,6 +192,8 @@ internal sealed partial class AddAudioSourceWindow
                 break;
 
             case AudioSourceType.TextToSpeech:
+                TextToSpeechVoicesComboBox.ItemsSource ??= new ListCollectionView(SpeechSynthesisUtils.GetInstalledVoiceItems());
+
                 PathType.Text = "Text to Speech Voice";
                 UriTextBox.Visibility = Visibility.Collapsed;
                 TextToSpeechVoicesComboBox.Visibility = Visibility.Visible;

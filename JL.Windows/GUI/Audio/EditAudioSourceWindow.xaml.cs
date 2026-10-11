@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core;
@@ -53,15 +54,13 @@ internal sealed partial class EditAudioSourceWindow
             case AudioSourceType.TextToSpeech:
                 PathType.Text = "Text to Speech Voice";
 
-                if (SpeechSynthesisUtils.InstalledVoices is not null)
-                {
-                    TextToSpeechVoicesComboBox.ItemsSource = WindowsUtils.CloneComboBoxItems(SpeechSynthesisUtils.InstalledVoices);
-                    TextToSpeechVoicesComboBox.SelectedIndex = Array.FindIndex(SpeechSynthesisUtils.InstalledVoices, iv => iv.Content.ToString() == _uri);
+                ComboBoxItem[] installedVoices = SpeechSynthesisUtils.GetInstalledVoiceItems();
+                TextToSpeechVoicesComboBox.ItemsSource = new ListCollectionView(installedVoices);
+                TextToSpeechVoicesComboBox.SelectedIndex = Array.FindIndex(installedVoices, iv => (string)iv.Content == _uri);
 
-                    if (TextToSpeechVoicesComboBox.SelectedIndex < 0)
-                    {
-                        TextToSpeechVoicesComboBox.SelectedIndex = 0;
-                    }
+                if (TextToSpeechVoicesComboBox.SelectedIndex < 0)
+                {
+                    TextToSpeechVoicesComboBox.SelectedIndex = 0;
                 }
 
                 UriTextBox.Visibility = Visibility.Collapsed;

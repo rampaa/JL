@@ -14,56 +14,64 @@ namespace JL.Windows.SpeechSynthesis;
 
 internal static class SpeechSynthesisUtils
 {
-    private static readonly SpeechSynthesizer s_synthesizer = new();
-    private static readonly SpeechSynthesizer s_streamSynthesizer = new();
-    public static readonly ComboBoxItem[]? InstalledVoices = GetInstalledVoiceNames();
+    private static readonly Lazy<SpeechSynthesizer> s_synthesizer = new(CreateSynthesizer);
+    private static readonly Lazy<SpeechSynthesizer> s_streamSynthesizer = new(static () => new SpeechSynthesizer());
+    private static VoiceInfo[]? s_installedVoices;
 
     private static long s_lastAudioPlayTimestamp;
 
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
 
-    private static ComboBoxItem[]? GetInstalledVoiceNames()
+    private static SpeechSynthesizer CreateSynthesizer()
     {
-        s_synthesizer.SetOutputToDefaultAudioDevice();
+        SpeechSynthesizer synthesizer = new();
+        synthesizer.SetOutputToDefaultAudioDevice();
+        return synthesizer;
+    }
 
+    private static VoiceInfo[] GetInstalledVoices()
+    {
 #pragma warning disable CA1304 // Specify CultureInfo
-        List<InstalledVoice> installedVoices = s_synthesizer.GetInstalledVoices().Where(static iv => iv.Enabled && iv.VoiceInfo.Name is not null && iv.VoiceInfo.Culture is not null).ToList();
+        return s_synthesizer.Value.GetInstalledVoices()
+            .Where(static iv => iv.Enabled && iv.VoiceInfo.Name is not null && iv.VoiceInfo.Culture is not null)
+            .Select(static iv => iv.VoiceInfo)
+            .OrderBy(static voice => voice.Culture.TwoLetterISOLanguageName is not "ja")
+            .ThenBy(static voice => voice.Name, StringComparer.InvariantCulture)
+            .ToArray();
 #pragma warning restore CA1304 // Specify CultureInfo
+    }
 
-        return installedVoices.Count is 0
-            ? null
-            : Application.Current?.Dispatcher.Invoke(() =>
+    public static ComboBoxItem[] GetInstalledVoiceItems()
+    {
+        // Only the audio-settings windows use this cache, on the UI thread.
+        ReadOnlySpan<VoiceInfo> installedVoices = s_installedVoices ??= GetInstalledVoices();
+        ComboBoxItem[] items = new ComboBoxItem[installedVoices.Length];
+
+        for (int i = 0; i < installedVoices.Length; i++)
+        {
+            VoiceInfo voice = installedVoices[i];
+            ComboBoxItem item = new()
             {
-                ReadOnlySpan<InstalledVoice> installedVoicesSpan = installedVoices.AsReadOnlySpan();
-                ComboBoxItem[] installedVoiceComboboxItems = new ComboBoxItem[installedVoicesSpan.Length];
+                Content = voice.Name
+            };
 
-                for (int i = 0; i < installedVoicesSpan.Length; i++)
-                {
-                    ref readonly InstalledVoice installedVoice = ref installedVoicesSpan[i];
+            if (voice.Culture.TwoLetterISOLanguageName is not "ja")
+            {
+                item.Foreground = Brushes.LightSlateGray;
+            }
 
-                    ComboBoxItem comboBoxItem = new()
-                    {
-                        Content = installedVoice.VoiceInfo.Name
-                    };
+            items[i] = item;
+        }
 
-                    if (installedVoice.VoiceInfo.Culture.TwoLetterISOLanguageName is not "ja")
-                    {
-                        comboBoxItem.Foreground = Brushes.LightSlateGray;
-                    }
-
-                    installedVoiceComboboxItems[i] = comboBoxItem;
-                }
-
-                return installedVoiceComboboxItems
-                    .OrderBy(static iv => iv.Foreground == Brushes.LightSlateGray)
-                    .ThenBy(static iv => (string)iv.Content, StringComparer.InvariantCulture)
-                    .ToArray();
-            });
+        return items;
     }
 
     public static void StopTextToSpeech()
     {
-        s_synthesizer.SpeakAsyncCancelAll();
+        if (s_synthesizer.IsValueCreated)
+        {
+            s_synthesizer.Value.SpeakAsyncCancelAll();
+        }
     }
 
     public static async Task TextToSpeech(string voiceName, string text)
@@ -73,7 +81,8 @@ internal static class SpeechSynthesisUtils
             await WindowsAudioUtils.PausePlaying().ConfigureAwait(false);
         }
 
-        if (s_synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
+        SpeechSynthesizer synthesizer = s_synthesizer.Value;
+        if (synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
         {
             s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
             return;
@@ -81,11 +90,11 @@ internal static class SpeechSynthesisUtils
 
         s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
 
-        s_synthesizer.SpeakAsyncCancelAll();
+        synthesizer.SpeakAsyncCancelAll();
 
         try
         {
-            s_synthesizer.SelectVoice(voiceName);
+            synthesizer.SelectVoice(voiceName);
         }
         catch (ArgumentException ex)
         {
@@ -106,21 +115,23 @@ internal static class SpeechSynthesisUtils
             return;
         }
 
-        _ = s_synthesizer.SpeakAsync(text);
+        _ = synthesizer.SpeakAsync(text);
     }
 
     public static byte[]? GetAudioResponseFromTextToSpeech(string text)
     {
-        if (InstalledVoiceWithHighestPriority is null)
+        string? voiceName = InstalledVoiceWithHighestPriority;
+        if (voiceName is null)
         {
             return null;
         }
 
-        s_streamSynthesizer.SpeakAsyncCancelAll();
-        s_streamSynthesizer.SelectVoice(InstalledVoiceWithHighestPriority);
+        SpeechSynthesizer streamSynthesizer = s_streamSynthesizer.Value;
+        streamSynthesizer.SpeakAsyncCancelAll();
+        streamSynthesizer.SelectVoice(voiceName);
         using MemoryStream audioDataStream = new();
-        s_streamSynthesizer.SetOutputToWaveStream(audioDataStream);
-        s_streamSynthesizer.Speak(text);
+        streamSynthesizer.SetOutputToWaveStream(audioDataStream);
+        streamSynthesizer.Speak(text);
         return audioDataStream.ToArray();
     }
 

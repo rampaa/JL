@@ -20,7 +20,7 @@
                          TextWrapping="Wrap"
                          Margin="10" />
 
-                <ComboBox Name="TextToSpeechVoicesComboBox" Width="400" Margin="10" HorizontalAlignment="Left" Visibility="Collapsed" />
+                <ComboBox Name="TextToSpeechVoicesComboBox" Width="400" Margin="10" HorizontalAlignment="Left" Visibility="Collapsed" IsSynchronizedWithCurrentItem="False" />
             </DockPanel>
         </StackPanel>
 

@@ -147,28 +147,6 @@ internal static class WindowsUtils
         return items;
     }
 
-    public static ComboBoxItem[] CloneComboBoxItems(ComboBoxItem[] comboBoxItems)
-    {
-        ComboBoxItem[] clone = new ComboBoxItem[comboBoxItems.Length];
-        for (int i = 0; i < comboBoxItems.Length; i++)
-        {
-            ComboBoxItem comboBoxItem = comboBoxItems[i];
-
-            clone[i] = new ComboBoxItem
-            {
-                Content = comboBoxItem.Content,
-                FontFamily = comboBoxItem.FontFamily
-            };
-
-            if (comboBoxItem.Foreground == Brushes.LightSlateGray)
-            {
-                clone[i].Foreground = Brushes.LightSlateGray;
-            }
-        }
-
-        return clone;
-    }
-
     public static void ShowAddNameWindow(Window owner, string? selectedText, string reading = "")
     {
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
