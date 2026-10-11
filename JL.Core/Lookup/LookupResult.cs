@@ -232,11 +232,7 @@ public sealed class LookupResult
                 return cmpResult;
             }
 
-            if (Frequencies.Count > 1
-                && (frequencyScore is int.MaxValue
-                    || (!readingsContainMatchedText
-                        && !otherReadingsContainMatchedText
-                        && !Readings.SequenceEqual(other.Readings))))
+            if (Frequencies.Count > 1)
             {
                 cmpResult = GetFrequencyScore(Frequencies, other.Frequencies);
                 if (cmpResult is not 0)
@@ -383,7 +379,11 @@ public sealed class LookupResult
             {
                 int normalizedFrequencyScore = GetNormalizedFrequencyScore(frequencyResult);
                 int otherNormalizedFrequencyScore = GetNormalizedFrequencyScore(otherFrequencyResult);
-                return normalizedFrequencyScore.CompareTo(otherNormalizedFrequencyScore);
+                int cmpResult = normalizedFrequencyScore.CompareTo(otherNormalizedFrequencyScore);
+                if (cmpResult is not 0)
+                {
+                    return cmpResult;
+                }
             }
         }
 
