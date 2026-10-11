@@ -178,7 +178,15 @@ internal sealed partial class EditFrequencyWindow
             {
                 DBUtils.SendOptimizePragmaToAllDBs();
                 SqliteConnection.ClearAllPools();
-                PathUtils.ReplaceFileAtomicallyOnSameVolume(DBUtils.GetDBPathForFreqDict(name), dbPath);
+                string newDBPath = DBUtils.GetDBPathForFreqDict(name);
+                if (dbPath.Equals(newDBPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Move(dbPath, newDBPath);
+                }
+                else
+                {
+                    PathUtils.ReplaceFileAtomicallyOnSameVolume(newDBPath, dbPath);
+                }
             }
 
             _ = FreqUtils.FreqDicts.Remove(_freq.Name);

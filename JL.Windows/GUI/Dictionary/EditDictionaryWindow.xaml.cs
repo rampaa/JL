@@ -231,7 +231,15 @@ internal sealed partial class EditDictionaryWindow
             {
                 DBUtils.SendOptimizePragmaToAllDBs();
                 SqliteConnection.ClearAllPools();
-                PathUtils.ReplaceFileAtomicallyOnSameVolume(DBUtils.GetDBPathForDict(name), dbPath);
+                string newDBPath = DBUtils.GetDBPathForDict(name);
+                if (dbPath.Equals(newDBPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Move(dbPath, newDBPath);
+                }
+                else
+                {
+                    PathUtils.ReplaceFileAtomicallyOnSameVolume(newDBPath, dbPath);
+                }
             }
 
             _ = DictUtils.Dicts.Remove(_dict.Name);
