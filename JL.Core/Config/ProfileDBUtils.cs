@@ -162,25 +162,34 @@ public static class ProfileDBUtils
         return reader.GetBoolean(0);
     }
 
-    internal static bool ProfileExists(SqliteConnection connection, string profileName)
+    public static bool ProfileExists(SqliteConnection connection, string profileName)
     {
+        if (profileName.Equals(ProfileUtils.GlobalProfileName, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
         using SqliteCommand command = connection.CreateCommand();
 
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText =
             $"""
-            SELECT EXISTS
-            (
-                SELECT 1
-                FROM {ConfigDBManager.Profile}
-                WHERE {ConfigDBManager.Name} = @{ConfigDBManager.Name}
-            );
+            SELECT {ConfigDBManager.Name}
+            FROM {ConfigDBManager.Profile}
+            WHERE {ConfigDBManager.Id} != {ProfileUtils.GlobalProfileId};
             """;
 
-        _ = command.Parameters.AddWithValue($"@{ConfigDBManager.Name}", profileName);
-
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
         using SqliteDataReader reader = command.ExecuteReader();
-        _ = reader.Read();
-        return reader.GetBoolean(0);
+        while (reader.Read())
+        {
+            if (reader.GetString(0).Equals(profileName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static bool ProfileExists(string profileName)
