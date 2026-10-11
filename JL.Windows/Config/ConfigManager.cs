@@ -9,6 +9,7 @@ using HandyControl.Data;
 using JL.Core.Config;
 using JL.Core.Frontend;
 using JL.Core.Network;
+using JL.Core.Network.WebSocket;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Backlog;
@@ -376,8 +377,13 @@ internal sealed class ConfigManager
     {
     }
 
-    public static void ResetConfigs()
+    public static async Task ResetConfigs()
     {
+        CoreConfigManager.Instance.CaptureTextFromWebSocket = false;
+        CoreConfigManager.Instance.CaptureTextFromTsukikageWebsocket = false;
+        await WebSocketUtils.ResetWebSocketConnections().ConfigureAwait(true);
+
+        // ReSharper disable once UseAwaitUsing
         using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         Instance.SaveBeforeClosing(connection);
         ConfigDBManager.DeleteAllSettingsFromProfile(connection, MainWindowTopPositionSettingName, MainWindowLeftPositionSettingName);
