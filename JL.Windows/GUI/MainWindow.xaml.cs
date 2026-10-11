@@ -78,7 +78,7 @@ internal sealed partial class MainWindow : IDisposable
     public double WidthBeforeResolutionChange { get; set; }
 
     private static readonly AtomicBool s_closingEventStarted = new(false);
-    private static readonly AtomicBool s_cleanupStarted = new(false);
+    private Task? _cleanupTask;
 
     private MainWindow()
     {
@@ -196,7 +196,6 @@ internal sealed partial class MainWindow : IDisposable
             _processingWebSocketText = true;
         }
 
-        ConfigManager configManager = ConfigManager.Instance;
         while (true)
         {
             string? currentText;
@@ -237,9 +236,19 @@ internal sealed partial class MainWindow : IDisposable
 
                 Task processingTask = await Dispatcher.InvokeAsync(async () =>
                 {
+                    CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
+                    if (_cleanupTask is not null
+                        || (currentTsukikage
+                            ? !coreConfigManager.CaptureTextFromTsukikageWebsocket
+                            : !coreConfigManager.CaptureTextFromWebSocket))
+                    {
+                        return;
+                    }
+
+                    ConfigManager configManager = ConfigManager.Instance;
                     WindowsUtils.LastWebSocketTextWasVertical = verticalText;
                     bool tsukikageTextNotHovered = charIndex is -1;
-                    bool keepStats = !currentTsukikage || tsukikageTextNotHovered || !CoreConfigManager.Instance.IgnoreHoveredTsukikageTextForStats;
+                    bool keepStats = !currentTsukikage || tsukikageTextNotHovered || !coreConfigManager.IgnoreHoveredTsukikageTextForStats;
                     bool copiedText = CopyText(currentText, currentTsukikage, keepStats)
                         && !FirstPopupWindow.MiningMode
                         && (currentTsukikage || configManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket)
@@ -717,7 +726,7 @@ internal sealed partial class MainWindow : IDisposable
         {
             MoveWindowToScreen();
             ConfigManager configManager = ConfigManager.Instance;
-            await FirstPopupWindow.HandleDelayedLookup(MainTextBox, configManager.EnableMiningModeForDelayedLookups, charPosition).ConfigureAwait(false);
+            await FirstPopupWindow.HandleDelayedLookup(MainTextBox, configManager.EnableMiningModeForDelayedLookups, charPosition).ConfigureAwait(true);
             if (configManager.AutoPauseOrResumeMpvOnHoverChange && FirstPopupWindow.Opacity is not 0)
             {
                 await MpvUtils.PausePlayback().ConfigureAwait(false);
@@ -891,18 +900,15 @@ internal sealed partial class MainWindow : IDisposable
         Application.Current.Shutdown();
     }
 
-    public async Task HandleAppClosing()
+    public Task HandleAppClosing()
     {
-        if (!s_cleanupStarted.TrySetTrue())
-        {
-            return;
-        }
+        return _cleanupTask ??= CleanUp();
+    }
 
+    private async Task CleanUp()
+    {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         WinApi.UnsubscribeFromWndProc(this);
-
-        await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(true);
-        await WebSocketUtils.DisconnectFromTsukikageWebSocketConnection().ConfigureAwait(true);
 
         // ReSharper disable once UseAwaitUsing
         using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
@@ -914,6 +920,8 @@ internal sealed partial class MainWindow : IDisposable
         }
 
         BacklogUtils.StopBacklogTimer();
+        await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(false);
+        await WebSocketUtils.DisconnectFromTsukikageWebSocketConnection().ConfigureAwait(false);
         await BacklogUtils.WriteBacklog().ConfigureAwait(false);
 
         DBUtils.SendOptimizePragmaToAllDBs();
