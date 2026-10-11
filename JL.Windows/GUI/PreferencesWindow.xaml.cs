@@ -300,7 +300,8 @@ internal sealed partial class PreferencesWindow
         _ankiConfigTask = LoadAnkiConfig();
         try
         {
-            await _ankiConfigTask.ConfigureAwait(false);
+            // Clear _ankiConfigTask on the UI thread so it cannot change while another UI event checks and reads it.
+            await _ankiConfigTask.ConfigureAwait(true);
         }
         finally
         {
