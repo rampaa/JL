@@ -27,18 +27,15 @@ public static class JmdictWordClassUtils
             return;
         }
 
+        Dictionary<string, IList<JmdictWordClass>>? dictionary;
         FileStream fileStream = new(s_partOfSpeechFilePath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
         await using (fileStream.ConfigureAwait(false))
         {
-            Dictionary<string, IList<JmdictWordClass>>? wordClassDictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
-            Debug.Assert(wordClassDictionary is not null);
-            DictUtils.WordClassDictionary = wordClassDictionary;
+            dictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
         }
 
-        IList<JmdictWordClass>[] jmdictWordClasses = DictUtils.WordClassDictionary.Values.ToArray();
-
-        Debug.Assert(DictUtils.WordClassDictionary is Dictionary<string, IList<JmdictWordClass>>);
-        Dictionary<string, IList<JmdictWordClass>> dictionary = (Dictionary<string, IList<JmdictWordClass>>)DictUtils.WordClassDictionary;
+        Debug.Assert(dictionary is not null);
+        IList<JmdictWordClass>[] jmdictWordClasses = dictionary.Values.ToArray();
         foreach (IList<JmdictWordClass> jmdictWordClassList in jmdictWordClasses)
         {
             int jmdictWordClassListCount = jmdictWordClassList.Count;
@@ -69,7 +66,7 @@ public static class JmdictWordClassUtils
             }
         }
 
-        DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(static entry => entry.Key, static IList<JmdictWordClass> (kvp) => kvp.Value.ToArray(), StringComparer.Ordinal);
+        DictUtils.WordClassDictionary = dictionary.ToFrozenDictionary(static entry => entry.Key, static IList<JmdictWordClass> (kvp) => kvp.Value.ToArray(), StringComparer.Ordinal);
     }
 
     public static async Task Serialize()

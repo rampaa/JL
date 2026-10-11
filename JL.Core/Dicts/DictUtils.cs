@@ -43,7 +43,7 @@ public static class DictUtils
     private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "dicts.json");
     public static bool DictsReady { get; private set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
-    internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = FrozenDictionary<string, IList<JmdictWordClass>>.Empty;
+    internal static FrozenDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = FrozenDictionary<string, IList<JmdictWordClass>>.Empty;
     private static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e_NG.gz");
     private static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
@@ -87,11 +87,7 @@ public static class DictUtils
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
-                    new NewlineBetweenDefinitionsOption(true),
-                    generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
-                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
-                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
+                    new NewlineBetweenDefinitionsOption(true)),
                 maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
@@ -108,10 +104,7 @@ public static class DictUtils
                     showImages: new ShowImagesOption(true),
                     showImageAtBottom: new ShowImageAtBottomOption(true),
                     maxImageWidth: new MaxImageWidthOption(0),
-                    maxImageHeight: new MaxImageHeightOption(0),
-                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
-                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
+                    maxImageHeight: new MaxImageHeightOption(0)),
                 maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
@@ -125,11 +118,7 @@ public static class DictUtils
                 new DictOptions(
                     new UseDBOption(false),
                     new NoAllOption(false),
-                    new NewlineBetweenDefinitionsOption(true),
-                    generateMazegakiVariants: new GenerateMazegakiVariantsOption(false),
-                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
-                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
+                    new NewlineBetweenDefinitionsOption(true)),
                 maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
@@ -146,10 +135,7 @@ public static class DictUtils
                     showImages: new ShowImagesOption(true),
                     showImageAtBottom: new ShowImageAtBottomOption(true),
                     maxImageWidth: new MaxImageWidthOption(0),
-                    maxImageHeight: new MaxImageHeightOption(0),
-                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
-                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
+                    maxImageHeight: new MaxImageHeightOption(0)),
                 maxSearchKeyLength: 0,
                 autoUpdatable: false,
                 url: null,
@@ -1198,10 +1184,6 @@ public static class DictUtils
         {
             DictOptions builtInCustomWordOptions = BuiltInDicts[nameof(DictType.CustomWordDictionary)].Options;
             dict.Options.NewlineBetweenDefinitions ??= builtInCustomWordOptions.NewlineBetweenDefinitions;
-            dict.Options.GenerateMazegakiVariants ??= builtInCustomWordOptions.GenerateMazegakiVariants;
-            dict.Options.GenerateFusejiVariants ??= builtInCustomWordOptions.GenerateFusejiVariants;
-            dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInCustomWordOptions.MaxSearchKeyLengthForFusejiGeneration;
-            dict.Options.MaxTotalFusejiCount ??= builtInCustomWordOptions.MaxTotalFusejiCount;
         }
         else if (dict.Type is DictType.CustomNameDictionary or DictType.ProfileCustomNameDictionary)
         {
@@ -1210,10 +1192,6 @@ public static class DictUtils
             dict.Options.ShowImageAtBottom ??= builtInCustomNameOptions.ShowImageAtBottom;
             dict.Options.MaxImageWidth ??= builtInCustomNameOptions.MaxImageWidth;
             dict.Options.MaxImageHeight ??= builtInCustomNameOptions.MaxImageHeight;
-            dict.Options.GenerateMazegakiVariants ??= builtInCustomNameOptions.GenerateMazegakiVariants;
-            dict.Options.GenerateFusejiVariants ??= builtInCustomNameOptions.GenerateFusejiVariants;
-            dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInCustomNameOptions.MaxSearchKeyLengthForFusejiGeneration;
-            dict.Options.MaxTotalFusejiCount ??= builtInCustomNameOptions.MaxTotalFusejiCount;
         }
         else
         {
