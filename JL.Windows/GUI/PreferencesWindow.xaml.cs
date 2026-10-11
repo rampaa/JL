@@ -343,13 +343,14 @@ internal sealed partial class PreferencesWindow
         CheckForJLUpdatesButton.IsEnabled = true;
     }
 
-    private void ResetPreferencesButton_Click(object sender, RoutedEventArgs e)
+    // ReSharper disable once AsyncVoidMethod
+    private async void ResetPreferencesButton_Click(object sender, RoutedEventArgs e)
     {
         ResetPreferencesButton.IsEnabled = false;
         if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile?", "Reset preferences for the current profile?", this))
         {
             IsEnabled = false;
-            ConfigManager.ResetConfigs();
+            await ConfigManager.ResetConfigs().ConfigureAwait(true);
             MainWindow.Instance.UpdateLayout();
             Close();
         }
@@ -961,7 +962,7 @@ internal sealed partial class PreferencesWindow
 
             int selectedProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
             Stats selectedProfileStats = StatsDBUtils.GetStatsFromDB(connection, selectedProfileId);
-            lock (StatsUtils.TimeStatsLock)
+            lock (StatsUtils.StatsLock)
             {
                 lock (StatsUtils.TermLookupCountsLock)
                 {

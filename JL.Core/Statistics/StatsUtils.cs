@@ -14,7 +14,7 @@ public static class StatsUtils
     public static Stats LifetimeStats { get; internal set; } = new();
 
     internal static readonly Stopwatch s_timeStatStopWatch = new();
-    public static readonly Lock TimeStatsLock = new();
+    public static readonly Lock StatsLock = new();
     public static readonly Lock TermLookupCountsLock = new();
     private static readonly Timer s_statsTimer = new();
     private static readonly Timer s_idleTimeTimer = new()
@@ -40,7 +40,7 @@ public static class StatsUtils
 
     public static void SetIdleTimeTimerInterval(int textLength)
     {
-        lock (TimeStatsLock)
+        lock (StatsLock)
         {
             s_textLength = textLength;
             UpdateIdleTimeTimer();
@@ -66,7 +66,7 @@ public static class StatsUtils
 
     public static void StartTimeStatStopWatch(bool onlyIfStopped = false)
     {
-        lock (TimeStatsLock)
+        lock (StatsLock)
         {
             if (onlyIfStopped && s_timeStatStopWatch.IsRunning)
             {
@@ -80,7 +80,7 @@ public static class StatsUtils
 
     public static void StopTimeStatStopWatch()
     {
-        lock (TimeStatsLock)
+        lock (StatsLock)
         {
             s_timeStatStopWatch.Stop();
             s_idleTimeTimer.Enabled = false;
@@ -90,7 +90,7 @@ public static class StatsUtils
 
     private static void IdleTimeTimer_OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
-        lock (TimeStatsLock)
+        lock (StatsLock)
         {
             if (!s_timeStatStopWatch.IsRunning || s_idleTimeDeadline is 0)
             {
@@ -115,7 +115,7 @@ public static class StatsUtils
 
     public static void UpdateTimeStats(bool restartStopWatch)
     {
-        lock (TimeStatsLock)
+        lock (StatsLock)
         {
             long elapsedTicks = s_timeStatStopWatch.ElapsedTicks;
             if (restartStopWatch && s_timeStatStopWatch.IsRunning)
@@ -157,107 +157,107 @@ public static class StatsUtils
 
     public static void IncrementStat(StatType type, long amount = 1)
     {
-        switch (type)
+        lock (StatsLock)
         {
-            case StatType.Characters:
+            switch (type)
             {
-                bool positive = amount >= 0;
-                ulong unsignedAmount = positive
-                    ? (ulong)amount
-                    : (ulong)-amount;
-
-                if (positive)
+                case StatType.Characters:
                 {
-                    SessionStats.Characters += unsignedAmount;
-                    ProfileLifetimeStats.Characters += unsignedAmount;
-                    LifetimeStats.Characters += unsignedAmount;
-                }
-                else
-                {
-                    SessionStats.Characters -= unsignedAmount;
-                    ProfileLifetimeStats.Characters -= unsignedAmount;
-                    LifetimeStats.Characters -= unsignedAmount;
-                }
+                    bool positive = amount >= 0;
+                    ulong unsignedAmount = positive
+                        ? (ulong)amount
+                        : (ulong)-amount;
 
-                break;
-            }
+                    if (positive)
+                    {
+                        SessionStats.Characters += unsignedAmount;
+                        ProfileLifetimeStats.Characters += unsignedAmount;
+                        LifetimeStats.Characters += unsignedAmount;
+                    }
+                    else
+                    {
+                        SessionStats.Characters -= unsignedAmount;
+                        ProfileLifetimeStats.Characters -= unsignedAmount;
+                        LifetimeStats.Characters -= unsignedAmount;
+                    }
 
-            case StatType.Lines:
-            {
-                bool positive = amount >= 0;
-                ulong unsignedAmount = positive
-                    ? (ulong)amount
-                    : (ulong)-amount;
-
-                if (positive)
-                {
-                    SessionStats.Lines += unsignedAmount;
-                    ProfileLifetimeStats.Lines += unsignedAmount;
-                    LifetimeStats.Lines += unsignedAmount;
-                }
-                else
-                {
-                    SessionStats.Lines -= unsignedAmount;
-                    ProfileLifetimeStats.Lines -= unsignedAmount;
-                    LifetimeStats.Lines -= unsignedAmount;
+                    break;
                 }
 
-                break;
-            }
+                case StatType.Lines:
+                {
+                    bool positive = amount >= 0;
+                    ulong unsignedAmount = positive
+                        ? (ulong)amount
+                        : (ulong)-amount;
 
-            case StatType.Time:
-            {
-                lock (TimeStatsLock)
+                    if (positive)
+                    {
+                        SessionStats.Lines += unsignedAmount;
+                        ProfileLifetimeStats.Lines += unsignedAmount;
+                        LifetimeStats.Lines += unsignedAmount;
+                    }
+                    else
+                    {
+                        SessionStats.Lines -= unsignedAmount;
+                        ProfileLifetimeStats.Lines -= unsignedAmount;
+                        LifetimeStats.Lines -= unsignedAmount;
+                    }
+
+                    break;
+                }
+
+                case StatType.Time:
                 {
                     IncrementTimeStats(amount);
+
+                    break;
                 }
 
-                break;
+                case StatType.CardsMined:
+                {
+                    ulong unsignedAmount = (ulong)amount;
+                    SessionStats.CardsMined += unsignedAmount;
+                    ProfileLifetimeStats.CardsMined += unsignedAmount;
+                    LifetimeStats.CardsMined += unsignedAmount;
+
+                    break;
+                }
+
+                case StatType.TimesPlayedAudio:
+                {
+                    ulong unsignedAmount = (ulong)amount;
+                    SessionStats.TimesPlayedAudio += unsignedAmount;
+                    ProfileLifetimeStats.TimesPlayedAudio += unsignedAmount;
+                    LifetimeStats.TimesPlayedAudio += unsignedAmount;
+
+                    break;
+                }
+
+                case StatType.NumberOfLookups:
+                {
+                    ulong unsignedAmount = (ulong)amount;
+                    SessionStats.NumberOfLookups += unsignedAmount;
+                    ProfileLifetimeStats.NumberOfLookups += unsignedAmount;
+                    LifetimeStats.NumberOfLookups += unsignedAmount;
+
+                    break;
+                }
+
+                case StatType.Imoutos:
+                {
+                    ulong unsignedAmount = (ulong)amount;
+                    SessionStats.Imoutos += unsignedAmount;
+                    ProfileLifetimeStats.Imoutos += unsignedAmount;
+                    LifetimeStats.Imoutos += unsignedAmount;
+
+                    break;
+                }
+
+                default:
+                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatType), nameof(StatsUtils), nameof(IncrementStat), type);
+                    break;
             }
-
-            case StatType.CardsMined:
-            {
-                ulong unsignedAmount = (ulong)amount;
-                SessionStats.CardsMined += unsignedAmount;
-                ProfileLifetimeStats.CardsMined += unsignedAmount;
-                LifetimeStats.CardsMined += unsignedAmount;
-
-                break;
-            }
-
-            case StatType.TimesPlayedAudio:
-            {
-                ulong unsignedAmount = (ulong)amount;
-                SessionStats.TimesPlayedAudio += unsignedAmount;
-                ProfileLifetimeStats.TimesPlayedAudio += unsignedAmount;
-                LifetimeStats.TimesPlayedAudio += unsignedAmount;
-
-                break;
-            }
-
-            case StatType.NumberOfLookups:
-            {
-                ulong unsignedAmount = (ulong)amount;
-                SessionStats.NumberOfLookups += unsignedAmount;
-                ProfileLifetimeStats.NumberOfLookups += unsignedAmount;
-                LifetimeStats.NumberOfLookups += unsignedAmount;
-
-                break;
-            }
-
-            case StatType.Imoutos:
-            {
-                ulong unsignedAmount = (ulong)amount;
-                SessionStats.Imoutos += unsignedAmount;
-                ProfileLifetimeStats.Imoutos += unsignedAmount;
-                LifetimeStats.Imoutos += unsignedAmount;
-
-                break;
-            }
-
-            default:
-                LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(StatType), nameof(StatsUtils), nameof(IncrementStat), type);
-                break;
         }
     }
 
@@ -266,7 +266,7 @@ public static class StatsUtils
         lock (StatsDBUtils.s_statsDBLock)
         {
             int profileId;
-            lock (TimeStatsLock)
+            lock (StatsLock)
             {
                 Stats stats = statsMode switch
                 {

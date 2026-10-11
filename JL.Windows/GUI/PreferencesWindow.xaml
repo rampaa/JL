@@ -325,7 +325,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                          Cursor="Help"
-                                         ToolTip="Only takes effect if dynamic height is enabled">
+                                         ToolTip="Only takes effect if dynamic width is enabled">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Reposition window to the fixed right-edge position on text change"
                                        Style="{StaticResource TextBlockDefault}"
@@ -393,7 +393,7 @@
 
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
                                          Cursor="Help"
-                                         ToolTip="Only takes effect if dynamic width is enabled">
+                                         ToolTip="Only takes effect if dynamic height is enabled">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Reposition window to the fixed bottom position on text change"
                                        Style="{StaticResource TextBlockDefault}"
