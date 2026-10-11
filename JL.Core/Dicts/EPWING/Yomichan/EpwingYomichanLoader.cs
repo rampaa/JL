@@ -43,15 +43,13 @@ internal static class EpwingYomichanLoader
 
         GenerateMazegakiVariantsOption? generateMazegakiOption = dict.Options.GenerateMazegakiVariants;
         Debug.Assert(!nonKanjiDict || !nonNameDict || generateMazegakiOption is not null);
-        bool generateMazegaki = nonKanjiDict && nonNameDict
-            // ReSharper disable once NullableWarningSuppressionIsUsed
-            && generateMazegakiOption!.Value;
+        // ReSharper disable once NullableWarningSuppressionIsUsed
+        bool generateMazegaki = nonKanjiDict && nonNameDict && generateMazegakiOption!.Value;
 
         GenerateFusejiVariantsOption? generateFusejiVariantsOption = dict.Options.GenerateFusejiVariants;
         Debug.Assert(!nonKanjiDict || generateFusejiVariantsOption is not null);
-        bool generateFusejiVariants = nonKanjiDict
-            // ReSharper disable once NullableWarningSuppressionIsUsed
-            && generateFusejiVariantsOption!.Value;
+        // ReSharper disable once NullableWarningSuppressionIsUsed
+        bool generateFusejiVariants = nonKanjiDict && generateFusejiVariantsOption!.Value;
 
         int maxSearchKeyLengthForFusejiGeneration;
         int maxTotalFuseji;
@@ -78,7 +76,7 @@ internal static class EpwingYomichanLoader
                     ? JapaneseUtils.NormalizeText(record.PrimarySpelling).GetPooledString()
                     : record.PrimarySpelling.GetPooledString();
 
-                if (DictUtils.AddRecordToDictionary(primarySpellingInHiragana, record, contents, dict))
+                if (EpwingYomichanUtils.AddRecordToDictionary(primarySpellingInHiragana, record, contents, dict))
                 {
                     if (nonKanjiDict)
                     {
@@ -86,7 +84,7 @@ internal static class EpwingYomichanLoader
                         {
                             foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(primarySpellingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                             {
-                                _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
+                                _ = EpwingYomichanUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                             }
                         }
 
@@ -95,13 +93,13 @@ internal static class EpwingYomichanLoader
                             string readingInHiragana = JapaneseUtils.NormalizeText(record.Reading).GetPooledString();
                             if (primarySpellingInHiragana != readingInHiragana)
                             {
-                                if (DictUtils.AddRecordToDictionary(readingInHiragana, record, contents, dict))
+                                if (EpwingYomichanUtils.AddRecordToDictionary(readingInHiragana, record, contents, dict))
                                 {
                                     if (generateFusejiVariants)
                                     {
                                         foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(readingInHiragana, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                         {
-                                            _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
+                                            _ = EpwingYomichanUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                                         }
                                     }
 
@@ -109,13 +107,13 @@ internal static class EpwingYomichanLoader
                                     {
                                         foreach (string mazegaki in MazegakiVariantGenerator.GenerateMazegakiVariants(primarySpellingInHiragana, readingInHiragana))
                                         {
-                                            if (DictUtils.AddRecordToDictionary(mazegaki, record, contents, dict))
+                                            if (EpwingYomichanUtils.AddRecordToDictionary(mazegaki, record, contents, dict))
                                             {
                                                 if (generateFusejiVariants)
                                                 {
                                                     foreach (string fusejiVariant in FusejiUtils.CreateFusejiVariants(mazegaki, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration))
                                                     {
-                                                        _ = DictUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
+                                                        _ = EpwingYomichanUtils.AddRecordToDictionary(fusejiVariant, record, contents, dict);
                                                     }
                                                 }
                                             }
@@ -1196,12 +1194,6 @@ internal static class EpwingYomichanLoader
                     }
                 }
 
-                if (tableRowSpans is { Count: > 0 } && tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot)
-                {
-                    // Row spans do not cross row groups.
-                    tableRowSpans.Clear();
-                }
-
                 if (contentPresent && previousTag != tag && contentKind is ContentValueKind.Array)
                 {
                     RemoveImagesFromReplacedContent(ref imageInfos, imageInfoCountBeforeContent);
@@ -1281,7 +1273,7 @@ internal static class EpwingYomichanLoader
                     int contentStart = (int)reader.TokenStartIndex;
                     int contentDepth = reader.CurrentDepth;
 
-                    if (!tagPresent)
+                    if (!tagPresent || tableRowSpans is not null || tag is ContentTag.Table)
                     {
                         SkipNestedContentForLater(ref reader, out contentOffset, out contentLength);
                         contentNeedsParsing = true;
@@ -1292,15 +1284,6 @@ internal static class EpwingYomichanLoader
                     int orderedListIndex = 0;
                     ContentTag lastTag = ContentTag.None;
                     int tableColumnIndex = 0;
-                    List<int>? childTableRowSpans = null;
-                    if (tag is ContentTag.Table)
-                    {
-                        childTableRowSpans = [];
-                    }
-                    else if (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot or ContentTag.TR)
-                    {
-                        childTableRowSpans = tableRowSpans;
-                    }
                     bool success = TryAppendDefinitionsFromJsonArray(
                         ref reader,
                         json,
@@ -1312,8 +1295,8 @@ internal static class EpwingYomichanLoader
                         ref orderedListIndex,
                         ref lastTag,
                         imageInfoCache,
-                        childTableRowSpans,
-                        tag is ContentTag.TR && childTableRowSpans is not null,
+                        null,
+                        false,
                         ref tableColumnIndex);
 
                     if (!success)
@@ -1334,11 +1317,6 @@ internal static class EpwingYomichanLoader
                     contentOffset = contentStart;
                     contentLength = (int)reader.BytesConsumed - contentStart;
 
-                    if (tag is ContentTag.TR && childTableRowSpans is not null)
-                    {
-                        EpwingYomichanUtils.AdvanceTableRow(stringBuilder, childTableRowSpans, tableColumnIndex);
-                    }
-
                     if (stringBuilder.Length > 0)
                     {
                         contentText = stringBuilder.ToString();
@@ -1354,22 +1332,13 @@ internal static class EpwingYomichanLoader
                     int contentStart = (int)reader.TokenStartIndex;
                     int contentDepth = reader.CurrentDepth;
 
-                    if (!tagPresent)
+                    if (!tagPresent || tableRowSpans is not null || tag is ContentTag.Table)
                     {
                         SkipNestedContentForLater(ref reader, out contentOffset, out contentLength);
                         contentNeedsParsing = true;
                         continue;
                     }
 
-                    List<int>? childTableRowSpans = null;
-                    if (tag is ContentTag.Table)
-                    {
-                        childTableRowSpans = [];
-                    }
-                    else if (tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot or ContentTag.TR)
-                    {
-                        childTableRowSpans = tableRowSpans;
-                    }
 
                     if (!TryGetDefinitionsFromJsonObject(
                             ref reader,
@@ -1377,7 +1346,7 @@ internal static class EpwingYomichanLoader
                             dict,
                             ref imageInfos,
                             imageInfoCache,
-                            childTableRowSpans,
+                            null,
                             out parsedNestedContent,
                             out nestedColSpan,
                             out nestedRowSpan))
@@ -1643,6 +1612,12 @@ internal static class EpwingYomichanLoader
             return false;
         }
 
+        if (tableRowSpans is { Count: > 0 } && tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot)
+        {
+            // Row spans do not cross row groups.
+            tableRowSpans.Clear();
+        }
+
         if (contentPresent)
         {
             if (invalidContent && !contentNeedsParsing)
@@ -1727,6 +1702,11 @@ internal static class EpwingYomichanLoader
 
                 bool appendWhitespace = tag is ContentTag.Span && objectText is not null
                     && (stylePresent ? styleMarginRight : dataClassPresent && objectText.Length > 0 && char.IsAscii(objectText[0]));
+                if (tableRowSpans is { Count: > 0 } && tag is ContentTag.THead or ContentTag.TBody or ContentTag.TFoot)
+                {
+                    tableRowSpans.Clear();
+                }
+
                 result = new YomichanContent<ContentTag>(tag, objectText, appendWhitespace, marker);
                 return true;
             }

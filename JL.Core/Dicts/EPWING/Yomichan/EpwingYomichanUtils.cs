@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using JL.Core.Dicts.Interfaces;
 using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Core.Utilities.ObjectPool;
@@ -11,6 +13,38 @@ namespace JL.Core.Dicts.EPWING.Yomichan;
 internal static class EpwingYomichanUtils
 {
     private static readonly ImageInfo s_missingImageInfo = new("", 0, 0, 0, 0);
+
+    internal static bool AddRecordToDictionary(string normalizedKey, EpwingYomichanRecord record, Dictionary<string, IList<IDictRecord>> contents, Dict dict)
+    {
+        ref IList<IDictRecord>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(contents, normalizedKey, out bool exists);
+        if (!exists)
+        {
+            records = [record];
+            if (normalizedKey.Length > dict.MaxSearchKeyLength)
+            {
+                dict.MaxSearchKeyLength = normalizedKey.Length;
+            }
+
+            return true;
+        }
+
+        Debug.Assert(records is not null);
+        List<IDictRecord> list = (List<IDictRecord>)records;
+        int duplicateIndex = list.AsReadOnlySpan().IndexOf(record);
+        if (duplicateIndex >= 0)
+        {
+            if (record.PopularityScore > ((EpwingYomichanRecord)list[duplicateIndex]).PopularityScore)
+            {
+                list[duplicateIndex] = record;
+                return true;
+            }
+
+            return false;
+        }
+
+        list.Add(record);
+        return true;
+    }
 
     internal static string[]? GetDefinitions(JsonElement jsonElement, Dict dict, ref List<ImageInfo>? imageInfos,
         ConcurrentDictionary<string, ImageInfo> imageInfoCache)
