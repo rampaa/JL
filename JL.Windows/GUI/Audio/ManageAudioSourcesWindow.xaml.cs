@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -193,7 +194,7 @@ internal sealed partial class ManageAudioSourcesWindow
             resultDockPanels[i] = dockPanel;
         }
 
-        AudioSourceListBox.ItemsSource = resultDockPanels;
+        AudioSourceListBox.ItemsSource = new ListCollectionView(resultDockPanels);
     }
 
     private static void CheckBox_Checked(object sender, RoutedEventArgs e)

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace JL.Windows.GUI.Info;
 
@@ -12,7 +13,7 @@ internal sealed partial class InfoWindow
     {
         InitializeComponent();
         InfoTextBox.Visibility = Visibility.Collapsed;
-        InfoListBox.ItemsSource = items;
+        InfoListBox.ItemsSource = new ListCollectionView(items);
     }
 
     public InfoWindow(string text)

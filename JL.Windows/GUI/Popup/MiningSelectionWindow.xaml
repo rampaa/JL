@@ -7,7 +7,7 @@
         SizeToContent="WidthAndHeight" WindowStyle="None" LostFocus="Window_LostFocus"
         ShowInTaskbar="False" AllowsTransparency="True" x:ClassModifier="internal">
     <Grid>
-        <ListView x:Name="MiningListView" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
+        <ListView x:Name="MiningListView" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False" IsSynchronizedWithCurrentItem="False"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"

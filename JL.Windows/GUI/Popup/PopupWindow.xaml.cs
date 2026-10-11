@@ -164,7 +164,7 @@ internal sealed partial class PopupWindow : IDisposable
 
         AddMenuItemsToEditableTextBoxContextMenu();
 
-        DictTabButtonsItemsControl.ItemsSource = _dictTypeButtons;
+        DictTabButtonsItemsControl.ItemsSource = new ListCollectionView(_dictTypeButtons);
     }
 
     private void AddMenuItemsToEditableTextBoxContextMenu()

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -269,7 +270,7 @@ internal sealed partial class ManageDictionariesWindow
             resultDockPanels[i] = dockPanel;
         }
 
-        DictionariesDisplay.ItemsSource = resultDockPanels;
+        DictionariesDisplay.ItemsSource = new ListCollectionView(resultDockPanels);
     }
 
     private static void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

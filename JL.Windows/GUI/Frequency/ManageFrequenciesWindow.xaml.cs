@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -229,7 +230,7 @@ internal sealed partial class ManageFrequenciesWindow
             resultDockPanels[i] = dockPanel;
         }
 
-        FrequenciesDisplay.ItemsSource = resultDockPanels;
+        FrequenciesDisplay.ItemsSource = new ListCollectionView(resultDockPanels);
     }
 
     private static void PathTextBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

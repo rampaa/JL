@@ -28,7 +28,7 @@
                 <hc:TextBox x:Name="InfoSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
                             hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoSearchTextBox_TextChanged" />
 
-                <ListBox x:Name="InfoListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}" Foreground="{StaticResource PrimaryTextBrush}" FontSize="20">
+                <ListBox x:Name="InfoListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}" Foreground="{StaticResource PrimaryTextBrush}" FontSize="20" IsSynchronizedWithCurrentItem="False">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="5,0,5,0" />

@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -89,7 +90,7 @@ internal sealed partial class ManageProfilesWindow
             _ = dockPanel.Children.Add(removeButton);
         }
 
-        ProfileListBox.ItemsSource = resultDockPanels;
+        ProfileListBox.ItemsSource = new ListCollectionView(resultDockPanels);
     }
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)

@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Interop;
 using JL.Core.Config;
 using JL.Core.Statistics;
@@ -211,7 +213,7 @@ internal sealed partial class StatsWindow
 
         if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode mode))
         {
-            IList<KeyValuePair<string, int>>? termLookupCounts = mode switch
+            IList? termLookupCounts = mode switch
             {
                 StatsMode.Session => _sessionLookupCountsForCurrentProfile,
                 StatsMode.Profile => _termLookupCountsForCurrentProfile,
@@ -219,7 +221,10 @@ internal sealed partial class StatsWindow
                 _ => _sessionLookupCountsForCurrentProfile
             };
 
-            infoDataGridWindow.InfoDataGrid.ItemsSource = termLookupCounts;
+            infoDataGridWindow.InfoDataGrid.ItemsSource = termLookupCounts is not null
+                ? new ListCollectionView(termLookupCounts)
+                : null;
+
             infoDataGridWindow.Owner = this;
             _ = infoDataGridWindow.ShowDialog();
         }

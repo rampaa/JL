@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using JL.Core.External.AnkiConnect;
@@ -69,7 +70,7 @@ internal sealed partial class MiningSelectionWindow
         }
 
         listViewItem[0] = new ListViewItem { Content = lookupResult.PrimarySpelling, Foreground = configManager.PrimarySpellingColor };
-        currentInstance.MiningListView.ItemsSource = listViewItem;
+        currentInstance.MiningListView.ItemsSource = new ListCollectionView(listViewItem);
         currentInstance.MiningListView.Background = configManager.PopupBackgroundColor;
         currentInstance.MiningListView.FontSize = 18;
         currentInstance.Background = configManager.PopupBackgroundColor;
