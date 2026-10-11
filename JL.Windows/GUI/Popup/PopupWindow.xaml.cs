@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -910,7 +911,8 @@ internal sealed partial class PopupWindow : IDisposable
             popupItemSource[i] = new LookupDisplayResult(this, lookupResult, i, resultCount - 1 > i);
         }
 
-        PopupListView.ItemsSource = popupItemSource;
+        // Avoid keeping closed popups alive in WPF's default-view cache.
+        PopupListView.ItemsSource = new ListCollectionView(popupItemSource);
 
         if (checkForDuplicateCards)
         {
