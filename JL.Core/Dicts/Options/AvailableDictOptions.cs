@@ -190,7 +190,6 @@ public sealed class GenerateMazegakiVariantsOption(bool value)
         [DictType.JMdict,
         DictType.NonspecificWordYomichan, DictType.NonspecificYomichan,
         DictType.NonspecificWordNazeka, DictType.NonspecificNazeka,
-        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary,
         DictType.PitchAccentYomichan];
 }
 
@@ -203,7 +202,6 @@ public sealed class GenerateFusejiVariantsOption(bool value)
         [DictType.JMdict, DictType.JMnedict,
         DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
         DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
-        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary,
         DictType.PitchAccentYomichan];
 }
 
@@ -216,7 +214,6 @@ public sealed class MaxSearchKeyLengthForFusejiGenerationOption(int value)
         [DictType.JMdict, DictType.JMnedict,
         DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
         DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
-        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary,
         DictType.PitchAccentYomichan];
 }
 
@@ -229,6 +226,5 @@ public sealed class MaxTotalFusejiCountOption(int value)
         [DictType.JMdict, DictType.JMnedict,
         DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
         DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
-        DictType.CustomWordDictionary, DictType.ProfileCustomWordDictionary, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary,
         DictType.PitchAccentYomichan];
 }
