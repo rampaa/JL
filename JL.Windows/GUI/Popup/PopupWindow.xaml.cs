@@ -2829,7 +2829,9 @@ internal sealed partial class PopupWindow : IDisposable
         LastLookupResults = [];
         _dictsWithResults.Clear();
         AllDictionaryTabButton.Click -= DictTypeButtonOnClick;
+        _lookupDelayTimer.Stop();
         _lookupDelayTimer.Tick -= LookupDelayTimer_Elapsed;
+        _enableMiningModeTimer.Stop();
         _enableMiningModeTimer.Tick -= EnableMiningModeTimer_Elapsed;
 
         if (_duplicateCheckCancellationTokenSource is not null)
