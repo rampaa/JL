@@ -13,8 +13,25 @@ public static class AnkiConfigUtils
     private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "AnkiConfig.json");
 
     private static Dictionary<MineType, AnkiConfig>? s_ankiConfigDict;
+    private static readonly SemaphoreSlim s_configSemaphoreSlim = new(1, 1);
 
     public static async Task WriteAnkiConfig(Dictionary<MineType, AnkiConfig> ankiConfig)
+    {
+        await s_configSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (await WriteAnkiConfigFile(ankiConfig).ConfigureAwait(false))
+            {
+                Volatile.Write(ref s_ankiConfigDict, ankiConfig);
+            }
+        }
+        finally
+        {
+            _ = s_configSemaphoreSlim.Release();
+        }
+    }
+
+    private static async Task<bool> WriteAnkiConfigFile(Dictionary<MineType, AnkiConfig> ankiConfig)
     {
         try
         {
@@ -28,39 +45,48 @@ public static class AnkiConfigUtils
             }
 
             PathUtils.ReplaceFileAtomicallyOnSameVolume(s_configFilePath, tempConfigFilePath);
-            s_ankiConfigDict = ankiConfig;
+            return true;
         }
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Couldn't write AnkiConfig");
             FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't write AnkiConfig. Check the logs for more details.");
+            return false;
         }
     }
 
     public static async ValueTask<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig(CancellationToken cancellationToken)
     {
-        if (s_ankiConfigDict is not null)
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = Volatile.Read(ref s_ankiConfigDict);
+        if (ankiConfigDict is not null)
         {
-            return s_ankiConfigDict;
+            return ankiConfigDict;
         }
 
-        if (!File.Exists(s_configFilePath))
-        {
-            LoggerManager.Logger.Warning("AnkiConfig.json doesn't exist");
-            return null;
-        }
-
+        await s_configSemaphoreSlim.WaitAsync(CancellationToken.None).ConfigureAwait(false);
         try
         {
+            ankiConfigDict = s_ankiConfigDict;
+            if (ankiConfigDict is not null)
+            {
+                return ankiConfigDict;
+            }
+
+            if (!File.Exists(s_configFilePath))
+            {
+                LoggerManager.Logger.Warning("AnkiConfig.json doesn't exist");
+                return null;
+            }
+
             FileStream ankiConfigStream = new(s_configFilePath, FileStreamOptionsPresets.s_asyncReadFso);
             await using (ankiConfigStream.ConfigureAwait(false))
             {
-                s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter, CancellationToken.None).ConfigureAwait(false);
+                ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream, JsonOptions.s_jsoWithEnumConverter, CancellationToken.None).ConfigureAwait(false);
             }
 
-            Debug.Assert(s_ankiConfigDict is not null);
+            Debug.Assert(ankiConfigDict is not null);
             AtomicBool fieldsChanged = new(false);
-            await Parallel.ForEachAsync(s_ankiConfigDict.Values, CancellationToken.None, async (ankiConfig, _) =>
+            await Parallel.ForEachAsync(ankiConfigDict.Values, CancellationToken.None, async (ankiConfig, _) =>
             {
                 if (ankiConfig.Fields.Count > 0)
                 {
@@ -77,16 +103,21 @@ public static class AnkiConfigUtils
 
             if (fieldsChanged.Read())
             {
-                await WriteAnkiConfig(s_ankiConfigDict).ConfigureAwait(false);
+                _ = await WriteAnkiConfigFile(ankiConfigDict).ConfigureAwait(false);
             }
 
-            return s_ankiConfigDict;
+            Volatile.Write(ref s_ankiConfigDict, ankiConfigDict);
+            return ankiConfigDict;
         }
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Couldn't read AnkiConfig");
             FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't read AnkiConfig. Check the logs for more details.");
             return null;
+        }
+        finally
+        {
+            _ = s_configSemaphoreSlim.Release();
         }
     }
 
