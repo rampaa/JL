@@ -13,7 +13,6 @@ using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Windows.GUI.Options;
 using JL.Windows.Utilities;
-using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 
 namespace JL.Windows.GUI.Dictionary;
@@ -230,8 +229,10 @@ internal sealed partial class EditDictionaryWindow
             if (dbExists)
             {
                 DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
                 string newDBPath = DBUtils.GetDBPathForDict(name);
+                DBUtils.ClearPools(dbPath);
+                DBUtils.ClearPools(newDBPath);
+
                 if (dbPath.Equals(newDBPath, StringComparison.OrdinalIgnoreCase))
                 {
                     File.Move(dbPath, newDBPath);

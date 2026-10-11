@@ -122,7 +122,7 @@ internal static class JmnedictDBManager
             using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
             Debug.Assert(connection is not null);
 
-            DBUtils.ConfigureForBulkWrite(connection);
+            DBUtils.ConfigureForBulkWrite(connection, dbPath);
 
 #pragma warning disable CA1849 // Call async methods when in an async method
             SqliteTransaction transaction = connection.BeginTransaction();
@@ -219,7 +219,7 @@ internal static class JmnedictDBManager
                 _ = createIndexCommand.ExecuteNonQuery();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-                DBUtils.ConfigureForRead(connection);
+                DBUtils.ConfigureForRead(connection, dbPath);
 
                 // ReSharper disable once UseAwaitUsing
                 using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -421,7 +421,7 @@ internal static class JmnedictDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, dict.DBPath);
         using SqliteTransaction transaction = connection.BeginTransaction();
         using JmnedictRecordInserter recordInserter = new(connection);
 
@@ -446,7 +446,7 @@ internal static class JmnedictDBManager
 
         transaction.Commit();
 
-        DBUtils.ConfigureForRead(connection);
+        DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";

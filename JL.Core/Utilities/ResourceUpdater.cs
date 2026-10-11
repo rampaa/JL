@@ -578,7 +578,9 @@ public static class ResourceUpdater
 
     private static bool PrepareDatabaseForReplacement(string tempDBPath, string dbPath)
     {
-        SqliteConnection.ClearAllPools();
+        DBUtils.ClearPools(tempDBPath);
+        DBUtils.ClearPools(dbPath);
+
         using (SqliteConnection connection = new($"Data Source={tempDBPath};Mode=ReadWrite;Pooling=False;"))
         {
             connection.Open();
@@ -627,7 +629,7 @@ public static class ResourceUpdater
     {
         try
         {
-            SqliteConnection.ClearAllPools();
+            DBUtils.ClearPools(tempDBPath);
             DeleteTemporaryDB(tempDBPath);
         }
         catch (Exception ex)

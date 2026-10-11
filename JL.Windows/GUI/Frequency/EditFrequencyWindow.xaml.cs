@@ -11,7 +11,6 @@ using JL.Core.Freqs.Options;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Database;
 using JL.Windows.GUI.Options;
-using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 
 namespace JL.Windows.GUI.Frequency;
@@ -177,8 +176,10 @@ internal sealed partial class EditFrequencyWindow
             if (dbExists)
             {
                 DBUtils.SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
                 string newDBPath = DBUtils.GetDBPathForFreqDict(name);
+                DBUtils.ClearPools(dbPath);
+                DBUtils.ClearPools(newDBPath);
+
                 if (dbPath.Equals(newDBPath, StringComparison.OrdinalIgnoreCase))
                 {
                     File.Move(dbPath, newDBPath);

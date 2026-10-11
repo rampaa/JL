@@ -193,7 +193,7 @@ internal static class EpwingYomichanDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, dict.DBPath);
 
         using RecordInserter recordInserter = new(connection);
         using SearchKeyInserter searchKeyInserter = new(connection);
@@ -221,7 +221,7 @@ internal static class EpwingYomichanDBManager
 
         transaction.Commit();
 
-        DBUtils.ConfigureForRead(connection);
+        DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
@@ -280,7 +280,7 @@ internal static class EpwingYomichanDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, dbPath);
 
         using RecordInserter recordInserter = new(connection);
         using SearchKeyInserter searchKeyInserter = new(connection);
@@ -432,7 +432,7 @@ internal static class EpwingYomichanDBManager
 
         if (rowId > 1)
         {
-            DBUtils.ConfigureForRead(connection);
+            DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
             using SqliteCommand analyzeCommand = connection.CreateCommand();

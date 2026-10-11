@@ -82,6 +82,7 @@ public static class FreqUtils
 
     public static async Task LoadFrequencies()
     {
+        bool initialLoad = !FreqsReady;
         FreqsReady = false;
 
         bool freqCleared = false;
@@ -115,7 +116,10 @@ public static class FreqUtils
 
         if (tasks.Count > 0 || freqCleared)
         {
-            SqliteConnection.ClearAllPools();
+            if (initialLoad)
+            {
+                SqliteConnection.ClearAllPools();
+            }
 
             if (tasks.Count > 0)
             {
@@ -164,6 +168,15 @@ public static class FreqUtils
             if (freqSnapshot.All(static f => !f.Updating))
             {
                 FrontendManager.Frontend.Notify(NotificationLevel.Success, "Finished loading frequency dictionaries");
+            }
+        }
+
+        foreach (Freq freq in freqs)
+        {
+            if (!freq.Updating && (!freq.Active || !freq.Options.UseDB.Value))
+            {
+                using SqliteConnection connection = new(freq.ReadOnlyConnectionString);
+                SqliteConnection.ClearPool(connection);
             }
         }
 

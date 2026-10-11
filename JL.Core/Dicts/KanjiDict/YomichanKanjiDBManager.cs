@@ -103,7 +103,7 @@ internal static class YomichanKanjiDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, dbPath);
 
         using YomichanKanjiRecordInserter recordInserter = new(connection);
 
@@ -188,7 +188,7 @@ internal static class YomichanKanjiDBManager
             _ = createIndexCommand.ExecuteNonQuery();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
-            DBUtils.ConfigureForRead(connection);
+            DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
             using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -350,7 +350,7 @@ internal static class YomichanKanjiDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, dict.DBPath);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         using YomichanKanjiRecordInserter recordInserter = new(connection);
@@ -377,7 +377,7 @@ internal static class YomichanKanjiDBManager
 
         transaction.Commit();
 
-        DBUtils.ConfigureForRead(connection);
+        DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";

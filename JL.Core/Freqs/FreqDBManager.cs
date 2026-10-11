@@ -159,7 +159,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, freq.DBPath);
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         using FrequencyRecordWriter recordWriter = new(connection);
@@ -179,7 +179,7 @@ internal static class FreqDBManager
 
         transaction.Commit();
 
-        DBUtils.ConfigureForRead(connection);
+        DBUtils.ConfigureForRead(connection, freq.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
@@ -419,7 +419,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, dbPath);
 
         using FrequencyRecordWriter recordWriter = new(connection);
 
@@ -524,7 +524,7 @@ internal static class FreqDBManager
         if (rowId > 1)
         {
             RemoveDuplicateYomichanFrequencyRecords(connection, freq.Options.HigherValueMeansHigherFrequency.Value);
-            DBUtils.ConfigureForRead(connection);
+            DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
             using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -1024,7 +1024,7 @@ internal static class FreqDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(freq.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, freq.DBPath);
         using FrequencyRecordWriter recordWriter = new(connection);
 
         long rowId = 1;
@@ -1104,7 +1104,7 @@ internal static class FreqDBManager
         if (rowId > 1)
         {
             RemoveDuplicateNazekaFrequencyRecords(connection, freq.Options.HigherValueMeansHigherFrequency.Value);
-            DBUtils.ConfigureForRead(connection);
+            DBUtils.ConfigureForRead(connection, freq.DBPath);
 
             // ReSharper disable once UseAwaitUsing
             using SqliteCommand analyzeCommand = connection.CreateCommand();

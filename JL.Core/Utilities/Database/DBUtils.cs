@@ -77,6 +77,7 @@ public static class DBUtils
         if (connection is not null)
         {
             SendOptimizePragma(connection);
+            SqliteConnection.ClearPool(connection);
         }
     }
 
@@ -143,8 +144,20 @@ public static class DBUtils
     public static void DeleteDB(string dbPath)
     {
         SendOptimizePragmaToAllDBs();
-        SqliteConnection.ClearAllPools();
+        ClearPools(dbPath);
         File.Delete(dbPath);
+    }
+
+    public static void ClearPools(string dbPath)
+    {
+        using SqliteConnection connection = new(GetReadWriteCreateConnectionString(dbPath));
+        SqliteConnection.ClearPool(connection);
+
+        connection.ConnectionString = GetReadWriteConnectionString(dbPath);
+        SqliteConnection.ClearPool(connection);
+
+        connection.ConnectionString = GetReadOnlyConnectionString(dbPath);
+        SqliteConnection.ClearPool(connection);
     }
 
     //private static int CalculateParameterStringCapacity(int parameterCount)
@@ -198,9 +211,19 @@ public static class DBUtils
 
     internal static SqliteConnection CreateDBConnection(string dbPath)
     {
-        SqliteConnection connection = new($"Data Source={dbPath};");
+        SqliteConnection connection = new(GetReadWriteCreateConnectionString(dbPath));
         connection.Open();
         return connection;
+    }
+
+    private static string GetReadWriteCreateConnectionString(string dbPath)
+    {
+        return $"Data Source={dbPath};";
+    }
+
+    private static string GetReadWriteConnectionString(string dbPath)
+    {
+        return $"Data Source={dbPath};Mode=ReadWrite;";
     }
 
     internal static string GetReadOnlyConnectionString(string dbPath)
@@ -226,7 +249,7 @@ public static class DBUtils
 
     internal static SqliteConnection? CreateReadWriteDBConnection(string dbPath)
     {
-        SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadWrite;");
+        SqliteConnection connection = new(GetReadWriteConnectionString(dbPath));
         try
         {
             connection.Open();
@@ -240,9 +263,9 @@ public static class DBUtils
         }
     }
 
-    internal static void ConfigureForBulkWrite(SqliteConnection connection)
+    internal static void ConfigureForBulkWrite(SqliteConnection connection, string dbPath)
     {
-        SqliteConnection.ClearAllPools();
+        ClearPools(dbPath);
 
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA journal_mode = WAL; PRAGMA wal_autocheckpoint = 8192; PRAGMA synchronous = 0; PRAGMA foreign_keys = OFF; PRAGMA cache_size = -400000; PRAGMA cache_spill = 13000;";
@@ -256,9 +279,9 @@ public static class DBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    internal static void ConfigureForRead(SqliteConnection connection)
+    internal static void ConfigureForRead(SqliteConnection connection, string dbPath)
     {
-        SqliteConnection.ClearAllPools();
+        ClearPools(dbPath);
 
         ValidateForeignKeys(connection);
 

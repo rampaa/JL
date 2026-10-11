@@ -224,7 +224,7 @@ internal static class EpwingNazekaDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dbPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, dbPath);
 
         using EpwingNazekaRecordInserter recordInserter = new(connection);
         using EpwingNazekaSearchKeyInserter searchKeyInserter = new(connection);
@@ -360,7 +360,7 @@ internal static class EpwingNazekaDBManager
 
         if (rowId > 1)
         {
-            DBUtils.ConfigureForRead(connection);
+            DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
             using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -1058,7 +1058,7 @@ internal static class EpwingNazekaDBManager
         using SqliteConnection? connection = DBUtils.CreateReadWriteDBConnection(dict.DBPath);
         Debug.Assert(connection is not null);
 
-        DBUtils.ConfigureForBulkWrite(connection);
+        DBUtils.ConfigureForBulkWrite(connection, dict.DBPath);
         using EpwingNazekaRecordInserter recordInserter = new(connection);
         using EpwingNazekaSearchKeyInserter searchKeyInserter = new(connection);
         using SqliteTransaction transaction = connection.BeginTransaction();
@@ -1084,7 +1084,7 @@ internal static class EpwingNazekaDBManager
 
         transaction.Commit();
 
-        DBUtils.ConfigureForRead(connection);
+        DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";

@@ -569,6 +569,7 @@ public static class DictUtils
 
         try
         {
+            bool initialLoad = !DictsReady;
             DictsReady = false;
 
             CheckSingleDictActiveness();
@@ -675,7 +676,10 @@ public static class DictUtils
 
             if (tasks.Count > 0 || dictCleared)
             {
-                SqliteConnection.ClearAllPools();
+                if (initialLoad)
+                {
+                    SqliteConnection.ClearAllPools();
+                }
 
                 if (tasks.Count > 0)
                 {
@@ -734,6 +738,17 @@ public static class DictUtils
 
                 ProfileCustomNamesCancellationTokenSource.Dispose();
                 ProfileCustomNamesCancellationTokenSource = null;
+            }
+
+            foreach (Dict dict in dicts)
+            {
+                if (!dict.Updating
+                    && (!dict.Active || !dict.Options.UseDB.Value)
+                    && DBUtils.s_dictTypesWithDBSupport.Contains(dict.Type))
+                {
+                    using SqliteConnection connection = new(dict.ReadOnlyConnectionString);
+                    SqliteConnection.ClearPool(connection);
+                }
             }
 
             DictsReady = true;
