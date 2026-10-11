@@ -410,8 +410,10 @@ internal static class JmdictDBManager
                     try
                     {
                         await ImportFromDisk(dict, dict.DBPath, entities).ConfigureAwait(false);
-                        await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
-                        await JmdictWordClassUtils.Load().ConfigureAwait(false);
+                        if (JmdictWordClassUtils.Serialize())
+                        {
+                            _ = await JmdictWordClassUtils.Load().ConfigureAwait(false);
+                        }
                     }
                     finally
                     {

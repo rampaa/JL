@@ -280,8 +280,10 @@ public static class ResourceUpdater
         bool updated = await UpdateBuiltInDict(isUpdate, noPrompt, DictType.JMdict, nameof(DictType.JMdict), JmdictLoader.Size, JmdictDBManager.CreateDB).ConfigureAwait(false);
         if (updated)
         {
-            await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
-            await JmdictWordClassUtils.Load().ConfigureAwait(false);
+            if (JmdictWordClassUtils.Serialize())
+            {
+                _ = await JmdictWordClassUtils.Load().ConfigureAwait(false);
+            }
 
             return true;
         }

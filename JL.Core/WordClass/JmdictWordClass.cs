@@ -1,14 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using JL.Core.Utilities;
 
 namespace JL.Core.WordClass;
 
 internal sealed class JmdictWordClass(string spelling, string[] wordClasses, string[]? readings = null) : IEquatable<JmdictWordClass>
 {
-    [JsonPropertyName("S")] public string Spelling { get; } = spelling.GetPooledString();
-    [JsonPropertyName("C")] public string[] WordClasses { get; } = wordClasses;
-    [JsonPropertyName("R")] public string[]? Readings { get; } = readings;
+    public string Spelling { get; } = spelling;
+    public string[] WordClasses { get; } = wordClasses;
+    public string[]? Readings { get; } = readings;
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {

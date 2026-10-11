@@ -1,7 +1,6 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Interfaces;
@@ -16,60 +15,27 @@ namespace JL.Core.WordClass;
 
 public static class JmdictWordClassUtils
 {
-    private static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.json");
+    private static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.bin");
 
     private static readonly byte[] s_searchKeysQuery = TextUtils.Utf8NoBom.GetBytes($"SELECT {JmdictDBManager.RecordId}, {JmdictDBManager.SearchKey} FROM {JmdictDBManager.RecordSearchKey}\0");
 
-    public static async Task Load()
+    public static async Task<bool> Load()
     {
-        if (!File.Exists(s_partOfSpeechFilePath))
+        FrozenDictionary<string, IList<JmdictWordClass>>? dictionary = await JmdictWordClassBinarySerializer.Deserialize(s_partOfSpeechFilePath).ConfigureAwait(false);
+        if (dictionary is not null && dictionary.Count is not 0)
         {
-            return;
+            DictUtils.WordClassDictionary = dictionary;
+            return true;
         }
-
-        Dictionary<string, IList<JmdictWordClass>>? dictionary;
-        FileStream fileStream = new(s_partOfSpeechFilePath, FileStreamOptionsPresets.s_asyncRead64KBufferFso);
-        await using (fileStream.ConfigureAwait(false))
+        else
         {
-            dictionary = await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream, JsonOptions.DefaultJso).ConfigureAwait(false);
+            LoggerManager.Logger.Error("Couldn't load word-class data from '{Path}'", s_partOfSpeechFilePath);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't load word-class data. Check the logs for more details.");
+            return false;
         }
-
-        Debug.Assert(dictionary is not null);
-        IList<JmdictWordClass>[] jmdictWordClasses = dictionary.Values.ToArray();
-        foreach (IList<JmdictWordClass> jmdictWordClassList in jmdictWordClasses)
-        {
-            int jmdictWordClassListCount = jmdictWordClassList.Count;
-            for (int j = 0; j < jmdictWordClassListCount; j++)
-            {
-                JmdictWordClass jmdictWordClass = jmdictWordClassList[j];
-
-                jmdictWordClass.Readings?.DeduplicateStringsInArray();
-                jmdictWordClass.WordClasses.DeduplicateStringsInArray();
-
-                if (jmdictWordClass.Readings is not null)
-                {
-                    foreach (string reading in jmdictWordClass.Readings)
-                    {
-                        string readingInHiragana = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                        ref IList<JmdictWordClass>? result = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, readingInHiragana, out bool exists);
-                        if (exists)
-                        {
-                            Debug.Assert(result is not null);
-                            result.Add(jmdictWordClass);
-                        }
-                        else
-                        {
-                            result = [jmdictWordClass];
-                        }
-                    }
-                }
-            }
-        }
-
-        DictUtils.WordClassDictionary = dictionary.ToFrozenDictionary(static entry => entry.Key, static IList<JmdictWordClass> (kvp) => kvp.Value.ToArray(), StringComparer.Ordinal);
     }
 
-    public static async Task Serialize()
+    public static bool Serialize()
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new(StringComparer.Ordinal);
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
@@ -78,7 +44,11 @@ public static class JmdictWordClassUtils
         {
             // ReSharper disable once UseAwaitUsing
             using SqliteConnection? connection = DBUtils.CreateDBConnectionForReadOnlyConnectionString(dict.ReadOnlyConnectionString);
-            Debug.Assert(connection is not null);
+            if (connection is null)
+            {
+                FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't generate word-class data. Check the logs for more details.");
+                return false;
+            }
             PopulateFromDB(jmdictWordClassDictionary, connection);
         }
         else
@@ -86,14 +56,15 @@ public static class JmdictWordClassUtils
             PopulateFromJmdictContents(jmdictWordClassDictionary);
         }
 
-        string tempPartOfSpeechFilePath = PathUtils.GetTempPath(s_partOfSpeechFilePath);
-        FileStream fileStream = new(tempPartOfSpeechFilePath, FileStreamOptionsPresets.s_asyncCreate64KBufferFso);
-        await using (fileStream.ConfigureAwait(false))
+        if (jmdictWordClassDictionary.Count is 0)
         {
-            await JsonSerializer.SerializeAsync(fileStream, jmdictWordClassDictionary, JsonOptions.s_jsoIgnoringWhenWritingNull).ConfigureAwait(false);
+            LoggerManager.Logger.Error("Couldn't generate word-class data from '{DictName}': no word-class records were found", dict.Name);
+            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't generate word-class data. Check the logs for more details.");
+            return false;
         }
 
-        PathUtils.ReplaceFileAtomicallyOnSameVolume(s_partOfSpeechFilePath, tempPartOfSpeechFilePath);
+        JmdictWordClassBinarySerializer.Serialize(s_partOfSpeechFilePath, jmdictWordClassDictionary);
+        return true;
     }
 
     private static void PopulateFromJmdictContents(Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary)
@@ -190,7 +161,7 @@ public static class JmdictWordClassUtils
                     }
                 }
 
-                JmdictWordClass record = new(jmdictRecord.PrimarySpelling, wordClasses, jmdictRecord.Readings);
+                JmdictWordClass record = new(jmdictRecord.PrimarySpelling.GetPooledString(), wordClasses, jmdictRecord.Readings);
                 ref List<JmdictWordClass>? results = ref CollectionsMarshal.GetValueRefOrAddDefault(jmdictWordClassDictionary, key, out bool exists);
                 if (exists)
                 {
@@ -299,7 +270,6 @@ public static class JmdictWordClassUtils
 
         if (rowIdToWordClassCandidate.Count is 0)
         {
-            LoggerManager.Logger.Error("PopulateFromDB failed unexpectedly, rowIdToRecord.Count is 0!");
             return;
         }
 
@@ -362,7 +332,7 @@ public static class JmdictWordClassUtils
                 }
             }
 
-            JmdictWordClass record = new(data.PrimarySpelling, data.WordClasses, data.Readings);
+            JmdictWordClass record = new(data.PrimarySpelling.GetPooledString(), data.WordClasses, data.Readings);
             ref List<JmdictWordClass>? results = ref CollectionsMarshal.GetValueRefOrAddDefault(jmdictWordClassDictionary, key, out bool exists);
             if (exists)
             {
@@ -384,72 +354,84 @@ public static class JmdictWordClassUtils
         Dict jmdictDict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         string fullJmdictPath = Path.GetFullPath(jmdictDict.Path, AppInfo.ApplicationPath);
 
-        if (!File.Exists(s_partOfSpeechFilePath)
-            || (File.Exists(fullJmdictPath) && File.GetLastWriteTime(fullJmdictPath) > File.GetLastWriteTime(s_partOfSpeechFilePath)))
+        if (File.Exists(s_partOfSpeechFilePath)
+            && (!File.Exists(fullJmdictPath) || File.GetLastWriteTime(fullJmdictPath) <= File.GetLastWriteTime(s_partOfSpeechFilePath)))
         {
-            if (jmdictDict.Active)
+            FrozenDictionary<string, IList<JmdictWordClass>>? dictionary = await JmdictWordClassBinarySerializer.Deserialize(s_partOfSpeechFilePath).ConfigureAwait(false);
+            if (dictionary is not null && dictionary.Count is not 0)
             {
-                await Serialize().ConfigureAwait(false);
+                DictUtils.WordClassDictionary = dictionary;
+                return;
             }
-            else
+        }
+
+        bool serialized = false;
+        if (jmdictDict.Active || (jmdictDict.Options.UseDB.Value && File.Exists(jmdictDict.DBPath)))
+        {
+            serialized = Serialize();
+        }
+        else
+        {
+            bool deleteJmdictFile = false;
+            bool deleteDB = !File.Exists(jmdictDict.DBPath);
+            if (!File.Exists(fullJmdictPath))
             {
-                bool deleteJmdictFile = false;
-                bool deleteDB = !File.Exists(jmdictDict.DBPath);
-                if (!File.Exists(fullJmdictPath))
+                deleteJmdictFile = true;
+
+                Uri? uri = jmdictDict.Url;
+                Debug.Assert(uri is not null);
+
+                bool downloaded = await ResourceUpdater.DownloadBuiltInDict(fullJmdictPath, uri, jmdictDict.Type.ToString(), false, true).ConfigureAwait(false);
+                if (!downloaded)
                 {
-                    deleteJmdictFile = true;
+                    return;
+                }
+            }
 
-                    Uri? uri = jmdictDict.Url;
-                    Debug.Assert(uri is not null);
-
-                    bool downloaded = await ResourceUpdater.DownloadBuiltInDict(fullJmdictPath, uri, jmdictDict.Type.ToString(), false, true).ConfigureAwait(false);
-                    if (!downloaded)
-                    {
-                        return;
-                    }
+            bool useDB = jmdictDict.Options.UseDB.Value;
+            try
+            {
+                if (useDB)
+                {
+                    JmdictDBManager.CreateDB(jmdictDict.DBPath);
+                    await JmdictDBManager.ImportFromDisk(jmdictDict, jmdictDict.DBPath, DictUtils.JmdictEntities).ConfigureAwait(false);
+                }
+                else
+                {
+                    jmdictDict.Contents = new Dictionary<string, IList<IDictRecord>>(jmdictDict.Size > 0 ? jmdictDict.Size : JmdictLoader.Size, StringComparer.Ordinal);
+                    await JmdictLoader.Load(jmdictDict, DictUtils.JmdictEntities).ConfigureAwait(false);
                 }
 
-                bool useDB = jmdictDict.Options.UseDB.Value;
-                try
+                serialized = Serialize();
+            }
+            catch (Exception ex)
+            {
+                LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", jmdictDict.Type.GetDescription(), jmdictDict.Name, fullJmdictPath);
+                FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {jmdictDict.Name}. Check the logs for more details.");
+            }
+            finally
+            {
+                jmdictDict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                if (deleteJmdictFile)
                 {
-                    if (useDB)
+                    if (File.Exists(fullJmdictPath))
                     {
-                        await JmdictDBManager.ImportFromDisk(jmdictDict, jmdictDict.DBPath, DictUtils.JmdictEntities).ConfigureAwait(false);
+                        File.Delete(fullJmdictPath);
                     }
-                    else
-                    {
-                        jmdictDict.Contents = new Dictionary<string, IList<IDictRecord>>(jmdictDict.Size > 0 ? jmdictDict.Size : JmdictLoader.Size, StringComparer.Ordinal);
-                        await JmdictLoader.Load(jmdictDict, DictUtils.JmdictEntities).ConfigureAwait(false);
-                    }
-
-                    await Serialize().ConfigureAwait(false);
                 }
-                catch (Exception ex)
+                if (deleteDB)
                 {
-                    LoggerManager.Logger.Error(ex, "Couldn't import '{DictType}'-'{DictName}' from '{FullDictPath}'", jmdictDict.Type.GetDescription(), jmdictDict.Name, fullJmdictPath);
-                    FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't import {jmdictDict.Name}. Check the logs for more details.");
-                }
-                finally
-                {
-                    jmdictDict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
-                    if (deleteJmdictFile)
+                    if (File.Exists(jmdictDict.DBPath))
                     {
-                        if (File.Exists(fullJmdictPath))
-                        {
-                            File.Delete(fullJmdictPath);
-                        }
-                    }
-                    if (deleteDB)
-                    {
-                        if (File.Exists(jmdictDict.DBPath))
-                        {
-                            File.Delete(jmdictDict.DBPath);
-                        }
+                        DBUtils.DeleteDB(jmdictDict.DBPath);
                     }
                 }
             }
         }
 
-        await Load().ConfigureAwait(false);
+        if (serialized)
+        {
+            _ = await Load().ConfigureAwait(false);
+        }
     }
 }
