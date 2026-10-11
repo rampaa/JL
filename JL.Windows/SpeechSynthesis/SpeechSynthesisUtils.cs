@@ -91,8 +91,18 @@ internal static class SpeechSynthesisUtils
         {
             LoggerManager.Logger.Error(ex, "Failed to select voice {VoiceName}", voiceName);
             NotificationManager.Notify(NotificationLevel.Error, $"{voiceName} is not available on your system. Deactivating it.");
-            AudioUtils.AudioSources[voiceName].Active = false;
-            SetInstalledVoiceWithHighestPriority();
+
+            // Run on the UI thread so disabling this voice and reading AudioSources cannot overlap with edits in the settings window.
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                if (AudioUtils.AudioSources.TryGetValue(voiceName, out AudioSource? audioSource))
+                {
+                    audioSource.Active = false;
+                    AudioUtils.UpdateActiveAudioSources();
+                    SetInstalledVoiceWithHighestPriority();
+                }
+            }).Task.ConfigureAwait(false);
+
             return;
         }
 
