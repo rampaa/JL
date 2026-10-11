@@ -12,6 +12,9 @@ internal sealed class WebSocketConnection : IDisposable
     private ClientWebSocket? _webSocketClient;
     private CancellationTokenSource? _webSocketCancellationTokenSource;
     private readonly Uri _webSocketUri;
+    private readonly Lock _connectionLock = new();
+    private Task? _listenTask;
+    private Task? _disconnectTask;
 
     public bool Connected => _webSocketClient?.State is WebSocketState.Open;
 
@@ -20,31 +23,59 @@ internal sealed class WebSocketConnection : IDisposable
         _webSocketUri = webSocketUri;
     }
 
-    public async Task Disconnect()
+    public Task Disconnect()
     {
-        if (_webSocketClient?.State is WebSocketState.Open)
+        lock (_connectionLock)
         {
-            await _webSocketClient.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
+            return _webSocketCancellationTokenSource is null
+                ? Task.CompletedTask
+                : _disconnectTask ??= DisconnectCore(_webSocketCancellationTokenSource, _listenTask);
+        }
+    }
+
+    private async Task DisconnectCore(CancellationTokenSource cancellationTokenSource, Task? listenTask)
+    {
+        ClientWebSocket? webSocketClient = _webSocketClient;
+        if (webSocketClient?.State is WebSocketState.Open)
+        {
+            try
+            {
+                await webSocketClient.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                LoggerManager.Logger.Debug(ex, "Couldn't send the close message to the WebSocket server at {WebSocketUri}", _webSocketUri);
+            }
         }
 
-        if (_webSocketCancellationTokenSource is null)
+        await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+        webSocketClient?.Dispose();
+        if (listenTask is not null)
         {
-            return;
+            await listenTask.ConfigureAwait(false);
         }
 
-        await _webSocketCancellationTokenSource.CancelAsync().ConfigureAwait(false);
-        _webSocketCancellationTokenSource.Dispose();
-        _webSocketClient?.Dispose();
-        _webSocketCancellationTokenSource = null;
-        _webSocketClient = null;
+        cancellationTokenSource.Dispose();
+        lock (_connectionLock)
+        {
+            _listenTask = null;
+            _webSocketClient = null;
+            _disconnectTask = Task.CompletedTask;
+            _webSocketCancellationTokenSource = null;
+        }
     }
 
     public void Connect(bool tsukikage)
     {
-        if (_webSocketCancellationTokenSource is null)
+        lock (_connectionLock)
         {
-            _webSocketCancellationTokenSource = new CancellationTokenSource();
-            ListenWebSocket(tsukikage, _webSocketCancellationTokenSource.Token).SafeFireAndForget("Unexpected error while listening the WebSocket");
+            if (_webSocketCancellationTokenSource is null)
+            {
+                _disconnectTask = null;
+                _webSocketCancellationTokenSource = new CancellationTokenSource();
+                _listenTask = ListenWebSocket(tsukikage, _webSocketCancellationTokenSource.Token);
+                _listenTask.SafeFireAndForget("Unexpected error while listening the WebSocket");
+            }
         }
     }
 
@@ -52,8 +83,6 @@ internal sealed class WebSocketConnection : IDisposable
     {
         return Task.Run(async () =>
         {
-            CoreConfigManager coreConfigManager = CoreConfigManager.Instance;
-
             do
             {
                 try
@@ -69,17 +98,21 @@ internal sealed class WebSocketConnection : IDisposable
                         Memory<byte> buffer = rentedBuffer;
                         while (!cancellationToken.IsCancellationRequested
                             && webSocketClient.State is WebSocketState.Open
-                            && (tsukikage ? coreConfigManager.CaptureTextFromTsukikageWebsocket : coreConfigManager.CaptureTextFromWebSocket))
+                            && (tsukikage
+                                ? CoreConfigManager.Instance.CaptureTextFromTsukikageWebsocket
+                                : CoreConfigManager.Instance.CaptureTextFromWebSocket))
                         {
                             try
                             {
                                 ValueWebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
                                 if (cancellationToken.IsCancellationRequested
-                                    || (tsukikage ? !coreConfigManager.CaptureTextFromTsukikageWebsocket : !coreConfigManager.CaptureTextFromWebSocket))
+                                    || (tsukikage
+                                        ? !CoreConfigManager.Instance.CaptureTextFromTsukikageWebsocket
+                                        : !CoreConfigManager.Instance.CaptureTextFromWebSocket))
                                 {
                                     if (webSocketClient.State is WebSocketState.Open)
                                     {
-                                        await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
+                                        await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), cancellationToken).ConfigureAwait(false);
                                     }
 
                                     return;
@@ -99,7 +132,7 @@ internal sealed class WebSocketConnection : IDisposable
                                             buffer = rentedBuffer;
                                         }
 
-                                        result = await webSocketClient.ReceiveAsync(buffer[totalBytesReceived..], CancellationToken.None).ConfigureAwait(false);
+                                        result = await webSocketClient.ReceiveAsync(buffer[totalBytesReceived..], cancellationToken).ConfigureAwait(false);
                                         totalBytesReceived += result.Count;
                                     }
 
@@ -115,7 +148,12 @@ internal sealed class WebSocketConnection : IDisposable
                             }
                             catch (WebSocketException webSocketException)
                             {
-                                if (coreConfigManager is { AutoReconnectToTsukikageWebSocket: false, AutoReconnectToWebSocket: false, CaptureTextFromClipboard: false }
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    return;
+                                }
+
+                                if (CoreConfigManager.Instance is { AutoReconnectToTsukikageWebSocket: false, AutoReconnectToWebSocket: false, CaptureTextFromClipboard: false }
                                     && webSocketClient.State is not WebSocketState.Open
                                     && WebSocketUtils.AllConnectionsAreDisconnected())
                                 {
@@ -123,14 +161,16 @@ internal sealed class WebSocketConnection : IDisposable
                                 }
 
                                 if (!cancellationToken.IsCancellationRequested
-                                    && (tsukikage ? coreConfigManager.CaptureTextFromTsukikageWebsocket : coreConfigManager.CaptureTextFromWebSocket))
+                                    && (tsukikage
+                                        ? CoreConfigManager.Instance.CaptureTextFromTsukikageWebsocket
+                                        : CoreConfigManager.Instance.CaptureTextFromWebSocket))
                                 {
                                     LoggerManager.Logger.Warning(webSocketException, "WebSocket server at {WebSocketUri} is closed unexpectedly", _webSocketUri);
                                     FrontendManager.Frontend.Notify(NotificationLevel.Information, $"WebSocket server at {_webSocketUri} is closed unexpectedly");
                                 }
                                 else if (webSocketClient.State is WebSocketState.Open)
                                 {
-                                    await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), CancellationToken.None).ConfigureAwait(false);
+                                    await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, nameof(WebSocketCloseStatus.NormalClosure), cancellationToken).ConfigureAwait(false);
                                 }
 
                                 break;
@@ -145,15 +185,24 @@ internal sealed class WebSocketConnection : IDisposable
 
                 catch (WebSocketException webSocketException)
                 {
-                    if (tsukikage ? !coreConfigManager.AutoReconnectToTsukikageWebSocket : !coreConfigManager.AutoReconnectToWebSocket)
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        if (!coreConfigManager.CaptureTextFromClipboard && WebSocketUtils.AllConnectionsAreDisconnected())
+                        return;
+                    }
+
+                    if (tsukikage
+                        ? !CoreConfigManager.Instance.AutoReconnectToTsukikageWebSocket
+                        : !CoreConfigManager.Instance.AutoReconnectToWebSocket)
+                    {
+                        if (!CoreConfigManager.Instance.CaptureTextFromClipboard && WebSocketUtils.AllConnectionsAreDisconnected())
                         {
                             StatsUtils.StopTimeStatStopWatch();
                         }
 
                         if (!cancellationToken.IsCancellationRequested
-                            && (tsukikage ? coreConfigManager.CaptureTextFromTsukikageWebsocket : coreConfigManager.CaptureTextFromWebSocket))
+                            && (tsukikage
+                                ? CoreConfigManager.Instance.CaptureTextFromTsukikageWebsocket
+                                : CoreConfigManager.Instance.CaptureTextFromWebSocket))
                         {
                             LoggerManager.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server at {WebSocketUri}, probably because it is not running", _webSocketUri);
                             FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Couldn't connect to the WebSocket server at {_webSocketUri}, probably because it is not running");
@@ -179,7 +228,7 @@ internal sealed class WebSocketConnection : IDisposable
                 }
             }
             while (!cancellationToken.IsCancellationRequested
-                && (tsukikage ? coreConfigManager is { AutoReconnectToTsukikageWebSocket: true, CaptureTextFromTsukikageWebsocket: true } : coreConfigManager is { AutoReconnectToWebSocket: true, CaptureTextFromWebSocket: true }));
+                && (tsukikage ? CoreConfigManager.Instance is { AutoReconnectToTsukikageWebSocket: true, CaptureTextFromTsukikageWebsocket: true } : CoreConfigManager.Instance is { AutoReconnectToWebSocket: true, CaptureTextFromWebSocket: true }));
         }, CancellationToken.None);
     }
 
