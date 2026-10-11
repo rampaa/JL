@@ -136,7 +136,7 @@ public static class StatsDBUtils
         {
             Stats stats;
             string statsJson;
-            lock (StatsUtils.TimeStatsLock)
+            lock (StatsUtils.StatsLock)
             {
                 stats = StatsUtils.LifetimeStats;
                 statsJson = JsonSerializer.Serialize(stats, JsonOptions.s_jsoWithEnumConverterAndIndentation);
@@ -161,7 +161,7 @@ public static class StatsDBUtils
             Stats stats;
             string statsJson;
             int profileId;
-            lock (StatsUtils.TimeStatsLock)
+            lock (StatsUtils.StatsLock)
             {
                 stats = StatsUtils.ProfileLifetimeStats;
                 profileId = ProfileUtils.CurrentProfileId;
@@ -184,7 +184,7 @@ public static class StatsDBUtils
     {
         Stats lifetimeStats = GetStatsFromDB(connection, ProfileUtils.GlobalProfileId);
         Stats profileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId);
-        lock (StatsUtils.TimeStatsLock)
+        lock (StatsUtils.StatsLock)
         {
             lock (StatsUtils.TermLookupCountsLock)
             {
