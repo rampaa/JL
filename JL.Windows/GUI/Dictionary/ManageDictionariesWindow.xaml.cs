@@ -88,11 +88,9 @@ internal sealed partial class ManageDictionariesWindow
             await DictUtils.LoadDictionaries().ConfigureAwait(false);
             await DictUtils.SerializeDicts().ConfigureAwait(false);
 
-            if (RebuildWordClassFile)
+            if (RebuildWordClassFile && JmdictWordClassUtils.Serialize())
             {
-                await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
-                await JmdictWordClassUtils.Load().ConfigureAwait(false);
-                RebuildWordClassFile = false;
+                RebuildWordClassFile = !await JmdictWordClassUtils.Load().ConfigureAwait(false);
             }
 
             ObjectPoolManager.ClearStringPoolIfDictsAreReady();
