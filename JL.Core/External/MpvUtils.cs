@@ -21,16 +21,18 @@ public static class MpvUtils
     public static async Task PausePlayback(bool previouslyPausedByJL = false)
     {
         await s_semaphoreSlim.WaitAsync().ConfigureAwait(false);
+        using CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromSeconds(2));
+        CancellationToken cancellationToken = cancellationTokenSource.Token;
         try
         {
             NamedPipeClientStream pipeClient = new(".", CoreConfigManager.Instance.MpvNamedPipePath, PipeDirection.InOut, PipeOptions.Asynchronous);
             await using (pipeClient.ConfigureAwait(false))
             {
-                await pipeClient.ConnectAsync(500).ConfigureAwait(false);
-                await pipeClient.WriteAsync(s_getPausePropertyCommand).ConfigureAwait(false);
+                await pipeClient.ConnectAsync(500, cancellationToken).ConfigureAwait(false);
+                await pipeClient.WriteAsync(s_getPausePropertyCommand, cancellationToken).ConfigureAwait(false);
 
                 using StreamReader reader = new(pipeClient);
-                string? responseJson = await reader.ReadLineAsync().ConfigureAwait(false);
+                string? responseJson = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
                 if (responseJson is null)
                 {
                     return;
@@ -43,7 +45,7 @@ public static class MpvUtils
                 //bool isPaused = JsonElement.Parse(responseJson).GetProperty("data").GetBoolean();
                 if (!isPaused)
                 {
-                    await pipeClient.WriteAsync(s_pauseCommand).ConfigureAwait(false);
+                    await pipeClient.WriteAsync(s_pauseCommand, cancellationToken).ConfigureAwait(false);
 
                     s_pausedByJL = true;
                     s_lastPausedByJLTimestamp = Stopwatch.GetTimestamp();
@@ -61,11 +63,11 @@ public static class MpvUtils
                 }
             }
         }
-        catch (TimeoutException)
+        catch (Exception ex) when (ex is TimeoutException || (ex is OperationCanceledException && cancellationToken.IsCancellationRequested))
         {
             s_pausedByJL = false;
-            LoggerManager.Logger.Warning("Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={MpvNamedPipePath} to your mpv.conf file", CoreConfigManager.Instance.MpvNamedPipePath);
-            FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Connection timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={CoreConfigManager.Instance.MpvNamedPipePath} to your mpv.conf file.");
+            LoggerManager.Logger.Warning("Command timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={MpvNamedPipePath} to your mpv.conf file", CoreConfigManager.Instance.MpvNamedPipePath);
+            FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Command timed out. Is mpv currently running with its IPC server properly configured? Make sure to add input-ipc-server={CoreConfigManager.Instance.MpvNamedPipePath} to your mpv.conf file.");
         }
         catch (Exception ex)
         {
@@ -88,20 +90,23 @@ public static class MpvUtils
             return;
         }
 
+        using CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromSeconds(2));
+        CancellationToken cancellationToken = cancellationTokenSource.Token;
         try
         {
             NamedPipeClientStream pipeClient = new(".", CoreConfigManager.Instance.MpvNamedPipePath, PipeDirection.Out, PipeOptions.Asynchronous);
             await using (pipeClient.ConfigureAwait(false))
             {
-                await pipeClient.ConnectAsync(500).ConfigureAwait(false);
-                await pipeClient.WriteAsync(s_unpauseCommand).ConfigureAwait(false);
+                await pipeClient.ConnectAsync(500, cancellationToken).ConfigureAwait(false);
+                await pipeClient.WriteAsync(s_unpauseCommand, cancellationToken).ConfigureAwait(false);
+                s_pausedByJL = false;
             }
         }
-        catch (TimeoutException)
+        catch (Exception ex) when (ex is TimeoutException || (ex is OperationCanceledException && cancellationToken.IsCancellationRequested))
         {
             s_pausedByJL = false;
-            LoggerManager.Logger.Warning("Connection timed out. Is mpv running?");
-            FrontendManager.Frontend.Notify(NotificationLevel.Warning, "Connection timed out. Is mpv running?");
+            LoggerManager.Logger.Warning("Command timed out. Is mpv running?");
+            FrontendManager.Frontend.Notify(NotificationLevel.Warning, "Command timed out. Is mpv running?");
         }
         catch (Exception ex)
         {
