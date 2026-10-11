@@ -76,10 +76,7 @@ internal static class WindowsUtils
         List<ComboBoxItem> japaneseFonts = new(Fonts.SystemFontFamilies.Count);
         foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
         {
-            if (fontFamily.FamilyNames.Keys is null)
-            {
-                continue;
-            }
+            LanguageSpecificStringDictionary familyNames = fontFamily.FamilyNames;
 
             ComboBoxItem comboBoxItem = new()
             {
@@ -87,13 +84,12 @@ internal static class WindowsUtils
                 FontFamily = fontFamily
             };
 
-            if (fontFamily.FamilyNames.ContainsKey(japaneseXmlLanguage))
+            if (familyNames.ContainsKey(japaneseXmlLanguage))
             {
                 japaneseFonts.Add(comboBoxItem);
             }
 
-            else if (fontFamily.FamilyNames.Keys.Count is 1
-                     && fontFamily.FamilyNames.ContainsKey(englishXmlLanguage))
+            else if (familyNames.Count is 1 && familyNames.ContainsKey(englishXmlLanguage))
             {
                 bool foundGlyph = false;
 
@@ -370,7 +366,7 @@ internal static class WindowsUtils
             Application? application = Application.Current;
             if (application is not null)
             {
-                await application.Dispatcher.BeginInvoke(MainWindow.Instance.HandleAppClosing, DispatcherPriority.Send).Task.ConfigureAwait(true);
+                await application.Dispatcher.InvokeAsync(MainWindow.Instance.HandleAppClosing, DispatcherPriority.Send).Task.Unwrap().ConfigureAwait(true);
 
                 using Process? process = Process.Start(new ProcessStartInfo
                 {
