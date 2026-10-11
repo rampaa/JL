@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using JL.Core.Config;
 using JL.Core.Dicts;
@@ -1099,8 +1100,7 @@ internal sealed partial class PreferencesWindow
             }];
         }
 
-        ConfigManager.MainWindowFontWeights = fontWeightNames;
-        MainWindowFontWeightComboBox.ItemsSource = fontWeightNames;
+        MainWindowFontWeightComboBox.ItemsSource = new ListCollectionView(fontWeightNames);
 
         string? selectedFontWeight = (string?)MainWindowFontWeightComboBox.SelectedValue;
         int index = Array.FindIndex(fontWeightNames, fw => (string)fw.Content == selectedFontWeight);

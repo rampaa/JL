@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using HandyControl.Data;
@@ -367,9 +368,7 @@ internal sealed class ConfigManager
     private const string LookupModeSettingName = "LookupMode";
     #endregion
 
-    private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
-    private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneComboBoxItems(s_japaneseFonts);
-    public static ComboBoxItem[] MainWindowFontWeights { get; set; } = [];
+    private static FontInfo[]? s_japaneseFonts;
 
     private SkinType Theme { get; set; } = SkinType.Dark;
 
@@ -1284,24 +1283,29 @@ internal sealed class ConfigManager
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
 
-        preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, static f => f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
+        // Cache font data; keep the controls and their collection views owned by this window.
+        FontInfo[] fonts = s_japaneseFonts ??= WindowsUtils.FindJapaneseFonts();
+        preferenceWindow.MainWindowFontComboBox.ItemsSource ??= new ListCollectionView(WindowsUtils.CreateFontComboBoxItems(fonts));
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(fonts, static font => font.FontFamily.Source == MainWindow.Instance.MainTextBox.FontFamily.Source);
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex < 0)
         {
             preferenceWindow.MainWindowFontComboBox.SelectedIndex = 0;
         }
 
-        if (MainWindowFontWeights.Length is 0)
+        ComboBoxItem[] mainWindowFontWeights = preferenceWindow.MainWindowFontWeightComboBox.ItemsSource is ListCollectionView fontWeightView
+            ? (ComboBoxItem[])fontWeightView.SourceCollection
+            : [];
+        if (mainWindowFontWeights.Length is 0)
         {
             string mainWindowFont = (string)preferenceWindow.MainWindowFontComboBox.SelectedValue;
-            MainWindowFontWeights = WindowsUtils.GetFontWeightNames(mainWindowFont);
+            mainWindowFontWeights = WindowsUtils.GetFontWeightNames(mainWindowFont);
+            preferenceWindow.MainWindowFontWeightComboBox.ItemsSource = new ListCollectionView(mainWindowFontWeights);
         }
 
-        preferenceWindow.MainWindowFontWeightComboBox.ItemsSource = MainWindowFontWeights;
-        int mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, static fw => (string)fw.Content == MainWindow.Instance.MainTextBox.FontWeight.ToString());
+        int mainWindowFontWeightIndex = Array.FindIndex(mainWindowFontWeights, static fw => (string)fw.Content == MainWindow.Instance.MainTextBox.FontWeight.ToString());
         if (mainWindowFontWeightIndex < 0)
         {
-            mainWindowFontWeightIndex = Array.FindIndex(MainWindowFontWeights, static fw => fw.Content is "Normal");
+            mainWindowFontWeightIndex = Array.FindIndex(mainWindowFontWeights, static fw => fw.Content is "Normal");
             if (mainWindowFontWeightIndex < 0)
             {
                 mainWindowFontWeightIndex = 0;
@@ -1310,9 +1314,9 @@ internal sealed class ConfigManager
 
         preferenceWindow.MainWindowFontWeightComboBox.SelectedIndex = mainWindowFontWeightIndex;
 
-        preferenceWindow.PopupFontComboBox.ItemsSource = s_popupJapaneseFonts;
+        preferenceWindow.PopupFontComboBox.ItemsSource ??= new ListCollectionView(WindowsUtils.CreateFontComboBoxItems(fonts));
         preferenceWindow.PopupFontComboBox.SelectedIndex =
-            Array.FindIndex(s_popupJapaneseFonts, f => f.Content.ToString() == PopupFont.Source);
+            Array.FindIndex(fonts, font => font.FontFamily.Source == PopupFont.Source);
 
         if (preferenceWindow.PopupFontComboBox.SelectedIndex < 0)
         {

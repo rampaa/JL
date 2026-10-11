@@ -68,25 +68,19 @@ internal static class WindowsUtils
 
     public static bool LastWebSocketTextWasVertical { get; set; } // = false;
 
-    public static ComboBoxItem[] FindJapaneseFonts()
+    public static FontInfo[] FindJapaneseFonts()
     {
         XmlLanguage japaneseXmlLanguage = XmlLanguage.GetLanguage("ja-JP");
         XmlLanguage englishXmlLanguage = XmlLanguage.GetLanguage("en-US");
 
-        List<ComboBoxItem> japaneseFonts = new(Fonts.SystemFontFamilies.Count);
+        List<FontInfo> japaneseFonts = new(Fonts.SystemFontFamilies.Count);
         foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
         {
             LanguageSpecificStringDictionary familyNames = fontFamily.FamilyNames;
 
-            ComboBoxItem comboBoxItem = new()
-            {
-                Content = fontFamily.Source,
-                FontFamily = fontFamily
-            };
-
             if (familyNames.ContainsKey(japaneseXmlLanguage))
             {
-                japaneseFonts.Add(comboBoxItem);
+                japaneseFonts.Add(new FontInfo(fontFamily, true));
             }
 
             else if (familyNames.Count is 1 && familyNames.ContainsKey(englishXmlLanguage))
@@ -105,18 +99,13 @@ internal static class WindowsUtils
                             // 0x67A0 -> 枠, kokuji
                             if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(0x30F8))
                             {
-                                japaneseFonts.Add(comboBoxItem);
                                 foundGlyph = true;
                                 break;
                             }
                         }
                     }
 
-                    if (!foundGlyph)
-                    {
-                        comboBoxItem.Foreground = Brushes.LightSlateGray;
-                        japaneseFonts.Add(comboBoxItem);
-                    }
+                    japaneseFonts.Add(new FontInfo(fontFamily, foundGlyph));
                 }
 
                 catch (UnauthorizedAccessException ex)
@@ -126,15 +115,36 @@ internal static class WindowsUtils
             }
             else
             {
-                comboBoxItem.Foreground = Brushes.LightSlateGray;
-                japaneseFonts.Add(comboBoxItem);
+                japaneseFonts.Add(new FontInfo(fontFamily, false));
             }
         }
 
         return japaneseFonts
-            .OrderBy(static f => f.Foreground == Brushes.LightSlateGray)
-            .ThenBy(static font => (string)font.Content, StringComparer.InvariantCulture)
+            .OrderByDescending(static font => font.SupportsJapanese)
+            .ThenBy(static font => font.FontFamily.Source, StringComparer.InvariantCulture)
             .ToArray();
+    }
+
+    public static ComboBoxItem[] CreateFontComboBoxItems(FontInfo[] fonts)
+    {
+        ComboBoxItem[] items = new ComboBoxItem[fonts.Length];
+        for (int i = 0; i < fonts.Length; i++)
+        {
+            FontInfo font = fonts[i];
+            ComboBoxItem item = new()
+            {
+                Content = font.FontFamily.Source,
+                FontFamily = font.FontFamily
+            };
+
+            if (!font.SupportsJapanese)
+            {
+                item.Foreground = Brushes.LightSlateGray;
+            }
+
+            items[i] = item;
+        }
+        return items;
     }
 
     public static ComboBoxItem[] CloneComboBoxItems(ComboBoxItem[] comboBoxItems)
