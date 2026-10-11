@@ -59,7 +59,7 @@ public static partial class JapaneseUtils
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
     // CJK Unified Ideographs Extension J (323B0-3347F)
-    [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u2FDF\u2FF0-\u30FF\u3190-\u319F\u31C0-\u31FF\u3220-\u325F\u3280-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE10-\uFE1F\uFE30-\uFE4F\uFF00-\uFF9F\uFFE0-\uFFEF]|\uD82C[\uDC00-\uDD6F]|\uD834[\uDF60-\uDF7F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD868][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]|\uD869[\uDF00-\uDFFF]|[\uD86A-\uD87A][\uDC00-\uDFFF]|\uD87B[\uDC00-\uDE5F]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD88C][\uDC00-\uDFFF]|\uD88D[\uDC00-\uDC7F]", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"[\u00D7\u2000-\u206F\u25A0-\u25FF\u2E80-\u2FDF\u2FF0-\u30FF\u3190-\u319F\u31C0-\u31FF\u3220-\u325F\u3280-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE10-\uFE1F\uFE30-\uFE4F\uFF00-\uFF9F\uFFE0-\uFFEF]|\uD82C[\uDC00-\uDD6F]|\uD834[\uDF60-\uDF7F]|\uD83C[\uDE00-\uDEFF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD868][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]|\uD869[\uDF00-\uDFFF]|[\uD86A-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD88C][\uDC00-\uDFFF]|\uD88D[\uDC00-\uDC7F]", RegexOptions.CultureInvariant)]
     private static partial Regex JapaneseRegex { get; }
 
     private static readonly FrozenDictionary<char, char> s_normalizationDict = new KeyValuePair<char, char>[]
@@ -777,7 +777,7 @@ public static partial class JapaneseUtils
     internal static bool IsKatakana(char character)
     {
         int codePoint = character;
-        return codePoint is (>= 0x30A0 and <= 0x31FF) or (>= 0xFF66 and <= 0xFF9D);
+        return codePoint is (>= 0x30A0 and <= 0x30FF) or (>= 0x31F0 and <= 0x31FF) or (>= 0xFF66 and <= 0xFF9D);
     }
 
     // Hiragana (3040–309F)
@@ -790,7 +790,7 @@ public static partial class JapaneseUtils
         for (int i = 0; i < textLength; i++)
         {
             int codePoint = text[i];
-            if (codePoint is (>= 0x3040 and <= 0x31FF) or (>= 0xFF66 and <= 0xFF9D))
+            if (codePoint is (>= 0x3040 and <= 0x30FF) or (>= 0x31F0 and <= 0x31FF) or (>= 0xFF66 and <= 0xFF9D))
             {
                 return true;
             }
