@@ -109,22 +109,35 @@ public static class DBUtils
         }
     }
 
-    private static int GetVersionFromDB(string readOnlyConnectionString)
+    internal static bool TryInspectDB(string readOnlyConnectionString, out bool recordsExist, out int version, out SqliteException? error)
     {
-        using SqliteConnection? connection = CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
-        Debug.Assert(connection is not null);
+        using SqliteConnection connection = new(readOnlyConnectionString);
 
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA user_version;";
+        try
+        {
+            connection.Open();
 
-        using SqliteDataReader reader = command.ExecuteReader();
-        _ = reader.Read();
-        return reader.GetInt32(0);
-    }
+            using SqliteCommand command = connection.CreateCommand();
+            command.CommandText =
+                """
+                SELECT user_version, EXISTS(SELECT 1 FROM record)
+                FROM pragma_user_version;
+                """;
 
-    internal static bool CheckIfDBSchemaIsOutOfDate(int version, string readonlyConnectionString)
-    {
-        return version != GetVersionFromDB(readonlyConnectionString);
+            using SqliteDataReader reader = command.ExecuteReader();
+            _ = reader.Read();
+            version = reader.GetInt32(0);
+            recordsExist = reader.GetBoolean(1);
+            error = null;
+            return true;
+        }
+        catch (SqliteException ex)
+        {
+            recordsExist = false;
+            version = 0;
+            error = ex;
+            return false;
+        }
     }
 
     public static void DeleteDB(string dbPath)
@@ -224,34 +237,6 @@ public static class DBUtils
             LoggerManager.Logger.Error(ex, "Failed to open DB connection in ReadWrite mode for path: {DBPath}", dbPath);
             connection.Dispose();
             return null;
-        }
-    }
-
-    internal static bool RecordExists(string readOnlyConnectionString)
-    {
-        using SqliteConnection? connection = CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionString);
-        Debug.Assert(connection is not null);
-
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText =
-            """
-            SELECT EXISTS
-            (
-                SELECT 1
-                FROM record
-            );
-            """;
-
-        try
-        {
-            using SqliteDataReader reader = command.ExecuteReader();
-            _ = reader.Read();
-            return reader.GetBoolean(0);
-        }
-        catch (SqliteException ex)
-        {
-            LoggerManager.Logger.Error(ex, "Failed to check if record exists in DB with connection string: {ReadOnlyConnectionString}", readOnlyConnectionString);
-            return false;
         }
     }
 
