@@ -1,9 +1,7 @@
 using System.Collections.Frozen;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using JL.Core.Japanese;
 using JL.Core.Utilities;
 using JL.Core.Utilities.Array;
 
@@ -44,30 +42,6 @@ internal static class JmdictWordClassBinarySerializer
                     {
                         _ = stringIds.TryAdd(reading, stringIds.Count);
                     }
-                }
-            }
-        }
-
-        // Expand each distinct source record once; reading buckets contain no additional records to process.
-        foreach (JmdictWordClass record in recordIds.Keys)
-        {
-            if (record.Readings is null)
-            {
-                continue;
-            }
-
-            foreach (string reading in record.Readings)
-            {
-                string key = JapaneseUtils.NormalizeText(reading).GetPooledString();
-                ref List<JmdictWordClass>? records = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
-                if (exists)
-                {
-                    Debug.Assert(records is not null);
-                    records.Add(record);
-                }
-                else
-                {
-                    records = [record];
                 }
             }
         }
