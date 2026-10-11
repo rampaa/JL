@@ -199,7 +199,7 @@ public sealed class GenerateFusejiVariantsOption(bool value)
 
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
-        [DictType.JMdict, DictType.JMnedict,
+        [DictType.JMdict,
         DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
         DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
         DictType.PitchAccentYomichan];
@@ -211,7 +211,7 @@ public sealed class MaxSearchKeyLengthForFusejiGenerationOption(int value)
 
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
-        [DictType.JMdict, DictType.JMnedict,
+        [DictType.JMdict,
         DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
         DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
         DictType.PitchAccentYomichan];
@@ -223,7 +223,7 @@ public sealed class MaxTotalFusejiCountOption(int value)
 
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
-        [DictType.JMdict, DictType.JMnedict,
+        [DictType.JMdict,
         DictType.NonspecificWordYomichan, DictType.NonspecificYomichan, DictType.NonspecificNameYomichan,
         DictType.NonspecificWordNazeka, DictType.NonspecificNazeka, DictType.NonspecificNameNazeka,
         DictType.PitchAccentYomichan];

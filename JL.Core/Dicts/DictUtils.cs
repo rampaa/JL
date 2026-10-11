@@ -196,10 +196,7 @@ public static class DictUtils
                     new UseDBOption(true),
                     new NoAllOption(false),
                     new NewlineBetweenDefinitionsOption(true),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
-                    generateFusejiVariants: new GenerateFusejiVariantsOption(false),
-                    maxSearchKeyLengthForFusejiGeneration: new MaxSearchKeyLengthForFusejiGenerationOption(9),
-                    maxTotalFusejiCount: new MaxTotalFusejiCountOption(1)),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)),
                 41,
                 autoUpdatable: true,
                 url: s_jmnedictUrl,
@@ -1213,9 +1210,6 @@ public static class DictUtils
 
             dict.Options.NewlineBetweenDefinitions ??= builtInJmnedictOptions.NewlineBetweenDefinitions;
             dict.Options.AutoUpdateAfterNDays ??= builtInJmnedictOptions.AutoUpdateAfterNDays;
-            dict.Options.GenerateFusejiVariants ??= builtInJmnedictOptions.GenerateFusejiVariants;
-            dict.Options.MaxSearchKeyLengthForFusejiGeneration ??= builtInJmnedictOptions.MaxSearchKeyLengthForFusejiGeneration;
-            dict.Options.MaxTotalFusejiCount ??= builtInJmnedictOptions.MaxTotalFusejiCount;
         }
         else if (dict.Type is DictType.CustomWordDictionary or DictType.ProfileCustomWordDictionary)
         {
