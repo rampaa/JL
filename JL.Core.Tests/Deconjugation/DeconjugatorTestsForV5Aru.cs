@@ -1345,7 +1345,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     [Test]
     public void Deconjugate_ClassicalNegativeFormNu_V5Aru()
     {
-        const string termToDeconjugate = "仰いぬ";
+        const string termToDeconjugate = "仰らぬ";
         const string expected = "～archaic negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "仰る", LastTag: "v5aru" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -1354,7 +1354,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     [Test]
     public void Deconjugate_ClassicalNegativeContinuativeFormZu_V5Aru()
     {
-        const string termToDeconjugate = "仰いず";
+        const string termToDeconjugate = "仰らず";
         const string expected = "～adverbial negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "仰る", LastTag: "v5aru" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -1363,7 +1363,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     [Test]
     public void Deconjugate_ClassicalAdverbialFormZuNi_V5Aru()
     {
-        const string termToDeconjugate = "仰いずに";
+        const string termToDeconjugate = "仰らずに";
         const string expected = "～without doing so";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "仰る", LastTag: "v5aru" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -1408,7 +1408,7 @@ internal sealed class DeconjugatorTestsForV5Aru
     [Test]
     public void Deconjugate_Zaru_V5Aru()
     {
-        const string termToDeconjugate = "仰いざる";
+        const string termToDeconjugate = "仰らざる";
         const string expected = "～archaic attributive negative";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "仰る", LastTag: "v5aru" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));

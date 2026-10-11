@@ -1982,7 +1982,7 @@ internal sealed class DeconjugatorTestsForV5RI
     [Test]
     public void Deconjugate_PlainNonPastKansaibenSubDialectNegative_V5RI()
     {
-        const string termToDeconjugate = "有らへん";
+        const string termToDeconjugate = "有らひん";
         const string expected = "～negative→ksb";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "有る", LastTag: "v5r-i" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
@@ -1991,7 +1991,7 @@ internal sealed class DeconjugatorTestsForV5RI
     [Test]
     public void Deconjugate_PlainPastKansaibenSubDialectNegative_V5RI()
     {
-        const string termToDeconjugate = "有らへんかった";
+        const string termToDeconjugate = "有らひんかった";
         const string expected = "～negative→ksb→past";
         string? actual = LookupResultUtils.DeconjugationProcessesToText(Deconjugator.Deconjugate(termToDeconjugate).Where(static form => form is { Text: "有る", LastTag: "v5r-i" }).Select(static form => form.Process).ToList().AsReadOnlySpan());
         Assert.That(actual, Is.EqualTo(expected));
