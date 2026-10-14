@@ -599,8 +599,7 @@ internal static class EpwingYomichanLoader
         bool nonKanjiDict, bool nonNameDict, ConcurrentDictionary<string, ImageInfo> imageInfoCache, out EpwingYomichanImportRecord record)
     {
         record = default;
-        if (!TryReadRecord(ref reader, json, dict, imageInfoCache, out string primarySpelling, out string? reading, out double popularityScore,
-            out string[]? definitions, out string[]? wordClasses, out string[]? definitionTags, out List<ImageInfo>? imageInfos))
+        if (!TryReadRecord(ref reader, json, dict, imageInfoCache, out string primarySpelling, out string? reading, out double popularityScore, out string[]? definitions, out string[]? wordClasses, out string[]? definitionTags, out List<ImageInfo>? imageInfos))
         {
             return false;
         }

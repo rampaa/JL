@@ -286,7 +286,7 @@ public static class DBUtils
         ValidateForeignKeys(connection);
 
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1; PRAGMA foreign_keys = ON; PRAGMA cache_size = -2000";
+        command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1; PRAGMA foreign_keys = ON; PRAGMA cache_size = -3000";
         _ = command.ExecuteNonQuery();
     }
 

@@ -540,7 +540,6 @@ internal static class EpwingYomichanDBManager
         try
         {
             using SqliteRecordReader reader = new(connection, GetQuery(validTermCount));
-
             if (validTermCount == terms.Length)
             {
                 for (int i = 0; i < terms.Length; i++)

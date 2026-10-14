@@ -16,8 +16,7 @@ internal sealed class TextInfo(List<string> textList,
     Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts,
     IDictionary<string, IList<IDictRecord>>? pitchAccentDict,
     int maxTextInHiraganaLength,
-    int maxDeconjugatedTextLength,
-    int maxTextWithoutLongVowelMarksLength
+    int maxWordSearchKeyLength
     ) : IEquatable<TextInfo>
 {
     public List<string> TextList { get; } = textList;
@@ -30,8 +29,7 @@ internal sealed class TextInfo(List<string> textList,
     public Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? FrequencyDicts { get; } = frequencyDicts;
     public IDictionary<string, IList<IDictRecord>>? PitchAccentDict { get; } = pitchAccentDict;
     public int MaxTextInHiraganaLength { get; } = maxTextInHiraganaLength;
-    public int MaxDeconjugatedTextLength { get; } = maxDeconjugatedTextLength;
-    public int MaxTextWithoutLongVowelMarksLength { get; } = maxTextWithoutLongVowelMarksLength;
+    public int MaxWordSearchKeyLength { get; } = maxWordSearchKeyLength;
 
     public bool Equals([NotNullWhen(true)] TextInfo? other)
     {
