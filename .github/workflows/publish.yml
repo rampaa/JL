@@ -120,18 +120,20 @@ jobs:
             /DSQLITE_DEFAULT_MEMSTATUS=0 \
             /DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 \
             /DSQLITE_DEFAULT_SYNCHRONOUS=2 \
-            /DSQLITE_DEFAULT_MMAP_SIZE=${SQLITE_DEFAULT_MMAP_SIZE} \
-            /DSQLITE_DEFAULT_LOOKASIDE=1300,200 \
             /DSQLITE_DQS=0 \
             /DSQLITE_LIKE_DOESNT_MATCH_BLOB \
             /DHAVE_ISNAN \
             /DHAVE_LOCALTIME_S \
+            /DSQLITE_THREADSAFE=2 \
             /DSQLITE_POWERSAFE_OVERWRITE=1 \
             /DSQLITE_USE_ALLOCA \
             /DSQLITE_TEMP_STORE=2 \
+            /DSQLITE_DEFAULT_PCACHE_INITSZ=0 ^
+            /DSQLITE_DEFAULT_CACHE_SIZE=-3000 ^
+            /DSQLITE_DEFAULT_MMAP_SIZE=${SQLITE_DEFAULT_MMAP_SIZE} \
             /DSQLITE_WIN32_MALLOC \
-            /DSQLITE_WIN32_HEAP_CREATE \
-            /DSQLITE_THREADSAFE=2 \
+            /DSQLITE_WIN32_HEAP_CREATE=0 \
+            /DSQLITE_DEFAULT_LOOKASIDE=400,400 \
             ../sqlite-src/sqlite3.c \
             /link /LTCG /OPT:REF /OPT:ICF /OUT:e_sqlite3.dll
           cd ..
