@@ -58,7 +58,7 @@ internal static class Deconjugator
         }
 
         string newText = string.Concat(stem, rule.DecEnd);
-        newFormsToProcess.Add(new Form(newText, form.OriginalText, rule.DecTag, new ProcessNode(rule.Detail, form.Process)));
+        newFormsToProcess.Add(new Form(newText, rule.DecTag, new ProcessNode(rule.Detail, form.Process)));
     }
 
     private static void ApplyBucket(in Form form, in RuleBucket bucket, PooledList<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
@@ -107,7 +107,7 @@ internal static class Deconjugator
         List<Form> processedForms = new(4);
         PooledList<Form> newFormsToProcess = new(64);
         PooledList<Form> formsToProcess = new(64);
-        formsToProcess.Add(new Form(text, text, "", null));
+        formsToProcess.Add(new Form(text, "", null));
 
         FrozenDictionary<char, RuleBucket> ruleBucketsByLastDecEndChar = RuleBucketsByLastDecEndChar;
         FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
