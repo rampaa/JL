@@ -45,6 +45,7 @@ public static class ConfigDBManager
 
     private const string InsertedNewProfilesOnceV4SettingName = "InsertedNewProfilesOnceV4";
     private const string ChangedDefaultValueOfTsukikageOnceV4SettingName = "ChangedDefaultValueOfTsukikageOnceV4";
+    private const string JLVersionOfLastDatabaseOptimizationSettingName = "JLVersionOfLastDatabaseOptimization";
 
     private static readonly string s_configsPath = Path.Join(AppInfo.ConfigPath, "Configs.sqlite");
     private static readonly string s_configsReadOnlyConnectionString = DBUtils.GetReadOnlyConnectionString(s_configsPath);
@@ -500,14 +501,40 @@ public static class ConfigDBManager
         DBUtils.SendOptimizePragma(s_configsPath);
     }
 
-    public static void AnalyzeAndVacuum(SqliteConnection connection)
+    public static void AnalyzeAndVacuum(SqliteConnection connection, Version jlVersion)
     {
-        using SqliteCommand analyzeCommand = connection.CreateCommand();
-        analyzeCommand.CommandText = "ANALYZE;";
-        _ = analyzeCommand.ExecuteNonQuery();
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            SELECT {Value}
+            FROM {Setting}
+            WHERE {ProfileId} = @{ProfileId} AND {Name} = @{Name};
+            """;
 
-        using SqliteCommand vacuumCommand = connection.CreateCommand();
-        vacuumCommand.CommandText = "VACUUM;";
-        _ = vacuumCommand.ExecuteNonQuery();
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", ProfileUtils.GlobalProfileId);
+        _ = command.Parameters.AddWithValue($"@{Name}", JLVersionOfLastDatabaseOptimizationSettingName);
+
+        string version = jlVersion.ToString();
+        using (SqliteDataReader reader = command.ExecuteReader())
+        {
+            if (reader.Read() && reader.GetString(0) == version)
+            {
+                return;
+            }
+        }
+
+        command.CommandText =
+            $"""
+            ANALYZE;
+            VACUUM;
+
+            INSERT INTO {Setting} ({ProfileId}, {Name}, {Value})
+            VALUES (@{ProfileId}, @{Name}, @{Value})
+            ON CONFLICT ({ProfileId}, {Name})
+            DO UPDATE SET {Value} = excluded.{Value};
+            """;
+
+        _ = command.Parameters.AddWithValue($"@{Value}", version);
+        _ = command.ExecuteNonQuery();
     }
 }

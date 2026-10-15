@@ -917,6 +917,7 @@ internal sealed partial class MainWindow : IDisposable
             StatsUtils.UpdateTimeStats(restartStopWatch: false);
             StatsDBUtils.UpdateLifetimeStats(connection);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);
+            ConfigDBManager.AnalyzeAndVacuum(connection, WindowsUtils.JLVersion);
         }
 
         BacklogUtils.StopBacklogTimer();

@@ -427,8 +427,6 @@ internal sealed class ConfigManager
         Instance = newInstance;
         CoreConfigManager.CreateNewCoreConfigManager();
         Instance.ApplyPreferences(connection, ConfigDBManager.GetAllConfigs(connection));
-
-        ConfigDBManager.AnalyzeAndVacuum(connection);
     }
 
     public void ApplyPreferences(SqliteConnection connection, Dictionary<string, string> configs)
@@ -2070,8 +2068,6 @@ internal sealed class ConfigManager
         ConfigDBManager.UpdateSetting(connection, MainWindowLeftPositionSettingName, mainWindowLeftPosition.ToString(CultureInfo.InvariantCulture));
 
         transaction.Commit();
-
-        ConfigDBManager.AnalyzeAndVacuum(connection);
     }
 
     public static void InsertSettingsForMpvProfile(SqliteConnection connection, int mpvProfileId)
