@@ -985,7 +985,7 @@ internal sealed partial class PreferencesWindow
         // ReSharper disable once UseAwaitUsing
         using (SqliteConnection preferencesConnection = ConfigDBManager.CreateReadWriteDBConnection())
         {
-            configManager.ApplyPreferences(preferencesConnection);
+            configManager.ApplyPreferences(preferencesConnection, ConfigDBManager.GetAllConfigs(preferencesConnection));
         }
         if (previousAnkiUri != coreConfigManager.AnkiConnectUri || previousAnkiApiKey != coreConfigManager.AnkiConnectApiKey)
         {

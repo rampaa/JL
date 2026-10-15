@@ -264,6 +264,16 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
+    public static SqliteCommand CreateUpdateSettingCommand(SqliteConnection connection, int? profileId = null)
+    {
+        SqliteCommand command = connection.CreateCommand();
+        command.CommandText = UpdateSettingQuery;
+        _ = command.Parameters.AddWithValue($"@{ProfileId}", profileId ?? ProfileUtils.CurrentProfileId);
+        _ = command.Parameters.Add($"@{Name}", SqliteType.Text);
+        _ = command.Parameters.Add($"@{Value}", SqliteType.Text);
+        return command;
+    }
+
     public static void UpdateSetting(SqliteConnection connection, string settingName, string? value, int? profileId = null)
     {
         Debug.Assert(value is not null);
@@ -274,6 +284,32 @@ public static class ConfigDBManager
         _ = command.Parameters.AddWithValue($"@{Name}", settingName);
         _ = command.Parameters.AddWithValue($"@{Value}", value);
         _ = command.ExecuteNonQuery();
+    }
+
+    public static void UpdateSetting(SqliteCommand command, string settingName, string? value)
+    {
+        Debug.Assert(value is not null);
+
+        command.Parameters[1].Value = settingName;
+        command.Parameters[2].Value = value;
+        _ = command.ExecuteNonQuery();
+    }
+
+    public static void UpdateSetting(SqliteCommand command, Dictionary<string, string> configs, string settingName, string? value)
+    {
+        Debug.Assert(value is not null);
+
+        bool settingExists = configs.TryGetValue(settingName, out string? currentValue);
+        if (settingExists && currentValue == value)
+        {
+            return;
+        }
+
+        UpdateSetting(command, settingName, value);
+        if (settingExists)
+        {
+            configs[settingName] = value;
+        }
     }
 
     public static void DeleteAllSettingsFromProfile(SqliteConnection connection, params ReadOnlySpan<string> excludedSettings)

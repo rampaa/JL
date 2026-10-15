@@ -32,20 +32,27 @@ internal static class ConfigUtils
 
     public static Brush GetFrozenBrushFromConfig(SqliteConnection connection, Dictionary<string, string> configs, Brush solidColorBrush, string configKey)
     {
-        if (configs.TryGetValue(configKey, out string? configValue))
-        {
-            return WindowsUtils.FrozenBrushFromHex(configValue);
-        }
-
-        ConfigDBManager.InsertSetting(connection, configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));
-        return solidColorBrush;
+        return GetFrozenBrushFromConfig(connection, configs, solidColorBrush, 1, configKey);
     }
 
     public static Brush GetFrozenBrushFromConfig(SqliteConnection connection, Dictionary<string, string> configs, Brush solidColorBrush, double brushOpacity, string configKey)
     {
         if (configs.TryGetValue(configKey, out string? configValue))
         {
-            return WindowsUtils.FrozenBrushFromHex(configValue, brushOpacity);
+            Color color = WindowsUtils.ColorFromHex(configValue);
+            if (solidColorBrush is SolidColorBrush { IsFrozen: true } currentBrush
+                && currentBrush.Color == color && currentBrush.Opacity == brushOpacity)
+            {
+                return currentBrush;
+            }
+
+            SolidColorBrush brush = new(color)
+            {
+                Opacity = brushOpacity
+            };
+
+            brush.Freeze();
+            return brush;
         }
 
         ConfigDBManager.InsertSetting(connection, configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));

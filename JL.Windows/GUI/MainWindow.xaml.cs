@@ -132,7 +132,7 @@ internal sealed partial class MainWindow : IDisposable
         // ReSharper disable once UseAwaitUsing
         using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
         {
-            configManager.ApplyPreferences(connection);
+            configManager.ApplyPreferences(connection, ConfigDBManager.GetAllConfigs(connection));
         }
 
         RegexReplacerUtils.PopulateRegexReplacements();

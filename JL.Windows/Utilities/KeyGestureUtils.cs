@@ -224,19 +224,23 @@ internal static class KeyGestureUtils
 
     public static void SetInputGestureText(this MenuItem menuItem, KeyGesture keyGesture)
     {
-        string formattedString = keyGesture.ToFormattedString();
+        menuItem.InputGestureText = keyGesture.ToInputGestureText();
+    }
 
-        menuItem.InputGestureText = formattedString is not "None"
+    public static string ToInputGestureText(this KeyGesture keyGesture)
+    {
+        string formattedString = keyGesture.ToFormattedString();
+        return formattedString is not "None"
             ? formattedString
             : "";
     }
 
-    public static void UpdateKeyGesture(SqliteConnection connection, string key, string rawKeyGesture)
+    public static void UpdateKeyGesture(SqliteCommand command, Dictionary<string, string> configs, string key, string rawKeyGesture)
     {
         string value = rawKeyGesture.AsSpan().StartsWith("Win+", StringComparison.Ordinal)
             ? rawKeyGesture[4..]
             : rawKeyGesture;
 
-        ConfigDBManager.UpdateSetting(connection, key, value);
+        ConfigDBManager.UpdateSetting(command, configs, key, value);
     }
 }
