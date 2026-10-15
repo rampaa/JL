@@ -175,7 +175,6 @@ internal sealed partial class EditFrequencyWindow
         {
             if (dbExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
                 string newDBPath = DBUtils.GetDBPathForFreqDict(name);
                 DBUtils.ClearPools(dbPath);
                 DBUtils.ClearPools(newDBPath);
@@ -191,7 +190,13 @@ internal sealed partial class EditFrequencyWindow
             }
 
             _ = FreqUtils.FreqDicts.Remove(_freq.Name);
-            FreqUtils.FreqDicts.Add(name, new Freq(_freq.Type, name, _freq.Path, _freq.Active, _freq.Priority, _freq.Size, _freq.MaxValue, _freq.Options, _freq.AutoUpdatable, _freq.Url, _freq.Revision));
+            Freq renamedFreq = new(_freq.Type, name, _freq.Path, _freq.Active, _freq.Priority, _freq.Size, _freq.MaxValue, _freq.Options, _freq.AutoUpdatable, _freq.Url, _freq.Revision)
+            {
+                Ready = _freq.Ready,
+                Contents = _freq.Contents
+            };
+
+            FreqUtils.FreqDicts.Add(name, renamedFreq);
         }
 
         Close();

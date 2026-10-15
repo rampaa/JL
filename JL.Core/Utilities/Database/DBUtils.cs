@@ -143,7 +143,6 @@ public static class DBUtils
 
     public static void DeleteDB(string dbPath)
     {
-        SendOptimizePragmaToAllDBs();
         ClearPools(dbPath);
         File.Delete(dbPath);
     }

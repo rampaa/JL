@@ -228,7 +228,6 @@ internal sealed partial class EditDictionaryWindow
         {
             if (dbExists)
             {
-                DBUtils.SendOptimizePragmaToAllDBs();
                 string newDBPath = DBUtils.GetDBPathForDict(name);
                 DBUtils.ClearPools(dbPath);
                 DBUtils.ClearPools(newDBPath);
