@@ -20,6 +20,8 @@ internal static partial class WinApi
     {
         // ReSharper disable InconsistentNaming
 
+        internal const uint SRCCOPY = 0x00CC0020;
+        internal const uint DIB_RGB_COLORS = 0;
         internal const int GWL_EXSTYLE = -20;
         internal const nint WS_EX_NOREDIRECTIONBITMAP = 0x00200000;
         internal const nint WS_EX_COMPOSITED = 0x02000000;
@@ -51,6 +53,46 @@ internal static partial class WinApi
             Disallow = 2
         }
         // ReSharper restore UnusedMember.Global
+
+        [LibraryImport("user32.dll", EntryPoint = "GetDC")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial nint GetDC(nint hWnd);
+
+        [LibraryImport("user32.dll", EntryPoint = "ReleaseDC")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int ReleaseDC(nint hWnd, nint hDC);
+
+        [LibraryImport("gdi32.dll", EntryPoint = "CreateCompatibleDC")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial nint CreateCompatibleDC(nint hDC);
+
+        [LibraryImport("gdi32.dll", EntryPoint = "CreateDIBSection")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial nint CreateDIBSection(nint hDC, in BitmapInfoHeader bitmapInfo, uint usage, out nint bits, nint section, uint offset);
+
+        [LibraryImport("gdi32.dll", EntryPoint = "SelectObject")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial nint SelectObject(nint hDC, nint hObject);
+
+        [LibraryImport("gdi32.dll", EntryPoint = "DeleteObject")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool DeleteObject(nint hObject);
+
+        [LibraryImport("gdi32.dll", EntryPoint = "DeleteDC")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool DeleteDC(nint hDC);
+
+        [LibraryImport("gdi32.dll", EntryPoint = "BitBlt")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool BitBlt(nint destination, int x, int y, int width, int height, nint source, int sourceX, int sourceY, uint operation);
+
+        [LibraryImport("gdi32.dll", EntryPoint = "GdiFlush")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool GdiFlush();
 
         [LibraryImport("user32.dll", EntryPoint = "AddClipboardFormatListener", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
