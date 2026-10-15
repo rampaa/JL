@@ -1055,7 +1055,7 @@ public static class MiningUtils
         string[] expressions = lookupResult.Readings ?? [lookupResult.PrimarySpelling];
 
         // File mining excludes graphical pitch fields.
-        bool addPitchAccents = mineAllFields
+        bool addPitchAccents = !mineAllFields
                                // ReSharper disable once NullableWarningSuppressionIsUsed
                                && jlFields!.Contains(JLField.PitchAccents);
 
@@ -1146,7 +1146,7 @@ public static class MiningUtils
         }
 
         string firstExpression = expressions[selectedSpellingIndex];
-        if (mineAllFields)
+        if (!mineAllFields)
         {
             Debug.Assert(jlFields is not null);
             if (jlFields.Contains(JLField.PitchAccentForFirstReading))
@@ -1547,21 +1547,28 @@ public static class MiningUtils
     private static StringBuilder GetExpressionWithPitchAccent(ReadOnlySpan<char> expression, StringBuilder expressionWithPitchAccentStringBuilder, byte position)
     {
         bool lowPitch = false;
-        ReadOnlySpan<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expression);
-        for (int i = 0; i < combinedFormList.Length; i++)
+        int moraIndex = 0;
+        for (int charIndex = 0; charIndex < expression.Length; ++moraIndex)
         {
-            if (i == position - 1)
+            int moraLength = charIndex + 1 < expression.Length && JapaneseUtils.SmallCombiningKanaSet.Contains(expression[charIndex + 1])
+                ? 2
+                : 1;
+
+            ReadOnlySpan<char> mora = expression.Slice(charIndex, moraLength);
+            charIndex += moraLength;
+
+            if (moraIndex == position - 1)
             {
-                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-top-right\">{combinedFormList[i]}</span>");
+                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-top-right\">{mora}</span>");
                 lowPitch = true;
             }
-            else if (i is 0)
+            else if (moraIndex is 0)
             {
-                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-bottom-right\">{combinedFormList[i]}</span>");
+                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-bottom-right\">{mora}</span>");
             }
             else
             {
-                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-{(lowPitch ? "bottom" : "top")}\">{combinedFormList[i]}</span>");
+                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-{(lowPitch ? "bottom" : "top")}\">{mora}</span>");
             }
         }
 
