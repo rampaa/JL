@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using JL.Core.Config;
 using JL.Core.Frontend;
@@ -83,10 +84,27 @@ internal sealed class WebSocketConnection : IDisposable
     {
         return Task.Run(async () =>
         {
+            long lastConnectionAttemptTimestamp = 0;
             do
             {
                 try
                 {
+                    if (lastConnectionAttemptTimestamp is not 0)
+                    {
+                        TimeSpan retryDelay = TimeSpan.FromMilliseconds(250) - Stopwatch.GetElapsedTime(lastConnectionAttemptTimestamp);
+                        if (retryDelay > TimeSpan.Zero)
+                        {
+                            await Task.Delay(retryDelay, cancellationToken).ConfigureAwait(false);
+                            if (tsukikage
+                                ? !CoreConfigManager.Instance.AutoReconnectToTsukikageWebSocket
+                                : !CoreConfigManager.Instance.AutoReconnectToWebSocket)
+                            {
+                                return;
+                            }
+                        }
+                    }
+
+                    lastConnectionAttemptTimestamp = Stopwatch.GetTimestamp();
                     using ClientWebSocket webSocketClient = new();
                     await webSocketClient.ConnectAsync(_webSocketUri, cancellationToken).ConfigureAwait(false);
                     _webSocketClient = webSocketClient;
