@@ -2,7 +2,7 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal sealed class JmnedictImportEntryBatch
 {
-    public const int MaxEntriesPerBatch = 256;
+    public const int MaxEntriesPerBatch = 1024;
 
     public int EntryCount { get; set; }
     public int[] EntryIds { get; } = new int[MaxEntriesPerBatch];
