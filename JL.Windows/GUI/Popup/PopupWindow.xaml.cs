@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
@@ -2017,7 +2018,7 @@ internal sealed partial class PopupWindow : IDisposable
                     : LastLookupResults[_listViewItemIndex].PrimarySpelling;
             }
 
-            return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text);
+            return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, AudioUtils.StartAudioRequest());
         }
 
         return Task.CompletedTask;

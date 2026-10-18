@@ -74,48 +74,60 @@ internal static class SpeechSynthesisUtils
         }
     }
 
-    public static async Task TextToSpeech(string voiceName, string text)
+    public static async Task TextToSpeech(string voiceName, string text, long requestId)
     {
-        if (WindowsAudioUtils.IsPlaying())
-        {
-            await WindowsAudioUtils.PausePlaying().ConfigureAwait(false);
-        }
-
-        SpeechSynthesizer synthesizer = s_synthesizer.Value;
-        if (synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
-        {
-            s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
-            return;
-        }
-
-        s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
-
-        synthesizer.SpeakAsyncCancelAll();
-
+        await WindowsAudioUtils.AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
         try
         {
-            synthesizer.SelectVoice(voiceName);
-        }
-        catch (ArgumentException ex)
-        {
-            LoggerManager.Logger.Error(ex, "Failed to select voice {VoiceName}", voiceName);
-            NotificationManager.Notify(NotificationLevel.Error, $"{voiceName} is not available on your system. Deactivating it.");
-
-            // Run on the UI thread so disabling this voice and reading AudioSources cannot overlap with edits in the settings window.
-            await Application.Current.Dispatcher.InvokeAsync(() =>
+            if (!AudioUtils.IsCurrentAudioRequest(requestId))
             {
-                if (AudioUtils.AudioSources.TryGetValue(voiceName, out AudioSource? audioSource))
+                return;
+            }
+
+            WindowsAudioUtils.DisposeCurrentMedia();
+
+            SpeechSynthesizer synthesizer = s_synthesizer.Value;
+            if (synthesizer.State is SynthesizerState.Speaking && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
+            {
+                s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
+                return;
+            }
+
+            s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
+            synthesizer.SpeakAsyncCancelAll();
+
+            try
+            {
+                synthesizer.SelectVoice(voiceName);
+            }
+            catch (ArgumentException ex)
+            {
+                LoggerManager.Logger.Error(ex, "Failed to select voice {VoiceName}", voiceName);
+                NotificationManager.Notify(NotificationLevel.Error, $"{voiceName} is not available on your system. Deactivating it.");
+
+                // Run on the UI thread so disabling this voice and reading AudioSources cannot overlap with edits in the settings window.
+                await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    audioSource.Active = false;
-                    AudioUtils.UpdateActiveAudioSources();
-                    SetInstalledVoiceWithHighestPriority();
-                }
-            }).Task.ConfigureAwait(false);
+                    if (AudioUtils.AudioSources.TryGetValue(voiceName, out AudioSource? audioSource))
+                    {
+                        audioSource.Active = false;
+                        AudioUtils.UpdateActiveAudioSources();
+                        SetInstalledVoiceWithHighestPriority();
+                    }
+                }).Task.ConfigureAwait(false);
 
-            return;
+                return;
+            }
+
+            if (AudioUtils.IsCurrentAudioRequest(requestId))
+            {
+                _ = synthesizer.SpeakAsync(text);
+            }
         }
-
-        _ = synthesizer.SpeakAsync(text);
+        finally
+        {
+            _ = WindowsAudioUtils.AudioPlayerSemaphoreSlim.Release();
+        }
     }
 
     public static byte[]? GetAudioResponseFromTextToSpeech(string text)
@@ -126,13 +138,15 @@ internal static class SpeechSynthesisUtils
             return null;
         }
 
-        SpeechSynthesizer streamSynthesizer = s_streamSynthesizer.Value;
-        streamSynthesizer.SpeakAsyncCancelAll();
-        streamSynthesizer.SelectVoice(voiceName);
-        using MemoryStream audioDataStream = new();
-        streamSynthesizer.SetOutputToWaveStream(audioDataStream);
-        streamSynthesizer.Speak(text);
-        return audioDataStream.ToArray();
+        lock (s_streamSynthesizer)
+        {
+            SpeechSynthesizer streamSynthesizer = s_streamSynthesizer.Value;
+            streamSynthesizer.SelectVoice(voiceName);
+            using MemoryStream audioDataStream = new();
+            streamSynthesizer.SetOutputToWaveStream(audioDataStream);
+            streamSynthesizer.Speak(text);
+            return audioDataStream.ToArray();
+        }
     }
 
     public static void SetInstalledVoiceWithHighestPriority()

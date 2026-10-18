@@ -10,6 +10,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using HandyControl.Tools;
+using JL.Core.Audio;
 using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.External;
@@ -549,10 +550,9 @@ internal sealed partial class MainWindow : IDisposable
             }
         }
 
-        if (configManager.TextToSpeechOnTextChange
-            && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
+        if (configManager.TextToSpeechOnTextChange && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
         {
-            SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, sanitizedNewText).SafeFireAndForget("TextToSpeech failed");
+            SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, sanitizedNewText, AudioUtils.StartAudioRequest()).SafeFireAndForget("TextToSpeech failed");
         }
 
         Debug.Assert(MainTextBox.Text.Length > 0);
@@ -1392,7 +1392,7 @@ internal sealed partial class MainWindow : IDisposable
 
             if (selectedText.Length > 0)
             {
-                return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText);
+                return SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText, AudioUtils.StartAudioRequest());
             }
         }
         return Task.CompletedTask;

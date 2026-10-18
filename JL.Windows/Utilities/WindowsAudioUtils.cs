@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using JL.Core;
+using JL.Core.Audio;
 using JL.Core.Frontend;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -25,16 +26,36 @@ internal static class WindowsAudioUtils
         set => Volatile.Write(ref s_audioPlayer, value);
     }
 
-    private static readonly SemaphoreSlim s_audioPlayerSemaphoreSlim = new(1, 1);
+    public static readonly SemaphoreSlim AudioPlayerSemaphoreSlim = new(1, 1);
 
     private static long s_lastAudioPlayTimestamp;
 
-    public static async Task PlayAudio(byte[] audio, string audioFormat)
+    public static async Task StopAudio(long requestId)
     {
-        await s_audioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+        await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
         try
         {
-            DisposeCurrentMedia();
+            if (AudioUtils.IsCurrentAudioRequest(requestId))
+            {
+                SpeechSynthesisUtils.StopTextToSpeech();
+                DisposeCurrentMedia();
+            }
+        }
+        finally
+        {
+            _ = AudioPlayerSemaphoreSlim.Release();
+        }
+    }
+
+    public static async Task<bool> PlayAudio(byte[] audio, string audioFormat, long requestId)
+    {
+        await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (!AudioUtils.IsCurrentAudioRequest(requestId))
+            {
+                return false;
+            }
 
             try
             {
@@ -54,7 +75,13 @@ internal static class WindowsAudioUtils
                 DisposeCurrentMedia();
                 LoggerManager.Logger.Error(ex, "Error decoding audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
                 NotificationManager.Notify(NotificationLevel.Error, "Error playing audio. Check the logs for more details.");
-                return;
+                return false;
+            }
+
+            if (!AudioUtils.IsCurrentAudioRequest(requestId))
+            {
+                DisposeCurrentMedia();
+                return false;
             }
 
             MediaPlayer mediaPlayer = new();
@@ -70,22 +97,24 @@ internal static class WindowsAudioUtils
 
             mediaPlayer.Source = s_mediaSource;
             mediaPlayer.Play();
+            return true;
         }
         catch (Exception ex)
         {
             DisposeCurrentMedia();
             LoggerManager.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio, JsonOptions.DefaultJso), audioFormat);
             NotificationManager.Notify(NotificationLevel.Error, "Error playing audio. Check the logs for more details.");
+            return false;
         }
         finally
         {
-            _ = s_audioPlayerSemaphoreSlim.Release();
+            _ = AudioPlayerSemaphoreSlim.Release();
         }
     }
 
     private static async Task DisposeMedia(MediaPlayer player, MediaPlayerFailedEventArgs? args)
     {
-        await s_audioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+        await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
         try
         {
             if (s_audioPlayer != player)
@@ -112,11 +141,12 @@ internal static class WindowsAudioUtils
         }
         finally
         {
-            _ = s_audioPlayerSemaphoreSlim.Release();
+            _ = AudioPlayerSemaphoreSlim.Release();
         }
     }
 
-    private static void DisposeCurrentMedia()
+    // The caller holds AudioPlayerSemaphoreSlim.
+    public static void DisposeCurrentMedia()
     {
         MediaPlayer? player = s_audioPlayer;
         AudioPlayer = null;
@@ -170,8 +200,15 @@ internal static class WindowsAudioUtils
         }
 
         s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
+        long requestId = AudioUtils.StartAudioRequest();
         try
         {
+            await StopAudio(requestId).ConfigureAwait(false);
+            if (!AudioUtils.IsCurrentAudioRequest(requestId))
+            {
+                return;
+            }
+
             string[] filePaths = Directory.GetFiles(Path.Join(AppInfo.ResourcesPath, "Motivation"));
             if (filePaths.Length is 0)
             {
@@ -186,13 +223,11 @@ internal static class WindowsAudioUtils
 
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
 
-            await Task.Run(async () =>
+            if (AudioUtils.IsCurrentAudioRequest(requestId)
+                && await Task.Run(() => PlayAudio(audioData, "mp3", requestId)).ConfigureAwait(false))
             {
-                SpeechSynthesisUtils.StopTextToSpeech();
-                await PlayAudio(audioData, "mp3").ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            StatsUtils.IncrementStat(StatType.Imoutos);
+                StatsUtils.IncrementStat(StatType.Imoutos);
+            }
         }
         catch (Exception ex)
         {
@@ -216,23 +251,6 @@ internal static class WindowsAudioUtils
         catch
         {
             return false;
-        }
-    }
-
-    public static async Task PausePlaying()
-    {
-        await s_audioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
-        try
-        {
-            s_audioPlayer?.Pause();
-        }
-        catch (Exception ex)
-        {
-            LoggerManager.Logger.Error(ex, "Error while pausing audio player");
-        }
-        finally
-        {
-            _ = s_audioPlayerSemaphoreSlim.Release();
         }
     }
 }

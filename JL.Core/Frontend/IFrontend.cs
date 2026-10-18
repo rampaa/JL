@@ -5,7 +5,7 @@ namespace JL.Core.Frontend;
 
 public interface IFrontend
 {
-    public Task PlayAudio(byte[] audio, string audioFormat);
+    public Task<bool> PlayAudio(byte[] audio, string audioFormat, long requestId);
 
     public void Notify(NotificationLevel notificationLevel, string message);
 
@@ -21,9 +21,9 @@ public interface IFrontend
 
     public byte[]? GetMonitorScreenshotAsByteArray();
 
-    public Task TextToSpeech(string voiceName, string text);
+    public Task TextToSpeech(string voiceName, string text, long requestId);
 
-    public void StopTextToSpeech();
+    public Task StopAudio(long requestId);
 
     public byte[]? GetAudioResponseFromTextToSpeech(string text);
 

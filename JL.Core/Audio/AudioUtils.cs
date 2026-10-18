@@ -18,6 +18,7 @@ public static class AudioUtils
     public static readonly OrderedDictionary<string, AudioSource> AudioSources = new(StringComparer.Ordinal);
 
     private static KeyValuePair<string, AudioSourceType>[] s_activeAudioSources = [];
+    private static long s_audioRequestId;
 
     private static readonly OrderedDictionary<string, AudioSource> s_builtInAudioSources = new(1, StringComparer.Ordinal)
     {
@@ -35,6 +36,10 @@ public static class AudioUtils
         new("vorbis-config", "ogg"),
         new("x-midi", "midi")
     }.ToFrozenDictionary(StringComparer.Ordinal);
+
+    public static long StartAudioRequest() => Interlocked.Increment(ref s_audioRequestId);
+
+    public static bool IsCurrentAudioRequest(long requestId) => requestId == Volatile.Read(ref s_audioRequestId);
 
     private static async ValueTask<AudioResponse?> GetAudioFromUrl(Uri url)
     {
@@ -128,11 +133,16 @@ public static class AudioUtils
         return null;
     }
 
-    internal static async ValueTask<AudioResponse?> GetPrioritizedAudio(string spelling, string reading)
+    internal static async ValueTask<AudioResponse?> GetPrioritizedAudio(string spelling, string reading, long requestId)
     {
         AudioResponse? audioResponse = null;
         foreach ((string uri, AudioSourceType audioSourceType) in Volatile.Read(ref s_activeAudioSources))
         {
+            if (requestId is not -1 && !IsCurrentAudioRequest(requestId))
+            {
+                return null;
+            }
+
             switch (audioSourceType)
             {
                 case AudioSourceType.Url:
@@ -166,7 +176,10 @@ public static class AudioUtils
                 }
 
                 case AudioSourceType.TextToSpeech:
-                    await FrontendManager.Frontend.TextToSpeech(uri, reading).ConfigureAwait(false);
+                    if (requestId is not -1)
+                    {
+                        await FrontendManager.Frontend.TextToSpeech(uri, reading, requestId).ConfigureAwait(false);
+                    }
                     return s_textToSpeechAudioResponse;
 
                 default:
@@ -185,14 +198,17 @@ public static class AudioUtils
 
     public static async Task GetAndPlayAudio(string foundSpelling, string? reading)
     {
+        long requestId = StartAudioRequest();
+        await FrontendManager.Frontend.StopAudio(requestId).ConfigureAwait(false);
         reading ??= foundSpelling;
 
-        AudioResponse? audioResponse = await GetPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
-        if (audioResponse?.AudioData is not null)
+        AudioResponse? audioResponse = await GetPrioritizedAudio(foundSpelling, reading, requestId).ConfigureAwait(false);
+        if (audioResponse?.AudioData is not null && IsCurrentAudioRequest(requestId))
         {
-            FrontendManager.Frontend.StopTextToSpeech();
-            await FrontendManager.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat).ConfigureAwait(false);
-            StatsUtils.IncrementStat(StatType.TimesPlayedAudio);
+            if (await FrontendManager.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat, requestId).ConfigureAwait(false))
+            {
+                StatsUtils.IncrementStat(StatType.TimesPlayedAudio);
+            }
         }
     }
 

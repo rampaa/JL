@@ -373,7 +373,7 @@ public static class AnkiConnectUtils
 
         bool needsAudio = audioFields.Count > 0;
         AudioResponse? audioResponse = needsAudio
-            ? await AudioUtils.GetPrioritizedAudio(lookupResult.PrimarySpelling, selectedReading).ConfigureAwait(false)
+            ? await AudioUtils.GetPrioritizedAudio(lookupResult.PrimarySpelling, selectedReading, -1).ConfigureAwait(false)
             : null;
 
         byte[]? audioData = audioResponse?.AudioData;

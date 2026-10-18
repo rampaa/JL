@@ -5,7 +5,7 @@ namespace JL.Core.Frontend;
 
 internal sealed class DummyFrontend : IFrontend
 {
-    public Task PlayAudio(byte[] audio, string audioFormat) => Task.CompletedTask;
+    public Task StopAudio(long requestId) => Task.CompletedTask;
 
     public void Notify(NotificationLevel notificationLevel, string message)
     {
@@ -21,11 +21,9 @@ internal sealed class DummyFrontend : IFrontend
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray() => Task.FromResult<byte[]?>(null);
 
-    public Task TextToSpeech(string voiceName, string text) => Task.CompletedTask;
+    public Task TextToSpeech(string voiceName, string text, long requestId) => Task.CompletedTask;
 
-    public void StopTextToSpeech()
-    {
-    }
+    public Task<bool> PlayAudio(byte[] audio, string audioFormat, long requestId) => Task.FromResult(false);
 
     public byte[]? GetAudioResponseFromTextToSpeech(string text) => null;
 

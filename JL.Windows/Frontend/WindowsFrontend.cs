@@ -19,7 +19,7 @@ internal sealed class WindowsFrontend : IFrontend
         _mainWindow = mainWindow;
     }
 
-    public Task PlayAudio(byte[] audio, string audioFormat) => WindowsAudioUtils.PlayAudio(audio, audioFormat);
+    public Task<bool> PlayAudio(byte[] audio, string audioFormat, long requestId) => WindowsAudioUtils.PlayAudio(audio, audioFormat, requestId);
 
     public void Notify(NotificationLevel notificationLevel, string message) => NotificationManager.Notify(notificationLevel, message);
 
@@ -33,9 +33,9 @@ internal sealed class WindowsFrontend : IFrontend
 
     public Task<byte[]?> GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
 
-    public Task TextToSpeech(string voiceName, string text) => SpeechSynthesisUtils.TextToSpeech(voiceName, text);
+    public Task TextToSpeech(string voiceName, string text, long requestId) => SpeechSynthesisUtils.TextToSpeech(voiceName, text, requestId);
 
-    public void StopTextToSpeech() => SpeechSynthesisUtils.StopTextToSpeech();
+    public Task StopAudio(long requestId) => WindowsAudioUtils.StopAudio(requestId);
 
     public byte[]? GetAudioResponseFromTextToSpeech(string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(text);
 
