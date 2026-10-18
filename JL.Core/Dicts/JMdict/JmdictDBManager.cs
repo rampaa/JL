@@ -21,7 +21,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictDBManager
 {
-    public const int Version = 26;
+    public const int Version = 27;
     private const int ImportRecordBatchSize = 128;
     private const int VariantSearchKeyTransactionBatchSize = 20_000_000;
 

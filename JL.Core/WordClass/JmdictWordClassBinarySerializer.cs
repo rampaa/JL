@@ -9,7 +9,7 @@ namespace JL.Core.WordClass;
 
 internal static class JmdictWordClassBinarySerializer
 {
-    private const int Version = 5;
+    private const int Version = 6;
     private const int ChecksumLength = 32;
 
     internal static void Serialize(string path, Dictionary<string, List<JmdictWordClass>> dictionary)
