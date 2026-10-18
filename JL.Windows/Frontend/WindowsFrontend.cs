@@ -37,7 +37,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public Task StopAudio(long requestId) => WindowsAudioUtils.StopAudio(requestId);
 
-    public byte[]? GetAudioResponseFromTextToSpeech(string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(text);
+    public Task<byte[]?> GetAudioResponseFromTextToSpeech(string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(text);
 
     public void SetInstalledVoiceWithHighestPriority() => SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
 

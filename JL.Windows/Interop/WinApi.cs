@@ -54,6 +54,70 @@ internal static partial class WinApi
         }
         // ReSharper restore UnusedMember.Global
 
+        [LibraryImport("kernel32.dll", EntryPoint = "WaitForSingleObject", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial uint WaitForSingleObject(nint handle, uint milliseconds);
+
+        [LibraryImport("kernel32.dll", EntryPoint = "WaitForMultipleObjects", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static unsafe partial uint WaitForMultipleObjects(uint count, nint* handles, [MarshalAs(UnmanagedType.Bool)] bool waitAll, uint milliseconds);
+
+        [LibraryImport("shlwapi.dll", EntryPoint = "SHCreateMemStream")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial nint SHCreateMemStream(nint initialData, uint length);
+
+        [LibraryImport("shcore.dll", EntryPoint = "CreateRandomAccessStreamOverStream")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int CreateRandomAccessStreamOverStream(nint stream, int options, in Guid iid, out nint result);
+
+        [LibraryImport("mfplat.dll", EntryPoint = "MFStartup")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFStartup(uint version, uint flags);
+
+        [LibraryImport("mfplat.dll", EntryPoint = "MFShutdown")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFShutdown();
+
+        [LibraryImport("mfplat.dll", EntryPoint = "MFCreateAttributes")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFCreateAttributes(out nint attributes, uint size);
+
+        [LibraryImport("mfplat.dll", EntryPoint = "MFCreateMediaType")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFCreateMediaType(out nint mediaType);
+
+        [LibraryImport("mfplat.dll", EntryPoint = "MFCreateSample")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFCreateSample(out nint sample);
+
+        [LibraryImport("mfplat.dll", EntryPoint = "MFCreateMemoryBuffer")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFCreateMemoryBuffer(uint length, out nint buffer);
+
+        [LibraryImport("mf.dll", EntryPoint = "MFTranscodeGetAudioOutputAvailableTypes")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFTranscodeGetAudioOutputAvailableTypes(in Guid subtype, uint flags, nint attributes, out nint types);
+
+        [LibraryImport("mfplat.dll", EntryPoint = "MFCreateMFByteStreamOnStreamEx")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFCreateMFByteStreamOnStreamEx(nint stream, out nint byteStream);
+
+        [LibraryImport("mfreadwrite.dll", EntryPoint = "MFCreateSourceReaderFromByteStream")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFCreateSourceReaderFromByteStream(nint byteStream, nint attributes, out nint reader);
+
+        [LibraryImport("mfreadwrite.dll", EntryPoint = "MFCreateSinkWriterFromURL")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFCreateSinkWriterFromURL(nint url, nint byteStream, nint attributes, out nint writer);
+
+        [LibraryImport("ole32.dll", EntryPoint = "CoInitializeEx")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int InitializeCom(nint reserved, uint flags);
+
+        [LibraryImport("ole32.dll", EntryPoint = "CoUninitialize")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial void CoUninitialize();
+
         [LibraryImport("user32.dll", EntryPoint = "GetDC")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static partial nint GetDC(nint hWnd);

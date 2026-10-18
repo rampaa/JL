@@ -133,7 +133,7 @@ internal static class PopupWindowUtils
 
     public static Task PlayAudio(string primarySpelling, string? reading)
     {
-        if (WindowsAudioUtils.IsPlaying()
+        if (WindowsAudioUtils.IsPlayingRecordedAudio()
             && s_primarySpellingOfLastPlayedAudio == primarySpelling
             && s_readingOfLastPlayedAudio == reading)
         {

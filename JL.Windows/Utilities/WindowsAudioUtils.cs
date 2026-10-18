@@ -20,6 +20,7 @@ internal static class WindowsAudioUtils
     private static MediaPlayer? s_audioPlayer;
     private static MediaSource? s_mediaSource;
     private static InMemoryRandomAccessStream? s_mediaStream;
+    private static SpeechAudioSource? s_speechAudioSource;
     private static MediaPlayer? AudioPlayer
     {
         get => Volatile.Read(ref s_audioPlayer);
@@ -30,6 +31,9 @@ internal static class WindowsAudioUtils
 
     private static long s_lastAudioPlayTimestamp;
 
+    // The caller holds AudioPlayerSemaphoreSlim.
+    public static bool IsPlayingSpeech() => s_speechAudioSource is not null;
+
     public static async Task StopAudio(long requestId)
     {
         await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
@@ -37,7 +41,6 @@ internal static class WindowsAudioUtils
         {
             if (AudioUtils.IsCurrentAudioRequest(requestId))
             {
-                SpeechSynthesisUtils.StopTextToSpeech();
                 DisposeCurrentMedia();
             }
         }
@@ -84,19 +87,7 @@ internal static class WindowsAudioUtils
                 return false;
             }
 
-            MediaPlayer mediaPlayer = new();
-            AudioPlayer = mediaPlayer;
-            mediaPlayer.MediaFailed += static async (player, args) =>
-            {
-                await DisposeMedia(player, args).ConfigureAwait(false);
-            };
-            mediaPlayer.MediaEnded += static async (player, _) =>
-            {
-                await DisposeMedia(player, null).ConfigureAwait(false);
-            };
-
-            mediaPlayer.Source = s_mediaSource;
-            mediaPlayer.Play();
+            StartAudioPlayer();
             return true;
         }
         catch (Exception ex)
@@ -110,6 +101,56 @@ internal static class WindowsAudioUtils
         {
             _ = AudioPlayerSemaphoreSlim.Release();
         }
+    }
+
+    public static async Task<bool> PlaySpeech(SpeechAudioSource speechAudioSource, long requestId)
+    {
+        await AudioPlayerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (!AudioUtils.IsCurrentAudioRequest(requestId))
+            {
+                return false;
+            }
+
+            DisposeCurrentMedia();
+            s_speechAudioSource = speechAudioSource;
+            s_mediaSource = MediaSource.CreateFromMediaStreamSource(speechAudioSource.PlaybackSource);
+            StartAudioPlayer();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            DisposeCurrentMedia();
+            LoggerManager.Logger.Error(ex, "Error starting speech playback");
+            NotificationManager.Notify(NotificationLevel.Error, "Error playing audio. Check the logs for more details.");
+            return false;
+        }
+        finally
+        {
+            _ = AudioPlayerSemaphoreSlim.Release();
+        }
+    }
+
+    private static void StartAudioPlayer()
+    {
+        MediaPlayer mediaPlayer = new();
+        AudioPlayer = mediaPlayer;
+        mediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
+        mediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
+
+        mediaPlayer.Source = s_mediaSource;
+        mediaPlayer.Play();
+    }
+
+    private static async void MediaPlayer_MediaFailed(MediaPlayer player, MediaPlayerFailedEventArgs args)
+    {
+        await DisposeMedia(player, args).ConfigureAwait(false);
+    }
+
+    private static async void MediaPlayer_MediaEnded(MediaPlayer player, object args)
+    {
+        await DisposeMedia(player, null).ConfigureAwait(false);
     }
 
     private static async Task DisposeMedia(MediaPlayer player, MediaPlayerFailedEventArgs? args)
@@ -152,8 +193,11 @@ internal static class WindowsAudioUtils
         AudioPlayer = null;
         MediaSource? source = s_mediaSource;
         InMemoryRandomAccessStream? mediaStream = s_mediaStream;
+        SpeechAudioSource? speechAudioSource = s_speechAudioSource;
         s_mediaSource = null;
         s_mediaStream = null;
+        s_speechAudioSource = null;
+        speechAudioSource?.Dispose();
         try
         {
             player?.Dispose();
@@ -193,7 +237,7 @@ internal static class WindowsAudioUtils
 
     public static async Task Motivate()
     {
-        if (IsPlaying() && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
+        if (IsPlayingRecordedAudio() && Stopwatch.GetElapsedTime(s_lastAudioPlayTimestamp).TotalMilliseconds < 300)
         {
             s_lastAudioPlayTimestamp = Stopwatch.GetTimestamp();
             return;
@@ -236,10 +280,10 @@ internal static class WindowsAudioUtils
         }
     }
 
-    public static bool IsPlaying()
+    public static bool IsPlayingRecordedAudio()
     {
         MediaPlayer? player = AudioPlayer;
-        if (player is null)
+        if (player is null || Volatile.Read(ref s_speechAudioSource) is not null)
         {
             return false;
         }

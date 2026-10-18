@@ -379,7 +379,7 @@ public static class AnkiConnectUtils
         byte[]? audioData = audioResponse?.AudioData;
         if (audioResponse?.AudioSource is AudioSourceType.TextToSpeech)
         {
-            audioData = FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(selectedReading);
+            audioData = await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(selectedReading).ConfigureAwait(false);
         }
 
         bool needsSentenceAudio = sentenceAudioFields.Count > 0;
@@ -387,7 +387,7 @@ public static class AnkiConnectUtils
         byte[]? sentenceAudioData = needsSentenceAudio
             ? sentenceAudioIsSameAsAudio
                 ? audioData
-                : FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(sentence)
+                : await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(sentence).ConfigureAwait(false)
             : null;
 
         bool needsSourceTextAudio = sourceTextAudioFields.Count > 0;
@@ -395,7 +395,7 @@ public static class AnkiConnectUtils
         byte[]? sourceTextAudioData = needsSourceTextAudio
             ? sourceTextAudioIsSameAsSentenceAudio
                 ? sentenceAudioData
-                : FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(currentText)
+                : await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(currentText).ConfigureAwait(false)
             : null;
 
         int totalAudioCount = 0;
@@ -403,10 +403,12 @@ public static class AnkiConnectUtils
         {
             ++totalAudioCount;
         }
+
         if (sentenceAudioData is not null)
         {
             ++totalAudioCount;
         }
+
         if (sourceTextAudioData is not null)
         {
             ++totalAudioCount;

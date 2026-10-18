@@ -25,7 +25,7 @@ internal sealed class DummyFrontend : IFrontend
 
     public Task<bool> PlayAudio(byte[] audio, string audioFormat, long requestId) => Task.FromResult(false);
 
-    public byte[]? GetAudioResponseFromTextToSpeech(string text) => null;
+    public Task<byte[]?> GetAudioResponseFromTextToSpeech(string text) => Task.FromResult<byte[]?>(null);
 
     public void SetInstalledVoiceWithHighestPriority()
     {

@@ -20,12 +20,6 @@
         "resolved": "10.0.13",
         "contentHash": "40yrBMsLEcjixBR4G+FiUaBPvxXIPSKJ2OgSrbOZcmSDBda4Sb0k7BWrfDpIvn3IvvDzwOL/tEPa6gDQfh6aRw=="
       },
-      "System.Speech": {
-        "type": "Direct",
-        "requested": "[10.0.13, )",
-        "resolved": "10.0.13",
-        "contentHash": "XxZ8CqmEYRvud8jyJcFKvIVIqNseAy6NdTbEJwSUzDX1FXYCf2gGuCmFST/cOFIOAMIKJ7hHiynhRl+oyIQHvw=="
-      },
       "CommunityToolkit.HighPerformance": {
         "type": "Transitive",
         "resolved": "8.4.2",

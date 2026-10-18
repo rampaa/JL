@@ -909,6 +909,7 @@ internal sealed partial class MainWindow : IDisposable
         }
 
         BacklogUtils.StopBacklogTimer();
+        await SpeechSynthesisUtils.StopSpeechAndDisposeResources().ConfigureAwait(false);
         await WebSocketUtils.DisconnectFromAllWebSocketConnections().ConfigureAwait(false);
         await WebSocketUtils.DisconnectFromTsukikageWebSocketConnection().ConfigureAwait(false);
         await BacklogUtils.WriteBacklog().ConfigureAwait(false);

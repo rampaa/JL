@@ -13,7 +13,7 @@ public static class AudioUtils
 {
     private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "AudioSourceConfig.json");
 
-    internal static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
+    internal static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "mp3", null);
 
     public static readonly OrderedDictionary<string, AudioSource> AudioSources = new(StringComparer.Ordinal);
 
