@@ -1329,6 +1329,19 @@ public static class DictUtils
         return true;
     }
 
+    public static void UpdateCustomWordDictLookupState(Dict dict)
+    {
+        bool hasEntries = dict.Active && dict.Contents.Count > 0;
+        if (dict.Type is DictType.CustomWordDictionary)
+        {
+            LookupHasCustomWordDict = hasEntries;
+        }
+        else
+        {
+            LookupHasProfileCustomWordDict = hasEntries;
+        }
+    }
+
     internal static void PopulateDictTypeArrays(Dict[] dicts)
     {
         List<Dict> allDicts = new(dicts.Length);
@@ -1358,11 +1371,11 @@ public static class DictUtils
                     }
                     else if (dict.Type is DictType.CustomWordDictionary)
                     {
-                        hasCustomWordDict = true;
+                        hasCustomWordDict = dict.Contents.Count > 0;
                     }
                     else if (dict.Type is DictType.ProfileCustomWordDictionary)
                     {
-                        hasProfileCustomWordDict = true;
+                        hasProfileCustomWordDict = dict.Contents.Count > 0;
                     }
                     else
                     {

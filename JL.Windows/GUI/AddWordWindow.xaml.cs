@@ -214,6 +214,7 @@ internal sealed partial class AddWordWindow
         if (dict.Active)
         {
             CustomWordLoader.AddToDictionary(dict, spellings, readings, definitions, rawPartOfSpeech, wordClasses);
+            DictUtils.UpdateCustomWordDictLookupState(dict);
         }
 
         PopupWindowUtils.HidePopups(0);

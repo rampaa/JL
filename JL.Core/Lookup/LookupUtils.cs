@@ -230,6 +230,14 @@ public static class LookupUtils
                 case DictType.CustomWordDictionary:
                 case DictType.ProfileCustomWordDictionary:
                 {
+                    bool profileCustomWordDict = dict.Type is DictType.ProfileCustomWordDictionary;
+                    if (profileCustomWordDict
+                        ? !lookUpProfileCustomWordDict
+                        : !lookUpCustomWordDict)
+                    {
+                        break;
+                    }
+
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
                     GetWordResults(textInfo, wordSearchKeys.AsSpan(), dict, false, results, null);
                     if (results.Count > 0)
@@ -237,7 +245,6 @@ public static class LookupUtils
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
                         // ReSharper disable once AccessToDisposedClosure
                         resultSlots[i] = rentedLookupResults;
-                        bool profileCustomWordDict = dict.Type is DictType.ProfileCustomWordDictionary;
                         // ReSharper disable once AccessToDisposedClosure
                         BuildCustomWordResult(results, rentedLookupResults, wordFreqs, dbWordFreqs,
                             profileCustomWordDict ? freqConnectionsForProfileCustomWordDict : freqConnectionsForCustomWordDict,
