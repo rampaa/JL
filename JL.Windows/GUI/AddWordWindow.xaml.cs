@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -7,7 +8,10 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomWordDict;
+using JL.Core.Frontend;
+using JL.Core.Utilities;
 using JL.Windows.GUI.Info;
+using JL.Windows.GUI.Notification;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -95,6 +99,8 @@ internal sealed partial class AddWordWindow
             "adj-t"
         ];
 
+    private bool _saving; // = false;
+
     private static AddWordWindow? s_instance;
     public static AddWordWindow Instance
     {
@@ -130,7 +136,7 @@ internal sealed partial class AddWordWindow
         await HandleSaveButtonClick().ConfigureAwait(false);
     }
 
-    private Task HandleSaveButtonClick()
+    private async Task HandleSaveButtonClick()
     {
         DefinitionsTextBox.ClearValue(BorderBrushProperty);
         DefinitionsTextBox.ClearValue(CursorProperty);
@@ -146,7 +152,7 @@ internal sealed partial class AddWordWindow
             SpellingsTextBox.BorderBrush = Brushes.Red;
             SpellingsTextBox.Cursor = Cursors.Help;
             SpellingsTextBox.ToolTip = "Spellings field cannot be left empty!";
-            return Task.CompletedTask;
+            return;
         }
 
         string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
@@ -156,7 +162,7 @@ internal sealed partial class AddWordWindow
             DefinitionsTextBox.BorderBrush = Brushes.Red;
             DefinitionsTextBox.Cursor = Cursors.Help;
             DefinitionsTextBox.ToolTip = "Definitions field cannot be left empty!";
-            return Task.CompletedTask;
+            return;
         }
 
         string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
@@ -174,7 +180,7 @@ internal sealed partial class AddWordWindow
                 WordClassTextBox.BorderBrush = Brushes.Red;
                 WordClassTextBox.Cursor = Cursors.Help;
                 WordClassTextBox.ToolTip = "Word Classes field cannot be left empty!";
-                return Task.CompletedTask;
+                return;
             }
 
             string[] validWordClasses = rawPartOfSpeech is "Verb"
@@ -188,7 +194,7 @@ internal sealed partial class AddWordWindow
                     WordClassTextBox.BorderBrush = Brushes.Red;
                     WordClassTextBox.Cursor = Cursors.Help;
                     WordClassTextBox.ToolTip = "Invalid word class! Press the info button to see the list of valid word classes.";
-                    return Task.CompletedTask;
+                    return;
                 }
             }
         }
@@ -211,6 +217,29 @@ internal sealed partial class AddWordWindow
             : DictType.ProfileCustomWordDictionary;
 
         Dict dict = DictUtils.SingleDictTypeDicts[dictType];
+        string line = string.IsNullOrWhiteSpace(rawWordClasses)
+            ? $"{rawSpellings}\t{rawReadings}\t{rawDefinitions.ReplaceLineEndings("\\n")}\t{rawPartOfSpeech}\n"
+            : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions.ReplaceLineEndings("\\n")}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
+
+        string path = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        _saving = true;
+        IsEnabled = false;
+        try
+        {
+            await File.AppendAllTextAsync(path, line).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            LoggerManager.Logger.Error(ex, "Couldn't save custom word to {Path}", path);
+            NotificationManager.Notify(NotificationLevel.Error, "Couldn't save the word. Check the logs for more details.");
+            return;
+        }
+        finally
+        {
+            _saving = false;
+            IsEnabled = true;
+        }
+
         if (dict.Active)
         {
             CustomWordLoader.AddToDictionary(dict, spellings, readings, definitions, rawPartOfSpeech, wordClasses);
@@ -219,13 +248,11 @@ internal sealed partial class AddWordWindow
 
         PopupWindowUtils.HidePopups(0);
         Close();
+    }
 
-        string line = string.IsNullOrWhiteSpace(rawWordClasses)
-            ? $"{rawSpellings}\t{rawReadings}\t{rawDefinitions.ReplaceLineEndings("\\n")}\t{rawPartOfSpeech}\n"
-            : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions.ReplaceLineEndings("\\n")}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
-
-        string path = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        return File.AppendAllTextAsync(path, line);
+    private void Window_Closing(object? sender, CancelEventArgs e)
+    {
+        e.Cancel = _saving;
     }
 
     private void Window_Closed(object sender, EventArgs e)

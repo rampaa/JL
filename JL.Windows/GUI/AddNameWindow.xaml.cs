@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -7,6 +8,9 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
+using JL.Core.Frontend;
+using JL.Core.Utilities;
+using JL.Windows.GUI.Notification;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -16,6 +20,8 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class AddNameWindow
 {
+    private bool _saving; // = false;
+
     private static AddNameWindow? s_instance;
     public static AddNameWindow Instance
     {
@@ -51,7 +57,7 @@ internal sealed partial class AddNameWindow
         await HandleSaveButtonClick().ConfigureAwait(false);
     }
 
-    private Task HandleSaveButtonClick()
+    private async Task HandleSaveButtonClick()
     {
         SpellingTextBox.ClearValue(BorderBrushProperty);
         SpellingTextBox.ClearValue(CursorProperty);
@@ -74,7 +80,7 @@ internal sealed partial class AddNameWindow
             SpellingTextBox.BorderBrush = Brushes.Red;
             SpellingTextBox.Cursor = Cursors.Help;
             SpellingTextBox.ToolTip = "Spelling field cannot be left empty!";
-            return Task.CompletedTask;
+            return;
         }
 
         string? reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
@@ -94,6 +100,26 @@ internal sealed partial class AddNameWindow
             : DictType.ProfileCustomNameDictionary;
 
         Dict dict = DictUtils.SingleDictTypeDicts[dictType];
+        string path = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
+        string line = $"{spelling}\t{reading}\t{nameType}\t{extraInfo?.ReplaceLineEndings("\\n")}\n";
+        _saving = true;
+        IsEnabled = false;
+        try
+        {
+            await File.AppendAllTextAsync(path, line).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            LoggerManager.Logger.Error(ex, "Couldn't save custom name to {Path}", path);
+            NotificationManager.Notify(NotificationLevel.Error, "Couldn't save the name. Check the logs for more details.");
+            return;
+        }
+        finally
+        {
+            _saving = false;
+            IsEnabled = true;
+        }
+
         if (dict.Active)
         {
             CustomNameLoader.AddToDictionary(dict, spelling, reading, nameType, extraInfo, null);
@@ -101,10 +127,11 @@ internal sealed partial class AddNameWindow
 
         PopupWindowUtils.HidePopups(0);
         Close();
+    }
 
-        string path = Path.GetFullPath(dict.Path, AppInfo.ApplicationPath);
-        string line = $"{spelling}\t{reading}\t{nameType}\t{extraInfo?.ReplaceLineEndings("\\n")}\n";
-        return File.AppendAllTextAsync(path, line);
+    private void Window_Closing(object? sender, CancelEventArgs e)
+    {
+        e.Cancel = _saving;
     }
 
     private void Window_Closed(object sender, EventArgs e)
