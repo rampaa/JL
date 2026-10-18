@@ -594,11 +594,11 @@ internal sealed class ConfigManager
         {
             if (DiscardIdenticalTextAllBacklog)
             {
-                BacklogUtils.UpdateUniqueBacklogItems();
+                BacklogUtils.UpdateBacklogTextCounts();
             }
             else
             {
-                BacklogUtils.ClearUniqueBacklogItems();
+                BacklogUtils.ClearBacklogTextCounts();
             }
         }
 

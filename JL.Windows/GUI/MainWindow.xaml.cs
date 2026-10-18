@@ -486,10 +486,6 @@ internal sealed partial class MainWindow : IDisposable
             if (backlogActive && keepStats)
             {
                 BacklogUtils.ReplaceLastBacklogText(mergedText, characterCountWithPunctuation, characterCountWithoutPunctuation);
-                if (configManager.DiscardIdenticalTextAllBacklog)
-                {
-                    BacklogUtils.UpdateUniqueBacklogItem(previousText, mergedText);
-                }
             }
         }
         else
@@ -502,19 +498,11 @@ internal sealed partial class MainWindow : IDisposable
                 if (backlogActive && keepStats)
                 {
                     BacklogUtils.AddToBacklog(sanitizedNewText, characterCountWithPunctuation, characterCountWithoutPunctuation, countStats);
-                    if (configManager.DiscardIdenticalTextAllBacklog)
-                    {
-                        BacklogUtils.AddToUniqueBacklogItems(sanitizedNewText);
-                    }
                 }
             }
             else if (keepStats)
             {
                 BacklogUtils.AddToBacklogShowAllBacklog(sanitizedNewText, characterCountWithPunctuation, characterCountWithoutPunctuation, countStats);
-                if (configManager.DiscardIdenticalTextAllBacklog)
-                {
-                    BacklogUtils.AddToUniqueBacklogItems(sanitizedNewText);
-                }
             }
         }
 

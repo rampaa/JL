@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Controls;
 using JL.Core;
@@ -24,7 +25,7 @@ internal static class BacklogUtils
     private static readonly LinkedList<BacklogItem> s_backlog = [];
     private static LinkedListNode<BacklogItem>? s_currentNode;
 
-    private static readonly HashSet<string> s_uniqueBacklogItems = new(StringComparer.Ordinal);
+    private static readonly Dictionary<string, int> s_backlogTextCounts = new(StringComparer.Ordinal);
 
     private static readonly LinkedList<LinkedListNode<BacklogItem>> s_pendingBacklogItemsForBacklogFile = new();
 
@@ -81,10 +82,21 @@ internal static class BacklogUtils
         ConfigManager configManager = ConfigManager.Instance;
         if (configManager.MaxBacklogCapacity > 0 && s_backlog.Count > configManager.MaxBacklogCapacity)
         {
+            if (configManager.DiscardIdenticalTextAllBacklog)
+            {
+                Debug.Assert(s_backlog.First is not null);
+                DecrementBacklogTextCount(s_backlog.First.Value.Text);
+            }
+
             s_backlog.RemoveFirst();
         }
 
         s_currentNode = s_backlog.AddLast(CreateBacklogItem(text, characterCount, characterCountWithoutPunctuation, countStats));
+        if (configManager.DiscardIdenticalTextAllBacklog)
+        {
+            IncrementBacklogTextCount(text);
+        }
+
         if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
         {
             lock (s_pendingItemsLock)
@@ -94,9 +106,19 @@ internal static class BacklogUtils
         }
     }
 
-    public static void AddToUniqueBacklogItems(string text)
+    private static void IncrementBacklogTextCount(string text)
     {
-        _ = s_uniqueBacklogItems.Add(text);
+        ref int count = ref CollectionsMarshal.GetValueRefOrAddDefault(s_backlogTextCounts, text, out _);
+        ++count;
+    }
+
+    private static void DecrementBacklogTextCount(string text)
+    {
+        _ = s_backlogTextCounts.Remove(text, out int count);
+        if (count > 1)
+        {
+            s_backlogTextCounts.Add(text, count - 1);
+        }
     }
 
     public static void AddToBacklogShowAllBacklog(string text, int characterCount, int characterCountWithoutPunctuation, bool countStats)
@@ -106,9 +128,24 @@ internal static class BacklogUtils
         TextBox mainTextBox = mainWindow.MainTextBox;
 
         bool removeOldestItem = configManager.MaxBacklogCapacity > 0 && s_backlog.Count > configManager.MaxBacklogCapacity;
+        if (removeOldestItem)
+        {
+            if (configManager.DiscardIdenticalTextAllBacklog)
+            {
+                Debug.Assert(s_backlog.First is not null);
+                DecrementBacklogTextCount(s_backlog.First.Value.Text);
+            }
+
+            s_backlog.RemoveFirst();
+        }
 
         BacklogItem item = CreateBacklogItem(text, characterCount, characterCountWithoutPunctuation, countStats);
         s_currentNode = s_backlog.AddLast(item);
+        if (configManager.DiscardIdenticalTextAllBacklog)
+        {
+            IncrementBacklogTextCount(text);
+        }
+
         if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
         {
             lock (s_pendingItemsLock)
@@ -119,7 +156,6 @@ internal static class BacklogUtils
 
         if (removeOldestItem)
         {
-            s_backlog.RemoveFirst();
             mainTextBox.Text = AllBacklogText;
         }
         else
@@ -140,20 +176,15 @@ internal static class BacklogUtils
 
     public static bool BacklogContains(string text)
     {
-        return s_uniqueBacklogItems.Contains(text);
+        return s_backlogTextCounts.ContainsKey(text);
     }
 
-    public static void UpdateUniqueBacklogItem(string oldText, string newText)
+    public static void UpdateBacklogTextCounts()
     {
-        _ = s_uniqueBacklogItems.Remove(oldText);
-        _ = s_uniqueBacklogItems.Add(newText);
-    }
-
-    public static void UpdateUniqueBacklogItems()
-    {
+        s_backlogTextCounts.Clear();
         foreach (BacklogItem backlogItem in s_backlog)
         {
-            _ = s_uniqueBacklogItems.Add(backlogItem.Text);
+            IncrementBacklogTextCount(backlogItem.Text);
         }
     }
 
@@ -179,6 +210,12 @@ internal static class BacklogUtils
             lock (s_pendingItemsLock)
             {
                 BacklogItem lastItem = lastNode.Value;
+                if (configManager.DiscardIdenticalTextAllBacklog)
+                {
+                    DecrementBacklogTextCount(lastItem.Text);
+                    IncrementBacklogTextCount(text);
+                }
+
                 lastNode.Value = new BacklogItem(text, lastItem.Timestamp,
                     AddBacklogStats(lastItem.SessionStats, StatsUtils.SessionStats.ResetCount, characterCount, characterCountWithoutPunctuation),
                     AddBacklogStats(lastItem.ProfileStats, StatsUtils.ProfileLifetimeStats.ResetCount, characterCount, characterCountWithoutPunctuation),
@@ -195,6 +232,11 @@ internal static class BacklogUtils
         else
         {
             s_currentNode = s_backlog.AddLast(CreateBacklogItem(text, characterCount, characterCountWithoutPunctuation, false));
+            if (configManager.DiscardIdenticalTextAllBacklog)
+            {
+                IncrementBacklogTextCount(text);
+            }
+
             if (configManager is { AutoSaveBacklogBeforeClosing: true, MaxBacklogCapacity: not 0 })
             {
                 lock (s_pendingItemsLock)
@@ -309,7 +351,12 @@ internal static class BacklogUtils
         SubtractBacklogStats(StatsUtils.LifetimeStats, backlogItem.LifetimeStats, stripPunctuation);
 
         LinkedListNode<BacklogItem>? newCurrentNode = s_currentNode.Previous ?? s_currentNode.Next;
-        _ = s_uniqueBacklogItems.Remove(backlogItem.Text);
+
+        if (configManager.DiscardIdenticalTextAllBacklog)
+        {
+            DecrementBacklogTextCount(backlogItem.Text);
+        }
+
         s_backlog.Remove(s_currentNode);
 
         lock (s_pendingItemsLock)
@@ -635,7 +682,7 @@ internal static class BacklogUtils
         s_backlog.Clear();
         s_currentNode = null;
 
-        s_uniqueBacklogItems.Clear();
+        s_backlogTextCounts.Clear();
         lock (s_pendingItemsLock)
         {
             s_pendingBacklogItemsForBacklogFile.Clear();
@@ -651,9 +698,9 @@ internal static class BacklogUtils
         }
     }
 
-    public static void ClearUniqueBacklogItems()
+    public static void ClearBacklogTextCounts()
     {
-        s_uniqueBacklogItems.Clear();
+        s_backlogTextCounts.Clear();
     }
 
     public static void TrimBacklog()
@@ -666,9 +713,10 @@ internal static class BacklogUtils
             {
                 LinkedListNode<BacklogItem>? firstNode = s_backlog.First;
                 changeCurrentNodeToLast = changeCurrentNodeToLast || firstNode == s_currentNode;
-                if (firstNode is not null)
+                if (configManager.DiscardIdenticalTextAllBacklog)
                 {
-                    _ = s_uniqueBacklogItems.Remove(firstNode.Value.Text);
+                    Debug.Assert(firstNode is not null);
+                    DecrementBacklogTextCount(firstNode.Value.Text);
                 }
 
                 s_backlog.RemoveFirst();
