@@ -1523,9 +1523,8 @@ public static class MiningUtils
             for (int i = 0; i < jmdictWcResultsCount; i++)
             {
                 JmdictWordClass result = jmdictWcResults[i];
-                if (primarySpelling == result.Spelling
-                    && ((reading is null && result.Readings is null)
-                        || (reading is not null && result.Readings is not null && result.Readings.Contains(reading))))
+                if ((reading is null && result.Readings is null)
+                    || (reading is not null && result.Readings is not null && result.Readings.Contains(reading)))
                 {
                     // If there is more than one valid result, we can't be sure which one applies to the current record, so we return null.
                     // See the entries for 駆ける and 振りかえる in JMdict as examples, where the spelling and reading are the same, but the word classes differ.

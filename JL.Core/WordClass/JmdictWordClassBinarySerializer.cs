@@ -9,7 +9,7 @@ namespace JL.Core.WordClass;
 
 internal static class JmdictWordClassBinarySerializer
 {
-    private const int Version = 4;
+    private const int Version = 5;
     private const int ChecksumLength = 32;
 
     internal static void Serialize(string path, Dictionary<string, List<JmdictWordClass>> dictionary)
@@ -29,7 +29,6 @@ internal static class JmdictWordClassBinarySerializer
 
                 maximumArrayLength = Math.Max(maximumArrayLength, record.WordClasses.Length);
                 _ = wordClassIds.TryAdd(record.WordClasses, wordClassIds.Count);
-                _ = stringIds.TryAdd(record.Spelling, stringIds.Count);
                 foreach (string wordClass in record.WordClasses)
                 {
                     _ = stringIds.TryAdd(wordClass, stringIds.Count);
@@ -109,7 +108,6 @@ internal static class JmdictWordClassBinarySerializer
             writer.Write(recordIds.Count);
             foreach (JmdictWordClass record in recordIds.Keys)
             {
-                WriteNumber(writer, stringIds[record.Spelling], stringIdWidth);
                 WriteNumber(writer, wordClassIds[record.WordClasses], wordClassIdWidth);
                 writer.Write(record.Readings is not null);
                 if (record.Readings is not null)
@@ -218,7 +216,7 @@ internal static class JmdictWordClassBinarySerializer
             wordClasses[i] = classes;
         }
 
-        int recordCount = ReadCount(reader, stringIdWidth + wordClassIdWidth + sizeof(bool));
+        int recordCount = ReadCount(reader, wordClassIdWidth + sizeof(bool));
         if (recordCount < 0)
         {
             return null;
@@ -226,7 +224,6 @@ internal static class JmdictWordClassBinarySerializer
         JmdictWordClass[] records = new JmdictWordClass[recordCount];
         for (int i = 0; i < records.Length; i++)
         {
-            string spelling = strings[ReadNumber(reader, stringIdWidth)];
             int wordClassId = ReadNumber(reader, wordClassIdWidth);
             string[]? readings = null;
             if (reader.ReadBoolean())
@@ -237,7 +234,7 @@ internal static class JmdictWordClassBinarySerializer
                     return null;
                 }
             }
-            records[i] = new JmdictWordClass(spelling, wordClasses[wordClassId], readings);
+            records[i] = new JmdictWordClass(wordClasses[wordClassId], readings);
         }
 
         int keyCount = ReadCount(reader, stringIdWidth + arrayLengthWidth);

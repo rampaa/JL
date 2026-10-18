@@ -1475,8 +1475,7 @@ public static class LookupUtils
             for (int i = 0; i < jmdictWcResultsCount; i++)
             {
                 JmdictWordClass result = jmdictWcResults[i];
-                if (primarySpelling == result.Spelling
-                    && ((hasReading && result.Readings is not null && result.Readings.Contains(reading))
+                if (((hasReading && result.Readings is not null && result.Readings.Contains(reading))
                         || (!hasReading && result.Readings is null))
                     && result.WordClasses.Contains(tag))
                 {

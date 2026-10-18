@@ -1,8 +1,7 @@
 namespace JL.Core.WordClass;
 
-internal sealed class WordClassCandidate(string primarySpelling, string? normalizedPrimarySpelling, string[]? readings, string[]? normalizedReadings, string[] wordClasses)
+internal sealed class WordClassCandidate(string? normalizedPrimarySpelling, string[]? readings, string[]? normalizedReadings, string[] wordClasses)
 {
-    public string PrimarySpelling { get; } = primarySpelling;
     public string? NormalizedPrimarySpelling { get; } = normalizedPrimarySpelling;
     public string[]? Readings { get; } = readings;
     public string[]? NormalizedReadings { get; } = normalizedReadings;

@@ -17,6 +17,13 @@ public static class JmdictWordClassUtils
 {
     private static readonly string s_partOfSpeechFilePath = Path.Join(AppInfo.ResourcesPath, "PoS.bin");
 
+    private static readonly byte[] s_recordsQuery = TextUtils.Utf8NoBom.GetBytes($"""
+        SELECT {JmdictDBManager.RowId}, {JmdictDBManager.PrimarySpelling}, {JmdictDBManager.Readings}, {JmdictDBManager.PartOfSpeechSharedByAllSenses}, {JmdictDBManager.PartOfSpeech},
+               {JmdictDBManager.MiscSharedByAllSenses}, {JmdictDBManager.Misc}, {JmdictDBManager.ReadingsOrthographyInfo},
+               {JmdictDBManager.SpellingRestrictions}, {JmdictDBManager.ReadingRestrictions}
+        FROM {JmdictDBManager.Record}
+        """ + "\0");
+
     private static readonly byte[] s_searchKeysQuery = TextUtils.Utf8NoBom.GetBytes($"SELECT {JmdictDBManager.RecordId}, {JmdictDBManager.SearchKey} FROM {JmdictDBManager.RecordSearchKey}\0");
 
     public static async Task<bool> Load()
@@ -70,6 +77,7 @@ public static class JmdictWordClassUtils
     private static void PopulateFromJmdictContents(Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary)
     {
         FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
+        HashSet<JmdictRecord> processedKanaRecords = new(ReferenceEqualityComparer.Instance);
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         foreach ((string key, IList<IDictRecord> jmdictRecordList) in dict.Contents)
@@ -117,7 +125,16 @@ public static class JmdictWordClassUtils
                     continue;
                 }
 
-                string[] wordClasses = wordClassList.ToArray();
+                // The primary spelling's key may have been replaced by a search-only key.
+                // Generate kana forms once per record, regardless of which key reaches it.
+                if (jmdictRecord.Readings is not null
+                    && HasUsuallyKanaSenses(jmdictRecord.MiscSharedByAllSenses, jmdictRecord.Misc)
+                    && processedKanaRecords.Add(jmdictRecord))
+                {
+                    AddKanaWordClasses(jmdictWordClassDictionary, jmdictRecord.PrimarySpelling, jmdictRecord.Readings,
+                        jmdictRecord.ReadingsOrthographyInfo, jmdictRecord.WordClassesSharedByAllSenses, jmdictRecord.WordClasses,
+                        jmdictRecord.MiscSharedByAllSenses, jmdictRecord.Misc, jmdictRecord.SpellingRestrictions, jmdictRecord.ReadingRestrictions);
+                }
 
                 if (jmdictRecord.Readings is not null)
                 {
@@ -132,36 +149,13 @@ public static class JmdictWordClassUtils
                         }
                     }
 
-                    if (keyFromReading)
+                    if (keyFromReading && JapaneseUtils.NormalizeText(jmdictRecord.PrimarySpelling) != key)
                     {
-                        if (JapaneseUtils.NormalizeText(jmdictRecord.PrimarySpelling) != key)
-                        {
-                            continue;
-                        }
-
-                        if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? prevResults))
-                        {
-                            bool alreadyAdded = false;
-                            foreach (JmdictWordClass wordClass in prevResults.AsReadOnlySpan())
-                            {
-                                if (wordClass.Spelling == jmdictRecord.PrimarySpelling
-                                    && wordClass.Readings.SequenceEqual(jmdictRecord.Readings)
-                                    && wordClass.WordClasses.SequenceEqual(wordClasses))
-                                {
-                                    alreadyAdded = true;
-                                    break;
-                                }
-                            }
-
-                            if (alreadyAdded)
-                            {
-                                continue;
-                            }
-                        }
+                        continue;
                     }
                 }
 
-                JmdictWordClass record = new(jmdictRecord.PrimarySpelling.GetPooledString(), wordClasses, jmdictRecord.Readings);
+                JmdictWordClass record = new(wordClassList.ToArray(), jmdictRecord.Readings);
                 ref List<JmdictWordClass>? results = ref CollectionsMarshal.GetValueRefOrAddDefault(jmdictWordClassDictionary, key, out bool exists);
                 if (exists)
                 {
@@ -184,88 +178,94 @@ public static class JmdictWordClassUtils
         FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
 
         Dictionary<long, WordClassCandidate> rowIdToWordClassCandidate = [];
-        using SqliteCommand recordCommand = connection.CreateCommand();
-        recordCommand.CommandText =
-            $"""
-            SELECT {JmdictDBManager.RowId}, {JmdictDBManager.PrimarySpelling}, {JmdictDBManager.Readings}, {JmdictDBManager.PartOfSpeechSharedByAllSenses}, {JmdictDBManager.PartOfSpeech}
-            FROM {JmdictDBManager.Record}
-            """;
-
         const int rowIdColumnIndex = 0;
         const int primarySpellingColumnIndex = 1;
         const int readingsColumnIndex = 2;
         const int wordClassesSharedByAllSensesColumnIndex = 3;
         const int wordClassesColumnIndex = 4;
+        const int miscSharedByAllSensesColumnIndex = 5;
+        const int miscColumnIndex = 6;
+        const int readingsOrthographyInfoColumnIndex = 7;
+        const int spellingRestrictionsColumnIndex = 8;
+        const int readingRestrictionsColumnIndex = 9;
 
-        using SqliteDataReader dataReader = recordCommand.ExecuteReader();
-        while (dataReader.Read())
+        using (SqliteRecordReader dataReader = new(connection, s_recordsQuery))
         {
-            string[]? wordClassesSharedByAllSenses = dataReader.GetNullableValueFromBlobStream<string[]>(wordClassesSharedByAllSensesColumnIndex);
-            string[]?[]? wordClasses = dataReader.GetNullableValueFromBlobStream<string[]?[]>(wordClassesColumnIndex);
-            if (wordClasses is null && wordClassesSharedByAllSenses is null)
+            while (dataReader.Read())
             {
-                continue;
-            }
-
-            List<string> wordClassList = [];
-            if (wordClasses is not null)
-            {
-                foreach (string[]? wordClassArray in wordClasses)
+                string[]? wordClassesSharedByAllSenses = dataReader.DeserializeNullable<string[]>(wordClassesSharedByAllSensesColumnIndex);
+                string[]?[]? wordClasses = dataReader.DeserializeNullable<string[]?[]>(wordClassesColumnIndex);
+                if (wordClasses is null && wordClassesSharedByAllSenses is null)
                 {
-                    if (wordClassArray is not null)
+                    continue;
+                }
+
+                List<string> wordClassList = [];
+                if (wordClasses is not null)
+                {
+                    foreach (string[]? wordClassArray in wordClasses)
                     {
-                        foreach (string wordClass in wordClassArray)
+                        if (wordClassArray is not null)
                         {
-                            if (validWordClasses.TryGetValue(wordClass, out string? internedWordClass) && !wordClassList.Contains(internedWordClass))
+                            foreach (string wordClass in wordClassArray)
                             {
-                                wordClassList.Add(internedWordClass);
+                                if (validWordClasses.TryGetValue(wordClass, out string? internedWordClass) && !wordClassList.Contains(internedWordClass))
+                                {
+                                    wordClassList.Add(internedWordClass);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if (wordClassesSharedByAllSenses is not null)
-            {
-                foreach (string wordClass in wordClassesSharedByAllSenses)
+                if (wordClassesSharedByAllSenses is not null)
                 {
-                    if (validWordClasses.TryGetValue(wordClass, out string? internedWordClass) && !wordClassList.Contains(internedWordClass))
+                    foreach (string wordClass in wordClassesSharedByAllSenses)
                     {
-                        wordClassList.Add(internedWordClass);
+                        if (validWordClasses.TryGetValue(wordClass, out string? internedWordClass) && !wordClassList.Contains(internedWordClass))
+                        {
+                            wordClassList.Add(internedWordClass);
+                        }
                     }
                 }
-            }
 
-            if (wordClassList.Count is 0)
-            {
-                continue;
-            }
-
-            long rowId = dataReader.GetInt64(rowIdColumnIndex);
-            string primarySpelling = dataReader.GetString(primarySpellingColumnIndex);
-            string[]? readings = dataReader.GetNullableValueFromBlobStream<string[]>(readingsColumnIndex);
-
-            string normalizedPrimarySpelling = JapaneseUtils.NormalizeText(primarySpelling);
-            string[]? normalizedReadings;
-            if (readings is not null)
-            {
-                normalizedReadings = new string[readings.Length];
-                for (int i = 0; i < readings.Length; i++)
+                if (wordClassList.Count is 0)
                 {
-                    normalizedReadings[i] = JapaneseUtils.NormalizeText(readings[i]);
+                    continue;
                 }
-            }
-            else
-            {
-                normalizedReadings = null;
-            }
 
-            rowIdToWordClassCandidate[rowId] = new WordClassCandidate(
-                primarySpelling,
-                normalizedPrimarySpelling,
-                readings,
-                normalizedReadings,
-                wordClassList.ToArray());
+                long rowId = dataReader.GetInt64(rowIdColumnIndex);
+                string[]? readings = dataReader.DeserializeNullable<string[]>(readingsColumnIndex);
+                string? normalizedPrimarySpelling = null;
+                string[]? normalizedReadings = null;
+                if (readings is not null)
+                {
+                    string primarySpelling = dataReader.GetString(primarySpellingColumnIndex);
+                    string[]? miscSharedByAllSenses = dataReader.DeserializeNullable<string[]>(miscSharedByAllSensesColumnIndex);
+                    string[]?[]? misc = dataReader.DeserializeNullable<string[]?[]>(miscColumnIndex);
+                    if (HasUsuallyKanaSenses(miscSharedByAllSenses, misc))
+                    {
+                        AddKanaWordClasses(jmdictWordClassDictionary, primarySpelling, readings,
+                            dataReader.DeserializeNullable<string[]?[]>(readingsOrthographyInfoColumnIndex),
+                            wordClassesSharedByAllSenses, wordClasses, miscSharedByAllSenses, misc,
+                            dataReader.DeserializeNullable<string[]?[]>(spellingRestrictionsColumnIndex),
+                            dataReader.DeserializeNullable<string[]?[]>(readingRestrictionsColumnIndex));
+                    }
+
+                    normalizedPrimarySpelling = JapaneseUtils.NormalizeText(primarySpelling);
+                    normalizedReadings = new string[readings.Length];
+                    for (int i = 0; i < readings.Length; i++)
+                    {
+                        normalizedReadings[i] = JapaneseUtils.NormalizeText(readings[i]);
+                    }
+                }
+
+                rowIdToWordClassCandidate[rowId] = new WordClassCandidate(
+                    normalizedPrimarySpelling,
+                    readings,
+                    normalizedReadings,
+                    wordClassList.ToArray());
+            }
         }
 
         if (rowIdToWordClassCandidate.Count is 0)
@@ -312,27 +312,7 @@ public static class JmdictWordClassUtils
             }
 
             string key = keySpan.ToString();
-            if (keyFromReading && jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? prevResults))
-            {
-                bool alreadyAdded = false;
-                foreach (JmdictWordClass wordClass in prevResults.AsReadOnlySpan())
-                {
-                    if (wordClass.Spelling == data.PrimarySpelling
-                        && wordClass.Readings.SequenceEqual(data.Readings)
-                        && wordClass.WordClasses.SequenceEqual(data.WordClasses))
-                    {
-                        alreadyAdded = true;
-                        break;
-                    }
-                }
-
-                if (alreadyAdded)
-                {
-                    continue;
-                }
-            }
-
-            JmdictWordClass record = new(data.PrimarySpelling.GetPooledString(), data.WordClasses, data.Readings);
+            JmdictWordClass record = new(data.WordClasses, data.Readings);
             ref List<JmdictWordClass>? results = ref CollectionsMarshal.GetValueRefOrAddDefault(jmdictWordClassDictionary, key, out bool exists);
             if (exists)
             {
@@ -345,6 +325,114 @@ public static class JmdictWordClassUtils
             else
             {
                 results = [record];
+            }
+        }
+    }
+
+    private static bool HasUsuallyKanaSenses(string[]? miscSharedByAllSenses, string[]?[]? misc)
+    {
+        if (miscSharedByAllSenses is not null && miscSharedByAllSenses.Contains("uk"))
+        {
+            return true;
+        }
+
+        if (misc is not null)
+        {
+            foreach (string[]? senseMisc in misc)
+            {
+                if (senseMisc is not null && senseMisc.Contains("uk"))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static void AddKanaWordClasses(Dictionary<string, List<JmdictWordClass>> dictionary, string primarySpelling,
+        string[] readings, string[]?[]? readingsOrthographyInfo, string[]? wordClassesSharedByAllSenses, string[]?[]? wordClasses,
+        string[]? miscSharedByAllSenses, string[]?[]? misc, string[]?[]? spellingRestrictions, string[]?[]? readingRestrictions)
+    {
+        bool allSensesUsuallyUseKana = miscSharedByAllSenses is not null && miscSharedByAllSenses.Contains("uk");
+        int senseCount = wordClasses?.Length ?? misc?.Length ?? spellingRestrictions?.Length ?? readingRestrictions?.Length ?? 1;
+        for (int readingIndex = 0; readingIndex < readings.Length; readingIndex++)
+        {
+            string[]? readingInfo = readingsOrthographyInfo?[readingIndex];
+            bool excludedReading = false;
+            if (readingInfo is not null)
+            {
+                foreach (string tag in readingInfo)
+                {
+                    if (tag is "rk" or "ik" or "ok" or "sk")
+                    {
+                        excludedReading = true;
+                        break;
+                    }
+                }
+            }
+
+            if (excludedReading)
+            {
+                continue;
+            }
+
+            string reading = readings[readingIndex];
+            List<string>? kanaWordClasses = null;
+            for (int senseIndex = 0; senseIndex < senseCount; senseIndex++)
+            {
+                if (!allSensesUsuallyUseKana && misc?[senseIndex]?.Contains("uk") is not true)
+                {
+                    continue;
+                }
+
+                string[]? senseSpellings = spellingRestrictions?[senseIndex];
+                string[]? senseReadings = readingRestrictions?[senseIndex];
+                if ((senseSpellings is not null && !senseSpellings.Contains(primarySpelling))
+                    || (senseReadings is not null && !senseReadings.Contains(reading)))
+                {
+                    continue;
+                }
+
+                if (kanaWordClasses is null)
+                {
+                    kanaWordClasses = [];
+                    AddWordClasses(kanaWordClasses, wordClassesSharedByAllSenses);
+                }
+                AddWordClasses(kanaWordClasses, wordClasses?[senseIndex]);
+            }
+
+            if (kanaWordClasses is not { Count: > 0 })
+            {
+                continue;
+            }
+
+            string key = JapaneseUtils.NormalizeText(reading);
+            JmdictWordClass record = new(kanaWordClasses.ToArray());
+            ref List<JmdictWordClass>? results = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+            if (exists)
+            {
+                Debug.Assert(results is not null);
+                if (!results.AsReadOnlySpan().Contains(record))
+                {
+                    results.Add(record);
+                }
+            }
+            else
+            {
+                results = [record];
+            }
+        }
+    }
+
+    private static void AddWordClasses(List<string> results, ReadOnlySpan<string> wordClasses)
+    {
+        FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
+        foreach (string wordClass in wordClasses)
+        {
+            if (validWordClasses.TryGetValue(wordClass, out string? pooledWordClass) && !results.Contains(pooledWordClass))
+            {
+                results.Add(pooledWordClass);
             }
         }
     }

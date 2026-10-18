@@ -5,8 +5,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using JL.Core.Utilities.ObjectPool;
-using MessagePack;
-using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Utilities;
 
@@ -235,29 +233,6 @@ public static class ExtensionMethods
     private static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[]? array, int start, int length)
     {
         return new ReadOnlySpan<T>(array, start, length);
-    }
-
-    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[]? array)
-    //{
-    //    return new ReadOnlyMemory<T>(array);
-    //}
-
-    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[]? array, int start, int length)
-    //{
-    //    return new ReadOnlyMemory<T>(array, start, length);
-    //}
-
-    internal static T? GetNullableValueFromBlobStream<T>(this SqliteDataReader dataReader, int index) where T : class
-    {
-        if (dataReader.IsDBNull(index))
-        {
-            return null;
-        }
-
-        using Stream stream = dataReader.GetStream(index);
-        return MessagePackSerializer.Deserialize<T>(stream);
     }
 
     public static void SafeFireAndForget(this Task task, string errorMessage)
