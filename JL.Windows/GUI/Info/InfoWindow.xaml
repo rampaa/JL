@@ -23,27 +23,31 @@
             </Style>
         </Grid.Resources>
 
-        <ScrollViewer PanningMode="Both">
-            <StackPanel>
-                <hc:TextBox x:Name="InfoSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
-                            hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoSearchTextBox_TextChanged" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-                <ListBox x:Name="InfoListBox" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}" Foreground="{StaticResource PrimaryTextBrush}" FontSize="20" IsSynchronizedWithCurrentItem="False">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="5,0,5,0" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.Template>
-                        <ControlTemplate>
-                            <ItemsPresenter></ItemsPresenter>
-                        </ControlTemplate>
-                    </ListBox.Template>
-                </ListBox>
+        <hc:TextBox x:Name="InfoSearchTextBox" HorizontalAlignment="Center" Width="300" Height="35" TextWrapping="Wrap"
+                    hc:InfoElement.Placeholder="Search" Margin="5" TextChanged="InfoSearchTextBox_TextChanged" />
 
-                <TextBox Name="InfoTextBox" Padding="20" FontSize="20" IsReadOnly="true" IsUndoEnabled="False" UndoLimit="0" VerticalScrollBarVisibility="Auto"
-                 TextWrapping="Wrap" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Cursor="Arrow" BorderThickness="0"/>
-            </StackPanel>
-        </ScrollViewer>
+        <ListBox x:Name="InfoListBox" Grid.Row="1" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingWithTriggers}" Foreground="{StaticResource PrimaryTextBrush}"
+                 FontSize="20" IsSynchronizedWithCurrentItem="False" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="5,0,5,0" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.Template>
+                <ControlTemplate>
+                    <ScrollViewer CanContentScroll="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" PanningMode="Both" Focusable="False">
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ListBox.Template>
+        </ListBox>
+
+        <TextBox Name="InfoTextBox" Grid.Row="1" Padding="20" FontSize="20" IsReadOnly="true" IsUndoEnabled="False" UndoLimit="0" VerticalScrollBarVisibility="Auto"
+         TextWrapping="Wrap" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Cursor="Arrow" BorderThickness="0"/>
     </Grid>
 </Window>
