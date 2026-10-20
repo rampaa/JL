@@ -287,7 +287,7 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void UpdateSetting(SqliteCommand command, string settingName, string? value)
+    private static void UpdateSetting(SqliteCommand command, string settingName, string? value)
     {
         Debug.Assert(value is not null);
 
