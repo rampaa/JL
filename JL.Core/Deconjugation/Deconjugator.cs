@@ -1,6 +1,5 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
-using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Core.Utilities.ObjectPool;
 
@@ -9,39 +8,13 @@ namespace JL.Core.Deconjugation;
 // Modified from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
-    internal static FrozenDictionary<char, RuleBucket> RuleBucketsByLastDecEndChar { get; set; } = FrozenDictionary<char, RuleBucket>.Empty;
-    internal static RuleBucket RulesWithEmptyConEnd { get; set; }
+    internal static DeconjugationRules? Rules { get; set; }
 
-    private static void ApplyRuleInternal(in Form form, in VirtualRule rule, PooledList<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
+    private static void ApplyMatchedRule(in Form form, in VirtualRule rule, PooledList<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
     {
-        if (rule.Type is RuleType.OnlyFinal)
+        if (rule.Type is RuleType.Rewrite && textSpan.Length != rule.ConEnd.Length)
         {
-            if (form.LastTag.Length is not 0 || !textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
-            {
-                return;
-            }
-        }
-        else if (rule.Type is RuleType.Rewrite)
-        {
-            if (form.Text != rule.ConEnd)
-            {
-                return;
-            }
-        }
-        else if (rule.Type is RuleType.NeverFinal)
-        {
-            if (form.LastTag.Length is 0 || !textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
-            {
-                return;
-            }
-        }
-        else // if (rule.Type is RuleType.Standard)
-        {
-            // ending doesn't match
-            if (!textSpan.EndsWith(rule.ConEnd, StringComparison.Ordinal))
-            {
-                return;
-            }
+            return;
         }
 
         if (textSpan.Length == rule.ConEnd.Length && rule.DecEnd.Length is 0)
@@ -59,24 +32,6 @@ internal static class Deconjugator
 
         string newText = string.Concat(stem, rule.DecEnd);
         newFormsToProcess.Add(new Form(newText, rule.DecTag, new ProcessNode(rule.Detail, form.Process)));
-    }
-
-    private static void ApplyBucket(in Form form, in RuleBucket bucket, PooledList<Form> newFormsToProcess, ReadOnlySpan<char> textSpan)
-    {
-        if (form.Process is null)
-        {
-            foreach (ref readonly VirtualRule rule in bucket.AllRules.AsSpan())
-            {
-                ApplyRuleInternal(form, rule, newFormsToProcess, textSpan);
-            }
-        }
-        else if (bucket.RulesByTag.TryGetValue(form.LastTag, out VirtualRule[]? rules))
-        {
-            foreach (ref readonly VirtualRule rule in rules.AsSpan())
-            {
-                ApplyRuleInternal(form, rule, newFormsToProcess, textSpan);
-            }
-        }
     }
 
     private static bool DiscoveredFormsContain(ReadOnlySpan<Form> discoveredForms, ReadOnlySpan<char> stem, string decEnd, string tag, ProcessNode? parentProcessNode, string newDetail)
@@ -109,7 +64,8 @@ internal static class Deconjugator
         PooledList<Form> formsToProcess = new(64);
         formsToProcess.Add(new Form(text, "", null));
 
-        FrozenDictionary<char, RuleBucket> ruleBucketsByLastDecEndChar = RuleBucketsByLastDecEndChar;
+        DeconjugationRules? rules = Rules;
+        Debug.Assert(rules is not null);
         FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
         while (formsToProcess.Count > 0)
         {
@@ -119,12 +75,19 @@ internal static class Deconjugator
                 if ((form.Process?.ProperStepCount ?? 0) <= 7)
                 {
                     ReadOnlySpan<char> textSpan = form.Text.AsSpan();
-                    if (textSpan.Length is not 0 && ruleBucketsByLastDecEndChar.TryGetValue(textSpan[^1], out RuleBucket bucket))
+                    RuleSuffixMatcher? suffixMatcher = rules.GetSuffixMatcher(form);
+                    if (suffixMatcher is not null)
                     {
-                        ApplyBucket(form, bucket, newFormsToProcess, textSpan);
-                    }
+                        foreach (ref readonly VirtualRule rule in suffixMatcher.GetMatchingRules(textSpan))
+                        {
+                            ApplyMatchedRule(form, rule, newFormsToProcess, textSpan);
+                        }
 
-                    ApplyBucket(form, RulesWithEmptyConEnd, newFormsToProcess, textSpan);
+                        foreach (ref readonly VirtualRule rule in suffixMatcher.EmptyEndingRules.AsSpan())
+                        {
+                            ApplyMatchedRule(form, rule, newFormsToProcess, textSpan);
+                        }
+                    }
                 }
 
                 string formTag = form.LastTag;

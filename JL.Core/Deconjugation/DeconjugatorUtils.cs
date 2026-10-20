@@ -1,9 +1,8 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using JL.Core.Lookup;
 using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
@@ -26,15 +25,31 @@ internal static class DeconjugatorUtils
 
     public static async Task DeserializeRules()
     {
-        Rule[]? rules;
+        Deconjugator.Rules = await LoadRules(Path.Join(AppInfo.ResourcesPath, "deconjugation_rules.json"),
+            Path.Join(AppInfo.ResourcesPath, "deconjugation_rules.bin")).ConfigureAwait(false);
+    }
 
-        FileStream fileStream = new(Path.Join(AppInfo.ResourcesPath, "deconjugation_rules.json"), FileStreamOptionsPresets.s_asyncReadFso);
-        await using (fileStream.ConfigureAwait(false))
+    internal static async Task<DeconjugationRules> LoadRules(string jsonPath, string binaryPath)
+    {
+        byte[] json = await File.ReadAllBytesAsync(jsonPath).ConfigureAwait(false);
+        byte[] sourceHash = SHA256.HashData(json);
+        DeconjugationRules? cachedRules = await DeconjugationRulesBinarySerializer.Deserialize(binaryPath, sourceHash).ConfigureAwait(false);
+        if (cachedRules is not null)
         {
-            rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, s_jso).ConfigureAwait(false);
-            Debug.Assert(rules is not null);
+            return cachedRules;
         }
 
+        DeconjugationRules rules = BuildRules(json);
+        DeconjugationRulesBinarySerializer.Serialize(binaryPath, rules, sourceHash);
+        return rules;
+    }
+
+    internal static DeconjugationRules BuildRules(ReadOnlySpan<byte> json)
+    {
+        Rule[]? rules = JsonSerializer.Deserialize<Rule[]>(json, s_jso);
+        Debug.Assert(rules is not null);
+
+        int virtualRuleCount = 0;
         // ReSharper disable once ForCanBeConvertedToForeach
         for (int i = 0; i < rules.Length; i++)
         {
@@ -43,15 +58,15 @@ internal static class DeconjugatorUtils
             rule.ConEnds.DeduplicateStringsInArray();
             rule.DecTags.DeduplicateStringsInArray();
             rule.ConTags.DeduplicateStringsInArray();
+            virtualRuleCount += rule.ConEnds.Length;
         }
 
-        BuildRuleDictionaries(rules);
+        return BuildRules(rules, virtualRuleCount);
     }
 
-    private static void BuildRuleDictionaries(Rule[] rules)
+    private static DeconjugationRules BuildRules(Rule[] rules, int virtualRuleCount)
     {
-        Dictionary<char, List<VirtualRule>> rulesByLastConEndChar = new(59);
-        List<VirtualRule> rulesWithEmptyConEnd = new(9);
+        List<VirtualRule> virtualRules = new(virtualRuleCount);
 
         foreach (ref readonly Rule rule in rules.AsSpan())
         {
@@ -61,6 +76,10 @@ internal static class DeconjugatorUtils
             string[] decEnds = rule.DecEnds;
             string[] conTags = rule.ConTags;
             string[] decTags = rule.DecTags;
+
+            Debug.Assert(decEnds.Length == conEnds.Length);
+            Debug.Assert(conTags.Length is 1 || conTags.Length == conEnds.Length);
+            Debug.Assert(decTags.Length is 1 || decTags.Length == conEnds.Length);
 
             string? singleConTag = conTags.Length is 1 ? conTags[0] : null;
             string? singleDecTag = decTags.Length is 1 ? decTags[0] : null;
@@ -73,63 +92,26 @@ internal static class DeconjugatorUtils
                 string decTag = singleDecTag ?? decTags[i];
 
                 VirtualRule virtualRule = new(type, decEnd, conEnd, decTag, conTag, detail);
-                if (conEnd.Length is 0)
-                {
-                    rulesWithEmptyConEnd.Add(virtualRule);
-                }
-                else
-                {
-                    char lastChar = conEnd[^1];
-                    ref List<VirtualRule>? list = ref CollectionsMarshal.GetValueRefOrAddDefault(rulesByLastConEndChar, lastChar, out bool exists);
-                    if (!exists)
-                    {
-                        list = new List<VirtualRule>(16);
-                    }
 
-                    Debug.Assert(list is not null);
-                    list.Add(virtualRule);
-                }
+                //bool isDuplicate = false;
+                //for (int j = 0; j < virtualRules.Count; j++)
+                //{
+                //    VirtualRule existing = virtualRules[j];
+                //    if (virtualRule.Type == existing.Type
+                //        && virtualRule.DecEnd == existing.DecEnd
+                //        && virtualRule.ConEnd == existing.ConEnd
+                //        && virtualRule.DecTag == existing.DecTag
+                //        && virtualRule.Detail == existing.Detail)
+                //    {
+                //        isDuplicate = true;
+                //        break;
+                //    }
+                //}
+
+                virtualRules.Add(virtualRule);
             }
         }
 
-        Deconjugator.RuleBucketsByLastDecEndChar = rulesByLastConEndChar.ToFrozenDictionary(static entry => entry.Key, static entry => CreateBucket(entry.Value.AsReadOnlySpan()));
-        Deconjugator.RulesWithEmptyConEnd = CreateBucket(rulesWithEmptyConEnd.AsReadOnlySpan());
-    }
-
-    private static RuleBucket CreateBucket(ReadOnlySpan<VirtualRule> rules)
-    {
-        Dictionary<string, List<VirtualRule>> rulesByConTag = new(StringComparer.Ordinal);
-        List<VirtualRule> allUniqueRules = new(rules.Length);
-
-        foreach (ref readonly VirtualRule rule in rules)
-        {
-            ref List<VirtualRule>? rulesForConTag = ref CollectionsMarshal.GetValueRefOrAddDefault(rulesByConTag, rule.ConTag, out bool exists);
-            if (!exists)
-            {
-                rulesForConTag = new List<VirtualRule>(8);
-            }
-
-            Debug.Assert(rulesForConTag is not null);
-            rulesForConTag.Add(rule);
-
-            //bool isDuplicate = false;
-            //for (int j = 0; j < allUniqueRules.Count; j++)
-            //{
-            //    VirtualRule existing = allUniqueRules[j];
-            //    if (rule.Type == existing.Type
-            //        && rule.DecEnd == existing.DecEnd
-            //        && rule.ConEnd == existing.ConEnd
-            //        && rule.DecTag == existing.DecTag
-            //        && rule.Detail == existing.Detail)
-            //    {
-            //        isDuplicate = true;
-            //        break;
-            //    }
-            //}
-
-            allUniqueRules.Add(rule);
-        }
-
-        return new RuleBucket(allUniqueRules.ToArray(), rulesByConTag.ToFrozenDictionary(static entry => entry.Key, static entry => entry.Value.ToArray(), StringComparer.Ordinal));
+        return DeconjugationRules.Create(virtualRules.AsReadOnlySpan());
     }
 }
