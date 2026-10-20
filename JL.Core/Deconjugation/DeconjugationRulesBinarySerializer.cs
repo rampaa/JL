@@ -27,7 +27,7 @@ internal static class DeconjugationRulesBinarySerializer
             byte[] data = await File.ReadAllBytesAsync(path).ConfigureAwait(false);
             return Deserialize(data, sourceHash);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex)
         {
             LoggerManager.Logger.Debug(ex, "Couldn't read deconjugation rules from '{Path}'", path);
             return null;
@@ -98,23 +98,23 @@ internal static class DeconjugationRulesBinarySerializer
         bool[] hasEmptyConEnds = new bool[ruleArrayCount];
         for (int i = 0; i < ruleArrays.Length; ++i)
         {
-            if (!reader.TryReadCount(sizeof(int), out int count))
+            if (!reader.TryReadCount(sizeof(int), out int matchingRuleCount))
             {
                 return null;
             }
 
-            VirtualRule[] array = new VirtualRule[count];
+            VirtualRule[] matchingRules = new VirtualRule[matchingRuleCount];
             int maximumConEndLength = 0;
             bool hasEmptyConEnd = false;
-            for (int j = 0; j < array.Length; ++j)
+            for (int j = 0; j < matchingRules.Length; ++j)
             {
-                if (!reader.TryReadIndex(rules.Length, out int index))
+                if (!reader.TryReadIndex(rules.Length, out int ruleIndex))
                 {
                     return null;
                 }
 
-                array[j] = rules[index];
-                int conEndLength = rules[index].ConEnd.Length;
+                matchingRules[j] = rules[ruleIndex];
+                int conEndLength = rules[ruleIndex].ConEnd.Length;
                 maximumConEndLength = Math.Max(maximumConEndLength, conEndLength);
                 hasEmptyConEnd |= conEndLength is 0;
             }
@@ -124,7 +124,7 @@ internal static class DeconjugationRulesBinarySerializer
                 return null;
             }
 
-            ruleArrays[i] = array;
+            ruleArrays[i] = matchingRules;
             maximumConEndLengths[i] = maximumConEndLength;
             hasEmptyConEnds[i] = hasEmptyConEnd;
         }
@@ -138,8 +138,12 @@ internal static class DeconjugationRulesBinarySerializer
         bool[] usedCharacterCodes = new bool[characterCount + 1];
         for (int i = 0; i < characterCount; ++i)
         {
-            if (!reader.TryReadUInt16(out ushort character) || !reader.TryReadUInt16(out ushort code)
-                || code is 0 || code > characterCount || characterCodes[character] is not 0 || usedCharacterCodes[code])
+            if (!reader.TryReadUInt16(out ushort character)
+                || !reader.TryReadUInt16(out ushort code)
+                || code is 0
+                || code > characterCount
+                || characterCodes[character] is not 0
+                || usedCharacterCodes[code])
             {
                 return null;
             }
@@ -148,8 +152,10 @@ internal static class DeconjugationRulesBinarySerializer
             usedCharacterCodes[code] = true;
         }
 
-        if (!reader.TryReadInt32(out int characterCodeCount) || characterCodeCount != characterCount + 1
-            || !reader.TryReadCount(sizeof(int) * 4, out int matcherCount) || matcherCount is 0)
+        if (!reader.TryReadInt32(out int characterCodeCount)
+            || characterCodeCount != characterCount + 1
+            || !reader.TryReadCount(sizeof(int) * 4, out int matcherCount)
+            || matcherCount is 0)
         {
             return null;
         }
@@ -169,9 +175,11 @@ internal static class DeconjugationRulesBinarySerializer
                 tag = strings[tagIndex];
             }
 
-            if (!reader.TryReadCount(sizeof(int), out int nodeCount) || nodeCount is 0
+            if (!reader.TryReadCount(sizeof(int), out int nodeCount)
+                || nodeCount is 0
                 || nodeCount > Array.MaxLength / characterCodeCount
-                || !reader.TryReadCount(sizeof(int) * 2, out int transitionCount) || transitionCount != nodeCount - 1)
+                || !reader.TryReadCount(sizeof(int) * 2, out int transitionCount)
+                || transitionCount != nodeCount - 1)
             {
                 return null;
             }
@@ -179,6 +187,7 @@ internal static class DeconjugationRulesBinarySerializer
             int[] nextNodeIndices = new int[nodeCount * characterCodeCount];
             int[] suffixLengthsByNodeIndex = new int[nodeCount];
             int previousPosition = -1;
+
             // Transitions are stored in table order, and each node is created after its parent.
             for (int j = 0; j < transitionCount; ++j)
             {
@@ -204,17 +213,19 @@ internal static class DeconjugationRulesBinarySerializer
             VirtualRule[][] matchingRulesByNodeIndex = new VirtualRule[nodeCount][];
             for (int j = 0; j < nodeCount; ++j)
             {
-                if (!reader.TryReadIndex(ruleArrays.Length, out int arrayIndex)
-                    || hasEmptyConEnds[arrayIndex] || maximumConEndLengths[arrayIndex] > suffixLengthsByNodeIndex[j])
+                if (!reader.TryReadIndex(ruleArrays.Length, out int ruleArrayIndex)
+                    || hasEmptyConEnds[ruleArrayIndex]
+                    || maximumConEndLengths[ruleArrayIndex] > suffixLengthsByNodeIndex[j])
                 {
                     return null;
                 }
 
-                matchingRulesByNodeIndex[j] = ruleArrays[arrayIndex];
+                matchingRulesByNodeIndex[j] = ruleArrays[ruleArrayIndex];
             }
 
             if (!reader.TryReadIndex(ruleArrays.Length, out int emptyEndingRulesIndex)
-                || maximumConEndLengths[emptyEndingRulesIndex] > 0 || matchingRulesByNodeIndex[0].Length is not 0)
+                || maximumConEndLengths[emptyEndingRulesIndex] > 0
+                || matchingRulesByNodeIndex[0].Length is not 0)
             {
                 return null;
             }
@@ -261,7 +272,7 @@ internal static class DeconjugationRulesBinarySerializer
 
             PathUtils.ReplaceFileAtomicallyOnSameVolume(path, temporaryPath);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex)
         {
             LoggerManager.Logger.Debug(ex, "Couldn't save deconjugation rules to '{Path}'", path);
         }
@@ -280,7 +291,7 @@ internal static class DeconjugationRulesBinarySerializer
         {
             File.Delete(PathUtils.GetTempPath(path));
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex)
         {
             LoggerManager.Logger.Debug(ex, "Couldn't remove the temporary deconjugation rules file for '{Path}'", path);
         }
@@ -301,9 +312,9 @@ internal static class DeconjugationRulesBinarySerializer
         Dictionary<string, int> stringIds = new(StringComparer.Ordinal);
         foreach (RuleSuffixMatcher matcher in matchers.AsReadOnlySpan())
         {
-            foreach (VirtualRule[] array in matcher.MatchingRulesByNodeIndex)
+            foreach (VirtualRule[] matchingRules in matcher.MatchingRulesByNodeIndex)
             {
-                AddRuleArray(array, ruleArrays, ruleArrayIds, ruleIds, stringIds);
+                AddRuleArray(matchingRules, ruleArrays, ruleArrayIds, ruleIds, stringIds);
             }
 
             AddRuleArray(matcher.EmptyEndingRules, ruleArrays, ruleArrayIds, ruleIds, stringIds);
@@ -349,10 +360,10 @@ internal static class DeconjugationRulesBinarySerializer
         }
 
         writer.Write(ruleArrays.Count);
-        foreach (VirtualRule[] array in ruleArrays.AsReadOnlySpan())
+        foreach (VirtualRule[] matchingRules in ruleArrays.AsReadOnlySpan())
         {
-            writer.Write(array.Length);
-            foreach (ref readonly VirtualRule rule in array.AsSpan())
+            writer.Write(matchingRules.Length);
+            foreach (ref readonly VirtualRule rule in matchingRules.AsSpan())
             {
                 writer.Write(ruleIds[rule]);
             }
@@ -380,6 +391,7 @@ internal static class DeconjugationRulesBinarySerializer
             }
 
             writer.Write(matcher.MatchingRulesByNodeIndex.Length);
+
             // Every node except the root has exactly one incoming transition.
             writer.Write(matcher.MatchingRulesByNodeIndex.Length - 1);
             int[] nextNodeIndices = matcher.NextNodeIndices;
@@ -392,25 +404,25 @@ internal static class DeconjugationRulesBinarySerializer
                 }
             }
 
-            foreach (VirtualRule[] array in matcher.MatchingRulesByNodeIndex)
+            foreach (VirtualRule[] matchingRules in matcher.MatchingRulesByNodeIndex)
             {
-                writer.Write(ruleArrayIds[array]);
+                writer.Write(ruleArrayIds[matchingRules]);
             }
 
             writer.Write(ruleArrayIds[matcher.EmptyEndingRules]);
         }
     }
 
-    private static void AddRuleArray(VirtualRule[] array, List<VirtualRule[]> ruleArrays, Dictionary<VirtualRule[], int> ruleArrayIds,
+    private static void AddRuleArray(VirtualRule[] matchingRules, List<VirtualRule[]> ruleArrays, Dictionary<VirtualRule[], int> ruleArrayIds,
         Dictionary<VirtualRule, int> ruleIds, Dictionary<string, int> stringIds)
     {
-        if (!ruleArrayIds.TryAdd(array, ruleArrays.Count))
+        if (!ruleArrayIds.TryAdd(matchingRules, ruleArrays.Count))
         {
             return;
         }
 
-        ruleArrays.Add(array);
-        foreach (ref readonly VirtualRule rule in array.AsSpan())
+        ruleArrays.Add(matchingRules);
+        foreach (ref readonly VirtualRule rule in matchingRules.AsSpan())
         {
             if (!ruleIds.TryAdd(rule, ruleIds.Count))
             {

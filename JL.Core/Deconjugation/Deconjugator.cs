@@ -66,6 +66,7 @@ internal static class Deconjugator
 
         DeconjugationRules? rules = Rules;
         Debug.Assert(rules is not null);
+
         FrozenSet<string> validWordClasses = DeconjugatorUtils.ValidWordClasses;
         while (formsToProcess.Count > 0)
         {
