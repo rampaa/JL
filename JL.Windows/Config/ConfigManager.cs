@@ -62,6 +62,7 @@ internal sealed class ConfigManager
     public Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
     public bool AlwaysOnTop { get; set; } = true;
     public bool TextOnlyVisibleOnHover { get; set; } // = false;
+    public bool BlurTextOnUnhover { get; private set; } // = false;
     public bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } // = false;
     public double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100
     public bool AutoPauseOrResumeMpvOnHoverChange { get; private set; } // = false;
@@ -514,6 +515,7 @@ internal sealed class ConfigManager
         FixedPopupBottomPositioning = ConfigDBManager.GetValueFromConfig(connection, configs, FixedPopupBottomPositioning, nameof(FixedPopupBottomPositioning));
         ChangeMainWindowBackgroundOpacityOnUnhover = ConfigDBManager.GetValueFromConfig(connection, configs, ChangeMainWindowBackgroundOpacityOnUnhover, nameof(ChangeMainWindowBackgroundOpacityOnUnhover));
         TextOnlyVisibleOnHover = ConfigDBManager.GetValueFromConfig(connection, configs, TextOnlyVisibleOnHover, nameof(TextOnlyVisibleOnHover));
+        BlurTextOnUnhover = ConfigDBManager.GetValueFromConfig(connection, configs, BlurTextOnUnhover, nameof(BlurTextOnUnhover));
         AutoPauseOrResumeMpvOnHoverChange = ConfigDBManager.GetValueFromConfig(connection, configs, AutoPauseOrResumeMpvOnHoverChange, nameof(AutoPauseOrResumeMpvOnHoverChange));
         OnlyCaptureTextWithJapaneseChars = ConfigDBManager.GetValueFromConfig(connection, configs, OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars));
         DisableLookupsForNonJapaneseCharsInMainWindow = ConfigDBManager.GetValueFromConfig(connection, configs, DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow));
@@ -719,7 +721,7 @@ internal sealed class ConfigManager
         MainWindowFixedRightPosition = ConfigDBManager.GetValueFromConfig(connection, configs, MainWindowFixedRightPosition, nameof(MainWindowFixedRightPosition));
         MainWindow.Instance.UpdatePosition();
 
-        MainWindow.Instance.MainGrid.Opacity = TextOnlyVisibleOnHover && !MainWindow.Instance.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0d : 1d;
+        MainWindow.Instance.UpdateTextVisibility(MainWindow.Instance.IsMouseOver || PreferencesWindow.IsItVisible());
 
         // MAKE SURE YOU FREEZE ANY NEW FREEZABLE OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
@@ -1287,6 +1289,7 @@ internal sealed class ConfigManager
         preferenceWindow.FocusableCheckBox.IsChecked = Focusable;
         preferenceWindow.RestoreFocusToPreviouslyActiveWindowCheckBox.IsChecked = RestoreFocusToPreviouslyActiveWindow;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
+        preferenceWindow.BlurTextOnUnhoverCheckBox.IsChecked = BlurTextOnUnhover;
         preferenceWindow.AutoPauseOrResumeMpvOnHoverChangeCheckBox.IsChecked = AutoPauseOrResumeMpvOnHoverChange;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = coreConfigManager.AnkiIntegration;
         preferenceWindow.AutoShowAnkiNoteAfterMiningCheckBox.IsChecked = coreConfigManager.AutoShowAnkiNoteAfterMining;
@@ -1812,6 +1815,9 @@ internal sealed class ConfigManager
 
         ConfigDBManager.UpdateSetting(command, configs, nameof(TextOnlyVisibleOnHover),
             preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString());
+
+        ConfigDBManager.UpdateSetting(command, configs, nameof(BlurTextOnUnhover),
+            preferenceWindow.BlurTextOnUnhoverCheckBox.IsChecked.ToString());
 
         ConfigDBManager.UpdateSetting(command, configs, nameof(AutoPauseOrResumeMpvOnHoverChange),
             preferenceWindow.AutoPauseOrResumeMpvOnHoverChangeCheckBox.IsChecked.ToString());

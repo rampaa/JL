@@ -8,6 +8,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Threading;
 using HandyControl.Tools;
 using JL.Core.Audio;
@@ -81,6 +82,13 @@ internal sealed partial class MainWindow : IDisposable
     private static readonly AtomicBool s_closingEventStarted = new(false);
     private Task? _cleanupTask;
 
+    private readonly BlurEffect _blurEffect = new()
+    {
+        Radius = 30d,
+        KernelType = KernelType.Gaussian,
+        RenderingBias = RenderingBias.Performance
+    };
+
     private MainWindow()
     {
         InitializeComponent();
@@ -128,6 +136,8 @@ internal sealed partial class MainWindow : IDisposable
             ProfileDBUtils.SetCurrentProfileFromDB(readOnlyConnection);
             StatsDBUtils.SetStatsFromDB(readOnlyConnection);
         }
+
+        _blurEffect.Freeze();
 
         ConfigManager configManager = ConfigManager.Instance;
         // ReSharper disable once UseAwaitUsing
@@ -1175,9 +1185,7 @@ internal sealed partial class MainWindow : IDisposable
         else if (keyGesture.IsEqual(configManager.ToggleTextOnlyVisibleOnHoverKeyGesture))
         {
             configManager.TextOnlyVisibleOnHover = !configManager.TextOnlyVisibleOnHover;
-            MainGrid.Opacity = configManager.TextOnlyVisibleOnHover && !IsMouseOver
-                ? 0
-                : 1;
+            UpdateTextVisibility(IsMouseOver || PreferencesWindow.IsItVisible());
         }
 
         else if (keyGesture.IsEqual(configManager.OpenLastCreatedNoteInAnkiKeyGesture))
@@ -1908,10 +1916,7 @@ internal sealed partial class MainWindow : IDisposable
         }
 
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.TextOnlyVisibleOnHover)
-        {
-            MainGrid.Opacity = 1d;
-        }
+        UpdateTextVisibility(true);
 
         if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
         {
@@ -2127,6 +2132,25 @@ internal sealed partial class MainWindow : IDisposable
             && mousePosition.Y > physicalTop && mousePosition.Y - physicalHeight < physicalTop;
     }
 
+    public void UpdateTextVisibility(bool showText)
+    {
+        ConfigManager configManager = ConfigManager.Instance;
+        bool hideText = !showText && configManager.TextOnlyVisibleOnHover;
+        MainGrid.Opacity = hideText ? 0d : 1d;
+
+        if (!showText && !hideText && configManager.BlurTextOnUnhover)
+        {
+            if (MainTextBoxEffectWrapper.Effect is not BlurEffect)
+            {
+                MainTextBoxEffectWrapper.Effect = _blurEffect;
+            }
+        }
+        else
+        {
+            MainTextBoxEffectWrapper.Effect = null;
+        }
+    }
+
     public void ChangeVisibility()
     {
         ConfigManager configManager = ConfigManager.Instance;
@@ -2150,10 +2174,7 @@ internal sealed partial class MainWindow : IDisposable
 
         if (!_passThroughMode)
         {
-            if (configManager.TextOnlyVisibleOnHover)
-            {
-                MainGrid.Opacity = 0d;
-            }
+            UpdateTextVisibility(false);
 
             if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
             {
@@ -2202,10 +2223,7 @@ internal sealed partial class MainWindow : IDisposable
     private async void Window_MouseEnter(object sender, MouseEventArgs e)
     {
         ConfigManager configManager = ConfigManager.Instance;
-        if (configManager.TextOnlyVisibleOnHover)
-        {
-            MainGrid.Opacity = 1d;
-        }
+        UpdateTextVisibility(true);
 
         if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
         {
@@ -2592,10 +2610,7 @@ internal sealed partial class MainWindow : IDisposable
 
         if (!_passThroughMode)
         {
-            if (configManager.TextOnlyVisibleOnHover)
-            {
-                MainGrid.Opacity = 0d;
-            }
+            UpdateTextVisibility(false);
 
             if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
             {
@@ -2676,7 +2691,7 @@ internal sealed partial class MainWindow : IDisposable
                 _passThroughMode = true;
                 WinApi.SetTransparentStyle(WindowHandle);
 
-                MainGrid.Opacity = 1d;
+                UpdateTextVisibility(true);
                 FontSizeSlider.Visibility = Visibility.Collapsed;
                 OpacitySlider.Visibility = Visibility.Collapsed;
 

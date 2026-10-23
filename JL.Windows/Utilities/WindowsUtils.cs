@@ -625,10 +625,7 @@ internal static class WindowsUtils
             {
                 if (!mainWindow.IsMouseOver)
                 {
-                    if (configManager.TextOnlyVisibleOnHover)
-                    {
-                        mainWindow.MainGrid.Opacity = 0d;
-                    }
+                    mainWindow.UpdateTextVisibility(false);
 
                     if (configManager.ChangeMainWindowBackgroundOpacityOnUnhover)
                     {

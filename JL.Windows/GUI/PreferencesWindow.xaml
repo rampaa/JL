@@ -513,6 +513,16 @@
                                 </DockPanel>
                             </ListBoxItem>
 
+                            <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp"
+                                         ToolTip="Blurs the main window text until hovered. Text only visible on hover takes priority when both options are enabled.">
+                                <DockPanel Margin="10,0,10,0">
+                                    <TextBlock HorizontalAlignment="Left" Text="Blur text on unhover"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    <CheckBox x:Name="BlurTextOnUnhoverCheckBox" HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </ListBoxItem>
+
                             <ListBoxItem PreviewMouseUp="ListBoxItem_PreviewMouseUp">
                                 <DockPanel Margin="10,0,10,0">
                                     <TextBlock HorizontalAlignment="Left" Text="Change opacity on unhover"
