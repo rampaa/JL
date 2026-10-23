@@ -2138,7 +2138,7 @@ internal sealed partial class MainWindow : IDisposable
         bool hideText = !showText && configManager.TextOnlyVisibleOnHover;
         MainGrid.Opacity = hideText ? 0d : 1d;
 
-        if (!showText && !hideText && configManager.BlurTextOnUnhover)
+        if (!hideText && configManager.BlurTextOnUnhover)
         {
             if (MainTextBoxEffectWrapper.Effect is not BlurEffect)
             {
