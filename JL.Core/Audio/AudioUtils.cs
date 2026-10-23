@@ -19,6 +19,8 @@ public static class AudioUtils
 
     private static KeyValuePair<string, AudioSourceType>[] s_activeAudioSources = [];
     private static long s_audioRequestId;
+    private static readonly Lock s_audioRequestLock = new();
+    private static CancellationTokenSource? s_audioDownloadCancellationTokenSource;
 
     private static readonly OrderedDictionary<string, AudioSource> s_builtInAudioSources = new(1, StringComparer.Ordinal)
     {
@@ -37,15 +39,23 @@ public static class AudioUtils
         new("x-midi", "midi")
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    public static long StartAudioRequest() => Interlocked.Increment(ref s_audioRequestId);
+    public static long StartAudioRequest()
+    {
+        lock (s_audioRequestLock)
+        {
+            long requestId = Interlocked.Increment(ref s_audioRequestId);
+            s_audioDownloadCancellationTokenSource?.Cancel();
+            return requestId;
+        }
+    }
 
     public static bool IsCurrentAudioRequest(long requestId) => requestId == Volatile.Read(ref s_audioRequestId);
 
-    private static async ValueTask<AudioResponse?> GetAudioFromUrl(Uri url)
+    private static async ValueTask<AudioResponse?> GetAudioFromUrl(Uri url, CancellationToken cancellationToken)
     {
         try
         {
-            using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
                 string? mediaType = response.Content.Headers.ContentType?.MediaType;
@@ -58,13 +68,18 @@ public static class AudioUtils
                     audioFormat = fileSuffix;
                 }
 
-                byte[] audioData = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                byte[] audioData = await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
                 return HashUtils.HasMd5Hash(audioData, NetworkUtils.s_jpod101NoAudioMd5HashBytes)
                     ? null
                     : new AudioResponse(AudioSourceType.Url, audioFormat, audioData);
             }
 
             LoggerManager.Logger.Information("Error getting audio from {Url}", url.OriginalString);
+            return null;
+        }
+        catch (OperationCanceledException)
+        {
+            LoggerManager.Logger.Debug("Audio download cancelled for {Url}", url.OriginalString);
             return null;
         }
         catch (Exception ex)
@@ -75,14 +90,14 @@ public static class AudioUtils
         }
     }
 
-    private static async ValueTask<AudioResponse?> GetAudioFromJsonReturningUrl(Uri url)
+    private static async ValueTask<AudioResponse?> GetAudioFromJsonReturningUrl(Uri url, CancellationToken cancellationToken)
     {
         try
         {
-            using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            using HttpResponseMessage response = await NetworkUtils.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
-                JsonElement jsonElement = await response.Content.ReadFromJsonAsync<JsonElement>().ConfigureAwait(false);
+                JsonElement jsonElement = await response.Content.ReadFromJsonAsync<JsonElement>(cancellationToken).ConfigureAwait(false);
                 if (jsonElement.TryGetProperty("audioSources", out JsonElement audioSources))
                 {
                     foreach (JsonElement audioSource in audioSources.EnumerateArray())
@@ -96,7 +111,12 @@ public static class AudioUtils
                                 urlStr = urlStr.Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase);
                                 if (Uri.TryCreate(urlStr, UriKind.Absolute, out Uri? resultUrl))
                                 {
-                                    AudioResponse? audioResponse = await GetAudioFromUrl(resultUrl).ConfigureAwait(false);
+                                    AudioResponse? audioResponse = await GetAudioFromUrl(resultUrl, cancellationToken).ConfigureAwait(false);
+                                    if (cancellationToken.IsCancellationRequested)
+                                    {
+                                        return null;
+                                    }
+
                                     if (audioResponse is not null)
                                     {
                                         return audioResponse;
@@ -109,6 +129,11 @@ public static class AudioUtils
             }
 
             LoggerManager.Logger.Information("Error getting audio from {Url}", url.OriginalString);
+            return null;
+        }
+        catch (OperationCanceledException)
+        {
+            LoggerManager.Logger.Debug("Audio download cancelled for {Url}", url.OriginalString);
             return null;
         }
         catch (Exception ex)
@@ -135,65 +160,99 @@ public static class AudioUtils
 
     internal static async ValueTask<AudioResponse?> GetPrioritizedAudio(string spelling, string reading, long requestId)
     {
-        AudioResponse? audioResponse = null;
-        foreach ((string uri, AudioSourceType audioSourceType) in Volatile.Read(ref s_activeAudioSources))
+        CancellationTokenSource? cancellationTokenSource = null;
+        try
         {
-            if (requestId is not -1 && !IsCurrentAudioRequest(requestId))
+            AudioResponse? audioResponse = null;
+            foreach ((string uri, AudioSourceType audioSourceType) in Volatile.Read(ref s_activeAudioSources))
             {
-                return null;
-            }
-
-            switch (audioSourceType)
-            {
-                case AudioSourceType.Url:
-                case AudioSourceType.UrlJson:
+                if (requestId is not -1 && !IsCurrentAudioRequest(requestId))
                 {
-                    string normalizedUriStr = uri
-                        .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase)
-                        .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
-                        .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
-
-                    Uri normalizedUri = new(normalizedUriStr);
-                    audioResponse = audioSourceType is AudioSourceType.Url
-                        ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
-                        : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
-
-                    break;
+                    return null;
                 }
 
-                case AudioSourceType.LocalPath:
+                switch (audioSourceType)
                 {
-                    string normalizedUriStr = uri
-                        .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
-                        .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
-
-                    normalizedUriStr = Path.GetFullPath(normalizedUriStr, AppInfo.ApplicationPath);
-
-                    Uri normalizedUri = new(normalizedUriStr);
-                    audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
-
-                    break;
-                }
-
-                case AudioSourceType.TextToSpeech:
-                    if (requestId is not -1)
+                    case AudioSourceType.Url:
+                    case AudioSourceType.UrlJson:
                     {
-                        await FrontendManager.Frontend.TextToSpeech(uri, reading, requestId).ConfigureAwait(false);
-                    }
-                    return s_textToSpeechAudioResponse;
+                        string normalizedUriStr = uri
+                            .Replace("://localhost", "://127.0.0.1", StringComparison.OrdinalIgnoreCase)
+                            .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
+                            .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
 
-                default:
-                    LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AudioUtils), nameof(GetPrioritizedAudio), audioSourceType);
+                        if (requestId is not -1 && cancellationTokenSource is null)
+                        {
+                            lock (s_audioRequestLock)
+                            {
+                                if (!IsCurrentAudioRequest(requestId))
+                                {
+                                    return null;
+                                }
+
+                                cancellationTokenSource = new CancellationTokenSource();
+                                s_audioDownloadCancellationTokenSource = cancellationTokenSource;
+                            }
+                        }
+
+                        CancellationToken cancellationToken = cancellationTokenSource?.Token ?? CancellationToken.None;
+                        Uri normalizedUri = new(normalizedUriStr);
+                        audioResponse = audioSourceType is AudioSourceType.Url
+                            ? await GetAudioFromUrl(normalizedUri, cancellationToken).ConfigureAwait(false)
+                            : await GetAudioFromJsonReturningUrl(normalizedUri, cancellationToken).ConfigureAwait(false);
+
+                        break;
+                    }
+
+                    case AudioSourceType.LocalPath:
+                    {
+                        string normalizedUriStr = uri
+                            .Replace("{Term}", spelling, StringComparison.OrdinalIgnoreCase)
+                            .Replace("{Reading}", reading, StringComparison.OrdinalIgnoreCase);
+
+                        normalizedUriStr = Path.GetFullPath(normalizedUriStr, AppInfo.ApplicationPath);
+
+                        Uri normalizedUri = new(normalizedUriStr);
+                        audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
+
+                        break;
+                    }
+
+                    case AudioSourceType.TextToSpeech:
+                        if (requestId is not -1)
+                        {
+                            await FrontendManager.Frontend.TextToSpeech(uri, reading, requestId).ConfigureAwait(false);
+                        }
+                        return s_textToSpeechAudioResponse;
+
+                    default:
+                        LoggerManager.Logger.Error("Invalid {TypeName} ({ClassName}.{MethodName}): {Value}", nameof(AudioSourceType), nameof(AudioUtils), nameof(GetPrioritizedAudio), audioSourceType);
+                        break;
+                }
+
+                if (audioResponse is not null)
+                {
                     break;
+                }
             }
 
-            if (audioResponse is not null)
+            return audioResponse;
+        }
+        finally
+        {
+            if (cancellationTokenSource is not null)
             {
-                break;
+                lock (s_audioRequestLock)
+                {
+                    if (ReferenceEquals(s_audioDownloadCancellationTokenSource, cancellationTokenSource))
+                    {
+                        s_audioDownloadCancellationTokenSource = null;
+                    }
+
+                    cancellationTokenSource.Dispose();
+                }
             }
         }
-
-        return audioResponse;
     }
 
     public static async Task GetAndPlayAudio(string foundSpelling, string? reading)
