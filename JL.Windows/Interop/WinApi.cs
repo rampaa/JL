@@ -66,10 +66,6 @@ internal static partial class WinApi
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static partial nint SHCreateMemStream(nint initialData, uint length);
 
-        [LibraryImport("shcore.dll", EntryPoint = "CreateRandomAccessStreamOverStream")]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static partial int CreateRandomAccessStreamOverStream(nint stream, int options, in Guid iid, out nint result);
-
         [LibraryImport("mfplat.dll", EntryPoint = "MFStartup")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static partial int MFStartup(uint version, uint flags);
@@ -94,6 +90,10 @@ internal static partial class WinApi
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static partial int MFCreateMemoryBuffer(uint length, out nint buffer);
 
+        [LibraryImport("mfplat.dll", EntryPoint = "MFCreateAlignedMemoryBuffer")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int MFCreateAlignedMemoryBuffer(uint length, uint alignmentMask, out nint buffer);
+
         [LibraryImport("mf.dll", EntryPoint = "MFTranscodeGetAudioOutputAvailableTypes")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static partial int MFTranscodeGetAudioOutputAvailableTypes(in Guid subtype, uint flags, nint attributes, out nint types);
@@ -101,10 +101,6 @@ internal static partial class WinApi
         [LibraryImport("mfplat.dll", EntryPoint = "MFCreateMFByteStreamOnStreamEx")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static partial int MFCreateMFByteStreamOnStreamEx(nint stream, out nint byteStream);
-
-        [LibraryImport("mfreadwrite.dll", EntryPoint = "MFCreateSourceReaderFromByteStream")]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static partial int MFCreateSourceReaderFromByteStream(nint byteStream, nint attributes, out nint reader);
 
         [LibraryImport("mfreadwrite.dll", EntryPoint = "MFCreateSinkWriterFromURL")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]

@@ -13,15 +13,19 @@ internal static class SpeechSynthesisInterop
         nint nativeObjectAddress = WinRT.MarshalInterface<IBuffer>.FromManaged(buffer);
         try
         {
-            Marshal.ThrowExceptionForHR(Marshal.QueryInterface(nativeObjectAddress, in s_bufferByteAccess, out nint bufferAccessAddress));
+            if (!MediaFoundation.CheckResult(Marshal.QueryInterface(nativeObjectAddress, in s_bufferByteAccess, out nint bufferAccessAddress), "Accessing the playback buffer"))
+            {
+                return 0;
+            }
             try
             {
                 const int bufferMethodIndex = 3;
-                nint bufferDataAddress;
+                nint bufferDataAddress = 0;
                 nint* methods = *(nint**)bufferAccessAddress;
                 delegate* unmanaged[Stdcall]<nint, nint*, int> getBuffer = (delegate* unmanaged[Stdcall]<nint, nint*, int>)methods[bufferMethodIndex];
-                Marshal.ThrowExceptionForHR(getBuffer(bufferAccessAddress, &bufferDataAddress));
-                return bufferDataAddress;
+                return MediaFoundation.CheckResult(getBuffer(bufferAccessAddress, &bufferDataAddress), "Reading the playback buffer address")
+                    ? bufferDataAddress
+                    : 0;
             }
             finally
             {
@@ -34,23 +38,34 @@ internal static class SpeechSynthesisInterop
         }
     }
 
-    public static unsafe void GetPreferredAudioFormat(object engine, out Guid formatId, out nint waveFormat)
+    public static unsafe bool TryGetPreferredAudioFormat(object engine, out Guid formatId, out nint waveFormat)
     {
+        formatId = default;
+        waveFormat = 0;
         nint nativeObjectAddress = Marshal.GetIUnknownForObject(engine);
         try
         {
-            Marshal.ThrowExceptionForHR(Marshal.QueryInterface(nativeObjectAddress, in s_speechEngine, out nint speechEngineAddress));
+            if (!MediaFoundation.CheckResult(Marshal.QueryInterface(nativeObjectAddress, in s_speechEngine, out nint speechEngineAddress), "Accessing the speech engine"))
+            {
+                return false;
+            }
             try
             {
                 const int outputFormatMethodIndex = 4;
-                Guid format;
-                nint waveFormatAddress;
+                Guid format = default;
+                nint waveFormatAddress = 0;
                 nint* methods = *(nint**)speechEngineAddress;
                 delegate* unmanaged[Stdcall]<nint, nint, nint, Guid*, nint*, int> getOutputFormat =
                     (delegate* unmanaged[Stdcall]<nint, nint, nint, Guid*, nint*, int>)methods[outputFormatMethodIndex];
-                Marshal.ThrowExceptionForHR(getOutputFormat(speechEngineAddress, 0, 0, &format, &waveFormatAddress));
+                if (!MediaFoundation.CheckResult(getOutputFormat(speechEngineAddress, 0, 0, &format, &waveFormatAddress), "Reading the speech audio format"))
+                {
+                    Marshal.FreeCoTaskMem(waveFormatAddress);
+                    return false;
+                }
+
                 formatId = format;
                 waveFormat = waveFormatAddress;
+                return true;
             }
             finally
             {

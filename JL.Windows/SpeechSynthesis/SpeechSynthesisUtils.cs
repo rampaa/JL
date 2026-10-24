@@ -15,6 +15,7 @@ internal static class SpeechSynthesisUtils
 {
     private const int ResourceDisposalTimeoutSeconds = 2;
     private const int SpeechThrottleMilliseconds = 300;
+    private const SpeechPlaybackChannels PlaybackChannels = SpeechPlaybackChannels.EnginePreferred;
     private static readonly SemaphoreSlim s_playbackSynthesisSemaphoreSlim = new(1, 1);
     private static readonly Lock s_miningLock = new();
     private static NativeSpeechSynthesizer? s_playbackSynthesizer;
@@ -24,7 +25,6 @@ internal static class SpeechSynthesisUtils
     private static long s_lastAudioPlayTimestamp;
     private static bool s_stopping;
 
-    private const SpeechPlaybackChannels PlaybackChannels = SpeechPlaybackChannels.EnginePreferred;
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
 
     public static ComboBoxItem[] GetInstalledVoiceItems()
@@ -89,10 +89,20 @@ internal static class SpeechSynthesisUtils
                 return;
             }
 
-            NativeSpeechSynthesizer synthesizer = s_playbackSynthesizer ??= new NativeSpeechSynthesizer();
-            if (!synthesizer.TrySelectVoice(voiceName))
+            NativeSpeechSynthesizer? synthesizer = s_playbackSynthesizer ??= NativeSpeechSynthesizer.Create();
+            if (synthesizer is null)
             {
-                voiceUnavailable = true;
+                NotifyPlaybackSynthesisFailure();
+                return;
+            }
+
+            if (!synthesizer.TrySelectVoice(voiceName, out voiceUnavailable))
+            {
+                if (!voiceUnavailable)
+                {
+                    NotifyPlaybackSynthesisFailure();
+                }
+
                 return;
             }
 
@@ -115,7 +125,7 @@ internal static class SpeechSynthesisUtils
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Couldn't start speech synthesis with {VoiceName}", voiceName);
-            NotificationManager.Notify(NotificationLevel.Error, "Couldn't synthesize speech. Check the logs for more details.");
+            NotifyPlaybackSynthesisFailure();
         }
         finally
         {
@@ -133,13 +143,21 @@ internal static class SpeechSynthesisUtils
         }
     }
 
+    private static void NotifyPlaybackSynthesisFailure()
+    {
+        NotificationManager.Notify(NotificationLevel.Error, "Couldn't synthesize speech. Check the logs for more details.");
+    }
+
     private static void GenerateSpeechForPlayback(NativeSpeechSynthesizer synthesizer, string text, SpeechAudioSource speechAudio)
     {
         try
         {
             if (!speechAudio.CancellationToken.IsCancellationRequested)
             {
-                synthesizer.GenerateSpeech(text, speechAudio);
+                if (!synthesizer.GenerateSpeech(text, speechAudio) && !speechAudio.CancellationToken.IsCancellationRequested)
+                {
+                    speechAudio.ReportSynthesisFailure();
+                }
             }
         }
         catch (OperationCanceledException)
@@ -198,23 +216,32 @@ internal static class SpeechSynthesisUtils
 
     private static async Task<byte[]?> CreateMiningAudioResponse(string voiceName, string text)
     {
-        using InMemoryRandomAccessStream? compressedAudio = CreateMiningAudio(voiceName, text);
-        if (compressedAudio is null)
+        try
         {
+            using InMemoryRandomAccessStream? compressedAudio = CreateMiningAudio(voiceName, text);
+            if (compressedAudio is null)
+            {
+                return null;
+            }
+
+            byte[] audio = new byte[checked((int)compressedAudio.Size)];
+            using DataReader reader = new(compressedAudio.GetInputStreamAt(0));
+            uint loaded = await reader.LoadAsync((uint)audio.Length).AsTask().ConfigureAwait(false);
+            if (loaded != audio.Length)
+            {
+                LoggerManager.Logger.Error("Couldn't read all of the synthesized MP3 audio");
+                return null;
+            }
+
+            reader.ReadBytes(audio);
+            return audio;
+        }
+        catch (Exception ex)
+        {
+            LoggerManager.Logger.Error(ex, "Couldn't generate mining audio with {VoiceName}", voiceName);
+            // NotificationManager.Notify(NotificationLevel.Error, "Couldn't generate speech audio. Mining will continue without it.");
             return null;
         }
-
-        byte[] audio = new byte[checked((int)compressedAudio.Size)];
-        using DataReader reader = new(compressedAudio.GetInputStreamAt(0));
-        uint loaded = await reader.LoadAsync((uint)audio.Length).AsTask().ConfigureAwait(false);
-        if (loaded != audio.Length)
-        {
-            LoggerManager.Logger.Error("Couldn't read all of the synthesized MP3 audio");
-            return null;
-        }
-
-        reader.ReadBytes(audio);
-        return audio;
     }
 
     private static InMemoryRandomAccessStream? CreateMiningAudio(string voiceName, string text)
@@ -226,21 +253,24 @@ internal static class SpeechSynthesisUtils
                 return null;
             }
 
-            NativeSpeechSynthesizer synthesizer = s_miningSynthesizer ??= new NativeSpeechSynthesizer();
-            if (!synthesizer.TrySelectVoice(voiceName))
-            {
-                DeactivateUnavailableVoice(voiceName).SafeFireAndForget("Couldn't deactivate an unavailable speech voice");
-                return null;
-            }
-
-            using IRandomAccessStream? wave = synthesizer.GenerateWaveAudio(text);
-            if (wave is null)
+            NativeSpeechSynthesizer? synthesizer = s_miningSynthesizer ??= NativeSpeechSynthesizer.Create();
+            if (synthesizer is null)
             {
                 return null;
             }
 
-            Mp3Encoder encoder = s_miningMp3Encoder ??= new Mp3Encoder();
-            return encoder.Encode(wave, synthesizer.PreferredAudioFormat.SamplesPerSecond, synthesizer.PreferredAudioFormat.ChannelCount);
+            if (!synthesizer.TrySelectVoice(voiceName, out bool voiceNotFound))
+            {
+                if (voiceNotFound)
+                {
+                    DeactivateUnavailableVoice(voiceName).SafeFireAndForget("Couldn't deactivate an unavailable speech voice");
+                }
+
+                return null;
+            }
+
+            Mp3Encoder? encoder = s_miningMp3Encoder ??= Mp3Encoder.Create();
+            return encoder?.Encode(synthesizer, text);
         }
     }
 

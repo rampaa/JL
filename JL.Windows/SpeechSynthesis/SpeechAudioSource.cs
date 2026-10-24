@@ -22,6 +22,7 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
     private const int Success = 0;
     private const int AccessDenied = unchecked((int)0x80030005);
     private const int InvalidFunction = unchecked((int)0x80030001);
+    private const int InvalidArgument = unchecked((int)0x80070057);
     private const int WriteAborted = unchecked((int)0x80004004);
     private const int BufferCapacity = 8;
     private readonly Channel<IBuffer> _queuedAudioBuffers = Channel.CreateBounded<IBuffer>(new BoundedChannelOptions(BufferCapacity) { SingleWriter = true });
@@ -39,6 +40,10 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
     private long _suppliedByteCount;
     private int _disposed;
     private int _remainingUsers = 2; // Both the synthesis worker and player must finish before the cancellation handle can be disposed.
+
+    public bool IsSynthesisStopped { get; private set; } = true;
+    public void BeginSynthesis() => IsSynthesisStopped = false;
+    public void MarkSynthesisStopped() => IsSynthesisStopped = true;
 
     public CancellationToken CancellationToken { get; }
     public MediaStreamSource PlaybackSource { get; }
@@ -69,31 +74,31 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
     // ReSharper disable once AsyncVoidMethod
     private async void MediaStreamSource_SampleRequested(MediaStreamSource sender, MediaStreamSourceSampleRequestedEventArgs args)
     {
-        MediaStreamSourceSampleRequest request = args.Request;
-        MediaStreamSourceSampleRequestDeferral deferral = request.GetDeferral();
         try
         {
-            if (await _queuedAudioBuffers.Reader.WaitToReadAsync().ConfigureAwait(false)
-                && _queuedAudioBuffers.Reader.TryRead(out IBuffer? buffer))
+            MediaStreamSourceSampleRequest request = args.Request;
+            MediaStreamSourceSampleRequestDeferral deferral = request.GetDeferral();
+            try
             {
-                TimeSpan start = GetPlaybackTime(_suppliedByteCount);
-                _suppliedByteCount += buffer.Length;
-                MediaStreamSample sample = MediaStreamSample.CreateFromBuffer(buffer, start);
-                sample.Duration = GetPlaybackTime(_suppliedByteCount) - start;
-                request.Sample = sample;
+                if (await _queuedAudioBuffers.Reader.WaitToReadAsync(CancellationToken.None).ConfigureAwait(false)
+                    && _queuedAudioBuffers.Reader.TryRead(out IBuffer? buffer))
+                {
+                    TimeSpan start = GetPlaybackTime(_suppliedByteCount);
+                    _suppliedByteCount += buffer.Length;
+                    MediaStreamSample sample = MediaStreamSample.CreateFromBuffer(buffer, start);
+                    sample.Duration = GetPlaybackTime(_suppliedByteCount) - start;
+                    request.Sample = sample;
+                }
+            }
+            finally
+            {
+                deferral.Complete();
             }
         }
         catch (Exception ex)
         {
             LoggerManager.Logger.Error(ex, "Couldn't supply speech audio to the player");
-            if (!CancellationToken.IsCancellationRequested)
-            {
-                PlaybackSource.NotifyError(MediaStreamSourceErrorStatus.Other);
-            }
-        }
-        finally
-        {
-            deferral.Complete();
+            ReportSynthesisFailure();
         }
     }
 
@@ -109,6 +114,11 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
         if (bytesWrittenAddress is not 0)
         {
             Marshal.WriteInt32(bytesWrittenAddress, 0);
+        }
+
+        if (inputByteCount < 0 || (inputDataAddress is 0 && inputByteCount > 0))
+        {
+            return InvalidArgument;
         }
 
         if (CancellationToken.IsCancellationRequested)
@@ -169,6 +179,11 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
             {
                 _bufferBeingFilled = new WinRTBuffer((uint)_bufferCapacityBytes);
                 _bufferDataAddress = SpeechSynthesisInterop.GetBufferDataAddress(_bufferBeingFilled);
+                if (_bufferDataAddress is 0)
+                {
+                    _bufferBeingFilled = null;
+                    return false;
+                }
             }
 
             int frameCount = Math.Min((_bufferCapacityBytes - _bufferedByteCount) / _playbackFormat.BytesPerFrame, (inputByteCount - inputOffset) / _engineFormat.BytesPerFrame);
@@ -252,7 +267,7 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
         // SAPI's Write callback is synchronous; only its synthesis worker waits for playback to free space.
         while (!_queuedAudioBuffers.Writer.TryWrite(_bufferBeingFilled))
         {
-            if (!_queuedAudioBuffers.Writer.WaitToWriteAsync().AsTask().GetAwaiter().GetResult())
+            if (!_queuedAudioBuffers.Writer.WaitToWriteAsync(CancellationToken.None).AsTask().GetAwaiter().GetResult())
             {
                 return false;
             }
@@ -264,17 +279,17 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
         return true;
     }
 
-    public void CompleteSynthesis()
+    public bool CompleteSynthesis()
     {
         if (_incompleteFrameByteCount is not 0)
         {
             LoggerManager.Logger.Error("Speech synthesis ended with an incomplete PCM sample frame");
-            ReportSynthesisFailure();
-            return;
+            return false;
         }
 
-        _ = QueueFilledBuffer();
+        bool succeeded = QueueFilledBuffer();
         _ = _queuedAudioBuffers.Writer.TryComplete();
+        return succeeded;
     }
 
     public void ReportSynthesisFailure()
@@ -282,12 +297,25 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
         _ = _queuedAudioBuffers.Writer.TryComplete();
         if (!CancellationToken.IsCancellationRequested)
         {
-            PlaybackSource.NotifyError(MediaStreamSourceErrorStatus.Other);
+            try
+            {
+                PlaybackSource.NotifyError(MediaStreamSourceErrorStatus.Other);
+            }
+            catch (Exception ex)
+            {
+                LoggerManager.Logger.Error(ex, "Couldn't report the speech playback failure");
+            }
         }
     }
 
     public void ReleaseSynthesisResources()
     {
+        if (!IsSynthesisStopped)
+        {
+            LoggerManager.Logger.Error("Cannot release speech audio while synthesis is running");
+            return;
+        }
+
         _bufferBeingFilled = null;
         _bufferDataAddress = 0;
         _incompleteFrame = null;
