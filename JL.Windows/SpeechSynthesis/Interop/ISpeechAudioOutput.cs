@@ -5,7 +5,9 @@ namespace JL.Windows.SpeechSynthesis.Interop;
 
 #pragma warning disable CA1515 // Runtime COM exposes this interface to SAPI only when it is public.
 // SAPI expects the exact IStream method order. PreserveSig returns errors directly without throwing.
-[ComVisible(true), Guid("0000000C-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+[ComVisible(true)]
+[Guid("0000000C-0000-0000-C000-000000000046")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public interface ISpeechAudioOutput
 {
     [PreserveSig]

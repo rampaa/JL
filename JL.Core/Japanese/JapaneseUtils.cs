@@ -289,7 +289,7 @@ public static partial class JapaneseUtils
 
     private static readonly FrozenDictionary<string, char>.AlternateLookup<ReadOnlySpan<char>> s_supplementaryNormalizationDictAlternativeLookup = s_supplementaryNormalizationDict.GetAlternateLookup<ReadOnlySpan<char>>();
 
-    public static readonly FrozenDictionary<char, char> SmallVowelHiraganaToFinalVowelDict = new KeyValuePair<char, char>[]
+    private static readonly FrozenDictionary<char, char> s_smallVowelHiraganaToFinalVowelDict = new KeyValuePair<char, char>[]
     {
         new('ぁ', 'あ'),
         new('ぃ', 'い'),
@@ -367,12 +367,12 @@ public static partial class JapaneseUtils
 
     private static readonly SearchValues<char> s_expressionTerminatingCharacters = SearchValues.Create([.. s_leftToRightBracketDict.Keys, .. s_leftToRightBracketDict.Values, .. s_sentenceTerminatingCharactersArray, '…', '‥', '︙', '︰']);
     internal static readonly SearchValues<char> s_fuseji = SearchValues.Create(NormalizedFuseji, '〇', '◯', '●', '⬤', '◎', '◉', '□', '■', '×', '◇', '◆', '△', '▲', '▽', '▼', '※', '*', '#');
-    internal static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜', '~');
+    private static readonly SearchValues<char> s_longVowelMarkChars = SearchValues.Create('ー', '〜', '~');
     internal static readonly SearchValues<char> s_longVowelMarkCharsNotNormalized = SearchValues.Create('ー', '〜', '~', '～');
     private static readonly SearchValues<char> s_charsToStrip = SearchValues.Create(' ', '・', '.', '·', '=', '゠', '☆', '★', '†', '‡', '♥', '♡');
     private static readonly SearchValues<char> s_longVowelMarksAndSmallVowelHiragana = SearchValues.Create(
     [
-        'ー', '〜', '~', .. SmallVowelHiraganaToFinalVowelDict.Keys
+        'ー', '〜', '~', .. s_smallVowelHiraganaToFinalVowelDict.Keys
     ]);
 
     private static char[] BuildHighSurrogates(FrozenDictionary<string, char> supplementaryDict)
@@ -629,15 +629,14 @@ public static partial class JapaneseUtils
         }
 
         alternativeVowel = GetAlternativeVowel(vowel);
-        return s_longVowelMarkChars.Contains(currentCharacter) || (SmallVowelHiraganaToFinalVowelDict.TryGetValue(currentCharacter, out char smallVowelTarget)
+        return s_longVowelMarkChars.Contains(currentCharacter) || (s_smallVowelHiraganaToFinalVowelDict.TryGetValue(currentCharacter, out char smallVowelTarget)
             && (smallVowelTarget == vowel || smallVowelTarget == alternativeVowel));
     }
 
     private static bool IsElongationContinuation(char character, char vowel, char alternativeVowel)
     {
         return s_longVowelMarkChars.Contains(character)
-            || (SmallVowelHiraganaToFinalVowelDict.TryGetValue(character, out char target)
-                && (target == vowel || target == alternativeVowel));
+            || (s_smallVowelHiraganaToFinalVowelDict.TryGetValue(character, out char target) && (target == vowel || target == alternativeVowel));
     }
 
     internal static int CountNonConsecutiveLongVowelMarks(ReadOnlySpan<char> text)
@@ -996,7 +995,7 @@ public static partial class JapaneseUtils
             && character is not ('ﾞ' or 'ﾟ'); // Halfwidth dakuten and handakuten combine with the preceding kana.
     }
 
-    public static string RemovePunctuation(string text)
+    internal static string RemovePunctuation(string text)
     {
         int index = FirstPunctuationIndex(text);
         if (index < 0)

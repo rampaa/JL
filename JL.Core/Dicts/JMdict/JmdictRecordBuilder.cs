@@ -188,9 +188,8 @@ internal static class JmdictRecordBuilder
             List<string?> definitionInfoList = new(senseListSpanLength);
             List<string[]?> crossReferencesList = new(senseListSpanLength);
 
-            for (int i = 0; i < senseListSpan.Length; i++)
+            foreach (Sense sense in senseListSpan)
             {
-                Sense sense = senseListSpan[i];
                 if ((sense.StagKArray is null && sense.StagRArray is null)
                     || SenseAppliesToSpelling(sense, key, kanjiElementsSpan, readingElementsSpan)
                     || SenseAppliesToReading(sense, key, kanjiElementsSpan, readingElementsSpan))
@@ -488,9 +487,8 @@ internal static class JmdictRecordBuilder
             List<string?> definitionInfoList = new(senseListSpanLength);
             List<string[]?> crossReferencesList = new(senseListSpanLength);
 
-            for (int j = 0; j < senseListSpan.Length; j++)
+            foreach (Sense sense in senseListSpan)
             {
-                Sense sense = senseListSpan[j];
                 if ((sense.StagKArray is null && sense.StagRArray is null)
                     || SenseAppliesToReading(sense, key, kanjiElementsSpan, readingElementsSpan))
                 {

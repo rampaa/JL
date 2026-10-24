@@ -1233,7 +1233,7 @@ internal sealed partial class PopupWindow : IDisposable
         LookupDisplayResult? selectedItem = useSelectedListViewItemIfItExists
             ? (LookupDisplayResult?)PopupListView.SelectedItem
             : null;
-        int listViewItemIndex = selectedItem is not null ? selectedItem.Index : _listViewItemIndex;
+        int listViewItemIndex = selectedItem?.Index ?? _listViewItemIndex;
 
         LookupResult lookupResult = LastLookupResults[listViewItemIndex];
         if (lookupResult.Readings is null || lookupResult.Readings.Length is 1)
@@ -1281,7 +1281,7 @@ internal sealed partial class PopupWindow : IDisposable
             ? (LookupDisplayResult?)PopupListView.SelectedItem
             : null;
 
-        int listViewItemIndex = selectedItem is not null ? selectedItem.Index : _listViewItemIndex;
+        int listViewItemIndex = selectedItem?.Index ?? _listViewItemIndex;
 
         LookupResult[] lookupResults = LastLookupResults;
         LookupResult lookupResult = lookupResults[listViewItemIndex];
@@ -2416,9 +2416,9 @@ internal sealed partial class PopupWindow : IDisposable
 
     private void ClickDictTypeButton(Button button)
     {
-        for (int i = 0; i < _dictTypeButtons.Count; i++)
+        foreach (Button dictTypeButton in _dictTypeButtons)
         {
-            _dictTypeButtons[i].ClearValue(BackgroundProperty);
+            dictTypeButton.ClearValue(BackgroundProperty);
         }
 
         button.Background = Brushes.DodgerBlue;

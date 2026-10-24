@@ -1679,7 +1679,7 @@ public static class MiningUtils
                 ankiConfig = otherConfig;
             }
 
-            if (ankiConfig is null || ankiConfig.FirstFieldName is null)
+            if (ankiConfig?.FirstFieldName is null)
             {
                 continue;
             }
@@ -1705,15 +1705,12 @@ public static class MiningUtils
                 };
 
                 ref int noteIndex = ref CollectionsMarshal.GetValueRefOrAddDefault(noteIndicesByKey, noteKey, out bool exists);
-                if (exists)
-                {
-                    noteIndices[i] = noteIndex;
-                }
-                else
+                if (!exists)
                 {
                     noteIndex = notes.Count + 1;
-                    noteIndices[i] = noteIndex;
                 }
+
+                noteIndices[i] = noteIndex;
             }
 
             Dictionary<string, string> firstFieldDict = new(1, StringComparer.Ordinal)

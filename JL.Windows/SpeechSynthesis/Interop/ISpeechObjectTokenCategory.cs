@@ -2,7 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace JL.Windows.SpeechSynthesis.Interop;
 
-[ComImport, Guid("CA7EAC50-2D01-4145-86D4-5AE7D70F4469"), InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
+[ComImport]
+[Guid("CA7EAC50-2D01-4145-86D4-5AE7D70F4469")]
+[InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
 internal interface ISpeechObjectTokenCategory
 {
     [DispId(3)]

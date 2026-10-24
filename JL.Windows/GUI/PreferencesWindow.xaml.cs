@@ -48,6 +48,10 @@ internal sealed partial class PreferencesWindow
     public bool SetAnkiConfig { get; private set; } // = false;
     private Task? _ankiConfigTask;
     private bool _ankiNamesLoaded; // = false;
+    private bool _wordTagsChanged; // = false;
+    private bool _kanjiTagsChanged; // = false;
+    private bool _nameTagsChanged; // = false;
+    private bool _otherTagsChanged; // = false;
     private string _profileName;
     private readonly Dict _profileNamesDict;
     private readonly Dict _profileWordsDict;
@@ -349,6 +353,7 @@ internal sealed partial class PreferencesWindow
     private async void ResetPreferencesButton_Click(object sender, RoutedEventArgs e)
     {
         ResetPreferencesButton.IsEnabled = false;
+        // ReSharper disable once MethodHasAsyncOverload
         if (WindowsUtils.ShowYesNoDialog("Are you really sure that you want to reset all your preferences to their default values for the current profile?", "Reset preferences for the current profile?", this))
         {
             IsEnabled = false;
@@ -366,41 +371,40 @@ internal sealed partial class PreferencesWindow
 
     #region MiningSetup
 
-    private async Task SetPreviousMiningConfig()
+    private void TagsTextChanged(object sender, TextChangedEventArgs e)
     {
-        bool wordTagsChanged = false;
-        bool kanjiTagsChanged = false;
-        bool nameTagsChanged = false;
-        bool otherTagsChanged = false;
-
-        void TagsTextChanged(object sender, TextChangedEventArgs e)
+        if (ReferenceEquals(sender, WordTagsTextBox))
         {
-            if (sender == WordTagsTextBox)
-            {
-                wordTagsChanged = true;
-            }
-
-            else if (sender == KanjiTagsTextBox)
-            {
-                kanjiTagsChanged = true;
-            }
-
-            else if (sender == NameTagsTextBox)
-            {
-                nameTagsChanged = true;
-            }
-
-            else
-            {
-                otherTagsChanged = true;
-            }
+            _wordTagsChanged = true;
         }
 
-        TextChangedEventHandler tagsTextChanged = TagsTextChanged;
-        WordTagsTextBox.TextChanged += tagsTextChanged;
-        KanjiTagsTextBox.TextChanged += tagsTextChanged;
-        NameTagsTextBox.TextChanged += tagsTextChanged;
-        OtherTagsTextBox.TextChanged += tagsTextChanged;
+        else if (ReferenceEquals(sender, KanjiTagsTextBox))
+        {
+            _kanjiTagsChanged = true;
+        }
+
+        else if (ReferenceEquals(sender, NameTagsTextBox))
+        {
+            _nameTagsChanged = true;
+        }
+
+        else
+        {
+            _otherTagsChanged = true;
+        }
+    }
+
+    private async Task SetPreviousMiningConfig()
+    {
+        _wordTagsChanged = false;
+        _kanjiTagsChanged = false;
+        _nameTagsChanged = false;
+        _otherTagsChanged = false;
+
+        WordTagsTextBox.TextChanged += TagsTextChanged;
+        KanjiTagsTextBox.TextChanged += TagsTextChanged;
+        NameTagsTextBox.TextChanged += TagsTextChanged;
+        OtherTagsTextBox.TextChanged += TagsTextChanged;
         Dictionary<MineType, AnkiConfig>? ankiConfigDict;
         try
         {
@@ -408,10 +412,10 @@ internal sealed partial class PreferencesWindow
         }
         finally
         {
-            WordTagsTextBox.TextChanged -= tagsTextChanged;
-            KanjiTagsTextBox.TextChanged -= tagsTextChanged;
-            NameTagsTextBox.TextChanged -= tagsTextChanged;
-            OtherTagsTextBox.TextChanged -= tagsTextChanged;
+            WordTagsTextBox.TextChanged -= TagsTextChanged;
+            KanjiTagsTextBox.TextChanged -= TagsTextChanged;
+            NameTagsTextBox.TextChanged -= TagsTextChanged;
+            OtherTagsTextBox.TextChanged -= TagsTextChanged;
         }
 
         if (ankiConfigDict is null || !IsVisible)
@@ -421,25 +425,25 @@ internal sealed partial class PreferencesWindow
 
         if (ankiConfigDict.TryGetValue(MineType.Word, out AnkiConfig? wordAnkiConfig))
         {
-            SetPreviousMiningConfig(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordTagsTextBox, wordAnkiConfig, wordTagsChanged);
+            SetPreviousMiningConfig(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordTagsTextBox, wordAnkiConfig, _wordTagsChanged);
             CreateFieldElements(wordAnkiConfig.Fields, JLFieldUtils.JLFieldsForWordDicts, WordMiningSetupStackPanelFields);
         }
 
         if (ankiConfigDict.TryGetValue(MineType.Kanji, out AnkiConfig? kanjiAnkiConfig))
         {
-            SetPreviousMiningConfig(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiTagsTextBox, kanjiAnkiConfig, kanjiTagsChanged);
+            SetPreviousMiningConfig(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiTagsTextBox, kanjiAnkiConfig, _kanjiTagsChanged);
             CreateFieldElements(kanjiAnkiConfig.Fields, JLFieldUtils.JLFieldsForKanjiDicts, KanjiMiningSetupStackPanelFields);
         }
 
         if (ankiConfigDict.TryGetValue(MineType.Name, out AnkiConfig? nameAnkiConfig))
         {
-            SetPreviousMiningConfig(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameTagsTextBox, nameAnkiConfig, nameTagsChanged);
+            SetPreviousMiningConfig(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameTagsTextBox, nameAnkiConfig, _nameTagsChanged);
             CreateFieldElements(nameAnkiConfig.Fields, JLFieldUtils.JLFieldsForNameDicts, NameMiningSetupStackPanelFields);
         }
 
         if (ankiConfigDict.TryGetValue(MineType.Other, out AnkiConfig? otherAnkiConfig))
         {
-            SetPreviousMiningConfig(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherTagsTextBox, otherAnkiConfig, otherTagsChanged);
+            SetPreviousMiningConfig(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherTagsTextBox, otherAnkiConfig, _otherTagsChanged);
             CreateFieldElements(otherAnkiConfig.Fields, JLFieldUtils.JLFieldsForWordDicts, OtherMiningSetupStackPanelFields);
         }
     }
@@ -521,7 +525,8 @@ internal sealed partial class PreferencesWindow
             names.CopyTo(newNames, 0);
             if (addSelectedName)
             {
-                newNames[^1] = selectedName!;
+                Debug.Assert(selectedName is not null);
+                newNames[^1] = selectedName;
             }
 
             names = newNames;

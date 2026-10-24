@@ -746,6 +746,7 @@ public static class DictUtils
                     && (!dict.Active || !dict.Options.UseDB.Value)
                     && DBUtils.s_dictTypesWithDBSupport.Contains(dict.Type))
                 {
+                    // ReSharper disable once UseAwaitUsing
                     using SqliteConnection connection = new(dict.ReadOnlyConnectionString);
                     SqliteConnection.ClearPool(connection);
                 }
@@ -798,13 +799,11 @@ public static class DictUtils
                         dictCleared = true;
                         return new DBState(useDB, dbExists);
                     }
-                    else
-                    {
-                        LoggerManager.Logger.Warning(error, "Couldn't inspect the database for '{DictName}' at '{DBPath}'. Rebuilding it", dict.Name, dbPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Couldn't read the database for {dict.Name}.");
-                        DBUtils.DeleteDB(dbPath);
-                        dbExists = false;
-                    }
+
+                    LoggerManager.Logger.Warning(error, "Couldn't inspect the database for '{DictName}' at '{DBPath}'. Rebuilding it", dict.Name, dbPath);
+                    FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Couldn't read the database for {dict.Name}.");
+                    DBUtils.DeleteDB(dbPath);
+                    dbExists = false;
                 }
             }
 
@@ -1331,7 +1330,7 @@ public static class DictUtils
 
     public static void UpdateCustomWordDictLookupState(Dict dict)
     {
-        bool hasEntries = dict.Active && dict.Contents.Count > 0;
+        bool hasEntries = dict is { Active: true, Contents.Count: > 0 };
         if (dict.Type is DictType.CustomWordDictionary)
         {
             LookupHasCustomWordDict = hasEntries;

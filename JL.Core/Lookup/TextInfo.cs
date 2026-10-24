@@ -11,10 +11,9 @@ internal sealed class TextInfo(List<string> textList,
     List<List<Form>?>? deconjugationResultsList,
     List<List<List<Form>>?>? deconjugatedTextWithoutLongVowelMarksList,
     List<List<string>?>? textWithoutLongVowelMarksList,
-    int textWithoutLongVowelMarksCount,
-    string[]? deconjugatedTexts,
     Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts,
     IDictionary<string, IList<IDictRecord>>? pitchAccentDict,
+    string[]? wordSearchKeys,
     int maxTextInHiraganaLength,
     int maxWordSearchKeyLength
     ) : IEquatable<TextInfo>
@@ -24,10 +23,9 @@ internal sealed class TextInfo(List<string> textList,
     public List<List<Form>?>? DeconjugationResultsList { get; } = deconjugationResultsList;
     public List<List<List<Form>>?>? DeconjugatedTextWithoutLongVowelMarksList { get; } = deconjugatedTextWithoutLongVowelMarksList;
     public List<List<string>?>? TextWithoutLongVowelMarksList { get; } = textWithoutLongVowelMarksList;
-    public int TextWithoutLongVowelMarksCount { get; } = textWithoutLongVowelMarksCount;
-    public string[]? DeconjugatedTexts { get; } = deconjugatedTexts;
     public Dictionary<string, Dictionary<string, List<FrequencyRecord>>>? FrequencyDicts { get; } = frequencyDicts;
     public IDictionary<string, IList<IDictRecord>>? PitchAccentDict { get; } = pitchAccentDict;
+    public string[]? WordSearchKeys { get; } = wordSearchKeys;
     public int MaxTextInHiraganaLength { get; } = maxTextInHiraganaLength;
     public int MaxWordSearchKeyLength { get; } = maxWordSearchKeyLength;
 

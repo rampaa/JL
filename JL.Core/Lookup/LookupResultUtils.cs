@@ -63,7 +63,7 @@ public static class LookupResultUtils
         };
     }
 
-    public static string FrequenciesToText(ReadOnlySpan<LookupFrequencyResult> frequencies)
+    internal static string FrequenciesToText(ReadOnlySpan<LookupFrequencyResult> frequencies)
     {
         StringBuilder sb = ObjectPoolManager.StringBuilderPool.Get();
         for (int i = 0; i < frequencies.Length; i++)

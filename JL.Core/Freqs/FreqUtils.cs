@@ -175,6 +175,7 @@ public static class FreqUtils
         {
             if (!freq.Updating && (!freq.Active || !freq.Options.UseDB.Value))
             {
+                // ReSharper disable once UseAwaitUsing
                 using SqliteConnection connection = new(freq.ReadOnlyConnectionString);
                 SqliteConnection.ClearPool(connection);
             }
@@ -221,13 +222,11 @@ public static class FreqUtils
                         freqCleared = true;
                         return new DBState(useDB, dbExists);
                     }
-                    else
-                    {
-                        LoggerManager.Logger.Warning(error, "Couldn't inspect the database for '{DictName}' at '{DBPath}'. Rebuilding it", freq.Name, dbPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Couldn't read the database for {freq.Name}.");
-                        DBUtils.DeleteDB(dbPath);
-                        dbExists = false;
-                    }
+
+                    LoggerManager.Logger.Warning(error, "Couldn't inspect the database for '{DictName}' at '{DBPath}'. Rebuilding it", freq.Name, dbPath);
+                    FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"Couldn't read the database for {freq.Name}.");
+                    DBUtils.DeleteDB(dbPath);
+                    dbExists = false;
                 }
             }
 

@@ -162,7 +162,7 @@ public static class ProfileDBUtils
         return reader.GetBoolean(0);
     }
 
-    public static bool ProfileExists(SqliteConnection connection, string profileName)
+    internal static bool ProfileExists(SqliteConnection connection, string profileName)
     {
         if (profileName.Equals(ProfileUtils.GlobalProfileName, StringComparison.OrdinalIgnoreCase))
         {

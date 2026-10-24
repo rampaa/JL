@@ -24,7 +24,7 @@ internal static class SpeechSynthesisUtils
     private static long s_lastAudioPlayTimestamp;
     private static bool s_stopping;
 
-    public static SpeechPlaybackChannels PlaybackChannels { get; } = SpeechPlaybackChannels.EnginePreferred;
+    private const SpeechPlaybackChannels PlaybackChannels = SpeechPlaybackChannels.EnginePreferred;
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
 
     public static ComboBoxItem[] GetInstalledVoiceItems()

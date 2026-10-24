@@ -1088,12 +1088,9 @@ internal sealed class ConfigManager
         }
 
         PopupWindow? currentPopupWindow = MainWindow.Instance.FirstPopupWindow;
-        string toggleDictTabsInputGestureText = currentPopupWindow is not null
-            ? ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture.ToInputGestureText()
-            : "";
-        string closePopupInputGestureText = currentPopupWindow is not null
-            ? ClosePopupKeyGesture.ToInputGestureText()
-            : "";
+        string toggleDictTabsInputGestureText = ToggleVisibilityOfDictionaryTabsInMiningModeKeyGesture.ToInputGestureText();
+        string closePopupInputGestureText = ClosePopupKeyGesture.ToInputGestureText();
+
         while (currentPopupWindow is not null)
         {
             currentPopupWindow.Background = PopupBackgroundColor;
@@ -1485,6 +1482,8 @@ internal sealed class ConfigManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
         Dictionary<string, string> configs = ConfigDBManager.GetAllConfigs(connection);
+
+        // ReSharper disable once UseAwaitUsing
         using SqliteCommand command = ConfigDBManager.CreateUpdateSettingCommand(connection);
 
         KeyGestureUtils.UpdateKeyGesture(command, configs, nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);

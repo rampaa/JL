@@ -104,7 +104,7 @@ public static class LookupUtils
         Freq[]? sharedDBWordFreqs = lookUpEpwingWordDicts ? dbWordFreqs : null;
         bool collectDeconjugatedTexts = queryWordDictsFromDB
             || (lookUpEpwingWordDicts && querySharedPitch) || sharedDBWordFreqs is not null;
-        TextInfo textInfo = GetTextInfo(text, lookUpWordDicts, collectDeconjugatedTexts, queryWordDictsFromDB, querySharedPitch, sharedDBWordFreqs, pitchDict, out string[]? wordSearchKeys);
+        TextInfo textInfo = GetTextInfo(text, lookUpWordDicts, collectDeconjugatedTexts, queryWordDictsFromDB, querySharedPitch, sharedDBWordFreqs, pitchDict);
 
         string? readOnlyConnectionStringForPitchDict;
         if (dbIsUsedForPitchDict)
@@ -139,7 +139,7 @@ public static class LookupUtils
                 case DictType.JMdict:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetWordResults(textInfo, wordSearchKeys.AsSpan(), dict, useDB, results, JmdictDBManager.GetRecordsFromDB);
+                    GetWordResults(textInfo, dict, useDB, results, JmdictDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -239,16 +239,18 @@ public static class LookupUtils
                     }
 
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetWordResults(textInfo, wordSearchKeys.AsSpan(), dict, false, results, null);
+                    GetWordResults(textInfo, dict, false, results, null);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
-                        // ReSharper disable once AccessToDisposedClosure
                         resultSlots[i] = rentedLookupResults;
-                        // ReSharper disable once AccessToDisposedClosure
                         BuildCustomWordResult(results, rentedLookupResults, wordFreqs, dbWordFreqs,
                             profileCustomWordDict ? freqConnectionsForProfileCustomWordDict : freqConnectionsForCustomWordDict,
-                            dbIsUsedForPitchDict, profileCustomWordDict ? sqliteConnectionForProfileCustomWordPitch : sqliteConnectionForCustomWordPitch, pitchDict);
+                            dbIsUsedForPitchDict, profileCustomWordDict
+                                // ReSharper disable once AccessToDisposedClosure
+                                ? sqliteConnectionForProfileCustomWordPitch
+                                // ReSharper disable once AccessToDisposedClosure
+                                : sqliteConnectionForCustomWordPitch, pitchDict);
                     }
 
                     ObjectPoolManager.s_intermediaryResultPool.Return(results);
@@ -333,7 +335,7 @@ public static class LookupUtils
                 case DictType.NonspecificYomichan:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetWordResults(textInfo, wordSearchKeys.AsSpan(), dict, useDB, results, EpwingYomichanDBManager.GetRecordsFromDB);
+                    GetWordResults(textInfo, dict, useDB, results, EpwingYomichanDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -408,7 +410,7 @@ public static class LookupUtils
                 case DictType.NonspecificNazeka:
                 {
                     Dictionary<string, IntermediaryResult> results = ObjectPoolManager.s_intermediaryResultPool.Get();
-                    GetWordResults(textInfo, wordSearchKeys.AsSpan(), dict, useDB, results, EpwingNazekaDBManager.GetRecordsFromDB);
+                    GetWordResults(textInfo, dict, useDB, results, EpwingNazekaDBManager.GetRecordsFromDB);
                     if (results.Count > 0)
                     {
                         List<LookupResult> rentedLookupResults = ObjectPoolManager.s_lookupResultListPool.Get();
@@ -510,7 +512,7 @@ public static class LookupUtils
         }
     }
 
-    private static TextInfo GetTextInfo(string text, bool prepareDeconjugation, bool collectDeconjugatedTexts, bool queryWordDictsFromDB, bool queryPitchFromDB, Freq[]? dbWordFreqs, Dict? pitchDict, out string[]? wordSearchKeys)
+    private static TextInfo GetTextInfo(string text, bool prepareDeconjugation, bool collectDeconjugatedTexts, bool queryWordDictsFromDB, bool queryPitchFromDB, Freq[]? dbWordFreqs, Dict? pitchDict)
     {
         int textLength = text.Length;
         List<string> textList = new(textLength);
@@ -666,7 +668,7 @@ public static class LookupUtils
             deconjugatedTexts = deconjugatedTextsHashSet.Count > 0 ? deconjugatedTextsHashSet.ToArray() : null;
         }
 
-        wordSearchKeys = null;
+        string[]? wordSearchKeys = null;
         HashSet<string>? allSearchKeys = null;
         bool queryWordFrequencies = dbWordFreqs is not null;
         bool prepareWordSearchKeys = queryWordDictsFromDB && (deconjugatedTexts is not null || textWithoutLongVowelMarksCount > 0);
@@ -729,7 +731,7 @@ public static class LookupUtils
             pitchAccentDict = pitchDict?.Contents;
         }
 
-        return new TextInfo(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTextWithoutLongVowelMarksList, textWithoutLongVowelMarksList, textWithoutLongVowelMarksCount, deconjugatedTexts, frequencyDicts, pitchAccentDict, maxTextInHiraganaLength, Math.Max(maxTextInHiraganaLength, Math.Max(maxDeconjugatedTextLength, maxTextWithoutLongVowelMarksLength)));
+        return new TextInfo(textList, textInHiraganaList, deconjugationResultsList, deconjugatedTextWithoutLongVowelMarksList, textWithoutLongVowelMarksList, frequencyDicts, pitchAccentDict, wordSearchKeys, maxTextInHiraganaLength, Math.Max(maxTextInHiraganaLength, Math.Max(maxDeconjugatedTextLength, maxTextWithoutLongVowelMarksLength)));
     }
 
     private static void GetWordResultsHelper(Dict dict,
@@ -817,7 +819,7 @@ public static class LookupUtils
         }
     }
 
-    private static void GetWordResults(TextInfo textInfo, ReadOnlySpan<string> wordSearchKeys, Dict dict, bool useDB, Dictionary<string, IntermediaryResult> results, GetRecordsFromDB? getRecordsFromDB)
+    private static void GetWordResults(TextInfo textInfo, Dict dict, bool useDB, Dictionary<string, IntermediaryResult> results, GetRecordsFromDB? getRecordsFromDB)
     {
         ReadOnlySpan<string> textList = textInfo.TextList.AsReadOnlySpan();
         ReadOnlySpan<string> textInHiraganaList = textInfo.TextInHiraganaList.AsReadOnlySpan();
@@ -830,6 +832,7 @@ public static class LookupUtils
         {
             Debug.Assert(getRecordsFromDB is not null);
             int maxSearchKeyLength = dict.MaxSearchKeyLength;
+            ReadOnlySpan<string> wordSearchKeys = textInfo.WordSearchKeys.AsSpan();
             if (wordSearchKeys.IsEmpty)
             {
                 wordSearchKeys = textInHiraganaList;
@@ -1227,7 +1230,7 @@ public static class LookupUtils
             IList<IDictRecord> resultsList = wordResult.Results;
             for (int i = 0; i < resultsList.Count; i++)
             {
-                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : (null, 0);
+                DeconjugationInfo deconjugationInfo = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : default;
                 JmdictRecord jmdictResult = (JmdictRecord)resultsList[i];
                 LookupResult result = new
                 (
@@ -1240,8 +1243,8 @@ public static class LookupUtils
                     frequencies: wordFreqsExist ? GetWordFrequencies(jmdictResult, wordFreqs!, frequencyDicts) : null,
                     alternativeSpellings: jmdictResult.AlternativeSpellings,
                     deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                    deconjugationProcess: deconjugationProcess,
-                    minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                    deconjugationProcess: deconjugationInfo.Process,
+                    minDeconjugationProcessStepCount: deconjugationInfo.MinStepCount,
                     entryId: jmdictResult.Id,
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(jmdictResult.PrimarySpelling, jmdictResult.Readings, pitchAccentDict!) : null,
@@ -1373,7 +1376,7 @@ public static class LookupUtils
             IList<IDictRecord> resultsList = wordResult.Results;
             for (int i = 0; i < resultsList.Count; i++)
             {
-                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : (null, 0);
+                DeconjugationInfo deconjugationInfo = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : default;
                 EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)resultsList[i];
                 string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
                 LookupResult result = new
@@ -1386,8 +1389,8 @@ public static class LookupUtils
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                     deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                    deconjugationProcess: deconjugationProcess,
-                    minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                    deconjugationProcess: deconjugationInfo.Process,
+                    minDeconjugationProcessStepCount: deconjugationInfo.MinStepCount,
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                     wordClasses: epwingResult.WordClasses,
@@ -1440,7 +1443,7 @@ public static class LookupUtils
             IList<IDictRecord> resultsList = wordResult.Results;
             for (int i = 0; i < resultsList.Count; i++)
             {
-                (string? deconjugationProcess, int minDeconjugationProcessStepCount) = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : (null, 0);
+                DeconjugationInfo deconjugationInfo = deconjugatedWord ? GetDeconjugationInfo(processesSpan, i) : default;
                 EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)resultsList[i];
                 string[]? readings = epwingResult.Reading is not null ? [epwingResult.Reading] : null;
                 LookupResult result = new
@@ -1454,8 +1457,8 @@ public static class LookupUtils
                     frequencies: freqsExist ? GetWordFrequencies(epwingResult, freqs!, frequencyDicts) : null,
                     alternativeSpellings: epwingResult.AlternativeSpellings,
                     deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                    deconjugationProcess: deconjugationProcess,
-                    minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                    deconjugationProcess: deconjugationInfo.Process,
+                    minDeconjugationProcessStepCount: deconjugationInfo.MinStepCount,
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(epwingResult.PrimarySpelling, readings, pitchAccentDict!) : null,
                     imageInfos: epwingResult.ImageInfo is not null ? [epwingResult.ImageInfo] : null
@@ -1577,18 +1580,21 @@ public static class LookupUtils
             for (int i = 0; i < resultsList.Count; i++)
             {
                 CustomWordRecord customWordDictResult = (CustomWordRecord)resultsList[i];
-                string? deconjugationProcess = null;
-                int minDeconjugationProcessStepCount = 0;
+                DeconjugationInfo deconjugationInfo;
                 if (deconjugatedWord)
                 {
                     if (customWordDictResult.HasUserDefinedWordClass)
                     {
-                        (deconjugationProcess, minDeconjugationProcessStepCount) = GetDeconjugationInfo(processesSpan, i);
+                        deconjugationInfo = GetDeconjugationInfo(processesSpan, i);
                     }
                     else
                     {
-                        minDeconjugationProcessStepCount = GetMinDeconjugationProcessStepCount(processesSpan[i].AsReadOnlySpan());
+                        deconjugationInfo = new DeconjugationInfo(null, GetMinDeconjugationProcessStepCount(processesSpan[i].AsReadOnlySpan()));
                     }
+                }
+                else
+                {
+                    deconjugationInfo = default;
                 }
 
                 LookupResult result = new
@@ -1602,8 +1608,8 @@ public static class LookupUtils
                     frequencies: wordFreqsExist ? GetWordFrequencies(customWordDictResult, wordFreqs!, frequencyDicts) : null,
                     alternativeSpellings: customWordDictResult.AlternativeSpellings,
                     deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                    deconjugationProcess: deconjugationProcess,
-                    minDeconjugationProcessStepCount: minDeconjugationProcessStepCount,
+                    deconjugationProcess: deconjugationInfo.Process,
+                    minDeconjugationProcessStepCount: deconjugationInfo.MinStepCount,
                     // ReSharper disable once NullableWarningSuppressionIsUsed
                     pitchPositions: pitchAccentDictExists ? GetPitchPosition(customWordDictResult.PrimarySpelling, customWordDictResult.Readings, pitchAccentDict!) : null,
                     wordClasses: customWordDictResult.WordClasses
@@ -1853,15 +1859,12 @@ public static class LookupUtils
         return min;
     }
 
-    private static (string? process, int minStepCount) GetDeconjugationInfo(ReadOnlySpan<List<ProcessNode>> processListSpan, int index)
+    private static DeconjugationInfo GetDeconjugationInfo(ReadOnlySpan<List<ProcessNode>> processListSpan, int index)
     {
         ReadOnlySpan<ProcessNode> processSpan = processListSpan[index].AsReadOnlySpan();
         string? process = LookupResultUtils.DeconjugationProcessesToText(processSpan);
-        if (process is null)
-        {
-            return (null, 0);
-        }
-
-        return (process, GetMinDeconjugationProcessStepCount(processSpan));
+        return process is null
+            ? default
+            : new DeconjugationInfo(process, GetMinDeconjugationProcessStepCount(processSpan));
     }
 }

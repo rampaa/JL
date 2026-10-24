@@ -41,7 +41,9 @@ internal static class ConfigUtils
         {
             Color color = WindowsUtils.ColorFromHex(configValue);
             if (solidColorBrush is SolidColorBrush { IsFrozen: true } currentBrush
-                && currentBrush.Color == color && currentBrush.Opacity == brushOpacity)
+                && currentBrush.Color == color
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                && currentBrush.Opacity == brushOpacity)
             {
                 return currentBrush;
             }

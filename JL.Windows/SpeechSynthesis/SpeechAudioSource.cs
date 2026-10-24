@@ -15,7 +15,8 @@ namespace JL.Windows.SpeechSynthesis;
 
 // SAPI writes audio synchronously while MediaPlayer requests it asynchronously.
 // The bounded queue connects them and limits how much audio is kept ahead of playback.
-[ComVisible(true), ClassInterface(ClassInterfaceType.None)]
+[ComVisible(true)]
+[ClassInterface(ClassInterfaceType.None)]
 internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
 {
     private const int Success = 0;
@@ -65,6 +66,7 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
         PlaybackSource.SampleRequested += MediaStreamSource_SampleRequested;
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void MediaStreamSource_SampleRequested(MediaStreamSource sender, MediaStreamSourceSampleRequestedEventArgs args)
     {
         MediaStreamSourceSampleRequest request = args.Request;

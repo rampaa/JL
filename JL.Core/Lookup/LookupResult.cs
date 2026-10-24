@@ -44,7 +44,7 @@ public sealed class LookupResult
     internal string[]? WordClasses { get; } = wordClasses;
 
     // Yomichan dictionaries
-    public double PopularityScore { get; } = popularityScore;
+    private double PopularityScore { get; } = popularityScore;
     public ImageInfo[]? ImageInfos { get; } = imageInfos;
 
     // JMdict, Nazeka EPWING

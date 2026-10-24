@@ -34,12 +34,10 @@ public static class JmdictWordClassUtils
             DictUtils.WordClassDictionary = dictionary;
             return true;
         }
-        else
-        {
-            LoggerManager.Logger.Error("Couldn't load word-class data from '{Path}'", s_partOfSpeechFilePath);
-            FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't load word-class data. Check the logs for more details.");
-            return false;
-        }
+
+        LoggerManager.Logger.Error("Couldn't load word-class data from '{Path}'", s_partOfSpeechFilePath);
+        FrontendManager.Frontend.Notify(NotificationLevel.Error, "Couldn't load word-class data. Check the logs for more details.");
+        return false;
     }
 
     public static bool Serialize()

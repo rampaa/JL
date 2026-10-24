@@ -11,7 +11,6 @@ using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.GUI.Info;
 using JL.Windows.SpeechSynthesis;
-using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI.Audio;
 

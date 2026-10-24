@@ -22,6 +22,7 @@ public sealed class AtomicBool
         Volatile.Write(ref _value, True);
     }
 
+    // ReSharper disable once MemberCanBeInternal
     public void SetFalse()
     {
         Volatile.Write(ref _value, False);

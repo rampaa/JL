@@ -143,11 +143,13 @@ internal static class WindowsAudioUtils
         mediaPlayer.Play();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private static async void MediaPlayer_MediaFailed(MediaPlayer player, MediaPlayerFailedEventArgs args)
     {
         await DisposeMedia(player, args).ConfigureAwait(false);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private static async void MediaPlayer_MediaEnded(MediaPlayer player, object args)
     {
         await DisposeMedia(player, null).ConfigureAwait(false);

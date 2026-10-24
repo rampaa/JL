@@ -1,8 +1,11 @@
 using System.Runtime.InteropServices;
+// ReSharper disable UnusedMember.Global
 
 namespace JL.Windows.SpeechSynthesis.Interop;
 
-[ComImport, Guid("269316D8-57BD-11D2-9EEE-00C04F797396"), InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
+[ComImport]
+[Guid("269316D8-57BD-11D2-9EEE-00C04F797396")]
+[InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
 internal interface ISpeechVoice
 {
     [DispId(1)]
