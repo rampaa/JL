@@ -18,6 +18,7 @@ namespace JL.Core.Freqs;
 public static class FreqUtils
 {
     private static readonly string s_configFilePath = Path.Join(AppInfo.ConfigPath, "freqs.json");
+    private static readonly Lock s_lookupFailureLock = new();
     public static bool FreqsReady { get; private set; } // = false;
 
     public static readonly Dictionary<string, Freq> FreqDicts = new(StringComparer.OrdinalIgnoreCase);
@@ -575,6 +576,40 @@ public static class FreqUtils
         {
             freq.Options.MaxTotalFusejiCount ??= new MaxTotalFusejiCountOption(1);
         }
+    }
+
+    internal static void HandleLookupFailure(string readOnlyConnectionString, SqliteException exception)
+    {
+        if (exception.SqliteErrorCode is raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(exception, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return;
+        }
+
+        LoggerManager.Logger.Error(exception, "Database lookup failed for {ReadOnlyConnectionString}", readOnlyConnectionString);
+        Freq? failedFreq = null;
+        lock (s_lookupFailureLock)
+        {
+            Freq[] freqs = [.. WordFreqs ?? [], .. KanjiFreqs ?? []];
+            foreach (Freq freq in freqs)
+            {
+                if (freq.Active && freq.ReadOnlyConnectionString == readOnlyConnectionString)
+                {
+                    failedFreq = freq;
+                    break;
+                }
+            }
+
+            if (failedFreq is null)
+            {
+                return;
+            }
+
+            failedFreq.Active = false;
+            CheckFreqDicts(freqs);
+        }
+
+        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't read {failedFreq.Name}. The frequency dictionary has been deactivated. Check the logs for more details.");
     }
 
     private static void CheckFreqDicts(Freq[] freqs)

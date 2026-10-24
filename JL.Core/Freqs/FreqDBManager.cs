@@ -235,9 +235,9 @@ internal static class FreqDBManager
 
             return results;
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Database is locked for {ConnectionString}", connection.ConnectionString);
+            FreqUtils.HandleLookupFailure(connection.ConnectionString, ex);
             return null;
         }
     }
@@ -276,9 +276,9 @@ internal static class FreqDBManager
                 ? reader.GetInt32(0)
                 : null;
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            FreqUtils.HandleLookupFailure(readOnlyConnectionString, ex);
             return null;
         }
     }
@@ -301,9 +301,9 @@ internal static class FreqDBManager
                 ? reader.GetInt32(0)
                 : null;
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            FreqUtils.HandleLookupFailure(readOnlyConnectionString, ex);
             return null;
         }
     }

@@ -50,6 +50,7 @@ public static class DictUtils
     private static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
     private static readonly SemaphoreSlim s_loadDictionariesSemaphoreSlim = new(1, 1);
+    private static readonly Lock s_lookupFailureLock = new();
 
     internal static readonly SearchValues<char> s_invalidCharactersForPrimarySpellings = SearchValues.Create('�', '\n');
 
@@ -1339,6 +1340,48 @@ public static class DictUtils
         {
             LookupHasProfileCustomWordDict = hasEntries;
         }
+    }
+
+    internal static void HandleLookupFailure(string readOnlyConnectionString, SqliteException exception)
+    {
+        if (exception.SqliteErrorCode is raw.SQLITE_BUSY)
+        {
+            LoggerManager.Logger.Error(exception, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            return;
+        }
+
+        LoggerManager.Logger.Error(exception, "Database lookup failed for {ReadOnlyConnectionString}", readOnlyConnectionString);
+        Dict? failedDict = null;
+        lock (s_lookupFailureLock)
+        {
+            if (PitchDict is { Active: true } pitchDict && pitchDict.ReadOnlyConnectionString == readOnlyConnectionString)
+            {
+                failedDict = pitchDict;
+                DBIsUsedForPitchDict = false;
+                PitchDict = null;
+            }
+            else
+            {
+                foreach (Dict dict in s_allDicts)
+                {
+                    if (dict.Active && dict.ReadOnlyConnectionString == readOnlyConnectionString)
+                    {
+                        failedDict = dict;
+                        break;
+                    }
+                }
+            }
+
+            if (failedDict is null)
+            {
+                return;
+            }
+
+            failedDict.Active = false;
+            PopulateDictTypeArrays(s_allDicts);
+        }
+
+        FrontendManager.Frontend.Notify(NotificationLevel.Error, $"Couldn't read {failedDict.Name}. The dictionary has been deactivated. Check the logs for more details.");
     }
 
     internal static void PopulateDictTypeArrays(Dict[] dicts)

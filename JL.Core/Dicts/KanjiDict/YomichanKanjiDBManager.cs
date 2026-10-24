@@ -415,9 +415,9 @@ internal static class YomichanKanjiDBManager
 
             return results;
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            DictUtils.HandleLookupFailure(readOnlyConnectionString, ex);
             return null;
         }
     }
@@ -462,9 +462,9 @@ internal static class YomichanKanjiDBManager
 
             return results;
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode is SQLitePCL.raw.SQLITE_BUSY)
+        catch (SqliteException ex)
         {
-            LoggerManager.Logger.Error(ex, "Database is locked for {ReadOnlyConnectionString}", readOnlyConnectionString);
+            DictUtils.HandleLookupFailure(readOnlyConnectionString, ex);
             return null;
         }
     }

@@ -93,9 +93,7 @@ public static class LookupUtils
         RentedArrayBuffer<SqliteConnection?>? freqConnectionsForProfileCustomWordDict = sqliteFreqConnectionsForProfileCustomWordDict.Items;
 
         Dict? pitchDict = DictUtils.PitchDict;
-        bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict
-            // ReSharper disable once NullableWarningSuppressionIsUsed
-            && pitchDict!.Ready;
+        bool dbIsUsedForPitchDict = DictUtils.DBIsUsedForPitchDict && pitchDict is { Active: true, Ready: true };
 
         bool querySharedPitch = dbIsUsedForPitchDict
             && ((lookupCategory is LookupCategory.All && DictUtils.LookupNeedsSharedPitch)
