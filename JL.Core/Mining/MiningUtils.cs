@@ -1708,11 +1708,12 @@ public static class MiningUtils
                 if (exists)
                 {
                     noteIndices[i] = noteIndex;
-                    continue;
                 }
-
-                noteIndex = notes.Count + 1;
-                noteIndices[i] = noteIndex;
+                else
+                {
+                    noteIndex = notes.Count + 1;
+                    noteIndices[i] = noteIndex;
+                }
             }
 
             Dictionary<string, string> firstFieldDict = new(1, StringComparer.Ordinal)
