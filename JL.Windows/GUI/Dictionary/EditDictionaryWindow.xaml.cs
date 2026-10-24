@@ -145,7 +145,7 @@ internal sealed partial class EditDictionaryWindow
 
             if (oldDottedLinesOption != newDottedLinesOption || oldPitchAccentMarkerColor != newPitchAccentMarkerColor)
             {
-                PopupWindowUtils.SetPitchAccentMarkerPen(newDottedLinesOption, WindowsUtils.FrozenBrushFromHex(newPitchAccentMarkerColor));
+                PopupWindowUtils.SetPitchAccentMarkerPen(newDottedLinesOption, ColorUtils.FrozenBrushFromHex(newPitchAccentMarkerColor, Brushes.DeepSkyBlue));
             }
         }
 

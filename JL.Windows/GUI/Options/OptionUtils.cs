@@ -27,7 +27,7 @@ internal static class OptionUtils
         if (valid)
         {
             Brush pitchAccentMarkerBrush = colorStr is not null
-                ? WindowsUtils.FrozenBrushFromHex(colorStr)
+                ? ColorUtils.FrozenBrushFromHex(colorStr, defaultBrush)
                 : defaultBrush;
 
             button.Background = pitchAccentMarkerBrush;

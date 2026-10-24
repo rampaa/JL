@@ -12,7 +12,7 @@ internal static class ConfigUtils
     {
         if (configs.TryGetValue(configKey, out string? configValue))
         {
-            return WindowsUtils.ColorFromHex(configValue);
+            return ColorUtils.ColorFromHex(configValue, color);
         }
 
         ConfigDBManager.InsertSetting(connection, configKey, color.ToString(CultureInfo.InvariantCulture));
@@ -23,7 +23,7 @@ internal static class ConfigUtils
     {
         if (configs.TryGetValue(configKey, out string? configValue))
         {
-            return WindowsUtils.BrushFromHex(configValue);
+            return ColorUtils.BrushFromHex(configValue, solidColorBrush);
         }
 
         ConfigDBManager.InsertSetting(connection, configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));
@@ -39,7 +39,11 @@ internal static class ConfigUtils
     {
         if (configs.TryGetValue(configKey, out string? configValue))
         {
-            Color color = WindowsUtils.ColorFromHex(configValue);
+            if (!ColorUtils.TryParseColor(configValue, out Color color))
+            {
+                return solidColorBrush;
+            }
+
             if (solidColorBrush is SolidColorBrush { IsFrozen: true } currentBrush
                 && currentBrush.Color == color
                 // ReSharper disable once CompareOfFloatsByEqualityOperator

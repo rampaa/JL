@@ -18,13 +18,13 @@ internal static class DictOptionManager
 
         Debug.Assert(jmdict.Options.POrthographyInfoColor is not null);
         string pOrthographyInfoColorString = jmdict.Options.POrthographyInfoColor.Value;
-        POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(pOrthographyInfoColorString);
+        POrthographyInfoColor = ColorUtils.FrozenBrushFromHex(pOrthographyInfoColorString, ConfigManager.Instance.PrimarySpellingColor);
 
         if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchAccentDict))
         {
             Debug.Assert(pitchAccentDict.Options.PitchAccentMarkerColor is not null);
             string pitchAccentMarkerColorString = pitchAccentDict.Options.PitchAccentMarkerColor.Value;
-            PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorString);
+            PitchAccentMarkerColor = ColorUtils.FrozenBrushFromHex(pitchAccentMarkerColorString, Brushes.DeepSkyBlue);
 
             Debug.Assert(pitchAccentDict.Options.ShowPitchAccentWithDottedLines is not null);
             await MainWindow.Instance.Dispatcher.BeginInvoke(() => PopupWindowUtils.SetPitchAccentMarkerPen(pitchAccentDict.Options.ShowPitchAccentWithDottedLines.Value, PitchAccentMarkerColor), DispatcherPriority.Send).Task.ConfigureAwait(false);

@@ -404,47 +404,6 @@ internal static class WindowsUtils
         }
     }
 
-    public static SolidColorBrush BrushFromHex(ReadOnlySpan<char> hex)
-    {
-        return new SolidColorBrush(ColorFromHex(hex));
-    }
-
-    public static SolidColorBrush FrozenBrushFromHex(ReadOnlySpan<char> hex)
-    {
-        SolidColorBrush brush = new(ColorFromHex(hex));
-        brush.Freeze();
-        return brush;
-    }
-
-    public static Color ColorFromHex(ReadOnlySpan<char> hex)
-    {
-        Debug.Assert(hex.Length is 9 && hex[0] is '#');
-
-        char lastDigit = hex[8];
-        byte b = HexToByte(hex[7], lastDigit);
-        byte g = HexToByte(hex[5], hex[6]);
-        byte r = HexToByte(hex[3], hex[4]);
-        byte a = HexToByte(hex[1], hex[2]);
-
-        return Color.FromArgb(a, r, g, b);
-    }
-
-    private static byte HexToByte(char highNibble, char lowNibble)
-    {
-        return (byte)((HexDigitToInt(highNibble) * 16) + HexDigitToInt(lowNibble));
-    }
-
-    private static int HexDigitToInt(char c)
-    {
-        return c is >= '0' and <= '9'
-            ? c - '0'
-            : c is >= 'A' and <= 'F'
-                ? c - 'A' + 10
-                : c is >= 'a' and <= 'f'
-                    ? c - 'a' + 10
-                    : throw new FormatException($"Invalid hex digit: {c}");
-    }
-
     private static double MeasureTextWidth(double fontSize, string text)
     {
         FormattedText formattedText = new(

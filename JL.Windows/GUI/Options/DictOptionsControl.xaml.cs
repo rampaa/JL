@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Windows.Config;
@@ -45,7 +46,7 @@ internal sealed partial class DictOptionsControl
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
         {
             pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption(PitchAccentMarkerColorButton.Background.ToString(CultureInfo.InvariantCulture));
-            DictOptionManager.PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorOption.Value);
+            DictOptionManager.PitchAccentMarkerColor = ColorUtils.FrozenBrushFromHex(pitchAccentMarkerColorOption.Value, Brushes.DeepSkyBlue);
         }
 
         ProperNameEntriesOption? properNameOption = null;
@@ -82,7 +83,7 @@ internal sealed partial class DictOptionsControl
             pOrthographyInfoColorOption =
                 new POrthographyInfoColorOption(POrthographyInfoColorButton.Background.ToString(CultureInfo.InvariantCulture));
 
-            DictOptionManager.POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(pOrthographyInfoColorOption.Value);
+            DictOptionManager.POrthographyInfoColor = ColorUtils.FrozenBrushFromHex(pOrthographyInfoColorOption.Value, ConfigManager.Instance.PrimarySpellingColor);
         }
 
         POrthographyInfoFontSizeOption? pOrthographyInfoFontSize = null;
