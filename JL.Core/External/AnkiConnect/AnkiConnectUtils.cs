@@ -222,47 +222,16 @@ public static class AnkiConnectUtils
 
         List<Dictionary<string, object>>? imageDictionaries = null;
 
-        List<string> imageClipboardOverMonitorScreenshotFields = [];
-        List<string> clipboardImageFields = [];
-        List<string> screenshotFields = [];
-        List<string> audioFields = [];
-        List<string> sentenceAudioFields = [];
-        List<string> sourceTextAudioFields = [];
-        List<string>? definitionsImagesFields = lookupResult.ImageInfos is not null ? [] : null;
-        foreach ((string fieldName, JLField fieldValue) in userFields)
-        {
-            if (fieldValue is JLField.ImageClipboardOverMonitorScreenshot)
-            {
-                imageClipboardOverMonitorScreenshotFields.Add(fieldName);
-            }
-            else if (fieldValue is JLField.Image)
-            {
-                clipboardImageFields.Add(fieldName);
-            }
-            else if (fieldValue is JLField.MonitorScreenshot)
-            {
-                screenshotFields.Add(fieldName);
-            }
-            else if (fieldValue is JLField.DefinitionsImages)
-            {
-                definitionsImagesFields?.Add(fieldName);
-            }
-            else if (fieldValue is JLField.Audio)
-            {
-                audioFields.Add(fieldName);
-            }
-            else if (fieldValue is JLField.SentenceAudio)
-            {
-                sentenceAudioFields.Add(fieldName);
-            }
-            else if (fieldValue is JLField.SourceTextAudio)
-            {
-                sourceTextAudioFields.Add(fieldName);
-            }
-        }
+        string[]? imageClipboardOverMonitorScreenshotFields = ankiConfig.ImageClipboardOverMonitorScreenshotFields;
+        string[]? clipboardImageFields = ankiConfig.ClipboardImageFields;
+        string[]? screenshotFields = ankiConfig.ScreenshotFields;
+        string[]? audioFields = ankiConfig.AudioFields;
+        string[]? sentenceAudioFields = ankiConfig.SentenceAudioFields;
+        string[]? sourceTextAudioFields = ankiConfig.SourceTextAudioFields;
+        string[]? definitionsImagesFields = ankiConfig.DefinitionsImagesFields;
 
-        bool imageClipboardOverMonitorScreenshotFieldsExist = imageClipboardOverMonitorScreenshotFields.Count > 0;
-        bool clipboardImageFieldsExist = clipboardImageFields.Count > 0;
+        bool imageClipboardOverMonitorScreenshotFieldsExist = imageClipboardOverMonitorScreenshotFields is not null;
+        bool clipboardImageFieldsExist = clipboardImageFields is not null;
 
         byte[]? clipboardImageBytes = clipboardImageFieldsExist || imageClipboardOverMonitorScreenshotFieldsExist
             ? await FrontendManager.Frontend.GetImageFromClipboardAsByteArray().ConfigureAwait(false)
@@ -270,7 +239,7 @@ public static class AnkiConnectUtils
 
         bool fallbackToScreenshot = imageClipboardOverMonitorScreenshotFieldsExist && clipboardImageBytes is null;
 
-        bool screenshotFieldsExist = screenshotFields.Count > 0;
+        bool screenshotFieldsExist = screenshotFields is not null;
 
         byte[]? screenshotBytes = screenshotFieldsExist || fallbackToScreenshot
             ? FrontendManager.Frontend.GetMonitorScreenshotAsByteArray()
@@ -278,12 +247,9 @@ public static class AnkiConnectUtils
 
         if (screenshotBytes is not null)
         {
-            List<string> imageFields = screenshotFieldsExist && fallbackToScreenshot
-                ? [.. screenshotFields, .. imageClipboardOverMonitorScreenshotFields]
-                : fallbackToScreenshot
-                    ? imageClipboardOverMonitorScreenshotFields
-                    : screenshotFields;
+            string[]? imageFields = fallbackToScreenshot ? ankiConfig.ScreenshotWithFallbackFields : screenshotFields;
 
+            Debug.Assert(imageFields is not null);
             Dictionary<string, object> screenshotDictionary = new(3, StringComparer.Ordinal)
             {
                 {
@@ -302,8 +268,7 @@ public static class AnkiConnectUtils
 
         if (lookupResult.ImageInfos is not null)
         {
-            Debug.Assert(definitionsImagesFields is not null);
-            if (definitionsImagesFields.Count > 0)
+            if (definitionsImagesFields is not null)
             {
                 if (imageDictionaries is null)
                 {
@@ -337,12 +302,9 @@ public static class AnkiConnectUtils
 
         if (clipboardImageBytes is not null)
         {
-            List<string> imageFields = clipboardImageFieldsExist && imageClipboardOverMonitorScreenshotFieldsExist
-                ? [.. clipboardImageFields, .. imageClipboardOverMonitorScreenshotFields]
-                : clipboardImageFieldsExist
-                    ? clipboardImageFields
-                    : imageClipboardOverMonitorScreenshotFields;
+            string[]? imageFields = ankiConfig.ClipboardImageWithFallbackFields;
 
+            Debug.Assert(imageFields is not null);
             Dictionary<string, object> clipboardImageDictionary = new(3, StringComparer.Ordinal)
             {
                 {
@@ -371,7 +333,7 @@ public static class AnkiConnectUtils
             note.Pictures = imageDictionaries.ToArray();
         }
 
-        bool needsAudio = audioFields.Count > 0;
+        bool needsAudio = audioFields is not null;
         AudioResponse? audioResponse = needsAudio
             ? await AudioUtils.GetPrioritizedAudio(lookupResult.PrimarySpelling, selectedReading, -1).ConfigureAwait(false)
             : null;
@@ -382,7 +344,7 @@ public static class AnkiConnectUtils
             audioData = await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(selectedReading).ConfigureAwait(false);
         }
 
-        bool needsSentenceAudio = sentenceAudioFields.Count > 0;
+        bool needsSentenceAudio = sentenceAudioFields is not null;
         bool sentenceAudioIsSameAsAudio = needsSentenceAudio && audioData is not null && sentence == lookupResult.PrimarySpelling;
         byte[]? sentenceAudioData = needsSentenceAudio
             ? sentenceAudioIsSameAsAudio
@@ -390,7 +352,7 @@ public static class AnkiConnectUtils
                 : await FrontendManager.Frontend.GetAudioResponseFromTextToSpeech(sentence).ConfigureAwait(false)
             : null;
 
-        bool needsSourceTextAudio = sourceTextAudioFields.Count > 0;
+        bool needsSourceTextAudio = sourceTextAudioFields is not null;
         bool sourceTextAudioIsSameAsSentenceAudio = needsSourceTextAudio && sentenceAudioData is not null && currentText == sentence;
         byte[]? sourceTextAudioData = needsSourceTextAudio
             ? sourceTextAudioIsSameAsSentenceAudio
@@ -421,7 +383,7 @@ public static class AnkiConnectUtils
             int audioIndex = 0;
             if (audioData is not null)
             {
-                Debug.Assert(audioResponse is not null);
+                Debug.Assert(audioResponse is not null && audioFields is not null);
                 note.Audios[audioIndex] = new Dictionary<string, object>(4, StringComparer.Ordinal)
                     {
                         {
@@ -444,6 +406,7 @@ public static class AnkiConnectUtils
             string? sentenceAudioFormat = null;
             if (sentenceAudioData is not null)
             {
+                Debug.Assert(sentenceAudioFields is not null);
                 Debug.Assert(!sentenceAudioIsSameAsAudio || audioResponse is not null);
                 sentenceAudioFormat = sentenceAudioIsSameAsAudio
                     // ReSharper disable once NullableWarningSuppressionIsUsed
@@ -471,6 +434,7 @@ public static class AnkiConnectUtils
 
             if (sourceTextAudioData is not null)
             {
+                Debug.Assert(sourceTextAudioFields is not null);
                 Debug.Assert(!sourceTextAudioIsSameAsSentenceAudio || sentenceAudioFormat is not null);
                 string sourceTextAudioFormat = sourceTextAudioIsSameAsSentenceAudio
                     // ReSharper disable once NullableWarningSuppressionIsUsed

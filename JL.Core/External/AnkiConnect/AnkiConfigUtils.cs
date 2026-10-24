@@ -22,6 +22,7 @@ public static class AnkiConfigUtils
         {
             if (await WriteAnkiConfigFile(ankiConfig).ConfigureAwait(false))
             {
+                PrepareMiningConfigs(ankiConfig);
                 Volatile.Write(ref s_ankiConfigDict, ankiConfig);
             }
         }
@@ -106,6 +107,7 @@ public static class AnkiConfigUtils
                 _ = await WriteAnkiConfigFile(ankiConfigDict).ConfigureAwait(false);
             }
 
+            PrepareMiningConfigs(ankiConfigDict);
             Volatile.Write(ref s_ankiConfigDict, ankiConfigDict);
             return ankiConfigDict;
         }
@@ -118,6 +120,28 @@ public static class AnkiConfigUtils
         finally
         {
             _ = s_configSemaphoreSlim.Release();
+        }
+    }
+
+    internal static void PrepareMiningConfigs(Dictionary<MineType, AnkiConfig> ankiConfigs)
+    {
+        foreach ((MineType mineType, AnkiConfig config) in ankiConfigs)
+        {
+            config.PrepareMiningFields();
+            config.MineType = mineType;
+            foreach ((MineType previousMineType, AnkiConfig previousConfig) in ankiConfigs)
+            {
+                if (previousMineType == mineType)
+                {
+                    break;
+                }
+
+                if (config.DeckName == previousConfig.DeckName && config.ModelName == previousConfig.ModelName)
+                {
+                    config.MineType = previousConfig.MineType;
+                    break;
+                }
+            }
         }
     }
 

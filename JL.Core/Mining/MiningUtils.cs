@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using JL.Core.Config;
 using JL.Core.Dicts;
@@ -1637,13 +1638,22 @@ public static class MiningUtils
     public static async ValueTask<bool[]?> CheckDuplicates(LookupResult[] lookupResults, int displayedLookupResultLength, string currentText, int currentCharPosition, CancellationToken cancellationToken)
     {
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfigUtils.ReadAnkiConfig(cancellationToken).ConfigureAwait(false);
-        if (ankiConfigDict is null)
+        if (ankiConfigDict is null || cancellationToken.IsCancellationRequested)
         {
             return null;
         }
 
+        _ = ankiConfigDict.TryGetValue(MineType.Word, out AnkiConfig? wordConfig);
+        _ = ankiConfigDict.TryGetValue(MineType.Name, out AnkiConfig? nameConfig);
+        _ = ankiConfigDict.TryGetValue(MineType.Kanji, out AnkiConfig? kanjiConfig);
+        _ = ankiConfigDict.TryGetValue(MineType.Other, out AnkiConfig? otherConfig);
+
         List<Note> notes = new(displayedLookupResultLength);
-        List<int> positions = new(displayedLookupResultLength);
+
+        // Store note indices plus one so zero marks results without a duplicate check.
+        int[] noteIndices = new int[displayedLookupResultLength];
+        Dictionary<DuplicateCheckKey, int>? noteIndicesByKey = null;
+        DuplicateCheckKey firstNoteKey = default;
 
         ReadOnlySpan<LookupResult> lookupResultsSpan = lookupResults;
         for (int i = 0; i < displayedLookupResultLength; i++)
@@ -1654,41 +1664,65 @@ public static class MiningUtils
             AnkiConfig? ankiConfig;
             if (DictUtils.s_wordDictTypes.Contains(dictType))
             {
-                _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
+                ankiConfig = wordConfig;
             }
             else if (DictUtils.KanjiDictTypes.Contains(dictType))
             {
-                _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
+                ankiConfig = kanjiConfig;
             }
             else if (DictUtils.s_nameDictTypes.Contains(dictType))
             {
-                _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
+                ankiConfig = nameConfig;
             }
             else
             {
-                _ = ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
+                ankiConfig = otherConfig;
             }
 
-            if (ankiConfig is null || ankiConfig.Fields.Count is 0)
+            if (ankiConfig is null || ankiConfig.FirstFieldName is null)
             {
                 continue;
             }
 
-            (string firstFieldName, JLField firstField) = ankiConfig.Fields.GetAt(0);
+            JLField firstField = ankiConfig.FirstField;
             string? firstFieldValue = GetMiningParameter(firstField, lookupResultsSpan, i, currentText, currentCharPosition);
             if (firstFieldValue is null)
             {
                 continue;
             }
 
+            DuplicateCheckKey noteKey = new(ankiConfig.MineType, firstFieldValue);
+            if (notes.Count is 0)
+            {
+                firstNoteKey = noteKey;
+                noteIndices[i] = 1;
+            }
+            else
+            {
+                if (noteIndicesByKey is null)
+                {
+                    noteIndicesByKey = new Dictionary<DuplicateCheckKey, int>(displayedLookupResultLength);
+                    noteIndicesByKey.Add(firstNoteKey, 1);
+                }
+
+                ref int noteIndex = ref CollectionsMarshal.GetValueRefOrAddDefault(noteIndicesByKey, noteKey, out bool exists);
+                if (exists)
+                {
+                    noteIndices[i] = noteIndex;
+                    continue;
+                }
+
+                noteIndex = notes.Count + 1;
+                noteIndices[i] = noteIndex;
+            }
+
             Dictionary<string, string> firstFieldDict = new(1, StringComparer.Ordinal)
             {
-                { firstFieldName, firstFieldValue }
+                { ankiConfig.FirstFieldName, firstFieldValue }
             };
 
             Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, firstFieldDict, AnkiConnectUtils.CheckDuplicateOptions);
             notes.Add(note);
-            positions.Add(i);
         }
 
         if (notes.Count is 0)
@@ -1702,11 +1736,17 @@ public static class MiningUtils
             return null;
         }
 
+        Debug.Assert(canAddNoteList.Length == notes.Count);
+
         bool[] results = new bool[displayedLookupResultLength];
         ReadOnlySpan<bool> canAddNoteSpan = canAddNoteList;
-        for (int i = 0; i < canAddNoteSpan.Length; i++)
+        for (int i = 0; i < noteIndices.Length; i++)
         {
-            results[positions[i]] = !canAddNoteSpan[i];
+            int noteIndex = noteIndices[i];
+            if (noteIndex is not 0)
+            {
+                results[i] = !canAddNoteSpan[noteIndex - 1];
+            }
         }
 
         return results;
