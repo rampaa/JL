@@ -148,6 +148,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedPrimarySpellingFontSize != value)
             {
                 PopupContentGenerator.BoxedPrimarySpellingFontSize = value;
@@ -163,6 +164,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedReadingsFontSize != value)
             {
                 PopupContentGenerator.BoxedReadingsFontSize = value;
@@ -178,6 +180,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedAlternativeSpellingsFontSize != value)
             {
                 PopupContentGenerator.BoxedAlternativeSpellingsFontSize = value;
@@ -193,6 +196,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedDefinitionsFontSize != value)
             {
                 PopupContentGenerator.BoxedDefinitionsFontSize = value;
@@ -208,6 +212,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedFrequencyFontSize != value)
             {
                 PopupContentGenerator.BoxedFrequencyFontSize = value;
@@ -223,6 +228,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedDeconjugationInfoFontSize != value)
             {
                 PopupContentGenerator.BoxedDeconjugationInfoFontSize = value;
@@ -238,6 +244,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedDictTypeFontSize != value)
             {
                 PopupContentGenerator.BoxedDictTypeFontSize = value;
@@ -253,6 +260,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedAudioButtonFontSize != value)
             {
                 PopupContentGenerator.BoxedAudioButtonFontSize = value;
@@ -268,6 +276,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedMiningButtonFontSize != value)
             {
                 PopupContentGenerator.BoxedMiningButtonFontSize = value;
@@ -285,6 +294,7 @@ internal sealed class ConfigManager
         set
         {
             field = value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if ((double)PopupContentGenerator.BoxedPopupDictionaryTabFontSize != value)
             {
                 PopupContentGenerator.BoxedPopupDictionaryTabFontSize = value;
@@ -620,9 +630,13 @@ internal sealed class ConfigManager
         EffectWrapper mainTextBoxEffectWrapper = MainWindow.Instance.MainTextBoxEffectWrapper;
         double mainTextBoxEffectOpacity = MainTextBoxDropShadowEffectBlurOpacity / 100.0;
         if (mainTextBoxEffectWrapper.EffectMode != MainTextBoxEffect
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             || mainTextBoxEffectWrapper.ShadowDirection != MainTextBoxDropShadowEffectDirection
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             || mainTextBoxEffectWrapper.EffectBlurRadius != MainTextBoxDropShadowEffectBlurRadius
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             || mainTextBoxEffectWrapper.EffectShadowDepth != MainTextBoxDropShadowEffectShadowDepth
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             || mainTextBoxEffectWrapper.EffectOpacity != mainTextBoxEffectOpacity
             || mainTextBoxEffectWrapper.EffectColor != MainTextBoxDropShadowEffectColor)
         {
