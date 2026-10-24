@@ -1699,11 +1699,10 @@ public static class MiningUtils
             }
             else
             {
-                if (noteIndicesByKey is null)
+                noteIndicesByKey ??= new Dictionary<DuplicateCheckKey, int>(displayedLookupResultLength)
                 {
-                    noteIndicesByKey = new Dictionary<DuplicateCheckKey, int>(displayedLookupResultLength);
-                    noteIndicesByKey.Add(firstNoteKey, 1);
-                }
+                    { firstNoteKey, 1 }
+                };
 
                 ref int noteIndex = ref CollectionsMarshal.GetValueRefOrAddDefault(noteIndicesByKey, noteKey, out bool exists);
                 if (exists)
