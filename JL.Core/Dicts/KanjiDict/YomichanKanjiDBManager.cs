@@ -188,6 +188,9 @@ internal static class YomichanKanjiDBManager
             _ = createIndexCommand.ExecuteNonQuery();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
+            DBUtils.FlushWalLog(connection);
+
+            dict.Ready = false;
             DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
@@ -205,6 +208,7 @@ internal static class YomichanKanjiDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
             dict.Size = GetDistinctKanjiCount(connection);
+            dict.Ready = true;
         }
         else
         {
@@ -377,6 +381,9 @@ internal static class YomichanKanjiDBManager
 
         transaction.Commit();
 
+        DBUtils.FlushWalLog(connection);
+
+        dict.Ready = false;
         DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -386,6 +393,8 @@ internal static class YomichanKanjiDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
+
+        dict.Ready = true;
     }
 
     public static List<IDictRecord>? GetRecordsFromDB(string readOnlyConnectionString, string term)

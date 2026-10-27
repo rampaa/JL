@@ -6,6 +6,7 @@ using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Utilities.ObjectPool;
 using Microsoft.Data.Sqlite;
+using SQLitePCL;
 
 namespace JL.Core.Utilities.Database;
 
@@ -280,12 +281,29 @@ public static class DBUtils
 
     internal static void ConfigureForRead(SqliteConnection connection, string dbPath)
     {
-        ClearPools(dbPath);
-
         ValidateForeignKeys(connection);
 
+        using SqliteCommand journalModeCommand = connection.CreateCommand();
+        journalModeCommand.CommandTimeout = 1;
+        journalModeCommand.CommandText = "PRAGMA journal_mode = DELETE;";
+        int attempt = 1;
+        while (true)
+        {
+            ClearPools(dbPath);
+
+            try
+            {
+                _ = journalModeCommand.ExecuteNonQuery();
+                break;
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode is raw.SQLITE_BUSY or raw.SQLITE_LOCKED && attempt < 30)
+            {
+                ++attempt;
+            }
+        }
+
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = 1; PRAGMA foreign_keys = ON; PRAGMA cache_size = -3000";
+        command.CommandText = "PRAGMA synchronous = 1; PRAGMA foreign_keys = ON; PRAGMA cache_size = -3000";
         _ = command.ExecuteNonQuery();
     }
 

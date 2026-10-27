@@ -221,6 +221,9 @@ internal static class EpwingYomichanDBManager
 
         transaction.Commit();
 
+        DBUtils.FlushWalLog(connection);
+
+        dict.Ready = false;
         DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -230,6 +233,8 @@ internal static class EpwingYomichanDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
+
+        dict.Ready = true;
     }
 
     public static async Task ImportFromDisk(Dict dict, string dbPath)
@@ -432,6 +437,9 @@ internal static class EpwingYomichanDBManager
 
         if (rowId > 1)
         {
+            DBUtils.FlushWalLog(connection);
+
+            dict.Ready = false;
             DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
@@ -450,6 +458,7 @@ internal static class EpwingYomichanDBManager
 
             dict.Size = GetDistinctSearchKeyCount(connection);
             dict.MaxSearchKeyLength = GetMaxSearchKeyLength(connection);
+            dict.Ready = true;
         }
         else
         {

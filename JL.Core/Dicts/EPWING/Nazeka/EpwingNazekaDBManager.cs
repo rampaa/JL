@@ -360,6 +360,9 @@ internal static class EpwingNazekaDBManager
 
         if (rowId > 1)
         {
+            DBUtils.FlushWalLog(connection);
+
+            dict.Ready = false;
             DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
@@ -378,6 +381,7 @@ internal static class EpwingNazekaDBManager
 
             dict.Size = GetDistinctSearchKeyCount(connection);
             dict.MaxSearchKeyLength = GetMaxSearchKeyLength(connection);
+            dict.Ready = true;
         }
         else
         {
@@ -1084,6 +1088,9 @@ internal static class EpwingNazekaDBManager
 
         transaction.Commit();
 
+        DBUtils.FlushWalLog(connection);
+
+        dict.Ready = false;
         DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -1093,6 +1100,8 @@ internal static class EpwingNazekaDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
+
+        dict.Ready = true;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, int maxSearchKeyLengthForDict)

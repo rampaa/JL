@@ -483,27 +483,37 @@ public static class LookupUtils
             foreach (Freq dbWordFreq in dbWordFreqs)
             {
                 string readOnlyConnectionStringForFreq = dbWordFreq.ReadOnlyConnectionString;
+                bool ready = dbWordFreq.Ready;
                 if (sqliteFreqConnectionsForJmdictExist)
                 {
                     Debug.Assert(sqliteFreqConnectionsForJmdict is not null);
+
 #pragma warning disable CA2000 // Dispose objects before losing scope
-                    sqliteFreqConnectionsForJmdict.Add(DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq));
+                    sqliteFreqConnectionsForJmdict.Add(ready
+                        ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq)
+                        : null);
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 }
 
                 if (sqliteFreqConnectionsForCustomWordDictExist)
                 {
                     Debug.Assert(sqliteFreqConnectionsForCustomWordDict is not null);
+
 #pragma warning disable CA2000 // Dispose objects before losing scope
-                    sqliteFreqConnectionsForCustomWordDict.Add(DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq));
+                    sqliteFreqConnectionsForCustomWordDict.Add(ready
+                        ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq)
+                        : null);
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 }
 
                 if (sqliteFreqConnectionsForProfileCustomWordDictExist)
                 {
                     Debug.Assert(sqliteFreqConnectionsForProfileCustomWordDict is not null);
+
 #pragma warning disable CA2000 // Dispose objects before losing scope
-                    sqliteFreqConnectionsForProfileCustomWordDict.Add(DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq));
+                    sqliteFreqConnectionsForProfileCustomWordDict.Add(ready
+                        ? DBUtils.CreateDBConnectionForReadOnlyConnectionString(readOnlyConnectionStringForFreq)
+                        : null);
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 }
             }
@@ -1128,7 +1138,10 @@ public static class LookupUtils
         {
             Dictionary<string, Dictionary<string, List<FrequencyRecord>>> singleResult = new(1, StringComparer.Ordinal);
             Freq freq = dbFreqs[0];
-            Dictionary<string, List<FrequencyRecord>>? records = FreqDBManager.GetRecordsFromDB(freq.ReadOnlyConnectionString, searchKeys);
+            Dictionary<string, List<FrequencyRecord>>? records = freq.Ready
+                ? FreqDBManager.GetRecordsFromDB(freq.ReadOnlyConnectionString, searchKeys)
+                : null;
+
             if (records is not null)
             {
                 singleResult.Add(freq.Name, records);
@@ -1143,7 +1156,9 @@ public static class LookupUtils
             _ = Parallel.For(0, dbFreqs.Length, i =>
             {
                 Freq freq = dbFreqs[i];
-                resultsArray[i] = FreqDBManager.GetRecordsFromDB(freq.ReadOnlyConnectionString, searchKeys);
+                resultsArray[i] = freq.Ready
+                    ? FreqDBManager.GetRecordsFromDB(freq.ReadOnlyConnectionString, searchKeys)
+                    : null;
             });
 
             Dictionary<string, Dictionary<string, List<FrequencyRecord>>> result = new(dbFreqs.Length, StringComparer.Ordinal);

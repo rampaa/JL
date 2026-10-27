@@ -179,6 +179,9 @@ internal static class FreqDBManager
 
         transaction.Commit();
 
+        DBUtils.FlushWalLog(connection);
+
+        freq.Ready = false;
         DBUtils.ConfigureForRead(connection, freq.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -188,6 +191,8 @@ internal static class FreqDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
+
+        freq.Ready = true;
     }
 
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(SqliteConnection connection, HashSet<string> terms)
@@ -524,6 +529,9 @@ internal static class FreqDBManager
         if (rowId > 1)
         {
             RemoveDuplicateYomichanFrequencyRecords(connection, freq.Options.HigherValueMeansHigherFrequency.Value);
+            DBUtils.FlushWalLog(connection);
+
+            freq.Ready = false;
             DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
@@ -541,6 +549,7 @@ internal static class FreqDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
             freq.Size = GetDistinctSearchKeyCount(connection);
+            freq.Ready = true;
         }
         else
         {
@@ -1104,6 +1113,9 @@ internal static class FreqDBManager
         if (rowId > 1)
         {
             RemoveDuplicateNazekaFrequencyRecords(connection, freq.Options.HigherValueMeansHigherFrequency.Value);
+            DBUtils.FlushWalLog(connection);
+
+            freq.Ready = false;
             DBUtils.ConfigureForRead(connection, freq.DBPath);
 
             // ReSharper disable once UseAwaitUsing
@@ -1121,6 +1133,7 @@ internal static class FreqDBManager
 #pragma warning restore CA1849 // Call async methods when in an async method
 
             freq.Size = GetDistinctSearchKeyCount(connection);
+            freq.Ready = true;
         }
         else
         {

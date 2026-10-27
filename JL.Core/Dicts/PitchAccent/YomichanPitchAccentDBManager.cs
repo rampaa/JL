@@ -262,6 +262,9 @@ internal static class YomichanPitchAccentDBManager
                 InsertVariantSearchKeys(connection, recordWriter, generateMazegaki, generateFusejiVariants, maxTotalFuseji, maxSearchKeyLengthForFusejiGeneration);
             }
 
+            DBUtils.FlushWalLog(connection);
+
+            dict.Ready = false;
             DBUtils.ConfigureForRead(connection, dbPath);
 
             // ReSharper disable once UseAwaitUsing
@@ -280,6 +283,7 @@ internal static class YomichanPitchAccentDBManager
 
             dict.Size = GetDistinctSearchKeyCount(connection);
             dict.MaxSearchKeyLength = GetMaxSearchKeyLength(connection);
+            dict.Ready = true;
         }
         else
         {
@@ -476,6 +480,9 @@ internal static class YomichanPitchAccentDBManager
 
         transaction.Commit();
 
+        DBUtils.FlushWalLog(connection);
+
+        dict.Ready = false;
         DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -485,6 +492,8 @@ internal static class YomichanPitchAccentDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
+
+        dict.Ready = true;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(SqliteConnection connection, HashSet<string> terms)

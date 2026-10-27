@@ -219,6 +219,9 @@ internal static class JmnedictDBManager
                 _ = createIndexCommand.ExecuteNonQuery();
 #pragma warning restore CA1849 // Call async methods when in an async method
 
+                DBUtils.FlushWalLog(connection);
+
+                dict.Ready = false;
                 DBUtils.ConfigureForRead(connection, dbPath);
 
                 // ReSharper disable once UseAwaitUsing
@@ -238,6 +241,7 @@ internal static class JmnedictDBManager
 
             dict.Size = rowId - 1;
             dict.MaxSearchKeyLength = GetMaxSearchKeyLength(connection);
+            dict.Ready = true;
         }
         else
         {
@@ -446,6 +450,9 @@ internal static class JmnedictDBManager
 
         transaction.Commit();
 
+        DBUtils.FlushWalLog(connection);
+
+        dict.Ready = false;
         DBUtils.ConfigureForRead(connection, dict.DBPath);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
@@ -455,6 +462,8 @@ internal static class JmnedictDBManager
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
         _ = vacuumCommand.ExecuteNonQuery();
+
+        dict.Ready = true;
     }
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string readOnlyConnectionString, ReadOnlySpan<string> terms, int maxSearchKeyLengthForDict)
