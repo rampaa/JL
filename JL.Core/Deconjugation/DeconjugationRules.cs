@@ -58,6 +58,8 @@ internal sealed class DeconjugationRules(RuleSuffixMatcher initialMatcher, Froze
 
     internal RuleSuffixMatcher? GetSuffixMatcher(in Form form)
     {
-        return form.Process is null ? InitialMatcher : MatchersByConTag.GetValueOrDefault(form.LastTag);
+        return form.Process is null
+            ? InitialMatcher
+            : MatchersByConTag.GetValueOrDefault(form.LastTag);
     }
 }
