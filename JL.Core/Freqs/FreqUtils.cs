@@ -294,10 +294,14 @@ public static class FreqUtils
                     freq.Size = freq.Contents.Count;
                     if (freq.Size is 0)
                     {
-                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dict has been deactivated.");
+                        if (freq.Active)
+                        {
+                            LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                            FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dict has been deactivated.");
 
-                        freq.Active = false;
+                            freq.Active = false;
+                        }
+
                         freqsToBeRemoved.Add(freq);
                     }
                 }
@@ -335,10 +339,14 @@ public static class FreqUtils
 
                     if (freq.Size is 0)
                     {
-                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
+                        if (freq.Active)
+                        {
+                            LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                            FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
 
-                        freq.Active = false;
+                            freq.Active = false;
+                        }
+
                         freqsToBeRemoved.Add(freq);
                     }
                 }
@@ -407,10 +415,14 @@ public static class FreqUtils
                     freq.Size = freq.Contents.Count;
                     if (freq.Size is 0)
                     {
-                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
+                        if (freq.Active)
+                        {
+                            LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                            FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
 
-                        freq.Active = false;
+                            freq.Active = false;
+                        }
+
                         freqsToBeRemoved.Add(freq);
                     }
                 }
@@ -448,10 +460,14 @@ public static class FreqUtils
 
                     if (freq.Size is 0)
                     {
-                        LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
-                        FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
+                        if (freq.Active)
+                        {
+                            LoggerManager.Logger.Warning("No valid records found for '{DictType}'-'{DictName}' from '{FullDictPath}'. The dict has been deactivated", freq.Type.GetDescription(), freq.Name, fullDictPath);
+                            FrontendManager.Frontend.Notify(NotificationLevel.Warning, $"No valid records found for {freq.Name}. The dictionary has been deactivated.");
 
-                        freq.Active = false;
+                            freq.Active = false;
+                        }
+
                         freqsToBeRemoved.Add(freq);
                     }
                 }
