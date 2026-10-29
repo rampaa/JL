@@ -21,7 +21,11 @@ Example:
 
 ---
 
-### 4) Windows Text to Speech
+### 4) Windows OneCore and SAPI-compatible voices via the `Text to Speech` type
 
-Example:  
-`Microsoft Haruka`
+All SAPI-compatible voices are supported, along with built-in Windows OneCore voices. Examples include:
+
+- Built-in Windows SAPI voices (e.g., Microsoft Haruka Desktop)
+- Built-in Windows OneCore voices (e.g., Microsoft Ayumi)
+- [VOICEVOX](https://voicevox.hiroshiba.jp/) (requires a SAPI adapter such as [SAPIForVOICEVOX](https://github.com/shigobu/SAPIForVOICEVOX))
+- Microsoft Natural Voices (requires a SAPI adapter such as [NaturalVoiceSAPIAdapter](https://github.com/gexgd0419/NaturalVoiceSAPIAdapter))
