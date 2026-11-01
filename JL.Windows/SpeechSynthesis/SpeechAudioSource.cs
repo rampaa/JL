@@ -42,8 +42,15 @@ internal sealed class SpeechAudioSource : ISpeechAudioOutput, IDisposable
     private int _remainingUsers = 2; // Both the synthesis worker and player must finish before the cancellation handle can be disposed.
 
     public bool IsSynthesisStopped { get; private set; } = true;
-    public void BeginSynthesis() => IsSynthesisStopped = false;
-    public void MarkSynthesisStopped() => IsSynthesisStopped = true;
+    public void BeginSynthesis()
+    {
+        IsSynthesisStopped = false;
+    }
+
+    public void MarkSynthesisStopped()
+    {
+        IsSynthesisStopped = true;
+    }
 
     public CancellationToken CancellationToken { get; }
     public MediaStreamSource PlaybackSource { get; }

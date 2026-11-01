@@ -1596,14 +1596,9 @@ public static class LookupUtils
                 DeconjugationInfo deconjugationInfo;
                 if (deconjugatedWord)
                 {
-                    if (customWordDictResult.HasUserDefinedWordClass)
-                    {
-                        deconjugationInfo = GetDeconjugationInfo(processesSpan, i);
-                    }
-                    else
-                    {
-                        deconjugationInfo = new DeconjugationInfo(null, GetMinDeconjugationProcessStepCount(processesSpan[i].AsReadOnlySpan()));
-                    }
+                    deconjugationInfo = customWordDictResult.HasUserDefinedWordClass
+                        ? GetDeconjugationInfo(processesSpan, i)
+                        : new DeconjugationInfo(null, GetMinDeconjugationProcessStepCount(processesSpan[i].AsReadOnlySpan()));
                 }
                 else
                 {

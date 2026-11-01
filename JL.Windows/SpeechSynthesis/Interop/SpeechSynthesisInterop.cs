@@ -40,7 +40,7 @@ internal static class SpeechSynthesisInterop
 
     public static unsafe bool TryGetPreferredAudioFormat(object engine, out Guid formatId, out nint waveFormat)
     {
-        formatId = default;
+        formatId = Guid.Empty;
         waveFormat = 0;
         nint nativeObjectAddress = Marshal.GetIUnknownForObject(engine);
         try
@@ -52,7 +52,7 @@ internal static class SpeechSynthesisInterop
             try
             {
                 const int outputFormatMethodIndex = 4;
-                Guid format = default;
+                Guid format = Guid.Empty;
                 nint waveFormatAddress = 0;
                 nint* methods = *(nint**)speechEngineAddress;
                 delegate* unmanaged[Stdcall]<nint, nint, nint, Guid*, nint*, int> getOutputFormat =
