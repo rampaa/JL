@@ -2329,6 +2329,8 @@ internal sealed partial class MainWindow : IDisposable
                 SetSizeToContent(configManager.MainWindowDynamicWidth, configManager.MainWindowDynamicHeight, configManager.MainWindowMaxDynamicWidth, configManager.MainWindowMaxDynamicHeight, configManager.MainWindowMinDynamicWidth, configManager.MainWindowMinDynamicHeight, configManager.MainWindowWidth, configManager.MainWindowHeight);
             }
 
+            UpdateTextVisibility(IsMouseOver || PreferencesWindow.IsItVisible());
+
             UpdatePosition();
             if (configManager.AlwaysOnTop)
             {
