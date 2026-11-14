@@ -132,20 +132,24 @@ internal static class ScreenshotUtils
 
     private static unsafe Rectangle DetectContentBounds(nint pixelBuffer, int width, int height, int stride)
     {
-        byte* pixels = (byte*)pixelBuffer;
+        ReadOnlySpan<byte> pixels = new((void*)pixelBuffer, height * stride);
+        return DetectContentBounds(pixels, width, height, stride);
+    }
 
+    private static Rectangle DetectContentBounds(ReadOnlySpan<byte> pixels, int width, int height, int stride)
+    {
         int rowBytes = width * BytesPerPixel;
 
         int maxHorizontalBar = height * MaximumBarPercent / 100;
 
         int top = 0;
-        while (top < maxHorizontalBar && IsBlackRow(pixels + (top * stride), rowBytes))
+        while (top < maxHorizontalBar && IsBlackRow(pixels.Slice(top * stride, rowBytes)))
         {
             ++top;
         }
 
         int bottom = 0;
-        while (bottom < maxHorizontalBar && IsBlackRow(pixels + ((height - 1 - bottom) * stride), rowBytes))
+        while (bottom < maxHorizontalBar && IsBlackRow(pixels.Slice((height - 1 - bottom) * stride, rowBytes)))
         {
             ++bottom;
         }
@@ -160,13 +164,19 @@ internal static class ScreenshotUtils
         int left = maxVerticalBar;
         int right = maxVerticalBar;
 
-        for (int y = top; y < height - bottom && (left > 0 || right > 0); ++y)
+        int contentBottom = height - bottom;
+        for (int y = top; y < contentBottom; y++)
         {
-            byte* row = pixels + (y * stride);
+            if (left is 0 && right is 0)
+            {
+                break;
+            }
+
+            ReadOnlySpan<byte> row = pixels.Slice(y * stride, rowBytes);
 
             if (left > 0)
             {
-                ReadOnlySpan<byte> head = new(row, left * BytesPerPixel);
+                ReadOnlySpan<byte> head = row[..(left * BytesPerPixel)];
                 int index = head.IndexOfAnyExceptInRange((byte)0, BlackThreshold);
                 if (index >= 0)
                 {
@@ -176,7 +186,7 @@ internal static class ScreenshotUtils
 
             if (right > 0)
             {
-                ReadOnlySpan<byte> tail = new(row + ((width - right) * BytesPerPixel), right * BytesPerPixel);
+                ReadOnlySpan<byte> tail = row[((width - right) * BytesPerPixel)..];
                 int index = tail.LastIndexOfAnyExceptInRange((byte)0, BlackThreshold);
                 if (index >= 0)
                 {
@@ -194,9 +204,9 @@ internal static class ScreenshotUtils
         return new Rectangle(left, top, width - left - right, height - top - bottom);
     }
 
-    private static unsafe bool IsBlackRow(byte* row, int rowBytes)
+    private static bool IsBlackRow(ReadOnlySpan<byte> row)
     {
-        return new ReadOnlySpan<byte>(row, rowBytes).IndexOfAnyExceptInRange((byte)0, BlackThreshold) < 0;
+        return row.IndexOfAnyExceptInRange((byte)0, BlackThreshold) < 0;
     }
 
     private static bool IsValidBarPair(int first, int second, int maximum)
