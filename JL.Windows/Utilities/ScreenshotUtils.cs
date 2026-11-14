@@ -10,6 +10,16 @@ namespace JL.Windows.Utilities;
 
 internal static class ScreenshotUtils
 {
+    private const int BytesPerPixel = 3;
+    private const int RowAlignment = 4;
+    private const long JpegQuality = 92;
+    private const int EstimatedCompressionRatio = 4;
+    private const byte BlackThreshold = 16;
+    private const int MinimumBarSize = 4;
+    private const int MaximumBarPercent = 50;
+    private const int MinimumBarPairTolerance = 4;
+    private const int BarPairToleranceDivisor = 8;
+
     private static readonly ImageCodecInfo? s_encoder = GetEncoder(ImageFormat.Jpeg);
     private static readonly EncoderParameters s_encoderParams = CreateEncoderParams();
 
@@ -30,7 +40,7 @@ internal static class ScreenshotUtils
     private static EncoderParameters CreateEncoderParams()
     {
         EncoderParameters encoderParameters = new(1);
-        encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 92L);
+        encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, JpegQuality);
         return encoderParameters;
     }
 
@@ -41,16 +51,17 @@ internal static class ScreenshotUtils
             return null;
         }
 
-        Rectangle screenshotBounds = MagpieUtils.UseMagpiePositioning()
+        bool useMagpiePositioning = MagpieUtils.UseMagpiePositioning();
+        Rectangle screenshotBounds = useMagpiePositioning
             ? MagpieUtils.MagpieWindowRect.ToRectangle()
             : WindowsUtils.ActiveScreen.Bounds;
 
         int width = screenshotBounds.Width;
         int height = screenshotBounds.Height;
-        int bytesPerRow = width * 3;
+        int bytesPerRow = width * BytesPerPixel;
 
-        // Add up to three padding bytes, then clear the lowest two bits to align each row to four bytes.
-        int stride = (bytesPerRow + 3) & ~3;
+        // DIB scanlines must be aligned to four bytes.
+        int stride = (bytesPerRow + RowAlignment - 1) & ~(RowAlignment - 1);
 
         BitmapInfoHeader bitmapInfo = new(width, height);
         nint memoryDeviceContext = WinApi.NativeMethods.CreateCompatibleDC(0);
@@ -65,13 +76,13 @@ internal static class ScreenshotUtils
         try
         {
             bitmapHandle = WinApi.NativeMethods.CreateDIBSection(memoryDeviceContext, in bitmapInfo, WinApi.NativeMethods.DIB_RGB_COLORS, out nint pixels, 0, 0);
-            if (bitmapHandle is 0)
+            if (bitmapHandle is 0 || pixels is 0)
             {
                 return null;
             }
 
             previousBitmap = WinApi.NativeMethods.SelectObject(memoryDeviceContext, bitmapHandle);
-            if (previousBitmap is 0)
+            if (previousBitmap is 0 or -1)
             {
                 return null;
             }
@@ -88,8 +99,13 @@ internal static class ScreenshotUtils
                 return null;
             }
 
-            using Bitmap bitmap = new(width, height, stride, PixelFormat.Format24bppRgb, pixels);
-            using MemoryStream ms = new(width * height * 3 / 4);
+            Rectangle contentBounds = useMagpiePositioning
+                ? new Rectangle(0, 0, width, height)
+                : DetectContentBounds(pixels, width, height, stride);
+
+            nint croppedPixels = pixels + (contentBounds.Y * stride) + (contentBounds.X * BytesPerPixel);
+            using Bitmap bitmap = new(contentBounds.Width, contentBounds.Height, stride, PixelFormat.Format24bppRgb, croppedPixels);
+            using MemoryStream ms = new(contentBounds.Width * contentBounds.Height * BytesPerPixel / EstimatedCompressionRatio);
             bitmap.Save(ms, s_encoder, s_encoderParams);
             return ms.ToArray();
         }
@@ -100,7 +116,7 @@ internal static class ScreenshotUtils
                 _ = WinApi.NativeMethods.ReleaseDC(0, screenDeviceContext);
             }
 
-            if (previousBitmap is not 0)
+            if (previousBitmap is not 0 and not -1)
             {
                 _ = WinApi.NativeMethods.SelectObject(memoryDeviceContext, previousBitmap);
             }
@@ -112,5 +128,88 @@ internal static class ScreenshotUtils
 
             _ = WinApi.NativeMethods.DeleteDC(memoryDeviceContext);
         }
+    }
+
+    private static unsafe Rectangle DetectContentBounds(nint pixelBuffer, int width, int height, int stride)
+    {
+        byte* pixels = (byte*)pixelBuffer;
+
+        int rowBytes = width * BytesPerPixel;
+
+        int maxHorizontalBar = height * MaximumBarPercent / 100;
+
+        int top = 0;
+        while (top < maxHorizontalBar && IsBlackRow(pixels + (top * stride), rowBytes))
+        {
+            ++top;
+        }
+
+        int bottom = 0;
+        while (bottom < maxHorizontalBar && IsBlackRow(pixels + ((height - 1 - bottom) * stride), rowBytes))
+        {
+            ++bottom;
+        }
+
+        if (!IsValidBarPair(top, bottom, maxHorizontalBar))
+        {
+            top = 0;
+            bottom = 0;
+        }
+
+        int maxVerticalBar = width * MaximumBarPercent / 100;
+        int left = maxVerticalBar;
+        int right = maxVerticalBar;
+
+        for (int y = top; y < height - bottom && (left > 0 || right > 0); ++y)
+        {
+            byte* row = pixels + (y * stride);
+
+            if (left > 0)
+            {
+                ReadOnlySpan<byte> head = new(row, left * BytesPerPixel);
+                int index = head.IndexOfAnyExceptInRange((byte)0, BlackThreshold);
+                if (index >= 0)
+                {
+                    left = index / BytesPerPixel;
+                }
+            }
+
+            if (right > 0)
+            {
+                ReadOnlySpan<byte> tail = new(row + ((width - right) * BytesPerPixel), right * BytesPerPixel);
+                int index = tail.LastIndexOfAnyExceptInRange((byte)0, BlackThreshold);
+                if (index >= 0)
+                {
+                    right = right - 1 - (index / BytesPerPixel);
+                }
+            }
+        }
+
+        if (!IsValidBarPair(left, right, maxVerticalBar))
+        {
+            left = 0;
+            right = 0;
+        }
+
+        return new Rectangle(left, top, width - left - right, height - top - bottom);
+    }
+
+    private static unsafe bool IsBlackRow(byte* row, int rowBytes)
+    {
+        return new ReadOnlySpan<byte>(row, rowBytes).IndexOfAnyExceptInRange((byte)0, BlackThreshold) < 0;
+    }
+
+    private static bool IsValidBarPair(int first, int second, int maximum)
+    {
+        if (first < MinimumBarSize
+            || second < MinimumBarSize
+            || first >= maximum
+            || second >= maximum)
+        {
+            return false;
+        }
+
+        int tolerance = Math.Max(MinimumBarPairTolerance, Math.Min(first, second) / BarPairToleranceDivisor);
+        return Math.Abs(first - second) <= tolerance;
     }
 }
